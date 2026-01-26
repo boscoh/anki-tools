@@ -24,6 +24,23 @@ This project uses [UV](https://docs.astral.sh/uv/) for Python package management
 uv sync
 ```
 
+## Testing
+
+Run the comprehensive test suite:
+
+```bash
+uv run pytest test_audio_extraction.py -v
+```
+
+**Test Coverage:** 27 tests covering:
+- Media mapping parsing
+- Audio file extraction
+- Card-to-audio linking
+- Chinese character filename handling
+- Integration workflows
+
+See `TEST_COVERAGE.md` for detailed test documentation.
+
 ## Usage
 
 Place your .apkg file in the parent directory, then run:
