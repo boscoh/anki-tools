@@ -1,8 +1,8 @@
 # Specification: Reading Anki .apkg Files and Processing Audio
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** 2026-01-26
-**Status:** Draft
+**Status:** Phase 1 Complete
 
 ## Overview
 
@@ -489,11 +489,20 @@ def test_audio_for_card():
 
 ## Success Criteria
 
-### Phase 1 (Basic Extraction)
+### Phase 1 (Basic Extraction) - ✅ COMPLETED 2026-01-26
 - ✅ Extract all audio files from .apkg
 - ✅ Preserve original filenames (Chinese characters)
 - ✅ Link cards to their audio files
 - ✅ No additional dependencies beyond stdlib
+
+**Implementation:**
+- Added `get_media_mapping()` - Parses media JSON file
+- Added `extract_audio_files(output_dir, audio_only=True)` - Extracts audio with proper filenames
+- Added `get_audio_for_card(card, models)` - Links cards to audio via [sound:...] tags
+- Added `get_audio_statistics()` - Reports counts and formats
+- Created `demo_audio_extraction.py` - Full demonstration script
+- Tested with 538 MP3 files, all Chinese character filenames preserved
+- Location: `anki-reader/read_anki.py`
 
 ### Phase 2 (Analysis)
 - ✅ Report audio statistics (count, formats, durations)
