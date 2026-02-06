@@ -201,10 +201,116 @@ class AnkiPackage:
         decks = json.loads(decks_json)
         return decks
 
-    def get_models(self) -> dict[str, dict]:
+    def _write_varint(self, value: int) -> bytes:
+        """Write a varint to bytes."""
+        result = b""
+        while value > 127:
+            result += bytes([(value & 0x7f) | 0x80])
+            value >>= 7
+        result += bytes([value])
+        return result
+
+    def _write_proto_string(self, field_num: int, value: str) -> bytes:
+        """Write a protobuf length-delimited string field."""
+        data = value.encode("utf-8")
+        tag = (field_num << 3) | 2
+        return bytes([tag]) + self._write_varint(len(data)) + data
+
+    def _parse_template_config(self, config: bytes) -> dict[str, str]:
+        """Parse protobuf config blob from templates table."""
+        result = {"qfmt": "", "afmt": ""}
+        pos = 0
+        while pos < len(config):
+            if pos >= len(config):
+                break
+            tag = config[pos]
+            pos += 1
+            field_num = tag >> 3
+            wire_type = tag & 0x07
+            
+            if wire_type == 2:
+                length, pos = self._read_varint(config, pos)
+                value = config[pos:pos + length].decode("utf-8", errors="replace")
+                pos += length
+                if field_num == 1:
+                    result["qfmt"] = value
+                elif field_num == 2:
+                    result["afmt"] = value
+            elif wire_type == 0:
+                _, pos = self._read_varint(config, pos)
+            else:
+                break
+        
+        return result
+
+    def _build_template_config(self, qfmt: str, afmt: str) -> bytes:
+        """Build protobuf config blob for templates table."""
+        return self._write_proto_string(1, qfmt) + self._write_proto_string(2, afmt)
+
+    def _parse_notetype_config(self, config: bytes) -> dict:
+        """Parse protobuf config blob from notetypes table to extract CSS."""
+        result = {"css": "", "other_fields": []}
+        pos = 0
+        while pos < len(config):
+            start_pos = pos
+            tag = config[pos]
+            pos += 1
+            field_num = tag >> 3
+            wire_type = tag & 0x07
+            
+            if wire_type == 2:
+                length, pos = self._read_varint(config, pos)
+                if field_num == 3:
+                    result["css"] = config[pos:pos + length].decode("utf-8", errors="replace")
+                else:
+                    result["other_fields"].append((start_pos, pos + length, field_num))
+                pos += length
+            elif wire_type == 0:
+                _, end_pos = self._read_varint(config, pos)
+                result["other_fields"].append((start_pos, end_pos, field_num))
+                pos = end_pos
+            else:
+                break
+        
+        result["_original"] = config
+        return result
+
+    def _build_notetype_config(self, parsed: dict, new_css: str | None = None) -> bytes:
+        """Rebuild notetype config with optionally updated CSS."""
+        original = parsed["_original"]
+        css = new_css if new_css is not None else parsed["css"]
+        
+        result = b""
+        pos = 0
+        
+        while pos < len(original):
+            tag = original[pos]
+            field_num = tag >> 3
+            wire_type = tag & 0x07
+            start = pos
+            pos += 1
+            
+            if wire_type == 2:
+                length, pos = self._read_varint(original, pos)
+                if field_num == 3:
+                    result += self._write_proto_string(3, css)
+                else:
+                    result += original[start:pos + length]
+                pos += length
+            elif wire_type == 0:
+                _, pos = self._read_varint(original, pos)
+                result += original[start:pos]
+            else:
+                result += original[start:]
+                break
+        
+        return result
+
+    def get_models(self, include_templates: bool = False) -> dict[str, dict]:
         """
         Get all note models/templates (called "notetypes" in Anki UI).
 
+        :param include_templates: If True, include template and CSS info for anki21b.
         :returns: Dict mapping model ID (string) to model info with ``'name'``
             and ``'flds'`` keys. The ``'flds'`` key contains a list of field
             dicts with ``'name'`` key.
@@ -224,6 +330,8 @@ class AnkiPackage:
                 models[model_id] = {
                     "name": row["name"],
                     "flds": [],
+                    "tmpls": [],
+                    "css": "",
                 }
             
             cursor.execute("SELECT ntid, name, ord FROM fields ORDER BY ntid, ord")
@@ -232,12 +340,128 @@ class AnkiPackage:
                 if model_id in models:
                     models[model_id]["flds"].append({"name": row["name"]})
             
+            if include_templates:
+                cursor.execute(
+                    "SELECT ntid, name, ord, config FROM templates ORDER BY ntid, ord"
+                )
+                for row in cursor.fetchall():
+                    model_id = str(row["ntid"])
+                    if model_id in models:
+                        config = self._parse_template_config(row["config"] or b"")
+                        tmpl = {
+                            "name": row["name"],
+                            "ord": row["ord"],
+                            "qfmt": config["qfmt"],
+                            "afmt": config["afmt"],
+                        }
+                        models[model_id]["tmpls"].append(tmpl)
+            
             return models
         
         cursor.execute("SELECT models FROM col")
         models_json = cursor.fetchone()[0]
         models = json.loads(models_json)
         return models
+
+    def update_model_template(
+        self,
+        model_id: str | None = None,
+        css: str | None = None,
+        qfmt: str | None = None,
+        afmt: str | None = None,
+        template_index: int = 0,
+    ) -> None:
+        """
+        Update CSS and/or card templates for a note type (model).
+
+        :param model_id: Model ID to update. If None, updates the first model found.
+        :param css: New CSS styling for the model.
+        :param qfmt: New question (front) template.
+        :param afmt: New answer (back) template.
+        :param template_index: Which template to update (0 for first card type).
+        :raises ValueError: If model not found.
+        """
+        cursor = self.conn.cursor()
+
+        if self._db_format == "anki21b":
+            if model_id is None:
+                cursor.execute("SELECT id FROM notetypes LIMIT 1")
+                row = cursor.fetchone()
+                if not row:
+                    raise ValueError("No models found in package")
+                model_id = str(row["id"])
+
+            if css is not None:
+                cursor.execute(
+                    "SELECT config FROM notetypes WHERE id = ?", (int(model_id),)
+                )
+                row = cursor.fetchone()
+                if not row:
+                    raise ValueError(f"Model {model_id} not found")
+                
+                parsed = self._parse_notetype_config(row["config"] or b"")
+                new_config = self._build_notetype_config(parsed, css)
+                cursor.execute(
+                    "UPDATE notetypes SET config = ? WHERE id = ?",
+                    (new_config, int(model_id)),
+                )
+
+            if qfmt is not None or afmt is not None:
+                cursor.execute(
+                    "SELECT config FROM templates WHERE ntid = ? AND ord = ?",
+                    (int(model_id), template_index),
+                )
+                row = cursor.fetchone()
+                if not row:
+                    raise ValueError(
+                        f"Template {template_index} not found for model {model_id}"
+                    )
+
+                current = self._parse_template_config(row["config"] or b"")
+                new_qfmt = qfmt if qfmt is not None else current["qfmt"]
+                new_afmt = afmt if afmt is not None else current["afmt"]
+                new_config = self._build_template_config(new_qfmt, new_afmt)
+
+                cursor.execute(
+                    "UPDATE templates SET config = ? WHERE ntid = ? AND ord = ?",
+                    (new_config, int(model_id), template_index),
+                )
+        else:
+            cursor.execute("SELECT models FROM col")
+            models_json = cursor.fetchone()[0]
+            models = json.loads(models_json)
+
+            if model_id is None:
+                model_id = next(iter(models.keys()), None)
+                if model_id is None:
+                    raise ValueError("No models found in package")
+
+            if model_id not in models:
+                raise ValueError(f"Model {model_id} not found")
+
+            model = models[model_id]
+
+            if css is not None:
+                model["css"] = css
+
+            if qfmt is not None or afmt is not None:
+                if template_index >= len(model.get("tmpls", [])):
+                    raise ValueError(
+                        f"Template {template_index} not found for model {model_id}"
+                    )
+                tmpl = model["tmpls"][template_index]
+                if qfmt is not None:
+                    tmpl["qfmt"] = qfmt
+                if afmt is not None:
+                    tmpl["afmt"] = afmt
+
+            cursor.execute(
+                "UPDATE col SET models = ? WHERE id = 1",
+                (json.dumps(models),),
+            )
+
+        self.conn.commit()
+        self._modified = True
 
     def get_notes(self) -> list[sqlite3.Row]:
         """

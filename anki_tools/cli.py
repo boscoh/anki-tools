@@ -383,6 +383,33 @@ def _get_csv_fields(entries):
     return [key for key in entries[0].keys() if key != "audio_filename"]
 
 
+char_click_script = r"""
+<script>
+  function expandSentenceUrl(elemId, url) {
+    var elem = document.getElementById(elemId);
+    if (!elem) return;
+
+    var content = elem.innerHTML;
+    content = content.replace("'", " ");
+    content = content.replace("。", " ");
+
+    content = content.replace(/\s{2,}/g, " ");
+    content = content.replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()]/g, "");
+    content = content.toLowerCase();
+
+    var innerHtml = "";
+    var chars = content.split("");
+    for (let ch of chars) {
+      innerHtml += `<a href="${url}${ch}">${ch}</a> `;
+    }
+
+    elem.innerHTML = innerHtml;
+  }
+
+  expandSentenceUrl('wiki-sentence', 'https://en.wiktionary.org/wiki/')
+</script>
+"""
+
 def _build_apkg(config):
     """Build APKG file with vocabulary and audio based on config."""
     entries = _parse_vocab_entries(config)
@@ -399,9 +426,18 @@ def _build_apkg(config):
     csv_fields = _get_csv_fields(entries)
     fields = ["audio"] + csv_fields
 
+    # Fields that contain CJK characters get larger font and clickable id
+    cjk_fields = {"characters", "hanzi", "cantonese", "mandarin", "chinese"}
+    
     answer_parts = ["{{audio}}", "<hr id=answer>"]
     for field in csv_fields[1:] + [csv_fields[0]]:
-        answer_parts.append(f"<div style='font-size: 2rem'>{{{{{field}}}}}</div>")
+        if field.lower() in cjk_fields:
+            answer_parts.append(
+                f"<div id='wiki-sentence' style='font-size: 3rem'>{{{{{field}}}}}</div>"
+            )
+        else:
+            answer_parts.append(f"<div style='font-size: 2rem'>{{{{{field}}}}}</div>")
+    answer_parts.append(char_click_script)
     answer_format = "\n".join(answer_parts)
 
     cards = []
@@ -720,6 +756,159 @@ def _export_summary_csv(
     return pinyin_corrections
 
 
+def _extract_template_fields(template: str) -> set[str]:
+    """Extract field names from Anki template ({{FieldName}} syntax)."""
+    matches = re.findall(r"\{\{([^#/}]+)\}\}", template)
+    builtins = {"FrontSide", "Tags", "Type", "Deck", "Subdeck", "Card"}
+    return {m.strip() for m in matches if m.strip() not in builtins}
+
+
+def _find_best_match(field: str, deck_fields: set[str]) -> str | None:
+    """Find the best matching deck field for a template field."""
+    field_lower = field.lower()
+    
+    for deck_field in deck_fields:
+        if deck_field.lower() == field_lower:
+            return deck_field
+    
+    field_words = set(re.split(r"[^a-zA-Z]+", field_lower))
+    best_match = None
+    best_score = 0
+    
+    for deck_field in deck_fields:
+        deck_words = set(re.split(r"[^a-zA-Z]+", deck_field.lower()))
+        common = field_words & deck_words
+        if common and len(common) > best_score:
+            best_score = len(common)
+            best_match = deck_field
+    
+    return best_match
+
+
+def _apply_field_mapping(template: str, mapping: dict[str, str]) -> str:
+    """Replace field references in template using mapping."""
+    result = template
+    for old_name, new_name in mapping.items():
+        result = result.replace(f"{{{{{old_name}}}}}", f"{{{{{new_name}}}}}")
+    return result
+
+
+@process_app.command
+def style(
+    apkg_path: Path,
+    *,
+    output: Path | None = None,
+    css: Path | None = None,
+    front: Path | None = None,
+    back: Path | None = None,
+):
+    """
+    Apply CSS and card templates to a deck.
+
+    Looks for card.css, front.html, back.html in current directory by default.
+    Auto-maps mismatched field names to closest deck fields.
+
+    Args:
+        apkg_path: Input .apkg file
+        output: Output .apkg file (default: input_styled.apkg)
+        css: CSS file (default: card.css)
+        front: Front template file (default: front.html)
+        back: Back template file (default: back.html)
+    """
+    if output is None:
+        output = apkg_path.parent / f"{apkg_path.stem}_styled.apkg"
+
+    css_path = css or Path("card.css")
+    front_path = front or Path("front.html")
+    back_path = back or Path("back.html")
+
+    with AnkiPackage(str(apkg_path)) as pkg:
+        models = pkg.get_models(include_templates=True)
+        all_fields = set()
+        print("Deck fields:")
+        for mid, model in models.items():
+            fields = [f["name"] for f in model["flds"]]
+            all_fields.update(fields)
+            print(f"  {', '.join(fields)}")
+
+    css_content = None
+    if css_path.exists():
+        css_content = css_path.read_text(encoding="utf-8")
+        print(f"\nLoaded: {css_path}")
+    else:
+        print(f"\nNo {css_path} found, skipping CSS")
+
+    qfmt = None
+    if front_path.exists():
+        qfmt = front_path.read_text(encoding="utf-8")
+        print(f"Loaded: {front_path}")
+
+        template_fields = _extract_template_fields(qfmt)
+        missing = template_fields - all_fields
+        
+        if missing:
+            mapping = {}
+            unmapped = []
+            for field in missing:
+                match = _find_best_match(field, all_fields)
+                if match:
+                    mapping[field] = match
+                else:
+                    unmapped.append(field)
+            
+            if mapping:
+                print(f"  Auto-mapping: {mapping}")
+                qfmt = _apply_field_mapping(qfmt, mapping)
+            if unmapped:
+                print(f"  WARNING: No match for: {unmapped}")
+    else:
+        print(f"No {front_path} found, skipping front template")
+
+    afmt = None
+    if back_path.exists():
+        afmt = back_path.read_text(encoding="utf-8")
+        print(f"Loaded: {back_path}")
+
+        template_fields = _extract_template_fields(afmt)
+        missing = template_fields - all_fields
+        
+        if missing:
+            mapping = {}
+            unmapped = []
+            
+            for field in missing:
+                match = _find_best_match(field, all_fields)
+                if match:
+                    mapping[field] = match
+                else:
+                    unmapped.append(field)
+            
+            if mapping:
+                print(f"  Auto-mapping: {mapping}")
+                afmt = _apply_field_mapping(afmt, mapping)
+            
+            if unmapped:
+                print(f"  WARNING: No match for: {unmapped}")
+    else:
+        print(f"No {back_path} found, skipping back template")
+
+    if not css_content and not qfmt and not afmt:
+        print("\nNothing to apply. Create card.css, front.html, or back.html first.")
+        return
+
+    import shutil
+    shutil.copy(apkg_path, output)
+
+    with AnkiPackage(str(output)) as pkg:
+        models = pkg.get_models()
+        for model_id in models:
+            pkg.update_model_template(model_id=model_id, css=css_content, qfmt=qfmt, afmt=afmt)
+        print(f"Updated {len(models)} model(s)")
+        pkg.save(output)
+
+    print(f"\nSaved: {output}")
+
+
 @process_app.command(name="all")
 def process_all(
     apkg_path: Path,
@@ -729,13 +918,15 @@ def process_all(
     model_id: int | None = None,
     keep_filtered: bool = False,
     no_pinyin_fix: bool = False,
+    no_style: bool = False,
     vocab_dir: str = "vocab",
     verbose: bool = False,
 ):
     """
-    Run complete pipeline: rank + reorder + fix pinyin.
+    Run complete pipeline: rank + reorder + fix pinyin + style.
 
     This is the main command for processing a Chinese Anki deck.
+    Applies card.css, front.html, back.html if found in current directory.
 
     Args:
         apkg_path: Input .apkg file
@@ -744,6 +935,7 @@ def process_all(
         model_id: Filter by specific model ID
         keep_filtered: Keep filtered cards (names, invalid)
         no_pinyin_fix: Skip pinyin correction
+        no_style: Skip card styling (CSS/templates)
         vocab_dir: Directory with frequency data
         verbose: Show detailed output
     """
@@ -794,7 +986,55 @@ def process_all(
             verbose=verbose,
         )
 
-    print("\nStep 4: Exporting summary...")
+    styles_applied = 0
+    if not no_style:
+        css_path = Path("card.css")
+        front_path = Path("front.html")
+        back_path = Path("back.html")
+        
+        css_content = css_path.read_text(encoding="utf-8") if css_path.exists() else None
+        qfmt = front_path.read_text(encoding="utf-8") if front_path.exists() else None
+        afmt = back_path.read_text(encoding="utf-8") if back_path.exists() else None
+        
+        if css_content or qfmt or afmt:
+            print("\nStep 4: Applying card styles...")
+            with AnkiPackage(str(output)) as pkg:
+                models = pkg.get_models()
+                all_fields = set()
+                for model in models.values():
+                    all_fields.update(f["name"] for f in model.get("flds", []))
+                
+                if qfmt:
+                    missing = _extract_template_fields(qfmt) - all_fields
+                    if missing:
+                        mapping = {f: _find_best_match(f, all_fields) for f in missing}
+                        mapping = {k: v for k, v in mapping.items() if v}
+                        if mapping:
+                            qfmt = _apply_field_mapping(qfmt, mapping)
+                
+                if afmt:
+                    missing = _extract_template_fields(afmt) - all_fields
+                    if missing:
+                        mapping = {f: _find_best_match(f, all_fields) for f in missing}
+                        mapping = {k: v for k, v in mapping.items() if v}
+                        if mapping:
+                            afmt = _apply_field_mapping(afmt, mapping)
+                
+                for model_id_key in models:
+                    pkg.update_model_template(model_id=model_id_key, css=css_content, qfmt=qfmt, afmt=afmt)
+                styles_applied = len(models)
+                pkg.save(output)
+            
+            applied = []
+            if css_content:
+                applied.append("CSS")
+            if qfmt:
+                applied.append("front")
+            if afmt:
+                applied.append("back")
+            print(f"  Applied: {', '.join(applied)} to {styles_applied} model(s)")
+
+    print("\nStep 5: Exporting summary...")
     pinyin_corrections = _export_summary_csv(
         ranked,
         remove_ranks if not keep_filtered else set(),
@@ -810,6 +1050,7 @@ def process_all(
     print(f"  Cards reordered:     {stats['cards_reordered']}")
     print(f"  Cards removed:       {stats['cards_removed']}")
     print(f"  Pinyin corrections:  {pinyin_corrections}")
+    print(f"  Styles applied:      {styles_applied} model(s)")
     print(f"  Output:  {output}")
     print(f"  Summary: {summary_csv}")
 
