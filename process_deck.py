@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 """
-Process a Chinese Anki deck: rank sentences, reorder cards, fix pinyin.
+Process Chinese Anki decks: rank sentences, reorder cards, fix pinyin.
 
-Combines rank_sentences.py, reorder_deck.py, and fix_pinyin.py into one pipeline.
+Commands:
+    rank    - Rank sentences by frequency and complexity
+    reorder - Reorder deck based on ranking CSV
+    fix     - Fix pinyin formatting
+    all     - Run complete pipeline (rank + reorder + fix)
 """
 
-import argparse
 import tempfile
 from pathlib import Path
+
+import cyclopts
 
 from rank_sentences import (
     extract_sentences,
@@ -18,131 +23,219 @@ from rank_sentences import (
 from reorder_deck import reorder_deck
 from fix_pinyin import fix_pinyin
 
+app = cyclopts.App(help="Process Chinese Anki decks")
 
-def process_deck(
-    input_apkg: str,
-    output_apkg: str | None = None,
+
+# =============================================================================
+# Rank command - analyze and rank sentences
+# =============================================================================
+
+
+@app.command
+def rank(
+    apkg_path: Path,
+    *,
+    output: Path | None = None,
     model_id: int | None = None,
-    remove_filtered: bool = True,
-    fix_pinyin_enabled: bool = True,
-    ranking_csv: str | None = None,
     vocab_dir: str = "vocab",
-    verbose: bool = False,
-) -> dict:
+):
     """
-    Process a Chinese Anki deck with ranking, reordering, and pinyin fixes.
-    
+    Rank sentences by frequency and complexity.
+
+    Outputs a CSV with sentences ranked for optimal learning order.
+
     Args:
-        input_apkg: Path to input .apkg file
-        output_apkg: Path to output .apkg file (default: input_processed.apkg)
-        model_id: Filter by specific model ID (None = all models)
-        remove_filtered: Remove foreign names and invalid characters
-        fix_pinyin_enabled: Apply pinyin corrections
-        ranking_csv: Path to save ranking CSV (None = temp file)
+        apkg_path: Input .apkg file
+        output: Output CSV file (default: ranked_sentences.csv)
+        model_id: Filter by specific model ID
         vocab_dir: Directory containing frequency data
-        verbose: Print detailed progress
-    
-    Returns:
-        Dict with processing statistics
     """
-    input_path = Path(input_apkg)
-    
-    if output_apkg is None:
-        output_apkg = str(input_path.parent / f"{input_path.stem}_processed.apkg")
-    
-    stats = {
-        'input': str(input_apkg),
-        'output': output_apkg,
-        'sentences_extracted': 0,
-        'cards_reordered': 0,
-        'cards_removed': 0,
-        'pinyin_corrected': 0,
-    }
-    
-    # Step 1: Extract and rank sentences
-    print("Step 1: Ranking sentences...")
-    sentences = extract_sentences(input_apkg, model_id)
-    stats['sentences_extracted'] = len(sentences)
-    
+    if output is None:
+        output = Path("ranked_sentences.csv")
+
+    print(f"Ranking sentences from: {apkg_path}")
+
+    sentences = extract_sentences(str(apkg_path), model_id)
     if not sentences:
         print("No sentences found!")
-        return stats
-    
+        return
+
     freq_data = load_frequency_data(vocab_dir)
     ranked = rank_sentences(sentences, freq_data)
-    
-    # Save ranking CSV
+    export_csv(ranked, str(output))
+
+    print(f"\nRanked {len(ranked)} sentences -> {output}")
+
+
+# =============================================================================
+# Reorder command - reorder deck based on ranking
+# =============================================================================
+
+
+@app.command
+def reorder(
+    apkg_path: Path,
+    ranking_csv: Path,
+    *,
+    output: Path | None = None,
+    keep_filtered: bool = False,
+):
+    """
+    Reorder deck based on ranking CSV.
+
+    Updates card order and optionally removes filtered cards (names, invalid).
+
+    Args:
+        apkg_path: Input .apkg file
+        ranking_csv: Ranking CSV from 'rank' command
+        output: Output .apkg file (default: input_reordered.apkg)
+        keep_filtered: Keep filtered cards instead of removing
+    """
+    if output is None:
+        output = apkg_path.parent / f"{apkg_path.stem}_reordered.apkg"
+
+    print(f"Reordering deck: {apkg_path}")
+    print(f"Using ranking: {ranking_csv}")
+
+    stats = reorder_deck(
+        str(apkg_path),
+        str(output),
+        str(ranking_csv),
+        remove_filtered=not keep_filtered,
+    )
+
+    print(f"\nReordered {stats['cards_reordered']} cards")
+    print(f"Removed {stats['cards_removed']} filtered cards")
+    print(f"Output: {output}")
+
+
+# =============================================================================
+# Fix command - fix pinyin formatting
+# =============================================================================
+
+
+@app.command
+def fix(
+    apkg_path: Path,
+    *,
+    output: Path | None = None,
+    verbose: bool = False,
+):
+    """
+    Fix pinyin formatting in deck.
+
+    Corrects: lowercase, syllable separation, tone marks, common errors.
+
+    Args:
+        apkg_path: Input .apkg file
+        output: Output .apkg file (default: input_fixed.apkg)
+        verbose: Show all corrections
+    """
+    if output is None:
+        output = apkg_path.parent / f"{apkg_path.stem}_fixed.apkg"
+
+    print(f"Fixing pinyin in: {apkg_path}")
+
+    fix_pinyin(
+        apkg_path,
+        output=output,
+        csv_output=None,
+        verbose=verbose,
+    )
+
+    print(f"\nOutput: {output}")
+
+
+# =============================================================================
+# All command - complete pipeline
+# =============================================================================
+
+
+@app.command(name="all")
+def process_all(
+    apkg_path: Path,
+    *,
+    output: Path | None = None,
+    model_id: int | None = None,
+    keep_filtered: bool = False,
+    no_pinyin_fix: bool = False,
+    ranking_csv: Path | None = None,
+    vocab_dir: str = "vocab",
+    verbose: bool = False,
+):
+    """
+    Run complete pipeline: rank + reorder + fix pinyin.
+
+    This is the main command for processing a Chinese Anki deck.
+
+    Args:
+        apkg_path: Input .apkg file
+        output: Output .apkg file (default: input_processed.apkg)
+        model_id: Filter by specific model ID
+        keep_filtered: Keep filtered cards (names, invalid)
+        no_pinyin_fix: Skip pinyin correction
+        ranking_csv: Save ranking CSV to this path
+        vocab_dir: Directory with frequency data
+        verbose: Show detailed output
+    """
+    if output is None:
+        output = apkg_path.parent / f"{apkg_path.stem}_processed.apkg"
+
+    print("=" * 50)
+    print("Processing Chinese Anki Deck")
+    print("=" * 50)
+    print(f"Input:  {apkg_path}")
+    print(f"Output: {output}")
+    print()
+
+    # Step 1: Rank sentences
+    print("Step 1: Ranking sentences...")
+    sentences = extract_sentences(str(apkg_path), model_id)
+
+    if not sentences:
+        print("No sentences found!")
+        return
+
+    freq_data = load_frequency_data(vocab_dir)
+    ranked = rank_sentences(sentences, freq_data)
+
+    # Save ranking CSV (temp file if not specified)
     if ranking_csv is None:
-        ranking_csv = tempfile.NamedTemporaryFile(
-            mode='w', suffix='.csv', delete=False
+        csv_file = tempfile.NamedTemporaryFile(
+            mode="w", suffix=".csv", delete=False
         ).name
-    export_csv(ranked, ranking_csv)
-    
+    else:
+        csv_file = str(ranking_csv)
+    export_csv(ranked, csv_file)
+
     # Step 2: Reorder deck
     print("\nStep 2: Reordering deck...")
-    reorder_stats = reorder_deck(
-        input_apkg,
-        output_apkg,
-        ranking_csv,
-        remove_filtered=remove_filtered
+    stats = reorder_deck(
+        str(apkg_path),
+        str(output),
+        csv_file,
+        remove_filtered=not keep_filtered,
     )
-    stats['cards_reordered'] = reorder_stats['cards_reordered']
-    stats['cards_removed'] = reorder_stats['cards_removed']
-    
+
     # Step 3: Fix pinyin
-    if fix_pinyin_enabled:
+    if not no_pinyin_fix:
         print("\nStep 3: Fixing pinyin...")
-        # Fix pinyin in place (overwrite the reordered deck)
-        # Use /dev/null for csv_output to suppress file creation
-        csv_out = Path("/dev/null") if not verbose else None
         fix_pinyin(
-            Path(output_apkg),
-            output=Path(output_apkg),
-            csv_output=csv_out,
-            verbose=verbose
+            output,
+            output=output,
+            csv_output=Path("/dev/null"),
+            verbose=verbose,
         )
-    
-    print(f"\n{'='*50}")
+
+    print()
+    print("=" * 50)
     print("DONE!")
-    print(f"  Input:  {input_apkg}")
-    print(f"  Output: {output_apkg}")
-    print(f"  Sentences ranked:  {stats['sentences_extracted']}")
+    print("=" * 50)
+    print(f"  Sentences ranked:  {len(ranked)}")
     print(f"  Cards reordered:   {stats['cards_reordered']}")
     print(f"  Cards removed:     {stats['cards_removed']}")
-    
-    return stats
+    print(f"  Output: {output}")
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description='Process Chinese Anki deck: rank, reorder, fix pinyin'
-    )
-    parser.add_argument('input_apkg', help='Input .apkg file')
-    parser.add_argument('-o', '--output', help='Output .apkg file')
-    parser.add_argument('--model-id', type=int, help='Filter by model ID')
-    parser.add_argument('--keep-filtered', action='store_true',
-                       help='Keep filtered cards (names, invalid)')
-    parser.add_argument('--no-pinyin-fix', action='store_true',
-                       help='Skip pinyin correction')
-    parser.add_argument('--ranking-csv', help='Save ranking CSV to this path')
-    parser.add_argument('--vocab-dir', default='vocab',
-                       help='Directory with frequency data')
-    parser.add_argument('-v', '--verbose', action='store_true',
-                       help='Verbose output')
-    
-    args = parser.parse_args()
-    
-    process_deck(
-        args.input_apkg,
-        output_apkg=args.output,
-        model_id=args.model_id,
-        remove_filtered=not args.keep_filtered,
-        fix_pinyin_enabled=not args.no_pinyin_fix,
-        ranking_csv=args.ranking_csv,
-        vocab_dir=args.vocab_dir,
-        verbose=args.verbose,
-    )
-
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    app()
