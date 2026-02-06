@@ -7,7 +7,7 @@ import tempfile
 import shutil
 from pathlib import Path
 import pytest
-from anki_package import AnkiPackage
+from anki_tools import AnkiPackage
 
 
 @pytest.fixture

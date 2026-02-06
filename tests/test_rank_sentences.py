@@ -2,7 +2,7 @@
 
 import pytest
 
-from rank_sentences import (
+from anki_tools.rank import (
     Sentence,
     FrequencyData,
     complexity_score,

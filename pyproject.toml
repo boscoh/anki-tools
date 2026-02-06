@@ -1,7 +1,7 @@
 [project]
-name = "anki-package"
+name = "anki-tools"
 version = "0.1.0"
-description = "Read, edit, and manipulate Anki flashcard packages (.apkg files) using Direct SQLite access"
+description = "Read, edit, and manipulate Anki flashcard packages (.apkg files)"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -15,12 +15,11 @@ dependencies = [
     "zstandard>=0.25.0",
 ]
 
-[tool.setuptools]
-py-modules = ["anki_package", "cli", "fix_pinyin"]
-
 [project.scripts]
-anki-cli = "cli:app"
-fix-pinyin = "fix_pinyin:app"
+anki = "anki_tools.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["anki_tools*"]
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
