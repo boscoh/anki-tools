@@ -406,7 +406,7 @@ char_click_script = r"""
     elem.innerHTML = innerHtml;
   }
 
-  expandSentenceUrl('wiki-sentence', 'https://en.wiktionary.org/wiki/')
+  expandSentenceUrl('canto-sentence', 'https://cantonese.org/search.php?q=')
 </script>
 """
 
@@ -433,7 +433,7 @@ def _build_apkg(config):
     for field in csv_fields[1:] + [csv_fields[0]]:
         if field.lower() in cjk_fields:
             answer_parts.append(
-                f"<div id='wiki-sentence' style='font-size: 3rem'>{{{{{field}}}}}</div>"
+                f"<div id='canto-sentence' style='font-size: 3rem'>{{{{{field}}}}}</div>"
             )
         else:
             answer_parts.append(f"<div style='font-size: 2rem'>{{{{{field}}}}}</div>")
