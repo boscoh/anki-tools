@@ -33,6 +33,7 @@ class Sentence:
     complexity_score: float = 0.0
     frequency_score: float = 0.0
     similarity_penalty: float = 0.0
+    similar_to: int | None = None  # Rank of most similar higher-ranked sentence
     final_score: float = 0.0
 
 
@@ -325,7 +326,7 @@ def char_similarity(sent_a: str, sent_b: str) -> float:
 
 def compute_similarity_penalties(
     sentences: list[Sentence], top_n: int = 100
-) -> list[float]:
+) -> tuple[list[float], list[int | None]]:
     """
     Compute similarity penalties for each sentence.
 
@@ -337,24 +338,35 @@ def compute_similarity_penalties(
         top_n: Number of higher-ranked sentences to check (for efficiency)
 
     Returns:
-        List of penalties (0-50 scale) in same order as input
+        Tuple of (penalties, similar_to_indices):
+        - penalties: List of penalties (0-50 scale) in same order as input
+        - similar_to_indices: List of indices (1-based rank) of most similar sentence
     """
     penalties = []
+    similar_to_indices = []
 
     for i, sent in enumerate(sentences):
         if i == 0:
             penalties.append(0.0)
+            similar_to_indices.append(None)
             continue
 
         # Check similarity to top_n higher-ranked sentences
-        higher_ranked = sentences[: min(i, top_n)]
-        max_sim = max(char_similarity(sent.chinese, h.chinese) for h in higher_ranked)
+        higher_ranked_indices = list(range(min(i, top_n)))
+        similarities = [
+            char_similarity(sent.chinese, sentences[j].chinese)
+            for j in higher_ranked_indices
+        ]
+
+        max_sim = max(similarities)
+        max_idx = higher_ranked_indices[similarities.index(max_sim)]
 
         # Penalty scales from 0 to 50 based on similarity
         penalty = max_sim * 50
         penalties.append(penalty)
+        similar_to_indices.append(max_idx + 1)  # 1-based rank
 
-    return penalties
+    return penalties, similar_to_indices
 
 
 # =============================================================================
@@ -405,9 +417,10 @@ def rank_sentences(
 
     # Calculate similarity penalties
     print("Calculating similarity penalties...")
-    penalties = compute_similarity_penalties(sentences)
-    for sent, penalty in zip(sentences, penalties):
+    penalties, similar_to_indices = compute_similarity_penalties(sentences)
+    for sent, penalty, similar_to in zip(sentences, penalties, similar_to_indices):
         sent.similarity_penalty = penalty
+        sent.similar_to = similar_to
 
     # Recalculate final score with penalties
     for sent in sentences:
@@ -437,6 +450,7 @@ def export_csv(sentences: list[Sentence], output_path: str) -> None:
                 "complexity",
                 "frequency",
                 "similarity_penalty",
+                "similar_to",
                 "final_score",
             ]
         )
@@ -452,6 +466,7 @@ def export_csv(sentences: list[Sentence], output_path: str) -> None:
                     f"{sent.complexity_score:.1f}",
                     f"{sent.frequency_score:.1f}",
                     f"{sent.similarity_penalty:.1f}",
+                    sent.similar_to if sent.similar_to else "",
                     f"{sent.final_score:.2f}",
                 ]
             )
