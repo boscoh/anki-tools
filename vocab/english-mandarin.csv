@@ -1,0 +1,208 @@
+english,characters,pinyin
+I,我,wǒ
+you (singular),你,nǐ
+he/she,他/她,tā
+we,我们,wǒmen
+you (plural),你们,nǐmen
+they (plural),他们/她们,tāmen
+this,这,zhè
+that,那,nà
+here,这里,zhèlǐ
+there,那里,nàlǐ
+who,谁,shuí
+what,什么,shénme
+where,哪里,nǎlǐ
+when,什么时候,shénme shíhòu
+how,怎么,zěnme
+not,不,bù
+all,所有,suǒyǒu
+many,许多,xǔduō
+some,一些,yīxiē
+few,少数,shǎoshù
+other,其他,qítā
+one,一,yī
+two,二,èr
+three,三,sān
+four,四,sì
+five,五,wǔ
+big,大,dà
+long,长,cháng
+wide,宽,kuān
+thick,厚,hòu
+heavy,重,zhòng
+small,小,xiǎo
+short,短,duǎn
+narrow,窄,zhǎi
+thin,薄,báo
+woman,女人,nǚrén
+man,男人,nánrén
+human being,人,rén
+child,孩子,háizi
+wife,妻子,qīzi
+husband,丈夫,zhàngfu
+mother,妈妈,māma
+father,爸爸,bàba
+animal,动物,dòngwù
+fish,鱼,yú
+bird,鸟,niǎo
+dog,狗,gǒu
+louse,虱子,shīzi
+snake,蛇,shé
+worm,虫子,chóngzi
+tree,树,shù
+forest,森林,sēnlín
+stick,棍子,gùnzi
+fruit,水果,shuǐguǒ
+seed,种子,zhǒngzi
+leaf,叶子,yèzi
+root,根,gēn
+tree bark,树皮,shùpí
+flower,花,huā
+grass,草,cǎo
+rope,绳子,shéngzi
+skin,皮肤,pífū
+meat,肉,ròu
+blood,血,xuè
+bone,骨头,gǔtou
+fat (noun),脂肪,zhīfáng
+egg,蛋,dàn
+horn,角,jiǎo
+tail,尾巴,wěiba
+feather,羽毛,yǔmáo
+hair,头发,tóufa
+head,头,tóu
+ear,耳朵,ěrduo
+eye,眼睛,yǎnjing
+nose,鼻子,bízi
+mouth,嘴,zuǐ
+tooth,牙齿,yáchǐ
+tongue,舌头,shétou
+fingernail,指甲,zhǐjia
+foot,脚,jiǎo
+leg,腿,tuǐ
+knee,膝盖,xīgài
+hand,手,shǒu
+wing,翅膀,chìbǎng
+belly,肚子,dùzi
+guts,肠子,chángzi
+neck,脖子,bózi
+back,背,bèi
+breast,胸,xiōng
+heart,心,xīn
+liver,肝,gān
+to drink,喝,hē
+to eat,吃,chī
+to bite,咬,yǎo
+to suck,吸,xī
+to spit,吐,tǔ
+to vomit,呕吐,ǒutù
+to blow,吹,chuī
+to breathe,呼吸,hūxī
+to laugh,笑,xiào
+to see,看,kàn
+to hear,听,tīng
+to know,知道,zhīdào
+to think,想,xiǎng
+to smell,闻,wén
+to fear,怕,pà
+to sleep,睡觉,shuìjiào
+to live,活,huó
+to die,死,sǐ
+to kill,杀,shā
+to fight,打架,dǎjià
+to hunt,打猎,dǎliè
+to hit,打,dǎ
+to cut,切,qiē
+to split,分开,fēnkāi
+to stab,刺,cì
+to scratch,抓,zhuā
+to dig,挖,wā
+to swim,游泳,yóuyǒng
+to fly,飞,fēi
+to walk,走,zǒu
+to come,来,lái
+to lie down,躺,tǎng
+to sit,坐,zuò
+to stand,站,zhàn
+to turn (intransitive),转,zhuǎn
+to fall,掉,diào
+to give,给,gěi
+to hold,拿,ná
+to squeeze,挤,jǐ
+to rub,擦,cā
+to wash,洗,xǐ
+to wipe,擦,cā
+to pull,拉,lā
+to push,推,tuī
+to throw,扔,rēng
+to tie,绑,bǎng
+to sew,缝,féng
+to count,数,shǔ
+to say,说,shuō
+to sing,唱,chàng
+to play,玩,wán
+to float,浮,fú
+to flow,流,liú
+to freeze,冻,dòng
+to swell,肿,zhǒng
+sun,太阳,tàiyáng
+moon,月亮,yuèliang
+star,星星,xīngxing
+water,水,shuǐ
+rain,雨,yǔ
+river,河,hé
+lake,湖,hú
+sea,海,hǎi
+salt,盐,yán
+stone,石头,shítou
+sand,沙,shā
+dust,灰尘,huīchén
+earth,土,tǔ
+cloud,云,yún
+fog,雾,wù
+sky,天,tiān
+wind,风,fēng
+snow,雪,xuě
+ice,冰,bīng
+smoke,烟,yān
+fire,火,huǒ
+ash,灰,huī
+to burn,烧,shāo
+road,路,lù
+mountain,山,shān
+red,红,hóng
+green,绿,lǜ
+yellow,黄,huáng
+white,白,bái
+black,黑,hēi
+night,晚上,wǎnshang
+day,白天,báitiān
+year,年,nián
+warm,暖,nuǎn
+cold,冷,lěng
+full,满,mǎn
+new,新,xīn
+old,旧,jiù
+good,好,hǎo
+bad,坏,huài
+rotten,烂,làn
+dirty,脏,zāng
+straight,直,zhí
+round,圆,yuán
+sharp,锋利,fēnglì
+dull,钝,dùn
+smooth,滑,huá
+wet,湿,shī
+dry,干,gān
+correct,对,duì
+near,近,jìn
+far,远,yuǎn
+right,右,yòu
+left,左,zuǒ
+at,在,zài
+in,里,lǐ
+with,和,hé
+and,和,hé
+if,如果,rúguǒ
+because,因为,yīnwèi
+name,名字,míngzi

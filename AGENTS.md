@@ -5,6 +5,7 @@ Follow these instructions precisely for all sessions.
 ## Project Tools
 
 **Python:** Use `uv` for package management and running scripts.
+**Markdonw**: Don't use emojis; Always format tables properly with aligned columns
 
 ## Beads Workflow (MANDATORY)
 

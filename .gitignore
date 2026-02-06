@@ -1,12 +1,14 @@
-# Anki package files (large binary files)
+# Anki package files (large binary files) - but allow test data in tests/
 *.apkg
+!tests/*.apkg
 
-# Extracted Anki directories
-A_Course_in_Contemporary_Chinese_1/
+# Extracted Anki directories (ignore extracted dirs, but allow .apkg files)
+data/A_Course_in_Contemporary_Chinese_1/
 
 # Audio output directories
 audio_output/
 audio/
+extracted_audio/
 
 # Python
 __pycache__/

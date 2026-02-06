@@ -1,0 +1,36 @@
+{{FrontSide}}
+
+<div class="SentenceAnot">{{Sentence (Annotated)}}</div>
+<div class="sentLatin">{{Sentence (Latin)}}</div>
+<div class="blue">{{Sentence (Translation)}}</div>
+
+<br>
+
+<div class="text-link"> cc: <span id="canto-sentence">{{Sentence (Annotated)}}</span> </div>
+<div class="text-link"> wiki: <span id="wiki-sentence">{{Sentence (Annotated)}}</span> </div>
+
+<script>
+  function expandSentenceUrl(elemId, url) {
+    var elem = document.getElementById(elemId);
+
+    var content = elem.innerHTML;
+    content = content.replace("'", " ");
+    content = content.replace("。", " ");
+
+    content = content.replace(/\s{2,}/g, " ");
+    content = content.replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()]/g, "");
+    content = content.toLowerCase();
+
+    var innerHtml = "";
+    var chars = content.split("");
+    for (let ch of chars) {
+      innerHtml += `<a href = "${url}/${ch}">${ch}</a> `;
+    }
+
+    elem.innerHTML = innerHtml;
+  }
+
+  expandSentenceUrl('canto-sentence', `https://cantonese.org/search.php?q=`)
+  expandSentenceUrl('wiki-sentence', `https://en.wiktionary.org/wiki`)
+</script>
+
