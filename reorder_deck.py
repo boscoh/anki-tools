@@ -6,10 +6,12 @@ Reads ranking from CSV and updates card order in the APKG file.
 """
 
 import csv
-import shutil
+import sys
 from pathlib import Path
 
 from anki_package import AnkiPackage
+
+csv.field_size_limit(sys.maxsize)
 
 
 def load_ranking(csv_path: str) -> tuple[dict[str, int], set[int]]:
