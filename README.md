@@ -1,4 +1,4 @@
-# Anki Package
+# Anki Tools
 
 Tools for building high-quality Anki vocabulary and sentence decks, with a focus on **listening comprehension** - audio-first flashcards where you hear the sentence and try to understand it.
 
@@ -9,16 +9,18 @@ The goal is to create flashcards that are:
 - **Interesting** - natural examples, not textbook filler
 - **Non-redundant** - no duplicate concepts or near-identical cards
 
-Read, edit, and manipulate Anki flashcard packages (.apkg files) using direct SQLite access.
+Read, edit, and manipulate Anki flashcard packages (.apkg files) using direct SQLite access, plus command-line tools for ranking, reordering, and building vocabulary decks.
 
 ## Features
 
-- Read and edit APKG files
-- Extract audio files with proper filenames
-- Create decks and copy cards
-- Rank and filter sentences by complexity, frequency, and similarity
-- Generate vocabulary flashcards from CSV files
-- Direct SQLite access with minimal dependencies
+- **Python API**: Read and edit APKG files with direct SQLite access
+- **CLI Tools**: Command-line interface for common workflows
+- **Audio Extraction**: Extract audio files with proper filenames
+- **Deck Management**: Create decks, copy cards, move cards between decks
+- **Sentence Ranking**: Rank and filter sentences by complexity, frequency, and similarity (Chinese and French)
+- **Vocabulary Generation**: Build Swadesh vocabulary decks with audio (multiple languages)
+- **Card Deletion**: Delete cards with automatic cleanup of unused audio files
+- **Minimal Dependencies**: Direct SQLite access, no Anki installation required
 
 ## Installation
 
@@ -26,12 +28,78 @@ Read, edit, and manipulate Anki flashcard packages (.apkg files) using direct SQ
 uv sync
 ```
 
+After installation, the `anki` command is available via `uv run anki`.
+
+## CLI Commands
+
+The `anki` command provides several subcommands:
+
+### swadesh - Build Vocabulary Decks
+
+```bash
+uv run anki swadesh list-languages    # List supported languages
+uv run anki swadesh build LANGUAGE    # Build deck for language
+```
+
+### zh - Chinese Deck Processing
+
+```bash
+uv run anki zh rank INPUT.apkg        # Rank by frequency/complexity
+uv run anki zh reorder INPUT.apkg     # Reorder by ranking
+uv run anki zh fix INPUT.apkg         # Fix pinyin formatting
+uv run anki zh all INPUT.apkg         # Run complete pipeline
+```
+
+### fr - French Deck Processing
+
+```bash
+uv run anki fr rank INPUT.apkg        # Rank by difficulty
+uv run anki fr similar INPUT.apkg     # Find similar sentences
+uv run anki fr reorder INPUT.apkg     # Reorder by ranking
+```
+
+### inspect - Inspect APKG Files
+
+```bash
+uv run anki inspect INPUT.apkg        # Show deck contents
+```
+
+### style - Apply Templates
+
+```bash
+uv run anki style INPUT.apkg          # Apply CSS and card templates
+```
+
 ## Quick Start
 
-### Basic Usage
+### Command Line Interface
+
+After installation, use the `anki` command:
+
+```bash
+# List available commands
+uv run anki --help
+
+# Build Swadesh vocabulary decks
+uv run anki swadesh build mandarin
+uv run anki swadesh list-languages
+
+# Rank Chinese sentences by difficulty
+uv run anki zh rank input.apkg
+uv run anki zh reorder input.apkg
+
+# Rank French sentences
+uv run anki fr rank input.apkg
+uv run anki fr similar input.apkg
+
+# Inspect APKG files
+uv run anki inspect deck.apkg
+```
+
+### Python API
 
 ```python
-from anki_package import AnkiPackage
+from anki_tools import AnkiPackage
 
 # Read and extract audio
 with AnkiPackage('deck.apkg') as reader:
@@ -54,29 +122,70 @@ with AnkiPackage('deck.apkg') as reader:
     reader.save('updated.apkg')
 ```
 
-### Vocabulary Generation
+### Swadesh Vocabulary Generation
 
-Generate vocabulary flashcards from CSV files:
+Generate Swadesh vocabulary flashcards with audio:
 
 ```bash
-# Generate .anki.txt import files
-uv run python vocab.py txt mandarin
-uv run python vocab.py txt spanish
-uv run python vocab.py txt greek
-uv run python vocab.py txt cantonese
+# List available languages
+uv run anki swadesh list-languages
 
-# Build .apkg files with audio
-uv run python vocab.py apkg mandarin
-uv run python vocab.py apkg spanish
-uv run python vocab.py apkg greek
-uv run python vocab.py apkg cantonese
+# Build vocabulary deck for a specific language
+uv run anki swadesh build mandarin
+uv run anki swadesh build spanish
+uv run anki swadesh build greek
+uv run anki swadesh build cantonese
+uv run anki swadesh build arabic
+uv run anki swadesh build hindi
+uv run anki swadesh build german
 ```
 
-The `vocab.py` script supports:
-- **txt subcommand**: Generate `.anki.txt` files from CSV (for Anki import)
-- **apkg subcommand**: Build `.apkg` files with audio generation using gTTS
+The `swadesh` command:
+- Builds `.apkg` files from CSV vocabulary lists in `vocab/` directory
+- Generates audio using gTTS (Google Text-to-Speech)
+- Creates flashcards with clickable characters (for character-based languages)
+- Supports multiple languages with proper formatting and styling
 
-Supported languages: Mandarin, Spanish, Greek, Cantonese
+### French Sentence Ranking
+
+Rank French decks by difficulty and similarity:
+
+```bash
+# Rank sentences by complexity, frequency, and uniqueness
+uv run anki fr rank deck.apkg
+
+# Show high-similarity pairs (candidates for deletion)
+uv run anki fr similar deck.apkg
+
+# Reorder deck based on ranking
+uv run anki fr reorder deck.apkg
+```
+
+**Frequency:** Uses wordfreq (no download; ships with the package).
+
+**Grammar:** No download needed for basic scoring (heuristics). For dependency-based grammar complexity, download the spaCy model once:
+
+```bash
+uv run python -m spacy download fr_core_news_sm
+```
+
+### Chinese Sentence Processing
+
+Process Chinese decks with ranking, reordering, and pinyin fixes:
+
+```bash
+# Rank sentences by frequency and complexity
+uv run anki zh rank deck.apkg
+
+# Reorder deck based on ranking
+uv run anki zh reorder deck.apkg
+
+# Fix pinyin formatting
+uv run anki zh fix deck.apkg
+
+# Run complete pipeline: rank + reorder + fix pinyin + style
+uv run anki zh all deck.apkg
+```
 
 ### gTTS Available Languages
 
@@ -125,30 +234,51 @@ The following languages are supported by gTTS for audio generation:
 
 ## API Reference
 
-### AnkiPackage
+### AnkiPackage Class
 
-**Reading:** `get_decks()`, `get_models()`, `get_notes()`, `get_cards()`, `parse_card()`
+Import: `from anki_tools import AnkiPackage`
 
-**Audio:** `get_media_mapping()`, `extract_audio_files()`, `get_audio_for_card()`, `get_audio_statistics()`, `add_media_file()`
+**Reading Methods:**
+- `get_decks()` - Get all decks
+- `get_models()` - Get all note types (card templates)
+- `get_notes()` - Get all notes
+- `get_cards()` - Get all cards
+- `parse_card()` - Parse card HTML fields
 
-**Editing:** `update_note_field()`, `move_card()`, `add_audio_to_card()`, `create_deck()`, `copy_cards_to_deck()`, `create_deck_from_cards()`, `delete_card()`, `delete_cards()`, `delete_note()`, `save()`
+**Audio Methods:**
+- `get_media_mapping()` - Get media ID to filename mapping
+- `extract_audio_files()` - Extract audio files to directory
+- `get_audio_for_card()` - Get audio files for specific card
+- `get_audio_statistics()` - Get audio usage statistics
+- `add_media_file()` - Add audio file to package
 
-## Examples
+**Editing Methods:**
+- `update_note_field()` - Update note field content
+- `move_card()` - Move card to different deck
+- `add_audio_to_card()` - Add audio reference to card
+- `create_deck()` - Create new deck
+- `copy_cards_to_deck()` - Copy cards to deck
+- `create_deck_from_cards()` - Create deck and copy cards
+- `delete_card()` - Delete single card with optional audio cleanup
+- `delete_cards()` - Delete multiple cards with optional audio cleanup
+- `delete_note()` - Delete note and all its cards
+- `save()` - Save changes to new APKG file
 
-Run examples with:
-```bash
-python main.py read          # Read cards
-python main.py audio         # Extract audio
-python main.py edit          # Edit cards
-python main.py deck          # Create decks
-python main.py add-audio     # Add audio files
-python main.py delete        # Delete cards and cleanup audio
+### Utility Functions
+
+```python
+from anki_tools import (
+    fix_pinyin,              # Fix pinyin formatting
+    extract_sentences,       # Extract sentences from deck
+    rank_sentences_zh,       # Rank Chinese sentences
+    write_ranking_csv,       # Write ranking to CSV
+    complexity_score_zh,     # Calculate complexity score
+    frequency_score_zh,      # Calculate frequency score
+    char_similarity_zh,      # Calculate character similarity
+    reorder_deck,            # Reorder deck by ranking
+    load_ranking,            # Load ranking from CSV
+)
 ```
-
-Or run `python main.py` for default card reading example.
-
-- `examples.py` - All examples in one file
-- `compare_methods.py` - Performance comparison
 
 ## Testing
 
@@ -174,8 +304,9 @@ Tests are organized in the `tests/` directory:
 - `tests/test_card_audio_linking.py` - Card-to-audio linking tests (6 tests)
 - `tests/test_integration.py` - Integration workflow tests (3 tests)
 - `tests/test_card_deletion.py` - Card deletion tests (10 tests)
+- `tests/test_rank_sentences.py` - Sentence ranking tests (7 tests)
 
-**Total:** 37 tests covering media mapping, audio extraction, card linking, deletion, and Chinese filenames
+**Total:** 54 tests covering media mapping, audio extraction, card linking, deletion, sentence ranking, and Chinese filenames
 
 ### Running Specific Tests
 
@@ -198,10 +329,10 @@ uv run pytest tests/ -k "deletion" -v
 
 ```bash
 # Generate coverage report
-uv run pytest tests/ --cov=anki --cov-report=html
+uv run pytest tests/ --cov=anki_tools --cov-report=html
 
 # View coverage in terminal
-uv run pytest tests/ --cov=anki --cov-report=term-missing
+uv run pytest tests/ --cov=anki_tools --cov-report=term-missing
 ```
 
 ### Prerequisites
@@ -333,3 +464,4 @@ Anki package files are ZIP archives containing:
 - [AnkiDroid Database Structure](https://github.com/ankidroid/Anki-Android/wiki/Database-Structure)
 - [genanki Documentation](https://github.com/kerrickstaley/genanki)
 - [Neri Frequency List](https://frequencylists.blogspot.com/2018/02/welcome.html)
+- Tatoeba Project
