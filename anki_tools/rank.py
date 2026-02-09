@@ -1,18 +1,17 @@
 """
-Rank Chinese sentences by complexity, word frequency, and uniqueness.
+Rank sentences by complexity, frequency, and similarity (ZH and FR pipelines).
 
 See SPEC_RANK_SENTENCES.md for full specification.
 """
 
 import csv
-import json
+import re
 from dataclasses import dataclass, field
-from pathlib import Path
+from typing import Callable
 
 import jieba
 
 from anki_tools.package import AnkiPackage
-
 
 # =============================================================================
 # Data Classes
@@ -21,23 +20,38 @@ from anki_tools.package import AnkiPackage
 
 @dataclass
 class Sentence:
-    """A Chinese sentence extracted from Anki deck."""
+    """A sentence extracted from an Anki deck (ZH or FR pipeline).
+
+    :param note_id: Note ID in the deck.
+    :param text: Main sentence text (Chinese or French).
+    :param original_order: Original card order index.
+    :param complexity_score: Structural complexity (0-100).
+    :param frequency_score: Word frequency score (0-100).
+    :param similarity_penalty: Penalty for similarity to higher-ranked sentences.
+    :param similar_to: Rank (1-based) of most similar higher-ranked sentence.
+    :param final_score: Combined ranking score.
+    """
 
     note_id: int
-    chinese: str
-    pinyin: str
-    english: str
+    text: str
     original_order: int
     complexity_score: float = 0.0
     frequency_score: float = 0.0
     similarity_penalty: float = 0.0
     similar_to: int | None = None  # Rank of most similar higher-ranked sentence
+    similar_to_sentence: str | None = None  # Closest sentence text (French pipeline)
+    grammar_score: float = 0.0  # Grammar complexity 0-100 (French pipeline)
     final_score: float = 0.0
 
 
 @dataclass
 class FrequencyData:
-    """Word and character frequency lookup tables."""
+    """Word and character frequency lookup tables.
+
+    :param word_freq: Word to frequency rank.
+    :param char_freq: Character to frequency rank.
+    :param hsk_vocab: Word or character to HSK level.
+    """
 
     word_freq: dict[str, int] = field(default_factory=dict)
     char_freq: dict[str, int] = field(default_factory=dict)
@@ -49,22 +63,45 @@ class FrequencyData:
 # =============================================================================
 
 
-def extract_sentences(apkg_path: str, model_id: int | None = None) -> list[Sentence]:
-    """
-    Extract sentences from an Anki package.
+def _resolve_extract_fields(
+    field_names: list[str],
+    text_prefer: str | None,
+) -> tuple[str, str | None]:
+    deck = set(field_names)
+    text = None
+    if text_prefer and text_prefer in deck:
+        text = text_prefer
+    if not text:
+        for c in ("Sentence", "French", "sentence", "Front"):
+            if c in deck:
+                text = c
+                break
+    if not text:
+        text = field_names[0] if field_names else "Front"
+    order = "[counter 2]" if "[counter 2]" in deck else None
+    return (text, order)
 
-    Args:
-        apkg_path: Path to the .apkg file
-        model_id: Optional model ID to filter by (extracts all if None)
 
-    Returns:
-        List of Sentence objects
+def extract_sentences(
+    apkg_path: str,
+    model_id: int | None = None,
+    *,
+    text_field: str | None = None,
+) -> list[Sentence]:
+    """Extract sentences from an Anki package.
+
+    Main text and order fields are inferred from each model's field names.
+    Pass text_field to prefer a specific main field (e.g. "French").
+
+    :param apkg_path: Path to the .apkg file.
+    :param model_id: Optional model ID to filter by; extracts all if None.
+    :param text_field: Preferred main sentence field (inferred if None).
+    :returns: List of :class:`Sentence` objects.
     """
     sentences = []
 
     with AnkiPackage(apkg_path) as pkg:
         models = pkg.get_models()
-        decks = pkg.get_decks()
         cards = pkg.get_cards()
 
         print(f"Available models in {apkg_path}:")
@@ -73,6 +110,8 @@ def extract_sentences(apkg_path: str, model_id: int | None = None) -> list[Sente
             for i, fld in enumerate(model["flds"]):
                 print(f"    [{i}] {fld['name']}")
 
+        resolved_by_model: dict[str, tuple[str, str | None]] = {}
+        card_index = 0
         for card in cards:
             card_model_id = str(card["mid"])
 
@@ -81,31 +120,33 @@ def extract_sentences(apkg_path: str, model_id: int | None = None) -> list[Sente
 
             model = models.get(card_model_id, {})
             field_names = [f["name"] for f in model.get("flds", [])]
+            if card_model_id not in resolved_by_model:
+                resolved_by_model[card_model_id] = _resolve_extract_fields(
+                    field_names, text_field
+                )
+            text_f, order_f = resolved_by_model[card_model_id]
+
             field_values = card["flds"].split("\x1f")
             fields = dict(zip(field_names, field_values))
 
-            chinese = fields.get("Sentence", fields.get("Front", ""))
-            pinyin = fields.get("Sentence (Latin)", fields.get("Pinyin", ""))
-            english = fields.get(
-                "Sentence (Translation)", fields.get("Translation", "")
-            )
+            text = fields.get(text_f, fields.get("Front", ""))
 
-            counter_str = fields.get("[counter 2]", "0")
-            try:
-                original_order = int(counter_str) if counter_str else 0
-            except ValueError:
-                original_order = 0
+            original_order = card_index
+            if order_f and order_f in fields and fields.get(order_f):
+                try:
+                    original_order = int(fields[order_f])
+                except ValueError:
+                    pass
 
-            if chinese:
+            if text:
                 sentences.append(
                     Sentence(
                         note_id=card["nid"],
-                        chinese=chinese,
-                        pinyin=pinyin,
-                        english=english,
+                        text=text,
                         original_order=original_order,
                     )
                 )
+                card_index += 1
 
     seen = set()
     unique = []
@@ -123,55 +164,53 @@ def extract_sentences(apkg_path: str, model_id: int | None = None) -> list[Sente
 # =============================================================================
 
 
-def load_frequency_data(vocab_dir: str = "vocab") -> FrequencyData:
-    """
-    Load word frequency and HSK vocabulary data.
+def _load_frequency_data_wordfreq(
+    lang: str,
+    *,
+    lower_keys: bool = False,
+    build_char_freq: bool = False,
+) -> FrequencyData:
+    from wordfreq import iter_wordlist
 
-    Expected files in vocab_dir:
-        - subtlex_ch.txt: Tab-separated word frequency list
-        - hsk_vocab.json: JSON mapping words to HSK levels
-
-    Returns:
-        FrequencyData with loaded lookup tables
-    """
-    vocab_path = Path(vocab_dir)
     data = FrequencyData()
-
-    subtlex_path = vocab_path / "subtlex_ch.txt"
-    if subtlex_path.exists():
-        with open(subtlex_path, encoding="utf-8") as f:
-            for rank, line in enumerate(f, 1):
-                parts = line.strip().split("\t")
-                if parts:
-                    word = parts[0]
-                    data.word_freq[word] = rank
-        print(f"Loaded {len(data.word_freq)} words from SUBTLEX-CH")
-    else:
-        print(f"Warning: {subtlex_path} not found, frequency scoring disabled")
-
-    hsk_path = vocab_path / "hsk_vocab.json"
-    if hsk_path.exists():
-        with open(hsk_path, encoding="utf-8") as f:
-            data.hsk_vocab = json.load(f)
-        print(f"Loaded {len(data.hsk_vocab)} HSK words")
-    else:
-        print(f"Warning: {hsk_path} not found, HSK scoring disabled")
-
-    for word, rank in data.word_freq.items():
-        for char in word:
-            if is_chinese_char(char) and char not in data.char_freq:
-                data.char_freq[char] = rank
-
+    for rank, word in enumerate(iter_wordlist(lang, wordlist="best"), 1):
+        key = word.lower() if lower_keys else word
+        data.word_freq[key] = rank
+    if build_char_freq:
+        for word, rank in data.word_freq.items():
+            for char in word:
+                if is_chinese_char(char) and char not in data.char_freq:
+                    data.char_freq[char] = rank
+    print(f"Loaded {len(data.word_freq)} words from wordfreq")
     return data
 
 
+def load_frequency_data_zh() -> FrequencyData:
+    """Load Chinese word frequency data from wordfreq."""
+    data = _load_frequency_data_wordfreq("zh", build_char_freq=True)
+    return data
+
+
+def load_frequency_data_fr() -> FrequencyData:
+    """Load French word frequency data from wordfreq."""
+    return _load_frequency_data_wordfreq("fr", lower_keys=True)
+
+
 def is_chinese_char(char: str) -> bool:
-    """Check if a character is a Chinese character."""
+    """Check if a character is a Chinese character.
+
+    :param char: Single character.
+    :returns: True if in CJK Unified Ideographs range.
+    """
     return "\u4e00" <= char <= "\u9fff"
 
 
 def get_chinese_chars(text: str) -> list[str]:
-    """Extract Chinese characters from text."""
+    """Extract Chinese characters from text.
+
+    :param text: Arbitrary text.
+    :returns: List of Chinese characters in order.
+    """
     return [c for c in text if is_chinese_char(c)]
 
 
@@ -180,19 +219,14 @@ def get_chinese_chars(text: str) -> list[str]:
 # =============================================================================
 
 
-def complexity_score(sentence: str) -> float:
-    """
-    Calculate complexity score (0-100) based on structural features.
+def complexity_score_zh(sentence: str) -> float:
+    """Calculate complexity score (0-100) based on structural features.
 
     Metrics (see SPEC_RANK_SENTENCES.md):
-        - Character count (15%)
-        - Unique character count (15%)
-        - Word count (20%)
-        - Average word length (10%)
-        - Character stroke count (15%) - TODO
-        - HSK level of characters (25%) - TODO
+        - Character count, unique characters, word count, average word length.
 
-    For now, simplified version using available metrics.
+    :param sentence: Chinese sentence.
+    :returns: Score from 0 to 100 (higher = more complex).
     """
     chars = get_chinese_chars(sentence)
     if not chars:
@@ -218,12 +252,13 @@ def complexity_score(sentence: str) -> float:
     return score * 100
 
 
-def get_word_rank(word: str, freq_data: FrequencyData, max_rank: int = 50000) -> int:
-    """
-    Get frequency rank for a word, falling back to character average if not found.
+def get_word_rank_zh(word: str, freq_data: FrequencyData, max_rank: int = 50000) -> int:
+    """Get frequency rank for a word, falling back to character average if not found.
 
-    If the word isn't in the frequency list (e.g., jieba combined common words),
-    calculate average rank of its characters.
+    :param word: Word to look up.
+    :param freq_data: Loaded frequency data.
+    :param max_rank: Default rank when not found.
+    :returns: Frequency rank (lower = more common).
     """
     if word in freq_data.word_freq:
         return freq_data.word_freq[word]
@@ -236,17 +271,14 @@ def get_word_rank(word: str, freq_data: FrequencyData, max_rank: int = 50000) ->
     return int(sum(char_ranks) / len(char_ranks))
 
 
-def frequency_score(sentence: str, freq_data: FrequencyData) -> float:
-    """
-    Calculate frequency score (0-100) based on word commonality.
+def frequency_score_zh(sentence: str, freq_data: FrequencyData) -> float:
+    """Calculate frequency score (0-100) based on word commonality.
 
     Higher score = more common vocabulary = easier to learn first.
 
-    Metrics:
-        - Average word frequency rank (40%)
-        - % words in top 1000 (25%)
-        - % words in top 5000 (15%)
-        - HSK coverage (20%)
+    :param sentence: Chinese sentence.
+    :param freq_data: Loaded frequency data.
+    :returns: Score from 0 to 100.
     """
     words = list(jieba.cut(sentence))
     chinese_words = [w for w in words if any(is_chinese_char(c) for c in w)]
@@ -258,7 +290,7 @@ def frequency_score(sentence: str, freq_data: FrequencyData) -> float:
         return 50.0
 
     max_rank = 50000
-    ranks = [get_word_rank(w, freq_data, max_rank) for w in chinese_words]
+    ranks = [get_word_rank_zh(w, freq_data, max_rank) for w in chinese_words]
 
     avg_rank = sum(ranks) / len(ranks)
     avg_score = 1.0 - min(avg_rank / max_rank, 1.0)
@@ -289,11 +321,12 @@ def frequency_score(sentence: str, freq_data: FrequencyData) -> float:
 # =============================================================================
 
 
-def char_similarity(sent_a: str, sent_b: str) -> float:
-    """
-    Calculate Jaccard similarity between character sets.
+def char_similarity_zh(sent_a: str, sent_b: str) -> float:
+    """Calculate Jaccard similarity between character sets.
 
-    Returns value between 0 (no overlap) and 1 (identical).
+    :param sent_a: First Chinese sentence.
+    :param sent_b: Second Chinese sentence.
+    :returns: Similarity between 0 (no overlap) and 1 (identical).
     """
     chars_a = set(get_chinese_chars(sent_a))
     chars_b = set(get_chinese_chars(sent_b))
@@ -307,47 +340,56 @@ def char_similarity(sent_a: str, sent_b: str) -> float:
     return intersection / union
 
 
-def compute_similarity_penalties(
-    sentences: list[Sentence], top_n: int = 100
-) -> tuple[list[float], list[int | None]]:
-    """
-    Compute similarity penalties for each sentence.
-
-    For each sentence, find maximum similarity to higher-ranked sentences
-    (those with better preliminary scores) and apply penalty.
-
-    Args:
-        sentences: List of sentences sorted by preliminary score (best first)
-        top_n: Number of higher-ranked sentences to check (for efficiency)
-
-    Returns:
-        Tuple of (penalties, similar_to_indices):
-        - penalties: List of penalties (0-50 scale) in same order as input
-        - similar_to_indices: List of indices (1-based rank) of most similar sentence
-    """
-    penalties = []
-    similar_to_indices = []
+def _compute_similarity_penalties(
+    sentences: list[Sentence],
+    similarity_fn: Callable[[str, str], float],
+    top_n: int = 100,
+) -> tuple[list[float], list[int | None], list[str | None]]:
+    penalties: list[float] = []
+    similar_to_indices: list[int | None] = []
+    similar_to_texts: list[str | None] = []
 
     for i, sent in enumerate(sentences):
         if i == 0:
             penalties.append(0.0)
             similar_to_indices.append(None)
+            similar_to_texts.append(None)
             continue
 
         higher_ranked_indices = list(range(min(i, top_n)))
         similarities = [
-            char_similarity(sent.chinese, sentences[j].chinese)
+            similarity_fn(sent.text, sentences[j].text)
             for j in higher_ranked_indices
         ]
-
         max_sim = max(similarities)
         max_idx = higher_ranked_indices[similarities.index(max_sim)]
-
-        penalty = max_sim * 50
+        penalty = max_sim * SIMILARITY_PENALTY_SCALE
         penalties.append(penalty)
         similar_to_indices.append(max_idx + 1)
+        similar_to_texts.append(sentences[max_idx].text)
 
-    return penalties, similar_to_indices
+    return penalties, similar_to_indices, similar_to_texts
+
+
+def compute_similarity_penalties_zh(
+    sentences: list[Sentence], top_n: int = 100
+) -> tuple[list[float], list[int | None], list[str | None]]:
+    """Compute similarity penalties (character-based, ZH)."""
+    return _compute_similarity_penalties(sentences, char_similarity_zh, top_n)
+
+
+SIMILARITY_PENALTY_SCALE = 20
+
+SIMILARITY_DELETE_THRESHOLD_RATIO = 0.7
+SIMILARITY_CONSIDER_DELETE_PENALTY = SIMILARITY_PENALTY_SCALE * SIMILARITY_DELETE_THRESHOLD_RATIO  # flag for deletion when Jaccard >= ratio
+
+STRUCTURAL_COMPLEXITY_BLEND = 0.6
+
+
+def _structural_score(
+    complexity: float, grammar: float, blend: float = STRUCTURAL_COMPLEXITY_BLEND
+) -> float:
+    return blend * complexity + (1.0 - blend) * grammar
 
 
 # =============================================================================
@@ -355,20 +397,18 @@ def compute_similarity_penalties(
 # =============================================================================
 
 
-def rank_sentences(
+def rank_sentences_zh(
     sentences: list[Sentence],
-    freq_data: FrequencyData,
     weights: dict[str, float] | None = None,
 ) -> list[Sentence]:
-    """
-    Rank sentences by combined score.
+    """Rank sentences by combined score (Chinese pipeline).
 
-    Default weights:
-        - complexity: 0.3 (simpler first)
-        - frequency: 0.5 (common vocab first)
-        - similarity_penalty: 0.2 (variety)
+    Default weights: complexity 0.3, frequency 0.5, similarity_penalty 0.2.
+    Complexity is inverted (lower complexity = higher score for learning).
 
-    Note: Complexity is inverted (lower complexity = higher score for learning)
+    :param sentences: Sentences to rank.
+    :param weights: Optional dict with complexity, frequency, similarity_penalty.
+    :returns: Same list sorted by final_score (best first).
     """
     if weights is None:
         weights = {
@@ -377,13 +417,15 @@ def rank_sentences(
             "similarity_penalty": 0.2,
         }
 
+    freq_data = load_frequency_data_zh()
+
     print("Calculating complexity scores...")
     for sent in sentences:
-        sent.complexity_score = complexity_score(sent.chinese)
+        sent.complexity_score = complexity_score_zh(sent.text)
 
     print("Calculating frequency scores...")
     for sent in sentences:
-        sent.frequency_score = frequency_score(sent.chinese, freq_data)
+        sent.frequency_score = frequency_score_zh(sent.text, freq_data)
 
     for sent in sentences:
         sent.final_score = (
@@ -394,10 +436,13 @@ def rank_sentences(
     sentences.sort(key=lambda s: s.final_score, reverse=True)
 
     print("Calculating similarity penalties...")
-    penalties, similar_to_indices = compute_similarity_penalties(sentences)
-    for sent, penalty, similar_to in zip(sentences, penalties, similar_to_indices):
+    penalties, similar_to_indices, similar_to_texts = compute_similarity_penalties_zh(sentences)
+    for sent, penalty, similar_to, sim_text in zip(
+        sentences, penalties, similar_to_indices, similar_to_texts
+    ):
         sent.similarity_penalty = penalty
         sent.similar_to = similar_to
+        sent.similar_to_sentence = sim_text
 
     for sent in sentences:
         sent.final_score = (
@@ -411,39 +456,304 @@ def rank_sentences(
     return sentences
 
 
-def export_csv(sentences: list[Sentence], output_path: str) -> None:
-    """Export ranked sentences to CSV file."""
+def write_ranking_csv(
+    sentences: list[Sentence],
+    output_path: str,
+    *,
+    structural_blend: float = STRUCTURAL_COMPLEXITY_BLEND,
+    similar_to_threshold: float = SIMILARITY_CONSIDER_DELETE_PENALTY,
+) -> None:
+    """Write ranking CSV for reorder_deck and inspection (ZH and FR).
+
+    Columns: rank, sentence, original_order, frequency, complexity, grammar,
+    structural, similarity, similar_to, final_score.
+    """
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(
             [
                 "rank",
                 "sentence",
-                "pinyin",
-                "english",
                 "original_order",
-                "complexity",
                 "frequency",
-                "similarity_penalty",
+                "complexity",
+                "grammar",
+                "structural",
+                "similarity",
                 "similar_to",
                 "final_score",
             ]
         )
-
         for rank, sent in enumerate(sentences, 1):
+            structural = _structural_score(
+                sent.complexity_score, sent.grammar_score, structural_blend
+            )
+            similar_to_text = (
+                (sent.similar_to_sentence or "")
+                if sent.similarity_penalty > similar_to_threshold
+                else ""
+            )
             writer.writerow(
                 [
                     rank,
-                    sent.chinese,
-                    sent.pinyin,
-                    sent.english,
+                    sent.text,
                     sent.original_order,
-                    f"{sent.complexity_score:.1f}",
                     f"{sent.frequency_score:.1f}",
+                    f"{sent.complexity_score:.1f}",
+                    f"{sent.grammar_score:.1f}",
+                    f"{structural:.1f}",
                     f"{sent.similarity_penalty:.1f}",
-                    sent.similar_to if sent.similar_to else "",
+                    similar_to_text,
                     f"{sent.final_score:.2f}",
                 ]
             )
+    print(f"Wrote ranking for {len(sentences)} sentences to {output_path}")
 
-    print(f"Exported {len(sentences)} sentences to {output_path}")
+
+# =============================================================================
+# French ranking (word-based, reusable structure)
+# =============================================================================
+
+
+def _tokenize_words_fr(text: str) -> list[str]:
+    """Tokenize text into words (letters only, lowercase for comparison).
+
+    :param text: Sentence or phrase.
+    :returns: List of non-empty word tokens.
+    """
+    cleaned = re.sub(r"<[^>]+>", "", text)
+    tokens = re.findall(r"[a-zA-Z\u00c0-\u024f]+", cleaned)
+    return [t.lower() for t in tokens if t]
+
+
+def complexity_score_fr(sentence: str) -> float:
+    """Calculate complexity score (0-100) for French/latin text from structural features.
+
+    :param sentence: French sentence.
+    :returns: Score from 0 to 100 (higher = more complex).
+    """
+    words = _tokenize_words_fr(sentence)
+    if not words:
+        return 0.0
+
+    word_count = len(words)
+    unique_words = len(set(words))
+    avg_word_len = sum(len(w) for w in words) / len(words)
+    char_count = sum(len(w) for w in words)
+
+    word_norm = min(word_count / 25, 1.0)
+    unique_norm = min(unique_words / 20, 1.0)
+    avg_len_norm = min(avg_word_len / 8, 1.0)
+    char_norm = min(char_count / 150, 1.0)
+
+    score = (
+        word_norm * 0.25
+        + unique_norm * 0.25
+        + avg_len_norm * 0.25
+        + char_norm * 0.25
+    )
+    return score * 100
+
+
+def get_word_rank_fr(word: str, freq_data: FrequencyData, max_rank: int = 100000) -> int:
+    """Get frequency rank for a word (French).
+
+    :param word: Word to look up (lowercase).
+    :param freq_data: Loaded frequency data.
+    :param max_rank: Default rank when not found.
+    :returns: Frequency rank (lower = more common).
+    """
+    return freq_data.word_freq.get(word.lower(), max_rank)
+
+
+def frequency_score_fr(sentence: str, freq_data: FrequencyData) -> float:
+    """Calculate frequency score (0-100) for French based on word commonality.
+
+    :param sentence: French sentence.
+    :param freq_data: Loaded frequency data (from load_frequency_data_fr).
+    :returns: Score from 0 to 100 (higher = more common = easier first).
+    """
+    words = _tokenize_words_fr(sentence)
+    if not words:
+        return 0.0
+    if not freq_data.word_freq:
+        return 50.0
+
+    max_rank = 100000
+    ranks = [get_word_rank_fr(w, freq_data, max_rank) for w in words]
+    avg_rank = sum(ranks) / len(ranks)
+    avg_score = 1.0 - min(avg_rank / max_rank, 1.0)
+    top_5k = sum(1 for r in ranks if r <= 5000) / len(ranks)
+    return (avg_score * 0.6 + top_5k * 0.4) * 100
+
+
+def _grammar_score_fr_spacy(sentence: str) -> float | None:
+    """Use spaCy fr_core_news_sm for grammar complexity (dependency depth, clause count). Returns None if unavailable."""
+    try:
+        import spacy
+        nlp = spacy.load("fr_core_news_sm")
+    except (ImportError, OSError):
+        return None
+    cleaned = re.sub(r"<[^>]+>", "", sentence)
+    if not cleaned.strip():
+        return 0.0
+    doc = nlp(cleaned)
+    if not doc:
+        return 0.0
+    max_depth = 0
+    for token in doc:
+        depth = 0
+        t = token
+        while t.head != t:
+            depth += 1
+            t = t.head
+        max_depth = max(max_depth, depth)
+    verb_count = sum(1 for t in doc if t.pos_ == "VERB" or t.pos_ == "AUX")
+    subj_count = sum(1 for t in doc if t.dep_ == "nsubj" or t.dep_ == "csubj")
+    score = min(100.0, max_depth * 8 + verb_count * 5 + subj_count * 3)
+    return score
+
+
+def grammar_score_fr(sentence: str) -> float:
+    """Grammar complexity score (0-100) for French.
+
+    Uses spaCy fr_core_news_sm if available (dependency depth, verbs, subjects);
+    otherwise heuristics (subjunctive, relatives, conditionals, commas).
+
+    :param sentence: French sentence.
+    :returns: Score from 0 to 100.
+    """
+    spacy_score = _grammar_score_fr_spacy(sentence)
+    if spacy_score is not None:
+        return min(100.0, spacy_score)
+
+    cleaned = re.sub(r"<[^>]+>", "", sentence)
+    lower = cleaned.lower()
+    score = 0.0
+
+    subjunctive_triggers = [
+        "il faut que", "il faut qu'", "pour que", "bien que", "avant que",
+        "quoique", "à moins que", "jusqu'à ce que", "pourvu que", "afin que",
+        "bien qu'", "quoiqu'", "pour qu'", "avant qu'", "à moins qu'",
+    ]
+    for trigger in subjunctive_triggers:
+        if trigger in lower:
+            score += 12
+            break
+
+    relative_markers = [
+        "lequel", "laquelle", "lesquels", "lesquelles", "dont",
+        " auquel", " à laquelle", " auxquels", " auxquelles",
+    ]
+    for m in relative_markers:
+        if m in lower:
+            score += 10
+            break
+
+    if re.search(r"\bqui\b", lower):
+        score += 3
+    que_count = lower.count(" que ") + lower.count(" qu'")
+    if que_count >= 2:
+        score += 6
+    elif que_count >= 1:
+        score += 2
+    if re.search(r"\bsi\b.*\b(était|avait|pouvait|faisait|allait|venait|voulait)", lower):
+        score += 8
+    comma_count = lower.count(",") + lower.count(";")
+    if comma_count >= 2:
+        score += min(comma_count * 3, 15)
+    elif comma_count == 1:
+        score += 3
+
+    return min(score, 100.0)
+
+
+def word_similarity_fr(sent_a: str, sent_b: str) -> float:
+    """Jaccard similarity between word sets (for French/latin text).
+
+    :param sent_a: First sentence.
+    :param sent_b: Second sentence.
+    :returns: Similarity between 0 and 1.
+    """
+    words_a = set(_tokenize_words_fr(sent_a))
+    words_b = set(_tokenize_words_fr(sent_b))
+    if not words_a or not words_b:
+        return 0.0
+    inter = len(words_a & words_b)
+    union = len(words_a | words_b)
+    return inter / union if union else 0.0
+
+
+def compute_similarity_penalties_fr(
+    sentences: list[Sentence], top_n: int = 100
+) -> tuple[list[float], list[int | None], list[str | None]]:
+    """Compute similarity penalties (word-based, FR)."""
+    return _compute_similarity_penalties(sentences, word_similarity_fr, top_n)
+
+
+def rank_sentences_fr(
+    sentences: list[Sentence],
+    weights: dict[str, float] | None = None,
+    structural_blend: float = STRUCTURAL_COMPLEXITY_BLEND,
+) -> list[Sentence]:
+    """Rank sentences for French (or other word-based languages) by combined score.
+
+    Combines complexity (length, lexical diversity) and grammar (clauses, mood) into
+    a single structural score to avoid double-counting correlated difficulty.
+
+    :param sentences: Sentences to rank (text = main sentence).
+    :param weights: Optional dict with structural, frequency, similarity_penalty.
+    :param structural_blend: Fraction of structural from complexity (rest from grammar); 0.6 = 60% complexity, 40% grammar.
+    :returns: Same list sorted by final_score (best first).
+    """
+    if weights is None:
+        weights = {
+            "structural": 0.35,
+            "frequency": 0.45,
+            "similarity_penalty": 0.2,
+        }
+
+    freq_data = load_frequency_data_fr()
+
+    print("Calculating complexity scores...")
+    for sent in sentences:
+        sent.complexity_score = complexity_score_fr(sent.text)
+
+    print("Calculating frequency scores...")
+    for sent in sentences:
+        sent.frequency_score = frequency_score_fr(sent.text, freq_data)
+
+    print("Calculating grammar scores...")
+    for sent in sentences:
+        sent.grammar_score = grammar_score_fr(sent.text)
+
+    for sent in sentences:
+        structural = _structural_score(sent.complexity_score, sent.grammar_score, structural_blend)
+        sent.final_score = (
+            sent.frequency_score * weights["frequency"]
+            + (100 - structural) * weights["structural"]
+        )
+
+    sentences.sort(key=lambda s: s.final_score, reverse=True)
+
+    print("Calculating similarity penalties...")
+    penalties, similar_to_indices, similar_to_sentences = compute_similarity_penalties_fr(
+        sentences
+    )
+    for sent, penalty, similar_to, sim_text in zip(
+        sentences, penalties, similar_to_indices, similar_to_sentences
+    ):
+        sent.similarity_penalty = penalty
+        sent.similar_to = similar_to
+        sent.similar_to_sentence = sim_text
+
+    for sent in sentences:
+        structural = _structural_score(sent.complexity_score, sent.grammar_score, structural_blend)
+        sent.final_score = (
+            sent.frequency_score * weights["frequency"]
+            + (100 - structural) * weights["structural"]
+            - sent.similarity_penalty * weights["similarity_penalty"]
+        )
+
+    sentences.sort(key=lambda s: s.final_score, reverse=True)
+    return sentences

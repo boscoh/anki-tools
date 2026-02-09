@@ -3,7 +3,6 @@ Tests for get_audio_for_card() method.
 """
 
 
-
 class TestCardAudioLinking:
     """Tests for get_audio_for_card() method."""
 
@@ -34,7 +33,7 @@ class TestCardAudioLinking:
             audio = pkg.get_audio_for_card(card, models)
             for filename in audio:
                 assert isinstance(filename, str)
-                assert filename.endswith(('.mp3', '.wav', '.ogg'))
+                assert filename.endswith((".mp3", ".wav", ".ogg"))
 
     def test_audio_references_extractable(self, pkg):
         """Test that audio references match extractable files."""
@@ -69,11 +68,11 @@ class TestCardAudioLinking:
 
         # Find a card with audio
         for card in cards:
-            if '[sound:' in card['flds']:
+            if "[sound:" in card["flds"]:
                 audio = pkg.get_audio_for_card(card, models)
                 assert len(audio) > 0
                 # The filename should not include the [sound:] wrapper
                 for filename in audio:
-                    assert not filename.startswith('[sound:')
-                    assert not filename.endswith(']')
+                    assert not filename.startswith("[sound:")
+                    assert not filename.endswith("]")
                 break

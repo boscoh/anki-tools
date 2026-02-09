@@ -12,6 +12,8 @@ dependencies = [
     "pypinyin>=0.55.0",
     "pytest>=8.0.0",
     "ruff>=0.15.0",
+    "spacy>=3.0",
+    "wordfreq>=3.0",
     "zstandard>=0.25.0",
 ]
 

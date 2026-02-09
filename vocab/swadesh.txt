@@ -73,7 +73,7 @@ head
 ear
 eye
 nose
-mouth w
+mouth
 tooth
 tongue
 fingernail

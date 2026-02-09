@@ -3,7 +3,6 @@ Tests for get_media_mapping() method.
 """
 
 
-
 class TestMediaMapping:
     """Tests for get_media_mapping() method."""
 
@@ -25,11 +24,12 @@ class TestMediaMapping:
             assert isinstance(file_id, str)
             assert isinstance(filename, str)
             # Filename should have an extension
-            assert '.' in filename
+            assert "." in filename
 
     def test_media_mapping_contains_audio(self, pkg):
         """Test that media mapping contains audio files."""
         mapping = pkg.get_media_mapping()
-        audio_files = [f for f in mapping.values()
-                      if f.endswith(('.mp3', '.wav', '.ogg'))]
+        audio_files = [
+            f for f in mapping.values() if f.endswith((".mp3", ".wav", ".ogg"))
+        ]
         assert len(audio_files) > 0

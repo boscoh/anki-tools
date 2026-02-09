@@ -14,8 +14,8 @@ from anki_tools import AnkiPackage
 def apkg_path():
     """Find the .apkg file in tests/ directory or current directory."""
     # Look in tests/ directory first, then current directory
-    for base in [Path('tests'), Path('.')]:
-        apkg_files = list(base.glob('*.apkg'))
+    for base in [Path("tests"), Path(".")]:
+        apkg_files = list(base.glob("*.apkg"))
         if apkg_files:
             return str(apkg_files[0])
     pytest.skip("No .apkg file found in tests/ or current directory")

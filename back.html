@@ -1,36 +1,20 @@
 {{FrontSide}}
 
-<div class="characters">{{Sentence (Annotated)}}</div>
-<div class="latin">{{Sentence (Latin)}}</div>
-<div class="translation">{{Sentence (Translation)}}</div>
-
-<br>
-
-<div> cc: <span id="canto-sentence">{{Sentence (Annotated)}}</span></div>
-<div> wiki: <span id="wiki-sentence">{{Sentence (Annotated)}}</span></div>
+<div id="chars" style="font-size: 1.5em">{{Sentence (Annotated)}}</div>
+<div id="latin">{{Sentence (Latin)}}</div>
+<div id="translation">{{Sentence (Translation)}}</div>
 
 <script>
-  function expandSentenceUrl(elemId, url) {
+  function expand(elemId, url) {
     var elem = document.getElementById(elemId);
-
-    var content = elem.innerHTML;
-    content = content.replace("'", " ");
-    content = content.replace("。", " ");
-
-    content = content.replace(/\s{2,}/g, " ");
-    content = content.replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()]/g, "");
-    content = content.toLowerCase();
-
-    var innerHtml = "";
-    var chars = content.split("");
-    for (let ch of chars) {
-      innerHtml += `<a href = "${url}/${ch}">${ch}</a> `;
+    if (elem) {
+      var isCJK = ch => /[\u4e00-\u9fff]/.test(ch);
+      elem.innerHTML = elem.innerHTML
+        .split("")
+        .filter(ch => !/\s/.test(ch))
+        .map(ch => isCJK(ch) ? `<a href="${url}${ch}">${ch}</a>` : ch)
+        .join("");
     }
-
-    elem.innerHTML = innerHtml;
   }
-
-  expandSentenceUrl('canto-sentence', `https://cantonese.org/search.php?q=`)
-  expandSentenceUrl('wiki-sentence', `https://en.wiktionary.org/wiki`)
+  expand('chars', `https://cantonese.org/search.php?q=`)
 </script>
-

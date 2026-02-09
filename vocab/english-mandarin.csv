@@ -1,32 +1,32 @@
-english,characters,pinyin
+english,mandarin,transliteration
 I,我,wǒ
 you (singular),你,nǐ
-he/she,他/她,tā
-we,我们,wǒmen
-you (plural),你们,nǐmen
-they (plural),他们/她们,tāmen
+he/she,他/她,tā tā
+we,我们,wǒ men
+you (plural),你们,nǐ men
+they (plural),他们/她们,tā men tā men
 this,这,zhè
 that,那,nà
-here,这里,zhèlǐ
-there,那里,nàlǐ
+here,这里,zhè lǐ
+there,那里,nà lǐ
 who,谁,shuí
-what,什么,shénme
-where,哪里,nǎlǐ
-when,什么时候,shénme shíhòu
-how,怎么,zěnme
+what,什么,shén me
+where,哪里,nǎ lǐ
+when,什么时候,shén me shí hòu
+how,怎么,zěn me
 not,不,bù
-all,所有,suǒyǒu
-many,许多,xǔduō
-some,一些,yīxiē
-few,少数,shǎoshù
-other,其他,qítā
+all,所有,suǒ yǒu
+many,许多,xǔ duō
+some,一些,yī xiē
+few,少数,shǎo shù
+other,其他,qí tā
 one,一,yī
 two,二,èr
 three,三,sān
 four,四,sì
 five,五,wǔ
 big,大,dà
-long,长,cháng
+long,长,zhǎng
 wide,宽,kuān
 thick,厚,hòu
 heavy,重,zhòng
@@ -34,58 +34,58 @@ small,小,xiǎo
 short,短,duǎn
 narrow,窄,zhǎi
 thin,薄,báo
-woman,女人,nǚrén
-man,男人,nánrén
+woman,女人,nǚ rén
+man,男人,nán rén
 human being,人,rén
-child,孩子,háizi
-wife,妻子,qīzi
-husband,丈夫,zhàngfu
-mother,妈妈,māma
-father,爸爸,bàba
-animal,动物,dòngwù
+child,孩子,hái zi
+wife,妻子,qī zǐ
+husband,丈夫,zhàng fū
+mother,妈妈,mā mā
+father,爸爸,bà bà
+animal,动物,dòng wù
 fish,鱼,yú
 bird,鸟,niǎo
 dog,狗,gǒu
-louse,虱子,shīzi
+louse,虱子,shī zi
 snake,蛇,shé
-worm,虫子,chóngzi
+worm,虫子,chóng zi
 tree,树,shù
-forest,森林,sēnlín
-stick,棍子,gùnzi
-fruit,水果,shuǐguǒ
-seed,种子,zhǒngzi
-leaf,叶子,yèzi
+forest,森林,sēn lín
+stick,棍子,gùn zi
+fruit,水果,shuǐ guǒ
+seed,种子,zhǒng zi
+leaf,叶子,yè zi
 root,根,gēn
-tree bark,树皮,shùpí
+tree bark,树皮,shù pí
 flower,花,huā
 grass,草,cǎo
-rope,绳子,shéngzi
-skin,皮肤,pífū
+rope,绳子,shéng zi
+skin,皮肤,pí fū
 meat,肉,ròu
 blood,血,xuè
-bone,骨头,gǔtou
-fat (noun),脂肪,zhīfáng
+bone,骨头,gǔ tou
+fat (noun),脂肪,zhī fáng
 egg,蛋,dàn
 horn,角,jiǎo
-tail,尾巴,wěiba
-feather,羽毛,yǔmáo
-hair,头发,tóufa
+tail,尾巴,wěi ba
+feather,羽毛,yǔ máo
+hair,头发,tóu fà
 head,头,tóu
-ear,耳朵,ěrduo
-eye,眼睛,yǎnjing
-nose,鼻子,bízi
+ear,耳朵,ěr duǒ
+eye,眼睛,yǎn jīng
+nose,鼻子,bí zi
 mouth,嘴,zuǐ
-tooth,牙齿,yáchǐ
-tongue,舌头,shétou
-fingernail,指甲,zhǐjia
+tooth,牙齿,yá chǐ
+tongue,舌头,shé tou
+fingernail,指甲,zhǐ jiǎ
 foot,脚,jiǎo
 leg,腿,tuǐ
-knee,膝盖,xīgài
+knee,膝盖,xī gài
 hand,手,shǒu
-wing,翅膀,chìbǎng
-belly,肚子,dùzi
-guts,肠子,chángzi
-neck,脖子,bózi
+wing,翅膀,chì bǎng
+belly,肚子,dǔ zi
+guts,肠子,cháng zi
+neck,脖子,bó zi
 back,背,bèi
 breast,胸,xiōng
 heart,心,xīn
@@ -95,29 +95,29 @@ to eat,吃,chī
 to bite,咬,yǎo
 to suck,吸,xī
 to spit,吐,tǔ
-to vomit,呕吐,ǒutù
+to vomit,呕吐,ǒu tù
 to blow,吹,chuī
-to breathe,呼吸,hūxī
+to breathe,呼吸,hū xī
 to laugh,笑,xiào
 to see,看,kàn
 to hear,听,tīng
-to know,知道,zhīdào
+to know,知道,zhī dào
 to think,想,xiǎng
 to smell,闻,wén
 to fear,怕,pà
-to sleep,睡觉,shuìjiào
+to sleep,睡觉,shuì jiào
 to live,活,huó
 to die,死,sǐ
 to kill,杀,shā
-to fight,打架,dǎjià
-to hunt,打猎,dǎliè
+to fight,打架,dǎ jià
+to hunt,打猎,dǎ liè
 to hit,打,dǎ
-to cut,切,qiē
-to split,分开,fēnkāi
+to cut,切,qiè
+to split,分开,fēn kāi
 to stab,刺,cì
 to scratch,抓,zhuā
 to dig,挖,wā
-to swim,游泳,yóuyǒng
+to swim,游泳,yóu yǒng
 to fly,飞,fēi
 to walk,走,zǒu
 to come,来,lái
@@ -136,8 +136,8 @@ to pull,拉,lā
 to push,推,tuī
 to throw,扔,rēng
 to tie,绑,bǎng
-to sew,缝,féng
-to count,数,shǔ
+to sew,缝,fèng
+to count,数,shù
 to say,说,shuō
 to sing,唱,chàng
 to play,玩,wán
@@ -145,18 +145,18 @@ to float,浮,fú
 to flow,流,liú
 to freeze,冻,dòng
 to swell,肿,zhǒng
-sun,太阳,tàiyáng
-moon,月亮,yuèliang
-star,星星,xīngxing
+sun,太阳,tài yáng
+moon,月亮,yuè liàng
+star,星星,xīng xīng
 water,水,shuǐ
 rain,雨,yǔ
 river,河,hé
 lake,湖,hú
 sea,海,hǎi
 salt,盐,yán
-stone,石头,shítou
+stone,石头,shí tou
 sand,沙,shā
-dust,灰尘,huīchén
+dust,灰尘,huī chén
 earth,土,tǔ
 cloud,云,yún
 fog,雾,wù
@@ -175,8 +175,8 @@ green,绿,lǜ
 yellow,黄,huáng
 white,白,bái
 black,黑,hēi
-night,晚上,wǎnshang
-day,白天,báitiān
+night,晚上,wǎn shàng
+day,白天,bái tiān
 year,年,nián
 warm,暖,nuǎn
 cold,冷,lěng
@@ -186,14 +186,14 @@ old,旧,jiù
 good,好,hǎo
 bad,坏,huài
 rotten,烂,làn
-dirty,脏,zāng
+dirty,脏,zàng
 straight,直,zhí
 round,圆,yuán
-sharp,锋利,fēnglì
+sharp,锋利,fēng lì
 dull,钝,dùn
 smooth,滑,huá
 wet,湿,shī
-dry,干,gān
+dry,干,gàn
 correct,对,duì
 near,近,jìn
 far,远,yuǎn
@@ -203,6 +203,6 @@ at,在,zài
 in,里,lǐ
 with,和,hé
 and,和,hé
-if,如果,rúguǒ
-because,因为,yīnwèi
-name,名字,míngzi
+if,如果,rú guǒ
+because,因为,yīn wèi
+name,名字,míng zì

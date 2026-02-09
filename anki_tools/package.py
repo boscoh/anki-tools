@@ -49,6 +49,7 @@ from pathlib import Path
 
 try:
     import zstandard
+
     HAS_ZSTD = True
 except ImportError:
     HAS_ZSTD = False
@@ -91,7 +92,10 @@ class AnkiPackage:
         self._db_path: str | None = None
 
     def __enter__(self) -> "AnkiPackage":
-        """Enter context manager, extract and open the APKG file."""
+        """Enter context manager, extract and open the APKG file.
+
+        :returns: Self for chaining.
+        """
         self.temp_dir = tempfile.mkdtemp()
 
         with zipfile.ZipFile(self.apkg_path, "r") as zip_ref:
@@ -99,7 +103,7 @@ class AnkiPackage:
 
         db_path = self._select_and_prepare_database()
         self._db_path = db_path
-        
+
         self.conn = sqlite3.connect(db_path)
         self.conn.row_factory = sqlite3.Row
 
@@ -122,7 +126,9 @@ class AnkiPackage:
                     "zstandard package required for anki21b format. "
                     "Install with: uv add zstandard"
                 )
-            decompressed_path = os.path.join(self.temp_dir, "collection_decompressed.db")
+            decompressed_path = os.path.join(
+                self.temp_dir, "collection_decompressed.db"
+            )
             self._decompress_zstd(db_path_21b, decompressed_path)
             self._db_format = "anki21b"
             return decompressed_path
@@ -164,11 +170,19 @@ class AnkiPackage:
 
     @property
     def _is_anki21(self) -> bool:
-        """Backward compatibility property for Anki 2.1+ formats."""
+        """Backward compatibility property for Anki 2.1+ formats.
+
+        :returns: True if format is anki21 or anki21b.
+        """
         return self._db_format in ("anki21", "anki21b")
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
-        """Exit context manager, close connection and clean up."""
+        """Exit context manager, close connection and clean up.
+
+        :param exc_type: Exception type if raised.
+        :param exc_val: Exception value if raised.
+        :param exc_tb: Exception traceback if raised.
+        """
         if self.conn:
             self.conn.close()
 
@@ -188,36 +202,49 @@ class AnkiPackage:
             - Anki21b: Normalized ``decks`` table
         """
         cursor = self.conn.cursor()
-        
+
         if self._db_format == "anki21b":
             cursor.execute("SELECT id, name FROM decks")
             decks = {}
             for row in cursor.fetchall():
                 decks[str(row["id"])] = {"name": row["name"]}
             return decks
-        
+
         cursor.execute("SELECT decks FROM col")
         decks_json = cursor.fetchone()[0]
         decks = json.loads(decks_json)
         return decks
 
     def _write_varint(self, value: int) -> bytes:
-        """Write a varint to bytes."""
+        """Write a varint to bytes.
+
+        :param value: Integer to encode.
+        :returns: Varint-encoded bytes.
+        """
         result = b""
         while value > 127:
-            result += bytes([(value & 0x7f) | 0x80])
+            result += bytes([(value & 0x7F) | 0x80])
             value >>= 7
         result += bytes([value])
         return result
 
     def _write_proto_string(self, field_num: int, value: str) -> bytes:
-        """Write a protobuf length-delimited string field."""
+        """Write a protobuf length-delimited string field.
+
+        :param field_num: Protobuf field number.
+        :param value: String value to encode.
+        :returns: Encoded bytes.
+        """
         data = value.encode("utf-8")
         tag = (field_num << 3) | 2
         return bytes([tag]) + self._write_varint(len(data)) + data
 
     def _parse_template_config(self, config: bytes) -> dict[str, str]:
-        """Parse protobuf config blob from templates table."""
+        """Parse protobuf config blob from templates table.
+
+        :param config: Raw protobuf config bytes.
+        :returns: Dict with ``qfmt`` and ``afmt`` keys.
+        """
         result = {"qfmt": "", "afmt": ""}
         pos = 0
         while pos < len(config):
@@ -227,10 +254,10 @@ class AnkiPackage:
             pos += 1
             field_num = tag >> 3
             wire_type = tag & 0x07
-            
+
             if wire_type == 2:
                 length, pos = self._read_varint(config, pos)
-                value = config[pos:pos + length].decode("utf-8", errors="replace")
+                value = config[pos : pos + length].decode("utf-8", errors="replace")
                 pos += length
                 if field_num == 1:
                     result["qfmt"] = value
@@ -240,15 +267,24 @@ class AnkiPackage:
                 _, pos = self._read_varint(config, pos)
             else:
                 break
-        
+
         return result
 
     def _build_template_config(self, qfmt: str, afmt: str) -> bytes:
-        """Build protobuf config blob for templates table."""
+        """Build protobuf config blob for templates table.
+
+        :param qfmt: Question template format.
+        :param afmt: Answer template format.
+        :returns: Protobuf config bytes.
+        """
         return self._write_proto_string(1, qfmt) + self._write_proto_string(2, afmt)
 
     def _parse_notetype_config(self, config: bytes) -> dict:
-        """Parse protobuf config blob from notetypes table to extract CSS."""
+        """Parse protobuf config blob from notetypes table to extract CSS.
+
+        :param config: Raw protobuf config bytes.
+        :returns: Dict with ``css`` and ``other_fields`` keys.
+        """
         result = {"css": "", "other_fields": []}
         pos = 0
         while pos < len(config):
@@ -257,11 +293,13 @@ class AnkiPackage:
             pos += 1
             field_num = tag >> 3
             wire_type = tag & 0x07
-            
+
             if wire_type == 2:
                 length, pos = self._read_varint(config, pos)
                 if field_num == 3:
-                    result["css"] = config[pos:pos + length].decode("utf-8", errors="replace")
+                    result["css"] = config[pos : pos + length].decode(
+                        "utf-8", errors="replace"
+                    )
                 else:
                     result["other_fields"].append((start_pos, pos + length, field_num))
                 pos += length
@@ -271,31 +309,36 @@ class AnkiPackage:
                 pos = end_pos
             else:
                 break
-        
+
         result["_original"] = config
         return result
 
     def _build_notetype_config(self, parsed: dict, new_css: str | None = None) -> bytes:
-        """Rebuild notetype config with optionally updated CSS."""
+        """Rebuild notetype config with optionally updated CSS.
+
+        :param parsed: Parsed config from :meth:`_parse_notetype_config`.
+        :param new_css: Optional new CSS string; uses existing if None.
+        :returns: Protobuf config bytes.
+        """
         original = parsed["_original"]
         css = new_css if new_css is not None else parsed["css"]
-        
+
         result = b""
         pos = 0
-        
+
         while pos < len(original):
             tag = original[pos]
             field_num = tag >> 3
             wire_type = tag & 0x07
             start = pos
             pos += 1
-            
+
             if wire_type == 2:
                 length, pos = self._read_varint(original, pos)
                 if field_num == 3:
                     result += self._write_proto_string(3, css)
                 else:
-                    result += original[start:pos + length]
+                    result += original[start : pos + length]
                 pos += length
             elif wire_type == 0:
                 _, pos = self._read_varint(original, pos)
@@ -303,7 +346,7 @@ class AnkiPackage:
             else:
                 result += original[start:]
                 break
-        
+
         return result
 
     def get_models(self, include_templates: bool = False) -> dict[str, dict]:
@@ -321,7 +364,7 @@ class AnkiPackage:
             - Anki21b: ``notetypes`` + ``fields`` tables
         """
         cursor = self.conn.cursor()
-        
+
         if self._db_format == "anki21b":
             cursor.execute("SELECT id, name FROM notetypes")
             models = {}
@@ -333,13 +376,13 @@ class AnkiPackage:
                     "tmpls": [],
                     "css": "",
                 }
-            
+
             cursor.execute("SELECT ntid, name, ord FROM fields ORDER BY ntid, ord")
             for row in cursor.fetchall():
                 model_id = str(row["ntid"])
                 if model_id in models:
                     models[model_id]["flds"].append({"name": row["name"]})
-            
+
             if include_templates:
                 cursor.execute(
                     "SELECT ntid, name, ord, config FROM templates ORDER BY ntid, ord"
@@ -355,9 +398,9 @@ class AnkiPackage:
                             "afmt": config["afmt"],
                         }
                         models[model_id]["tmpls"].append(tmpl)
-            
+
             return models
-        
+
         cursor.execute("SELECT models FROM col")
         models_json = cursor.fetchone()[0]
         models = json.loads(models_json)
@@ -398,7 +441,7 @@ class AnkiPackage:
                 row = cursor.fetchone()
                 if not row:
                     raise ValueError(f"Model {model_id} not found")
-                
+
                 parsed = self._parse_notetype_config(row["config"] or b"")
                 new_config = self._build_notetype_config(parsed, css)
                 cursor.execute(
@@ -551,11 +594,12 @@ class AnkiPackage:
             content = f.read()
 
         # Zstd magic: 0x28 0xB5 0x2F 0xFD (little-endian 0xFD2FB528)
-        ZSTD_MAGIC = b'\x28\xb5\x2f\xfd'
+        ZSTD_MAGIC = b"\x28\xb5\x2f\xfd"
         if content[:4] == ZSTD_MAGIC:
             if not HAS_ZSTD:
                 return {}
             import io
+
             dctx = zstandard.ZstdDecompressor()
             # Use stream_reader because content size may not be in frame header
             with dctx.stream_reader(io.BytesIO(content)) as reader:
@@ -599,34 +643,34 @@ class AnkiPackage:
         mapping = {}
         pos = 0
         entry_idx = 0
-        
+
         while pos < len(data):
             if pos >= len(data):
                 break
-            
+
             tag = data[pos]
             pos += 1
-            
-            if tag != 0x0a:
+
+            if tag != 0x0A:
                 break
-            
+
             msg_len, pos = self._read_varint(data, pos)
             if msg_len == 0:
                 break
-            
+
             msg_end = pos + msg_len
             filename = None
-            
+
             while pos < msg_end:
                 inner_tag = data[pos]
                 pos += 1
-                
+
                 field_num = inner_tag >> 3
                 wire_type = inner_tag & 0x07
-                
+
                 if field_num == 1 and wire_type == 2:
                     str_len, pos = self._read_varint(data, pos)
-                    filename = data[pos:pos + str_len].decode("utf-8")
+                    filename = data[pos : pos + str_len].decode("utf-8")
                     pos += str_len
                 elif wire_type == 2:
                     skip_len, pos = self._read_varint(data, pos)
@@ -636,13 +680,13 @@ class AnkiPackage:
                 else:
                     pos = msg_end
                     break
-            
+
             if filename is not None:
                 mapping[str(entry_idx)] = filename
-            
+
             pos = msg_end
             entry_idx += 1
-        
+
         return mapping
 
     def _read_varint(self, data: bytes, pos: int) -> tuple[int, int]:
@@ -661,7 +705,7 @@ class AnkiPackage:
         while pos < len(data):
             byte = data[pos]
             pos += 1
-            result |= (byte & 0x7f) << shift
+            result |= (byte & 0x7F) << shift
             if (byte & 0x80) == 0:
                 break
             shift += 7
@@ -742,9 +786,7 @@ class AnkiPackage:
 
         return stats
 
-    def add_media_file(
-        self, file_path: str | Path, filename: str | None = None
-    ) -> str:
+    def add_media_file(self, file_path: str | Path, filename: str | None = None) -> str:
         """
         Add a media file (audio/image) to the APKG package.
 
@@ -753,10 +795,10 @@ class AnkiPackage:
         :returns: The filename that can be used in card fields (e.g., ``"audio.mp3"``).
         :raises FileNotFoundError: If file_path doesn't exist.
 
-        :Example:
+        .. code-block:: python
 
-        >>> filename = pkg.add_media_file("/path/to/audio.mp3")
-        >>> pkg.add_audio_to_card(note_id, 0, filename)
+            filename = pkg.add_media_file("/path/to/audio.mp3")
+            pkg.add_audio_to_card(note_id, 0, filename)
         """
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"File not found: {file_path}")
@@ -1278,16 +1320,19 @@ class AnkiPackage:
         print(f"Saved changes to {output_path}")
 
     def _recompress_anki21b(self) -> None:
-        """Recompress the decompressed database back to anki21b format."""
+        """Recompress the decompressed database back to anki21b format.
+
+        Writes collection.anki21b from collection_decompressed.db using zstd.
+        """
         decompressed_path = os.path.join(self.temp_dir, "collection_decompressed.db")
         anki21b_path = os.path.join(self.temp_dir, "collection.anki21b")
-        
+
         with open(decompressed_path, "rb") as f:
             data = f.read()
-        
+
         cctx = zstandard.ZstdCompressor()
         compressed = cctx.compress(data)
-        
+
         with open(anki21b_path, "wb") as f:
             f.write(compressed)
 
@@ -1301,6 +1346,8 @@ class AnkiPackage:
         model_name: str = "Basic",
         question_format: str | None = None,
         answer_format: str | None = None,
+        css: str | None = None,
+        sort_field_index: int = 0,
     ) -> None:
         """
         Create a new APKG file from scratch.
@@ -1323,23 +1370,26 @@ class AnkiPackage:
             first field.
         :param answer_format: Anki template for the answer (back) side.
             Defaults to ``{{FrontSide}}<hr>`` followed by remaining fields.
+        :param css: CSS styling for the cards.
+        :param sort_field_index: Zero-based index of the field used for browser sorting.
 
-        :Example:
+        .. code-block:: python
 
-        >>> AnkiPackage.create(
-        ...     "vocab.apkg",
-        ...     "My Vocab",
-        ...     fields=["audio", "word", "meaning"],
-        ...     cards=[
-        ...         {"audio": "[sound:hello.mp3]", "word": "hello", "meaning": "greeting"},
-        ...         {"audio": "[sound:bye.mp3]", "word": "goodbye", "meaning": "farewell"},
-        ...     ],
-        ...     media_files=["audio/hello.mp3", "audio/bye.mp3"],
-        ...     question_format="{{audio}}",
-        ...     answer_format="{{audio}}<hr>{{word}}<br>{{meaning}}",
-        ... )
+            AnkiPackage.create(
+                "vocab.apkg",
+                "My Vocab",
+                fields=["audio", "word", "meaning"],
+                cards=[
+                    {"audio": "[sound:hello.mp3]", "word": "hello", "meaning": "greeting"},
+                    {"audio": "[sound:bye.mp3]", "word": "goodbye", "meaning": "farewell"},
+                ],
+                media_files=["audio/hello.mp3", "audio/bye.mp3"],
+                question_format="{{audio}}",
+                answer_format="{{audio}}<hr>{{word}}<br>{{meaning}}",
+            )
         """
         import random
+
         import genanki
 
         model_id = random.randrange(1 << 30, 1 << 31)
@@ -1354,18 +1404,23 @@ class AnkiPackage:
                 parts.append("{{" + field + "}}")
             answer_format = "\n".join(parts)
 
-        model = genanki.Model(
-            model_id,
-            model_name,
-            fields=[{"name": f} for f in fields],
-            templates=[
+        model_kwargs = {
+            "model_id": model_id,
+            "name": model_name,
+            "fields": [{"name": f} for f in fields],
+            "sort_field_index": sort_field_index,
+            "templates": [
                 {
                     "name": "Card 1",
                     "qfmt": question_format,
                     "afmt": answer_format,
                 }
             ],
-        )
+        }
+        if css:
+            model_kwargs["css"] = css
+
+        model = genanki.Model(**model_kwargs)
 
         deck = genanki.Deck(deck_id, deck_name)
 

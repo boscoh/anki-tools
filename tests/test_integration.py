@@ -12,11 +12,11 @@ class TestIntegration:
         """Test the complete audio extraction workflow."""
         # Step 1: Get statistics
         stats = pkg.get_audio_statistics()
-        assert stats['audio_files'] > 0
+        assert stats["audio_files"] > 0
 
         # Step 2: Extract audio
         extracted = pkg.extract_audio_files(temp_output_dir)
-        assert len(extracted) == stats['audio_files']
+        assert len(extracted) == stats["audio_files"]
 
         # Step 3: Link cards to audio
         cards = pkg.get_cards()
@@ -34,7 +34,9 @@ class TestIntegration:
 
         # Most referenced audio should be in extracted files
         # (Some decks may have missing media files)
-        found_count = sum(1 for audio_file in referenced_audio if audio_file in extracted)
+        found_count = sum(
+            1 for audio_file in referenced_audio if audio_file in extracted
+        )
         coverage = found_count / len(referenced_audio) if referenced_audio else 0
         assert coverage > 0.95  # At least 95% coverage
 
@@ -61,4 +63,6 @@ class TestIntegration:
         # Results should be identical
         assert extracted1.keys() == extracted2.keys()
         for filename in extracted1.keys():
-            assert os.path.getsize(extracted1[filename]) == os.path.getsize(extracted2[filename])
+            assert os.path.getsize(extracted1[filename]) == os.path.getsize(
+                extracted2[filename]
+            )
