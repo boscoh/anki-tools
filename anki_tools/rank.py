@@ -771,7 +771,8 @@ def rank_sentences_yue(
     """Rank sentences for Cantonese by combined score.
 
     Uses Chinese character-based complexity and similarity (like ZH)
-    but with Cantonese-specific weighting and frequency data.
+    with Cantonese-specific weighting. Frequency data uses Chinese (Mandarin)
+    as an approximation since Cantonese is not available in wordfreq.
 
     :param sentences: Sentences to rank.
     :param weights: Optional dict with complexity, frequency, similarity_penalty.

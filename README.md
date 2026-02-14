@@ -196,7 +196,9 @@ uv run anki yue similar deck.apkg
 uv run anki yue reorder deck.apkg
 ```
 
-**Method:** Uses character-based complexity and similarity scoring (like Chinese) with Cantonese-specific weighting. Frequency data from Chinese wordfreq.
+**Method:** Uses character-based complexity and similarity scoring (like Chinese) with Cantonese-specific weighting.
+
+**Note:** Frequency data uses Chinese (Mandarin) from wordfreq as an approximation, since Cantonese-specific frequency data is not available in wordfreq. This is reasonable because both languages use the same Chinese characters with similar frequency distributions.
 
 ### Chinese Sentence Processing
 
