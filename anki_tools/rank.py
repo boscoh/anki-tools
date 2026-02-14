@@ -13,13 +13,8 @@ import jieba
 import opencc
 from wordfreq import iter_wordlist
 
+from anki_tools.jyutping import get_jyutping, simplified_to_traditional
 from anki_tools.package import AnkiPackage
-
-try:
-    import ToJyutping
-    HAS_TOJYUTPING = True
-except ImportError:
-    HAS_TOJYUTPING = False
 
 try:
     import spacy
@@ -793,37 +788,6 @@ def rank_sentences_fr(
 # =============================================================================
 # Cantonese ranking (character-based, similar to ZH but with YUE weighting)
 # =============================================================================
-
-
-def simplified_to_traditional(text: str) -> str:
-    """Convert simplified Chinese to traditional Chinese.
-
-    :param text: Text with simplified Chinese characters.
-    :returns: Text with traditional Chinese characters.
-    """
-    try:
-        converter = opencc.OpenCC('s2t')
-        return converter.convert(text)
-    except Exception:
-        return text
-
-
-def get_jyutping(text: str) -> str:
-    """Generate jyutping romanization for Cantonese text.
-
-    :param text: Cantonese text (traditional Chinese).
-    :returns: Space-separated jyutping with tone numbers.
-    """
-    if not HAS_TOJYUTPING:
-        return ""
-    try:
-        clean_text = re.sub(r'[！？。，、：；""' "（）]", "", text)
-        if not clean_text:
-            return ""
-        result = ToJyutping.get_jyutping_text(clean_text)
-        return result
-    except Exception:
-        return ""
 
 
 def rank_sentences_yue(

@@ -4,9 +4,14 @@ import re
 from pathlib import Path
 
 import opencc
-import ToJyutping
 
 from anki_tools.package import AnkiPackage
+
+try:
+    import ToJyutping
+    HAS_TOJYUTPING = True
+except ImportError:
+    HAS_TOJYUTPING = False
 
 
 def simplified_to_traditional(text: str) -> str:
@@ -28,6 +33,8 @@ def get_jyutping(text: str) -> str:
     :param text: Cantonese text (traditional Chinese).
     :returns: Space-separated jyutping with tone numbers.
     """
+    if not HAS_TOJYUTPING:
+        return ""
     try:
         clean_text = re.sub(r'[！？。，、：；"""（）]', "", text)
         if not clean_text:
