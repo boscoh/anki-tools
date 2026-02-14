@@ -17,7 +17,7 @@ Read, edit, and manipulate Anki flashcard packages (.apkg files) using direct SQ
 - **CLI Tools**: Command-line interface for common workflows
 - **Audio Extraction**: Extract audio files with proper filenames
 - **Deck Management**: Create decks, copy cards, move cards between decks
-- **Sentence Ranking**: Rank and filter sentences by complexity, frequency, and similarity (Chinese and French)
+- **Sentence Ranking**: Rank and filter sentences by complexity, frequency, and similarity (Chinese, French, and Cantonese)
 - **Vocabulary Generation**: Build Swadesh vocabulary decks with audio (multiple languages)
 - **Card Deletion**: Delete cards with automatic cleanup of unused audio files
 - **Minimal Dependencies**: Direct SQLite access, no Anki installation required
@@ -58,6 +58,14 @@ uv run anki fr similar INPUT.apkg     # Find similar sentences
 uv run anki fr reorder INPUT.apkg     # Reorder by ranking
 ```
 
+### yue - Cantonese Deck Processing
+
+```bash
+uv run anki yue rank INPUT.apkg       # Rank by difficulty
+uv run anki yue similar INPUT.apkg    # Find similar sentences
+uv run anki yue reorder INPUT.apkg    # Reorder by ranking
+```
+
 ### inspect - Inspect APKG Files
 
 ```bash
@@ -91,6 +99,10 @@ uv run anki zh reorder input.apkg
 # Rank French sentences
 uv run anki fr rank input.apkg
 uv run anki fr similar input.apkg
+
+# Rank Cantonese sentences
+uv run anki yue rank input.apkg
+uv run anki yue similar input.apkg
 
 # Inspect APKG files
 uv run anki inspect deck.apkg
@@ -168,6 +180,23 @@ uv run anki fr reorder deck.apkg
 ```bash
 uv run python -m spacy download fr_core_news_sm
 ```
+
+### Cantonese Sentence Ranking
+
+Rank Cantonese decks by difficulty and similarity:
+
+```bash
+# Rank sentences by complexity, frequency, and uniqueness
+uv run anki yue rank deck.apkg
+
+# Show high-similarity pairs (candidates for deletion)
+uv run anki yue similar deck.apkg
+
+# Reorder deck based on ranking
+uv run anki yue reorder deck.apkg
+```
+
+**Method:** Uses character-based complexity and similarity scoring (like Chinese) with Cantonese-specific weighting. Frequency data from Chinese wordfreq.
 
 ### Chinese Sentence Processing
 
@@ -464,4 +493,5 @@ Anki package files are ZIP archives containing:
 - [AnkiDroid Database Structure](https://github.com/ankidroid/Anki-Android/wiki/Database-Structure)
 - [genanki Documentation](https://github.com/kerrickstaley/genanki)
 - [Neri Frequency List](https://frequencylists.blogspot.com/2018/02/welcome.html)
-- Tatoeba Project
+- [Tatoeba Project](https://tatoeba.org/en/)
+- [Xefjord's Complete Languages](https://xefjord.wixsite.com/xefscompletelangs)

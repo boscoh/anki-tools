@@ -6,6 +6,7 @@ Commands:
     swadesh - Build Swadesh vocabulary APKG files with audio
     zh - Process Chinese Anki decks (rank, reorder, fix pinyin)
     fr - Analyze French Anki decks (e.g. 6000 French Sentences)
+    yue - Analyze Cantonese Anki decks (e.g. LTL Cantonese)
     style - Apply CSS and card templates to any deck
 """
 
@@ -26,6 +27,7 @@ from anki_tools.rank import (
     SIMILARITY_CONSIDER_DELETE_PENALTY,
     extract_sentences,
     rank_sentences_fr,
+    rank_sentences_yue,
     rank_sentences_zh,
     write_ranking_csv,
 )
@@ -797,6 +799,142 @@ def reorder_fr(
 @process_fr_app.command(name="similar")
 def similar_fr(
     apkg_path: Path = DEFAULT_FRENCH_APKG,
+    *,
+    ranking_csv: Path | None = None,
+):
+    """Show sentence pairs with high similarity (from .rank.csv).
+
+    :param apkg_path: Input .apkg file (used to default ranking CSV path).
+    :param ranking_csv: Ranking CSV (default: same stem as apkg with .rank.csv).
+    """
+    apkg_path = Path(apkg_path)
+    if ranking_csv is None:
+        ranking_csv = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
+    if not ranking_csv.exists():
+        print(f"Error: File not found: {ranking_csv}")
+        return
+
+    threshold = SIMILARITY_CONSIDER_DELETE_PENALTY
+    with open(ranking_csv, encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        rows = []
+        for r in reader:
+            if not (r.get("similar_to") or "").strip():
+                continue
+            raw = r.get("similarity") or r.get("similarity_penalty") or "0"
+            try:
+                if float(raw) > threshold:
+                    rows.append(r)
+            except ValueError:
+                pass
+
+    if not rows:
+        print(f"No pairs with similarity > {threshold} (consider deleting above this).")
+        return
+
+    print(f"Pairs worth reviewing for deletion (similarity > {threshold}, {len(rows)}):\n")
+    for i, r in enumerate(rows, 1):
+        sent = r.get("sentence", "")
+        similar_to = r.get("similar_to", "")
+        sim = r.get("similarity") or r.get("similarity_penalty") or ""
+        print(f"{i}. [similarity {sim}]")
+        print(f"   SENT:   {sent}")
+        print(f"   CLOSEST: {similar_to}")
+        print()
+
+
+# =============================================================================
+# YUE commands - analyze Cantonese decks
+# =============================================================================
+
+process_yue_app = cyclopts.App(
+    name="yue", help="Analyze Cantonese Anki decks (e.g. LTL Cantonese)"
+)
+app.command(process_yue_app)
+
+DEFAULT_CANTONESE_APKG = Path("apkg/LTL Cantonese Deck Level 1 - Short.apkg")
+
+
+@process_yue_app.command(name="rank")
+def rank_yue(
+    apkg_path: Path = DEFAULT_CANTONESE_APKG,
+    *,
+    output: Path | None = None,
+    model_id: int | None = None,
+    text_field: str = "Front",
+):
+    """Rank Cantonese sentences by complexity, frequency, and uniqueness.
+
+    Uses character-based scoring (like ZH) with Cantonese-specific weighting.
+    Output CSV is compatible with yue reorder.
+
+    :param apkg_path: Input .apkg file.
+    :param output: Output CSV file (default: same stem as input with .rank.csv).
+    :param model_id: Filter by specific model ID.
+    :param text_field: Preferred sentence field (default: Front); inferred from deck if missing.
+    """
+    apkg_path = Path(apkg_path)
+    if output is None:
+        output = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
+    if not apkg_path.exists():
+        print(f"Error: File not found: {apkg_path}")
+        return
+
+    print(f"Ranking sentences from: {apkg_path}")
+    sentences = extract_sentences(str(apkg_path), model_id, text_field=text_field)
+    if not sentences:
+        print("No sentences found!")
+        return
+
+    ranked = rank_sentences_yue(sentences)
+    write_ranking_csv(ranked, str(output))
+
+    print(f"\nRanked {len(ranked)} sentences -> {output}")
+
+
+@process_yue_app.command(name="reorder")
+def reorder_yue(
+    apkg_path: Path = DEFAULT_CANTONESE_APKG,
+    ranking_csv: Path | None = None,
+    *,
+    output: Path | None = None,
+    keep_filtered: bool = False,
+):
+    """Reorder Cantonese deck based on ranking CSV from yue rank.
+
+    :param apkg_path: Input .apkg file.
+    :param ranking_csv: Ranking CSV (default: same stem as apkg with .rank.csv).
+    :param output: Output .apkg file (default: input_reordered.apkg).
+    :param keep_filtered: If True, keep filtered cards instead of removing.
+    """
+    apkg_path = Path(apkg_path)
+    if ranking_csv is None:
+        ranking_csv = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
+    if output is None:
+        output = apkg_path.parent / f"{apkg_path.stem}_reordered.apkg"
+
+    if not apkg_path.exists():
+        print(f"Error: File not found: {apkg_path}")
+        return
+
+    print(f"Reordering deck: {apkg_path}")
+    print(f"Using ranking: {ranking_csv}")
+
+    stats = reorder_deck(
+        str(apkg_path),
+        str(output),
+        str(ranking_csv),
+        remove_filtered=not keep_filtered,
+    )
+
+    print(f"\nReordered {stats['cards_reordered']} cards")
+    print(f"Removed {stats['cards_removed']} filtered cards")
+    print(f"Output: {output}")
+
+
+@process_yue_app.command(name="similar")
+def similar_yue(
+    apkg_path: Path = DEFAULT_CANTONESE_APKG,
     *,
     ranking_csv: Path | None = None,
 ):

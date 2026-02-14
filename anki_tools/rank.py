@@ -757,3 +757,67 @@ def rank_sentences_fr(
 
     sentences.sort(key=lambda s: s.final_score, reverse=True)
     return sentences
+
+
+# =============================================================================
+# Cantonese ranking (character-based, similar to ZH but with YUE weighting)
+# =============================================================================
+
+
+def rank_sentences_yue(
+    sentences: list[Sentence],
+    weights: dict[str, float] | None = None,
+) -> list[Sentence]:
+    """Rank sentences for Cantonese by combined score.
+
+    Uses Chinese character-based complexity and similarity (like ZH)
+    but with Cantonese-specific weighting and frequency data.
+
+    :param sentences: Sentences to rank.
+    :param weights: Optional dict with complexity, frequency, similarity_penalty.
+    :returns: Same list sorted by final_score (best first).
+    """
+    if weights is None:
+        weights = {
+            "complexity": 0.3,
+            "frequency": 0.5,
+            "similarity_penalty": 0.2,
+        }
+
+    freq_data = load_frequency_data_zh()
+
+    print("Calculating complexity scores...")
+    for sent in sentences:
+        sent.complexity_score = complexity_score_zh(sent.text)
+
+    print("Calculating frequency scores...")
+    for sent in sentences:
+        sent.frequency_score = frequency_score_zh(sent.text, freq_data)
+
+    for sent in sentences:
+        sent.final_score = (
+            sent.frequency_score * weights["frequency"]
+            + (100 - sent.complexity_score) * weights["complexity"]
+        )
+
+    sentences.sort(key=lambda s: s.final_score, reverse=True)
+
+    print("Calculating similarity penalties...")
+    penalties, similar_to_indices, similar_to_texts = compute_similarity_penalties_zh(sentences)
+    for sent, penalty, similar_to, sim_text in zip(
+        sentences, penalties, similar_to_indices, similar_to_texts
+    ):
+        sent.similarity_penalty = penalty
+        sent.similar_to = similar_to
+        sent.similar_to_sentence = sim_text
+
+    for sent in sentences:
+        sent.final_score = (
+            sent.frequency_score * weights["frequency"]
+            + (100 - sent.complexity_score) * weights["complexity"]
+            - sent.similarity_penalty * weights["similarity_penalty"]
+        )
+
+    sentences.sort(key=lambda s: s.final_score, reverse=True)
+
+    return sentences
