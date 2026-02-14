@@ -41,6 +41,7 @@ class Sentence:
     similar_to: int | None = None  # Rank of most similar higher-ranked sentence
     similar_to_sentence: str | None = None  # Closest sentence text (French pipeline)
     grammar_score: float = 0.0  # Grammar complexity 0-100 (French pipeline)
+    romanization: str = ""  # Romanization (jyutping for Cantonese)
     final_score: float = 0.0
 
 
@@ -66,7 +67,7 @@ class FrequencyData:
 def _resolve_extract_fields(
     field_names: list[str],
     text_prefer: str | None,
-) -> tuple[str, str | None]:
+) -> tuple[str, str | None, str | None]:
     deck = set(field_names)
     text = None
     if text_prefer and text_prefer in deck:
@@ -79,7 +80,12 @@ def _resolve_extract_fields(
     if not text:
         text = field_names[0] if field_names else "Front"
     order = "[counter 2]" if "[counter 2]" in deck else None
-    return (text, order)
+    romanization = None
+    for c in ("Jyutping", "Pinyin", "Romanization", "jyutping", "pinyin"):
+        if c in deck:
+            romanization = c
+            break
+    return (text, order, romanization)
 
 
 def extract_sentences(
@@ -110,7 +116,7 @@ def extract_sentences(
             for i, fld in enumerate(model["flds"]):
                 print(f"    [{i}] {fld['name']}")
 
-        resolved_by_model: dict[str, tuple[str, str | None]] = {}
+        resolved_by_model: dict[str, tuple[str, str | None, str | None]] = {}
         card_index = 0
         for card in cards:
             card_model_id = str(card["mid"])
@@ -124,12 +130,14 @@ def extract_sentences(
                 resolved_by_model[card_model_id] = _resolve_extract_fields(
                     field_names, text_field
                 )
-            text_f, order_f = resolved_by_model[card_model_id]
+            text_f, order_f, romanization_f = resolved_by_model[card_model_id]
 
             field_values = card["flds"].split("\x1f")
             fields = dict(zip(field_names, field_values))
 
             text = fields.get(text_f, fields.get("Front", ""))
+            romanization = fields.get(romanization_f, "") if romanization_f else ""
+            romanization = re.sub(r"<[^>]+>", "", romanization).strip()
 
             original_order = card_index
             if order_f and order_f in fields and fields.get(order_f):
@@ -144,6 +152,7 @@ def extract_sentences(
                         note_id=card["nid"],
                         text=text,
                         original_order=original_order,
+                        romanization=romanization,
                     )
                 )
                 card_index += 1
@@ -465,25 +474,31 @@ def write_ranking_csv(
 ) -> None:
     """Write ranking CSV for reorder_deck and inspection (ZH and FR).
 
-    Columns: rank, sentence, original_order, frequency, complexity, grammar,
-    structural, similarity, similar_to, final_score.
+    Columns: rank, sentence, romanization (if present), original_order, frequency,
+    complexity, grammar, structural, similarity, similar_to, final_score.
     """
+    has_romanization = any(sent.romanization for sent in sentences)
+
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(
-            [
-                "rank",
-                "sentence",
-                "original_order",
-                "frequency",
-                "complexity",
-                "grammar",
-                "structural",
-                "similarity",
-                "similar_to",
-                "final_score",
-            ]
-        )
+        header = [
+            "rank",
+            "sentence",
+        ]
+        if has_romanization:
+            header.append("romanization")
+        header.extend([
+            "original_order",
+            "frequency",
+            "complexity",
+            "grammar",
+            "structural",
+            "similarity",
+            "similar_to",
+            "final_score",
+        ])
+        writer.writerow(header)
+
         for rank, sent in enumerate(sentences, 1):
             structural = _structural_score(
                 sent.complexity_score, sent.grammar_score, structural_blend
@@ -493,20 +508,23 @@ def write_ranking_csv(
                 if sent.similarity_penalty > similar_to_threshold
                 else ""
             )
-            writer.writerow(
-                [
-                    rank,
-                    sent.text,
-                    sent.original_order,
-                    f"{sent.frequency_score:.1f}",
-                    f"{sent.complexity_score:.1f}",
-                    f"{sent.grammar_score:.1f}",
-                    f"{structural:.1f}",
-                    f"{sent.similarity_penalty:.1f}",
-                    similar_to_text,
-                    f"{sent.final_score:.2f}",
-                ]
-            )
+            row = [
+                rank,
+                sent.text,
+            ]
+            if has_romanization:
+                row.append(sent.romanization)
+            row.extend([
+                sent.original_order,
+                f"{sent.frequency_score:.1f}",
+                f"{sent.complexity_score:.1f}",
+                f"{sent.grammar_score:.1f}",
+                f"{structural:.1f}",
+                f"{sent.similarity_penalty:.1f}",
+                similar_to_text,
+                f"{sent.final_score:.2f}",
+            ])
+            writer.writerow(row)
     print(f"Wrote ranking for {len(sentences)} sentences to {output_path}")
 
 
@@ -764,12 +782,27 @@ def rank_sentences_fr(
 # =============================================================================
 
 
+def simplified_to_traditional(text: str) -> str:
+    """Convert simplified Chinese to traditional Chinese.
+
+    :param text: Text with simplified Chinese characters.
+    :returns: Text with traditional Chinese characters.
+    """
+    try:
+        import opencc
+        converter = opencc.OpenCC('s2t')
+        return converter.convert(text)
+    except Exception:
+        return text
+
+
 def rank_sentences_yue(
     sentences: list[Sentence],
     weights: dict[str, float] | None = None,
 ) -> list[Sentence]:
     """Rank sentences for Cantonese by combined score.
 
+    Converts simplified to traditional Chinese and generates jyutping romanization.
     Uses Chinese character-based complexity and similarity (like ZH)
     with Cantonese-specific weighting. Frequency data uses Chinese (Mandarin)
     as an approximation since Cantonese is not available in wordfreq.
@@ -784,6 +817,10 @@ def rank_sentences_yue(
             "frequency": 0.5,
             "similarity_penalty": 0.2,
         }
+
+    print("Converting to traditional Chinese...")
+    for sent in sentences:
+        sent.text = simplified_to_traditional(sent.text)
 
     freq_data = load_frequency_data_zh()
 
