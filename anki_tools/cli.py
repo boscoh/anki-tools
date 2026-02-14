@@ -518,73 +518,6 @@ app.command(process_zh_app)
 
 
 @process_zh_app.command
-def rank(
-    apkg_path: Path,
-    *,
-    output: Path | None = None,
-    model_id: int | None = None,
-):
-    """Rank sentences by frequency and complexity.
-
-    Writes a ranking CSV for use with zh reorder.
-
-    :param apkg_path: Input .apkg file.
-    :param output: Output CSV file (default: same stem as input with .rank.csv).
-    :param model_id: Filter by specific model ID.
-    """
-    apkg_path = Path(apkg_path)
-    if output is None:
-        output = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
-
-    print(f"Ranking sentences from: {apkg_path}")
-
-    sentences = extract_sentences(str(apkg_path), model_id)
-    if not sentences:
-        print("No sentences found!")
-        return
-
-    ranked = rank_sentences_zh(sentences)
-    write_ranking_csv(ranked, str(output))
-
-    print(f"\nRanked {len(ranked)} sentences -> {output}")
-
-
-@process_zh_app.command
-def reorder(
-    apkg_path: Path,
-    ranking_csv: Path,
-    *,
-    output: Path | None = None,
-    keep_filtered: bool = False,
-):
-    """Reorder deck based on ranking CSV.
-
-    Updates card order and optionally removes filtered cards (names, invalid).
-
-    :param apkg_path: Input .apkg file.
-    :param ranking_csv: Ranking CSV from 'rank' command.
-    :param output: Output .apkg file (default: input_reordered.apkg).
-    :param keep_filtered: If True, keep filtered cards instead of removing.
-    """
-    if output is None:
-        output = apkg_path.parent / f"{apkg_path.stem}_reordered.apkg"
-
-    print(f"Reordering deck: {apkg_path}")
-    print(f"Using ranking: {ranking_csv}")
-
-    stats = reorder_deck(
-        str(apkg_path),
-        str(output),
-        str(ranking_csv),
-        remove_filtered=not keep_filtered,
-    )
-
-    print(f"\nReordered {stats['cards_reordered']} cards")
-    print(f"Removed {stats['cards_removed']} filtered cards")
-    print(f"Output: {output}")
-
-
-@process_zh_app.command
 def fix(
     apkg_path: Path,
     *,
@@ -614,8 +547,8 @@ def fix(
     print(f"\nOutput: {output}")
 
 
-@process_zh_app.command(name="all")
-def process_all(
+@process_zh_app.command
+def rank(
     apkg_path: Path,
     *,
     output: Path | None = None,
@@ -625,14 +558,13 @@ def process_all(
     no_style: bool = False,
     verbose: bool = False,
 ):
-    """Run complete pipeline: rank + reorder + fix pinyin + style.
+    """Rank and reorder Chinese deck with pinyin fixes and styling.
 
-    Main command for processing a Chinese Anki deck. When style is enabled,
-    applies card.css, front.html, back.html from current directory (same as
-    the standalone style command).
+    Main command for processing a Chinese Anki deck. Ranks sentences by frequency
+    and complexity, reorders the deck, fixes pinyin, and applies styling.
 
     :param apkg_path: Input .apkg file.
-    :param output: Output .apkg file (default: input_processed.apkg).
+    :param output: Output .apkg file (default: input_reordered.apkg).
     :param model_id: Filter by specific model ID.
     :param keep_filtered: If True, keep filtered cards (names, invalid).
     :param no_pinyin_fix: If True, skip pinyin correction.
@@ -640,13 +572,16 @@ def process_all(
     :param verbose: If True, show detailed output.
     """
     if output is None:
-        output = apkg_path.parent / f"{apkg_path.stem}_processed.apkg"
+        output = apkg_path.parent / f"{apkg_path.stem}_reordered.apkg"
+
+    ranking_csv = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
 
     print("=" * 50)
     print("Processing Chinese Anki Deck")
     print("=" * 50)
     print(f"Input:   {apkg_path}")
     print(f"Output:  {output}")
+    print(f"Ranking: {ranking_csv}")
     print()
 
     print("Step 1: Ranking sentences...")
@@ -657,19 +592,13 @@ def process_all(
         return
 
     ranked = rank_sentences_zh(sentences)
-
-    ranking_file = tempfile.NamedTemporaryFile(
-        mode="w", suffix=".csv", delete=False
-    ).name
-    write_ranking_csv(ranked, ranking_file)
-
-    _, remove_ranks = load_ranking(ranking_file)
+    write_ranking_csv(ranked, str(ranking_csv))
 
     print("\nStep 2: Reordering deck...")
     stats = reorder_deck(
         str(apkg_path),
         str(output),
-        ranking_file,
+        str(ranking_csv),
         remove_filtered=not keep_filtered,
     )
 
@@ -703,7 +632,8 @@ def process_all(
     print(f"  Cards reordered:     {stats['cards_reordered']}")
     print(f"  Cards removed:       {stats['cards_removed']}")
     print(f"  Styles applied:      {styles_applied} model(s)")
-    print(f"  Output:  {output}")
+    print(f"  Output:              {output}")
+    print(f"  Ranking CSV:         {ranking_csv}")
 
 
 # =============================================================================
@@ -718,72 +648,54 @@ app.command(process_fr_app)
 DEFAULT_FRENCH_APKG = Path("apkg/6000_French_Sentences_w_Audio.apkg")
 
 
-@process_fr_app.command(name="rank")
-def rank_fr(
+@process_fr_app.command
+def rank(
     apkg_path: Path = DEFAULT_FRENCH_APKG,
     *,
     output: Path | None = None,
     model_id: int | None = None,
     text_field: str = "French",
+    keep_filtered: bool = False,
 ):
-    """Rank French sentences by complexity, frequency, and uniqueness.
+    """Rank and reorder French deck by complexity, frequency, and uniqueness.
 
-    Same pipeline as zh rank but with word-based scoring for French.
-    Output CSV is compatible with fr reorder. Ranking uses only the sentence
-    text; translation is not used.
+    Uses word-based scoring for French. Ranks sentences and reorders the deck.
+    Ranking uses only the sentence text; translation is not used.
 
     :param apkg_path: Input .apkg file.
-    :param output: Output CSV file (default: same stem as input with .rank.csv).
+    :param output: Output .apkg file (default: input_reordered.apkg).
     :param model_id: Filter by specific model ID.
     :param text_field: Preferred sentence field (default: French); inferred from deck if missing.
+    :param keep_filtered: If True, keep filtered cards instead of removing.
     """
     apkg_path = Path(apkg_path)
-    if output is None:
-        output = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
     if not apkg_path.exists():
         print(f"Error: File not found: {apkg_path}")
         return
 
-    print(f"Ranking sentences from: {apkg_path}")
+    if output is None:
+        output = apkg_path.parent / f"{apkg_path.stem}_reordered.apkg"
+
+    ranking_csv = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
+
+    print("=" * 50)
+    print("Processing French Anki Deck")
+    print("=" * 50)
+    print(f"Input:   {apkg_path}")
+    print(f"Output:  {output}")
+    print(f"Ranking: {ranking_csv}")
+    print()
+
+    print("Step 1: Ranking sentences...")
     sentences = extract_sentences(str(apkg_path), model_id, text_field=text_field)
     if not sentences:
         print("No sentences found!")
         return
 
     ranked = rank_sentences_fr(sentences)
-    write_ranking_csv(ranked, str(output))
+    write_ranking_csv(ranked, str(ranking_csv))
 
-    print(f"\nRanked {len(ranked)} sentences -> {output}")
-
-
-@process_fr_app.command(name="reorder")
-def reorder_fr(
-    apkg_path: Path = DEFAULT_FRENCH_APKG,
-    ranking_csv: Path | None = None,
-    *,
-    output: Path | None = None,
-    keep_filtered: bool = False,
-):
-    """Reorder French deck based on ranking CSV from fr rank.
-
-    :param apkg_path: Input .apkg file.
-    :param ranking_csv: Ranking CSV (default: same stem as apkg with .rank.csv).
-    :param output: Output .apkg file (default: input_reordered.apkg).
-    :param keep_filtered: If True, keep filtered cards instead of removing.
-    """
-    apkg_path = Path(apkg_path)
-    if ranking_csv is None:
-        ranking_csv = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
-    if output is None:
-        output = apkg_path.parent / f"{apkg_path.stem}_reordered.apkg"
-
-    if not apkg_path.exists():
-        print(f"Error: File not found: {apkg_path}")
-        return
-
-    print(f"Reordering deck: {apkg_path}")
-    print(f"Using ranking: {ranking_csv}")
-
+    print("\nStep 2: Reordering deck...")
     stats = reorder_deck(
         str(apkg_path),
         str(output),
@@ -791,9 +703,15 @@ def reorder_fr(
         remove_filtered=not keep_filtered,
     )
 
-    print(f"\nReordered {stats['cards_reordered']} cards")
-    print(f"Removed {stats['cards_removed']} filtered cards")
-    print(f"Output: {output}")
+    print()
+    print("=" * 50)
+    print("DONE!")
+    print("=" * 50)
+    print(f"  Sentences ranked:    {len(ranked)}")
+    print(f"  Cards reordered:     {stats['cards_reordered']}")
+    print(f"  Cards removed:       {stats['cards_removed']}")
+    print(f"  Output:              {output}")
+    print(f"  Ranking CSV:         {ranking_csv}")
 
 
 @process_fr_app.command(name="similar")
@@ -855,83 +773,6 @@ app.command(process_yue_app)
 DEFAULT_CANTONESE_APKG = Path("apkg/LTL Cantonese Deck Level 1 - Short.apkg")
 
 
-@process_yue_app.command(name="rank")
-def rank_yue(
-    apkg_path: Path = DEFAULT_CANTONESE_APKG,
-    *,
-    output: Path | None = None,
-    model_id: int | None = None,
-    text_field: str = "Front",
-):
-    """Rank Cantonese sentences by complexity, frequency, and uniqueness.
-
-    Uses character-based scoring (like ZH) with Cantonese-specific weighting.
-    Output CSV is compatible with yue reorder.
-
-    :param apkg_path: Input .apkg file.
-    :param output: Output CSV file (default: same stem as input with .rank.csv).
-    :param model_id: Filter by specific model ID.
-    :param text_field: Preferred sentence field (default: Front); inferred from deck if missing.
-    """
-    apkg_path = Path(apkg_path)
-    if output is None:
-        output = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
-    if not apkg_path.exists():
-        print(f"Error: File not found: {apkg_path}")
-        return
-
-    print(f"Ranking sentences from: {apkg_path}")
-    sentences = extract_sentences(str(apkg_path), model_id, text_field=text_field)
-    if not sentences:
-        print("No sentences found!")
-        return
-
-    ranked = rank_sentences_yue(sentences)
-    write_ranking_csv(ranked, str(output))
-
-    print(f"\nRanked {len(ranked)} sentences -> {output}")
-
-
-@process_yue_app.command(name="reorder")
-def reorder_yue(
-    apkg_path: Path = DEFAULT_CANTONESE_APKG,
-    ranking_csv: Path | None = None,
-    *,
-    output: Path | None = None,
-    keep_filtered: bool = False,
-):
-    """Reorder Cantonese deck based on ranking CSV from yue rank.
-
-    :param apkg_path: Input .apkg file.
-    :param ranking_csv: Ranking CSV (default: same stem as apkg with .rank.csv).
-    :param output: Output .apkg file (default: input_reordered.apkg).
-    :param keep_filtered: If True, keep filtered cards instead of removing.
-    """
-    apkg_path = Path(apkg_path)
-    if ranking_csv is None:
-        ranking_csv = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
-    if output is None:
-        output = apkg_path.parent / f"{apkg_path.stem}_reordered.apkg"
-
-    if not apkg_path.exists():
-        print(f"Error: File not found: {apkg_path}")
-        return
-
-    print(f"Reordering deck: {apkg_path}")
-    print(f"Using ranking: {ranking_csv}")
-
-    stats = reorder_deck(
-        str(apkg_path),
-        str(output),
-        str(ranking_csv),
-        remove_filtered=not keep_filtered,
-    )
-
-    print(f"\nReordered {stats['cards_reordered']} cards")
-    print(f"Removed {stats['cards_removed']} filtered cards")
-    print(f"Output: {output}")
-
-
 @process_yue_app.command(name="similar")
 def similar_yue(
     apkg_path: Path = DEFAULT_CANTONESE_APKG,
@@ -979,15 +820,15 @@ def similar_yue(
         print()
 
 
-@process_yue_app.command(name="all")
-def process_all_yue(
+@process_yue_app.command
+def rank(
     apkg_path: Path = DEFAULT_CANTONESE_APKG,
     *,
     output: Path | None = None,
     model_id: int | None = None,
     keep_filtered: bool = False,
 ):
-    """Run complete pipeline: rank + reorder.
+    """Rank and reorder Cantonese deck with traditional Chinese and jyutping.
 
     Main command for processing a Cantonese Anki deck.
     Converts to traditional Chinese, generates jyutping, ranks, and reorders.
