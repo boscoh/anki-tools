@@ -21,6 +21,7 @@ from textwrap import dedent
 import cyclopts
 from gtts import gTTS
 
+from anki_tools.jyutping import fix_jyutping
 from anki_tools.package import AnkiPackage
 from anki_tools.pinyin import fix_pinyin
 from anki_tools.rank import (
@@ -872,6 +873,13 @@ def rank(
         str(output),
         str(ranking_csv),
         remove_filtered=not keep_filtered,
+    )
+
+    print("\nStep 3: Fixing jyutping...")
+    fix_jyutping(
+        output,
+        output=output,
+        verbose=False,
     )
 
     print()
