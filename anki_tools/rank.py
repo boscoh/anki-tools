@@ -337,6 +337,18 @@ def frequency_score_zh(sentence: str, freq_data: FrequencyData) -> float:
 # =============================================================================
 
 
+def _jaccard_similarity(items_a: set, items_b: set) -> float:
+    """Calculate Jaccard similarity between two sets.
+
+    :param items_a: First set of items.
+    :param items_b: Second set of items.
+    :returns: Similarity between 0 (no overlap) and 1 (identical).
+    """
+    if not items_a or not items_b:
+        return 0.0
+    return len(items_a & items_b) / len(items_a | items_b)
+
+
 def char_similarity_zh(sent_a: str, sent_b: str) -> float:
     """Calculate Jaccard similarity between character sets.
 
@@ -346,14 +358,7 @@ def char_similarity_zh(sent_a: str, sent_b: str) -> float:
     """
     chars_a = set(get_chinese_chars(sent_a))
     chars_b = set(get_chinese_chars(sent_b))
-
-    if not chars_a or not chars_b:
-        return 0.0
-
-    intersection = len(chars_a & chars_b)
-    union = len(chars_a | chars_b)
-
-    return intersection / union
+    return _jaccard_similarity(chars_a, chars_b)
 
 
 def _compute_similarity_penalties(
@@ -755,11 +760,7 @@ def word_similarity_fr(sent_a: str, sent_b: str) -> float:
     """
     words_a = set(_tokenize_words_fr(sent_a))
     words_b = set(_tokenize_words_fr(sent_b))
-    if not words_a or not words_b:
-        return 0.0
-    inter = len(words_a & words_b)
-    union = len(words_a | words_b)
-    return inter / union if union else 0.0
+    return _jaccard_similarity(words_a, words_b)
 
 
 def compute_similarity_penalties_fr(
