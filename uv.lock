@@ -16,6 +16,7 @@ dependencies = [
     { name = "pytest" },
     { name = "ruff" },
     { name = "spacy" },
+    { name = "tojyutping" },
     { name = "wordfreq" },
     { name = "zstandard" },
 ]
@@ -31,6 +32,7 @@ requires-dist = [
     { name = "pytest", specifier = ">=8.0.0" },
     { name = "ruff", specifier = ">=0.15.0" },
     { name = "spacy", specifier = ">=3.0" },
+    { name = "tojyutping", specifier = ">=3.2.0" },
     { name = "wordfreq", specifier = ">=3.0" },
     { name = "zstandard", specifier = ">=0.25.0" },
 ]
@@ -1062,6 +1064,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/4a/44/b80c863608d0fd31641a2d50658560c22d4841f1e445529201e22b3e1d0f/thinc-8.3.10-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:2950acab8ae77427a86d11655ed0a161bc83a1edf9d31ba5c43deca6cd27ed4f", size = 4988146, upload-time = "2025-11-17T17:21:41.73Z" },
     { url = "https://files.pythonhosted.org/packages/93/6d/1bdd9344b2e7299faa55129dda624d50c334eed16a3761eb8b1dacd8bfcd/thinc-8.3.10-cp314-cp314-win_amd64.whl", hash = "sha256:c253139a5c873edf75a3b17ec9d8b6caebee072fdb489594bc64e35115df7625", size = 1738054, upload-time = "2025-11-17T17:21:43.328Z" },
     { url = "https://files.pythonhosted.org/packages/45/c4/44e3163d48e398efb3748481656963ac6265c14288012871c921dc81d004/thinc-8.3.10-cp314-cp314-win_arm64.whl", hash = "sha256:ad6da67f534995d6ec257f16665377d7ad95bef5c1b1c89618fd4528657a6f24", size = 1665001, upload-time = "2025-11-17T17:21:45.019Z" },
+]
+
+[[package]]
+name = "tojyutping"
+version = "3.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/fe/fe/d10b672782478e87b687779d7303c35d763132cf1b04ad4209c95eb7de4a/tojyutping-3.2.0.tar.gz", hash = "sha256:3a78560ff83716294bb87e88117e8f81ea3b4ef6fc6e9a54411d0e1dd356b6f0", size = 302121, upload-time = "2024-09-24T23:49:08.471Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/21/73/232b2ddc09db98b1ae37df6aebffa9c4808196e588d73f40cd6d26596cb7/ToJyutping-3.2.0-py3-none-any.whl", hash = "sha256:af7fe10095a3ce91b5cf2bcd7e7c62002407f432c3083562f725ddc140c6fd7e", size = 287884, upload-time = "2024-09-24T23:49:06.286Z" },
 ]
 
 [[package]]

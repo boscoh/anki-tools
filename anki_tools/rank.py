@@ -796,6 +796,23 @@ def simplified_to_traditional(text: str) -> str:
         return text
 
 
+def get_jyutping(text: str) -> str:
+    """Generate jyutping romanization for Cantonese text.
+
+    :param text: Cantonese text (traditional Chinese).
+    :returns: Space-separated jyutping with tone numbers.
+    """
+    try:
+        import ToJyutping
+        clean_text = re.sub(r'[！？。，、：；""' "（）]", "", text)
+        if not clean_text:
+            return ""
+        result = ToJyutping.get_jyutping_text(clean_text)
+        return result
+    except Exception:
+        return ""
+
+
 def rank_sentences_yue(
     sentences: list[Sentence],
     weights: dict[str, float] | None = None,
@@ -818,9 +835,10 @@ def rank_sentences_yue(
             "similarity_penalty": 0.2,
         }
 
-    print("Converting to traditional Chinese...")
+    print("Converting to traditional Chinese and generating jyutping...")
     for sent in sentences:
         sent.text = simplified_to_traditional(sent.text)
+        sent.romanization = get_jyutping(sent.text)
 
     freq_data = load_frequency_data_zh()
 
