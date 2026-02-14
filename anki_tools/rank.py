@@ -10,8 +10,22 @@ from dataclasses import dataclass, field
 from typing import Callable
 
 import jieba
+import opencc
+from wordfreq import iter_wordlist
 
 from anki_tools.package import AnkiPackage
+
+try:
+    import ToJyutping
+    HAS_TOJYUTPING = True
+except ImportError:
+    HAS_TOJYUTPING = False
+
+try:
+    import spacy
+    HAS_SPACY = True
+except ImportError:
+    HAS_SPACY = False
 
 # =============================================================================
 # Data Classes
@@ -28,7 +42,7 @@ class Sentence:
     :param complexity_score: Structural complexity (0-100).
     :param frequency_score: Word frequency score (0-100).
     :param similarity_penalty: Penalty for similarity to higher-ranked sentences.
-    :param similar_to: Rank (1-based) of most similar higher-ranked sentence.
+    :param similar_to_rank: Rank (1-based) of most similar higher-ranked sentence.
     :param final_score: Combined ranking score.
     """
 
@@ -38,8 +52,8 @@ class Sentence:
     complexity_score: float = 0.0
     frequency_score: float = 0.0
     similarity_penalty: float = 0.0
-    similar_to: int | None = None  # Rank of most similar higher-ranked sentence
-    similar_to_sentence: str | None = None  # Closest sentence text (French pipeline)
+    similar_to_rank: int | None = None  # Rank of most similar higher-ranked sentence
+    similar_to_text: str | None = None  # Closest sentence text (French pipeline)
     grammar_score: float = 0.0  # Grammar complexity 0-100 (French pipeline)
     romanization: str = ""  # Romanization (jyutping for Cantonese)
     final_score: float = 0.0
@@ -179,8 +193,6 @@ def _load_frequency_data_wordfreq(
     lower_keys: bool = False,
     build_char_freq: bool = False,
 ) -> FrequencyData:
-    from wordfreq import iter_wordlist
-
     data = FrequencyData()
     for rank, word in enumerate(iter_wordlist(lang, wordlist="best"), 1):
         key = word.lower() if lower_keys else word
@@ -355,14 +367,14 @@ def _compute_similarity_penalties(
     top_n: int = 100,
 ) -> tuple[list[float], list[int | None], list[str | None]]:
     penalties: list[float] = []
-    similar_to_indices: list[int | None] = []
-    similar_to_texts: list[str | None] = []
+    similar_to_rank_indices: list[int | None] = []
+    similar_to_rank_texts: list[str | None] = []
 
     for i, sent in enumerate(sentences):
         if i == 0:
             penalties.append(0.0)
-            similar_to_indices.append(None)
-            similar_to_texts.append(None)
+            similar_to_rank_indices.append(None)
+            similar_to_rank_texts.append(None)
             continue
 
         higher_ranked_indices = list(range(min(i, top_n)))
@@ -374,10 +386,10 @@ def _compute_similarity_penalties(
         max_idx = higher_ranked_indices[similarities.index(max_sim)]
         penalty = max_sim * SIMILARITY_PENALTY_SCALE
         penalties.append(penalty)
-        similar_to_indices.append(max_idx + 1)
-        similar_to_texts.append(sentences[max_idx].text)
+        similar_to_rank_indices.append(max_idx + 1)
+        similar_to_rank_texts.append(sentences[max_idx].text)
 
-    return penalties, similar_to_indices, similar_to_texts
+    return penalties, similar_to_rank_indices, similar_to_rank_texts
 
 
 def compute_similarity_penalties_zh(
@@ -445,13 +457,13 @@ def rank_sentences_zh(
     sentences.sort(key=lambda s: s.final_score, reverse=True)
 
     print("Calculating similarity penalties...")
-    penalties, similar_to_indices, similar_to_texts = compute_similarity_penalties_zh(sentences)
-    for sent, penalty, similar_to, sim_text in zip(
-        sentences, penalties, similar_to_indices, similar_to_texts
+    penalties, similar_to_rank_indices, similar_to_rank_texts = compute_similarity_penalties_zh(sentences)
+    for sent, penalty, similar_to_rank, sim_text in zip(
+        sentences, penalties, similar_to_rank_indices, similar_to_rank_texts
     ):
         sent.similarity_penalty = penalty
-        sent.similar_to = similar_to
-        sent.similar_to_sentence = sim_text
+        sent.similar_to_rank = similar_to_rank
+        sent.similar_to_text = sim_text
 
     for sent in sentences:
         sent.final_score = (
@@ -504,7 +516,7 @@ def write_ranking_csv(
                 sent.complexity_score, sent.grammar_score, structural_blend
             )
             similar_to_text = (
-                (sent.similar_to_sentence or "")
+                (sent.similar_to_text or "")
                 if sent.similarity_penalty > similar_to_threshold
                 else ""
             )
@@ -607,10 +619,11 @@ def frequency_score_fr(sentence: str, freq_data: FrequencyData) -> float:
 
 def _grammar_score_fr_spacy(sentence: str) -> float | None:
     """Use spaCy fr_core_news_sm for grammar complexity (dependency depth, clause count). Returns None if unavailable."""
+    if not HAS_SPACY:
+        return None
     try:
-        import spacy
         nlp = spacy.load("fr_core_news_sm")
-    except (ImportError, OSError):
+    except OSError:
         return None
     cleaned = re.sub(r"<[^>]+>", "", sentence)
     if not cleaned.strip():
@@ -755,15 +768,15 @@ def rank_sentences_fr(
     sentences.sort(key=lambda s: s.final_score, reverse=True)
 
     print("Calculating similarity penalties...")
-    penalties, similar_to_indices, similar_to_sentences = compute_similarity_penalties_fr(
+    penalties, similar_to_rank_indices, similar_to_texts = compute_similarity_penalties_fr(
         sentences
     )
-    for sent, penalty, similar_to, sim_text in zip(
-        sentences, penalties, similar_to_indices, similar_to_sentences
+    for sent, penalty, similar_to_rank, sim_text in zip(
+        sentences, penalties, similar_to_rank_indices, similar_to_texts
     ):
         sent.similarity_penalty = penalty
-        sent.similar_to = similar_to
-        sent.similar_to_sentence = sim_text
+        sent.similar_to_rank = similar_to_rank
+        sent.similar_to_text = sim_text
 
     for sent in sentences:
         structural = _structural_score(sent.complexity_score, sent.grammar_score, structural_blend)
@@ -789,7 +802,6 @@ def simplified_to_traditional(text: str) -> str:
     :returns: Text with traditional Chinese characters.
     """
     try:
-        import opencc
         converter = opencc.OpenCC('s2t')
         return converter.convert(text)
     except Exception:
@@ -802,8 +814,9 @@ def get_jyutping(text: str) -> str:
     :param text: Cantonese text (traditional Chinese).
     :returns: Space-separated jyutping with tone numbers.
     """
+    if not HAS_TOJYUTPING:
+        return ""
     try:
-        import ToJyutping
         clean_text = re.sub(r'[！？。，、：；""' "（）]", "", text)
         if not clean_text:
             return ""
@@ -859,13 +872,13 @@ def rank_sentences_yue(
     sentences.sort(key=lambda s: s.final_score, reverse=True)
 
     print("Calculating similarity penalties...")
-    penalties, similar_to_indices, similar_to_texts = compute_similarity_penalties_zh(sentences)
-    for sent, penalty, similar_to, sim_text in zip(
-        sentences, penalties, similar_to_indices, similar_to_texts
+    penalties, similar_to_rank_indices, similar_to_rank_texts = compute_similarity_penalties_zh(sentences)
+    for sent, penalty, similar_to_rank, sim_text in zip(
+        sentences, penalties, similar_to_rank_indices, similar_to_rank_texts
     ):
         sent.similarity_penalty = penalty
-        sent.similar_to = similar_to
-        sent.similar_to_sentence = sim_text
+        sent.similar_to_rank = similar_to_rank
+        sent.similar_to_text = sim_text
 
     for sent in sentences:
         sent.final_score = (

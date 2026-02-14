@@ -3,6 +3,9 @@
 import re
 from pathlib import Path
 
+import opencc
+import ToJyutping
+
 from anki_tools.package import AnkiPackage
 
 
@@ -13,7 +16,6 @@ def simplified_to_traditional(text: str) -> str:
     :returns: Text with traditional Chinese characters.
     """
     try:
-        import opencc
         converter = opencc.OpenCC('s2t')
         return converter.convert(text)
     except Exception:
@@ -27,7 +29,6 @@ def get_jyutping(text: str) -> str:
     :returns: Space-separated jyutping with tone numbers.
     """
     try:
-        import ToJyutping
         clean_text = re.sub(r'[！？。，、：；"""（）]', "", text)
         if not clean_text:
             return ""

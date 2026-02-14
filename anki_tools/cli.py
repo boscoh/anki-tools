@@ -13,6 +13,7 @@ Commands:
 import csv
 import os
 import re
+import shutil
 import tempfile
 import time
 from pathlib import Path
@@ -494,7 +495,6 @@ def apply(
     output = Path(output)
 
     if apkg_path.resolve() != output.resolve():
-        import shutil
         shutil.copy(apkg_path, output)
 
     n, applied = _apply_style(

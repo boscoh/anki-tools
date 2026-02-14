@@ -38,18 +38,26 @@ Anki21b: zstd-compressed protobuf with repeated MediaEntry messages
     Each entry contains filename, file size, and SHA1 hash
 """
 
+import io
 import json
 import os
+import random
 import re
 import shutil
 import sqlite3
 import tempfile
+import time
 import zipfile
 from pathlib import Path
 
 try:
-    import zstandard
+    import genanki
+    HAS_GENANKI = True
+except ImportError:
+    HAS_GENANKI = False
 
+try:
+    import zstandard
     HAS_ZSTD = True
 except ImportError:
     HAS_ZSTD = False
@@ -598,7 +606,6 @@ class AnkiPackage:
         if content[:4] == ZSTD_MAGIC:
             if not HAS_ZSTD:
                 return {}
-            import io
 
             dctx = zstandard.ZstdDecompressor()
             # Use stream_reader because content size may not be in frame header
@@ -851,7 +858,6 @@ class AnkiPackage:
         updated_flds = "\x1f".join(fields)
 
         # Update mod time (Anki uses milliseconds since epoch)
-        import time
 
         mod_time = int(time.time() * 1000)
 
@@ -873,7 +879,6 @@ class AnkiPackage:
         :param card_id: The card ID.
         :param new_deck_id: The destination deck ID.
         """
-        import time
 
         mod_time = int(time.time() * 1000)
 
@@ -916,7 +921,6 @@ class AnkiPackage:
             fields[field_index] += " " + audio_tag
 
         updated_flds = "\x1f".join(fields)
-        import time
 
         mod_time = int(time.time() * 1000)
 
@@ -940,7 +944,6 @@ class AnkiPackage:
         :returns: The deck ID of the newly created deck.
         :raises ValueError: If deck with given ID already exists.
         """
-        import time
 
         current_time = int(time.time() * 1000)
 
@@ -1011,7 +1014,6 @@ class AnkiPackage:
         :param card_ids: Optional list of specific card IDs to copy (all if None).
         :returns: Number of cards copied.
         """
-        import time
 
         mod_time = int(time.time() * 1000)
 
@@ -1388,9 +1390,7 @@ class AnkiPackage:
                 answer_format="{{audio}}<hr>{{word}}<br>{{meaning}}",
             )
         """
-        import random
 
-        import genanki
 
         model_id = random.randrange(1 << 30, 1 << 31)
         deck_id = random.randrange(1 << 30, 1 << 31)
