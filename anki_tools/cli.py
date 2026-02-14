@@ -385,9 +385,9 @@ def _apply_field_mapping(template: str, mapping: dict[str, str]) -> str:
 def _apply_style(
     target_apkg: Path,
     *,
-    css_path: Path = Path("card.css"),
-    front_path: Path = Path("front.html"),
-    back_path: Path = Path("back.html"),
+    css_path: Path = Path("templates/card.css"),
+    front_path: Path = Path("templates/front.html"),
+    back_path: Path = Path("templates/back.html"),
     verbose: bool = True,
 ) -> tuple[int, list[str]]:
     """Load CSS/templates, map fields to deck, update target package. Returns (models_updated, applied_names)."""
@@ -479,14 +479,14 @@ def apply(
 ):
     """Apply CSS and card templates to a deck.
 
-    Looks for card.css, front.html, back.html in current directory by default.
+    Looks for templates/card.css, templates/front.html, templates/back.html by default.
     Auto-maps mismatched field names to closest deck fields.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: input_styled.apkg).
-    :param css: CSS file (default: card.css).
-    :param front: Front template file (default: front.html).
-    :param back: Back template file (default: back.html).
+    :param css: CSS file (default: templates/card.css).
+    :param front: Front template file (default: templates/front.html).
+    :param back: Back template file (default: templates/back.html).
     """
     apkg_path = Path(apkg_path)
     if output is None:
@@ -499,13 +499,13 @@ def apply(
 
     n, applied = _apply_style(
         output,
-        css_path=css or Path("card.css"),
-        front_path=front or Path("front.html"),
-        back_path=back or Path("back.html"),
+        css_path=css or Path("templates/card.css"),
+        front_path=front or Path("templates/front.html"),
+        back_path=back or Path("templates/back.html"),
         verbose=True,
     )
     if not applied:
-        print("\nNothing to apply. Create card.css, front.html, or back.html first.")
+        print("\nNothing to apply. Create templates/card.css, templates/front.html, or templates/back.html first.")
         return
     print(f"\nSaved: {output}")
 
@@ -617,9 +617,9 @@ def rank(
         print("\nStep 4: Applying card styles...")
         styles_applied, applied = _apply_style(
             Path(output),
-            css_path=Path("card.css"),
-            front_path=Path("front.html"),
-            back_path=Path("back.html"),
+            css_path=Path("templates/card.css"),
+            front_path=Path("templates/front.html"),
+            back_path=Path("templates/back.html"),
             verbose=False,
         )
         if applied:
@@ -1048,8 +1048,8 @@ def _build_apkg(language: str) -> None:
         print(f"Error: Audio directory not found: {audio_dir}")
         return
 
-    # Load CSS from card.css if it exists
-    css_path = Path(__file__).parent.parent / "card.css"
+    # Load CSS from templates/card.css if it exists
+    css_path = Path(__file__).parent.parent / "templates" / "card.css"
     css_content = None
     if css_path.exists():
         css_content = css_path.read_text(encoding="utf-8")
@@ -1123,7 +1123,7 @@ def _build_apkg(language: str) -> None:
     print(f"  Cards: {len(cards)}")
     print(f"  Audio files: {len(media_files)}")
     if css_content:
-        print("  CSS: card.css")
+        print("  CSS: templates/card.css")
 
     AnkiPackage.create(
         output_path,
