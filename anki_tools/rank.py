@@ -413,25 +413,20 @@ def _structural_score(
 # =============================================================================
 
 
-def rank_sentences_zh(
+def _rank_character_based(
     sentences: list[Sentence],
-    weights: dict[str, float] | None = None,
+    weights: dict[str, float],
+    preprocess_fn: Callable[[list[Sentence]], None] | None = None,
 ) -> list[Sentence]:
-    """Rank sentences by combined score (Chinese pipeline).
-
-    Default weights: complexity 0.3, frequency 0.5, similarity_penalty 0.2.
-    Complexity is inverted (lower complexity = higher score for learning).
+    """Shared character-based ranking logic for Chinese and Cantonese.
 
     :param sentences: Sentences to rank.
-    :param weights: Optional dict with complexity, frequency, similarity_penalty.
+    :param weights: Dict with complexity, frequency, similarity_penalty weights.
+    :param preprocess_fn: Optional preprocessing function (e.g., for traditional conversion).
     :returns: Same list sorted by final_score (best first).
     """
-    if weights is None:
-        weights = {
-            "complexity": 0.3,
-            "frequency": 0.5,
-            "similarity_penalty": 0.2,
-        }
+    if preprocess_fn:
+        preprocess_fn(sentences)
 
     freq_data = load_frequency_data_zh()
 
@@ -470,6 +465,29 @@ def rank_sentences_zh(
     sentences.sort(key=lambda s: s.final_score, reverse=True)
 
     return sentences
+
+
+def rank_sentences_zh(
+    sentences: list[Sentence],
+    weights: dict[str, float] | None = None,
+) -> list[Sentence]:
+    """Rank sentences by combined score (Chinese pipeline).
+
+    Default weights: complexity 0.3, frequency 0.5, similarity_penalty 0.2.
+    Complexity is inverted (lower complexity = higher score for learning).
+
+    :param sentences: Sentences to rank.
+    :param weights: Optional dict with complexity, frequency, similarity_penalty.
+    :returns: Same list sorted by final_score (best first).
+    """
+    if weights is None:
+        weights = {
+            "complexity": 0.3,
+            "frequency": 0.5,
+            "similarity_penalty": 0.2,
+        }
+
+    return _rank_character_based(sentences, weights)
 
 
 def write_ranking_csv(
@@ -535,6 +553,40 @@ def write_ranking_csv(
     print(f"Wrote ranking for {len(sentences)} sentences to {output_path}")
 
 
+# =============================================================================
+# Cantonese ranking (character-based, similar to ZH but with YUE weighting)
+# =============================================================================
+
+
+def rank_sentences_yue(
+    sentences: list[Sentence],
+    weights: dict[str, float] | None = None,
+) -> list[Sentence]:
+    """Rank sentences for Cantonese by combined score.
+
+    Converts simplified to traditional Chinese and generates jyutping romanization.
+    Uses Chinese character-based complexity and similarity (like ZH)
+    with Cantonese-specific weighting. Frequency data uses Chinese (Mandarin)
+    as an approximation since Cantonese is not available in wordfreq.
+
+    :param sentences: Sentences to rank.
+    :param weights: Optional dict with complexity, frequency, similarity_penalty.
+    :returns: Same list sorted by final_score (best first).
+    """
+    if weights is None:
+        weights = {
+            "complexity": 0.3,
+            "frequency": 0.5,
+            "similarity_penalty": 0.2,
+        }
+
+    def preprocess_cantonese(sentences: list[Sentence]) -> None:
+        print("Converting to traditional Chinese and generating jyutping...")
+        for sent in sentences:
+            sent.text = simplified_to_traditional(sent.text)
+            sent.romanization = get_jyutping(sent.text)
+
+    return _rank_character_based(sentences, weights, preprocess_cantonese)
 # =============================================================================
 # French ranking (word-based, reusable structure)
 # =============================================================================
@@ -785,72 +837,3 @@ def rank_sentences_fr(
     return sentences
 
 
-# =============================================================================
-# Cantonese ranking (character-based, similar to ZH but with YUE weighting)
-# =============================================================================
-
-
-def rank_sentences_yue(
-    sentences: list[Sentence],
-    weights: dict[str, float] | None = None,
-) -> list[Sentence]:
-    """Rank sentences for Cantonese by combined score.
-
-    Converts simplified to traditional Chinese and generates jyutping romanization.
-    Uses Chinese character-based complexity and similarity (like ZH)
-    with Cantonese-specific weighting. Frequency data uses Chinese (Mandarin)
-    as an approximation since Cantonese is not available in wordfreq.
-
-    :param sentences: Sentences to rank.
-    :param weights: Optional dict with complexity, frequency, similarity_penalty.
-    :returns: Same list sorted by final_score (best first).
-    """
-    if weights is None:
-        weights = {
-            "complexity": 0.3,
-            "frequency": 0.5,
-            "similarity_penalty": 0.2,
-        }
-
-    print("Converting to traditional Chinese and generating jyutping...")
-    for sent in sentences:
-        sent.text = simplified_to_traditional(sent.text)
-        sent.romanization = get_jyutping(sent.text)
-
-    freq_data = load_frequency_data_zh()
-
-    print("Calculating complexity scores...")
-    for sent in sentences:
-        sent.complexity_score = complexity_score_zh(sent.text)
-
-    print("Calculating frequency scores...")
-    for sent in sentences:
-        sent.frequency_score = frequency_score_zh(sent.text, freq_data)
-
-    for sent in sentences:
-        sent.final_score = (
-            sent.frequency_score * weights["frequency"]
-            + (100 - sent.complexity_score) * weights["complexity"]
-        )
-
-    sentences.sort(key=lambda s: s.final_score, reverse=True)
-
-    print("Calculating similarity penalties...")
-    penalties, similar_to_rank_indices, similar_to_rank_texts = compute_similarity_penalties_zh(sentences)
-    for sent, penalty, similar_to_rank, sim_text in zip(
-        sentences, penalties, similar_to_rank_indices, similar_to_rank_texts
-    ):
-        sent.similarity_penalty = penalty
-        sent.similar_to_rank = similar_to_rank
-        sent.similar_to_text = sim_text
-
-    for sent in sentences:
-        sent.final_score = (
-            sent.frequency_score * weights["frequency"]
-            + (100 - sent.complexity_score) * weights["complexity"]
-            - sent.similarity_penalty * weights["similarity_penalty"]
-        )
-
-    sentences.sort(key=lambda s: s.final_score, reverse=True)
-
-    return sentences
