@@ -4,9 +4,7 @@ CLI tools for Anki package (.apkg) files.
 Commands:
     inspect - Diagnostic tools to inspect .apkg files
     swadesh - Build Swadesh vocabulary APKG files with audio
-    zh - Process Chinese Anki decks (rank, reorder, fix pinyin)
-    fr - Analyze French Anki decks (e.g. 6000 French Sentences)
-    yue - Analyze Cantonese Anki decks (e.g. LTL Cantonese)
+    fix - Fix and optimize decks (zh, fr, yue)
     style - Apply CSS and card templates to any deck
 """
 
@@ -511,45 +509,15 @@ def apply(
 
 
 # =============================================================================
-# Process commands - Chinese deck processing pipeline
+# Fix commands - optimize decks by language
 # =============================================================================
 
-process_zh_app = cyclopts.App(name="zh", help="Process Chinese Anki decks")
-app.command(process_zh_app)
+fix_app = cyclopts.App(name="fix", help="Fix and optimize Anki decks")
+app.command(fix_app)
 
 
-@process_zh_app.command
-def fix(
-    apkg_path: Path,
-    *,
-    output: Path | None = None,
-    verbose: bool = False,
-):
-    """Fix pinyin formatting in deck.
-
-    Corrects: lowercase, syllable separation, tone marks, common errors.
-
-    :param apkg_path: Input .apkg file.
-    :param output: Output .apkg file (default: input_fixed.apkg).
-    :param verbose: If True, show all corrections.
-    """
-    if output is None:
-        output = apkg_path.parent / f"{apkg_path.stem}_fixed.apkg"
-
-    print(f"Fixing pinyin in: {apkg_path}")
-
-    fix_pinyin(
-        apkg_path,
-        output=output,
-        csv_output=None,
-        verbose=verbose,
-    )
-
-    print(f"\nOutput: {output}")
-
-
-@process_zh_app.command
-def rank(
+@fix_app.command
+def zh(
     apkg_path: Path,
     *,
     output: Path | None = None,
@@ -559,10 +527,10 @@ def rank(
     no_style: bool = False,
     verbose: bool = False,
 ):
-    """Rank and reorder Chinese deck with pinyin fixes and styling.
+    """Fix Chinese deck: rank, reorder, fix pinyin, and apply styling.
 
-    Main command for processing a Chinese Anki deck. Ranks sentences by frequency
-    and complexity, reorders the deck, fixes pinyin, and applies styling.
+    Ranks sentences by frequency and complexity, reorders the deck,
+    fixes pinyin formatting, and applies card styling.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: input_reordered.apkg).
@@ -637,20 +605,11 @@ def rank(
     print(f"  Ranking CSV:         {ranking_csv}")
 
 
-# =============================================================================
-# FR commands - analyze French decks
-# =============================================================================
-
-process_fr_app = cyclopts.App(
-    name="fr", help="Analyze French Anki decks (e.g. 6000 French Sentences)"
-)
-app.command(process_fr_app)
-
 DEFAULT_FRENCH_APKG = Path("apkg/6000_French_Sentences_w_Audio.apkg")
 
 
-@process_fr_app.command
-def rank(
+@fix_app.command
+def fr(
     apkg_path: Path = DEFAULT_FRENCH_APKG,
     *,
     output: Path | None = None,
@@ -658,10 +617,9 @@ def rank(
     text_field: str = "French",
     keep_filtered: bool = False,
 ):
-    """Rank and reorder French deck by complexity, frequency, and uniqueness.
+    """Fix French deck: rank and reorder by complexity, frequency, and uniqueness.
 
-    Uses word-based scoring for French. Ranks sentences and reorders the deck.
-    Ranking uses only the sentence text; translation is not used.
+    Uses word-based scoring. Ranks sentences and reorders the deck optimally.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: input_reordered.apkg).
@@ -715,124 +673,21 @@ def rank(
     print(f"  Ranking CSV:         {ranking_csv}")
 
 
-@process_fr_app.command(name="similar")
-def similar_fr(
-    apkg_path: Path = DEFAULT_FRENCH_APKG,
-    *,
-    ranking_csv: Path | None = None,
-):
-    """Show sentence pairs with high similarity (from .rank.csv).
-
-    :param apkg_path: Input .apkg file (used to default ranking CSV path).
-    :param ranking_csv: Ranking CSV (default: same stem as apkg with .rank.csv).
-    """
-    apkg_path = Path(apkg_path)
-    if ranking_csv is None:
-        ranking_csv = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
-    if not ranking_csv.exists():
-        print(f"Error: File not found: {ranking_csv}")
-        return
-
-    threshold = SIMILARITY_CONSIDER_DELETE_PENALTY
-    with open(ranking_csv, encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        rows = []
-        for r in reader:
-            if not (r.get("similar_to") or "").strip():
-                continue
-            raw = r.get("similarity") or r.get("similarity_penalty") or "0"
-            try:
-                if float(raw) > threshold:
-                    rows.append(r)
-            except ValueError:
-                pass
-
-    if not rows:
-        print(f"No pairs with similarity > {threshold} (consider deleting above this).")
-        return
-
-    print(f"Pairs worth reviewing for deletion (similarity > {threshold}, {len(rows)}):\n")
-    for i, r in enumerate(rows, 1):
-        sent = r.get("sentence", "")
-        similar_to = r.get("similar_to", "")
-        sim = r.get("similarity") or r.get("similarity_penalty") or ""
-        print(f"{i}. [similarity {sim}]")
-        print(f"   SENT:   {sent}")
-        print(f"   CLOSEST: {similar_to}")
-        print()
-
-
-# =============================================================================
-# YUE commands - analyze Cantonese decks
-# =============================================================================
-
-process_yue_app = cyclopts.App(
-    name="yue", help="Analyze Cantonese Anki decks (e.g. LTL Cantonese)"
-)
-app.command(process_yue_app)
-
 DEFAULT_CANTONESE_APKG = Path("apkg/LTL Cantonese Deck Level 1 - Short.apkg")
 
 
-@process_yue_app.command(name="similar")
-def similar_yue(
-    apkg_path: Path = DEFAULT_CANTONESE_APKG,
-    *,
-    ranking_csv: Path | None = None,
-):
-    """Show sentence pairs with high similarity (from .rank.csv).
-
-    :param apkg_path: Input .apkg file (used to default ranking CSV path).
-    :param ranking_csv: Ranking CSV (default: same stem as apkg with .rank.csv).
-    """
-    apkg_path = Path(apkg_path)
-    if ranking_csv is None:
-        ranking_csv = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
-    if not ranking_csv.exists():
-        print(f"Error: File not found: {ranking_csv}")
-        return
-
-    threshold = SIMILARITY_CONSIDER_DELETE_PENALTY
-    with open(ranking_csv, encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        rows = []
-        for r in reader:
-            if not (r.get("similar_to") or "").strip():
-                continue
-            raw = r.get("similarity") or r.get("similarity_penalty") or "0"
-            try:
-                if float(raw) > threshold:
-                    rows.append(r)
-            except ValueError:
-                pass
-
-    if not rows:
-        print(f"No pairs with similarity > {threshold} (consider deleting above this).")
-        return
-
-    print(f"Pairs worth reviewing for deletion (similarity > {threshold}, {len(rows)}):\n")
-    for i, r in enumerate(rows, 1):
-        sent = r.get("sentence", "")
-        similar_to = r.get("similar_to", "")
-        sim = r.get("similarity") or r.get("similarity_penalty") or ""
-        print(f"{i}. [similarity {sim}]")
-        print(f"   SENT:   {sent}")
-        print(f"   CLOSEST: {similar_to}")
-        print()
-
-
-@process_yue_app.command
-def rank(
+@fix_app.command
+def yue(
     apkg_path: Path = DEFAULT_CANTONESE_APKG,
     *,
     output: Path | None = None,
     model_id: int | None = None,
     keep_filtered: bool = False,
 ):
-    """Rank and reorder Cantonese deck with traditional Chinese and jyutping.
+    """Fix Cantonese deck: convert to traditional, fix jyutping, rank, and reorder.
 
-    Main command for processing a Cantonese Anki deck.
-    Converts to traditional Chinese, generates jyutping, ranks, and reorders.
+    Converts simplified to traditional Chinese, generates accurate jyutping,
+    ranks by frequency and complexity, and reorders the deck optimally.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: input_reordered.apkg).

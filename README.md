@@ -39,14 +39,14 @@ uv run anki --help
 uv run anki swadesh list-languages
 uv run anki swadesh build mandarin
 
-# Rank and reorder Chinese sentences (outputs _reordered.apkg and .rank.csv)
-uv run anki zh rank input.apkg
+# Fix Chinese deck (rank, reorder, fix pinyin, apply styling)
+uv run anki fix zh input.apkg
 
-# Rank and reorder French sentences
-uv run anki fr rank input.apkg
+# Fix French deck (rank and reorder)
+uv run anki fix fr input.apkg
 
-# Rank and reorder Cantonese sentences (converts to traditional, fixes jyutping)
-uv run anki yue rank input.apkg
+# Fix Cantonese deck (convert to traditional, fix jyutping, rank, reorder)
+uv run anki fix yue input.apkg
 
 # Inspect APKG files
 uv run anki inspect deck.apkg
@@ -81,35 +81,36 @@ with AnkiPackage('deck.apkg') as reader:
     reader.save('updated.apkg')
 ```
 
-### Sentence Ranking
+### Fix Command
 
-The `rank` command analyzes sentences by complexity, frequency, and similarity, then reorders the deck optimally:
+The `fix` command optimizes decks by analyzing sentences by complexity, frequency, and similarity, then reorders optimally:
 
 **Chinese (zh):**
 ```bash
-uv run anki zh rank deck.apkg  # Ranks, reorders, outputs _reordered.apkg and .rank.csv
-uv run anki zh fix deck.apkg   # Fix pinyin formatting only
+uv run anki fix zh deck.apkg  # Rank, reorder, fix pinyin, apply styling
 ```
 - Character-based complexity and similarity
-- Uses wordfreq for frequency data
-- Includes HSK vocabulary bonus
+- Uses wordfreq for frequency data with HSK vocabulary bonus
+- Fixes pinyin formatting and applies card styling
+- Outputs `_reordered.apkg` and `.rank.csv`
 
 **French (fr):**
 ```bash
-uv run anki fr rank deck.apkg  # Ranks, reorders, outputs _reordered.apkg and .rank.csv
+uv run anki fix fr deck.apkg  # Rank and reorder
 ```
 - Word-based complexity and similarity
 - Uses wordfreq for frequency data
 - Optional spaCy grammar scoring: `uv run python -m spacy download fr_core_news_sm`
+- Outputs `_reordered.apkg` and `.rank.csv`
 
 **Cantonese (yue):**
 ```bash
-uv run anki yue rank deck.apkg  # Converts to traditional, fixes jyutping, ranks, reorders
+uv run anki fix yue deck.apkg  # Convert to traditional, fix jyutping, rank, reorder
 ```
 - Converts simplified to traditional Chinese
 - Generates accurate jyutping romanization
-- Uses character-based scoring like Chinese
-- Frequency data uses Mandarin Chinese as approximation
+- Character-based scoring (frequency uses Mandarin approximation)
+- Outputs `_reordered.apkg` and `.rank.csv`
 
 ### Swadesh Vocabulary Decks
 
