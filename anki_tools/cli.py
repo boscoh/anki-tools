@@ -979,6 +979,71 @@ def similar_yue(
         print()
 
 
+@process_yue_app.command(name="all")
+def process_all_yue(
+    apkg_path: Path = DEFAULT_CANTONESE_APKG,
+    *,
+    output: Path | None = None,
+    model_id: int | None = None,
+    keep_filtered: bool = False,
+):
+    """Run complete pipeline: rank + reorder.
+
+    Main command for processing a Cantonese Anki deck.
+    Converts to traditional Chinese, generates jyutping, ranks, and reorders.
+
+    :param apkg_path: Input .apkg file.
+    :param output: Output .apkg file (default: input_reordered.apkg).
+    :param model_id: Filter by specific model ID.
+    :param keep_filtered: If True, keep filtered cards (names, invalid).
+    """
+    apkg_path = Path(apkg_path)
+    if not apkg_path.exists():
+        print(f"Error: File not found: {apkg_path}")
+        return
+
+    if output is None:
+        output = apkg_path.parent / f"{apkg_path.stem}_reordered.apkg"
+
+    ranking_csv = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
+
+    print("=" * 50)
+    print("Processing Cantonese Anki Deck")
+    print("=" * 50)
+    print(f"Input:   {apkg_path}")
+    print(f"Output:  {output}")
+    print(f"Ranking: {ranking_csv}")
+    print()
+
+    print("Step 1: Ranking sentences...")
+    sentences = extract_sentences(str(apkg_path), model_id)
+
+    if not sentences:
+        print("No sentences found!")
+        return
+
+    ranked = rank_sentences_yue(sentences)
+    write_ranking_csv(ranked, str(ranking_csv))
+
+    print(f"\nStep 2: Reordering deck...")
+    stats = reorder_deck(
+        str(apkg_path),
+        str(output),
+        str(ranking_csv),
+        remove_filtered=not keep_filtered,
+    )
+
+    print()
+    print("=" * 50)
+    print("DONE!")
+    print("=" * 50)
+    print(f"  Sentences ranked:    {len(ranked)}")
+    print(f"  Cards reordered:     {stats['cards_reordered']}")
+    print(f"  Cards removed:       {stats['cards_removed']}")
+    print(f"  Output:              {output}")
+    print(f"  Ranking CSV:         {ranking_csv}")
+
+
 # =============================================================================
 # Swadesh commands - build vocabulary APKG files with audio
 # =============================================================================
