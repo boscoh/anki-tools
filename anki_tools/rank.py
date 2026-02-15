@@ -859,15 +859,15 @@ def reduce_sentences_stratified(
     """Reduce sentences using stratified complexity sampling with aggressive deduplication.
 
     Strategy:
-    1. Bin sentences by complexity quartiles
+    1. Compute complexity bins from actual data percentiles
     2. Within each bin, remove similar sentences (Jaccard > threshold)
     3. Sample proportionally from each bin to reach target_count
 
-    Complexity distribution targets:
-    - Bin 1 (0-25): 25% of sentences (beginner focus)
-    - Bin 2 (25-50): 30% of sentences (elementary)
-    - Bin 3 (50-75): 30% of sentences (intermediate)
-    - Bin 4 (75-100): 15% of sentences (advanced)
+    Bins are computed dynamically based on actual complexity distribution:
+    - Bin 1 (P0-P40): 35% of target (beginner focus)
+    - Bin 2 (P40-P70): 35% of target (elementary)
+    - Bin 3 (P70-P90): 20% of target (intermediate)
+    - Bin 4 (P90-P100): 10% of target (advanced)
 
     :param sentences: Already ranked sentences (sorted by final_score).
     :param target_count: Target number of sentences (e.g., 3000).
@@ -884,29 +884,49 @@ def reduce_sentences_stratified(
     if similarity_fn is None:
         similarity_fn = word_similarity_fr
 
-    # Define complexity bins and target proportions
+    # Compute complexity percentiles from actual data
+    complexities = sorted([s.complexity_score for s in sentences])
+    n = len(complexities)
+
+    p40 = complexities[int(n * 0.40)] if n > 0 else 0
+    p70 = complexities[int(n * 0.70)] if n > 0 else 0
+    p90 = complexities[int(n * 0.90)] if n > 0 else 0
+    p100 = complexities[-1] if n > 0 else 100
+
+    # Define complexity bins based on percentiles and target proportions
     bins = [
-        (0.0, 25.0, 0.25),    # Simple: 25%
-        (25.0, 50.0, 0.30),   # Elementary: 30%
-        (50.0, 75.0, 0.30),   # Intermediate: 30%
-        (75.0, 100.0, 0.15),  # Advanced: 15%
+        (0.0, p40, 0.35),      # Simple (P0-P40): 35%
+        (p40, p70, 0.35),      # Elementary (P40-P70): 35%
+        (p70, p90, 0.20),      # Intermediate (P70-P90): 20%
+        (p90, p100 + 0.1, 0.10),  # Advanced (P90-P100): 10%
     ]
 
     print(f"\nReducing from {len(sentences)} to {target_count} sentences...")
     print(f"Similarity threshold: {similarity_threshold}")
+    print(f"\nComputed complexity bins from actual data:")
+    print(f"  P40  = {p40:.1f}")
+    print(f"  P70  = {p70:.1f}")
+    print(f"  P90  = {p90:.1f}")
+    print(f"  P100 = {p100:.1f}")
 
     # Assign sentences to bins
     binned = [[] for _ in bins]
     for sent in sentences:
         for i, (low, high, _) in enumerate(bins):
-            if low <= sent.complexity_score < high or (i == len(bins) - 1 and sent.complexity_score >= low):
+            if i == len(bins) - 1:  # Last bin includes upper bound
+                if sent.complexity_score >= low:
+                    binned[i].append(sent)
+                    break
+            elif low <= sent.complexity_score < high:
                 binned[i].append(sent)
                 break
 
     # Print bin statistics
+    bin_labels = ["Simple (P0-P40)", "Elementary (P40-P70)", "Intermediate (P70-P90)", "Advanced (P90-P100)"]
     print("\nComplexity distribution before reduction:")
-    for i, (low, high, target_prop) in enumerate(bins):
-        print(f"  Bin {i+1} ({low:>5.1f}-{high:>5.1f}): {len(binned[i]):>5} sentences")
+    for i, ((low, high, target_prop), label) in enumerate(zip(bins, bin_labels)):
+        pct = len(binned[i]) / len(sentences) * 100 if sentences else 0
+        print(f"  Bin {i+1} {label:24s} [{low:5.1f}-{high:5.1f}]: {len(binned[i]):>5} sentences ({pct:4.1f}%)")
 
     # Deduplicate within each bin
     deduplicated_bins = []
@@ -937,7 +957,8 @@ def reduce_sentences_stratified(
 
         deduplicated_bins.append(kept)
         low, high, _ = bins[i]
-        print(f"  Bin {i+1} ({low:>5.1f}-{high:>5.1f}): removed {len(bin_sentences) - len(kept)} similar sentences, kept {len(kept)}")
+        label = bin_labels[i]
+        print(f"  Bin {i+1} {label:24s} [{low:5.1f}-{high:5.1f}]: removed {len(bin_sentences) - len(kept)}, kept {len(kept)}")
 
     print(f"\nTotal removed by similarity: {total_removed}")
 
@@ -970,7 +991,9 @@ def reduce_sentences_stratified(
         target = bin_targets[i]
         bin_selected = deduplicated_bins[i][:target]
         selected.extend(bin_selected)
-        print(f"  Bin {i+1} ({low:>5.1f}-{high:>5.1f}): {len(bin_selected):>5} sentences ({len(bin_selected)/len(selected)*100 if selected else 0:.1f}%)")
+        pct = len(bin_selected) / target_count * 100 if target_count else 0
+        label = bin_labels[i]
+        print(f"  Bin {i+1} {label:24s} [{low:5.1f}-{high:5.1f}]: {len(bin_selected):>5} sentences ({pct:4.1f}%)")
 
     # Sort selected sentences by original rank (final_score)
     selected.sort(key=lambda s: s.final_score, reverse=True)
