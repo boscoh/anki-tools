@@ -52,6 +52,7 @@ class Sentence:
     grammar_score: float = 0.0  # Grammar complexity 0-100 (French pipeline)
     romanization: str = ""  # Romanization (jyutping for Cantonese)
     final_score: float = 0.0
+    complexity_bin: int = 0  # Complexity bin (0-3) for stratified reduction
 
 
 @dataclass
@@ -860,8 +861,10 @@ def reduce_sentences_stratified(
 
     Strategy:
     1. Compute complexity bins from actual data percentiles
-    2. Within each bin, remove similar sentences (Jaccard > threshold)
-    3. Sample proportionally from each bin to reach target_count
+    2. Within each bin, rank by frequency (highest first)
+    3. Remove similar sentences (Jaccard > threshold)
+    4. Sample proportionally from each bin to reach target_count
+    5. Order final deck: Bin 1 (by freq) → Bin 2 (by freq) → Bin 3 (by freq) → Bin 4 (by freq)
 
     Bins are computed dynamically based on actual complexity distribution:
     - Bin 1 (P0-P40): 35% of target (beginner focus)
@@ -869,11 +872,11 @@ def reduce_sentences_stratified(
     - Bin 3 (P70-P90): 20% of target (intermediate)
     - Bin 4 (P90-P100): 10% of target (advanced)
 
-    :param sentences: Already ranked sentences (sorted by final_score).
+    :param sentences: Sentences with complexity/frequency scores computed.
     :param target_count: Target number of sentences (e.g., 3000).
     :param similarity_threshold: Jaccard threshold for deduplication (default 0.5).
     :param similarity_fn: Optional similarity function (defaults to word_similarity).
-    :returns: Reduced list of sentences maintaining complexity distribution.
+    :returns: Reduced list of sentences ordered by complexity bins, frequency within bins.
     """
     if not sentences:
         return []
@@ -909,7 +912,7 @@ def reduce_sentences_stratified(
     print(f"  P90  = {p90:.1f}")
     print(f"  P100 = {p100:.1f}")
 
-    # Assign sentences to bins
+    # Assign sentences to bins and sort by frequency within each bin
     binned = [[] for _ in bins]
     for sent in sentences:
         for i, (low, high, _) in enumerate(bins):
@@ -921,6 +924,10 @@ def reduce_sentences_stratified(
                 binned[i].append(sent)
                 break
 
+    # Sort each bin by frequency (highest first)
+    for bin_sentences in binned:
+        bin_sentences.sort(key=lambda s: s.frequency_score, reverse=True)
+
     # Print bin statistics
     bin_labels = ["Simple (P0-P40)", "Elementary (P40-P70)", "Intermediate (P70-P90)", "Advanced (P90-P100)"]
     print("\nComplexity distribution before reduction:")
@@ -928,7 +935,7 @@ def reduce_sentences_stratified(
         pct = len(binned[i]) / len(sentences) * 100 if sentences else 0
         print(f"  Bin {i+1} {label:24s} [{low:5.1f}-{high:5.1f}]: {len(binned[i]):>5} sentences ({pct:4.1f}%)")
 
-    # Deduplicate within each bin
+    # Deduplicate within each bin (already sorted by frequency)
     deduplicated_bins = []
     total_removed = 0
 
@@ -937,9 +944,7 @@ def reduce_sentences_stratified(
             deduplicated_bins.append([])
             continue
 
-        # Sort by final_score within bin (best first)
-        bin_sentences.sort(key=lambda s: s.final_score, reverse=True)
-
+        # Sentences already sorted by frequency (highest first)
         kept = []
         for sent in bin_sentences:
             # Check similarity to all kept sentences in this bin
@@ -990,15 +995,22 @@ def reduce_sentences_stratified(
     for i, (low, high, _) in enumerate(bins):
         target = bin_targets[i]
         bin_selected = deduplicated_bins[i][:target]
+
+        # Assign bin number for final ordering
+        for sent in bin_selected:
+            sent.complexity_bin = i
+
         selected.extend(bin_selected)
         pct = len(bin_selected) / target_count * 100 if target_count else 0
         label = bin_labels[i]
         print(f"  Bin {i+1} {label:24s} [{low:5.1f}-{high:5.1f}]: {len(bin_selected):>5} sentences ({pct:4.1f}%)")
 
-    # Sort selected sentences by original rank (final_score)
-    selected.sort(key=lambda s: s.final_score, reverse=True)
+    # Sort by bin, then by frequency within bin (maintaining smooth progression)
+    # Bin 1 (high freq) → Bin 2 (high freq) → Bin 3 (high freq) → Bin 4 (high freq)
+    selected.sort(key=lambda s: (s.complexity_bin, -s.frequency_score))
 
     print(f"\nFinal count: {len(selected)} sentences")
+    print(f"Final ordering: By complexity bin (ascending), then by frequency (descending) within bin")
 
     return selected
 
