@@ -13,13 +13,14 @@ from anki_tools.rank import SIMILARITY_CONSIDER_DELETE_PENALTY
 csv.field_size_limit(sys.maxsize)
 
 
-def load_ranking(csv_path: str) -> tuple[dict[str, int], set[int]]:
+def load_ranking(csv_path: str) -> tuple[dict[str, int], dict[int, int], set[int]]:
     """Load ranking from CSV file.
 
     :param csv_path: Path to the ranking CSV file.
-    :returns: Tuple of (sentence to rank mapping, set of ranks to remove as high-similarity).
+    :returns: Tuple of (sentence to rank mapping, note_id to rank mapping, set of ranks to remove as high-similarity).
     """
-    ranking = {}
+    sentence_ranking = {}
+    note_id_ranking = {}
     remove_ranks = set()
     sim_col = SIMILARITY_CONSIDER_DELETE_PENALTY
 
@@ -28,7 +29,16 @@ def load_ranking(csv_path: str) -> tuple[dict[str, int], set[int]]:
         for row in reader:
             rank = int(row["rank"])
             sentence = row["sentence"]
-            ranking[sentence] = rank
+            sentence_ranking[sentence] = rank
+
+            # If note_id column exists, use it for direct mapping
+            if "note_id" in row and row["note_id"]:
+                try:
+                    note_id = int(row["note_id"])
+                    note_id_ranking[note_id] = rank
+                except (ValueError, TypeError):
+                    pass
+
             if not (row.get("similar_to") or "").strip():
                 continue
             raw = row.get("similarity") or row.get("similarity_penalty") or "0"
@@ -38,11 +48,15 @@ def load_ranking(csv_path: str) -> tuple[dict[str, int], set[int]]:
             except ValueError:
                 remove_ranks.add(rank)
 
-    return ranking, remove_ranks
+    return sentence_ranking, note_id_ranking, remove_ranks
 
 
 def reorder_deck(
-    input_apkg: str, output_apkg: str, ranking_csv: str, remove_filtered: bool = True
+    input_apkg: str,
+    output_apkg: str,
+    ranking_csv: str,
+    remove_filtered: bool = True,
+    remove_unranked: bool = False,
 ) -> dict:
     """Reorder deck based on ranking CSV.
 
@@ -50,42 +64,72 @@ def reorder_deck(
     :param output_apkg: Path to output .apkg file.
     :param ranking_csv: Path to ranking CSV file.
     :param remove_filtered: If True, delete high-similarity cards (those with similar_to set in CSV).
+    :param remove_unranked: If True, delete cards that are not in the ranking CSV.
     :returns: Dict with keys total_ranked, matched_notes, cards_removed, cards_reordered.
     """
-    ranking, remove_ranks = load_ranking(ranking_csv)
+    sentence_ranking, note_id_ranking, remove_ranks = load_ranking(ranking_csv)
 
-    print(f"Loaded ranking for {len(ranking)} sentences")
+    print(f"Loaded ranking for {len(sentence_ranking)} sentences")
     print(f"Marked {len(remove_ranks)} high-similarity cards for removal")
 
     with AnkiPackage(input_apkg) as pkg:
         cursor = pkg.conn.cursor()
 
-        cursor.execute("SELECT id, flds FROM notes")
-        note_sentences = {}
-        for row in cursor.fetchall():
-            fields = row["flds"].split("\x1f")
-            sentence = fields[0] if fields else ""
-            note_sentences[row["id"]] = sentence
-
+        # Build note_ranks mapping, preferring note_id mapping if available
         note_ranks = {}
-        for nid, sentence in note_sentences.items():
-            if sentence in ranking:
-                note_ranks[nid] = ranking[sentence]
 
-        print(f"Matched {len(note_ranks)} notes to rankings")
+        # First, use direct note_id mapping if available
+        if note_id_ranking:
+            cursor.execute("SELECT id FROM notes")
+            for row in cursor.fetchall():
+                nid = row["id"]
+                if nid in note_id_ranking:
+                    note_ranks[nid] = note_id_ranking[nid]
+            print(f"Matched {len(note_ranks)} notes by note_id")
+
+        # Fall back to sentence matching for any unmatched notes
+        if not note_ranks:
+            cursor.execute("SELECT id, flds FROM notes")
+            note_sentences = {}
+            for row in cursor.fetchall():
+                fields = row["flds"].split("\x1f")
+                sentence = fields[0] if fields else ""
+                note_sentences[row["id"]] = sentence
+
+            for nid, sentence in note_sentences.items():
+                if sentence in sentence_ranking:
+                    note_ranks[nid] = sentence_ranking[sentence]
+            print(f"Matched {len(note_ranks)} notes by sentence text")
+
+        print(f"Total matched: {len(note_ranks)} notes to rankings")
 
         cursor.execute("SELECT id, nid, due FROM cards WHERE type = 0")
         cards = cursor.fetchall()
 
         cards_to_remove = []
+
+        # Remove high-similarity cards if requested
         if remove_filtered:
             for card in cards:
                 nid = card["nid"]
                 if nid in note_ranks and note_ranks[nid] in remove_ranks:
                     cards_to_remove.append(card["id"])
 
+        # Remove unranked cards if requested
+        if remove_unranked:
+            for card in cards:
+                nid = card["nid"]
+                if nid not in note_ranks:
+                    cards_to_remove.append(card["id"])
+
         if cards_to_remove:
-            print(f"Removing {len(cards_to_remove)} high-similarity cards...")
+            if remove_filtered and remove_unranked:
+                print(f"Removing {len(cards_to_remove)} cards (high-similarity + unranked)...")
+            elif remove_filtered:
+                print(f"Removing {len(cards_to_remove)} high-similarity cards...")
+            elif remove_unranked:
+                print(f"Removing {len(cards_to_remove)} unranked cards...")
+
             for card_id in cards_to_remove:
                 pkg.delete_card(card_id, cleanup_audio=False)
 
@@ -110,7 +154,7 @@ def reorder_deck(
         pkg.save(output_apkg)
 
         return {
-            "total_ranked": len(ranking),
+            "total_ranked": len(sentence_ranking),
             "matched_notes": len(note_ranks),
             "cards_removed": len(cards_to_remove),
             "cards_reordered": len(remaining_cards),

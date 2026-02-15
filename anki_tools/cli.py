@@ -26,9 +26,12 @@ from anki_tools.pinyin import fix_pinyin
 from anki_tools.rank import (
     SIMILARITY_CONSIDER_DELETE_PENALTY,
     extract_sentences,
+    rank_sentences_es,
     rank_sentences_fr,
     rank_sentences_yue,
     rank_sentences_zh,
+    reduce_sentences_stratified,
+    word_similarity_es,
     write_ranking_csv,
 )
 from anki_tools.reorder import load_ranking, reorder_deck
@@ -735,6 +738,91 @@ def yue(
         output,
         output=output,
         verbose=False,
+    )
+
+    print()
+    print("=" * 50)
+    print("DONE!")
+    print("=" * 50)
+    print(f"  Sentences ranked:    {len(ranked)}")
+    print(f"  Cards reordered:     {stats['cards_reordered']}")
+    print(f"  Cards removed:       {stats['cards_removed']}")
+    print(f"  Output:              {output}")
+    print(f"  Ranking CSV:         {ranking_csv}")
+
+
+@fix_app.command
+def es(
+    apkg_path: Path,
+    *,
+    output: Path | None = None,
+    model_id: int | None = None,
+    text_field: str = "Spanish",
+    keep_filtered: bool = False,
+    max_sentences: int | None = None,
+    similarity_threshold: float = 0.5,
+):
+    """Fix Spanish deck: rank, deduplicate, and reorder by complexity and frequency.
+
+    Optionally reduce to max_sentences using stratified complexity sampling.
+
+    :param apkg_path: Input .apkg file.
+    :param output: Output .apkg file (default: input_reordered.apkg).
+    :param model_id: Filter by specific model ID.
+    :param text_field: Preferred sentence field (default: Spanish).
+    :param keep_filtered: If True, keep filtered cards instead of removing.
+    :param max_sentences: Optional max sentence count (e.g., 3000).
+    :param similarity_threshold: Jaccard threshold for deduplication (default 0.5).
+    """
+    apkg_path = Path(apkg_path)
+    if not apkg_path.exists():
+        print(f"Error: File not found: {apkg_path}")
+        return
+
+    if output is None:
+        output = apkg_path.parent / f"{apkg_path.stem}_reordered.apkg"
+
+    ranking_csv = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
+
+    print("=" * 50)
+    print("Processing Spanish Anki Deck")
+    print("=" * 50)
+    print(f"Input:   {apkg_path}")
+    print(f"Output:  {output}")
+    print(f"Ranking: {ranking_csv}")
+    if max_sentences:
+        print(f"Target:  {max_sentences} sentences (stratified reduction)")
+    print()
+
+    print("Step 1: Ranking sentences...")
+    sentences = extract_sentences(str(apkg_path), model_id, text_field=text_field)
+    if not sentences:
+        print("No sentences found!")
+        return
+
+    print(f"Extracted {len(sentences)} sentences")
+
+    ranked = rank_sentences_es(sentences)
+
+    # Step 2: Reduce sentences if max_sentences specified
+    if max_sentences and len(ranked) > max_sentences:
+        print(f"\nStep 2: Reducing to {max_sentences} sentences...")
+        ranked = reduce_sentences_stratified(
+            ranked,
+            target_count=max_sentences,
+            similarity_threshold=similarity_threshold,
+            similarity_fn=word_similarity_es,
+        )
+
+    write_ranking_csv(ranked, str(ranking_csv))
+
+    print(f"\nStep 3: Reordering deck...")
+    stats = reorder_deck(
+        str(apkg_path),
+        str(output),
+        str(ranking_csv),
+        remove_filtered=not keep_filtered,
+        remove_unranked=bool(max_sentences),  # Remove unranked cards when reducing
     )
 
     print()

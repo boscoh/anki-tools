@@ -48,6 +48,9 @@ uv run anki fix fr input.apkg
 # Fix Cantonese deck (convert to traditional, fix jyutping, rank, reorder)
 uv run anki fix yue input.apkg
 
+# Fix Spanish deck (rank and reorder, optionally reduce to 3000 sentences)
+uv run anki fix es input.apkg --max-sentences 3000
+
 # Inspect APKG files
 uv run anki inspect deck.apkg
 
@@ -110,6 +113,21 @@ uv run anki fix yue deck.apkg  # Convert to traditional, fix jyutping, rank, reo
 - Converts simplified to traditional Chinese
 - Generates accurate jyutping romanization
 - Character-based scoring (frequency uses Mandarin approximation)
+- Outputs `_reordered.apkg` and `.rank.csv`
+
+**Spanish (es):**
+```bash
+uv run anki fix es deck.apkg  # Rank and reorder
+uv run anki fix es deck.apkg --max-sentences 3000  # Reduce to 3000 with stratified sampling
+```
+- Word-based complexity and similarity (like French)
+- Uses wordfreq for frequency data
+- Aggressive deduplication (Jaccard similarity threshold 0.5)
+- Optional stratified reduction by complexity bins:
+  - Bin 1 (0-25): 25% simple sentences
+  - Bin 2 (25-50): 30% elementary sentences
+  - Bin 3 (50-75): 30% intermediate sentences
+  - Bin 4 (75-100): 15% advanced sentences
 - Outputs `_reordered.apkg` and `.rank.csv`
 
 ### Swadesh Vocabulary Decks

@@ -21,7 +21,9 @@ from anki_tools.rank import (
     complexity_score_zh,
     extract_sentences,
     frequency_score_zh,
+    rank_sentences_es,
     rank_sentences_zh,
+    reduce_sentences_stratified,
     write_ranking_csv,
 )
 from anki_tools.reorder import load_ranking, reorder_deck

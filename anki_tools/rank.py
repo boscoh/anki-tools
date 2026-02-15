@@ -212,6 +212,11 @@ def load_frequency_data_fr() -> FrequencyData:
     return _load_frequency_data_wordfreq("fr", lower_keys=True)
 
 
+def load_frequency_data_es() -> FrequencyData:
+    """Load Spanish word frequency data from wordfreq."""
+    return _load_frequency_data_wordfreq("es", lower_keys=True)
+
+
 def is_chinese_char(char: str) -> bool:
     """Check if a character is a Chinese character.
 
@@ -504,7 +509,7 @@ def write_ranking_csv(
 ) -> None:
     """Write ranking CSV for reorder_deck and inspection (ZH and FR).
 
-    Columns: rank, sentence, romanization (if present), original_order, frequency,
+    Columns: rank, note_id, sentence, romanization (if present), original_order, frequency,
     complexity, grammar, structural, similarity, similar_to, final_score.
     """
     has_romanization = any(sent.romanization for sent in sentences)
@@ -513,6 +518,7 @@ def write_ranking_csv(
         writer = csv.writer(f)
         header = [
             "rank",
+            "note_id",
             "sentence",
         ]
         if has_romanization:
@@ -540,6 +546,7 @@ def write_ranking_csv(
             )
             row = [
                 rank,
+                sent.note_id,
                 sent.text,
             ]
             if has_romanization:
@@ -817,6 +824,312 @@ def rank_sentences_fr(
 
     print("Calculating similarity penalties...")
     penalties, similar_to_rank_indices, similar_to_texts = compute_similarity_penalties_fr(
+        sentences
+    )
+    for sent, penalty, similar_to_rank, sim_text in zip(
+        sentences, penalties, similar_to_rank_indices, similar_to_texts
+    ):
+        sent.similarity_penalty = penalty
+        sent.similar_to_rank = similar_to_rank
+        sent.similar_to_text = sim_text
+
+    for sent in sentences:
+        structural = _structural_score(sent.complexity_score, sent.grammar_score, structural_blend)
+        sent.final_score = (
+            sent.frequency_score * weights["frequency"]
+            + (100 - structural) * weights["structural"]
+            - sent.similarity_penalty * weights["similarity_penalty"]
+        )
+
+    sentences.sort(key=lambda s: s.final_score, reverse=True)
+    return sentences
+
+
+# =============================================================================
+# Sentence reduction with stratified complexity sampling
+# =============================================================================
+
+
+def reduce_sentences_stratified(
+    sentences: list[Sentence],
+    target_count: int,
+    similarity_threshold: float = 0.5,
+    similarity_fn: Callable[[str, str], float] | None = None,
+) -> list[Sentence]:
+    """Reduce sentences using stratified complexity sampling with aggressive deduplication.
+
+    Strategy:
+    1. Bin sentences by complexity quartiles
+    2. Within each bin, remove similar sentences (Jaccard > threshold)
+    3. Sample proportionally from each bin to reach target_count
+
+    Complexity distribution targets:
+    - Bin 1 (0-25): 25% of sentences (beginner focus)
+    - Bin 2 (25-50): 30% of sentences (elementary)
+    - Bin 3 (50-75): 30% of sentences (intermediate)
+    - Bin 4 (75-100): 15% of sentences (advanced)
+
+    :param sentences: Already ranked sentences (sorted by final_score).
+    :param target_count: Target number of sentences (e.g., 3000).
+    :param similarity_threshold: Jaccard threshold for deduplication (default 0.5).
+    :param similarity_fn: Optional similarity function (defaults to word_similarity).
+    :returns: Reduced list of sentences maintaining complexity distribution.
+    """
+    if not sentences:
+        return []
+
+    if len(sentences) <= target_count:
+        return sentences
+
+    if similarity_fn is None:
+        similarity_fn = word_similarity_fr
+
+    # Define complexity bins and target proportions
+    bins = [
+        (0.0, 25.0, 0.25),    # Simple: 25%
+        (25.0, 50.0, 0.30),   # Elementary: 30%
+        (50.0, 75.0, 0.30),   # Intermediate: 30%
+        (75.0, 100.0, 0.15),  # Advanced: 15%
+    ]
+
+    print(f"\nReducing from {len(sentences)} to {target_count} sentences...")
+    print(f"Similarity threshold: {similarity_threshold}")
+
+    # Assign sentences to bins
+    binned = [[] for _ in bins]
+    for sent in sentences:
+        for i, (low, high, _) in enumerate(bins):
+            if low <= sent.complexity_score < high or (i == len(bins) - 1 and sent.complexity_score >= low):
+                binned[i].append(sent)
+                break
+
+    # Print bin statistics
+    print("\nComplexity distribution before reduction:")
+    for i, (low, high, target_prop) in enumerate(bins):
+        print(f"  Bin {i+1} ({low:>5.1f}-{high:>5.1f}): {len(binned[i]):>5} sentences")
+
+    # Deduplicate within each bin
+    deduplicated_bins = []
+    total_removed = 0
+
+    for i, bin_sentences in enumerate(binned):
+        if not bin_sentences:
+            deduplicated_bins.append([])
+            continue
+
+        # Sort by final_score within bin (best first)
+        bin_sentences.sort(key=lambda s: s.final_score, reverse=True)
+
+        kept = []
+        for sent in bin_sentences:
+            # Check similarity to all kept sentences in this bin
+            is_duplicate = False
+            for kept_sent in kept:
+                sim = similarity_fn(sent.text, kept_sent.text)
+                if sim >= similarity_threshold:
+                    is_duplicate = True
+                    break
+
+            if not is_duplicate:
+                kept.append(sent)
+            else:
+                total_removed += 1
+
+        deduplicated_bins.append(kept)
+        low, high, _ = bins[i]
+        print(f"  Bin {i+1} ({low:>5.1f}-{high:>5.1f}): removed {len(bin_sentences) - len(kept)} similar sentences, kept {len(kept)}")
+
+    print(f"\nTotal removed by similarity: {total_removed}")
+
+    # Calculate target count per bin
+    bin_targets = []
+    for i, (low, high, target_prop) in enumerate(bins):
+        target = int(target_count * target_prop)
+        available = len(deduplicated_bins[i])
+        final_target = min(target, available)
+        bin_targets.append(final_target)
+
+    # Adjust if we're short due to rounding or insufficient sentences
+    total_allocated = sum(bin_targets)
+    if total_allocated < target_count:
+        # Distribute remaining quota to bins with surplus
+        remaining = target_count - total_allocated
+        for i in range(len(bins)):
+            if remaining <= 0:
+                break
+            available = len(deduplicated_bins[i])
+            surplus = available - bin_targets[i]
+            if surplus > 0:
+                add = min(surplus, remaining)
+                bin_targets[i] += add
+                remaining -= add
+
+    print("\nComplexity distribution after reduction:")
+    selected = []
+    for i, (low, high, _) in enumerate(bins):
+        target = bin_targets[i]
+        bin_selected = deduplicated_bins[i][:target]
+        selected.extend(bin_selected)
+        print(f"  Bin {i+1} ({low:>5.1f}-{high:>5.1f}): {len(bin_selected):>5} sentences ({len(bin_selected)/len(selected)*100 if selected else 0:.1f}%)")
+
+    # Sort selected sentences by original rank (final_score)
+    selected.sort(key=lambda s: s.final_score, reverse=True)
+
+    print(f"\nFinal count: {len(selected)} sentences")
+
+    return selected
+
+
+# =============================================================================
+# Spanish ranking (word-based, similar to French)
+# =============================================================================
+
+
+def complexity_score_es(sentence: str) -> float:
+    """Calculate complexity score (0-100) for Spanish from structural features.
+
+    Uses same word-based metrics as French.
+
+    :param sentence: Spanish sentence.
+    :returns: Score from 0 to 100 (higher = more complex).
+    """
+    return complexity_score_fr(sentence)
+
+
+def frequency_score_es(sentence: str, freq_data: FrequencyData) -> float:
+    """Calculate frequency score (0-100) for Spanish based on word commonality.
+
+    :param sentence: Spanish sentence.
+    :param freq_data: Loaded frequency data (from load_frequency_data_es).
+    :returns: Score from 0 to 100 (higher = more common = easier first).
+    """
+    words = _tokenize_words_fr(sentence)
+    if not words:
+        return 0.0
+    if not freq_data.word_freq:
+        return 50.0
+
+    max_rank = 100000
+    ranks = [get_word_rank_fr(w, freq_data, max_rank) for w in words]
+    avg_rank = sum(ranks) / len(ranks)
+    avg_score = 1.0 - min(avg_rank / max_rank, 1.0)
+    top_5k = sum(1 for r in ranks if r <= 5000) / len(ranks)
+    return (avg_score * 0.6 + top_5k * 0.4) * 100
+
+
+def grammar_score_es(sentence: str) -> float:
+    """Grammar complexity score (0-100) for Spanish.
+
+    Uses heuristics for subjunctive, relative clauses, conditionals.
+
+    :param sentence: Spanish sentence.
+    :returns: Score from 0 to 100.
+    """
+    cleaned = re.sub(r"<[^>]+>", "", sentence)
+    lower = cleaned.lower()
+    score = 0.0
+
+    # Subjunctive triggers
+    subjunctive_triggers = [
+        "es necesario que", "es importante que", "es posible que",
+        "para que", "aunque", "antes de que", "sin que", "con tal de que",
+        "ojalá", "tal vez", "quizás", "puede que",
+    ]
+    for trigger in subjunctive_triggers:
+        if trigger in lower:
+            score += 12
+            break
+
+    # Relative clauses
+    relative_markers = ["el cual", "la cual", "los cuales", "las cuales", "cuyo", "cuya"]
+    for m in relative_markers:
+        if m in lower:
+            score += 10
+            break
+
+    if re.search(r"\bque\b", lower):
+        score += 3
+
+    # Conditionals
+    if re.search(r"\bsi\b.*\b(fuera|hubiera|sería|haría|tendría)", lower):
+        score += 8
+
+    # Clause complexity
+    comma_count = lower.count(",") + lower.count(";")
+    if comma_count >= 2:
+        score += min(comma_count * 3, 15)
+    elif comma_count == 1:
+        score += 3
+
+    return min(score, 100.0)
+
+
+def word_similarity_es(sent_a: str, sent_b: str) -> float:
+    """Jaccard similarity between word sets (for Spanish).
+
+    Reuses word tokenization from French (both are Romance languages).
+
+    :param sent_a: First sentence.
+    :param sent_b: Second sentence.
+    :returns: Similarity between 0 and 1.
+    """
+    return word_similarity_fr(sent_a, sent_b)
+
+
+def compute_similarity_penalties_es(
+    sentences: list[Sentence], top_n: int = 100
+) -> tuple[list[float], list[int | None], list[str | None]]:
+    """Compute similarity penalties (word-based, ES)."""
+    return _compute_similarity_penalties(sentences, word_similarity_es, top_n)
+
+
+def rank_sentences_es(
+    sentences: list[Sentence],
+    weights: dict[str, float] | None = None,
+    structural_blend: float = STRUCTURAL_COMPLEXITY_BLEND,
+) -> list[Sentence]:
+    """Rank sentences for Spanish by combined score.
+
+    Uses word-based complexity, frequency, and grammar scoring.
+    Combines complexity and grammar into structural score.
+
+    :param sentences: Sentences to rank (text = main sentence).
+    :param weights: Optional dict with structural, frequency, similarity_penalty.
+    :param structural_blend: Fraction of structural from complexity (rest from grammar).
+    :returns: Same list sorted by final_score (best first).
+    """
+    if weights is None:
+        weights = {
+            "structural": 0.35,
+            "frequency": 0.45,
+            "similarity_penalty": 0.2,
+        }
+
+    freq_data = load_frequency_data_es()
+
+    print("Calculating complexity scores...")
+    for sent in sentences:
+        sent.complexity_score = complexity_score_es(sent.text)
+
+    print("Calculating frequency scores...")
+    for sent in sentences:
+        sent.frequency_score = frequency_score_es(sent.text, freq_data)
+
+    print("Calculating grammar scores...")
+    for sent in sentences:
+        sent.grammar_score = grammar_score_es(sent.text)
+
+    for sent in sentences:
+        structural = _structural_score(sent.complexity_score, sent.grammar_score, structural_blend)
+        sent.final_score = (
+            sent.frequency_score * weights["frequency"]
+            + (100 - structural) * weights["structural"]
+        )
+
+    sentences.sort(key=lambda s: s.final_score, reverse=True)
+
+    print("Calculating similarity penalties...")
+    penalties, similar_to_rank_indices, similar_to_texts = compute_similarity_penalties_es(
         sentences
     )
     for sent, penalty, similar_to_rank, sim_text in zip(
