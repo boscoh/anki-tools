@@ -90,12 +90,20 @@ The `fix` command optimizes decks by analyzing sentences by complexity, frequenc
 
 **Chinese (zh):**
 ```bash
-uv run anki fix zh deck.apkg  # Rank, reorder, fix pinyin, apply styling
+uv run anki fix zh deck.apkg                        # Rank, reorder, fix pinyin, apply styling
+uv run anki fix zh deck.apkg --max-sentences 2600   # Also deduplicate and reduce
 ```
 - Character-based complexity and similarity
 - Uses wordfreq for frequency data with HSK vocabulary bonus
+- Strips repeated-pattern sentences before ranking (e.g. '走吧走吧', '好了，好了')
 - Fixes pinyin formatting and applies card styling
 - Outputs `_reordered.apkg` and `.rank.csv`
+- With `--max-sentences`: stratified reduction across 4 complexity bins (35/35/20/10%)
+  with same-unique-char-length deduplication (threshold 0.67).
+  - Threshold 0.67 is intentional: for 3-unique-char sentences Jaccard jumps from 0.5
+    directly to 1.0 with nothing in between, so 0.67 catches only true anagrams
+    ('你要我'/'我要你') and avoids false positives like '我在这'/'你在这'.
+  - Dedup runs within each complexity bin; cross-bin near-duplicates are not removed.
 
 **French (fr):**
 ```bash
@@ -122,12 +130,12 @@ uv run anki fix es deck.apkg --max-sentences 3000  # Reduce to 3000 with stratif
 ```
 - Word-based complexity and similarity (like French)
 - Uses wordfreq for frequency data
-- Aggressive deduplication (Jaccard similarity threshold 0.5)
-- Optional stratified reduction by complexity bins:
-  - Bin 1 (0-25): 25% simple sentences
-  - Bin 2 (25-50): 30% elementary sentences
-  - Bin 3 (50-75): 30% intermediate sentences
-  - Bin 4 (75-100): 15% advanced sentences
+- Word-based deduplication (Jaccard similarity threshold 0.5)
+- Optional stratified reduction by data-driven complexity percentile bins:
+  - Bin 1 (P0–P40):  35% simple sentences
+  - Bin 2 (P40–P70): 35% elementary sentences
+  - Bin 3 (P70–P90): 20% intermediate sentences
+  - Bin 4 (P90–P100): 10% advanced sentences
 - Outputs `_reordered.apkg` and `.rank.csv`
 
 ### Swadesh Vocabulary Decks

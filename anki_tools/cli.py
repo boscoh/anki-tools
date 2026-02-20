@@ -563,8 +563,12 @@ def zh(
     :param no_style: If True, skip card styling (CSS/templates).
     :param verbose: If True, show detailed output.
     :param max_sentences: Optional max sentence count (e.g., 3000).
-    :param similarity_threshold: Jaccard threshold for deduplication (default 0.5).
-    :param min_chars: Skip dedup for sentences shorter than this (default 4).
+    :param similarity_threshold: Jaccard threshold for deduplication (default 0.67).
+        Uses unique-char-set-size matching so only same-unique-length sentences are
+        compared. For 3-unique-char sentences Jaccard jumps from 0.5 directly to 1.0
+        (no values between), so 0.67 catches only true anagrams like '你要我'/'我要你'.
+        0.5 would also remove valid pairs that share 2 of 4 unique chars ('我在这'/'你在这').
+    :param min_chars: Skip dedup for sentences with fewer raw chars than this (default 0 = off).
     """
     if output is None:
         output = apkg_path.parent / f"{apkg_path.stem}_reordered.apkg"

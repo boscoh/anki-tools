@@ -887,9 +887,14 @@ def reduce_sentences_stratified(
     Strategy:
     1. Compute complexity bins from actual data percentiles
     2. Within each bin, rank by frequency (highest first)
-    3. Remove similar sentences (Jaccard > threshold)
+    3. Remove similar sentences (Jaccard > threshold) — within each bin only
     4. Sample proportionally from each bin to reach target_count
     5. Order final deck: Bin 1 (by freq) → Bin 2 (by freq) → Bin 3 (by freq) → Bin 4 (by freq)
+
+    Note: deduplication runs within each bin independently. Cross-bin near-duplicates
+    (e.g. a simple sentence in Bin 1 and its repetition-pattern variant in Bin 2) are
+    not caught here. For Chinese, is_repeated_zh_sentence() removes the worst offenders
+    before this step is reached.
 
     Bins are computed dynamically based on actual complexity distribution:
     - Bin 1 (P0-P40): 35% of target (beginner focus)
