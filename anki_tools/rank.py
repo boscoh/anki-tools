@@ -218,6 +218,24 @@ def load_frequency_data_es() -> FrequencyData:
     return _load_frequency_data_wordfreq("es", lower_keys=True)
 
 
+def is_repeated_zh_sentence(text: str) -> bool:
+    """Check if Chinese chars in text form a pure repetition pattern.
+
+    Catches '是 是', '走吧走吧', '好了，好了', '谢谢你，谢谢你', etc.
+
+    :param text: Sentence text.
+    :returns: True if the Chinese character sequence is a repeated sub-sequence.
+    """
+    chars = get_chinese_chars(text)
+    n = len(chars)
+    if n < 2:
+        return False
+    for period in range(1, n // 2 + 1):
+        if n % period == 0 and chars == chars[:period] * (n // period):
+            return True
+    return False
+
+
 def is_chinese_char(char: str) -> bool:
     """Check if a character is a Chinese character.
 
@@ -438,6 +456,12 @@ def _rank_character_based(
     """
     if preprocess_fn:
         preprocess_fn(sentences)
+
+    before = len(sentences)
+    sentences = [s for s in sentences if not is_repeated_zh_sentence(s.text)]
+    removed = before - len(sentences)
+    if removed:
+        print(f"Filtered {removed} repeated-character sentences")
 
     freq_data = load_frequency_data_zh()
 
