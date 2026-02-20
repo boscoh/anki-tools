@@ -25,7 +25,9 @@ from anki_tools.package import AnkiPackage
 from anki_tools.pinyin import fix_pinyin
 from anki_tools.rank import (
     SIMILARITY_CONSIDER_DELETE_PENALTY,
+    char_similarity_zh,
     extract_sentences,
+    get_chinese_chars,
     rank_sentences_es,
     rank_sentences_fr,
     rank_sentences_yue,
@@ -34,6 +36,19 @@ from anki_tools.rank import (
     word_similarity_es,
     write_ranking_csv,
 )
+
+
+def _char_similarity_zh_same_len(a: str, b: str) -> float:
+    """Jaccard similarity between Chinese char sets, only for same unique-char-count sentences.
+
+    Uses unique character set size for length matching to avoid stutter anchors
+    (e.g. '是 是' matching '是的' just because both have 2 total Chinese chars).
+    """
+    sa = set(get_chinese_chars(a))
+    sb = set(get_chinese_chars(b))
+    if len(sa) != len(sb) or not sa:
+        return 0.0
+    return len(sa & sb) / len(sa | sb)
 from anki_tools.reorder import load_ranking, reorder_deck
 
 app = cyclopts.App(help="CLI tools for Anki package (.apkg) files")
@@ -529,11 +544,16 @@ def zh(
     no_pinyin_fix: bool = False,
     no_style: bool = False,
     verbose: bool = False,
+    max_sentences: int | None = None,
+    similarity_threshold: float = 0.67,
+    min_chars: int = 0,
 ):
     """Fix Chinese deck: rank, reorder, fix pinyin, and apply styling.
 
     Ranks sentences by frequency and complexity, reorders the deck,
     fixes pinyin formatting, and applies card styling.
+    Optionally reduce to max_sentences using stratified complexity sampling
+    with character-based similarity deduplication.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: input_reordered.apkg).
@@ -542,6 +562,9 @@ def zh(
     :param no_pinyin_fix: If True, skip pinyin correction.
     :param no_style: If True, skip card styling (CSS/templates).
     :param verbose: If True, show detailed output.
+    :param max_sentences: Optional max sentence count (e.g., 3000).
+    :param similarity_threshold: Jaccard threshold for deduplication (default 0.5).
+    :param min_chars: Skip dedup for sentences shorter than this (default 4).
     """
     if output is None:
         output = apkg_path.parent / f"{apkg_path.stem}_reordered.apkg"
@@ -554,6 +577,8 @@ def zh(
     print(f"Input:   {apkg_path}")
     print(f"Output:  {output}")
     print(f"Ranking: {ranking_csv}")
+    if max_sentences:
+        print(f"Target:  {max_sentences} sentences (stratified reduction)")
     print()
 
     print("Step 1: Ranking sentences...")
@@ -564,18 +589,30 @@ def zh(
         return
 
     ranked = rank_sentences_zh(sentences)
+
+    if max_sentences and len(ranked) > max_sentences:
+        print(f"\nStep 2: Reducing to {max_sentences} sentences...")
+        ranked = reduce_sentences_stratified(
+            ranked,
+            target_count=max_sentences,
+            similarity_threshold=similarity_threshold,
+            similarity_fn=_char_similarity_zh_same_len,
+            min_chars=min_chars,
+        )
+
     write_ranking_csv(ranked, str(ranking_csv))
 
-    print("\nStep 2: Reordering deck...")
+    print("\nStep 3: Reordering deck...")
     stats = reorder_deck(
         str(apkg_path),
         str(output),
         str(ranking_csv),
         remove_filtered=not keep_filtered,
+        remove_unranked=bool(max_sentences),
     )
 
     if not no_pinyin_fix:
-        print("\nStep 3: Fixing pinyin...")
+        print("\nStep 4: Fixing pinyin...")
         fix_pinyin(
             output,
             output=output,
@@ -585,7 +622,7 @@ def zh(
 
     styles_applied = 0
     if not no_style:
-        print("\nStep 4: Applying card styles...")
+        print("\nStep 5: Applying card styles...")
         styles_applied, applied = _apply_style(
             Path(output),
             css_path=Path("templates/card.css"),

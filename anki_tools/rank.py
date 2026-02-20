@@ -856,6 +856,7 @@ def reduce_sentences_stratified(
     target_count: int,
     similarity_threshold: float = 0.5,
     similarity_fn: Callable[[str, str], float] | None = None,
+    min_chars: int = 0,
 ) -> list[Sentence]:
     """Reduce sentences using stratified complexity sampling with aggressive deduplication.
 
@@ -876,6 +877,7 @@ def reduce_sentences_stratified(
     :param target_count: Target number of sentences (e.g., 3000).
     :param similarity_threshold: Jaccard threshold for deduplication (default 0.5).
     :param similarity_fn: Optional similarity function (defaults to word_similarity).
+    :param min_chars: Skip deduplication for sentences with fewer characters than this (default 0 = disabled).
     :returns: Reduced list of sentences ordered by complexity bins, frequency within bins.
     """
     if not sentences:
@@ -947,9 +949,17 @@ def reduce_sentences_stratified(
         # Sentences already sorted by frequency (highest first)
         kept = []
         for sent in bin_sentences:
+            # Short sentences have unreliable Jaccard similarity — skip dedup
+            if min_chars and len(sent.text.replace(" ", "")) < min_chars:
+                kept.append(sent)
+                continue
+
             # Check similarity to all kept sentences in this bin
             is_duplicate = False
             for kept_sent in kept:
+                # Also skip if the reference is short — it shouldn't anchor removals
+                if min_chars and len(kept_sent.text.replace(" ", "")) < min_chars:
+                    continue
                 sim = similarity_fn(sent.text, kept_sent.text)
                 if sim >= similarity_threshold:
                     is_duplicate = True
@@ -1005,12 +1015,12 @@ def reduce_sentences_stratified(
         label = bin_labels[i]
         print(f"  Bin {i+1} {label:24s} [{low:5.1f}-{high:5.1f}]: {len(bin_selected):>5} sentences ({pct:4.1f}%)")
 
-    # Sort by bin, then by frequency within bin (maintaining smooth progression)
-    # Bin 1 (high freq) → Bin 2 (high freq) → Bin 3 (high freq) → Bin 4 (high freq)
-    selected.sort(key=lambda s: (s.complexity_bin, -s.frequency_score))
+    # Sort by bin, then by final_score within bin (includes similarity penalties for variety)
+    # Bin 1 (best scores) → Bin 2 (best scores) → Bin 3 (best scores) → Bin 4 (best scores)
+    selected.sort(key=lambda s: (s.complexity_bin, -s.final_score))
 
     print(f"\nFinal count: {len(selected)} sentences")
-    print(f"Final ordering: By complexity bin (ascending), then by frequency (descending) within bin")
+    print(f"Final ordering: By complexity bin (ascending), then by final score (descending) within bin")
 
     return selected
 
