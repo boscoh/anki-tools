@@ -258,7 +258,7 @@ Input:
 
 - `cmn_sentences.tsv.bz2`: `id`, `lang`, `text`.
 - `cmn-eng_links.tsv.bz2`: `cmn_id`, `eng_id`.
-- Local `eng_sentences.tsv`: `id`, `lang`, `text` for English.
+- Local `archive/tibetan/eng_sentences.tsv`: `id`, `lang`, `text` for English.
 - `cmn_sentences_detailed.tsv.bz2`: `id`, `lang`, `text`, `author`, date.
 - `cmn_sentences_with_audio.tsv.bz2`: audio id per sentence.
 
@@ -607,7 +607,7 @@ data/tatoeba/                      cached dumps, gitignored
   cmn_sentences_detailed.tsv
   cmn-eng_links.tsv
   cmn_sentences_with_audio.tsv
-  eng_sentences.tsv                symlink or copy of repo file
+  eng_sentences.tsv                symlink or copy of archive/tibetan/eng_sentences.tsv
 data/hsk/
   hsk1.txt  hsk2.txt  hsk3.txt
 vocab/

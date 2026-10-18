@@ -10,6 +10,9 @@ audio_output/
 audio/
 extracted_audio/
 
+# Local input data and working files
+archive/
+
 # Python
 __pycache__/
 *.py[cod]
