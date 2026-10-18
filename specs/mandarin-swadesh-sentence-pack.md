@@ -748,4 +748,5 @@ The Tatoeba pool gives no sentence for 8 concepts. The selection keeps the
 core tier only, so the pack has no scaffold card.
 
 `vocab/swadesh_review.csv` holds the Mandarin rows of the word review. The
-file has 29 fixed rows and no open row, so gate G15 passes.
+file has 29 reviewed rows (15 fixed and 14 kept) and no open row, so gate
+G15 passes.
