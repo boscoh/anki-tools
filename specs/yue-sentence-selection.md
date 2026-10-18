@@ -44,7 +44,7 @@ keep fewer cards, with the widest vocabulary, weighted to spoken Cantonese.
 The defaults include the type caps (8.5). Each cell shows the new value, then
 the value of the current ranking at the same card count.
 
-| Input                           | Sentences in | Cards | Types         | `spoken_mass` |
+| Input                           | Sentences in | Cards | Words         | `spoken_mass` |
 | ------------------------------- | ------------ | ----- | ------------- | ------------- |
 | LTL deck                        | 999          | 613   | 933 / 730     | 66.8 / 63.6   |
 | LTL deck, cap 300               | 999          | 300   | 671 / 410     | 65.9 / 57.4   |
@@ -91,7 +91,7 @@ cover (2.2). Section 3 has the full tables.
 | Measure                        | Meaning                                                                                                  |
 | ------------------------------ | -------------------------------------------------------------------------------------------------------- |
 | `cards`                        | Sentences kept                                                                                           |
-| `types`                        | Distinct words in the kept sentences                                                                     |
+| `words`                        | Distinct words in the kept sentences                                                                     |
 | `top500`, `top1000`, `top1500` | How many of the 500, 1000, or 1500 most frequent words of the blend list (5.2) are in the kept sentences |
 | `spoken_mass`                  | Share of the 306,339 Cifu spoken tokens that belong to a word in the kept sentences                      |
 | Largest type share             | For each type key (8.5), the share of the kept cards that the most common value holds                    |
@@ -135,19 +135,19 @@ The default settings are:
 
 ### 3.1 Cards at the defaults
 
-| Input                  | Sentences in | Pass Y1 to Y7 | Cards kept | Types | top500 | top1000 | top1500 | `spoken_mass` |
+| Input                  | Sentences in | Pass Y1 to Y7 | Cards kept | Words | top500 | top1000 | top1500 | `spoken_mass` |
 | ---------------------- | ------------ | ------------- | ---------- | ----- | ------ | ------- | ------- | ------------- |
 | LTL deck               | 999          | 872           | 613        | 933   | 224    | 326     | 390     | 66.8%         |
 | Tatoeba Cantonese pool | 20,853       | 4,256         | 1,236      | 2,020 | 357    | 583     | 791     | 79.8%         |
 
 What the selection removes, against the passed pool:
 
-| Input   | Cards removed        | Types lost     | Top 1500 words lost | `spoken_mass` lost |
+| Input   | Cards removed        | Words lost     | Top 1500 words lost | `spoken_mass` lost |
 | ------- | -------------------- | -------------- | ------------------- | ------------------ |
 | LTL     | 259 of 872 (30%)     | 66 of 999      | 2                   | 0.0 points         |
 | Tatoeba | 3,020 of 4,256 (71%) | 1,458 of 3,478 | 0                   | 0.7 points         |
 
-Most lost types are rare words, outside the target set.
+Most lost words are rare, outside the target set.
 
 What the rules of section 7 remove, before the selection runs:
 
@@ -161,7 +161,7 @@ sentences, because only 26.3% have 12 Han characters or fewer.
 
 What the type caps change, against the same run without them (14.6):
 
-| Input            | Cards | Types | `spoken_mass` | Largest opening share | Largest frame share |
+| Input            | Cards | Words | `spoken_mass` | Largest opening share | Largest frame share |
 | ---------------- | ----- | ----- | ------------- | --------------------- | ------------------- |
 | LTL, no caps     | 681   | 984   | 66.8%         | 24%                   | 9%                  |
 | LTL, caps        | 613   | 933   | 66.8%         | 22%                   | 3%                  |
@@ -191,7 +191,7 @@ What the type caps change, against the same run without them (14.6):
 N sentences of the passed pool, in the order of the current ranker. Each cell
 shows the new value, then the current value.
 
-| Input   | Cards | Types         | top500    | top1000   | `spoken_mass` |
+| Input   | Cards | Words         | top500    | top1000   | `spoken_mass` |
 | ------- | ----- | ------------- | --------- | --------- | ------------- |
 | LTL     | 300   | 671 / 410     | 216 / 147 | 303 / 195 | 65.9 / 57.4   |
 | LTL     | 500   | 866 / 618     | 223 / 185 | 323 / 257 | 66.7 / 62.5   |
@@ -207,9 +207,9 @@ score, without the similarity penalty. It is an approximation.
 
 How to read the table:
 
-- At 300 cards, the LTL selection keeps 64% more types and 8.5 points more
+- At 300 cards, the LTL selection keeps 64% more distinct words and 8.5 points more
   `spoken_mass`.
-- At 500 cards, the Tatoeba selection keeps 2.3 times the types and 17.1
+- At 500 cards, the Tatoeba selection keeps 2.3 times the distinct words and 17.1
   points more `spoken_mass`.
 - The curve flattens. Tatoeba gains 2.1 points from 500 to 1,000 cards, and
   0.1 point from 1,000 to 1,236 cards.
@@ -235,7 +235,7 @@ How to read the table:
 
 Effect of a longer limit (`--max-han`) on the Tatoeba run:
 
-| `--max-han` | Pass pool | Cards | Types | `spoken_mass` |
+| `--max-han` | Pass pool | Cards | Words | `spoken_mass` |
 | ----------- | --------- | ----- | ----- | ------------- |
 | 12          | 4,256     | 1,236 | 2,020 | 79.8%         |
 | 14          | 4,595     | 1,222 | 2,065 | 80.3%         |
@@ -409,7 +409,7 @@ Greedy cover is not always the smallest set. The test in 3.1 shows that it
 keeps nearly all top 1500 words that the passed pool holds: 2 of 392 are lost
 for the LTL deck, and none for Tatoeba.
 
-The weight `1/log2(rank+1)` keeps both types and `spoken_mass` high. The
+The weight `1/log2(rank+1)` keeps both `words` and `spoken_mass` high. The
 test of four weights is in 14.5.
 
 ### 8.3 Similarity
@@ -596,7 +596,7 @@ the run with a non-zero exit code. Lower a value only with a new measurement.
 | G7   | Every kept sentence has a row in `.select.csv`, and the row counts match the input                                              | M3   |
 | G8   | `--no-select --freq written --order score` gives the same ranking CSV as the current version                                    | M5   |
 | G9   | The kept cards have a non-decreasing `hardest_rank` when `--order coverage`                                                     | M4   |
-| G10  | LTL deck, `--max-sentences 300`: at least 640 types, 210 top500 words, and `spoken_mass` 65.0 or more (measured 671, 216, 65.9) | M4   |
+| G10  | LTL deck, `--max-sentences 300`: at least 640 words, 210 top500 words, and `spoken_mass` 65.0 or more (measured 671, 216, 65.9) | M4   |
 | G11  | LTL deck, defaults: 613 cards, within 5 percent (measured 613)                                                                  | M4   |
 | G12  | No type value has more kept cards than `max(--type-floor, ceil(share * P))` (8.5)                                               | M4   |
 
@@ -649,7 +649,7 @@ tests. Patch the download function, as the existing yue tests do.
 | 3   | Add a Cantonese part-of-speech check to replace F9?                      | No Cantonese tagger in `jieba.posseg`                                     | M3        |
 | 4   | Add a `--targets swadesh` mode (`vocab/english-cantonese.csv`)?          | The Mandarin pack uses Swadesh targets                                    | later     |
 | 5   | Add a stop rule for small gain, such as `--min-gain`?                    | The last 236 Tatoeba cards add 0.1 point (3.3)                            | M4        |
-| 6   | Should `sqrt(blend_pm)` replace the log-rank weight?                     | +0.6 to 0.7 points, -37 to 50 types (14.5)                                | M4        |
+| 6   | Should `sqrt(blend_pm)` replace the log-rank weight?                     | +0.6 to 0.7 points, -37 to 50 words (14.5)                                | M4        |
 | 7   | Are the share defaults (20, 8, 75, and 3 percent) right?                 | Shares 15, 6, 70, and 2 percent remove 19 percent of the LTL cards (14.6) | M4        |
 | 8   | Is a meaning type needed, such as greeting, number, or place?            | The four keys are surface forms only                                      | M4        |
 
@@ -685,8 +685,8 @@ deck: 999 sentences, 1000 rows in the rank CSV.
 
 | Source                            | Genre           | Size                                      | License                                     | Verdict                            |
 | --------------------------------- | --------------- | ----------------------------------------- | ------------------------------------------- | ---------------------------------- |
-| Apple Daily list (in use today)   | Written news    | 493.9M tokens, 275k types                 | CC BY 4.0                                   | Keep as the written term           |
-| Cifu `SpokenAdult` column         | Spoken adult    | 306,339 tokens, 11,970 types with a count | repo file is GPL-3.0; source corpora differ | Use as the spoken term             |
+| Apple Daily list (in use today)   | Written news    | 493.9M tokens, 275k distinct words        | CC BY 4.0                                   | Keep as the written term           |
+| Cifu `SpokenAdult` column         | Spoken adult    | 306,339 tokens, 11,970 words with a count | repo file is GPL-3.0; source corpora differ | Use as the spoken term             |
 | Cifu `Written` column             | Written         | 2.36M tokens                              | as above                                    | Use for the written term           |
 | HKCanCor                          | Spoken, 1997-98 | about 230k words                          | CC BY 4.0                                   | Already inside Cifu; no direct use |
 | cantfreq (HKCanCor, HKCAC, IARPA) | Spoken          | 3 corpora                                 | no license file                             | Do not use                         |
@@ -714,13 +714,13 @@ The written-only ranks of 早晨 and 你好 come from `anki-afn`.
 
 ### 14.2 Tokenizer test on the LTL deck
 
-| Measure                    | jieba default | jieba + Cifu words | PyCantonese `segment` |
-| -------------------------- | ------------- | ------------------ | --------------------- |
-| Tokens (Han only)          | 4626          | 4303               | 4094                  |
-| Types                      | 1169          | 1133               | 1112                  |
-| Tokens with a spoken count | 91.1%         | 92.3%              | 85.4%                 |
-| Types with a spoken count  | 70.5%         | 75.9%              | 61.7%                 |
-| Tokens with any Cifu count | 95.8%         | 98.4%              | 88.3%                 |
+| Measure                            | jieba default | jieba + Cifu words | PyCantonese `segment` |
+| ---------------------------------- | ------------- | ------------------ | --------------------- |
+| Tokens (Han only)                  | 4626          | 4303               | 4094                  |
+| Distinct words                     | 1169          | 1133               | 1112                  |
+| Tokens with a spoken count         | 91.1%         | 92.3%              | 85.4%                 |
+| Distinct words with a spoken count | 70.5%         | 75.9%              | 61.7%                 |
+| Tokens with any Cifu count         | 95.8%         | 98.4%              | 88.3%                 |
 
 - A merged dictionary with the Apple Daily words was worse (82.1% spoken
   tokens), because it adds long written-only words.
@@ -749,7 +749,7 @@ The table shows the first failed rule for each sentence.
 
 | Measure                | All 999 sentences | The 872 that pass |
 | ---------------------- | ----------------- | ----------------- |
-| Types                  | 1133              | 999               |
+| Words                  | 1133              | 999               |
 | Top 500 blended words  | 236               | 224               |
 | Top 1000 blended words | 345               | 328               |
 | Top 1500 blended words | 414               | 392               |
@@ -762,7 +762,7 @@ puts the deck in a learning order. A larger set gives more diversity (3.1,
 
 ### 14.5 Test of four weight functions (no type caps)
 
-Values are types, top1000, and `spoken_mass`, with a cap of 300 or 500 cards.
+Values are `words`, top1000, and `spoken_mass`, with a cap of 300 or 500 cards.
 
 | Weight           | LTL 300        | Tatoeba 300    | Tatoeba 500      |
 | ---------------- | -------------- | -------------- | ---------------- |
@@ -772,9 +772,9 @@ Values are types, top1000, and `spoken_mass`, with a cap of 300 or 500 cards.
 | 1 (no weight)    | 718, 287, 64.5 | 989, 444, 72.3 | 1,334, 513, 76.3 |
 
 - `blend_pm` gains at most 0.6 points of `spoken_mass`, and it loses 90 to
-  140 types at 300 cards.
+  140 words at 300 cards.
 - The weight 1 loses up to 2.5 points.
-- `sqrt(blend_pm)` gains 0.6 to 0.7 points and loses 37 to 50 types (open
+- `sqrt(blend_pm)` gains 0.6 to 0.7 points and loses 37 to 50 words (open
   question 6).
 - Decision: use `1/log2(rank+1)`, which keeps both measures high.
 
@@ -800,7 +800,7 @@ cards).
 Test of three cap strengths. Each row lists the shares for opening, ending,
 form, and frame. The planned size `P` is 681 and 1,307 for the default runs.
 
-| Run              | Caps       | Cards | Types | top1000 | `spoken_mass` | Statements | Largest opening | Largest frame |
+| Run              | Caps       | Cards | Words | top1000 | `spoken_mass` | Statements | Largest opening | Largest frame |
 | ---------------- | ---------- | ----- | ----- | ------- | ------------- | ---------- | --------------- | ------------- |
 | LTL defaults     | none       | 681   | 984   | 328     | 66.8%         | 73%        | 24%             | 9%            |
 | LTL defaults     | 20/8/75/3  | 613   | 933   | 326     | 66.8%         | 73%        | 22%             | 3%            |
@@ -821,8 +821,8 @@ form, and frame. The planned size `P` is 681 and 1,307 for the default runs.
 
 - The default caps (20/8/75/3) remove 10% of the LTL cards and 5% of the
   Tatoeba cards at the defaults. `spoken_mass` falls by 0.0 and 0.1 points.
-- With a card cap, the default caps cost 23 of 694 types (LTL 300) and 11 of
-  1,329 types (Tatoeba 500). At Tatoeba 500, `top1000` rises from 528 to 547
+- With a card cap, the default caps cost 23 of 694 words (LTL 300) and 11 of
+  1,329 words (Tatoeba 500). At Tatoeba 500, `top1000` rises from 528 to 547
   and `spoken_mass` rises from 77.2% to 77.6%, because the caps force more
   questions and exclamations into the set.
 - The strict caps (15/6/70/2) remove 19% of the LTL cards at the defaults.
