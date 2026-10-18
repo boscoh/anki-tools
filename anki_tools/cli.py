@@ -26,6 +26,7 @@ from anki_tools.mandarin_audio import (
     generate_audio,
     load_sentence_rows,
 )
+from anki_tools.mandarin_deck import build_pack
 from anki_tools.mandarin_fetch import fetch_tatoeba
 from anki_tools.mandarin_swadesh import (
     build_candidate_pool,
@@ -1314,6 +1315,34 @@ def sentence_audio(
     print(f"wrote {result['index_path']}")
     if result["csv_path"]:
         print(f"wrote {result['csv_path']}")
+
+
+@swadesh_app.command
+def pack(
+    language: str,
+    *,
+    pack_license: str = "public",
+) -> None:
+    """Build the Mandarin Swadesh sentence pack.
+
+    :param language: Language name. Only mandarin is available.
+    :param pack_license: public or private.
+    """
+    lang = language.lower().strip()
+    if lang != "mandarin":
+        print(f"Unsupported language: {language}. Only mandarin is available.")
+        return
+
+    result = build_pack(pack_license=pack_license)
+    counts = result["manifest"]["counts"]
+    print(
+        f"{counts['cards']} cards, {counts['scaffold']} scaffold, "
+        f"{counts['tts_audio']} tts, {counts['native_audio']} native, "
+        f"{result['media_count']} media files, {result['skipped']} skipped"
+    )
+    print(f"wrote {result['output']}")
+    print(f"wrote {result['manifest_path']}")
+    print(f"wrote {result['attribution_path']}")
 
 
 @swadesh_app.command

@@ -49,6 +49,7 @@ import tempfile
 import time
 import zipfile
 from pathlib import Path
+from typing import Any
 
 try:
     import genanki
@@ -1343,13 +1344,14 @@ class AnkiPackage:
         output_path: str | Path,
         deck_name: str,
         fields: list[str],
-        cards: list[dict[str, str]],
+        cards: list[dict[str, Any]],
         media_files: list[str] | None = None,
         model_name: str = "Basic",
         question_format: str | None = None,
         answer_format: str | None = None,
         css: str | None = None,
         sort_field_index: int = 0,
+        deck_description: str | None = None,
     ) -> None:
         """
         Create a new APKG file from scratch.
@@ -1363,7 +1365,8 @@ class AnkiPackage:
             field is used as the question by default.
         :param cards: List of card data dictionaries. Each dict should have keys
             matching the field names. Missing keys default to empty string.
-            Audio references use Anki's ``[sound:filename.mp3]`` format.
+            Audio references use Anki's ``[sound:filename.mp3]`` format. An
+            optional ``tags`` key holds a list of Anki tags for the note.
         :param media_files: Absolute paths to media files (audio, images) to
             include in the package. Files are copied into the APKG.
         :param model_name: Name of the note type/model shown in Anki.
@@ -1374,6 +1377,8 @@ class AnkiPackage:
             Defaults to ``{{FrontSide}}<hr>`` followed by remaining fields.
         :param css: CSS styling for the cards.
         :param sort_field_index: Zero-based index of the field used for browser sorting.
+        :param deck_description: Description of the deck. An empty string keeps
+            the deck description empty.
 
         .. code-block:: python
 
@@ -1422,11 +1427,13 @@ class AnkiPackage:
 
         model = genanki.Model(**model_kwargs)
 
-        deck = genanki.Deck(deck_id, deck_name)
+        deck = genanki.Deck(deck_id, deck_name, description=deck_description or "")
 
         for card in cards:
             field_values = [card.get(f, "") for f in fields]
-            note = genanki.Note(model=model, fields=field_values)
+            note = genanki.Note(
+                model=model, fields=field_values, tags=card.get("tags", [])
+            )
             deck.add_note(note)
 
         package = genanki.Package(deck)

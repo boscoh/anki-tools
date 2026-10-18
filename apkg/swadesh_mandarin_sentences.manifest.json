@@ -1,0 +1,52 @@
+{
+  "build_date": "2026-10-18",
+  "source_dump_date": "2026-10-18",
+  "counts": {
+    "words": 211,
+    "cards": 403,
+    "scaffold": 0,
+    "native_audio": 0,
+    "tts_audio": 403
+  },
+  "coverage": {
+    "core_with_card": 0.9614
+  },
+  "voice": "gtts:zh-CN",
+  "pack_license": "public",
+  "audio_license_skipped": {
+    "empty": 0,
+    "CC BY-NC 4.0": 0
+  },
+  "audio_license_source": {
+    "empty": 5742,
+    "CC BY-NC 4.0": 84
+  },
+  "files": {
+    "source_csv": "sha256:8509d2e9b3312f903ece8d8bef027391ff41e3e2aaac4450e9747ae275d89350",
+    "sentences_csv": "sha256:66e679ea04187e3b7d01803a0f5d48f8600a8ef7f4f6f9b7b2d108fa884a4df6"
+  },
+  "licenses": [
+    {
+      "data": "Swadesh word data",
+      "license": "CC BY-SA 4.0"
+    },
+    {
+      "data": "Tatoeba sentences",
+      "license": "CC BY 2.0 FR"
+    },
+    {
+      "data": "Tatoeba audio",
+      "license": "per recording"
+    }
+  ],
+  "excluded_words": [
+    "虱子",
+    "棍子",
+    "种子",
+    "骨头",
+    "肠子",
+    "乳房",
+    "呕吐",
+    "揉"
+  ]
+}
