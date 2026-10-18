@@ -1,0 +1,12 @@
+target,swadesh_index,english,variant,status,zipf,candidate_count,scaffold_candidates,rank,sentence,text_original,pinyin,english_text,tatoeba_id,unknown_words,han_len,rank_key,tier
+虱子,48,louse,primary,uncovered,1.82,0,0,0,,,,,,,,,
+棍子,53,stick,primary,uncovered,3.49,0,0,0,,,,,,,,,
+种子,55,seed,primary,uncovered,4.61,0,0,0,,,,,,,,,
+树皮,58,tree bark,primary,thin,3.19,1,0,1,桦树有白树皮。,桦树有白树皮。,huà shù yǒu bái shù pí,Birch trees have white bark.,10752795,1,6,1|1|-4.320|0|10752795,core
+骨头,65,bone,primary,uncovered,4.14,0,0,0,,,,,,,,,
+脂肪,66,fat (noun),primary,thin,4.04,1,0,1,切除这块肉的脂肪。,切除這塊肉的脂肪。,qiē chú zhè kuài ròu de zhī fáng,Trim the fat off the meat.,798271,2,8,2|1|-4.922|0|798271,core
+肠子,86,guts,primary,uncovered,3.35,0,0,0,,,,,,,,,
+乳房,89,breast,primary,uncovered,3.99,0,0,0,,,,,,,,,
+肝,91,liver,primary,thin,3.80,1,0,1,她哭得肝肠寸断。,她哭得肝腸寸斷。,tā kū dé gān cháng cùn duàn,She cried her heart out.,772138,2,7,2|1|-4.330|0|772138,core
+呕吐,97,to vomit,primary,uncovered,3.81,0,0,0,,,,,,,,,
+揉,131,to rub,primary,uncovered,3.97,0,0,0,,,,,,,,,

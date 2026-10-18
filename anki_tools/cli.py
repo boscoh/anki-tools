@@ -22,6 +22,17 @@ from gtts import gTTS
 
 from anki_tools.jyutping import fix_jyutping
 from anki_tools.mandarin_fetch import fetch_tatoeba
+from anki_tools.mandarin_swadesh import (
+    build_candidate_pool,
+    build_pack_report,
+    check_word_table,
+    load_word_table,
+    print_sentence_report,
+    select_sentences,
+    write_pool_report,
+    write_sentence_csv,
+    write_sentence_review_csv,
+)
 from anki_tools.package import AnkiPackage
 from anki_tools.pinyin import fix_pinyin
 from anki_tools.rank import (
@@ -1204,6 +1215,58 @@ def fetch(*, refresh: bool = False) -> None:
     results = fetch_tatoeba(refresh=refresh)
     for name, info in results.items():
         print(f"{name}.tsv: {info['rows']} rows ({info['source']})")
+
+@swadesh_app.command
+def sentences(
+    language: str,
+    per_word: int = 2,
+    max_cards: int = 450,
+    max_unknown: int = 2,
+    min_han: int = 4,
+    max_han: int = 10,
+) -> None:
+    """Build the Mandarin sentence candidates and write the card CSV files.
+
+    :param language: Language name. Only mandarin is available.
+    :param per_word: Card limit per word form.
+    :param max_cards: Hard card cap.
+    :param max_unknown: Unknown token budget per sentence.
+    :param min_han: Minimum Han character count for a core card.
+    :param max_han: Maximum Han character count.
+    """
+    lang = language.lower().strip()
+    if lang != "mandarin":
+        print(f"Unsupported language: {language}. Only mandarin is available.")
+        return
+
+    table = load_word_table()
+    failures = check_word_table(table)
+    if failures:
+        for failure in failures:
+            print(f"Error: {failure}")
+        return
+
+    pool, pool_report = build_candidate_pool(
+        table,
+        min_han=min_han,
+        max_han=max_han,
+        max_unknown=max_unknown,
+        fallback=True,
+    )
+    cards, selection = select_sentences(
+        pool, table, per_word=per_word, max_cards=max_cards
+    )
+    report = build_pack_report(pool_report, selection)
+
+    sentence_path = write_sentence_csv(cards)
+    review_path = write_sentence_review_csv(pool, table, per_word=per_word)
+    report_path = write_pool_report(report)
+
+    print_sentence_report(report)
+    print(f"wrote {sentence_path}")
+    print(f"wrote {review_path}")
+    print(f"wrote {report_path}")
+
 
 @swadesh_app.command
 def list_languages():
