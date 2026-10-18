@@ -2,24 +2,27 @@
 
 Status: draft for review
 Date: 2026-10-18
+Revision: 2026-10-18, the word list is Swadesh only, and the correction
+sweep of `vocab/english-*.csv` is complete.
 Owner: anki-tools
 
 ## 1. Purpose
 
-Build a listening-comprehension deck for Mandarin. The deck has three layers:
+Build a listening-comprehension deck for Mandarin. The deck has two layers:
 
-1. A base list of the 207 Swadesh concepts in Mandarin.
-2. A master word list of 2x to 3x that size (414 to 621 entries).
-3. Useful sentences that contain those words, with audio on each card.
+1. The reviewed Swadesh word list: 207 concepts, 211 forms.
+2. Useful sentences that contain those words, with audio on each card.
 
-The existing `anki swadesh build mandarin` command makes one isolated-word card
-per Swadesh entry. This spec adds the sentence layer on top of it.
+The word list stays at the Swadesh size, so the deck stays small enough to
+review in one pass. The existing `anki swadesh build mandarin` command makes
+one isolated-word card per Swadesh entry. This spec adds the sentence layer
+on top of it.
 
 ## 2. Scope
 
 In scope:
 
-- A master word list with a measured coverage report.
+- A reviewed word list with a measured coverage report.
 - A sentence corpus with English translations.
 - Native or synthesized audio for each sentence.
 - A build command that writes one `.apkg` file.
@@ -34,40 +37,50 @@ Out of scope:
 
 ## 3. Research findings
 
+### 3.1 Corpus and word list
+
 All numbers below come from a test run on the Tatoeba export of 2026-10-17
-and the local `vocab/english-mandarin.csv` file. The test used jieba with a
-user dictionary that contains the master list.
+and the local `vocab/english-mandarin.csv` file after the correction sweep.
+The test used jieba with a user dictionary that contains the word list.
 
-| Measure                                        | Value            |
-| ---------------------------------------------- | ---------------- |
-| Swadesh concepts                               | 207              |
-| Swadesh form entries in `english-mandarin.csv` | 211 unique       |
-| Tatoeba Mandarin sentences (cmn)               | 89,190           |
-| Mandarin to English translation links          | 78,295           |
-| Linked sentences with a final sentence mark    | 65,499 of 66,257 |
-| Candidate proper sentences, 4 to 10 Han chars  | 36,148           |
-| Tatoeba Mandarin sentences with native audio   | 5,826            |
-| HSK 2.0 level 1 words                          | 150              |
-| HSK 2.0 level 2 words                          | 151              |
-| HSK 2.0 level 3 words                          | 299              |
-| Swadesh + HSK 1 + HSK 2, unique forms          | 444              |
-| The same set with 2 or more eligible sentences | 397              |
-| Swadesh + HSK 1 to 3, unique forms             | 719              |
+| Measure                                       | Value            |
+| --------------------------------------------- | ---------------- |
+| Swadesh concepts                              | 207              |
+| Rows in `english-mandarin.csv`                | 207              |
+| Swadesh forms after slash expansion           | 211 unique       |
+| Tatoeba Mandarin sentences (cmn)              | 89,190           |
+| Mandarin to English translation links         | 78,295           |
+| Linked sentences with a final sentence mark   | 65,499 of 66,257 |
+| Candidate proper sentences, 4 to 10 Han chars | 36,148           |
+| Tatoeba Mandarin sentences with native audio  | 5,826            |
 
-Sentences with at most two words outside the master list and the top 1000
-frequency list give coverage as follows:
+### 3.2 Why the word list stays at Swadesh size
 
-| Measure                                   | Value      |
-| ----------------------------------------- | ---------- |
-| Master list, Swadesh + HSK 1 + HSK 2      | 444 words  |
-| Words with 1 or more eligible sentences   | 414 of 444 |
-| Words with at least one native audio card | 274 of 444 |
-| Swadesh core words with 1 or more cards   | 187 of 207 |
-| Swadesh core words with native audio      | 112 of 207 |
+An earlier test used a wider word list: Swadesh plus HSK 2.0 levels 1 and
+2. These numbers are the evidence for the decision in section 6.
 
-Result: a 500-word master list is feasible. Native audio covers about half of
-the words. TTS must cover the rest. Strict mode (`--max-unknown 1`) gives
-398 of 444 words and 175 of 207 core words.
+| Measure                                        | Value      |
+| ---------------------------------------------- | ---------- |
+| HSK 2.0 level 1 words                          | 150        |
+| HSK 2.0 level 2 words                          | 151        |
+| HSK 2.0 level 3 words                          | 299        |
+| Swadesh + HSK 1 + HSK 2, unique forms          | 444        |
+| The same set with 2 or more eligible sentences | 397        |
+| Swadesh + HSK 1 to 3, unique forms             | 719        |
+| Words with 1 or more eligible sentences        | 414 of 444 |
+| Words with at least one native audio card      | 274 of 444 |
+| Swadesh core words with 1 or more cards        | 187 of 207 |
+| Swadesh core words with native audio           | 112 of 207 |
+
+The wider list does not add a Swadesh sentence. 207 concepts give about
+414 cards at 2 cards per word, and that count stays small enough to review.
+The sentence filter does not need the wider list: the known word set also
+holds the top 1000 `wordfreq` words (8.1).
+
+The 187 of 207 figure is an upper bound for the Swadesh-only list, because
+the wider list covered more sentences. M1 measures the Swadesh-only value.
+Strict mode (`--max-unknown 1`) gives 398 of 444 words and 175 of 207
+core words for the wider list.
 
 ## 4. Data sources
 
@@ -80,7 +93,6 @@ the words. TTS must cover the rest. Strict mode (`--max-unknown 1`) gives
 | Tatoeba translation links    | `.../cmn-eng_links.tsv.bz2`                                            | CC BY 2.0 FR          | English translation pairing |
 | Tatoeba sentences with audio | `.../cmn_sentences_with_audio.tsv.bz2`                                 | per recording         | Audio id per sentence       |
 | Tatoeba audio download       | `tatoeba.org/audio/download/{audio_id}`                                | per recording         | Audio file                  |
-| HSK 2.0 word lists           | `raw.githubusercontent.com/glxxyz/hskhsk.com/main/data/lists/`         | MIT (repo)            | Extended vocabulary         |
 | CC-CEDICT                    | `mdbg.net/chinese/export/cedict/`                                      | CC BY-SA 4.0          | Word validation, pinyin     |
 | wordfreq                     | Python package                                                         | Apache 2.0            | Frequency ranks             |
 
@@ -88,8 +100,8 @@ Rules:
 
 - Do not redistribute CC-CEDICT glosses in the deck. Use CC-CEDICT only for
   internal checks, such as homograph lookup and pinyin verification.
-- Write the card glosses from the Swadesh English labels and from the HSK
-  official definitions. Keep the deck license separate.
+- Write the card glosses from the Swadesh English labels. Keep the deck
+  license separate.
 - Record the Tatoeba sentence author and the audio author in the manifest.
 - Check the native audio license before distribution. In the 2026-10-17
   export, 5,742 of 5,826 Mandarin recordings have an empty license column,
@@ -110,38 +122,56 @@ Tatoeba audio download method, verified 2026-10-18:
 
 | Stage | Name               | Input                        | Output                                           |
 | ----- | ------------------ | ---------------------------- | ------------------------------------------------ |
-| S0    | Fetch              | network                      | `data/tatoeba/*.tsv`, `data/hsk/*.txt`           |
-| S1    | Base list          | Swadesh module and local CSV | `vocab/mandarin_swadesh.csv`                     |
-| S2    | Master list        | base list, HSK, wordfreq     | `vocab/mandarin_master.csv`, report              |
-| S3    | Candidate pool     | S0, S2                       | in-memory pool, pool report                      |
-| S4    | Sentence selection | S3                           | `vocab/mandarin_sentences.csv`, review CSV       |
-| S5    | Audio              | S4                           | `audio/mandarin_sentences/*.mp3`, index CSV      |
-| S6    | Pack               | S2, S4, S5, license data     | `apkg/swadesh_mandarin_sentences.apkg`, manifest |
+| S0    | Fetch              | network                      | `data/tatoeba/*.tsv`                             |
+| S1    | Word table         | reviewed CSV, wordfreq       | none, checks and an in-memory table              |
+| S2    | Candidate pool     | S0, S1                       | in-memory pool, pool report                      |
+| S3    | Sentence selection | S2                           | `vocab/mandarin_sentences.csv`, review CSV       |
+| S4    | Audio              | S3                           | `audio/mandarin_sentences/*.mp3`, index CSV      |
+| S5    | Pack               | S1, S3, S4, license data     | `apkg/swadesh_mandarin_sentences.apkg`, manifest |
 
 Each stage reads its input files and writes deterministic output. Each stage
 is safe to re-run. A stage skips work when its cache is complete.
 
-## 6. S1: Swadesh base list
+## 6. S1: Swadesh word table
 
-Parse `vocab/english-mandarin.csv`, which has 211 forms for 207 concepts.
-Add these columns:
+The word list is `vocab/english-mandarin.csv`. The correction sweep fixes
+this file, so the build must not regenerate it, and it must not write a
+second word file. S1 reads the CSV and makes one row per form in memory.
 
-| Column        | Type   | Example        | Meaning                  |
-| ------------- | ------ | -------------- | ------------------------ |
-| `index`       | int    | 9              | Swadesh 207 index        |
-| `english`     | string | here           | Swadesh English label    |
-| `mandarin`    | string | 这里           | Simplified form          |
-| `traditional` | string | 這裡           | Traditional form         |
-| `pinyin`      | string | zhèli          | Tone-marked pinyin       |
-| `variant`     | string | primary        | `primary` or `alternate` |
-| `notes`       | string | Beijing accent | Register or region note  |
+Do not add HSK words or other words. A wider list adds no Swadesh sentence,
+and it makes the deck too large to review (3.2).
 
-Check:
+Split each slash-separated form into one row. For example, 他/她/它 becomes
+three rows. The table has these columns:
 
+| Column            | Type   | Example | Meaning                     |
+| ----------------- | ------ | ------- | --------------------------- |
+| `swadesh_index`   | int    | 9       | Swadesh 207 index           |
+| `english`         | string | here    | Swadesh English label       |
+| `mandarin`        | string | 这里    | Simplified form, unique key |
+| `pinyin`          | string | zhè lǐ  | Tone-marked pinyin          |
+| `traditional`     | string | 這裡    | OpenCC traditional form     |
+| `variant`         | string | primary | `primary` or `alternate`    |
+| `zipf`            | float  | 5.30    | wordfreq Zipf value         |
+| `candidate_count` | int    | 97      | Sentences after S2 filters  |
+| `tier`            | string | core    | `core` or `scaffold`        |
+
+`candidate_count` and `tier` come from S2 and S3. They are not input data.
+A word with zero candidates keeps its row, and the report lists it as
+uncovered. A card that comes from the fallback window (7.1) gets
+`tier=scaffold`.
+
+Check on every build:
+
+- 207 input rows, and 205 to 220 forms after slash expansion.
 - All indices 1 to 207 exist, with no gap.
-- Each row has exactly one simplified form.
-- Multi-form entries (for example 他/她/它) become separate rows.
+- Each row has one simplified form. No duplicate form.
 - Every English label matches `vocab/swadesh.txt` at the same index.
+- Every `pinyin` value equals the reviewed `transliteration` value, or has
+  a manual override row in `vocab/mandarin_pinyin_overrides.csv`.
+- `vocab/swadesh_review.csv` has no `open` row.
+
+A failed check stops the build. The audit runs the same checks.
 
 ### 6.1 Review against sources
 
@@ -174,7 +204,7 @@ Output `vocab/swadesh_review.csv` with columns `lang`, `index`,
 `english`, `current`, `canonical`, `issue`, `fix`, `status`.
 `status` is `fixed`, `kept`, or `open`. The build fails on any `open` row.
 
-Measured result of the review (2026-10-18):
+Result of the correction sweep, after the fixes (2026-10-18):
 
 | File                  | Canonical match | Errors fixed |
 | --------------------- | --------------- | ------------ |
@@ -185,7 +215,10 @@ Measured result of the review (2026-10-18):
 | english-spanish.csv   | 194 of 207      | 8            |
 | english-hindi.csv     | 205 of 207      | 3            |
 | english-arabic.csv    | 206 of 207      | 8            |
+| all seven files       | 1357 of 1449    | 126          |
 
+The fixes cover forms, Mandarin pinyin readings, and Cantonese jyutping.
+The sweep is complete: no row is `open`.
 The remaining differences are variants or register choices. Several file
 forms are better than the module form, for example 星星 for star and 心 for
 heart.
@@ -196,63 +229,7 @@ corpus does not contain. Greek and Hindi scores have low value for a
 related reason: the corpora store inflected forms, not citation forms.
 For example, δαγκώνω scores 0.00 and δαγκώνει scores 3.56.
 
-## 7. S2: Master list of 2x to 3x size
-
-### 7.1 Target size
-
-Target size is 500 entries, with a hard limit of 400 to 650. This range is
-1.9x to 3.1x of 207. The build fails outside the limit.
-
-### 7.2 Construction rule
-
-Apply these steps in order:
-
-1. Add every Swadesh form. Swadesh rows are always `tier=core`.
-2. Add HSK 1 and HSK 2 forms, `tier=extended`.
-3. Deduplicate by simplified string. Keep the row with the higher source
-   priority: Swadesh before HSK 1, HSK 1 before HSK 2, HSK 2 before HSK 3.
-4. Remove an `extended` form when its candidate count is below 2.
-5. Repeat these steps until the count is stable:
-   add HSK 3 forms in descending Zipf until the count reaches 500, then
-   remove `extended` forms with fewer than 2 candidates.
-6. Keep a Swadesh form with zero candidates, and set `tier=scaffold`.
-
-The Swadesh part is fixed. The HSK part flexes to reach the target size.
-
-### 7.3 Output schema
-
-`vocab/mandarin_master.csv`:
-
-| Column            | Type   | Example | Meaning                           |
-| ----------------- | ------ | ------- | --------------------------------- |
-| `rank`            | int    | 1       | Build order, low rank first       |
-| `mandarin`        | string | 水      | Simplified form, unique key       |
-| `traditional`     | string | 水      | Traditional form                  |
-| `pinyin`          | string | shuǐ    | Tone-marked pinyin                |
-| `pos`             | string | noun    | Part of speech                    |
-| `gloss_en`        | string | water   | Short gloss, 1 to 4 words         |
-| `swadesh_index`   | int    | 150     | Swadesh index or empty            |
-| `source`          | string | swadesh | `swadesh`, `hsk1`, `hsk2`, `hsk3` |
-| `hsk_level`       | int    | 0       | 0 for Swadesh rows                |
-| `zipf`            | float  | 5.30    | wordfreq Zipf value               |
-| `candidate_count` | int    | 97      | Sentences after S3 filters        |
-| `tier`            | string | core    | `core`, `extended`, `scaffold`    |
-
-Sort by `rank`. Assign rank as follows:
-
-1. Swadesh index order, 1 to 207.
-2. HSK level, then descending Zipf.
-
-### 7.4 Master list acceptance
-
-- Size in 400 to 650.
-- `core` coverage of at least 90 percent with 1 or more eligible sentences.
-  The measured result is 187 of 207 Swadesh forms (90 percent).
-- No duplicate `mandarin` value.
-- Every `pinyin` value matches the pypinyin output for that form, or has a
-  manual override row in `vocab/mandarin_pinyin_overrides.csv`.
-
-## 8. S3: Candidate sentence pool
+## 7. S2: Candidate sentence pool
 
 Input:
 
@@ -282,11 +259,11 @@ Filter rules, applied in order:
 | F7   | No quotation mark (`"`, `“`, `”`, `「`, `」`, `『`, `』`)     |
 | F8   | At most 1 internal punctuation mark (comma, colon, semicolon) |
 | F9   | Has a predicate: 1 token tagged `v` or `a` by `jieba.posseg`  |
-| F10  | No orphan sentence-initial conjunction (see 8.1)              |
+| F10  | No orphan sentence-initial conjunction (see 7.1)              |
 | F11  | English text has 2 to 12 words                                |
 | F12  | Not a duplicate after Simplified conversion                   |
 
-### 8.1 Definition of a proper sentence
+### 7.1 Definition of a proper sentence
 
 A card sentence must read as one complete statement. These rules enforce
 that requirement:
@@ -301,7 +278,7 @@ that requirement:
 - One clause join. At most one internal comma or colon.
 - Predicate. jieba tags at least one token as a verb or an adjective.
   A bare noun phrase such as 三只狗。 fails this test. Fallback: pass when
-  the sentence contains 是, 有, 在, 不, or a verb from the master list.
+  the sentence contains 是, 有, 在, 不, or a verb from the word list.
 - No orphan conjunction. A sentence that starts with 因为, 所以, 但是, 可是,
   而且, 然后, 不过, or 虽然 and has no comma lacks its main clause.
 
@@ -314,23 +291,23 @@ Measured effect of the proper-sentence filters on the linked Mandarin pool:
 | F1 to F10 (the proper set)   | 36,148    |
 
 The 4 to 10 window removes fragments and still yields 36,148 sentences.
-That is enough for 414 of 444 master words.
-
+That is enough for 414 of 444 words in the wider list.
 Fallback window: when a word gets no candidate in 4 to 10 characters, retry
 that word with a 3 to 10 character window and drop F6 and F8. Mark such a
 card `tier=scaffold`.
 
-## 9. S4: Sentence selection
+## 8. S3: Sentence selection
 
-### 9.1 Sentence tokenization
+### 8.1 Sentence tokenization
 
-- Load the master list into a jieba user dictionary.
-- Tokenize each candidate sentence.
+- Load the word list into a jieba user dictionary.
 - Keep punctuation tokens out of word counts.
-- Known word set = master list plus the top 1000 `wordfreq` words for `zh`.
+- Known word set = word list plus the top 1000 `wordfreq` words for `zh`.
   This set is Mandarin only. Do not use the `zh` list for Cantonese (6.1).
+- The known word set does not depend on the word list size. The
+  Swadesh-only list does not make this filter stricter.
 
-### 9.2 Hard constraints per card
+### 8.2 Hard constraints per card
 
 | Constraint     | Rule                                                           |
 | -------------- | -------------------------------------------------------------- |
@@ -345,7 +322,7 @@ card `tier=scaffold`.
 Reuse `char_similarity_zh` and `is_repeated_zh_sentence` from
 `anki_tools/rank.py`.
 
-### 9.3 Ranking key
+### 8.3 Ranking key
 
 Sort candidates for each target word by this key, first item first:
 
@@ -356,28 +333,30 @@ Sort candidates for each target word by this key, first item first:
 4. Han length, 5 to 9 first.
 5. Tatoeba sentence id, low first, for determinism.
 
-### 9.4 Selection and coverage
+### 8.4 Selection and coverage
 
 Use greedy set cover:
 
-1. Build a bipartite graph of master words and candidate sentences.
+1. Build a bipartite graph of word-table forms and candidate sentences.
 2. Score each candidate with the ranking key.
 3. Take the best unused sentence. Remove the words it covers from the
    uncovered set. Increment the count for each covered word.
 4. Stop when every word with candidates reaches `--per-word`, or the card
    cap is reached.
-5. Process `core` words before `extended` words, so the Swadesh words get
-   their second sentence first.
+5. Process `core` words in Swadesh index order, so the primary form of a
+   concept gets a card before its alternate form.
 
-Defaults: `--per-word 2`, `--max-cards 1200`, `--max-unknown 2`.
+Defaults: `--per-word 2`, `--max-cards 450`, `--max-unknown 2`. The word
+list has 211 forms, so 2 cards per word gives about 420 cards. Keep the
+deck below about 450 cards for daily review.
 
 Reject a card when the sentence has no English translation after pairing.
 Report the words that stay uncovered:
 
-- `scaffold` words with zero candidates.
+- Words with zero candidates.
 - Words with candidates that were cut by the card cap.
 
-### 9.5 Output schema
+### 8.5 Output schema
 
 `vocab/mandarin_sentences.csv`:
 
@@ -407,7 +386,7 @@ Also write `vocab/mandarin_sentences_review.csv` with the top three candidates
 per uncovered or low-confidence word. A human reviews 5 percent of the cards
 before release.
 
-### 9.6 Pinyin
+### 8.6 Pinyin
 
 - Run pypinyin with jieba segmentation and `Style.TONE`.
 - Do not use the pypinyin default reading for a polyphone. Select the
@@ -416,9 +395,9 @@ before release.
 - Apply the 不 and 一 tone sandhi rules.
 - Check that the syllable count equals the Han character count.
 
-## 10. S5: Audio
+## 9. S4: Audio
 
-### 10.1 Tiers
+### 9.1 Tiers
 
 | Tier | Source         | Condition                                                                                    |
 | ---- | -------------- | -------------------------------------------------------------------------------------------- |
@@ -430,7 +409,7 @@ Default mode is `--native-audio none`. Ship TTS audio only until a license
 check on the two main Mandarin audio contributors completes. Skip a
 recording with the CC BY-NC 4.0 license unless `--pack-license private`.
 
-### 10.2 TTS settings
+### 9.2 TTS settings
 
 | Setting    | Value                                                  |
 | ---------- | ------------------------------------------------------ |
@@ -446,7 +425,7 @@ recording with the CC BY-NC 4.0 license unless `--pack-license private`.
 Add `--voice-by-card` later for voice variety. One voice per pack keeps the
 listening training consistent.
 
-### 10.3 File names and cache
+### 9.3 File names and cache
 
 | Type       | Pattern               | Example                     |
 | ---------- | --------------------- | --------------------------- |
@@ -461,19 +440,19 @@ Keep an index file `audio/mandarin_sentences/index.csv` with columns
 Use ASCII file names only. Anki handles UTF-8 names, but ASCII names are
 shorter and stable on every platform.
 
-### 10.4 Validation
+### 9.4 Validation
 
 - `ffprobe` reads each file. Duration must be 0.4 to 15 seconds.
 - The file must start with `ID3` or `FF FB`.
 - A failed file is deleted and the card is marked `audio_missing`.
 - A card without audio does not enter the pack.
 
-Measured cost: 900 TTS sentences at 1 request per second take about 15
-minutes. 400 native downloads take about 7 minutes.
+Measured cost: 450 TTS sentences at 1 request per second take about 8
+minutes. 200 native downloads take about 4 minutes.
 
-## 11. S6: Pack build
+## 10. S5: Pack build
 
-### 11.1 Note model
+### 10.1 Note model
 
 Model name: `Mandarin Swadesh Sentence`.
 
@@ -517,24 +496,23 @@ Use `templates/card.css` and add these classes: `.front-audio`,
 `.sentence`, `.pinyin`, `.english`, `.target`, `.source`, `.hint`.
 Sentence font 2.5rem, pinyin 1.2rem, English 1.1rem, source 0.8rem gray.
 
-### 11.2 Tags
+### 10.2 Tags
 
 One tag per dimension:
 
 - `swadesh::water`
-- `hsk::1`
 - `audio::native` or `audio::tts`
-- `tier::core` or `tier::extended`
+- `tier::core` or `tier::scaffold`
 
 Anki tags cannot contain spaces. Map each gloss to a slug.
 
-### 11.3 Deck
+### 10.3 Deck
 
 - Deck name: `Mandarin Swadesh Sentences`.
-- Add notes in master `rank` order. Anki shows new cards in note order.
+- Add notes in Swadesh index order. Anki shows new cards in note order.
 - Do not split the deck. Use tags for study filters.
 
-### 11.4 Manifest
+### 10.4 Manifest
 
 Write `apkg/swadesh_mandarin_sentences.manifest.json`:
 
@@ -542,12 +520,12 @@ Write `apkg/swadesh_mandarin_sentences.manifest.json`:
 {
   "build_date": "2026-10-18",
   "source_dump_date": "2026-10-17",
-  "counts": {"master_words": 500, "cards": 900, "native_audio": 210, "tts_audio": 690},
-  "coverage": {"core_with_card": 0.93, "all_with_card": 0.88},
+  "counts": {"words": 211, "cards": 420, "scaffold": 24, "native_audio": 120, "tts_audio": 300},
+  "coverage": {"core_with_card": 0.88},
   "voice": "zh-CN-XiaoxiaoNeural",
   "pack_license": "public",
   "audio_license_skipped": {"none": 0, "CC BY-NC 4.0": 3},
-  "files": {"master_csv": "sha256:...", "sentences_csv": "sha256:..."},
+  "files": {"source_csv": "sha256:...", "sentences_csv": "sha256:..."},
   "licenses": [
     {"data": "Tatoeba sentences", "license": "CC BY 2.0 FR"},
     {"data": "Tatoeba audio", "license": "per recording"}
@@ -556,7 +534,7 @@ Write `apkg/swadesh_mandarin_sentences.manifest.json`:
 }
 ```
 
-### 11.5 Attribution
+### 10.5 Attribution
 
 Write `ATTRIBUTION.md` at the repo root and add a short line to the deck
 description. The file lists:
@@ -564,22 +542,20 @@ description. The file lists:
 - Tatoeba sentence ids and authors, grouped by author.
 - Tatoeba audio ids and authors, when the native tier is on.
 - The Swadesh source page and its license.
-- The HSK list source.
 - The TTS engine and voice.
 
 Tatoeba text needs this sentence: "Sentences come from Tatoeba
 (https://tatoeba.org) and use the CC BY 2.0 FR license."
 
-## 12. CLI
+## 11. CLI
 
 New commands under the existing `anki swadesh` app. Keep `build` unchanged.
 
 ```bash
-anki swadesh fetch                                   # S0, cache Tatoeba and HSK data
-anki swadesh master mandarin --target-size 500       # S1 and S2
-anki swadesh sentences mandarin --per-word 2         # S3 and S4
-anki swadesh audio mandarin --native none            # S5
-anki swadesh pack mandarin                           # S6
+anki swadesh fetch                                   # S0, cache Tatoeba data
+anki swadesh sentences mandarin --per-word 2         # S1 to S3
+anki swadesh audio mandarin --native none            # S4
+anki swadesh pack mandarin                           # S5
 anki swadesh audit mandarin                          # gates, no writes
 ```
 
@@ -587,9 +563,8 @@ Options:
 
 | Option           | Default              | Meaning                      |
 | ---------------- | -------------------- | ---------------------------- |
-| `--target-size`  | 500                  | Master list size, 400 to 650 |
 | `--per-word`     | 2                    | Max sentences per word       |
-| `--max-cards`    | 1200                 | Hard card cap                |
+| `--max-cards`    | 450                  | Hard card cap                |
 | `--max-unknown`  | 2                    | Unknown tokens per sentence  |
 | `--min-han`      | 4                    | Minimum Han characters       |
 | `--max-han`      | 10                   | Maximum Han characters       |
@@ -599,7 +574,7 @@ Options:
 | `--refresh`      | off                  | Ignore the cache and refetch |
 | `--pack-license` | public               | `public` or `private`        |
 
-## 13. File layout
+## 12. File layout
 
 ```
 data/tatoeba/                      cached dumps, gitignored
@@ -608,14 +583,12 @@ data/tatoeba/                      cached dumps, gitignored
   cmn-eng_links.tsv
   cmn_sentences_with_audio.tsv
   eng_sentences.tsv                symlink or copy of archive/tibetan/eng_sentences.tsv
-data/hsk/
-  hsk1.txt  hsk2.txt  hsk3.txt
 vocab/
-  mandarin_swadesh.csv
-  mandarin_master.csv
+  english-mandarin.csv            reviewed source list
   mandarin_sentences.csv
   mandarin_sentences_review.csv
   mandarin_pinyin_overrides.csv
+  swadesh_review.csv
 audio/mandarin_sentences/
   ta_*.mp3  tts_*.mp3  word_*.mp3  index.csv
 apkg/
@@ -628,39 +601,42 @@ specs/mandarin-swadesh-sentence-pack.md
 Add `data/`, `audio/mandarin_sentences/`, and `apkg/*.apkg` to
 `.gitignore`. Commit the CSV files and the manifest.
 
-## 14. Quality gates
+## 13. Quality gates
 
 `anki swadesh audit mandarin` runs these checks and exits with a non-zero
 code on a failure.
 
 | Gate | Check                                                             |
 | ---- | ----------------------------------------------------------------- |
-| G1   | Master list size in 400 to 650                                    |
-| G2   | No duplicate master form                                          |
-| G3   | Every card target exists in the master list                       |
+| G1   | Word table: 207 rows, 205 to 220 forms, no gap                    |
+| G2   | No duplicate word form                                            |
+| G3   | Every card target exists in the reviewed CSV                      |
 | G4   | Every card has a unique Tatoeba id after conversion               |
 | G5   | Target appears one time in each sentence                          |
 | G6   | No card pair with char-set Jaccard of 0.67 or more                |
 | G7   | Every card has a valid audio file with duration 0.4 to 15 seconds |
 | G8   | Audio file count equals the media count in the APKG               |
 | G9   | Pinyin syllable count equals Han character count                  |
-| G10  | Core coverage of 90 percent or more                               |
+| G10  | Core coverage of 80 percent or more, provisional for M1           |
 | G11  | Manifest counts equal the CSV row counts                          |
 | G12  | `ATTRIBUTION.md` exists and names every audio author in the pack  |
 | G13  | The APKG opens with `AnkiPackage` and lists the expected notes    |
 | G14  | Every card passes the proper-sentence rules F2 to F10             |
 | G15  | `vocab/swadesh_review.csv` has no open row                        |
 
+G10 is provisional. M1 measures the real coverage. This spec then keeps
+the measured value minus 5 points as the gate.
+
 Add unit tests in `tests/test_mandarin_pack.py` for:
 
-- Master list size and dedupe.
+- Word-table size, dedupe, and slash expansion.
 - Unknown-word filter.
 - Set cover on a small fixture.
 - Audio filename determinism.
 - Proper-sentence filters F2 to F10 on a small fixture.
 - Manifest counts.
 
-## 15. Risks
+## 14. Risks
 
 | Risk                                       | Effect                  | Mitigation                                           |
 | ------------------------------------------ | ----------------------- | ---------------------------------------------------- |
@@ -671,29 +647,31 @@ Add unit tests in `tests/test_mandarin_pack.py` for:
 | Strict length rule drops a natural short   | Fewer cards per word    | 4-char minimum, fallback window, review CSV          |
 | edge-tts is an unofficial endpoint         | Voice service can break | Retry, gTTS fallback, cached audio                   |
 | Tatoeba rate limits and slow downloads     | Build time              | 1 request per second, cache, resume                  |
-| Deck too large for daily review            | Low completion          | `--max-cards`, tags, subdeck by rank later           |
+| Deck too large for daily review            | Low completion          | `--max-cards 450`, Swadesh-only list, tags           |
+| Swadesh-only list gives a small deck       | Few cards to study      | 2 cards per word, scaffold tier, HSK tier later      |
 | Sentence pairs from a bad translation      | Wrong English           | English length check, review CSV, 5 percent audit    |
 | Wrong Swadesh form or reading              | Bad cards               | Source review in 6.1, gloss check, review CSV        |
 
-## 16. Milestones
+## 15. Milestones
 
 | Milestone | Task                                           | Output                   |
 | --------- | ---------------------------------------------- | ------------------------ |
 | M0        | `swadesh fetch` with cache and checksum report | `data/` populated        |
-| M1        | S1 and S2 with size and coverage report        | `mandarin_master.csv`    |
-| M2        | S3 and S4 with review CSV                      | `mandarin_sentences.csv` |
-| M3        | S5 TTS only, audio index, validation           | `audio/` populated       |
-| M4        | S6 pack, manifest, templates, tags             | first `.apkg`            |
+| M1        | S1 word-table checks and coverage report       | coverage report          |
+| M2        | S2 and S3 with review CSV                      | `mandarin_sentences.csv` |
+| M3        | S4 TTS only, audio index, validation           | `audio/` populated       |
+| M4        | S5 pack, manifest, templates, tags             | first `.apkg`            |
 | M5        | `audit`, tests, README and `ATTRIBUTION.md`    | release check            |
 | M6        | Native audio tier and slow variant             | optional second pack     |
 
 Acceptance for M4: the audit passes all gates, and 5 percent of the cards
 pass a manual review of sentence, pinyin, gloss, and audio.
 
-## 17. Open questions
+## 16. Open questions
 
 1. Ship the native audio tier in the public pack, or keep it local only?
 2. Use 2 sentences per word, or 1 sentence plus the existing word deck?
 3. Add scaffold template sentences for words with no Tatoeba example?
-4. Split the pack by rank into 250-card subdecks for review load?
+4. Split the pack into two subdecks for review load?
 5. Add a slow audio variant by default?
+6. Add HSK 1 and 2 words later as an optional extended tier?
