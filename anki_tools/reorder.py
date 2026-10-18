@@ -73,7 +73,9 @@ def reorder_deck(
     print(f"Marked {len(remove_ranks)} high-similarity cards for removal")
 
     with AnkiPackage(input_apkg) as pkg:
-        cursor = pkg.conn.cursor()
+        conn = pkg.conn
+        assert conn is not None
+        cursor = conn.cursor()
 
         # Build note_ranks mapping, preferring note_id mapping if available
         note_ranks = {}
@@ -148,7 +150,7 @@ def reorder_deck(
         for new_due, (rank, card_id) in enumerate(remaining_cards, start=1):
             cursor.execute("UPDATE cards SET due = ? WHERE id = ?", (new_due, card_id))
 
-        pkg.conn.commit()
+        conn.commit()
         pkg._modified = True
 
         pkg.save(output_apkg)
