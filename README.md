@@ -171,6 +171,43 @@ has no use, and step 2 deletes it.
 
 The deck name has the entry count (for example, `Swadesh Mandarin 207`).
 
+### Mandarin Swadesh Sentences
+
+Build a listening-comprehension deck for Mandarin. The deck pairs 207 Swadesh
+concepts with 403 Tatoeba sentences. Each card holds one sentence, the
+tone-marked pinyin, the English translation, the target word, and two MP3
+files.
+
+```bash
+uv run anki swadesh fetch                                   # cache the Tatoeba data
+uv run anki swadesh sentences mandarin --per-word 2 --max-cards 450
+uv run anki swadesh audio mandarin --native-audio none      # make the audio
+uv run anki swadesh pack mandarin                           # write the APKG
+uv run anki swadesh audit mandarin                          # gates G1 to G16
+```
+
+The commands write these files:
+
+| Path                                            | Content                            |
+| ----------------------------------------------- | ---------------------------------- |
+| `vocab/mandarin_sentences.csv`                  | one row per card                   |
+| `vocab/mandarin_sentences_review.csv`           | top candidates for the weak words  |
+| `audio/mandarin_sentences/index.csv`            | file index of the audio cache      |
+| `apkg/swadesh_mandarin_sentences.apkg`          | the deck                           |
+| `apkg/swadesh_mandarin_sentences.manifest.json` | counts, coverage, and file hashes  |
+| `ATTRIBUTION.md`                                | sentence authors and licenses      |
+
+The audio step uses gTTS because `edge-tts` is absent. `ffprobe` must be on
+the path. The audio step removes a file that fails the header or duration
+check.
+
+Measured result: 403 cards, 606 media files, and core coverage of 199 of 207
+concepts (0.961). The pack has 0 scaffold cards and 0 native recordings. These
+8 words have no selected sentence: 虱子, 棍子, 种子, 骨头, 肠子, 乳房, 呕吐, and
+揉.
+
+Licenses: word data CC BY-SA 4.0, Tatoeba sentence text CC BY 2.0 FR, and
+audio per recording. This pack uses synthesized audio only.
 
 
 ## API Reference

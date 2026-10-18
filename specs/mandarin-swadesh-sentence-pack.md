@@ -1,6 +1,6 @@
 # Spec: Mandarin Swadesh Sentence Pack with Audio
 
-Status: draft for review
+Status: implemented
 Date: 2026-10-18
 Revision: 2026-10-18. Review fixes: pool counts, F5 marks, scaffold gate,
 known-word set, CLI options, and license terms. The sweep is done for the
@@ -727,3 +727,25 @@ pass a manual review of sentence, pinyin, gloss, and audio.
 4. Split the pack into two subdecks for review load?
 5. Add a slow audio variant by default?
 6. Add HSK 1 and 2 words later as an optional extended tier?
+
+## 17. Implementation result
+
+Milestone M5 is complete. These values come from the full pipeline run of
+2026-10-18.
+
+| Measure         | Value                                                  |
+| --------------- | ------------------------------------------------------ |
+| Build date      | 2026-10-18                                             |
+| Cards           | 403 core, 0 scaffold                                   |
+| Media files     | 606 (403 sentence files and 203 word files)            |
+| Core coverage   | 199 of 207 concepts (0.961)                            |
+| Uncovered words | 虱子, 棍子, 种子, 骨头, 肠子, 乳房, 呕吐, 揉           |
+| TTS engine      | gTTS, because `edge-tts` is absent; voice `gtts:zh-CN` |
+| Native audio    | 0 recordings                                           |
+| Gate result     | G1 to G16 pass; `anki swadesh audit mandarin` exits 0  |
+
+The Tatoeba pool gives no sentence for 8 concepts. The selection keeps the
+core tier only, so the pack has no scaffold card.
+
+`vocab/swadesh_review.csv` holds the Mandarin rows of the word review. The
+file has 29 fixed rows and no open row, so gate G15 passes.

@@ -26,6 +26,7 @@ from anki_tools.mandarin_audio import (
     generate_audio,
     load_sentence_rows,
 )
+from anki_tools.mandarin_audit import print_audit, run_audit
 from anki_tools.mandarin_deck import build_pack
 from anki_tools.mandarin_fetch import fetch_tatoeba
 from anki_tools.mandarin_swadesh import (
@@ -1343,6 +1344,22 @@ def pack(
     print(f"wrote {result['output']}")
     print(f"wrote {result['manifest_path']}")
     print(f"wrote {result['attribution_path']}")
+
+
+@swadesh_app.command
+def audit(language: str) -> None:
+    """Run the quality gates G1 to G16 on the Mandarin sentence pack.
+
+    :param language: Language name. Only mandarin is available.
+    """
+    lang = language.lower().strip()
+    if lang != "mandarin":
+        print(f"Unsupported language: {language}. Only mandarin is available.")
+        return
+
+    code = print_audit(run_audit())
+    if code:
+        raise SystemExit(code)
 
 
 @swadesh_app.command
