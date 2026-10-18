@@ -157,6 +157,7 @@ every language:
 | Mandarin reading | CC-CEDICT gloss                           | The reading whose gloss matches the English label |
 | Jyutping         | `tojyutping` via `anki_tools/jyutping.py` | The syllabary matches the written form            |
 | Transliteration  | Romanization table for the language       | No pinyin or foreign text in the column           |
+| Frequency        | `wordfreq` (`zh`, `de`, `es`, `ar`, `hi`) | Flag below 3.0. Skip Cantonese, see the rule      |
 
 Rules:
 
@@ -164,6 +165,9 @@ Rules:
   matches the English label, not the first reading from pypinyin.
 - Keep a module difference when the file form is the more common word.
   Record the reason in the review file.
+- Do not use Zipf for Cantonese. `wordfreq` has no `yue` list, and the `zh`
+  proxy measures Mandarin only. Use words.hk or CantoDict for the Cantonese
+  form, `tojyutping` for the reading, and the module for the canonical form.
 - Report the match count per language in the review file.
 
 Output `vocab/swadesh_review.csv` with columns `lang`, `index`,
@@ -185,6 +189,12 @@ Measured result of the review (2026-10-18):
 The remaining differences are variants or register choices. Several file
 forms are better than the module form, for example 星星 for star and 心 for
 heart.
+
+The Cantonese Zipf scan is void. It reports 24 forms below 3.0, and all of
+them are Cantonese-specific characters (哋, 嚟, 畀, 脷) that the Mandarin
+corpus does not contain. Greek and Hindi scores have low value for a
+related reason: the corpora store inflected forms, not citation forms.
+For example, δαγκώνω scores 0.00 and δαγκώνει scores 3.56.
 
 ## 7. S2: Master list of 2x to 3x size
 
@@ -318,6 +328,7 @@ card `tier=scaffold`.
 - Tokenize each candidate sentence.
 - Keep punctuation tokens out of word counts.
 - Known word set = master list plus the top 1000 `wordfreq` words for `zh`.
+  This set is Mandarin only. Do not use the `zh` list for Cantonese (6.1).
 
 ### 9.2 Hard constraints per card
 
@@ -340,7 +351,8 @@ Sort candidates for each target word by this key, first item first:
 
 1. Unknown token count, low first.
 2. Native audio present, yes first.
-3. Mean Zipf value of the sentence tokens, high first.
+3. Mean Zipf value of the sentence tokens for `zh`, high first. Omit this
+   term for Cantonese (6.1).
 4. Han length, 5 to 9 first.
 5. Tatoeba sentence id, low first, for determinism.
 

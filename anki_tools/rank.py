@@ -604,7 +604,9 @@ def rank_sentences_yue(
     Converts simplified to traditional Chinese and generates jyutping romanization.
     Uses Chinese character-based complexity and similarity (like ZH)
     with Cantonese-specific weighting. Frequency data uses Chinese (Mandarin)
-    as an approximation since Cantonese is not available in wordfreq.
+    as an approximation since Cantonese is not available in wordfreq. Do not
+    treat the frequency term as a Cantonese frequency measure. wordfreq has no
+    `yue` list, and the `zh` list measures Mandarin only.
 
     :param sentences: Sentences to rank.
     :param weights: Optional dict with complexity, frequency, similarity_penalty.
@@ -638,6 +640,22 @@ def _tokenize_words_fr(text: str) -> list[str]:
     cleaned = re.sub(r"<[^>]+>", "", text)
     tokens = re.findall(r"[a-zA-Z\u00c0-\u024f]+", cleaned)
     return [t.lower() for t in tokens if t]
+
+
+def latin_text_dedup_key(text: str) -> str:
+    """Normalize Latin-script text for exact deduplication (letters only, lowercased).
+
+    Punctuation and surrounding quotes are ignored so variants like ``Hi!`` and ``Hi``
+    map to the same key. Falls back to casefolded whitespace collapse when there are
+    no letter tokens (e.g. digits-only or symbols).
+
+    :param text: Sentence or phrase.
+    :returns: Stable string key for dictionary lookups.
+    """
+    toks = _tokenize_words_fr(text)
+    if toks:
+        return " ".join(toks)
+    return " ".join(text.split()).casefold()
 
 
 def complexity_score_fr(sentence: str) -> float:

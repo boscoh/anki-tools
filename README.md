@@ -120,7 +120,8 @@ uv run anki fix yue deck.apkg  # Convert to traditional, fix jyutping, rank, reo
 ```
 - Converts simplified to traditional Chinese
 - Generates accurate jyutping romanization
-- Character-based scoring (frequency uses Mandarin approximation)
+- Character-based scoring. The frequency term uses a Mandarin approximation
+  as a fallback. Do not treat it as a Cantonese frequency measure.
 - Outputs `_reordered.apkg` and `.rank.csv`
 
 **Spanish (es):**
