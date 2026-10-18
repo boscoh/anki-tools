@@ -178,7 +178,7 @@ Measured result of the review (2026-10-18):
 | english-cantonese.csv | 175 of 207      | 48           |
 | english-greek.csv     | 184 of 207      | 42           |
 | english-german.csv    | 201 of 207      | 1            |
-| english-spanish.csv   | 192 of 207      | 1            |
+| english-spanish.csv   | 194 of 207      | 8            |
 | english-hindi.csv     | 205 of 207      | 3            |
 | english-arabic.csv    | 206 of 207      | 8            |
 

@@ -1,7 +1,7 @@
 english,spanish
-I,Yo
+I,yo
 you (singular),tú
-he/she/it/they (singular),él/ella
+he/she/it/they (singular),él/ella/ello
 we,nosotros/nosotras
 you (plural),ustedes
 they (plural),ellos/ellas
@@ -20,7 +20,7 @@ many,muchos/muchas
 some,algunos/algunas
 few,pocos/pocas
 other,otro/otra
-one,un/una
+one,uno
 two,dos
 three,tres
 four,cuatro
@@ -132,7 +132,7 @@ to squeeze,apretar
 to rub,frotar
 to wash,lavar
 to wipe,limpiar
-to pull,tirar
+to pull,tirar de
 to push,empujar
 to throw,lanzar
 to tie,atar
@@ -190,16 +190,16 @@ dirty,sucio/sucia
 straight,recto/recta
 round,redondo/redonda
 sharp,afilado/afilada
-dull,desafilado/sin filo
+dull,romo/roma
 smooth,liso/lisa
 wet,mojado/mojada
 dry,seco/seca
 correct,correcto/correcta
 near,cerca
 far,lejos
-right,derecho/derecha
-left,izquierdo/izquierda
-at,en
+right,derecha
+left,izquierda
+at,en/a
 in,en
 with,con
 and,y
