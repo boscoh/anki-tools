@@ -2,6 +2,7 @@
 
 Status: draft
 Date: 2026-10-19
+Revision: 2026-10-19. Added 1.1 to 1.5: goals, card counts, and the numbers.
 Owner: anki-tools
 Related: `specs/mandarin-swadesh-sentence-pack.md`, beads `anki-afn`, `anki-58i`
 
@@ -20,6 +21,143 @@ spec adds three things:
 The goal is the same as the Mandarin pack: a small deck for listening
 comprehension, with short natural sentences and no near-duplicates.
 
+### 1.1 Goals
+
+1. Keep as much vocabulary diversity as the input allows, with the fewest
+   cards.
+2. Weight that diversity to the most frequent words of spoken Cantonese, not
+   written Cantonese.
+3. Keep each sentence short, complete, and unlike the other kept sentences.
+
+The spec measures diversity with these numbers:
+
+| Measure                        | Meaning                                                                                                  |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| `cards`                        | Sentences kept                                                                                           |
+| `types`                        | Distinct words in the kept sentences                                                                     |
+| `top500`, `top1000`, `top1500` | How many of the 500, 1000, or 1500 most frequent words of the blend list (6.2) are in the kept sentences |
+| `spoken_mass`                  | Share of the 306,339 Cifu spoken tokens that belong to a word in the kept sentences                      |
+
+`spoken_mass` estimates the coverage of running speech. A learner who knows
+every kept word recognizes this share of spoken tokens. The tokenizer and the
+rank list both come from Cifu, so the absolute values are high. Use
+`spoken_mass` to compare methods. Do not use it as a claim about real speech.
+
+### 1.2 Expected number of cards
+
+The test used two inputs. The settings are the defaults of section 11:
+`--per-word 2`, `--top-words 1500`, `--known-top 2000`, `--max-unknown 2`,
+3 to 12 Han characters, similarity 0.67, and no `--max-sentences`.
+
+| Input                  | Sentences in | Pass Y1 to Y7 | Cards kept | Types | top500 | top1000 | top1500 | spoken_mass |
+| ---------------------- | ------------ | ------------- | ---------- | ----- | ------ | ------- | ------- | ----------- |
+| LTL deck (`.apkg`)     | 999          | 871           | 679        | 982   | 224    | 328     | 392     | 66.8%       |
+| Tatoeba Cantonese pool | 20,853       | 4,254         | 1,307      | 2,058 | 357    | 583     | 791     | 79.9%       |
+
+The selection removes cards that add no new target word. It keeps the
+frequent vocabulary:
+
+| Input   | Cards removed from the passed pool | Types lost     | Top 1500 words lost | `spoken_mass` lost |
+| ------- | ---------------------------------- | -------------- | ------------------- | ------------------ |
+| LTL     | 192 of 871 (22%)                   | 16 of 998      | 0                   | 0.0 points         |
+| Tatoeba | 2,947 of 4,254 (69%)               | 1,418 of 3,476 | 0                   | 0.6 points         |
+
+The types that the Tatoeba run loses are rare words, outside the target set.
+
+The rules of section 7 also cost vocabulary before the selection runs:
+
+- LTL deck: 12 of the 236 top-500 words appear only in rejected sentences.
+  `spoken_mass` falls from 67.7% to 66.8%.
+- Tatoeba pool: `spoken_mass` falls from 95.8% to 80.5%, and top500 falls
+  from 457 to 357. Rule Y1 causes most of the loss: it rejects 15,445 of
+  20,853 sentences, because only 26.3% of them have 12 Han characters or
+  fewer.
+
+### 1.3 Cards for each setting
+
+| Input   | `--top-words` | `--per-word 1` | `--per-word 2` | `--per-word 3` |
+| ------- | ------------- | -------------- | -------------- | -------------- |
+| LTL     | 500           | 296            | 415            | 486            |
+| LTL     | 1000 or more  | 559            | 679            | 734            |
+| Tatoeba | 500           | 263            | 459            | 622            |
+| Tatoeba | 1000          | 554            | 896            | 1,173          |
+| Tatoeba | 1500          | 829            | 1,307          | 1,645          |
+| Tatoeba | 2000          | 1,133          | 1,686          | 2,053          |
+
+The LTL rows for 1000 or more are equal, because the passed deck has only 969
+ranked words. At `--per-word 1`, each card carries 1.7 to 1.8 target words.
+A second card for each word is often not possible: 341 of the 969 LTL target
+words and 997 of the 1500 Tatoeba target words reach 2 cards.
+
+### 1.4 Cards with a cap, against the current ranking
+
+`--max-sentences` stops the selection early. The table compares the new
+selection with the first N sentences of the passed pool in the order of the
+current ranker. Each cell shows the new value, then the current value.
+
+| Input   | Cards | Types         | top500    | top1000   | `spoken_mass` |
+| ------- | ----- | ------------- | --------- | --------- | ------------- |
+| LTL     | 300   | 693 / 410     | 216 / 147 | 306 / 195 | 66.0 / 57.4   |
+| LTL     | 500   | 893 / 618     | 224 / 185 | 328 / 257 | 66.8 / 62.5   |
+| LTL     | 679   | 982 / 803     | 224 / 202 | 328 / 290 | 66.8 / 65.0   |
+| Tatoeba | 300   | 977 / 357     | 316 / 138 | 476 / 179 | 74.8 / 54.8   |
+| Tatoeba | 500   | 1,329 / 572   | 336 / 178 | 528 / 244 | 77.2 / 60.5   |
+| Tatoeba | 1,000 | 1,919 / 1,026 | 357 / 237 | 583 / 355 | 79.8 / 66.5   |
+| Tatoeba | 1,307 | 2,058 / 1,306 | 357 / 260 | 583 / 393 | 79.9 / 69.9   |
+
+For the LTL deck, the current order is the real `rank.csv` order. For
+Tatoeba, the current order uses the present frequency score (Apple Daily) and
+complexity score, without the similarity penalty. It is an approximation.
+
+How to read the table:
+
+- At 300 cards, the LTL selection keeps 69% more types and 8.6 points more
+  `spoken_mass`.
+- At 500 cards, the Tatoeba selection keeps 2.3 times the types and 16.7
+  points more `spoken_mass`.
+- The curve flattens. Tatoeba gains 2.6 points from 500 to 1,000 cards, and
+  0.1 point from 1,000 to 1,307 cards. A cap of 500 gives 97% of the final
+  `spoken_mass` (77.2 of 79.9) with 38% of the cards.
+- The LTL deck needs no cap. 500 cards already reach the 66.8% of the full
+  result.
+
+### 1.5 The Tatoeba Cantonese pool
+
+The export of 2026-10-17 has these counts:
+
+| Measure                                   | Value                                       |
+| ----------------------------------------- | ------------------------------------------- |
+| Cantonese sentences                       | 20,853                                      |
+| Sentences with 12 Han characters or fewer | 26.3%                                       |
+| Sentences that pass Y1 to Y7              | 4,254                                       |
+| Sentences with an English link            | 7,038                                       |
+| Passed sentences with an English link     | 3,644                                       |
+| Sentences with native audio               | 1,784                                       |
+| Audio license (1,781 of 1,784 rows)       | CC BY 4.0                                   |
+| Default cards with an English link        | 1,113 of 1,307                              |
+| Default cards with native audio           | 402 of 1,307                                |
+| Cards when the pool needs an English link | 1,291 (`spoken_mass` 79.3%, 455 with audio) |
+
+Effect of a longer limit (`--max-han`) on the Tatoeba run:
+
+| `--max-han` | Pass pool | Cards | Types | `spoken_mass` |
+| ----------- | --------- | ----- | ----- | ------------- |
+| 12          | 4,254     | 1,307 | 2,058 | 79.9%         |
+| 14          | 4,593     | 1,297 | 2,109 | 80.4%         |
+| 16          | 4,758     | 1,287 | 2,138 | 80.6%         |
+
+A limit of 16 gains 0.7 points and gives longer sentences. Keep 12.
+
+### 1.6 How the numbers were made
+
+A prototype of sections 6 to 8 made all numbers in 1.2 to 1.5. The prototype
+is not in the repository. It used the Cifu file and the Apple Daily file of
+2026-10-19, the Cifu tokenizer (6.3), the blend of 6.2 with `w = 0.7`, the
+override `你好` = `多謝`, and rules Y1 to Y7. Tatoeba data came from
+`downloads.tatoeba.org/exports/per_language/yue/`. A count can differ by one
+from a later table because of a tie in the sort. Gate G10 and milestone M4
+turn these numbers into tests.
+
 ## 2. Scope
 
 In scope:
@@ -29,11 +167,13 @@ In scope:
 - New options for `anki fix yue`.
 - A selection report that shows what the filter removed, and why.
 - A new `anki freq yue` command that writes the frequency list.
+- The Tatoeba Cantonese export as a second input (M6). Section 1.5 gives
+  the numbers. Its command is in a later spec.
 
 Out of scope:
 
 - Audio, TTS, and new card templates.
-- A Tatoeba Cantonese candidate pool (see 12, open question 1).
+- The command and the card fields for the Tatoeba pool (a later spec).
 - Changes to `fix zh`, `fix fr`, or `fix es`.
 - Swadesh targets. The Mandarin pack uses them. This spec uses the most
   frequent words instead (6.1).
@@ -91,11 +231,11 @@ sentence.
 
 | Result                   | Count |
 | ------------------------ | ----- |
-| Pass                     | 879   |
+| Pass                     | 871   |
 | Y1 length not 3 to 12    | 31    |
 | Y2 Latin letter or digit | 50    |
 | Y4 not one final mark    | 15    |
-| Y7 more than 2 unknown   | 24    |
+| Y7 more than 2 unknown   | 32    |
 | Total                    | 999   |
 
 Example of a Y2 failure: `送Tom走。` has rank 3 in the current output. The
@@ -105,17 +245,18 @@ Han length of the deck: 4 to 8 characters for 814 of 999 sentences.
 
 ### 3.4 Vocabulary reach of the deck
 
-| Measure                                   | Value |
-| ----------------------------------------- | ----- |
-| Top 1500 blended words found in the deck  | 456   |
-| The same words found in the 879 that pass | 434   |
-| Top 500 blended words found in the deck   | 265   |
-| The same words found in the 879 that pass | 253   |
+| Measure                | All 999 sentences | The 871 that pass |
+| ---------------------- | ----------------- | ----------------- |
+| Types                  | 1133              | 998               |
+| Top 500 blended words  | 236               | 224               |
+| Top 1000 blended words | 345               | 328               |
+| Top 1500 blended words | 414               | 392               |
+| `spoken_mass`          | 67.7%             | 66.8%             |
 
 The LTL deck is small, so it limits the result. A selection step cannot add
 words that the deck does not have. It still removes repeat sentences, and it
 puts the deck in a learning order. A larger Cantonese set gives more
-diversity (12, open question 1).
+diversity (1.2 and 1.5).
 
 ## 4. Data sources and licenses
 
@@ -275,9 +416,11 @@ deck fail Y4, print a warning and tell the user to use `--no-final-mark`
 
 ### 8.1 Target words
 
-The target set is the first `--top-words` words (default 1500) of the Y1
-list that appear as a token in at least one passed sentence. A word that the
-deck never uses is not a target. The report lists it as `absent`.
+The target set is the `--top-words` most frequent words (default 1500) among
+the words that appear as a token in at least one passed sentence. The order
+is the Y1 rank. A word with no Y1 rank is not a target. The coverage report
+lists each top-`--top-words` word of the Y1 list that no passed sentence uses
+as `absent`.
 
 ### 8.2 Greedy cover
 
@@ -295,8 +438,23 @@ Use greedy cover, as in the Mandarin pack. The loop is:
 7. Stop when `--max-sentences` is reached, or when every gain is 0.
 
 Defaults: `--per-word 2`, `--max-sentences` none. With no `--max-sentences`,
-the loop stops when every gain is 0, so the result is the smallest set that
-reaches `--per-word` for each target word the deck can supply.
+the loop stops when every gain is 0. Greedy cover is not always the smallest
+set, but the test in 1.2 shows that the result keeps all top 1500 words that
+the passed pool holds.
+
+Test of four weight functions for step 1, with a cap of 300 or 500 cards
+(types, top1000, `spoken_mass`):
+
+| Weight           | LTL 300        | Tatoeba 300    | Tatoeba 500      |
+| ---------------- | -------------- | -------------- | ---------------- |
+| `1/log2(rank+1)` | 694, 306, 65.9 | 977, 476, 74.8 | 1,329, 528, 77.2 |
+| `blend_pm`       | 582, 328, 66.2 | 841, 483, 75.2 | 1,237, 572, 77.8 |
+| `sqrt(blend_pm)` | 628, 323, 66.3 | 927, 483, 75.4 | 1,292, 562, 77.9 |
+| 1 (no weight)    | 718, 287, 64.5 | 989, 444, 72.3 | 1,334, 513, 76.3 |
+
+The `blend_pm` weight gains at most 0.6 points of `spoken_mass`, and it loses
+90 to 140 types at 300 cards. The weight 1 loses up to 2.5 points. Use
+`1/log2(rank+1)`, which keeps both measures high.
 
 ### 8.3 Similarity
 
@@ -385,11 +543,10 @@ New options for `anki fix yue`. The existing options stay.
 
 ## 12. Open questions
 
-1. Add Tatoeba Cantonese as a candidate pool? The export has 20,831 `yue`
-   sentences and 1,784 with audio (checked on the Tatoeba site). That is
-   enough for real diversity. It needs links to English, a converter for
-   variant characters, and a separate command like `anki swadesh sentences`.
-   This is a second spec.
+1. Tatoeba Cantonese as a candidate pool is in scope (M6). Section 1.5
+   gives the numbers. It needs a download step, English links, and a command
+   like `anki swadesh sentences`. Write that command in a second spec. The
+   pool uses traditional characters already, but check variant characters.
 2. Is Cifu usable in a public build? The repository file is GPL-3.0. The
    data comes from corpora with other terms. Ask the authors, or build the
    spoken list from HKCanCor alone (CC BY 4.0) with PyCantonese.
@@ -398,25 +555,32 @@ New options for `anki fix yue`. The existing options stay.
 4. Add a Cantonese part-of-speech check to replace F9?
 5. Should the Swadesh Cantonese list (`vocab/english-cantonese.csv`) add a
    `--targets swadesh` mode, to match the Mandarin pack?
+6. Add a stop rule for small gain, such as `--min-gain`? The Tatoeba run
+   adds 0.1 point of `spoken_mass` for the last 307 cards (1.4).
+7. Should `sqrt(blend_pm)` replace the log-rank weight? It gains 0.6 to 0.7
+   points at 300 and 500 cards, and loses 37 to 50 types (8.2).
 
 ## 13. Quality gates
 
 `anki freq yue --check` and the unit tests run these checks. A failure stops
 the run with a non-zero exit code.
 
-| Gate | Check                                                                                        |
-| ---- | -------------------------------------------------------------------------------------------- |
-| G1   | `data/yue_frequency.tsv` has at least 40,000 rows, and its ranks are 1 to N with no gap      |
-| G2   | On the LTL deck, at least 92 percent of Han tokens have a spoken count (measured 92.3)       |
-| G3   | 係, 嘅, 唔, 我, 你 are in the first 20 ranks                                                 |
-| G4   | 你好, 早晨, 唔該 are in the first 3000 ranks (overrides apply)                               |
-| G5   | No kept sentence fails Y1 to Y7                                                              |
-| G6   | No two kept sentences are duplicates by 8.3                                                  |
-| G7   | Every kept sentence has a row in `.select.csv`, and the row counts match the input           |
-| G8   | `--no-select --freq written --order score` gives the same ranking CSV as the current version |
-| G9   | The kept cards have a non-decreasing `hardest_rank` when `--order coverage`                  |
+| Gate | Check                                                                                                                           |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------- |
+| G1   | `data/yue_frequency.tsv` has at least 40,000 rows, and its ranks are 1 to N with no gap                                         |
+| G2   | On the LTL deck, at least 92 percent of Han tokens have a spoken count (measured 92.3)                                          |
+| G3   | 係, 嘅, 唔, 我, 你 are in the first 20 ranks                                                                                    |
+| G4   | 你好, 早晨, 唔該 are in the first 3000 ranks (overrides apply)                                                                  |
+| G5   | No kept sentence fails Y1 to Y7                                                                                                 |
+| G6   | No two kept sentences are duplicates by 8.3                                                                                     |
+| G7   | Every kept sentence has a row in `.select.csv`, and the row counts match the input                                              |
+| G8   | `--no-select --freq written --order score` gives the same ranking CSV as the current version                                    |
+| G9   | The kept cards have a non-decreasing `hardest_rank` when `--order coverage`                                                     |
+| G10  | LTL deck, `--max-sentences 300`: at least 650 types, 210 top500 words, and `spoken_mass` 65.0 or more (measured 693, 216, 66.0) |
+| G11  | LTL deck, defaults: 679 cards, within 5 percent (measured 679)                                                                  |
 
-G2 comes from section 3.2. Lower the value only with a new measurement.
+G2 comes from section 3.2. G10 and G11 come from sections 1.2 and 1.4.
+Lower a value only with a new measurement.
 
 ## 14. Tests
 
@@ -438,31 +602,38 @@ function, as the existing yue tests do.
 
 ## 15. Risks
 
-| Risk                                              | Effect                       | Mitigation                                             |
-| ------------------------------------------------- | ---------------------------- | ------------------------------------------------------ |
-| Spoken sample is small (306k tokens)              | Wrong rank below about 2000  | Use spoken only for count of 5 or more; blend          |
-| Cifu is biased to the HKCanCor 1997-98 vocabulary | Old words rank high          | Written term at weight 0.3; overrides                  |
-| Cifu license is unclear for redistribution        | Cannot ship a derived list   | Cache only; `data/` ignored; question 2                |
-| Tokenizer splits words wrongly (我仲讀)           | Wrong target match           | Cifu dictionary; G2; fix by hand in overrides          |
-| The blend changes the order of the current output | Old decks look different     | `--no-select`, `--freq written`, M2 report             |
-| Small input deck limits diversity                 | Selection gains little       | Report coverage; question 1                            |
-| Strict rules drop natural short sentences         | Fewer cards                  | Y1 starts at 3 characters; `.select.csv` shows reasons |
-| Variant map goes the wrong way                    | Wrong frequency for 咁 or 枱 | Pick the larger Cifu count; review in M1               |
+| Risk                                                                        | Effect                       | Mitigation                                                           |
+| --------------------------------------------------------------------------- | ---------------------------- | -------------------------------------------------------------------- |
+| Spoken sample is small (306k tokens)                                        | Wrong rank below about 2000  | Use spoken only for count of 5 or more; blend                        |
+| Cifu is biased to the HKCanCor 1997-98 vocabulary                           | Old words rank high          | Written term at weight 0.3; overrides                                |
+| Cifu license is unclear for redistribution                                  | Cannot ship a derived list   | Cache only; `data/` ignored; question 2                              |
+| Tokenizer splits words wrongly (我仲讀)                                     | Wrong target match           | Cifu dictionary; G2; fix by hand in overrides                        |
+| The blend changes the order of the current output                           | Old decks look different     | `--no-select`, `--freq written`, M2 report                           |
+| Small input deck limits diversity                                           | Selection gains little       | Report coverage; question 1                                          |
+| Strict rules drop natural short sentences                                   | Fewer cards                  | Y1 starts at 3 characters; `.select.csv` shows reasons               |
+| Variant map goes the wrong way                                              | Wrong frequency for 咁 or 枱 | Pick the larger Cifu count; review in M1                             |
+| `spoken_mass` is circular: Cifu gives the tokenizer, the rank, and the test | Values are too high          | Use it to compare methods only; G10 compares with the current ranker |
+| Tatoeba Cantonese sentences are long (26.3% have 12 characters or fewer)    | Rule Y1 rejects 74% of them  | Keep 12; a limit of 16 gains 0.7 points (1.5)                        |
 
 ## 16. Milestones
 
-| Milestone | Task                                                        | Output                               |
-| --------- | ----------------------------------------------------------- | ------------------------------------ |
-| M0        | Fetch Cifu to the cache; check the license; add `CIFU_PATH` | cached file, license note            |
-| M1        | Reader, blend, variant map, overrides, `anki freq yue`      | `data/yue_frequency.tsv`, G1, G3, G4 |
-| M2        | Tokenizer, `--freq` option, change report for `anki-afn`    | report of changed sentences, G2      |
-| M3        | Rules Y1 to Y7, `.select.csv`                               | G5, G7                               |
-| M4        | Greedy cover, similarity, learning order, `.coverage.csv`   | G6, G9; `fix yue` options complete   |
-| M5        | README, `ATTRIBUTION.md`, tests, regression gate G8         | release check                        |
+| Milestone | Task                                                          | Output                                 |
+| --------- | ------------------------------------------------------------- | -------------------------------------- |
+| M0        | Fetch Cifu to the cache; check the license; add `CIFU_PATH`   | cached file, license note              |
+| M1        | Reader, blend, variant map, overrides, `anki freq yue`        | `data/yue_frequency.tsv`, G1, G3, G4   |
+| M2        | Tokenizer, `--freq` option, change report for `anki-afn`      | report of changed sentences, G2        |
+| M3        | Rules Y1 to Y7, `.select.csv`                                 | G5, G7                                 |
+| M4        | Greedy cover, similarity, learning order, `.coverage.csv`     | G6, G9; `fix yue` options complete     |
+| M5        | README, `ATTRIBUTION.md`, tests, regression gate G8           | release check                          |
+| M6        | Tatoeba Cantonese pool: download, English links, command spec | numbers of 1.5 reproduced, second spec |
 
 M2 comes before the default changes. The report shows each sentence whose
 rank moves by more than 100 places, so the user can check the result.
 
-Acceptance for M4: on the LTL deck, the kept set has at least 95 percent of
-the top 500 words that the deck holds (253 of 265 words in the passed set),
-and the user marks 5 percent of the kept cards as good sentences.
+Acceptance for M4: on the LTL deck with the defaults, the kept set has all
+224 top-500 words of the passed set, at most 700 cards, and a `spoken_mass`
+of 66.8% (G10, G11). The user marks 5 percent of the kept cards as good
+sentences.
+
+Acceptance for M6: on the Tatoeba pool, 500 cards give a `spoken_mass` of
+77.0% or more, and the default run gives about 1,300 cards (1.2, 1.4).
