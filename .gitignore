@@ -38,3 +38,7 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+
+# Beads (issue tracker) runtime files next to .beads/
+*.gate.lock*
+.beads-credential-key
