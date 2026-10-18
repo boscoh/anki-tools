@@ -38,38 +38,36 @@ All numbers below come from a test run on the Tatoeba export of 2026-10-17
 and the local `vocab/english-mandarin.csv` file. The test used jieba with a
 user dictionary that contains the master list.
 
-| Measure                                          | Value           |
-| ------------------------------------------------ | --------------- |
-| Swadesh concepts                                 | 207             |
-| Swadesh form entries in `english-mandarin.csv`   | 209, 207 unique |
-| Swadesh forms with 1 or more candidates, 3 to 8  | 185 of 207      |
-| Swadesh forms with 3 or more candidates, 3 to 8  | 157 of 207      |
-| Swadesh forms with 1 or more candidates, 3 to 10 | 194 of 207      |
-| Tatoeba Mandarin sentences (cmn)                 | 89,190          |
-| Mandarin to English translation links            | 78,295          |
-| Candidate sentences, 3 to 8 Han characters       | 30,465          |
-| Candidate sentences, 3 to 10 Han characters      | 43,379          |
-| Tatoeba Mandarin sentences with native audio     | 5,826           |
-| HSK 2.0 level 1 words                            | 150             |
-| HSK 2.0 level 2 words                            | 151             |
-| HSK 2.0 level 3 words                            | 299             |
-| Swadesh + HSK 1 + HSK 2, unique forms            | 444             |
-| The same set with 2 or more candidate sentences  | 405             |
-| Swadesh + HSK 1 to 3, unique forms               | 719             |
+| Measure                                        | Value            |
+| ---------------------------------------------- | ---------------- |
+| Swadesh concepts                               | 207              |
+| Swadesh form entries in `english-mandarin.csv` | 209, 207 unique  |
+| Tatoeba Mandarin sentences (cmn)               | 89,190           |
+| Mandarin to English translation links          | 78,295           |
+| Linked sentences with a final sentence mark    | 65,499 of 66,257 |
+| Candidate proper sentences, 4 to 10 Han chars  | 36,148           |
+| Tatoeba Mandarin sentences with native audio   | 5,826            |
+| HSK 2.0 level 1 words                          | 150              |
+| HSK 2.0 level 2 words                          | 151              |
+| HSK 2.0 level 3 words                          | 299              |
+| Swadesh + HSK 1 + HSK 2, unique forms          | 444              |
+| The same set with 2 or more eligible sentences | 397              |
+| Swadesh + HSK 1 to 3, unique forms             | 719              |
 
-Sentences with at most one word outside the master list and the top 1000
+Sentences with at most two words outside the master list and the top 1000
 frequency list give coverage as follows:
 
 | Measure                                   | Value      |
 | ----------------------------------------- | ---------- |
 | Master list, Swadesh + HSK 1 + HSK 2      | 444 words  |
-| Words with 1 or more selected sentences   | 408 of 444 |
-| Words with at least one native audio card | 248 of 444 |
-| Swadesh core words with 1 or more cards   | 183 of 207 |
-| Swadesh core words with native audio      | 100 of 207 |
+| Words with 1 or more eligible sentences   | 414 of 444 |
+| Words with at least one native audio card | 274 of 444 |
+| Swadesh core words with 1 or more cards   | 187 of 207 |
+| Swadesh core words with native audio      | 112 of 207 |
 
 Result: a 500-word master list is feasible. Native audio covers about half of
-the words. TTS must cover the rest.
+the words. TTS must cover the rest. Strict mode (`--max-unknown 1`) gives
+398 of 444 words and 175 of 207 core words.
 
 ## 4. Data sources
 
@@ -194,8 +192,8 @@ Sort by `rank`. Assign rank as follows:
 ### 7.4 Master list acceptance
 
 - Size in 400 to 650.
-- `core` coverage of at least 85 percent with 1 or more sentences. The 3 to 8
-  character window gives 185 of 207 Swadesh forms (89 percent).
+- `core` coverage of at least 90 percent with 1 or more eligible sentences.
+  The measured result is 187 of 207 Swadesh forms (90 percent).
 - No duplicate `mandarin` value.
 - Every `pinyin` value matches the pypinyin output for that form, or has a
   manual override row in `vocab/mandarin_pinyin_overrides.csv`.
@@ -219,21 +217,54 @@ Converter step:
 
 Filter rules, applied in order:
 
-| Rule | Condition                                            |
-| ---- | ---------------------------------------------------- |
-| F1   | Has at least one English translation link            |
-| F2   | 3 to 8 Han characters                                |
-| F3   | No Latin letters and no digits                       |
-| F4   | No repeated-pattern text (`is_repeated_zh_sentence`) |
-| F5   | No more than one punctuation mark                    |
-| F6   | English text has 2 to 12 words                       |
-| F7   | Not a duplicate after Simplified conversion          |
+| Rule | Condition                                                     |
+| ---- | ------------------------------------------------------------- |
+| F1   | Has at least one English translation link                     |
+| F2   | 4 to 10 Han characters                                        |
+| F3   | No Latin letters and no digits                                |
+| F4   | No repeated-pattern text (`is_repeated_zh_sentence`)          |
+| F5   | Last character is `。`, `？`, or `！`                         |
+| F6   | Exactly 1 sentence-final mark (no two-sentence string)        |
+| F7   | No quotation mark (`"`, `“`, `”`, `「`, `」`, `『`, `』`)     |
+| F8   | At most 1 internal punctuation mark (comma, colon, semicolon) |
+| F9   | Has a predicate: 1 token tagged `v` or `a` by `jieba.posseg`  |
+| F10  | No orphan sentence-initial conjunction (see 8.1)              |
+| F11  | English text has 2 to 12 words                                |
+| F12  | Not a duplicate after Simplified conversion                   |
 
-Measured pool size after F1 and F2: 30,465 sentences. Record the exact
-number in the pool report.
+### 8.1 Definition of a proper sentence
 
-Fallback window: when a word gets no candidate in 3 to 8 characters, retry
-that word with a 2 to 10 character window. Mark such a card `tier=scaffold`.
+A card sentence must read as one complete statement. These rules enforce
+that requirement:
+
+- Length. 4 to 10 Han characters. Shorter text is a fragment, longer text
+  is hard to follow by ear. Prefer 5 to 9.
+- Final mark. The text ends with `。`, `？`, or `！`. A trailing quote mark,
+  Latin full stop, or a bare noun is a fragment.
+- One sentence. Exactly one sentence-final mark. A dialogue pair or a
+  two-sentence string makes a bad card.
+- No dialogue. Quotation marks signal a nested quote or a dialogue.
+- One clause join. At most one internal comma or colon.
+- Predicate. jieba tags at least one token as a verb or an adjective.
+  A bare noun phrase such as 三只狗。 fails this test. Fallback: pass when
+  the sentence contains 是, 有, 在, 不, or a verb from the master list.
+- No orphan conjunction. A sentence that starts with 因为, 所以, 但是, 可是,
+  而且, 然后, 不过, or 虽然 and has no comma lacks its main clause.
+
+Measured effect of the proper-sentence filters on the linked Mandarin pool:
+
+| Filter set                   | Pool size |
+| ---------------------------- | --------- |
+| Linked sentences, any length | 66,257    |
+| F1 to F8, no predicate test  | 41,967    |
+| F1 to F10 (the proper set)   | 36,148    |
+
+The 4 to 10 window removes fragments and still yields 36,148 sentences.
+That is enough for 414 of 444 master words.
+
+Fallback window: when a word gets no candidate in 4 to 10 characters, retry
+that word with a 3 to 10 character window and drop F6 and F8. Mark such a
+card `tier=scaffold`.
 
 ## 9. S4: Sentence selection
 
@@ -246,14 +277,15 @@ that word with a 2 to 10 character window. Mark such a card `tier=scaffold`.
 
 ### 9.2 Hard constraints per card
 
-| Constraint     | Rule                                                 |
-| -------------- | ---------------------------------------------------- |
-| Target match   | Target word appears exactly 1 time as a token        |
-| Unknown words  | At most 1 token outside the known word set           |
-| Length         | 3 to 8 Han characters                                |
-| Script         | Simplified Chinese only                              |
-| Duplicate      | No char-set Jaccard of 0.67 or more with a kept card |
-| Duplicate card | One card per sentence and per target word pair       |
+| Constraint     | Rule                                                           |
+| -------------- | -------------------------------------------------------------- |
+| Target match   | Target word appears exactly 1 time as a token                  |
+| Unknown words  | At most 2 tokens outside the known word set (1 in strict mode) |
+| Length         | 4 to 10 Han characters                                         |
+| Complete       | Passes all proper-sentence rules F5 to F10                     |
+| Script         | Simplified Chinese only                                        |
+| Duplicate      | No char-set Jaccard of 0.67 or more with a kept card           |
+| Duplicate card | One card per sentence and per target word pair                 |
 
 Reuse `char_similarity_zh` and `is_repeated_zh_sentence` from
 `anki_tools/rank.py`.
@@ -265,7 +297,7 @@ Sort candidates for each target word by this key, first item first:
 1. Unknown token count, low first.
 2. Native audio present, yes first.
 3. Mean Zipf value of the sentence tokens, high first.
-4. Han length, 4 to 6 first.
+4. Han length, 5 to 9 first.
 5. Tatoeba sentence id, low first, for determinism.
 
 ### 9.4 Selection and coverage
@@ -281,7 +313,7 @@ Use greedy set cover:
 5. Process `core` words before `extended` words, so the Swadesh words get
    their second sentence first.
 
-Defaults: `--per-word 2`, `--max-cards 1200`.
+Defaults: `--per-word 2`, `--max-cards 1200`, `--max-unknown 2`.
 
 Reject a card when the sentence has no English translation after pairing.
 Report the words that stay uncovered:
@@ -307,7 +339,7 @@ Report the words that stay uncovered:
 | `audio_source`   | string | native or tts          |
 | `audio_license`  | string | CC BY 2.0 FR or empty  |
 | `unknown_words`  | int    | 0                      |
-| `han_len`        | int    | 5                      |
+| `han_len`        | int    | 4                      |
 | `zipf_mean`      | float  | 5.12                   |
 | `rank_key`       | string | serialized sort key    |
 
@@ -500,9 +532,9 @@ Options:
 | `--target-size`  | 500                  | Master list size, 400 to 650 |
 | `--per-word`     | 2                    | Max sentences per word       |
 | `--max-cards`    | 1200                 | Hard card cap                |
-| `--max-unknown`  | 1                    | Unknown tokens per sentence  |
-| `--min-han`      | 3                    | Minimum Han characters       |
-| `--max-han`      | 8                    | Maximum Han characters       |
+| `--max-unknown`  | 2                    | Unknown tokens per sentence  |
+| `--min-han`      | 4                    | Minimum Han characters       |
+| `--max-han`      | 10                   | Maximum Han characters       |
 | `--native-audio` | none                 | `none`, `auto`, `only`       |
 | `--voice`        | zh-CN-XiaoxiaoNeural | edge-tts voice               |
 | `--slow-audio`   | off                  | Add a slow variant per card  |
@@ -554,10 +586,11 @@ code on a failure.
 | G7   | Every card has a valid audio file with duration 0.4 to 15 seconds |
 | G8   | Audio file count equals the media count in the APKG               |
 | G9   | Pinyin syllable count equals Han character count                  |
-| G10  | Core coverage of 85 percent or more                               |
+| G10  | Core coverage of 90 percent or more                               |
 | G11  | Manifest counts equal the CSV row counts                          |
 | G12  | `ATTRIBUTION.md` exists and names every audio author in the pack  |
 | G13  | The APKG opens with `AnkiPackage` and lists the expected notes    |
+| G14  | Every card passes the proper-sentence rules F2 to F10             |
 
 Add unit tests in `tests/test_mandarin_pack.py` for:
 
@@ -565,6 +598,7 @@ Add unit tests in `tests/test_mandarin_pack.py` for:
 - Unknown-word filter.
 - Set cover on a small fixture.
 - Audio filename determinism.
+- Proper-sentence filters F2 to F10 on a small fixture.
 - Manifest counts.
 
 ## 15. Risks
@@ -574,7 +608,8 @@ Add unit tests in `tests/test_mandarin_pack.py` for:
 | Native audio license unclear (84 CC BY-NC) | Cannot distribute       | Default TTS, opt-in native tier, skip NC when public |
 | Tatoeba text has traditional forms         | Mixed script deck       | OpenCC conversion, keep original text for checks     |
 | jieba segmentation errors                  | Wrong target match      | User dictionary, exact substring check, review CSV   |
-| Swadesh tail has no sentences              | Missing core words      | Scaffold tier, 2-character sentences, manual frame   |
+| Swadesh tail has no proper sentence        | Missing core words      | Fallback window, scaffold tier, manual frame         |
+| Strict length rule drops a natural short   | Fewer cards per word    | 4-char minimum, fallback window, review CSV          |
 | edge-tts is an unofficial endpoint         | Voice service can break | Retry, gTTS fallback, cached audio                   |
 | Tatoeba rate limits and slow downloads     | Build time              | 1 request per second, cache, resume                  |
 | Deck too large for daily review            | Low completion          | `--max-cards`, tags, subdeck by rank later           |
