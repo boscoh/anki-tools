@@ -21,6 +21,11 @@ import cyclopts
 from gtts import gTTS
 
 from anki_tools.jyutping import fix_jyutping
+from anki_tools.mandarin_audio import (
+    DEFAULT_VOICE as MANDARIN_DEFAULT_VOICE,
+    generate_audio,
+    load_sentence_rows,
+)
 from anki_tools.mandarin_fetch import fetch_tatoeba
 from anki_tools.mandarin_swadesh import (
     build_candidate_pool,
@@ -1266,6 +1271,49 @@ def sentences(
     print(f"wrote {sentence_path}")
     print(f"wrote {review_path}")
     print(f"wrote {report_path}")
+
+
+@swadesh_app.command(name="audio")
+def sentence_audio(
+    language: str,
+    *,
+    native_audio: str = "none",
+    voice: str = MANDARIN_DEFAULT_VOICE,
+    slow_audio: bool = False,
+    pack_license: str = "public",
+) -> None:
+    """Generate and validate the audio files for the Mandarin sentence pack.
+
+    :param language: Language name. Only mandarin is available.
+    :param native_audio: Tatoeba tier: none, auto, or only.
+    :param voice: edge-tts voice name.
+    :param slow_audio: Generate the slow variant.
+    :param pack_license: public or private.
+    """
+    lang = language.lower().strip()
+    if lang != "mandarin":
+        print(f"Unsupported language: {language}. Only mandarin is available.")
+        return
+
+    rows = load_sentence_rows()
+    result = generate_audio(
+        rows,
+        voice=voice,
+        native_audio=native_audio,
+        slow_audio=slow_audio,
+        pack_license=pack_license,
+    )
+    print(
+        f"engine {result['engine']} voice {result['voice']}: "
+        f"{result['tts']} tts, {result['native']} native, "
+        f"{result['words']} word, {result['skipped']} cached, "
+        f"{result['failed']} failed, {result['duration_s']:.1f} s"
+    )
+    for failure in result["failures"]:
+        print(f"failed: {failure['filename']} {failure['error']}")
+    print(f"wrote {result['index_path']}")
+    if result["csv_path"]:
+        print(f"wrote {result['csv_path']}")
 
 
 @swadesh_app.command
