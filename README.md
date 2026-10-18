@@ -146,9 +146,27 @@ Build vocabulary flashcards with audio:
 ```bash
 uv run anki swadesh list-languages
 uv run anki swadesh build mandarin
+uv run anki swadesh build all
 ```
 
-Builds `.apkg` files from CSV vocabulary lists with gTTS audio. See gTTS language table below for supported languages.
+Builds `.apkg` files from `vocab/english-<language>.csv` with gTTS audio.
+See gTTS language table below for supported languages.
+
+A build does these steps in order:
+
+1. Generates the MP3 file for each form that has no file yet.
+2. Deletes each audio file in `audio/audio_<language>/` that the current list
+   does not use. Use `--no-prune` to keep those files.
+3. Stops with an error if a form still has no audio. No deck is written.
+4. Writes `apkg/swadesh_<language>.apkg` through a temporary file. The old
+   deck is replaced only after a complete write.
+
+The audio file name comes from the target-language text. If you correct a
+form in the CSV file, the build makes a new MP3 file for it. The old MP3 file
+has no use, and step 2 deletes it.
+
+The deck name has the entry count (for example, `Swadesh Mandarin 207`).
+
 
 
 ## API Reference

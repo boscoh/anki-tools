@@ -914,6 +914,26 @@ def _parse_vocab_entries(config: dict) -> list[dict]:
     return entries
 
 
+def _prune_outdated_audio(audio_dir: Path, keep: set[str]) -> list[str]:
+    """Delete audio files that no list entry refers to.
+
+    :param audio_dir: Directory with generated audio files.
+    :param keep: File names used by the current list entries.
+    :returns: File names of the deleted audio files.
+    """
+    if not audio_dir.is_dir():
+        return []
+
+    removed = []
+    for path in sorted(audio_dir.iterdir()):
+        if not path.is_file() or path.name in keep:
+            continue
+        path.unlink()
+        removed.append(path.name)
+
+    return removed
+
+
 def _generate_audio_files(entries: list[dict], config: dict) -> None:
     """Generate audio files for entries using TTS if they don't exist.
 
@@ -1002,10 +1022,11 @@ def _content_field_order(csv_fields: list[str], audio_field_name: str) -> list[s
     return result
 
 
-def _build_apkg(language: str) -> None:
+def _build_apkg(language: str, prune: bool = True) -> None:
     """Build APKG file with vocabulary and audio for the given language.
 
     :param language: Language name (e.g. mandarin, spanish).
+    :param prune: Delete audio files that the current list does not use.
     """
     lang_lower = language.lower()
     lang_title = language.title()
@@ -1015,13 +1036,14 @@ def _build_apkg(language: str) -> None:
         "language": language,
         "vocab_file": f"vocab/english-{lang_lower}.csv",
         "audio_dir": f"audio/audio_{lang_lower}",
-        "deck_name": f"Swadesh {lang_title} 207",
+        "deck_name": f"Swadesh {lang_title}",
         "model_name": f"Swadesh {lang_title}",
         "output_file": f"swadesh_{lang_lower}.apkg",
         "audio_field_name": lang_lower,
     }
 
     entries = _parse_vocab_entries(config)
+    config["deck_name"] = f"{config['deck_name']} {len(entries)}"
 
     _generate_audio_files(entries, config)
 
@@ -1031,6 +1053,12 @@ def _build_apkg(language: str) -> None:
     if not audio_dir.exists():
         print(f"Error: Audio directory not found: {audio_dir}")
         return
+
+    keep = {entry["audio_filename"] for entry in entries}
+    if prune:
+        removed = _prune_outdated_audio(audio_dir, keep)
+        if removed:
+            print(f"Removed {len(removed)} outdated audio files")
 
     # Load CSS from templates/card.css if it exists
     css_path = Path(__file__).parent.parent / "templates" / "card.css"
@@ -1078,11 +1106,13 @@ def _build_apkg(language: str) -> None:
 
     cards = []
     media_files = []
+    missing: list[str] = []
 
     for entry in entries:
         audio_path = audio_dir / entry["audio_filename"]
 
         if not audio_path.exists():
+            missing.append(entry.get("english", entry["audio_filename"]))
             print(f"Warning: Audio file not found: {audio_path}")
             continue
 
@@ -1093,8 +1123,8 @@ def _build_apkg(language: str) -> None:
 
         media_files.append(str(audio_path.absolute()))
 
-    if not media_files:
-        print("Error: No audio files found. Check audio files exist.")
+    if missing:
+        print(f"Error: {len(missing)} forms have no audio: " + ", ".join(missing))
         return
 
     apkg_dir = Path("apkg")
@@ -1109,8 +1139,9 @@ def _build_apkg(language: str) -> None:
     if css_content:
         print("  CSS: templates/card.css")
 
+    tmp_path = output_path.with_name(output_path.name + ".tmp")
     AnkiPackage.create(
-        output_path,
+        tmp_path,
         config["deck_name"],
         fields=fields,
         cards=cards,
@@ -1121,6 +1152,7 @@ def _build_apkg(language: str) -> None:
         css=css_content,
         sort_field_index=0,
     )
+    tmp_path.replace(output_path)
 
     print(f"\nSuccessfully created: {output_path}")
 
@@ -1142,18 +1174,24 @@ app.command(swadesh_app)
 
 
 @swadesh_app.command
-def build(language: str):
+def build(language: str, prune: bool = True):
     """Build Swadesh vocabulary APKG for a language.
 
-    :param language: One of mandarin, spanish, greek, german, cantonese, arabic, hindi.
+    :param language: One of the supported languages, or all.
+    :param prune: Delete audio files that the current list does not use.
     """
     lang = language.lower().strip()
+    if lang == "all":
+        for name in SWADESH_LANGUAGES:
+            _build_apkg(name, prune=prune)
+        return
+
     if lang not in SWADESH_LANGUAGES:
         print(
             f"Unknown language: {language}. Supported: {', '.join(SWADESH_LANGUAGES)}"
         )
         return
-    _build_apkg(lang)
+    _build_apkg(lang, prune=prune)
 
 
 @swadesh_app.command
