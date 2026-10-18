@@ -2,8 +2,8 @@
 *.apkg
 !tests/*.apkg
 
-# Extracted Anki directories (ignore extracted dirs, but allow .apkg files)
-data/A_Course_in_Contemporary_Chinese_1/
+# Local input data and cached dumps
+data/
 
 # Audio output directories
 audio_output/

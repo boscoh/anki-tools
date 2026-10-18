@@ -21,6 +21,7 @@ import cyclopts
 from gtts import gTTS
 
 from anki_tools.jyutping import fix_jyutping
+from anki_tools.mandarin_fetch import fetch_tatoeba
 from anki_tools.package import AnkiPackage
 from anki_tools.pinyin import fix_pinyin
 from anki_tools.rank import (
@@ -1193,6 +1194,16 @@ def build(language: str, prune: bool = True):
         return
     _build_apkg(lang, prune=prune)
 
+
+@swadesh_app.command
+def fetch(*, refresh: bool = False) -> None:
+    """Fetch the Tatoeba exports for the Mandarin sentence pack.
+
+    :param refresh: Ignore the cache and download every file again.
+    """
+    results = fetch_tatoeba(refresh=refresh)
+    for name, info in results.items():
+        print(f"{name}.tsv: {info['rows']} rows ({info['source']})")
 
 @swadesh_app.command
 def list_languages():
