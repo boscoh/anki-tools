@@ -288,14 +288,20 @@ def _read_word_count_tsv(path: Path) -> dict[str, int]:
     :param path: Path to the TSV file.
     :returns: Word to occurrence count.
     """
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise RuntimeError(
+            f"Cannot read the Cantonese frequency file {path}. "
+            "Set YUE_FREQUENCY_PATH to a valid file."
+        ) from exc
     counts: dict[str, int] = {}
-    with open(path, encoding="utf-8") as f:
-        for line in f:
-            parts = line.rstrip("\n").split("\t")
-            if len(parts) != 2 or not parts[1].isdigit():
-                continue
-            word, count = parts
-            counts[word] = counts.get(word, 0) + int(count)
+    for line in text.splitlines():
+        parts = line.split("\t")
+        if len(parts) != 2 or not parts[1].isdigit():
+            continue
+        word, count = parts
+        counts[word] = counts.get(word, 0) + int(count)
     return counts
 
 
