@@ -204,21 +204,10 @@ Output `vocab/swadesh_review.csv` with columns `lang`, `index`,
 `english`, `current`, `canonical`, `issue`, `fix`, `status`.
 `status` is `fixed`, `kept`, or `open`. The build fails on any `open` row.
 
-Result of the correction sweep, after the fixes (2026-10-18):
+Result: 1357 of 1449 labels match the canonical module row set, and 125
+rows changed. The full record, the rules, and the complete change list are
+in `specs/swadesh-correction-sweep.md`.
 
-| File                  | Canonical match | Errors fixed |
-| --------------------- | --------------- | ------------ |
-| english-mandarin.csv  | 192 of 207      | 16           |
-| english-cantonese.csv | 175 of 207      | 48           |
-| english-greek.csv     | 184 of 207      | 42           |
-| english-german.csv    | 201 of 207      | 1            |
-| english-spanish.csv   | 194 of 207      | 8            |
-| english-hindi.csv     | 205 of 207      | 3            |
-| english-arabic.csv    | 206 of 207      | 8            |
-| all seven files       | 1357 of 1449    | 126          |
-
-The fixes cover forms, Mandarin pinyin readings, and Cantonese jyutping.
-The sweep is complete: no row is `open`.
 The remaining differences are variants or register choices. Several file
 forms are better than the module form, for example 星星 for star and 心 for
 heart.
@@ -545,7 +534,7 @@ description. The file lists:
 - The TTS engine and voice.
 
 Tatoeba text needs this sentence: "Sentences come from Tatoeba
-(https://tatoeba.org) and use the CC BY 2.0 FR license."
+(<https://tatoeba.org>) and use the CC BY 2.0 FR license."
 
 ## 11. CLI
 
@@ -576,7 +565,7 @@ Options:
 
 ## 12. File layout
 
-```
+```text
 data/tatoeba/                      cached dumps, gitignored
   cmn_sentences.tsv
   cmn_sentences_detailed.tsv
