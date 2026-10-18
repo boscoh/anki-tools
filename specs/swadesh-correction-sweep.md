@@ -1,6 +1,6 @@
 # Spec: Swadesh Vocabulary Correction Sweep
 
-Status: done
+Status: done for the seven CSV files; the review file is open (O1)
 Date: 2026-10-18
 Owner: anki-tools
 Commits: `42d43cd` (seven languages), `5b4d93c` (Spanish)
@@ -41,6 +41,22 @@ Out of scope:
 | Mandarin reading  | CC-CEDICT                                 | CC BY-SA 4.0 | Gloss match for each polyphone |
 | Cantonese reading | `tojyutping` via `anki_tools/jyutping.py` | MIT          | Syllabary check                |
 | Frequency         | `wordfreq`                                | Apache 2.0   | Flag a form below Zipf 3.0     |
+
+### 3.1 Normalization for the canonical check
+
+These steps apply before the form comparison:
+
+1. Fold case.
+2. Remove a parenthetical note.
+3. Remove `<notes:...>` and `[[...]]` markup.
+4. Remove a leading article for Greek, German, and Spanish.
+5. Remove Arabic vowel marks and tatweel.
+6. Split a module term on `//` and keep both forms.
+7. Convert Chinese forms to Simplified.
+
+The dump date is 2026-10-18. The revision ids are: ar 89015768, cmn
+92539038, de 86670657, el 83779807, es 88706918, hi 83632291, yue
+72271170.
 
 The module is a check only. Do not copy a module gloss into a deck. The
 `wordfreq` value is a flag only. It is not a validator.
@@ -88,21 +104,25 @@ The module is a check only. Do not copy a module gloss into a deck. The
 | German    | 207  | 209   | 208          | 201 of 207      | 1            |
 | Greek     | 207  | 213   | 210          | 184 of 207      | 42           |
 | Hindi     | 207  | 207   | 199          | 205 of 207      | 3            |
-| Mandarin  | 207  | 211   | 211          | 192 of 207      | 15           |
+| Mandarin  | 207  | 211   | 211          | 193 of 207      | 15           |
 | Spanish   | 207  | 253   | 252          | 194 of 207      | 8            |
-| Total     | 1449 | 1511  | 1498         | 1357 of 1449    | 125          |
+| Total     | 1449 | 1511  | 1498         | 1358 of 1449    | 125          |
 
 The row counts come from the two commits. The Forms column counts each
-slash-separated form as one entry. The canonical match is the count
-recorded during the sweep.
+slash-separated form as one entry. The canonical match uses the
+normalization in section 3.1. The counts were verified on 2026-10-18.
 
 Two count notes:
 
-- The pack spec reported 16 Mandarin fixes. The commits hold 15 changed
-  Mandarin rows. This spec counts changed rows. The difference of one is not
-  recorded.
+- An earlier revision of the pack spec reported 16 Mandarin fixes and a total
+  of 126. The commits hold 15 changed Mandarin rows and 125 changed rows in
+  total. The earlier count was an issue count, not a row count.
 - Spanish changed in two commits. `42d43cd` fixed the label of index 3.
   `5b4d93c` fixed 8 rows, and index 3 was one of them.
+
+A reading-only fix does not change the canonical form match. The match
+deltas are 1, 29, 1, 32, 3, 4, and 1. The total is 71. The 125 changed rows
+and the 71 new matches are different measures.
 
 The sweep does not change the frequency findings. Greek and Hindi scores
 have low value, because the corpora store inflected forms, not citation
@@ -117,9 +137,9 @@ Cantonese scan is void, because `wordfreq` has no `yue` list.
 | Reading           | The romanization is a different word, or the tone is wrong                 | 长 zhǎng → cháng, 数 shù → shǔ, 嘴 hau2 → zeoi2, 眼 ngaam5 → ngaan5  |
 | Register          | The form is bookish, or a Mandarin word in Cantonese                       | 许多 → 多, 少数 → 少, 人類 → 人, 丈夫 → 老公, 耳朵 → 耳仔, 嘻笑 → 笑 |
 | Character         | The form uses a homophone or a Mandarin character                          | 我地 → 我哋, 黎 → 嚟, 比 → 畀, 舌頭 → 脷, 鳥 → 雀, 站立 → 企         |
-| Gender and number | The form covers one gender only                                            | أَنْتَ → أَنْتَ/أَنْتِ, هُمْ → هُمْ/هُنَّ, él/ella → él/ella/ello                    |
+| Gender and number | The form covers one gender only                                            | أَنْتَ → أَنْتَ/أَنْتِ, هُمْ → هُمْ/هُنَّ, él/ella → él/ella/ello    |
 | Grammar class     | A noun or a participle stands where the label names an adjective or a verb | το κόκκινο → κόκκινος, το κοιλιά → η κοιλιά, δάγκω → δαγκώνω         |
-| Orthography       | The spelling or the vowel mark is wrong                                    | दाएँ → दायाँ, बाएँ → बायाँ, सुस्त → कुंद, عِنْد → عِنْدَ, Yo → yo                        |
+| Orthography       | The spelling or the vowel mark is wrong                                    | दाएँ → दायाँ, बाएँ → बायाँ, सुस्त → कुंद, عِنْد → عِنْدَ, Yo → yo    |
 | Label             | The English label is too narrow                                            | he/she → he/she/it/they (singular)                                   |
 
 ## 8. Review file
@@ -128,8 +148,8 @@ Cantonese scan is void, because `wordfreq` has no `yue` list.
 `current`, `canonical`, `issue`, `fix`, `status`. `status` is `fixed`,
 `kept`, or `open`. The build fails on any `open` row.
 
-The file is not in the repository yet. Until it is, the change lists in this
-spec are the record. See O1.
+M1 adds the file to the repository (O1). Until then, the change lists in
+this spec are the record.
 
 ## 9. Reproduce the changes
 
@@ -140,20 +160,24 @@ git diff 42d43cd^ HEAD -- vocab/
 
 The source checks in section 3 need the module dump and the CC-CEDICT
 export. No script is kept. The one-off scripts in `archive/scripts/` are
-stale and must not run. They would overwrite the corrected files.
+stale and must not run. They would overwrite the corrected files. The module
+revision ids in section 3.1 pin the counts. Fetch each page with
+`action=raw` to rebuild the dump.
 
 ## 10. Residual findings
 
 - Duplicate forms across rows remain in four files. Greek has 3: αυτό
   (index 3 and 7), το φτερό (70 and 84), το πόδι (80 and 81). German has 1:
   sie (3 and 6). Spanish has 1: en (201 and 202). Hindi has 8: तुम, वह,
-  छोटा, पंख, काटना, मारना, तैरना, बर्फ़. Most are polysemy, for example
-  foot and leg, or snow and ice. A deck builds one card per row, so it
-  makes two cards with the same answer. Decide each case: keep both, or add
-  a sense note to the gloss.
-- The canonical match counts are not verified now. `data/` is empty, so the
-  module dump is not available. A fresh dump can confirm the counts.
+  छोटा, पंख, काटना, मारना, तैरना, बर्फ़. A whole-cell duplicate makes two
+  cards with the same answer: Greek 70/84 and 80/81, and all 8 Hindi pairs.
+  The other cases share a form inside a slash row, so the two cards differ.
+  Decide each case: keep both, or add a sense note to the gloss.
+- The counts were verified on 2026-10-18 with the live module dumps in
+  section 3.1. O3 is closed.
 - The review file does not exist. The pack spec gates G15 on it.
+- Cantonese index 138 `聯 lyun4` is suspect. 聯 means to unite. To sew is
+  縫 fung4 or 車 ce1. Verify before release (O6).
 
 ## 11. Rules for the next edit
 
@@ -170,8 +194,8 @@ stale and must not run. They would overwrite the corrected files.
 | S1   | Every English label equals `vocab/swadesh.txt` at the same index |
 | S2   | Every transliteration cell is filled                             |
 | S3   | For a single-form row, the syllable count equals the Han count   |
-| S4   | `english-mandarin.csv` has no duplicate form                     |
-| S5   | The review file has no `open` row                                |
+| S4   | `english-mandarin.csv` has no duplicate form (Mandarin scope)    |
+| S5   | The review file exists and has no `open` row                     |
 | S6   | A build reads the CSV and never writes it                        |
 
 Checked on 2026-10-18 for `english-mandarin.csv`: S1 gives 0 mismatches, S2
@@ -179,13 +203,14 @@ gives 0 empty cells, S3 gives 0 mismatches, S4 gives 0 duplicates.
 
 ## 13. Open items
 
-| Id | Item                                                            |
-| -- | --------------------------------------------------------------- |
-| O1 | Commit `vocab/swadesh_review.csv`                               |
-| O2 | Add `anki swadesh review <lang>` to run the section 12 checks   |
-| O3 | Confirm the canonical match counts on a fresh module dump       |
-| O4 | Settle the Mandarin count: 15 changed rows against 16 fixes     |
-| O5 | Review the duplicate forms in Greek, German, Spanish, and Hindi |
+| Id  | Item                                                            |
+| --- | --------------------------------------------------------------- |
+| O1  | Commit `vocab/swadesh_review.csv`                               |
+| O2  | Add `anki swadesh review <lang>` to run the section 12 checks   |
+| O3  | Closed: counts verified on 2026-10-18 (section 3.1)             |
+| O4  | Closed: 15 rows changed; the earlier 16 was an issue count      |
+| O5  | Review the duplicate forms in Greek, German, Spanish, and Hindi |
+| O6  | Verify the Cantonese form for index 138 (聯)                    |
 
 ## Appendix A: Complete change list
 
@@ -334,21 +359,21 @@ transliteration. `Changed` names the fields that differ.
 
 ### A.6 Hindi (3 rows)
 
-| Index | English | Before    | After        | Changed       |
-| ----- | ------- | --------- | ------------ | ------------- |
-| 192   | dull    | सुस्त · sust | कुंद · kund    | form, reading |
-| 199   | right   | दाएँ · daan | दायाँ · daayaan | form, reading |
-| 200   | left    | बाएँ · baan | बायाँ · baayaan | form, reading |
+| Index | English | Before       | After           | Changed       |
+| ----- | ------- | ------------ | --------------- | ------------- |
+| 192   | dull    | सुस्त · sust | कुंद · kund     | form, reading |
+| 199   | right   | दाएँ · daan  | दायाँ · daayaan | form, reading |
+| 200   | left    | बाएँ · baan  | बायाँ · baayaan | form, reading |
 
 ### A.7 Arabic (8 rows)
 
-| Index | English                   | Before       | After                   | Changed       |
-| ----- | ------------------------- | ------------ | ----------------------- | ------------- |
-| 2     | you (singular)            | أَنْتَ · anta   | أَنْتَ/أَنْتِ · anta/anti     | form, reading |
-| 3     | he/she/it/they (singular) | هُوَ · huwa    | هُوَ/هِيَ · huwa/hiya       | form, reading |
+| Index | English                   | Before         | After                        | Changed       |
+| ----- | ------------------------- | -------------- | ---------------------------- | ------------- |
+| 2     | you (singular)            | أَنْتَ · anta  | أَنْتَ/أَنْتِ · anta/anti    | form, reading |
+| 3     | he/she/it/they (singular) | هُوَ · huwa    | هُوَ/هِيَ · huwa/hiya        | form, reading |
 | 6     | they (plural)             | هُمْ · hum     | هُمْ/هُنَّ · hum/hunna       | form, reading |
 | 7     | this                      | هٰذَا · hadha  | هٰذَا/هٰذِهِ · hadha/hadhihi | form, reading |
 | 187   | rotten                    | فَاسِد · fasid | مُتَعَفِّن · muta'affin      | form, reading |
-| 201   | at                        | عِنْد · ind    | عِنْدَ · inda              | form, reading |
-| 203   | with                      | مَع · ma'     | مَعَ · ma'a               | form, reading |
-| 205   | if                        | إِن · in      | إِنْ · in                 | form          |
+| 201   | at                        | عِنْد · ind    | عِنْدَ · inda                | form, reading |
+| 203   | with                      | مَع · ma'      | مَعَ · ma'a                  | form, reading |
+| 205   | if                        | إِن · in       | إِنْ · in                    | form          |
