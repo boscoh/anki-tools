@@ -14,7 +14,7 @@ what,τι
 where,πού
 when,πότε
 how,πώς
-not,όχι
+not,δεν
 all,όλοι
 many,πολλοί
 some,κάποιοι
@@ -31,7 +31,7 @@ wide,πλατύς
 thick,παχύς
 heavy,βαρύς
 small,μικρός
-short,σύντομος
+short,κοντός
 narrow,στενός
 thin,λεπτός
 woman,η γυναίκα
@@ -46,13 +46,13 @@ animal,το ζώο
 fish,το ψάρι
 bird,το πουλί
 dog,ο σκύλος
-louse,η φθείρα
+louse,η ψείρα
 snake,το φίδι
 worm,το σκουλήκι
 tree,το δέντρο
 forest,το δάσος
-stick,το κλαδί
-fruit,ο καρπός
+stick,το ραβδί
+fruit,το φρούτο
 seed,ο σπόρος
 leaf,το φύλλο
 root,η ρίζα
@@ -83,19 +83,19 @@ leg,το πόδι
 knee,το γόνατο
 hand,το χέρι
 wing,το φτερό
-belly,το κοιλιά
-guts,τα σκάφη
-neck,το λαιμό
+belly,η κοιλιά
+guts,τα σπλάχνα
+neck,ο λαιμός
 back,η πλάτη
 breast,το στήθος
 heart,η καρδιά
 liver,το συκώτι
 to drink,πίνω
 to eat,τρώω
-to bite,δάγκω
-to suck,συναγμένος
+to bite,δαγκώνω
+to suck,ρουφώ
 to spit,φτύνω
-to vomit,εμετίζω
+to vomit,ξερνώ
 to blow,φυσάω
 to breathe,αναπνέω
 to laugh,γελάω
@@ -115,16 +115,16 @@ to hit,χτυπάω
 to cut,κόβω
 to split,σπάω
 to stab,μαχαιρώνω
-to scratch,χαϊδεύω
-to dig,σκαλίζω
+to scratch,ξύνω
+to dig,σκάβω
 to swim,κολυμπάω
 to fly,πετάω
 to walk,περπατώ
 to come,έρχομαι
-to lie down,βάζομαι
+to lie down,ξαπλώνω
 to sit,κάθομαι
 to stand,στέκομαι
-to turn (intransitive),στρίβω
+to turn (intransitive),γυρίζω
 to fall,πέφτω
 to give,δίνω
 to hold,κρατώ
@@ -144,19 +144,19 @@ to play,παίζω
 to float,πλέω
 to flow,ρέω
 to freeze,παγώνω
-to swell,πρηστάνω
+to swell,πρήζομαι
 sun,ο ήλιος
 moon,το φεγγάρι
 star,το αστέρι
 water,το νερό
 rain,η βροχή
-river,ο ποτάμι
+river,το ποτάμι
 lake,η λίμνη
 sea,η θάλασσα
 salt,το αλάτι
 stone,η πέτρα
 sand,η άμμος
-dust,το σκόνη
+dust,η σκόνη
 earth,η γη
 cloud,το σύννεφο
 fog,η ομίχλη
@@ -167,34 +167,34 @@ ice,το πάγος
 smoke,ο καπνός
 fire,η φωτιά
 ash,η στάχτη
-to burn,το καίω
+to burn,καίω
 road,ο δρόμος
 mountain,το βουνό
-red,το κόκκινο
-green,το πράσινο
-yellow,το κίτρινο
-white,το λευκό
-black,το μαύρο
+red,κόκκινος
+green,πράσινος
+yellow,κίτρινος
+white,λευκός
+black,μαύρος
 night,η νύχτα
 day,η ημέρα
-year,το έτος
-warm,ζεστό
-cold,κρύο
-full,γεμάτο
-new,νέο
-old,παλιό
-good,καλό
-bad,κακό
-rotten,σάπιο
-dirty,βρώμικο
-straight,ευθύς
-round,στρογγυλό
-sharp,αιχμηρό
-dull,τυπικό
-smooth,λείο
-wet,βρεγμένο
-dry,ξηρό
-correct,σωστό
+year,ο χρόνος
+warm,ζεστός
+cold,κρύος
+full,γεμάτος
+new,νέος
+old,παλιός
+good,καλός
+bad,κακός
+rotten,σάπιος
+dirty,βρόμικος
+straight,ίσιος
+round,στρογγυλός
+sharp,αιχμηρός
+dull,στομωμένος
+smooth,λείος
+wet,βρεγμένος
+dry,ξηρός
+correct,σωστός
 near,κοντά
 far,μακριά
 right,δεξιά

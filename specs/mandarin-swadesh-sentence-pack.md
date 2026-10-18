@@ -41,7 +41,7 @@ user dictionary that contains the master list.
 | Measure                                        | Value            |
 | ---------------------------------------------- | ---------------- |
 | Swadesh concepts                               | 207              |
-| Swadesh form entries in `english-mandarin.csv` | 209, 207 unique  |
+| Swadesh form entries in `english-mandarin.csv` | 211 unique       |
 | Tatoeba Mandarin sentences (cmn)               | 89,190           |
 | Mandarin to English translation links          | 78,295           |
 | Linked sentences with a final sentence mark    | 65,499 of 66,257 |
@@ -123,8 +123,8 @@ is safe to re-run. A stage skips work when its cache is complete.
 
 ## 6. S1: Swadesh base list
 
-Parse `vocab/english-mandarin.csv`, which already has 209 forms for 207
-concepts. Add these columns:
+Parse `vocab/english-mandarin.csv`, which has 211 forms for 207 concepts.
+Add these columns:
 
 | Column        | Type   | Example        | Meaning                  |
 | ------------- | ------ | -------------- | ------------------------ |
@@ -141,6 +141,50 @@ Check:
 - All indices 1 to 207 exist, with no gap.
 - Each row has exactly one simplified form.
 - Multi-form entries (for example 他/她/它) become separate rows.
+- Every English label matches `vocab/swadesh.txt` at the same index.
+
+### 6.1 Review against sources
+
+A generated form is not a reviewed form. pypinyin gives the same wrong
+reading that a naive generator gives. For example, it returns 长 zhǎng and
+切 qiè, which are the wrong senses for long and to cut. Run this review for
+every language:
+
+| Check            | Source                                    | Rule                                              |
+| ---------------- | ----------------------------------------- | ------------------------------------------------- |
+| English label    | `vocab/swadesh.txt`                       | Exact text at the same index                      |
+| Canonical form   | `Module:Swadesh/data/{lang}`              | The form appears in the module row set            |
+| Mandarin reading | CC-CEDICT gloss                           | The reading whose gloss matches the English label |
+| Jyutping         | `tojyutping` via `anki_tools/jyutping.py` | The syllabary matches the written form            |
+| Transliteration  | Romanization table for the language       | No pinyin or foreign text in the column           |
+
+Rules:
+
+- Do not accept a polyphone without a gloss check. Pick the reading that
+  matches the English label, not the first reading from pypinyin.
+- Keep a module difference when the file form is the more common word.
+  Record the reason in the review file.
+- Report the match count per language in the review file.
+
+Output `vocab/swadesh_review.csv` with columns `lang`, `index`,
+`english`, `current`, `canonical`, `issue`, `fix`, `status`.
+`status` is `fixed`, `kept`, or `open`. The build fails on any `open` row.
+
+Measured result of the review (2026-10-18):
+
+| File                  | Canonical match | Errors fixed |
+| --------------------- | --------------- | ------------ |
+| english-mandarin.csv  | 192 of 207      | 16           |
+| english-cantonese.csv | 175 of 207      | 48           |
+| english-greek.csv     | 184 of 207      | 42           |
+| english-german.csv    | 201 of 207      | 1            |
+| english-spanish.csv   | 192 of 207      | 1            |
+| english-hindi.csv     | 205 of 207      | 3            |
+| english-arabic.csv    | 206 of 207      | 8            |
+
+The remaining differences are variants or register choices. Several file
+forms are better than the module form, for example 星星 for star and 心 for
+heart.
 
 ## 7. S2: Master list of 2x to 3x size
 
@@ -354,6 +398,8 @@ before release.
 ### 9.6 Pinyin
 
 - Run pypinyin with jieba segmentation and `Style.TONE`.
+- Do not use the pypinyin default reading for a polyphone. Select the
+  reading whose CC-CEDICT gloss matches the target gloss.
 - Override with CC-CEDICT pinyin when the form has one reading only.
 - Apply the 不 and 一 tone sandhi rules.
 - Check that the syllable count equals the Han character count.
@@ -591,6 +637,7 @@ code on a failure.
 | G12  | `ATTRIBUTION.md` exists and names every audio author in the pack  |
 | G13  | The APKG opens with `AnkiPackage` and lists the expected notes    |
 | G14  | Every card passes the proper-sentence rules F2 to F10             |
+| G15  | `vocab/swadesh_review.csv` has no open row                        |
 
 Add unit tests in `tests/test_mandarin_pack.py` for:
 
@@ -614,6 +661,7 @@ Add unit tests in `tests/test_mandarin_pack.py` for:
 | Tatoeba rate limits and slow downloads     | Build time              | 1 request per second, cache, resume                  |
 | Deck too large for daily review            | Low completion          | `--max-cards`, tags, subdeck by rank later           |
 | Sentence pairs from a bad translation      | Wrong English           | English length check, review CSV, 5 percent audit    |
+| Wrong Swadesh form or reading              | Bad cards               | Source review in 6.1, gloss check, review CSV        |
 
 ## 16. Milestones
 

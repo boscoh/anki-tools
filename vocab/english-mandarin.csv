@@ -1,7 +1,7 @@
 english,mandarin,transliteration
 I,我,wǒ
 you (singular),你,nǐ
-he/she,他/她,tā tā
+he/she/it/they (singular),他/她/它,tā tā tā
 we,我们,wǒ men
 you (plural),你们,nǐ men
 they (plural),他们/她们,tā men tā men
@@ -9,16 +9,16 @@ this,这,zhè
 that,那,nà
 here,这里,zhè lǐ
 there,那里,nà lǐ
-who,谁,shuí
+who,谁,shéi
 what,什么,shén me
 where,哪里,nǎ lǐ
 when,什么时候,shén me shí hòu
 how,怎么,zěn me
 not,不,bù
 all,所有,suǒ yǒu
-many,许多,xǔ duō
+many,多,duō
 some,一些,yī xiē
-few,少数,shǎo shù
+few,少,shǎo
 other,其他,qí tā
 one,一,yī
 two,二,èr
@@ -26,7 +26,7 @@ three,三,sān
 four,四,sì
 five,五,wǔ
 big,大,dà
-long,长,zhǎng
+long,长,cháng
 wide,宽,kuān
 thick,厚,hòu
 heavy,重,zhòng
@@ -83,11 +83,11 @@ leg,腿,tuǐ
 knee,膝盖,xī gài
 hand,手,shǒu
 wing,翅膀,chì bǎng
-belly,肚子,dǔ zi
+belly,肚子,dù zi
 guts,肠子,cháng zi
 neck,脖子,bó zi
 back,背,bèi
-breast,胸,xiōng
+breast,乳房,rǔ fáng
 heart,心,xīn
 liver,肝,gān
 to drink,喝,hē
@@ -129,15 +129,15 @@ to fall,掉,diào
 to give,给,gěi
 to hold,拿,ná
 to squeeze,挤,jǐ
-to rub,擦,cā
+to rub,揉,róu
 to wash,洗,xǐ
 to wipe,擦,cā
 to pull,拉,lā
 to push,推,tuī
 to throw,扔,rēng
 to tie,绑,bǎng
-to sew,缝,fèng
-to count,数,shù
+to sew,缝,féng
+to count,数,shǔ
 to say,说,shuō
 to sing,唱,chàng
 to play,玩,wán
@@ -178,22 +178,22 @@ black,黑,hēi
 night,晚上,wǎn shàng
 day,白天,bái tiān
 year,年,nián
-warm,暖,nuǎn
+warm,暖和,nuǎn huo
 cold,冷,lěng
 full,满,mǎn
 new,新,xīn
-old,旧,jiù
+old,老/旧,lǎo jiù
 good,好,hǎo
 bad,坏,huài
 rotten,烂,làn
-dirty,脏,zàng
+dirty,脏,zāng
 straight,直,zhí
 round,圆,yuán
 sharp,锋利,fēng lì
 dull,钝,dùn
 smooth,滑,huá
 wet,湿,shī
-dry,干,gàn
+dry,干,gān
 correct,对,duì
 near,近,jìn
 far,远,yuǎn
@@ -201,7 +201,7 @@ right,右,yòu
 left,左,zuǒ
 at,在,zài
 in,里,lǐ
-with,和,hé
+with,跟,gēn
 and,和,hé
 if,如果,rú guǒ
 because,因为,yīn wèi
