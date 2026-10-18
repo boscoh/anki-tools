@@ -150,8 +150,14 @@ its genre is written news text.
 `current`, `canonical`, `issue`, `fix`, `status`. `status` is `fixed`,
 `kept`, or `open`. The build fails on any `open` row.
 
-M1 adds the file to the repository (O1). Until then, the change lists in
-this spec are the record.
+The Mandarin rows are committed. The file holds 15 `fixed` rows and 14
+`kept` rows for `cmn`. The fixed rows are the appendix A.1 changes. The kept
+rows are the canonical differences that keep the more common file form, so
+`cmn` matches the canonical row set on 193 of 207 rows.
+
+The other languages have no rows yet. Appendix A remains their record. The
+Mandarin word table reads this file and does not write it, and it fails the
+build on an `open` row.
 
 ## 9. Reproduce the changes
 
@@ -177,7 +183,8 @@ revision ids in section 3.1 pin the counts. Fetch each page with
   Decide each case: keep both, or add a sense note to the gloss.
 - The counts were verified on 2026-10-18 with the live module dumps in
   section 3.1. O3 is closed.
-- The review file does not exist. The pack spec gates G15 on it.
+- The review file holds the Mandarin rows only. The other languages have no
+  rows, and the pack spec gates G15 on the file.
 - Cantonese index 138 `聯 lyun4` is suspect. 聯 means to unite. To sew is
   縫 fung4 or 車 ce1. Verify before release (O6).
 
@@ -201,18 +208,19 @@ revision ids in section 3.1 pin the counts. Fetch each page with
 | S6   | A build reads the CSV and never writes it                        |
 
 Checked on 2026-10-18 for `english-mandarin.csv`: S1 gives 0 mismatches, S2
-gives 0 empty cells, S3 gives 0 mismatches, S4 gives 0 duplicates.
+gives 0 empty cells, S3 gives 0 mismatches, S4 gives 0 duplicates. With the
+Mandarin review rows committed, S5 gives 0 open rows.
 
 ## 13. Open items
 
-| Id  | Item                                                            |
-| --- | --------------------------------------------------------------- |
-| O1  | Commit `vocab/swadesh_review.csv`                               |
-| O2  | Add `anki swadesh review <lang>` to run the section 12 checks   |
-| O3  | Closed: counts verified on 2026-10-18 (section 3.1)             |
-| O4  | Closed: 15 rows changed; the earlier 16 was an issue count      |
-| O5  | Review the duplicate forms in Greek, German, Spanish, and Hindi |
-| O6  | Verify the Cantonese form for index 138 (聯)                    |
+| Id  | Item                                                                   |
+| --- | ---------------------------------------------------------------------- |
+| O1  | Closed: `vocab/swadesh_review.csv` holds the Mandarin rows             |
+| O2  | Add `anki swadesh review <lang>` to run the section 12 checks          |
+| O3  | Closed: counts verified on 2026-10-18 (section 3.1)                    |
+| O4  | Closed: 15 rows changed; the earlier 16 was an issue count             |
+| O5  | Review the duplicate forms in Greek, German, Spanish, and Hindi         |
+| O6  | Verify the Cantonese form for index 138 (聯)                           |
 
 ## Appendix A: Complete change list
 

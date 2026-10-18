@@ -1,0 +1,30 @@
+lang,index,english,current,canonical,issue,fix,status
+cmn,3,he/she/it/they (singular),他/她 · tā tā,他/她/它 · tā tā tā,label,他/她/它 · tā tā tā,fixed
+cmn,11,who,谁 · shuí,谁 · shéi,reading,谁 · shéi,fixed
+cmn,18,many,许多 · xǔ duō,多 · duō,register,多 · duō,fixed
+cmn,20,few,少数 · shǎo shù,少 · shǎo,register,少 · shǎo,fixed
+cmn,28,long,长 · zhǎng,长 · cháng,reading,长 · cháng,fixed
+cmn,48,louse,虱子 · shī zi,虱,better file form,kept,kept
+cmn,50,worm,虫子 · chóng zi,蟲/蠕蟲/蚯蚓,variant,kept,kept
+cmn,53,stick,棍子 · gùn zi,樹枝/枝條/枝子,sense,kept,kept
+cmn,85,belly,肚子 · dǔ zi,肚子 · dù zi,reading,肚子 · dù zi,fixed
+cmn,89,breast,胸 · xiōng,乳房 · rǔ fáng,sense,乳房 · rǔ fáng,fixed
+cmn,90,heart,心 · xīn,心臟,better file form,kept,kept
+cmn,127,to fall,掉 · diào,落下/掉下,variant,kept,kept
+cmn,131,to rub,擦 · cā,揉 · róu,sense,揉 · róu,fixed
+cmn,138,to sew,缝 · fèng,缝 · féng,reading,缝 · féng,fixed
+cmn,139,to count,数 · shù,数 · shǔ,reading,数 · shǔ,fixed
+cmn,145,to freeze,冻 · dòng,結冰/凍結,variant,kept,kept
+cmn,146,to swell,肿 · zhǒng,膨脹,sense,kept,kept
+cmn,149,star,星星 · xīng xīng,星/恆星,better file form,kept,kept
+cmn,158,dust,灰尘 · huī chén,塵土,variant,kept,kept
+cmn,159,earth,土 · tǔ,土壤,variant,kept,kept
+cmn,177,night,晚上 · wǎn shàng,夜晚,variant,kept,kept
+cmn,180,warm,暖 · nuǎn,暖和 · nuǎn huo,register,暖和 · nuǎn huo,fixed
+cmn,180,warm,暖和 · nuǎn huo,溫暖,register,kept,kept
+cmn,184,old,旧 · jiù,老/旧 · lǎo jiù,sense,老/旧 · lǎo jiù,fixed
+cmn,188,dirty,脏 · zàng,脏 · zāng,reading,脏 · zāng,fixed
+cmn,193,smooth,滑 · huá,光滑,sense,kept,kept
+cmn,195,dry,干 · gàn,干 · gān,reading,干 · gān,fixed
+cmn,202,in,里 · lǐ,在……裡,variant,kept,kept
+cmn,203,with,和 · hé,跟 · gēn,register,跟 · gēn,fixed
