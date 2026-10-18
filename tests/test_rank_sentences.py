@@ -11,6 +11,7 @@ from anki_tools.rank import (
     char_similarity_zh,
     get_chinese_chars,
     is_chinese_char,
+    load_frequency_data_yue,
 )
 
 
@@ -119,3 +120,39 @@ class TestCharSimilarity:
     def test_empty_returns_zero(self):
         assert char_similarity_zh("", "你好") == 0.0
         assert char_similarity_zh("你好", "") == 0.0
+
+
+class TestYueFrequency:
+    @pytest.fixture
+    def freq_file(self, tmp_path):
+        path = tmp_path / "yue.tsv"
+        path.write_text(
+            "word\tcount\n嘅\t900\n我\t800\n食\t10\n",
+            encoding="utf-8",
+        )
+        return path
+
+    def test_ranks_follow_count_order(self, freq_file):
+        data = load_frequency_data_yue(freq_file)
+        assert data.word_freq == {"嘅": 1, "我": 2, "食": 3}
+
+    def test_header_line_is_skipped(self, freq_file):
+        data = load_frequency_data_yue(freq_file)
+        assert "word" not in data.word_freq
+
+    def test_char_rank_from_first_word(self, freq_file):
+        data = load_frequency_data_yue(freq_file)
+        assert data.char_freq == {"嘅": 1, "我": 2, "食": 3}
+
+    def test_max_words_truncates(self, freq_file):
+        data = load_frequency_data_yue(freq_file, max_words=2)
+        assert set(data.word_freq) == {"嘅", "我"}
+
+    def test_cantonese_scores_above_mandarin_proxy(self, freq_file):
+        yue_data = load_frequency_data_yue(freq_file)
+        zh_data = FrequencyData()
+        zh_data.word_freq = {"我": 1, "食": 2}
+        zh_data.char_freq = {"我": 1, "食": 2}
+        yue_score = frequency_score_zh("嘅", yue_data)
+        zh_score = frequency_score_zh("嘅", zh_data)
+        assert yue_score > zh_score

@@ -214,6 +214,9 @@ Rules:
 - Do not use Zipf for Cantonese. `wordfreq` has no `yue` list, and the `zh`
   proxy measures Mandarin only. Use words.hk or CantoDict for the Cantonese
   form, `tojyutping` for the reading, and the module for the canonical form.
+  For deck ranking, `anki_tools.rank.load_frequency_data_yue` supplies the
+  Apple Daily list. That list is written news text, so do not use it to
+  review a spoken Swadesh form.
 - Report the match count per language in the review file.
 
 Output `vocab/swadesh_review.csv` with columns `lang`, `index`,

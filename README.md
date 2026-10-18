@@ -120,8 +120,12 @@ uv run anki fix yue deck.apkg  # Convert to traditional, fix jyutping, rank, reo
 ```
 - Converts simplified to traditional Chinese
 - Generates accurate jyutping romanization
-- Character-based scoring. The frequency term uses a Mandarin approximation
-  as a fallback. Do not treat it as a Cantonese frequency measure.
+- Character-based scoring. The frequency term uses the Apple Daily Hong Kong
+  Chinese word list (275,492 types, 494M tokens), because `wordfreq` has no
+  `yue` list. The list is written news text, not speech.
+  - The first run downloads the list to `~/.cache/anki-tools/appledaily-word-freq.tsv`
+    (3.2 MB). Set `YUE_FREQUENCY_PATH` to use another file.
+  - Data: <https://github.com/chaaklau/appledaily-frequency>, CC BY 4.0.
 - Outputs `_reordered.apkg` and `.rank.csv`
 
 **Spanish (es):**
@@ -288,6 +292,7 @@ One card per line, fields separated by `|` or tab. Audio embedded with `[sound:f
 - [AnkiDroid Database Structure](https://github.com/ankidroid/Anki-Android/wiki/Database-Structure)
 - [genanki Documentation](https://github.com/kerrickstaley/genanki)
 - [Neri Frequency List](https://frequencylists.blogspot.com/2018/02/welcome.html)
+- [Apple Daily Cantonese Frequency](https://github.com/chaaklau/appledaily-frequency)
 - [Tatoeba Project](https://tatoeba.org/en/)
 - [Xefjord's Complete Languages](https://xefjord.wixsite.com/xefscompletelangs)
 
