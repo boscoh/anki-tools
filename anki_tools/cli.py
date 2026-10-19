@@ -47,6 +47,7 @@ from anki_tools.sentence_pack import pool as sentence_pool
 from anki_tools.sentence_pack import select as sentence_select
 from anki_tools.sentence_pack import tatoeba as sentence_tatoeba
 from anki_tools.sentence_pack.audit import print_audit as print_gate_table
+from anki_tools.sentence_pack.languages import cantonese as cantonese_lang
 from anki_tools.sentence_pack.languages import french as french_lang
 from anki_tools.sentence_pack.languages import greek as greek_lang
 from anki_tools.pinyin import fix_pinyin
@@ -1322,6 +1323,11 @@ def _build_apkg(language: str, prune: bool = True) -> None:
 
 
 SENTENCE_PACK_LANGUAGES = {
+    "cantonese": (
+        cantonese_lang,
+        cantonese_lang.CANTONESE,
+        cantonese_lang.run_cantonese_audit,
+    ),
     "french": (french_lang, french_lang.FRENCH, french_lang.run_french_audit),
     "greek": (greek_lang, greek_lang.GREEK, greek_lang.run_greek_audit),
 }
@@ -1400,19 +1406,21 @@ def sentences(
     max_unknown: int = 2,
     min_han: int = 4,
     max_han: int = 7,
-    min_words: int = 4,
-    max_words: int = 10,
+    min_words: int | None = None,
+    max_words: int | None = None,
 ) -> None:
     """Build the sentence candidates and write the card CSV files (S1 to S3).
 
-    :param language: Language name: mandarin, french, or greek.
+    :param language: Language name: mandarin, french, greek, or cantonese.
     :param per_word: Card limit per word form.
     :param max_cards: Hard card cap.
     :param max_unknown: Unknown token budget per sentence.
     :param min_han: Minimum Han character count for a Mandarin core card.
     :param max_han: Maximum Han character count.
-    :param min_words: Minimum word count for a sentence-pack core card.
-    :param max_words: Maximum word count for a sentence-pack card.
+    :param min_words: Minimum word count for a sentence-pack core card. The
+        profile default applies when empty.
+    :param max_words: Maximum word count for a sentence-pack card. The profile
+        default applies when empty.
     """
     lang = language.lower().strip()
     if lang in SENTENCE_PACK_LANGUAGES:
@@ -1428,7 +1436,7 @@ def sentences(
         )
         return
     if lang != "mandarin":
-        print(f"Unsupported language: {language}. Supported: mandarin, french, greek.")
+        print(f"Unsupported language: {language}. Supported: mandarin, french, greek, cantonese.")
         return
 
     table = load_word_table()
@@ -1472,7 +1480,7 @@ def sentence_audio(
 ) -> None:
     """Generate and validate the audio files of a sentence pack (stage S4).
 
-    :param language: Language name: mandarin, french, or greek.
+    :param language: Language name: mandarin, french, greek, or cantonese.
     :param native_audio: Tatoeba tier: none, auto, or only.
     :param voice: TTS voice name. The profile default applies when empty.
     :param slow_audio: Generate the slow variant.
@@ -1493,7 +1501,7 @@ def sentence_audio(
         )
         return
     if lang != "mandarin":
-        print(f"Unsupported language: {language}. Supported: mandarin, french, greek.")
+        print(f"Unsupported language: {language}. Supported: mandarin, french, greek, cantonese.")
         return
     if not voice:
         voice = MANDARIN_DEFAULT_VOICE
@@ -1530,7 +1538,7 @@ def pack(
 ) -> None:
     """Build one Swadesh sentence pack (stage S5).
 
-    :param language: Language name: mandarin, french, or greek.
+    :param language: Language name: mandarin, french, greek, or cantonese.
     :param pack_license: public or private.
     """
     lang = language.lower().strip()
@@ -1539,7 +1547,7 @@ def pack(
         _language_pack(module, profile, pack_license=pack_license)
         return
     if lang != "mandarin":
-        print(f"Unsupported language: {language}. Supported: mandarin, french, greek.")
+        print(f"Unsupported language: {language}. Supported: mandarin, french, greek, cantonese.")
         return
 
     result = build_pack(pack_license=pack_license)
@@ -1558,7 +1566,7 @@ def pack(
 def audit(language: str) -> None:
     """Run the quality gates of a Swadesh sentence pack.
 
-    :param language: Language name: mandarin, french, or greek.
+    :param language: Language name: mandarin, french, greek, or cantonese.
     """
     lang = language.lower().strip()
     if lang in SENTENCE_PACK_LANGUAGES:
@@ -1568,7 +1576,7 @@ def audit(language: str) -> None:
             raise SystemExit(code)
         return
     if lang != "mandarin":
-        print(f"Unsupported language: {language}. Supported: mandarin, french, greek.")
+        print(f"Unsupported language: {language}. Supported: mandarin, french, greek, cantonese.")
         return
 
     code = print_audit(run_audit())
@@ -1582,8 +1590,8 @@ def _language_sentences(
     per_word: int,
     max_cards: int,
     max_unknown: int,
-    min_words: int,
-    max_words: int,
+    min_words: int | None,
+    max_words: int | None,
 ) -> None:
     """Build the candidate pool and the card CSV files of one sentence pack.
 
@@ -1605,8 +1613,8 @@ def _language_sentences(
     pool, pool_report = sentence_pool.build_candidate_pool(
         table,
         profile,
-        min_units=min_words,
-        max_units=max_words,
+        min_units=profile.min_units if min_words is None else min_words,
+        max_units=profile.max_units if max_words is None else max_words,
         max_unknown=max_unknown,
         fallback=True,
         known_words=known,
