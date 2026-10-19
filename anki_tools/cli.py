@@ -44,7 +44,9 @@ from anki_tools.package import AnkiPackage
 from anki_tools.pinyin import fix_pinyin
 from anki_tools.rank import (
     SIMILARITY_CONSIDER_DELETE_PENALTY,
+    YUE_FREQUENCY_ATTRIBUTION,
     char_similarity_zh,
+    char_similarity_zh_same_len,
     extract_sentences,
     get_chinese_chars,
     rank_sentences_es,
@@ -57,18 +59,14 @@ from anki_tools.rank import (
 )
 
 
-def _char_similarity_zh_same_len(a: str, b: str) -> float:
-    """Jaccard similarity between Chinese char sets, only for same unique-char-count sentences.
-
-    Uses unique character set size for length matching to avoid stutter anchors
-    (e.g. '是 是' matching '是的' just because both have 2 total Chinese chars).
-    """
-    sa = set(get_chinese_chars(a))
-    sb = set(get_chinese_chars(b))
-    if len(sa) != len(sb) or not sa:
-        return 0.0
-    return len(sa & sb) / len(sa | sb)
 from anki_tools.reorder import load_ranking, reorder_deck
+from anki_tools.yue_frequency import (
+    CIFU_ATTRIBUTION,
+    FREQUENCY_PATH,
+    check_frequency,
+    load_yue_frequency,
+    write_frequency_tsv,
+)
 
 app = cyclopts.App(help="CLI tools for Anki package (.apkg) files")
 
@@ -546,6 +544,48 @@ def apply(
 
 
 # =============================================================================
+# Freq commands - build word frequency lists
+# =============================================================================
+
+freq_app = cyclopts.App(name="freq", help="Build word frequency lists")
+app.command(freq_app)
+
+
+@freq_app.command(name="yue")
+def freq_yue(
+    *,
+    output: Path = FREQUENCY_PATH,
+    spoken_weight: float = 0.7,
+    refresh: bool = False,
+    check: bool = False,
+):
+    """Build the Cantonese word frequency list from spoken and written counts.
+
+    Blends the Cifu spoken counts with the Cifu and Apple Daily written counts,
+    folds variant characters, and applies the override file. Downloads the two
+    source files into ~/.cache/anki-tools when they are absent.
+
+    :param output: Output TSV file, sorted by rank.
+    :param spoken_weight: Weight of the spoken term in the blend (0 to 1).
+    :param refresh: Download the source files again.
+    :param check: Run gates G1, G3, and G4 and exit with code 1 on a failure.
+    """
+    data = load_yue_frequency(spoken_weight=spoken_weight, refresh=refresh)
+    write_frequency_tsv(data, output)
+    print(f"Wrote {len(data.rows)} words to {output}")
+    print(f"  {CIFU_ATTRIBUTION}")
+    print(f"  {YUE_FREQUENCY_ATTRIBUTION}")
+    if not check:
+        return
+    failed = False
+    for gate, ok, message in check_frequency(data):
+        print(f"{gate} {'PASS' if ok else 'FAIL'}: {message}")
+        failed = failed or not ok
+    if failed:
+        raise SystemExit(1)
+
+
+# =============================================================================
 # Fix commands - optimize decks by language
 # =============================================================================
 
@@ -619,7 +659,7 @@ def zh(
             ranked,
             target_count=max_sentences,
             similarity_threshold=similarity_threshold,
-            similarity_fn=_char_similarity_zh_same_len,
+            similarity_fn=char_similarity_zh_same_len,
             min_chars=min_chars,
         )
 

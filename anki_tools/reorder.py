@@ -16,6 +16,8 @@ csv.field_size_limit(sys.maxsize)
 def load_ranking(csv_path: str) -> tuple[dict[str, int], dict[int, int], set[int]]:
     """Load ranking from CSV file.
 
+    Rows with ``kept`` equal to 0 are skipped, so they count as unranked.
+
     :param csv_path: Path to the ranking CSV file.
     :returns: Tuple of (sentence to rank mapping, note_id to rank mapping, set of ranks to remove as high-similarity).
     """
@@ -27,6 +29,8 @@ def load_ranking(csv_path: str) -> tuple[dict[str, int], dict[int, int], set[int
     with open(csv_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
+            if row.get("kept") == "0":
+                continue
             rank = int(row["rank"])
             sentence = row["sentence"]
             sentence_ranking[sentence] = rank

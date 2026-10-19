@@ -43,6 +43,9 @@ class Sentence:
     :param similarity_penalty: Penalty for similarity to higher-ranked sentences.
     :param similar_to_rank: Rank (1-based) of most similar higher-ranked sentence.
     :param final_score: Combined ranking score.
+    :param hardest_rank: Cantonese selection: rank of the least frequent known token.
+    :param reject_reason: Cantonese selection: rule or step that removed the sentence.
+    :param kept: Cantonese selection: True when kept, None when no selection ran.
     """
 
     note_id: int
@@ -57,6 +60,9 @@ class Sentence:
     romanization: str = ""  # Romanization (jyutping for Cantonese)
     final_score: float = 0.0
     complexity_bin: int = 0  # Complexity bin (0-3) for stratified reduction
+    hardest_rank: int = 0  # Rank of the least frequent known token (Cantonese selection)
+    reject_reason: str = ""  # Rule or selection step that removed the sentence
+    kept: bool | None = None  # None when no selection ran
 
 
 @dataclass
@@ -247,37 +253,49 @@ def yue_frequency_path() -> Path:
     return base / "anki-tools" / "appledaily-word-freq.tsv"
 
 
+def download_cached_file(url: str, dest: Path, *, force: bool = False) -> Path:
+    """Download a file into the cache.
+
+    The download writes a temporary file first, then renames it.
+
+    :param url: Source URL.
+    :param dest: Cache destination.
+    :param force: Download again when the file already exists.
+    :returns: Path to the cached file.
+    """
+    if dest.exists() and not force:
+        return dest
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_name(dest.name + ".tmp")
+    print(f"Downloading {url}")
+    try:
+        with urlopen(url, timeout=120) as response, open(tmp, "wb") as out:
+            shutil.copyfileobj(response, out)
+    except OSError as exc:
+        tmp.unlink(missing_ok=True)
+        raise RuntimeError(f"Cannot download {url}.") from exc
+    tmp.replace(dest)
+    print(f"Saved {dest} ({dest.stat().st_size} bytes)")
+    return dest
+
+
 def download_yue_frequency(path: Path | None = None, *, force: bool = False) -> Path:
     """Download the Apple Daily Cantonese frequency list into the cache.
 
-    The file has two tab-separated columns: word and occurrence count. The
-    download writes a temporary file first, then renames it.
+    The file has two tab-separated columns: word and occurrence count.
 
     :param path: Cache destination. Defaults to :func:`yue_frequency_path`.
     :param force: Download again when the cached file already exists.
     :returns: Path to the cached TSV file.
     """
     dest = Path(path) if path else yue_frequency_path()
-    if dest.exists() and not force:
-        return dest
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    tmp = dest.with_name(dest.name + ".tmp")
-    print(f"Downloading Cantonese frequency list from {YUE_FREQUENCY_URL}")
     try:
-        with (
-            urlopen(YUE_FREQUENCY_URL, timeout=120) as response,
-            open(tmp, "wb") as out,
-        ):
-            shutil.copyfileobj(response, out)
-    except OSError as exc:
-        tmp.unlink(missing_ok=True)
+        return download_cached_file(YUE_FREQUENCY_URL, dest, force=force)
+    except RuntimeError as exc:
         raise RuntimeError(
             f"Cannot download {YUE_FREQUENCY_URL}. "
             "Set YUE_FREQUENCY_PATH to a local copy of the file."
         ) from exc
-    tmp.replace(dest)
-    print(f"Saved {dest} ({dest.stat().st_size} bytes)")
-    return dest
 
 
 def _read_word_count_tsv(path: Path) -> dict[str, int]:
@@ -305,41 +323,67 @@ def _read_word_count_tsv(path: Path) -> dict[str, int]:
     return counts
 
 
-def _build_frequency_data(counts: dict[str, int], max_words: int) -> FrequencyData:
-    """Build rank tables from word counts.
+def frequency_data_from_ranks(ranks: dict[str, int]) -> FrequencyData:
+    """Build word and character rank tables from word ranks.
 
     Characters take the rank of the first word that contains them, as in
     :func:`_load_frequency_data_wordfreq`.
 
-    :param counts: Word to occurrence count.
-    :param max_words: Number of most common words to keep.
+    :param ranks: Word to rank, 1 is most frequent.
     :returns: Filled :class:`FrequencyData`.
     """
     data = FrequencyData()
-    ordered = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
-    for rank, (word, _) in enumerate(ordered[:max_words], 1):
-        data.word_freq[word] = rank
-    for word, rank in data.word_freq.items():
+    data.word_freq.update(ranks)
+    for word, rank in sorted(ranks.items(), key=lambda item: item[1]):
         for char in get_chinese_chars(word):
             data.char_freq.setdefault(char, rank)
     return data
 
 
-def load_frequency_data_yue(
-    path: Path | None = None, *, max_words: int = YUE_FREQUENCY_MAX_WORDS
-) -> FrequencyData:
-    """Load Cantonese word frequency data from the Apple Daily list.
+def _build_frequency_data(counts: dict[str, int], max_words: int) -> FrequencyData:
+    """Build rank tables from word counts.
 
-    The list holds 275,492 types from 493,922,982 tokens of Hong Kong news
-    text. It covers Cantonese-only forms that the Mandarin ``zh`` list misses.
-    The genre is written Chinese, not speech.
-
-    The download runs when the cached file is absent.
-
-    :param path: Frequency file. Defaults to :func:`yue_frequency_path`.
+    :param counts: Word to occurrence count.
     :param max_words: Number of most common words to keep.
     :returns: Filled :class:`FrequencyData`.
     """
+    ordered = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
+    ranks = {word: rank for rank, (word, _) in enumerate(ordered[:max_words], 1)}
+    return frequency_data_from_ranks(ranks)
+
+
+def load_frequency_data_yue(
+    path: Path | None = None,
+    *,
+    max_words: int = YUE_FREQUENCY_MAX_WORDS,
+    source: str = "written",
+    spoken_weight: float = 0.7,
+) -> FrequencyData:
+    """Load Cantonese word frequency data.
+
+    The ``written`` source is the Apple Daily list. It holds 275,492 types from
+    493,922,982 tokens of Hong Kong news text and covers Cantonese-only forms
+    that the Mandarin ``zh`` list misses. The genre is written Chinese.
+
+    The ``spoken`` and ``blend`` sources use the Cifu spoken counts. See
+    :mod:`anki_tools.yue_frequency`.
+
+    The download runs when a cached file is absent.
+
+    :param path: Apple Daily frequency file (``written`` source only).
+    :param max_words: Number of most common words to keep.
+    :param source: ``written``, ``spoken``, or ``blend``.
+    :param spoken_weight: Weight of the spoken term in the ``blend`` source.
+    :returns: Filled :class:`FrequencyData`.
+    """
+    if source != "written":
+        from anki_tools.yue_frequency import load_yue_frequency, to_frequency_data
+
+        data = to_frequency_data(
+            load_yue_frequency(freq=source, spoken_weight=spoken_weight), max_words
+        )
+        print(f"Loaded {len(data.word_freq)} words ({source} frequency)")
+        return data
     freq_path = Path(path) if path else download_yue_frequency()
     counts = _read_word_count_tsv(freq_path)
     if not counts:
@@ -516,6 +560,23 @@ def char_similarity_zh(sent_a: str, sent_b: str) -> float:
     return _jaccard_similarity(chars_a, chars_b)
 
 
+def char_similarity_zh_same_len(sent_a: str, sent_b: str) -> float:
+    """Jaccard similarity of character sets, only for equal unique-character counts.
+
+    The unique-character count avoids stutter anchors: '是 是' does not match
+    '是的' only because both have 2 Chinese characters.
+
+    :param sent_a: First Chinese sentence.
+    :param sent_b: Second Chinese sentence.
+    :returns: Similarity between 0 (no overlap or different sizes) and 1.
+    """
+    chars_a = set(get_chinese_chars(sent_a))
+    chars_b = set(get_chinese_chars(sent_b))
+    if len(chars_a) != len(chars_b) or not chars_a:
+        return 0.0
+    return _jaccard_similarity(chars_a, chars_b)
+
+
 def _compute_similarity_penalties(
     sentences: list[Sentence],
     similarity_fn: Callable[[str, str], float],
@@ -668,9 +729,11 @@ def write_ranking_csv(
     """Write ranking CSV for reorder_deck and inspection (ZH and FR).
 
     Columns: rank, note_id, sentence, romanization (if present), original_order, frequency,
-    complexity, grammar, structural, similarity, similar_to, final_score.
+    complexity, grammar, structural, similarity, similar_to, final_score, and
+    hardest_rank and kept when a selection ran.
     """
     has_romanization = any(sent.romanization for sent in sentences)
+    has_selection = any(sent.kept is not None for sent in sentences)
 
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
@@ -691,6 +754,8 @@ def write_ranking_csv(
             "similar_to",
             "final_score",
         ])
+        if has_selection:
+            header.extend(["hardest_rank", "kept"])
         writer.writerow(header)
 
         for rank, sent in enumerate(sentences, 1):
@@ -719,6 +784,8 @@ def write_ranking_csv(
                 similar_to_text,
                 f"{sent.final_score:.2f}",
             ])
+            if has_selection:
+                row.extend([sent.hardest_rank, int(bool(sent.kept))])
             writer.writerow(row)
     print(f"Wrote ranking for {len(sentences)} sentences to {output_path}")
 
@@ -731,6 +798,9 @@ def write_ranking_csv(
 def rank_sentences_yue(
     sentences: list[Sentence],
     weights: dict[str, float] | None = None,
+    *,
+    freq: str = "blend",
+    spoken_weight: float = 0.7,
 ) -> list[Sentence]:
     """Rank sentences for Cantonese by combined score.
 
@@ -739,10 +809,12 @@ def rank_sentences_yue(
     with Cantonese-specific weighting. The frequency term uses the Apple Daily
     Hong Kong Chinese list, because wordfreq has no `yue` list and its `zh`
     list measures Mandarin only. The Apple Daily list is written news text,
-    not speech, so the term is a written Cantonese frequency measure.
+    not speech. The ``blend`` and ``spoken`` sources add Cifu spoken counts.
 
     :param sentences: Sentences to rank.
     :param weights: Optional dict with complexity, frequency, similarity_penalty.
+    :param freq: Frequency term: ``blend``, ``spoken``, or ``written``.
+    :param spoken_weight: Weight of the spoken term in the ``blend`` term.
     :returns: Same list sorted by final_score (best first).
     """
     if weights is None:
@@ -759,7 +831,10 @@ def rank_sentences_yue(
             sent.romanization = get_jyutping(sent.text)
 
     return _rank_character_based(
-        sentences, weights, preprocess_cantonese, load_frequency_data_yue
+        sentences,
+        weights,
+        preprocess_cantonese,
+        lambda: load_frequency_data_yue(source=freq, spoken_weight=spoken_weight),
     )
 
 

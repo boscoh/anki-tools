@@ -1,0 +1,4 @@
+word	rank_like	reason
+你好	多謝	HKCanCor splits the greeting into 你 and 好, so Cifu has no entry
+晚安	早晨	Cifu spoken count is 0; the greeting is common speech
+拜拜	早晨	Written lists rank the farewell low; it is common speech
