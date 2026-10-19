@@ -34,6 +34,8 @@ __all__ = [
     "FrequencyData",
     "extract_sentences",
     "rank_sentences_zh",
+    "rank_sentences_es",
+    "reduce_sentences_stratified",
     "write_ranking_csv",
     "complexity_score_zh",
     "frequency_score_zh",
