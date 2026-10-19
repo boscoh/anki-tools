@@ -9,6 +9,7 @@ Commands:
 """
 
 import csv
+import importlib.util
 import os
 import re
 import shutil
@@ -41,6 +42,13 @@ from anki_tools.mandarin_swadesh import (
     write_sentence_review_csv,
 )
 from anki_tools.package import AnkiPackage
+from anki_tools.sentence_pack import audio as pack_audio
+from anki_tools.sentence_pack import pack as sentence_pack
+from anki_tools.sentence_pack import pool as sentence_pool
+from anki_tools.sentence_pack import select as sentence_select
+from anki_tools.sentence_pack import tatoeba as sentence_tatoeba
+from anki_tools.sentence_pack.audit import print_audit as print_gate_table
+from anki_tools.sentence_pack.languages import greek as greek_lang
 from anki_tools.pinyin import fix_pinyin
 from anki_tools.rank import (
     Sentence,
@@ -1361,12 +1369,31 @@ def build(language: str, prune: bool = True):
 
 
 @swadesh_app.command
-def fetch(*, refresh: bool = False) -> None:
-    """Fetch the Tatoeba exports for the Mandarin sentence pack.
+def fetch(*, refresh: bool = False, lang: list[str] | None = None) -> None:
+    """Fetch the Tatoeba exports of a language pack (stage S0).
+
+    With no ``--lang`` the command keeps the Mandarin behaviour and downloads the
+    Mandarin and English exports. A language with no native Tatoeba audio skips
+    the ``sentences_with_audio`` export.
 
     :param refresh: Ignore the cache and download every file again.
+    :param lang: Tatoeba language codes, for example ``ell --lang eng``.
     """
-    results = fetch_tatoeba(refresh=refresh)
+    if not lang:
+        results = fetch_tatoeba(refresh=refresh)
+        for name, info in results.items():
+            print(f"{name}.tsv: {info['rows']} rows ({info['source']})")
+        return
+    files: dict[str, str] = {}
+    for code in lang:
+        files.update(
+            sentence_tatoeba.language_files(
+                code, native_audio=code != greek_lang.GREEK.tatoeba_lang
+            )
+        )
+    if "eng" not in lang:
+        files.update(sentence_tatoeba.language_files("eng", native_audio=False))
+    results = sentence_tatoeba.fetch_tatoeba(files, refresh=refresh)
     for name, info in results.items():
         print(f"{name}.tsv: {info['rows']} rows ({info['source']})")
 
@@ -1378,19 +1405,32 @@ def sentences(
     max_unknown: int = 2,
     min_han: int = 4,
     max_han: int = 10,
+    min_words: int = 4,
+    max_words: int = 10,
 ) -> None:
-    """Build the Mandarin sentence candidates and write the card CSV files.
+    """Build the sentence candidates and write the card CSV files (S1 to S3).
 
-    :param language: Language name. Only mandarin is available.
+    :param language: Language name: mandarin or greek.
     :param per_word: Card limit per word form.
     :param max_cards: Hard card cap.
     :param max_unknown: Unknown token budget per sentence.
-    :param min_han: Minimum Han character count for a core card.
+    :param min_han: Minimum Han character count for a Mandarin core card.
     :param max_han: Maximum Han character count.
+    :param min_words: Minimum word count for a Greek core card.
+    :param max_words: Maximum word count for a Greek card.
     """
     lang = language.lower().strip()
+    if lang == "greek":
+        _greek_sentences(
+            per_word=per_word,
+            max_cards=max_cards,
+            max_unknown=max_unknown,
+            min_words=min_words,
+            max_words=max_words,
+        )
+        return
     if lang != "mandarin":
-        print(f"Unsupported language: {language}. Only mandarin is available.")
+        print(f"Unsupported language: {language}. Supported: mandarin, greek.")
         return
 
     table = load_word_table()
@@ -1427,21 +1467,37 @@ def sentence_audio(
     language: str,
     *,
     native_audio: str = "none",
-    voice: str = MANDARIN_DEFAULT_VOICE,
+    voice: str = "",
     slow_audio: bool = False,
     pack_license: str = "public",
+    tts: str = "",
 ) -> None:
-    """Generate and validate the audio files for the Mandarin sentence pack.
+    """Generate and validate the audio files of a sentence pack (stage S4).
 
-    :param language: Language name. Only mandarin is available.
+    :param language: Language name: mandarin or greek.
     :param native_audio: Tatoeba tier: none, auto, or only.
-    :param voice: edge-tts voice name.
+    :param voice: TTS voice name. The profile default applies when empty.
     :param slow_audio: Generate the slow variant.
     :param pack_license: public or private.
+    :param tts: TTS engine, gtts or edge. The installed engine applies when empty.
     """
     lang = language.lower().strip()
+    if lang == "greek":
+        _greek_audio(
+            native_audio=native_audio,
+            voice=voice,
+            slow_audio=slow_audio,
+            pack_license=pack_license,
+            tts=tts,
+        )
+        return
     if lang != "mandarin":
-        print(f"Unsupported language: {language}. Only mandarin is available.")
+        print(f"Unsupported language: {language}. Supported: mandarin, greek.")
+        return
+    if not voice:
+        voice = MANDARIN_DEFAULT_VOICE
+    if tts and tts != "gtts" and tts != "edge":
+        print(f"Unsupported tts engine: {tts}. Use gtts or edge.")
         return
 
     rows = load_sentence_rows()
@@ -1471,14 +1527,17 @@ def pack(
     *,
     pack_license: str = "public",
 ) -> None:
-    """Build the Mandarin Swadesh sentence pack.
+    """Build one Swadesh sentence pack (stage S5).
 
-    :param language: Language name. Only mandarin is available.
+    :param language: Language name: mandarin or greek.
     :param pack_license: public or private.
     """
     lang = language.lower().strip()
+    if lang == "greek":
+        _greek_pack(pack_license=pack_license)
+        return
     if lang != "mandarin":
-        print(f"Unsupported language: {language}. Only mandarin is available.")
+        print(f"Unsupported language: {language}. Supported: mandarin, greek.")
         return
 
     result = build_pack(pack_license=pack_license)
@@ -1495,18 +1554,125 @@ def pack(
 
 @swadesh_app.command
 def audit(language: str) -> None:
-    """Run the quality gates G1 to G16 on the Mandarin sentence pack.
+    """Run the quality gates of a Swadesh sentence pack.
 
-    :param language: Language name. Only mandarin is available.
+    :param language: Language name: mandarin or greek.
     """
     lang = language.lower().strip()
+    if lang == "greek":
+        code = print_gate_table(greek_lang.run_greek_audit())
+        if code:
+            raise SystemExit(code)
+        return
     if lang != "mandarin":
-        print(f"Unsupported language: {language}. Only mandarin is available.")
+        print(f"Unsupported language: {language}. Supported: mandarin, greek.")
         return
 
     code = print_audit(run_audit())
     if code:
         raise SystemExit(code)
+
+
+def _greek_sentences(
+    per_word: int,
+    max_cards: int,
+    max_unknown: int,
+    min_words: int,
+    max_words: int,
+) -> None:
+    table = greek_lang.load_word_table()
+    failures = greek_lang.check_word_table(table)
+    if failures:
+        for failure in failures:
+            print(f"Error: {failure}")
+        return
+    known = greek_lang.known_words(table)
+    pool, pool_report = sentence_pool.build_candidate_pool(
+        table,
+        greek_lang.GREEK,
+        min_units=min_words,
+        max_units=max_words,
+        max_unknown=max_unknown,
+        fallback=True,
+        known_words=known,
+        make_candidate=greek_lang.make_candidate,
+    )
+    cards, selection = sentence_select.select_sentences(
+        pool,
+        table,
+        greek_lang.GREEK,
+        per_word=per_word,
+        max_cards=max_cards,
+        finalize=greek_lang.GREEK.finalize_candidate,
+    )
+    report = sentence_pool.build_pack_report(pool_report, selection)
+    print(f"wrote {greek_lang.write_sentence_csv(cards)}")
+    print(
+        "wrote "
+        f"{greek_lang.write_sentence_review_csv(pool, table, per_word=per_word)}"
+    )
+    print(f"wrote {sentence_pool.write_pool_report(report, greek_lang.POOL_REPORT_PATH)}")
+    sentence_pool.print_sentence_report(report)
+
+
+def _greek_audio(
+    native_audio: str,
+    voice: str,
+    slow_audio: bool,
+    pack_license: str,
+    tts: str,
+) -> None:
+    if tts and tts not in ("gtts", "edge"):
+        print(f"Unsupported tts engine: {tts}. Use gtts or edge.")
+        return
+    rows = pack_audio.load_sentence_rows(greek_lang.SENTENCES_PATH)
+    engine = "gtts"
+    if tts:
+        engine = tts
+        if tts == "edge" and importlib.util.find_spec("edge_tts") is None:
+            print("edge-tts is not installed. Use --tts gtts.")
+            return
+    try:
+        result = pack_audio.generate_audio(
+            rows,
+            greek_lang.GREEK,
+            voice=voice or greek_lang.GREEK.voice,
+            native_audio=native_audio,
+            slow_audio=slow_audio,
+            pack_license=pack_license,
+            engine=engine,
+            csv_path=greek_lang.SENTENCES_PATH,
+        )
+    except ValueError as error:
+        print(f"Error: {error}")
+        raise SystemExit(1) from error
+    print(
+        f"engine {result['engine']} voice {result['voice']}: "
+        f"{result['tts']} tts, {result['native']} native, "
+        f"{result['words']} word, {result['skipped']} cached, "
+        f"{result['failed']} failed, {result['duration_s']:.1f} s"
+    )
+    for failure in result["failures"]:
+        print(f"failed: {failure['filename']} {failure['error']}")
+    print(f"wrote {result['index_path']}")
+    if result["csv_path"]:
+        print(f"wrote {result['csv_path']}")
+
+
+def _greek_pack(pack_license: str) -> None:
+    result = sentence_pack.build_pack(
+        greek_lang.GREEK,
+        greek_lang.load_word_table,
+        pack_license=pack_license,
+    )
+    counts = result["manifest"]["counts"]
+    print(
+        f"{counts['cards']} cards, {counts['scaffold']} scaffold, "
+        f"{counts['tts_audio']} tts, {counts['native_audio']} native, "
+        f"{result['media_count']} media files, {result['skipped']} skipped"
+    )
+    print(f"wrote {result['output']}")
+    print(f"wrote {result['manifest_path']}")
 
 
 @swadesh_app.command

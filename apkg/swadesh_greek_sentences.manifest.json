@@ -1,0 +1,86 @@
+{
+  "build_date": "2026-10-19",
+  "source_dump_date": "2026-10-19",
+  "counts": {
+    "words": 207,
+    "cards": 306,
+    "scaffold": 0,
+    "native_audio": 0,
+    "tts_audio": 306
+  },
+  "coverage": {
+    "core_with_card": 0.7826
+  },
+  "voice": "gtts:el",
+  "pack_license": "public",
+  "audio_license_skipped": {
+    "empty": 0,
+    "CC BY-NC 4.0": 0
+  },
+  "native_audio_available": false,
+  "files": {
+    "source_csv": "sha256:d644478c802f432ebe4fccc2468971cd025573b1388fd8401e024b2f89a1c21c",
+    "sentences_csv": "sha256:a4a9eb573129a10c28212d864f3b16a71f55405bd30fbbcc89d56483f830ad00"
+  },
+  "licenses": [
+    {
+      "data": "Greek Swadesh word data",
+      "license": "CC BY-SA 4.0"
+    },
+    {
+      "data": "Tatoeba sentences",
+      "license": "CC BY 2.0 FR"
+    },
+    {
+      "data": "spaCy el_core_news_sm",
+      "license": "MIT"
+    }
+  ],
+  "excluded_words": [
+    "πλατύς",
+    "παχύς",
+    "ψείρα",
+    "σκουλήκι",
+    "ραβδί",
+    "σπόρος",
+    "φλοιός του δέντρου",
+    "χόρτο",
+    "λίπος",
+    "κέρατο",
+    "πούπουλο",
+    "αυτί",
+    "νύχι",
+    "πόδι",
+    "γόνατο",
+    "φτερό",
+    "κοιλιά",
+    "σπλάχνα",
+    "συκώτι",
+    "ρουφώ",
+    "ξερνώ",
+    "φυσάω",
+    "κυνηγώ",
+    "χτυπάω",
+    "μαχαιρώνω",
+    "ξύνω",
+    "σκάβω",
+    "πετάω",
+    "σφίγγω",
+    "τρίβω",
+    "σκουπίζω",
+    "τραβάω",
+    "δένω",
+    "μετράω",
+    "πλέω",
+    "ρέω",
+    "παγώνω",
+    "πρήζομαι",
+    "σκόνη",
+    "στάχτη",
+    "σάπιος",
+    "στρογγυλός",
+    "αιχμηρός",
+    "στομωμένος",
+    "λείος"
+  ]
+}

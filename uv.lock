@@ -155,6 +155,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "cyclopts" },
+    { name = "el-core-news-sm" },
     { name = "genanki" },
     { name = "gtts" },
     { name = "jieba" },
@@ -176,6 +177,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "cyclopts", specifier = ">=4.5.1" },
+    { name = "el-core-news-sm", url = "https://github.com/explosion/spacy-models/releases/download/el_core_news_sm-3.8.0/el_core_news_sm-3.8.0-py3-none-any.whl" },
     { name = "genanki", specifier = ">=0.13.1" },
     { name = "gtts", specifier = ">=2.5.4" },
     { name = "jieba", specifier = ">=0.42.1" },
@@ -495,6 +497,14 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/ae/b6/03bb70946330e88ffec97aefd3ea75ba575cb2e762061e0e62a213befee8/docutils-0.22.4.tar.gz", hash = "sha256:4db53b1fde9abecbb74d91230d32ab626d94f6badfc575d6db9194a49df29968", size = 2291750, upload-time = "2025-12-18T19:00:26.443Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl", hash = "sha256:d0013f540772d1420576855455d050a2180186c91c15779301ac2ccb3eeb68de", size = 633196, upload-time = "2025-12-18T19:00:18.077Z" },
+]
+
+[[package]]
+name = "el-core-news-sm"
+version = "3.8.0"
+source = { url = "https://github.com/explosion/spacy-models/releases/download/el_core_news_sm-3.8.0/el_core_news_sm-3.8.0-py3-none-any.whl" }
+wheels = [
+    { url = "https://github.com/explosion/spacy-models/releases/download/el_core_news_sm-3.8.0/el_core_news_sm-3.8.0-py3-none-any.whl", hash = "sha256:18df59b7f099a20d6f7cc1f964a57408a4c1663b73b5110932c1ea24f66e3027" },
 ]
 
 [[package]]

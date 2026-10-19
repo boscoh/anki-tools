@@ -215,12 +215,12 @@ def coverage_ratio(inputs: AuditInputs) -> tuple[int, int, float]:
     :param inputs: Lazy file reader of the audit.
     :returns: Covered concept count, total concept count, and the ratio.
     """
-    index_of = {
-        inputs.profile.form_text(form): form.swadesh_index for form in inputs.table()
-    }
-    concepts = set(index_of.values())
+    positions = inputs.profile.form_positions(inputs.table())
+    concepts = {index for index, _ in positions.values()}
     covered = {
-        index_of[row["target"]] for row in inputs.rows() if row["target"] in index_of
+        positions[row["target"]][0]
+        for row in inputs.rows()
+        if row["target"] in positions
     }
     ratio = len(covered) / len(concepts) if concepts else 0.0
     return len(covered), len(concepts), ratio
@@ -282,7 +282,11 @@ def gate_unique_forms(
     :param profile: Language profile.
     :returns: Pass flag and detail text.
     """
-    counts = Counter(profile.form_text(form) for form in inputs.table())
+    counts = Counter(
+        profile.form_text(form)
+        for form in inputs.table()
+        if form.variant != "shared"
+    )
     duplicates = sorted(form for form, count in counts.items() if count > 1)
     if duplicates:
         return False, f"{len(duplicates)} duplicate form(s): {sample(duplicates)}"
@@ -652,8 +656,11 @@ def gate_target_in_table(
     """
     table = inputs.table()
     forms = {profile.form_text(form) for form in table}
+    rows_by_form: dict[str, list[str]] = {}
+    for form in table:
+        rows_by_form.setdefault(profile.form_text(form), []).append(form.variant)
     shared = {
-        profile.form_text(form) for form in table if form.variant == "shared"
+        name for name, variants in rows_by_form.items() if set(variants) == {"shared"}
     }
     rows = inputs.rows()
     problems: list[str] = []

@@ -3,7 +3,6 @@
 import pytest
 
 from anki_tools.rank import (
-    Sentence,
     FrequencyData,
     complexity_score_zh,
     frequency_score_zh,

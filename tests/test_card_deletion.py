@@ -63,11 +63,11 @@ class TestCardDeletion:
         audio2 = pkg.get_audio_files_for_note(cards[1]["nid"])
 
         # Delete first card
-        result1 = pkg.delete_card(cards[0]["id"], cleanup_audio=True)
+        pkg.delete_card(cards[0]["id"], cleanup_audio=True)
 
         # If audio files were shared, they shouldn't be deleted
         # Check if any audio from card 1 still exists (meaning it was shared)
-        remaining_audio = pkg.get_audio_files_for_note(cards[1]["nid"])
+        pkg.get_audio_files_for_note(cards[1]["nid"])
         if audio1 & audio2:  # If they share audio
             # Shared audio should still exist
             shared = audio1 & audio2

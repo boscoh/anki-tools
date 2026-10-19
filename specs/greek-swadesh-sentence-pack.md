@@ -780,16 +780,47 @@ and audio.
 
 ## 17. Implementation result
 
-Not implemented. This section records the probe baseline from 2026-10-18.
+Milestone M5 is complete. These values come from the full pipeline run of
+2026-10-19.
 
-| Measure            | Value                           |
-| ------------------ | ------------------------------- |
-| Word concepts      | 207                             |
-| Reviewed forms     | 206, with one shared form       |
-| Candidate pool     | 18,190 sentences, 4 to 10 words |
-| Concept coverage   | 168 of 207 (0.812)              |
-| Uncovered concepts | 39                              |
-| Expected cards     | 324                             |
-| Native audio       | none                            |
-| TTS engine         | gTTS, voice `gtts:el`           |
-| Gate result        | not run                         |
+| Measure            | Value                                                   |
+| ------------------ | ------------------------------------------------------- |
+| Build date         | 2026-10-19                                              |
+| Word table         | 207 rows, 206 unique forms, 146 review rows, 0 open     |
+| Candidate pool     | 9,293 candidates, 4 to 10 words, 0 scaffold             |
+| Cards              | 306 core, 0 scaffold                                    |
+| Media files        | 468 (306 sentence files and 162 word files)             |
+| Concept coverage   | 162 of 207 concepts (0.783)                             |
+| Uncovered concepts | 44                                                      |
+| Native audio       | none                                                    |
+| TTS engine         | gTTS, voice `gtts:el`                                   |
+| Gate result        | G1 to G19 pass; `anki swadesh audit greek` exits 0      |
+
+The uncovered words are πλατύς, παχύς, ψείρα, σκουλήκι, ραβδί, σπόρος,
+φλοιός του δέντρου, χόρτο, λίπος, κέρατο, πούπουλο, αυτί, νύχι, γόνατο,
+φτερό, κοιλιά, σπλάχνα, συκώτι, ρουφώ, ξερνώ, φυσάω, κυνηγώ, χτυπάω,
+μαχαιρώνω, ξύνω, σκάβω, πετάω, σφίγγω, τρίβω, σκουπίζω, τραβάω, δένω,
+μετρώ, πλέω, ρέω, παγώνω, πρήζομαι, σκόνη, στάχτη, σάπιος, στρογγυλός,
+αιχμηρός, στομωμένος, λείος.
+
+The measured values differ from the probe of section 3.3 in four places:
+
+- The pool has 9,293 candidates, not 18,190. The shared pool applies the
+  unknown-token budget of section 8.2 as filter 13, so 4,048 sentences that
+  pass F1 to F12 with more than two unknown tokens leave the pool.
+- The F1 to F12 pass count is 18,369, close to the probe value of 18,190.
+- Coverage is 162 concepts, not 168, and the deck has 306 cards, not 324.
+  The spaCy 3.8.0 tagger and lemmatizer of `el_core_news_sm` and the
+  carrier-lemma key set of section 8.2 find fewer targets than the probe.
+- The fallback window of section 7.1 adds 0 scaffold cards for the 44
+  uncovered words, so the deck keeps the core tier only.
+
+The coverage denominator is the 207 Swadesh concepts. Index 81 shares the
+form `πόδι` with index 80 and cannot get a card, so 162 of 207 is the best
+reachable value here. G10 at 0.76 still passes (0.783).
+
+The word review file has 146 rows: 83 article strips, 6 note removals, 2
+slash choices, 1 shared row, 23 module differences, and 31 rare forms. The
+row for index 41 keeps `άντρας`, and index 37 moves to `άνδρας` so that one
+form serves one concept. Row counts stay at 207 because the shared `πόδι`
+row keeps its place.

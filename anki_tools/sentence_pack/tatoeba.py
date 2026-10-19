@@ -71,6 +71,26 @@ def export_files(
     return files
 
 
+def language_files(lang: str, *, native_audio: bool = True) -> dict[str, str]:
+    """Build the export map of one language only.
+
+    :param lang: Tatoeba language code.
+    :param native_audio: Include the ``sentences_with_audio`` export.
+    :returns: Mapping from cache file name to download URL.
+    """
+    files = {
+        f"{lang}_sentences": export_url(lang, "sentences"),
+        f"{lang}_sentences_detailed": export_url(lang, "sentences_detailed"),
+    }
+    if lang != "eng":
+        files[f"{lang}-eng_links"] = link_url(lang, "eng")
+    if native_audio:
+        files[f"{lang}_sentences_with_audio"] = export_url(
+            lang, "sentences_with_audio"
+        )
+    return files
+
+
 def sha256_file(path: Path) -> str:
     """Hash a file with sha256.
 

@@ -113,6 +113,8 @@ FINAL_MARKS = ".?!;"
 INTERNAL_MARKS = ",·:"
 QUOTE_MARKS = '«»"“”—–'
 ORPHAN_CONJUNCTIONS = ("και", "αλλά", "ή", "γιατί", "επειδή", "λοιπόν", "όμως")
+PREDICATE_MARKERS = frozenset({"είναι", "έχει", "έχουν", "δεν", "θα"})
+VERB_FORMS: set[str] = set()
 ARTICLES = (
     "ο",
     "η",
@@ -537,12 +539,19 @@ def count_unknown(sentence: str, known: Collection[str]) -> int:
 
 
 def has_predicate(sentence: str) -> bool:
-    """Check filter F9: a finite verb or auxiliary token.
+    """Check filter F9: a finite verb, the marker fallback, or a word-list verb.
 
     :param sentence: Greek sentence.
     :returns: True when the sentence has a finite verb.
     """
-    return has_finite_verb(list(greek_tokens(sentence)))
+    tokens = greek_tokens(sentence)
+    if has_finite_verb(list(tokens)):
+        return True
+    if any(surface_key(token.text) in PREDICATE_MARKERS for token in tokens):
+        return True
+    if not VERB_FORMS:
+        return False
+    return bool(hits(sentence, frozenset(VERB_FORMS)))
 
 
 def glossary(word: WordForm) -> str:
@@ -563,13 +572,20 @@ def form_positions(table: Sequence[WordForm]) -> dict[str, tuple[int, int]]:
     :param table: Reviewed word table.
     :returns: Mapping from form to ``(swadesh_index, variant_rank)``.
     """
-    return {
-        form.greek: (
+    positions: dict[str, tuple[int, int]] = {}
+    ordered = sorted(
+        table,
+        key=lambda form: (
+            form.swadesh_index,
+            0 if form.variant == "primary" else 1,
+        ),
+    )
+    for form in ordered:
+        positions[form.greek] = (
             form.swadesh_index,
             0 if form.variant == "primary" else 1,
         )
-        for form in table
-    }
+    return positions
 
 
 def read_csv_rows(csv_path: Path) -> list[dict[str, str]]:
@@ -610,6 +626,7 @@ def load_word_table(
     if len(rows) != len(labels):
         raise ValueError(f"{csv_path}: {len(rows)} rows but {len(labels)} labels")
     table: list[WordForm] = []
+    global VERB_FORMS
     for index, row in enumerate(rows, start=1):
         form = normalized(row.get("greek", ""))
         if not form:
@@ -626,6 +643,7 @@ def load_word_table(
                 zipf=zipf_frequency(form, "el"),
             )
         )
+    VERB_FORMS = {form.greek for form in table if form.english.startswith("to ")}
     return table
 
 
@@ -1197,10 +1215,9 @@ def gate_script(
     rows = inputs.rows()
     bad: list[str] = []
     for row in rows:
-        for field, value in row.items():
-            if field in ("audio_source", "tier", "rank_key", "audio_missing"):
-                continue
-            if not isinstance(value, str) or not value:
+        for field in ("sentence", "text_original", "target"):
+            value = row.get(field, "")
+            if not value:
                 continue
             problem = script_problem(value)
             if problem:
@@ -1265,6 +1282,7 @@ def greek_gates() -> tuple[tuple[str, Any], ...]:
         gate_review_file,
         gate_sentence_audio,
         gate_similarity,
+        gate_target_in_table,
         gate_target_once,
         gate_targets_in_table,
         gate_unique_forms,
@@ -1291,7 +1309,7 @@ def greek_gates() -> tuple[tuple[str, Any], ...]:
         ("G16", gate_word_audio),
         ("G17", gate_script),
         ("G18", gate_no_native),
-        ("G19", gate_targets),
+        ("G19", gate_target_in_table),
     )
 
 

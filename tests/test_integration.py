@@ -30,7 +30,7 @@ class TestIntegration:
 
         # Get media mapping to check what's available
         mapping = pkg.get_media_mapping()
-        available_audio = set(mapping.values())
+        set(mapping.values())
 
         # Most referenced audio should be in extracted files
         # (Some decks may have missing media files)

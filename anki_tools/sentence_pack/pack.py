@@ -388,11 +388,9 @@ def build_manifest(
     :returns: The manifest mapping.
     """
     targets = {row["target"] for row in rows}
+    positions = profile.form_positions(table)
     concepts = {
-        profile_position
-        for form in table
-        if profile.form_text(form) in targets
-        for profile_position in (form.swadesh_index,)
+        positions[target][0] for target in targets if target in positions
     }
     manifest: dict[str, Any] = {
         "build_date": date.today().isoformat(),

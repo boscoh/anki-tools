@@ -234,6 +234,64 @@ Licenses: word data CC BY-SA 4.0, Tatoeba sentence text CC BY 2.0 FR, and
 audio per recording. This pack uses synthesized audio only.
 
 
+
+### Greek Swadesh Sentences
+
+Build a listening-comprehension deck for Greek. The deck pairs 207 Swadesh
+concepts with 306 Tatoeba sentences. Each card holds one sentence, the English
+translation, the target word with a gender gloss, and two MP3 files.
+
+```bash
+uv run anki swadesh fetch --lang ell --lang eng              # cache the Tatoeba data
+uv run anki swadesh sentences greek --per-word 2 --max-cards 340
+uv run anki swadesh audio greek --tts gtts                   # make the audio
+uv run anki swadesh pack greek                               # write the APKG
+uv run anki swadesh audit greek                              # gates G1 to G19
+```
+
+The commands write these files:
+
+| Path                                          | Content                            |
+| --------------------------------------------- | ---------------------------------- |
+| `vocab/english-greek.csv`                     | reviewed word table, 207 rows      |
+| `vocab/greek_word_review.csv`                 | word review, 146 rows              |
+| `vocab/greek_sentences.csv`                   | one row per card                   |
+| `vocab/greek_sentences_review.csv`            | top candidates for the weak words  |
+| `audio/greek_sentences/index.csv`             | file index of the audio cache      |
+| `apkg/swadesh_greek_sentences.apkg`           | the deck                           |
+| `apkg/swadesh_greek_sentences.manifest.json`  | counts, coverage, and file hashes  |
+| `ATTRIBUTION.md`                              | the `## Greek pack` section        |
+
+Greek needs three external things:
+
+1. The spaCy model `el_core_news_sm` 3.8.0. It is not on PyPI. `pyproject.toml`
+   pins the release URL, so `uv sync` installs it.
+2. `ffprobe` on the path. The audio step removes a file that fails the header or
+   duration check.
+3. `gtts` for the default voice `gtts:el`. The optional `edge-tts` package adds
+   the voice `el-GR-AthinaNeural` (and `el-GR-NestorasNeural`) with
+   `--tts edge --voice el-GR-AthinaNeural`.
+
+Greek has no Tatoeba recordings. `ell_sentences_with_audio.tsv.bz2` returns HTTP
+404, so `--native-audio auto` and `--native-audio only` are rejected for Greek.
+The pack is TTS only. Greek `;` is the question mark, so the filter and the TTS
+input keep it unchanged.
+
+Measured result: 306 cards, 468 media files, and core coverage of 162 of 206
+card-capable concepts (0.786). The pack has 0 scaffold cards and 0 native
+recordings. These 44 words have no selected sentence: πλατύς, παχύς, ψείρα,
+σκουλήκι, ραβδί, σπόρος, φλοιός του δέντρου, χόρτο, λίπος, κέρατο, πούπουλο,
+αυτί, νύχι, γόνατο, φτερό, κοιλιά, σπλάχνα, συκώτι, ρουφώ, ξερνώ, φυσάω,
+κυνηγώ, χτυπάω, μαχαιρώνω, ξύνω, σκάβω, πετάω, σφίγγω, τρίβω, σκουπίζω,
+τραβάω, δένω, μετρώ, πλέω, ρέω, παγώνω, πρήζομαι, σκόνη, στάχτη, σάπιος,
+στρογγυλός, αιχμηρός, στομωμένος, λείος.
+
+Index 81 (`πόδι`, leg) shares its form with index 80 (foot). The shared row has
+`variant=shared`, gets no card, and gate G19 rejects a card on a shared-only
+form.
+
+Licenses: word data CC BY-SA 4.0, Tatoeba sentence text CC BY 2.0 FR, spaCy
+model MIT, and synthesized audio named by its engine and voice.
 ## API Reference
 
 ### AnkiPackage Class

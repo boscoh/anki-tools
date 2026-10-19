@@ -1,0 +1,147 @@
+index,english,current,module_terms,chosen,issue,fix,status
+1,I,Εγώ,εγώ,Εγώ,module_diff,file form kept; module has εγώ,kept
+2,you (singular),εσύ (ενικός),εσύ|εσείς,εσύ,note,strip the note: εσύ,fixed
+3,he/she/it/they (singular),αυτός/αυτή/αυτό/αυτοί (ενικός),αυτός,αυτός,note,strip the note: αυτός/αυτή/αυτό/αυτοί,fixed
+3,he/she/it/they (singular),αυτός/αυτή/αυτό/αυτοί (ενικός),αυτός,αυτός,slash,one form per concept: αυτός,fixed
+5,you (plural),εσείς (πληθυντικός),εσείς,εσείς,note,strip the note: εσείς,fixed
+6,they (plural),αυτοί (πληθυντικός),αυτοί,αυτοί,note,strip the note: αυτοί,fixed
+7,this,αυτό,αυτός,αυτό,module_diff,file form kept; module has αυτός,kept
+8,that,εκείνο,εκείνος,εκείνο,module_diff,file form kept; module has εκείνος,kept
+11,who,ποιος/ποια/ποιο/ποιοι (ενικός),ποιος,ποιος,note,strip the note: ποιος/ποια/ποιο/ποιοι,fixed
+11,who,ποιος/ποια/ποιο/ποιοι (ενικός),ποιος,ποιος,slash,one form per concept: ποιος,fixed
+16,not,δεν,δε|μη,δεν,module_diff,file form kept; module has δε|μη,kept
+19,some,κάποιοι,μερικοί,κάποιοι,module_diff,file form kept; module has μερικοί,kept
+22,one,ένας,ένα,ένας,module_diff,file form kept; module has ένα,kept
+29,wide,πλατύς,πλατύς|φαρδύς,πλατύς,zipf,rare form zipf 0.00; keep if it has candidates,kept
+36,woman,η γυναίκα,γυναίκα,γυναίκα,article,strip the article: γυναίκα,fixed
+37,man,ο άντρας,άνδρας,άνδρας,article,strip the article: άνδρας,fixed
+38,human being,ο άνθρωπος,άνθρωπος,άνθρωπος,article,strip the article: άνθρωπος,fixed
+39,child,το παιδί,παιδί,παιδί,article,strip the article: παιδί,fixed
+40,wife,η σύζυγος,σύζυγος|γυναίκα,σύζυγος,article,strip the article: σύζυγος,fixed
+41,husband,ο σύζυγος,σύζυγος|άντρας,άντρας,article,strip the article: άντρας,fixed
+42,mother,η μητέρα,μητέρα|μάνα,μητέρα,article,strip the article: μητέρα,fixed
+43,father,ο πατέρας,πατέρας,πατέρας,article,strip the article: πατέρας,fixed
+44,animal,το ζώο,ζώο,ζώο,article,strip the article: ζώο,fixed
+45,fish,το ψάρι,ψάρι,ψάρι,article,strip the article: ψάρι,fixed
+46,bird,το πουλί,πουλί,πουλί,article,strip the article: πουλί,fixed
+47,dog,ο σκύλος,σκύλος,σκύλος,article,strip the article: σκύλος,fixed
+48,louse,η ψείρα,ψείρα,ψείρα,article,strip the article: ψείρα,fixed
+48,louse,η ψείρα,ψείρα,ψείρα,zipf,rare form zipf 0.00; keep if it has candidates,kept
+49,snake,το φίδι,φίδι,φίδι,article,strip the article: φίδι,fixed
+50,worm,το σκουλήκι,σκουλήκι,σκουλήκι,article,strip the article: σκουλήκι,fixed
+51,tree,το δέντρο,δέντρο,δέντρο,article,strip the article: δέντρο,fixed
+52,forest,το δάσος,δάσος,δάσος,article,strip the article: δάσος,fixed
+53,stick,το ραβδί,ραβδί|βέργα,ραβδί,article,strip the article: ραβδί,fixed
+54,fruit,το φρούτο,φρούτο,φρούτο,article,strip the article: φρούτο,fixed
+55,seed,ο σπόρος,σπόρος,σπόρος,article,strip the article: σπόρος,fixed
+56,leaf,το φύλλο,φύλλο,φύλλο,article,strip the article: φύλλο,fixed
+57,root,η ρίζα,ρίζα,ρίζα,article,strip the article: ρίζα,fixed
+58,tree bark,ο φλοιός του δέντρου,φλοιός,φλοιός του δέντρου,article,strip the article: φλοιός του δέντρου,fixed
+58,tree bark,ο φλοιός του δέντρου,φλοιός,φλοιός του δέντρου,module_diff,file form kept; module has φλοιός,kept
+59,flower,το λουλούδι,λουλούδι,λουλούδι,article,strip the article: λουλούδι,fixed
+60,grass,το χόρτο,χορτάρι,χόρτο,article,strip the article: χόρτο,fixed
+60,grass,το χόρτο,χορτάρι,χόρτο,module_diff,file form kept; module has χορτάρι,kept
+61,rope,το σχοινί,σχοινί,σχοινί,article,strip the article: σχοινί,fixed
+62,skin,το δέρμα,δέρμα,δέρμα,article,strip the article: δέρμα,fixed
+63,meat,το κρέας,κρέας,κρέας,article,strip the article: κρέας,fixed
+64,blood,το αίμα,αίμα,αίμα,article,strip the article: αίμα,fixed
+65,bone,το κόκαλο,κόκαλο,κόκαλο,article,strip the article: κόκαλο,fixed
+66,fat (noun),το λίπος (ουσιαστικό),λίπος,λίπος,note,strip the note: το λίπος,fixed
+66,fat (noun),το λίπος (ουσιαστικό),λίπος,λίπος,article,strip the article: λίπος,fixed
+67,egg,το αυγό,αυγό,αυγό,article,strip the article: αυγό,fixed
+68,horn,το κέρατο,κέρατο,κέρατο,article,strip the article: κέρατο,fixed
+69,tail,η ουρά,ουρά,ουρά,article,strip the article: ουρά,fixed
+70,feather,το φτερό,πούπουλο|φτερό,πούπουλο,article,strip the article: πούπουλο,fixed
+70,feather,το φτερό,πούπουλο|φτερό,πούπουλο,zipf,rare form zipf 0.00; keep if it has candidates,kept
+71,hair,τα μαλλιά,τρίχα|μαλλιά,μαλλιά,article,strip the article: μαλλιά,fixed
+72,head,το κεφάλι,κεφάλι,κεφάλι,article,strip the article: κεφάλι,fixed
+73,ear,το αυτί,αυτί,αυτί,article,strip the article: αυτί,fixed
+74,eye,το μάτι,μάτι,μάτι,article,strip the article: μάτι,fixed
+75,nose,η μύτη,μύτη,μύτη,article,strip the article: μύτη,fixed
+76,mouth,το στόμα,στόμα,στόμα,article,strip the article: στόμα,fixed
+77,tooth,το δόντι,δόντι,δόντι,article,strip the article: δόντι,fixed
+78,tongue,η γλώσσα,γλώσσα,γλώσσα,article,strip the article: γλώσσα,fixed
+79,fingernail,το νύχι,νύχι,νύχι,article,strip the article: νύχι,fixed
+80,foot,το πόδι,πόδι,πόδι,article,strip the article: πόδι,fixed
+81,leg,το πόδι,πόδι,πόδι,article,strip the article: πόδι,fixed
+81,leg,το πόδι,πόδι,πόδι,shared,shared form with index 80: πόδι,shared
+82,knee,το γόνατο,γόνατο,γόνατο,article,strip the article: γόνατο,fixed
+83,hand,το χέρι,χέρι,χέρι,article,strip the article: χέρι,fixed
+84,wing,το φτερό,φτερό,φτερό,article,strip the article: φτερό,fixed
+85,belly,η κοιλιά,κοιλιά,κοιλιά,article,strip the article: κοιλιά,fixed
+86,guts,τα σπλάχνα,σπλάχνο|εντόσθια,σπλάχνα,article,strip the article: σπλάχνα,fixed
+86,guts,τα σπλάχνα,σπλάχνο|εντόσθια,σπλάχνα,module_diff,file form kept; module has σπλάχνο|εντόσθια,kept
+87,neck,ο λαιμός,λαιμός,λαιμός,article,strip the article: λαιμός,fixed
+88,back,η πλάτη,πλάτη,πλάτη,article,strip the article: πλάτη,fixed
+89,breast,το στήθος,στήθος,στήθος,article,strip the article: στήθος,fixed
+90,heart,η καρδιά,καρδιά,καρδιά,article,strip the article: καρδιά,fixed
+91,liver,το συκώτι,συκώτι,συκώτι,article,strip the article: συκώτι,fixed
+94,to bite,δαγκώνω,δαγκώνω,δαγκώνω,zipf,rare form zipf 0.00; keep if it has candidates,kept
+95,to suck,ρουφώ,ρουφώ,ρουφώ,zipf,rare form zipf 0.00; keep if it has candidates,kept
+96,to spit,φτύνω,φτύνω,φτύνω,zipf,rare form zipf 0.00; keep if it has candidates,kept
+97,to vomit,ξερνώ,ξερνώ,ξερνώ,zipf,rare form zipf 0.00; keep if it has candidates,kept
+98,to blow,φυσάω,φυσάω,φυσάω,zipf,rare form zipf 0.00; keep if it has candidates,kept
+111,to fight,παλεύω,μαλώνω,παλεύω,module_diff,file form kept; module has μαλώνω,kept
+112,to hunt,κυνηγώ,κυνηγώ,κυνηγώ,zipf,rare form zipf 0.00; keep if it has candidates,kept
+113,to hit,χτυπάω,χτυπώ,χτυπάω,module_diff,file form kept; module has χτυπώ,kept
+115,to split,σπάω,χωρίζω,σπάω,module_diff,file form kept; module has χωρίζω,kept
+116,to stab,μαχαιρώνω,μαχαιρώνω,μαχαιρώνω,zipf,rare form zipf 0.00; keep if it has candidates,kept
+117,to scratch,ξύνω,ξύνω,ξύνω,zipf,rare form zipf 0.00; keep if it has candidates,kept
+118,to dig,σκάβω,σκάβω,σκάβω,zipf,rare form zipf 0.00; keep if it has candidates,kept
+119,to swim,κολυμπάω,κολυμπώ,κολυμπάω,module_diff,file form kept; module has κολυμπώ,kept
+129,to hold,κρατώ,κρατάω,κρατώ,module_diff,file form kept; module has κρατάω,kept
+130,to squeeze,σφίγγω,ζουλάω,σφίγγω,module_diff,file form kept; module has ζουλάω,kept
+130,to squeeze,σφίγγω,ζουλάω,σφίγγω,zipf,rare form zipf 0.00; keep if it has candidates,kept
+131,to rub,τρίβω,τρίβω,τρίβω,zipf,rare form zipf 0.00; keep if it has candidates,kept
+133,to wipe,σκουπίζω,σκουπίζω,σκουπίζω,zipf,rare form zipf 0.00; keep if it has candidates,kept
+134,to pull,τραβάω,τραβώ,τραβάω,module_diff,file form kept; module has τραβώ,kept
+135,to push,σπρώχνω,σπρώχνω,σπρώχνω,zipf,rare form zipf 0.00; keep if it has candidates,kept
+137,to tie,δένω,δένω,δένω,zipf,rare form zipf 0.00; keep if it has candidates,kept
+138,to sew,ράβω,ράβω,ράβω,zipf,rare form zipf 0.00; keep if it has candidates,kept
+143,to float,πλέω,πλέω|επιπλέω,πλέω,zipf,rare form zipf 0.00; keep if it has candidates,kept
+144,to flow,ρέω,τρέχω,ρέω,module_diff,file form kept; module has τρέχω,kept
+144,to flow,ρέω,τρέχω,ρέω,zipf,rare form zipf 0.00; keep if it has candidates,kept
+145,to freeze,παγώνω,παγώνω,παγώνω,zipf,rare form zipf 0.00; keep if it has candidates,kept
+146,to swell,πρήζομαι,φουσκώνω|πρήζομαι,πρήζομαι,zipf,rare form zipf 0.00; keep if it has candidates,kept
+147,sun,ο ήλιος,ήλιος,ήλιος,article,strip the article: ήλιος,fixed
+148,moon,το φεγγάρι,φεγγάρι|Σελήνη,φεγγάρι,article,strip the article: φεγγάρι,fixed
+149,star,το αστέρι,αστέρι|άστρο,αστέρι,article,strip the article: αστέρι,fixed
+150,water,το νερό,νερό,νερό,article,strip the article: νερό,fixed
+151,rain,η βροχή,βροχή,βροχή,article,strip the article: βροχή,fixed
+152,river,το ποτάμι,ποτάμι,ποτάμι,article,strip the article: ποτάμι,fixed
+153,lake,η λίμνη,λίμνη,λίμνη,article,strip the article: λίμνη,fixed
+154,sea,η θάλασσα,θάλασσα,θάλασσα,article,strip the article: θάλασσα,fixed
+155,salt,το αλάτι,αλάτι,αλάτι,article,strip the article: αλάτι,fixed
+156,stone,η πέτρα,πέτρα,πέτρα,article,strip the article: πέτρα,fixed
+157,sand,η άμμος,άμμος,άμμος,article,strip the article: άμμος,fixed
+158,dust,η σκόνη,σκόνη,σκόνη,article,strip the article: σκόνη,fixed
+159,earth,η γη,γη,γη,article,strip the article: γη,fixed
+160,cloud,το σύννεφο,σύννεφο,σύννεφο,article,strip the article: σύννεφο,fixed
+161,fog,η ομίχλη,ομίχλη,ομίχλη,article,strip the article: ομίχλη,fixed
+162,sky,ο ουρανός,ουρανός,ουρανός,article,strip the article: ουρανός,fixed
+163,wind,ο άνεμος,αέρας,άνεμος,article,strip the article: άνεμος,fixed
+163,wind,ο άνεμος,αέρας,άνεμος,module_diff,file form kept; module has αέρας,kept
+164,snow,το χιόνι,χιόνι,χιόνι,article,strip the article: χιόνι,fixed
+165,ice,το πάγος,πάγος,πάγος,article,strip the article: πάγος,fixed
+166,smoke,ο καπνός,καπνός,καπνός,article,strip the article: καπνός,fixed
+167,fire,η φωτιά,φωτιά,φωτιά,article,strip the article: φωτιά,fixed
+168,ash,η στάχτη,στάχτη,στάχτη,article,strip the article: στάχτη,fixed
+169,to burn,καίω,καίω,καίω,zipf,rare form zipf 0.00; keep if it has candidates,kept
+170,road,ο δρόμος,δρόμος,δρόμος,article,strip the article: δρόμος,fixed
+171,mountain,το βουνό,βουνό,βουνό,article,strip the article: βουνό,fixed
+175,white,λευκός,άσπρος,λευκός,module_diff,file form kept; module has άσπρος,kept
+177,night,η νύχτα,νύχτα,νύχτα,article,strip the article: νύχτα,fixed
+178,day,η ημέρα,μέρα,ημέρα,article,strip the article: ημέρα,fixed
+178,day,η ημέρα,μέρα,ημέρα,module_diff,file form kept; module has μέρα,kept
+179,year,ο χρόνος,χρόνος,χρόνος,article,strip the article: χρόνος,fixed
+183,new,νέος,καινούργιος,νέος,module_diff,file form kept; module has καινούργιος,kept
+187,rotten,σάπιος,σάπιος,σάπιος,zipf,rare form zipf 0.00; keep if it has candidates,kept
+188,dirty,βρόμικος,βρόμικος,βρόμικος,zipf,rare form zipf 0.00; keep if it has candidates,kept
+189,straight,ίσιος,ίσιος,ίσιος,zipf,rare form zipf 0.00; keep if it has candidates,kept
+190,round,στρογγυλός,στρογγυλός,στρογγυλός,zipf,rare form zipf 0.00; keep if it has candidates,kept
+191,sharp,αιχμηρός,κοφτερός,αιχμηρός,module_diff,file form kept; module has κοφτερός,kept
+191,sharp,αιχμηρός,κοφτερός,αιχμηρός,zipf,rare form zipf 0.00; keep if it has candidates,kept
+192,dull,στομωμένος,στομωμένος,στομωμένος,zipf,rare form zipf 0.00; keep if it has candidates,kept
+193,smooth,λείος,λείος,λείος,zipf,rare form zipf 0.00; keep if it has candidates,kept
+194,wet,βρεγμένος,βρεγμένος|υγρός,βρεγμένος,zipf,rare form zipf 0.00; keep if it has candidates,kept
+195,dry,ξηρός,στεγνός|ξερός,ξηρός,module_diff,file form kept; module has στεγνός|ξερός,kept
