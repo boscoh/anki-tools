@@ -218,6 +218,11 @@ Rules:
 - Multiword forms. Index 16 is `ne pas`, which is discontinuous. Indices 111
   (`se battre`), 125 (`se lever`), and 206 (`parce que`) are contiguous. Store
   the kind in a `form_kind` column with values `single`, `pair`, `discontinuous`.
+- Gender. Fill `gender` for a noun and leave it empty for a verb, an adverb,
+  or another word class. The module has no gender data, so M1 fills the
+  value by hand from a dictionary. Do not infer it from a `le` or `la` probe,
+  and do not translate it. The probe expects 120 nouns with a value.
+  A missing value is not a build error, but G20 counts the empty noun rows.
 - One form per concept. The table has 207 rows and 207 unique forms.
 - The `swadesh_index` is the CSV row order, starting at 1. `vocab/swadesh.txt`
   has 207 labels and no trailing newline.
@@ -227,16 +232,17 @@ Rules:
 
 Table columns:
 
-| Column            | Type   | Example | Meaning                           |
-| ----------------- | ------ | ------- | --------------------------------- |
-| `swadesh_index`   | int    | 36      | Swadesh 207 index                 |
-| `english`         | string | woman   | Swadesh English label             |
-| `french`          | string | femme   | French form, unique key           |
-| `variant`         | string | primary | `primary` or `alternate`          |
-| `form_kind`       | string | single  | `single`, `pair`, `discontinuous` |
-| `zipf`            | float  | 4.95    | wordfreq fr Zipf value            |
-| `candidate_count` | int    | 1245    | Sentences after S2 filters        |
-| `tier`            | string | core    | `core` or `scaffold`              |
+| Column            | Type   | Example | Meaning                            |
+| ----------------- | ------ | ------- | ---------------------------------- |
+| `swadesh_index`   | int    | 36      | Swadesh 207 index                  |
+| `english`         | string | woman   | Swadesh English label              |
+| `french`          | string | femme   | French form, unique key            |
+| `gender`          | string | f       | `m`, `f`, `n`, or empty for a verb |
+| `variant`         | string | primary | `primary` or `alternate`           |
+| `form_kind`       | string | single  | `single`, `pair`, `discontinuous`  |
+| `zipf`            | float  | 4.95    | wordfreq fr Zipf value             |
+| `candidate_count` | int    | 1245    | Sentences after S2 filters         |
+| `tier`            | string | core    | `core` or `scaffold`               |
 
 `candidate_count` and `tier` come from S2 and S3. They are not input data. A
 word with zero candidates keeps its row, and the report lists it as uncovered.
@@ -458,7 +464,7 @@ before release.
 ### 8.6 Gloss
 
 - Write the gloss from the Swadesh English label, not from a translation.
-- Add the gender for a noun: `femme (f)`, `homme (m)`, `eau (f)`.
+- Add the gender in parentheses when the `gender` column is filled: `femme (f)`, `eau (f)`.
 - For a verb, add the infinitive: `manger`.
 - Store the gloss in the card field `Gloss`. Do not store a second French form.
 
@@ -728,6 +734,8 @@ a failure.
 | G16  | Every card target has a valid `word_{hash}.mp3` file                                       |
 | G17  | No card field contains U+202F or U+00A0, and every field is NFC                            |
 | G18  | A public pack has no card with a CC BY-NC 4.0 audio file                                   |
+| G19  | No card has `form_kind=discontinuous` without both parts in the sentence (8.2)             |
+| G20  | Noun rows with an empty `gender` are reported; the count is in the manifest                |
 
 G10 uses the measured coverage. The probe measures 207 of 207 concepts (1.00).
 This spec sets the gate at 0.95, which is the measured value minus 5 points.
