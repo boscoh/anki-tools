@@ -311,7 +311,7 @@ blend_pm   = written_pm                                 otherwise
 The blend fixes most spoken words (14.1). It does not fix `你好`, because
 HKCanCor writes it as two tokens. The override file (5.4) covers this case.
 
-The blend changes the order of the old list. On the LTL deck, 604 of 998
+The blend changes the order of the old list. On the LTL deck, 603 of 998
 sentences move by more than 100 places (M2). The option `--freq-report` writes
 those sentences to `deck.freq_change.csv`.
 
