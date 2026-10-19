@@ -15,11 +15,13 @@ import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 import jieba
 
 from anki_tools.rank import (
     FrequencyData,
+    Sentence,
     _read_word_count_tsv,
     download_cached_file,
     download_yue_frequency,
@@ -396,6 +398,51 @@ def check_frequency(data: YueFrequency) -> list[tuple[str, bool, str]]:
     return results
 
 
+FREQ_CHANGE_COLUMNS: tuple[str, ...] = ("sentence", "rank_before", "rank_after", "move")
+
+
+def rank_change_rows(
+    before: list[Sentence], after: list[Sentence], threshold: int = 100
+) -> list[dict[str, Any]]:
+    """List sentences whose rank moves by more than a threshold.
+
+    :param before: Ranking with the first frequency term, best first.
+    :param after: Ranking with the second frequency term, best first.
+    :param threshold: Smallest move in places to report.
+    :returns: Rows sorted by the size of the move, largest first.
+    """
+    old = {s.note_id: i for i, s in enumerate(before, 1)}
+    rows: list[dict[str, Any]] = []
+    for new_rank, sentence in enumerate(after, 1):
+        old_rank = old.get(sentence.note_id)
+        if old_rank is None or abs(new_rank - old_rank) <= threshold:
+            continue
+        rows.append({
+            "sentence": sentence.text,
+            "rank_before": old_rank,
+            "rank_after": new_rank,
+            "move": old_rank - new_rank,
+        })
+    return sorted(rows, key=lambda row: -abs(row["move"]))
+
+
+def write_freq_change_csv(rows: list[dict[str, Any]], path: Path) -> None:
+    """Write the sentences that the new frequency term moves.
+
+    :param rows: Rows from :func:`rank_change_rows`.
+    :param path: Output file.
+    """
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        handle = open(path, "w", encoding="utf-8", newline="")
+    except OSError as exc:
+        raise RuntimeError(f"Cannot write {path}.") from exc
+    with handle:
+        writer = csv.DictWriter(handle, fieldnames=FREQ_CHANGE_COLUMNS, lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(rows)
+
+
 def build_yue_tokenizer(
     cifu: dict[str, CifuEntry],
     *,
@@ -440,3 +487,19 @@ def han_tokens(tokenizer: jieba.Tokenizer, text: str) -> list[str]:
     :returns: Tokens, in order.
     """
     return [token for token in tokenizer.lcut(text) if _HAN.search(token)]
+
+
+def spoken_token_coverage(
+    tokenizer: jieba.Tokenizer, texts: list[str], cifu: dict[str, CifuEntry]
+) -> float:
+    """Share of Han tokens that have a spoken count in Cifu (gate G2).
+
+    :param tokenizer: Cantonese tokenizer.
+    :param texts: Sentence texts.
+    :param cifu: Cifu entries.
+    :returns: A value between 0 and 1.
+    """
+    tokens = [token for text in texts for token in han_tokens(tokenizer, text)]
+    if not tokens:
+        return 0.0
+    return sum(1 for t in tokens if t in cifu and cifu[t].spoken > 0) / len(tokens)

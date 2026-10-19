@@ -306,6 +306,10 @@ blend_pm   = written_pm                                 otherwise
 The blend fixes most spoken words (14.1). It does not fix `你好`, because
 HKCanCor writes it as two tokens. The override file (5.4) covers this case.
 
+The blend changes the order of the old list. On the LTL deck, 604 of 998
+sentences move by more than 100 places (M2). The option `--freq-report` writes
+those sentences to `deck.freq_change.csv`.
+
 ### 5.3 Variant map
 
 The written lists use news-standard characters. Spoken text uses common
@@ -500,6 +504,7 @@ Frequency:
 | ----------------- | ------- | ------------------------------- |
 | `--freq`          | blend   | `blend`, `spoken`, or `written` |
 | `--spoken-weight` | 0.7     | Value of `w` in 5.2             |
+| `--freq-report`   | off     | Write the sentences that move by more than 100 places (M2) |
 
 `--freq written --order score --no-select` gives a byte-identical result to
 the current version (gate G8).

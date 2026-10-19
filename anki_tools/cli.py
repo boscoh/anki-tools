@@ -16,6 +16,7 @@ import tempfile
 import time
 from pathlib import Path
 from textwrap import dedent
+from typing import Literal
 
 import cyclopts
 from gtts import gTTS
@@ -44,6 +45,7 @@ from anki_tools.package import AnkiPackage
 from anki_tools.pinyin import fix_pinyin
 from anki_tools.rank import (
     SIMILARITY_CONSIDER_DELETE_PENALTY,
+    Sentence,
     YUE_FREQUENCY_ATTRIBUTION,
     char_similarity_zh,
     char_similarity_zh_same_len,
@@ -65,6 +67,8 @@ from anki_tools.yue_frequency import (
     FREQUENCY_PATH,
     check_frequency,
     load_yue_frequency,
+    rank_change_rows,
+    write_freq_change_csv,
     write_frequency_tsv,
 )
 
@@ -786,16 +790,22 @@ def yue(
     output: Path | None = None,
     model_id: int | None = None,
     keep_filtered: bool = False,
+    freq: Literal["blend", "spoken", "written"] = "blend",
+    spoken_weight: float = 0.7,
+    freq_report: bool = False,
 ):
     """Fix Cantonese deck: convert to traditional, fix jyutping, rank, and reorder.
-
     Converts simplified to traditional Chinese, generates accurate jyutping,
-    ranks by frequency and complexity, and reorders the deck optimally.
+    ranks by the blended spoken and written frequency and complexity, then
+    reorders the deck. Writes the ranking CSV next to the input.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: input_reordered.apkg).
     :param model_id: Filter by specific model ID.
     :param keep_filtered: If True, keep filtered cards (names, invalid).
+    :param freq: Frequency term: blend, spoken, or written.
+    :param spoken_weight: Weight of the spoken term in the blend (0 to 1).
+    :param freq_report: Write the sentences that the frequency change moves.
     """
     apkg_path = Path(apkg_path)
     if not apkg_path.exists():
@@ -822,7 +832,23 @@ def yue(
         print("No sentences found!")
         return
 
-    ranked = rank_sentences_yue(sentences)
+    ranked = rank_sentences_yue(
+        sentences, freq=freq, spoken_weight=spoken_weight
+    )
+    if freq_report and freq != "written":
+        comparison = rank_sentences_yue(
+            [
+                Sentence(note_id=s.note_id, text=s.text, original_order=s.original_order)
+                for s in sentences
+            ],
+            freq="written",
+        )
+        rows = rank_change_rows(comparison, ranked)
+        change_csv = apkg_path.parent / f"{apkg_path.stem}.freq_change.csv"
+        write_freq_change_csv(rows, change_csv)
+        print(
+            f"  {len(rows)} sentences move by more than 100 places: {change_csv}"
+        )
     write_ranking_csv(ranked, str(ranking_csv))
 
     print(f"\nStep 2: Reordering deck...")

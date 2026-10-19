@@ -5,15 +5,18 @@ from pathlib import Path
 import jieba
 import pytest
 
+from anki_tools.rank import Sentence
 from anki_tools.yue_frequency import (
     CifuEntry,
     build_yue_frequency,
     build_yue_tokenizer,
     check_frequency,
     han_tokens,
+    rank_change_rows,
     read_cifu,
     read_overrides,
     read_variants,
+    write_freq_change_csv,
     write_frequency_tsv,
 )
 
@@ -155,3 +158,25 @@ class TestTokenizer:
             entries, extra_words={"你好": "多謝"}, dict_path=tmp_path / "dict.txt"
         )
         assert han_tokens(tokenizer, "你好") == ["你好"]
+
+
+class TestRankChangeReport:
+    def test_reports_rows_past_the_threshold_sorted_by_move(self, tmp_path: Path) -> None:
+        before = [
+            Sentence(note_id=n, text=f"s{n}", original_order=n) for n in (1, 2, 3)
+        ]
+        after = [before[2], before[0], before[1]]
+        rows = rank_change_rows(before, after, threshold=0)
+        assert [row["sentence"] for row in rows] == ["s3", "s1", "s2"]
+        assert rows[0]["move"] == 2
+        assert rows[1]["move"] == -1
+        assert rows[2]["move"] == -1
+        assert rank_change_rows(before, after, threshold=2) == []
+
+    def test_writes_a_header_and_one_row_per_change(self, tmp_path: Path) -> None:
+        rows = [{"sentence": "我明。", "rank_before": 5, "rank_after": 986, "move": -981}]
+        out = tmp_path / "change.csv"
+        write_freq_change_csv(rows, out)
+        lines = out.read_text(encoding="utf-8").splitlines()
+        assert lines[0] == "sentence,rank_before,rank_after,move"
+        assert lines[1] == "我明。,5,986,-981"
