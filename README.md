@@ -354,6 +354,61 @@ so the public pack is TTS only.
 Licenses: word data CC BY-SA 4.0, Tatoeba sentence text CC BY 2.0 FR, spaCy
 model MIT, and synthesized audio named by its engine and voice.
 
+### Cantonese Swadesh Sentences
+
+Build a listening-comprehension deck for Cantonese. The deck pairs 207 Swadesh
+concepts with 333 Tatoeba sentences. Each card holds one sentence with the
+matched token in bold, the jyutping reading, the English translation, the
+target word with its reading, and two MP3 files.
+
+```bash
+uv run anki swadesh fetch --lang yue --lang eng              # cache the Tatoeba data
+uv run anki swadesh sentences cantonese --per-word 2 --max-cards 450
+uv run anki swadesh audio cantonese --native-audio auto      # make the audio
+uv run anki swadesh pack cantonese                           # write the APKG
+uv run anki swadesh audit cantonese                          # gates G1 to G19
+```
+
+The commands write these files:
+
+| Path                                              | Content                            |
+| ------------------------------------------------- | ---------------------------------- |
+| `vocab/english-cantonese.csv`                     | reviewed word table, 207 rows      |
+| `vocab/cantonese_word_review.csv`                 | word review, 33 rows               |
+| `vocab/cantonese_sentences.csv`                   | one row per card                   |
+| `vocab/cantonese_sentences_review.csv`            | top candidates for the weak words  |
+| `audio/cantonese_sentences/index.csv`             | file index of the audio cache      |
+| `apkg/swadesh_cantonese_sentences.apkg`           | the deck                           |
+| `apkg/swadesh_cantonese_sentences.manifest.json`  | counts, coverage, and file hashes  |
+| `ATTRIBUTION.md`                                  | the `## Cantonese pack` section    |
+
+Cantonese needs three external things:
+
+1. The Cifu lexicon for the tokenizer. `uv run anki freq yue` downloads it to
+   the cache. The build does not commit it.
+2. `ffprobe` on the path. The audio step removes a file that fails the header or
+   the duration check.
+3. `gtts` for the voice `gtts:yue`. The optional `edge-tts` package adds the
+   voice `zh-HK-HiuMaanNeural` with `--tts edge --voice zh-HK-HiuMaanNeural`.
+
+The build reads `vocab/english-cantonese.csv` and
+`vocab/cantonese_word_review.csv` and never writes them. Run
+`uv run python scripts/build_cantonese_word_table.py` to rebuild them from
+`Module:Swadesh/data/yue`.
+
+The card text uses Traditional characters. The build converts a simplified
+Tatoeba row with OpenCC and keeps the raw row in `text_original`. A form
+matches only on a token boundary, so the card for 我 does not take a sentence
+that holds 我哋.
+
+Measured result on 2026-10-20: 333 cards, 178 of 207 forms (0.860), 208
+native recordings, and 125 synthesized files. These 29 forms have no selected
+sentence: 闊, 蝨, 棍, 種子, 葉, 樹皮, 脂肪, 羽毛, 腿, 膝頭, 翼, 腸, 胸, 肝,
+咬, 吐, 打獵, 分開, 𢯎, 搾, 掟, 綁, 浮, 結冰, 脹, 湖, 鹽, 鈍, 裡面.
+
+Licenses: word data CC BY-SA 4.0, Tatoeba sentence text CC BY 2.0 FR, Cifu
+data cached only, and audio named by its source, engine, and voice.
+
 ## API Reference
 
 ### AnkiPackage Class

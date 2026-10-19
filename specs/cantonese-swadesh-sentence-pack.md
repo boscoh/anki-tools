@@ -381,7 +381,10 @@ Measured on 2026-10-20 with the defaults:
 | Concepts with a card       | 178 of 207 (86.0%)    |
 | Cards with native audio    | 208                   |
 | Cards with a TTS file      | 125                   |
+| Media files                | 511                   |
+| Audio duration             | 0.4 s to 15.0 s       |
 | Jyutping on every card     | yes                   |
+| Gates G1 to G19            | all pass              |
 
 The 29 forms without a card: 闊, 蝨, 棍, 種子, 葉, 樹皮, 脂肪, 羽毛, 腿,
 膝頭, 翼, 腸, 胸, 肝, 咬, 吐, 打獵, 分開, 𢯎, 搾, 掟, 綁, 浮, 結冰, 脹, 湖,

@@ -10313,3 +10313,335 @@ license. Each number is a Tatoeba sentence id.
 Engine: gTTS. Voice: gtts:zh-CN.
 Each file is synthesized, so the engine and the voice give
 the license.
+
+## Cantonese pack
+
+Sentences come from Tatoeba (<https://tatoeba.org>) and use the CC BY 2.0 FR license.
+
+### Word data
+
+The Swadesh Cantonese list comes from <https://en.wiktionary.org/wiki/Module:Swadesh/data/yue>.
+It uses the CC BY-SA 4.0 license.
+The reviewed forms are in `vocab/english-cantonese.csv`.
+
+### Sentence text
+
+The Tatoeba Cantonese sentences below use the CC BY 2.0 FR
+license. Each number is a Tatoeba sentence id.
+
+#### Akh2403
+
+9955415
+
+#### FishlandicFishy
+
+12278312
+
+#### KerenDeng
+
+2254244
+
+#### LeeSooHa
+
+8875176, 10120920, 12580558
+
+#### Riko
+
+520150, 520157
+
+#### Vortarulo
+
+1304756
+
+#### WilliamKwok
+
+5646169, 8891963
+
+#### anaga27
+
+9983848
+
+#### cantonesespoken
+
+1493380, 1606909
+
+#### cc_neko
+
+1531721
+
+#### clowergen
+
+10645871, 10645907, 10645915, 10645918
+
+#### dngzz1
+
+1385196
+
+#### fercheung
+
+1875302, 1877383, 1889225, 1899469, 1902783, 1912445, 1974735
+
+#### iclementine
+
+6743198
+
+#### johnastsang
+
+12431370
+
+#### kaenif
+
+750852, 750927, 1692126, 1692191, 2104085, 3364352, 3364554, 3365053, 4464878, 4534109, 4544217, 4544244, 4544275, 4544289, 4544379, 4646363, 4675914, 4778574, 4778576, 4778589, 4778615, 4778621, 4778627, 4778630, 4826791, 4826843, 5221029, 5221154, 5221178, 5221194, 5221214, 5221239, 5641393, 6005111, 6005134, 6318051, 6318072, 6329743
+
+#### kaistanb
+
+4917636
+
+#### minshirui
+
+446300, 450979
+
+#### nickyeow
+
+364850, 385534, 385981, 386571, 386769, 386773, 389470, 389895, 392323, 392325, 392327, 392332, 392944, 393389, 395071, 395074, 396402, 397021, 400472, 401744, 402229, 402965, 403342, 406543, 417763, 417780, 417783, 417798, 418555, 421999, 422013, 422030, 422973, 423187, 423907, 425415, 431503, 432361, 433553, 452567, 454805, 454806, 458804, 458853, 470242, 480957, 485866, 487477, 492892, 499505, 523933, 526397, 530792, 533755, 534148, 535805, 537328, 546754, 554493, 554628, 557287, 562131, 587384, 598111, 611602, 611953, 616294, 617499, 617638, 617699, 642564, 661173, 662795, 669086, 676245, 683034, 683075, 683241, 692001, 692062, 692881, 762043, 787388, 787546, 793804, 793852, 795363, 795411, 837960, 840827, 840850, 843872, 973655, 984834, 1085588, 1097588, 1128587, 1132196, 1132200, 1248157, 1269943, 1272702, 1304766, 1321392, 1323309, 1359743, 1385410, 1393435, 1393501, 1399805, 1399834, 1404411, 1472248, 1489812, 1542003, 1553748, 1572669, 1572703, 1579574, 1579631, 1761662, 1762938, 1765985, 1780714, 2093584, 2272636, 2962024, 3465162, 3475950, 3500934, 3500935, 3500962, 3868196, 3868854, 3868859, 3869340, 5355306, 5355322, 5355335, 5359893, 5360855, 5360859, 5360864, 5360896, 5374502, 5374516, 5375397, 5375405, 5375406, 5375408, 5729988, 5729989, 5730030, 5733421, 5734131, 5734156, 5734829, 5735064, 5735067, 5735083, 5735086, 5735123, 5738661, 5738678, 5751015, 5761068, 5761082, 5761090, 5761227, 5761381, 5777471, 5777478, 5792957, 5794880, 5794926, 5795773, 5795803, 5795806, 5795830, 5797622, 5797629, 5797638, 5798935, 5803968, 5942690, 5942708, 5943379, 5949277, 5953709, 5953743, 6082104, 6103436, 6103457, 6103511, 6103531, 6107247, 6107254, 6108430, 6108466, 6108472, 6109472, 6116908, 6120123, 6120127, 6127088, 6127101, 6127103, 6127149, 6362124, 6467266, 6475116, 6480665, 6480882, 6480918, 6484988, 6539140, 6539231, 6866769, 6945977, 6961841, 6961875, 6961895, 7009344, 7045382, 7066654, 7066666, 7066668, 7832942, 7832959, 7986278, 7987787, 7987854, 7987881, 7988138, 7988280, 7988297, 7996114, 7996124, 7996126, 7996157, 7999709, 9536282, 9536316
+
+#### nihtscua
+
+382488
+
+#### richke
+
+4329760
+
+#### thesilhouette
+
+12027502, 12061657, 12069064, 12073431, 12093425, 12095744, 12100092, 12101337, 12133432, 12134267, 12135902, 12276029, 12457679
+
+#### tigro1973
+
+1068841, 1069549, 1079314
+
+#### unknown
+
+1547109, 3840346
+
+### Audio
+
+Engine: gTTS. Voice: gtts:yue.
+Each synthesized file gives its license through the engine and
+the voice. Native recordings keep their own license.
+
+### Native recordings
+
+Tatoeba recordings keep their own license.
+
+| Audio id | Author | License |
+| -------- | ------ | ------- |
+| 988868 | cantonesespoken | CC BY 4.0 |
+| 988874 | cantonesespoken | CC BY 4.0 |
+| 990489 | cantonesespoken | CC BY 4.0 |
+| 990490 | cantonesespoken | CC BY 4.0 |
+| 990503 | cantonesespoken | CC BY 4.0 |
+| 990507 | cantonesespoken | CC BY 4.0 |
+| 990508 | cantonesespoken | CC BY 4.0 |
+| 990521 | cantonesespoken | CC BY 4.0 |
+| 990532 | cantonesespoken | CC BY 4.0 |
+| 990535 | cantonesespoken | CC BY 4.0 |
+| 990537 | cantonesespoken | CC BY 4.0 |
+| 990540 | cantonesespoken | CC BY 4.0 |
+| 990542 | cantonesespoken | CC BY 4.0 |
+| 990546 | cantonesespoken | CC BY 4.0 |
+| 994349 | cantonesespoken | CC BY 4.0 |
+| 994361 | cantonesespoken | CC BY 4.0 |
+| 994376 | cantonesespoken | CC BY 4.0 |
+| 994397 | cantonesespoken | CC BY 4.0 |
+| 994398 | cantonesespoken | CC BY 4.0 |
+| 994407 | cantonesespoken | CC BY 4.0 |
+| 994408 | cantonesespoken | CC BY 4.0 |
+| 994411 | cantonesespoken | CC BY 4.0 |
+| 994415 | cantonesespoken | CC BY 4.0 |
+| 996765 | cantonesespoken | CC BY 4.0 |
+| 996773 | cantonesespoken | CC BY 4.0 |
+| 996786 | cantonesespoken | CC BY 4.0 |
+| 996790 | cantonesespoken | CC BY 4.0 |
+| 996792 | cantonesespoken | CC BY 4.0 |
+| 996793 | cantonesespoken | CC BY 4.0 |
+| 996795 | cantonesespoken | CC BY 4.0 |
+| 996799 | cantonesespoken | CC BY 4.0 |
+| 996803 | cantonesespoken | CC BY 4.0 |
+| 996821 | cantonesespoken | CC BY 4.0 |
+| 996829 | cantonesespoken | CC BY 4.0 |
+| 996850 | cantonesespoken | CC BY 4.0 |
+| 1000351 | cantonesespoken | CC BY 4.0 |
+| 1000364 | cantonesespoken | CC BY 4.0 |
+| 1000389 | cantonesespoken | CC BY 4.0 |
+| 1000393 | cantonesespoken | CC BY 4.0 |
+| 1000421 | cantonesespoken | CC BY 4.0 |
+| 1000425 | cantonesespoken | CC BY 4.0 |
+| 1000427 | cantonesespoken | CC BY 4.0 |
+| 1000429 | cantonesespoken | CC BY 4.0 |
+| 1000443 | cantonesespoken | CC BY 4.0 |
+| 1000448 | cantonesespoken | CC BY 4.0 |
+| 1000453 | cantonesespoken | CC BY 4.0 |
+| 1000459 | cantonesespoken | CC BY 4.0 |
+| 1000460 | cantonesespoken | CC BY 4.0 |
+| 1000463 | cantonesespoken | CC BY 4.0 |
+| 1000464 | cantonesespoken | CC BY 4.0 |
+| 1007621 | cantonesespoken | CC BY 4.0 |
+| 1007625 | cantonesespoken | CC BY 4.0 |
+| 1007629 | cantonesespoken | CC BY 4.0 |
+| 1007636 | cantonesespoken | CC BY 4.0 |
+| 1007637 | cantonesespoken | CC BY 4.0 |
+| 1007645 | cantonesespoken | CC BY 4.0 |
+| 1007650 | cantonesespoken | CC BY 4.0 |
+| 1007659 | cantonesespoken | CC BY 4.0 |
+| 1007678 | cantonesespoken | CC BY 4.0 |
+| 1007680 | cantonesespoken | CC BY 4.0 |
+| 1007684 | cantonesespoken | CC BY 4.0 |
+| 1007689 | cantonesespoken | CC BY 4.0 |
+| 1007715 | cantonesespoken | CC BY 4.0 |
+| 1007731 | cantonesespoken | CC BY 4.0 |
+| 1007732 | cantonesespoken | CC BY 4.0 |
+| 1025270 | cantonesespoken | CC BY 4.0 |
+| 1025278 | cantonesespoken | CC BY 4.0 |
+| 1025287 | cantonesespoken | CC BY 4.0 |
+| 1025292 | cantonesespoken | CC BY 4.0 |
+| 1025300 | cantonesespoken | CC BY 4.0 |
+| 1025332 | cantonesespoken | CC BY 4.0 |
+| 1025337 | cantonesespoken | CC BY 4.0 |
+| 1025338 | cantonesespoken | CC BY 4.0 |
+| 1025339 | cantonesespoken | CC BY 4.0 |
+| 1025351 | cantonesespoken | CC BY 4.0 |
+| 1025373 | cantonesespoken | CC BY 4.0 |
+| 1025382 | cantonesespoken | CC BY 4.0 |
+| 1025386 | cantonesespoken | CC BY 4.0 |
+| 1025389 | cantonesespoken | CC BY 4.0 |
+| 1025396 | cantonesespoken | CC BY 4.0 |
+| 1025398 | cantonesespoken | CC BY 4.0 |
+| 1025404 | cantonesespoken | CC BY 4.0 |
+| 1025411 | cantonesespoken | CC BY 4.0 |
+| 1025423 | cantonesespoken | CC BY 4.0 |
+| 1025446 | cantonesespoken | CC BY 4.0 |
+| 1025448 | cantonesespoken | CC BY 4.0 |
+| 1025449 | cantonesespoken | CC BY 4.0 |
+| 1025453 | cantonesespoken | CC BY 4.0 |
+| 1025463 | cantonesespoken | CC BY 4.0 |
+| 1025473 | cantonesespoken | CC BY 4.0 |
+| 1025474 | cantonesespoken | CC BY 4.0 |
+| 1025482 | cantonesespoken | CC BY 4.0 |
+| 1025505 | cantonesespoken | CC BY 4.0 |
+| 1025515 | cantonesespoken | CC BY 4.0 |
+| 1025527 | cantonesespoken | CC BY 4.0 |
+| 1025531 | cantonesespoken | CC BY 4.0 |
+| 1025534 | cantonesespoken | CC BY 4.0 |
+| 1025540 | cantonesespoken | CC BY 4.0 |
+| 1025548 | cantonesespoken | CC BY 4.0 |
+| 1025557 | cantonesespoken | CC BY 4.0 |
+| 1025573 | cantonesespoken | CC BY 4.0 |
+| 1025596 | cantonesespoken | CC BY 4.0 |
+| 1025609 | cantonesespoken | CC BY 4.0 |
+| 1025610 | cantonesespoken | CC BY 4.0 |
+| 1025611 | cantonesespoken | CC BY 4.0 |
+| 1025632 | cantonesespoken | CC BY 4.0 |
+| 1025648 | cantonesespoken | CC BY 4.0 |
+| 1025651 | cantonesespoken | CC BY 4.0 |
+| 1025654 | cantonesespoken | CC BY 4.0 |
+| 1025655 | cantonesespoken | CC BY 4.0 |
+| 1025658 | cantonesespoken | CC BY 4.0 |
+| 1025661 | cantonesespoken | CC BY 4.0 |
+| 1025672 | cantonesespoken | CC BY 4.0 |
+| 1025682 | cantonesespoken | CC BY 4.0 |
+| 1025690 | cantonesespoken | CC BY 4.0 |
+| 1025697 | cantonesespoken | CC BY 4.0 |
+| 1025712 | cantonesespoken | CC BY 4.0 |
+| 1025716 | cantonesespoken | CC BY 4.0 |
+| 1025724 | cantonesespoken | CC BY 4.0 |
+| 1025725 | cantonesespoken | CC BY 4.0 |
+| 1025739 | cantonesespoken | CC BY 4.0 |
+| 1025748 | cantonesespoken | CC BY 4.0 |
+| 1025752 | cantonesespoken | CC BY 4.0 |
+| 1025779 | cantonesespoken | CC BY 4.0 |
+| 1025791 | cantonesespoken | CC BY 4.0 |
+| 1025793 | cantonesespoken | CC BY 4.0 |
+| 1025795 | cantonesespoken | CC BY 4.0 |
+| 1025798 | cantonesespoken | CC BY 4.0 |
+| 1025801 | cantonesespoken | CC BY 4.0 |
+| 1025802 | cantonesespoken | CC BY 4.0 |
+| 1025827 | cantonesespoken | CC BY 4.0 |
+| 1025837 | cantonesespoken | CC BY 4.0 |
+| 1025838 | cantonesespoken | CC BY 4.0 |
+| 1025839 | cantonesespoken | CC BY 4.0 |
+| 1025840 | cantonesespoken | CC BY 4.0 |
+| 1025844 | cantonesespoken | CC BY 4.0 |
+| 1025846 | cantonesespoken | CC BY 4.0 |
+| 1036626 | cantonesespoken | CC BY 4.0 |
+| 1036630 | cantonesespoken | CC BY 4.0 |
+| 1036632 | cantonesespoken | CC BY 4.0 |
+| 1036638 | cantonesespoken | CC BY 4.0 |
+| 1036644 | cantonesespoken | CC BY 4.0 |
+| 1036663 | cantonesespoken | CC BY 4.0 |
+| 1036666 | cantonesespoken | CC BY 4.0 |
+| 1036687 | cantonesespoken | CC BY 4.0 |
+| 1036714 | cantonesespoken | CC BY 4.0 |
+| 1036722 | cantonesespoken | CC BY 4.0 |
+| 1036730 | cantonesespoken | CC BY 4.0 |
+| 1036732 | cantonesespoken | CC BY 4.0 |
+| 1036733 | cantonesespoken | CC BY 4.0 |
+| 1036763 | cantonesespoken | CC BY 4.0 |
+| 1036768 | cantonesespoken | CC BY 4.0 |
+| 1036795 | cantonesespoken | CC BY 4.0 |
+| 1036814 | cantonesespoken | CC BY 4.0 |
+| 1036836 | cantonesespoken | CC BY 4.0 |
+| 1036843 | cantonesespoken | CC BY 4.0 |
+| 1036851 | cantonesespoken | CC BY 4.0 |
+| 1036857 | cantonesespoken | CC BY 4.0 |
+| 1036862 | cantonesespoken | CC BY 4.0 |
+| 1036863 | cantonesespoken | CC BY 4.0 |
+| 1036873 | cantonesespoken | CC BY 4.0 |
+| 1036881 | cantonesespoken | CC BY 4.0 |
+| 1036882 | cantonesespoken | CC BY 4.0 |
+| 1036891 | cantonesespoken | CC BY 4.0 |
+| 1036903 | cantonesespoken | CC BY 4.0 |
+| 1036911 | cantonesespoken | CC BY 4.0 |
+| 1036918 | cantonesespoken | CC BY 4.0 |
+| 1036927 | cantonesespoken | CC BY 4.0 |
+| 1036933 | cantonesespoken | CC BY 4.0 |
+| 1036939 | cantonesespoken | CC BY 4.0 |
+| 1036942 | cantonesespoken | CC BY 4.0 |
+| 1036952 | cantonesespoken | CC BY 4.0 |
+| 1036955 | cantonesespoken | CC BY 4.0 |
+| 1036998 | cantonesespoken | CC BY 4.0 |
+| 1037004 | cantonesespoken | CC BY 4.0 |
+| 1038686 | cantonesespoken | CC BY 4.0 |
+| 1038696 | cantonesespoken | CC BY 4.0 |
+| 1038708 | cantonesespoken | CC BY 4.0 |
+| 1038713 | cantonesespoken | CC BY 4.0 |
+| 1038718 | cantonesespoken | CC BY 4.0 |
+| 1038720 | cantonesespoken | CC BY 4.0 |
+| 1038721 | cantonesespoken | CC BY 4.0 |
+| 1038726 | cantonesespoken | CC BY 4.0 |
+| 1038737 | cantonesespoken | CC BY 4.0 |
+| 1038748 | cantonesespoken | CC BY 4.0 |
+| 1038756 | cantonesespoken | CC BY 4.0 |
+| 1038764 | cantonesespoken | CC BY 4.0 |
+| 1038768 | cantonesespoken | CC BY 4.0 |
+| 1038769 | cantonesespoken | CC BY 4.0 |
+| 1038775 | cantonesespoken | CC BY 4.0 |
+| 1038780 | cantonesespoken | CC BY 4.0 |
+| 1038782 | cantonesespoken | CC BY 4.0 |
+| 1038794 | cantonesespoken | CC BY 4.0 |
+| 1038799 | cantonesespoken | CC BY 4.0 |
+| 1038803 | cantonesespoken | CC BY 4.0 |
+| 1038834 | cantonesespoken | CC BY 4.0 |
+| 1038836 | cantonesespoken | CC BY 4.0 |
+| 1038841 | cantonesespoken | CC BY 4.0 |
+| 1038844 | cantonesespoken | CC BY 4.0 |
+| 1038853 | cantonesespoken | CC BY 4.0 |
+| 1038861 | cantonesespoken | CC BY 4.0 |
+| 1038862 | cantonesespoken | CC BY 4.0 |
+| 1042275 | cantonesespoken | CC BY 4.0 |
+| 1042310 | cantonesespoken | CC BY 4.0 |
+| 1042323 | cantonesespoken | CC BY 4.0 |
+| 1042331 | cantonesespoken | CC BY 4.0 |
+| 1042337 | cantonesespoken | CC BY 4.0 |
+| 1042343 | cantonesespoken | CC BY 4.0 |
