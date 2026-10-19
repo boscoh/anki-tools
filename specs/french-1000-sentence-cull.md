@@ -1,0 +1,597 @@
+# Spec: French 1000-Card Cull from the Audio Deck
+
+| Field   | Value                                                          |
+| ------- | -------------------------------------------------------------- |
+| Status  | proposed                                                       |
+| Date    | 2026-10-20                                                     |
+| Owner   | anki-tools                                                     |
+| Input   | `apkg/6000_French_Sentences_w_Audio.apkg`                      |
+| Related | `specs/yue-sentence-selection.md` (selection shape)            |
+| Related | `specs/french-swadesh-sentence-pack.md` (French tokenizer)     |
+| Issues  | epic `anki-ckn`; milestones D1 to D5 (section 13)              |
+
+## 1. Summary
+
+`apkg/6000_French_Sentences_w_Audio.apkg` holds 5,928 sentences with one audio
+file each. This spec culls the deck to 1,000 cards. The kept cards give a wide
+and diverse vocabulary, weighted to the most frequent spoken French words. No
+non-exempt word appears in more than 4 cards.
+
+The current order gives 1,272 distinct content words in 1,000 cards. The
+selection of this spec gives 2,004, and it covers 299 of the 300 target words.
+The count of the most-used non-exempt word falls from 131 cards to 4.
+
+### 1.1 Result at a glance
+
+| Measure                    | Current order | This spec |
+| -------------------------- | ------------- | --------- |
+| Cards                      | 1,000         | 1,000     |
+| Distinct content words     | 1,272         | 2,004     |
+| Top 300 words covered      | 282           | 299       |
+| Top 300 words with 2 cards | 256           | 289       |
+| Most cards of one non-exempt word | 131    | 4         |
+| Most cards of one exempt word     | 105    | 190       |
+| `spoken_mass`              | 0.473         | 0.540     |
+
+`spoken_mass` is the share of the Tatoeba French tokens that the kept words
+cover (section 3.2). Use it to compare methods. Do not use it as a claim about
+real speech.
+
+### 1.2 Key decisions
+
+| Decision             | Choice                                                       | Evidence |
+| -------------------- | ------------------------------------------------------------ | -------- |
+| Frequency source     | A blend of `wordfreq` fr and Tatoeba fr counts at 0.5        | 4        |
+| Tokenizer            | spaCy `fr_core_news_sm` lemma and part of speech             | 5        |
+| Target words         | 300 content lemmas, the option range is 200 to 500           | 5, 9     |
+| Selection            | Greedy cover, weight `1/log2(rank+1)`                        | 8, 9     |
+| Cards per word       | At most 4, with the top 100 words exempt                     | 8.4, 9.3 |
+| Similarity           | Lemma Jaccard at 0.67 or more is a duplicate                 | 8.5      |
+| Audio                | Reuse the input MP3 files, no new TTS                        | 10       |
+| Compatibility        | The output keeps the input model, fields, and deck order option | 10    |
+
+## 2. Input analysis
+
+The input deck is a Tatoeba French sentence list with synthesized audio. The
+numbers come from a read of the APKG on 2026-10-20.
+
+| Measure                          | Value          |
+| -------------------------------- | -------------- |
+| Cards and notes                  | 5,928          |
+| Note model                       | `French Sentences` |
+| Fields                           | `French`, `sound`, `Back`, `freq ranks` |
+| Media files                      | 5,928          |
+| Cards with a sound file          | 5,928          |
+| Cards with an English `Back`     | 5,928          |
+| Mean words per sentence          | 8.86           |
+| Sentences with 3 to 12 words     | 5,766 (97.3%)  |
+| Exact duplicate texts            | 0              |
+
+Length of the input sentences:
+
+| Words   | Sentences |
+| ------- | --------- |
+| 4       | 3         |
+| 5       | 25        |
+| 6       | 218       |
+| 7       | 878       |
+| 8       | 1,400     |
+| 9       | 1,387     |
+| 10      | 969       |
+| 11      | 601       |
+| 12      | 285       |
+| 13      | 120       |
+| 14      | 36        |
+| 15      | 5         |
+| 16      | 1         |
+
+The `freq ranks` field holds about 9 numbers per sentence, with a maximum of
+5,999. The source of the list is not known. The selection ignores the field and
+computes its own frequency list (open question 5).
+
+The input audio is TTS. The card text, the audio, and the English translation
+come from Tatoeba and the deck author. Check the license before a public
+release (open question 6).
+
+## 3. Goals and scope
+
+### 3.1 Goals
+
+1. Keep 1,000 cards from the 5,928.
+2. Cover 200 to 500 of the most frequent spoken French words. The default is
+   300.
+3. Keep the most cards that the input allows. The current order gives 1,272
+   content words. Aim for 1,900 or more.
+4. Do not use one non-exempt word in more than 4 cards.
+5. Keep each sentence short, complete, and unlike the other kept sentences.
+6. Reuse the input audio and the input note model.
+
+### 3.2 Measures
+
+| Measure             | Meaning                                                                |
+| ------------------- | ---------------------------------------------------------------------- |
+| `cards`             | Sentences kept                                                         |
+| `content`           | Distinct content lemmas in the kept cards                              |
+| `top200`, `top300`, `top500` | Target words that a kept card contains                       |
+| `covered2`          | Target words that at least two kept cards contain                      |
+| `max_uses`          | The most kept cards that hold one non-exempt content lemma             |
+| `max_exempt`        | The same value for an exempt word                                      |
+| `spoken_mass`       | Share of the Tatoeba French content tokens that the kept lemmas cover  |
+
+### 3.3 In scope
+
+- One cull command for a French sentence deck with audio.
+- A frequency list from public corpora, cached locally.
+- A filter, a selection, an APKG writer, a report, and gates.
+- Options for the card count, the target count, the word cap, and the order.
+
+### 3.4 Out of scope
+
+- New audio or TTS.
+- New card templates or a new note model.
+- Changes to the French Swadesh pack.
+- A general cull command for other languages (a later spec).
+
+## 4. Frequency analysis
+
+`wordfreq` has a French list but no separate spoken list. Tatoeba French is a
+large set of short everyday sentences. The spec blends the two terms:
+
+```text
+tatoeba_pm = Tatoeba lemma count / Tatoeba content tokens * 1e6
+written_pm = 10 ** (wordfreq Zipf value - 3)
+blend_pm   = w * tatoeba_pm + (1 - w) * written_pm   if count >= 5
+blend_pm   = written_pm                              otherwise
+```
+
+- `w` is `--spoken-weight`, default 0.5.
+- `--spoken-weight 0` gives the `wordfreq` list alone.
+- `--spoken-weight 1` gives the Tatoeba list alone.
+
+The Tatoeba input is `data/tatoeba/fra_sentences.tsv`: 728,898 sentences. The
+lemma counts need one spaCy pass over the file. Cache the result in
+`data/french_frequency.tsv`.
+
+### 4.1 Effect of the blend
+
+The blend changes the target list. The overlap of the top 500 content lemmas
+against the `wordfreq` list:
+
+| `--spoken-weight` | Overlap with `wordfreq` top 500 |
+| ----------------- | ------------------------------- |
+| 0.3               | 0.840                           |
+| 0.5               | 0.740                           |
+| 0.7               | 0.672                           |
+
+Words that enter the top 500 at weight 0.5 and not at 0 (a sample): vouloir,
+taire, aimer, falloir, connaître, appeler, chien, commencer, oublier, écrire,
+sentir, bel, tomber, boire, sembler, dormir, rencontrer, mourir, chat.
+
+The everyday words rise. A pure `wordfreq` list gives a target list with fewer
+conversation words and more written words.
+
+### 4.2 Top of the list
+
+The first 20 content lemmas at weight 0.5:
+
+| Rank | Lemma     | Deck count | Tatoeba count |
+| ---- | --------- | ---------- | ------------- |
+| 1    | pas       | 754        | 105,320       |
+| 2    | ne        | 661        | 79,139        |
+| 3    | faire     | 336        | 43,078        |
+| 4    | plus      | 316        | 23,591        |
+| 5    | tout      | 274        | 33,315        |
+| 6    | pouvoir   | 272        | 32,793        |
+| 7    | aller     | 248        | 29,543        |
+| 8    | dire      | 136        | 21,362        |
+| 9    | bien      | 89         | 11,612        |
+| 10   | vouloir   | 196        | 22,146        |
+| 11   | voir      | 141        | 14,646        |
+| 12   | devoir    | 246        | 18,499        |
+| 13   | même      | 59         | 7,296         |
+| 14   | très      | 96         | 10,938        |
+| 15   | fait      | 27         | 3,496         |
+| 16   | savoir    | 77         | 15,770        |
+| 17   | taire     | 71         | 15,504        |
+| 18   | temps     | 113        | 9,374         |
+| 19   | aimer     | 138        | 13,956        |
+| 20   | bon       | 102        | 9,301         |
+
+`pas` and `ne` are negation markers. They are in the top 100 and exempt from
+the card cap. `taire` is a lemmatizer result of `tais-toi` and similar forms.
+It stays because the word is common in the deck.
+
+## 5. Target words
+
+A target is a content lemma that appears in the deck:
+
+| Rule                        | Value                                             |
+| --------------------------- | ------------------------------------------------- |
+| Part of speech              | `NOUN`, `VERB`, `ADJ`, or `ADV`                   |
+| Minimum deck count          | 3                                                 |
+| Minimum content share       | 0.5 of all occurrences of the lemma               |
+| Minimum length              | 2 characters                                      |
+| Name list                   | `vocab/french_names.txt`, one name per line       |
+
+The content-share rule removes function words that a tagger sometimes marks as
+content: être, avoir, un, une, que, est, tu, lui, son, si, te, ça, ton, où,
+cet, ta. The name list removes marie, mary, tom, jean, and similar lemmas.
+
+The filters leave 1,688 content lemmas. The target list is the first
+`--target-words` of them in the blend order. The default is 300, and the
+accepted range is 200 to 500.
+
+The target count sets the coverage goal and the reports. It does not limit the
+selection. The gain uses every ranked content lemma, so the 1,000 cards cover
+more than the target list (section 9.4).
+
+## 6. Pipeline
+
+| Stage | Name       | Input                        | Output                              |
+| ----- | ---------- | ---------------------------- | ----------------------------------- |
+| C0    | Extract    | input APKG                   | notes, sentences, audio, English    |
+| C1    | Frequency  | Tatoeba fr, `wordfreq`       | `data/french_frequency.tsv`         |
+| C2    | Tokenize   | C0, spaCy                    | lemmas and parts of speech per card |
+| C3    | Filter     | C2                           | passed and rejected cards, reasons  |
+| C4    | Select     | C1, C2, C3                   | kept cards in learning order        |
+| C5    | Write      | C0, C4                       | `.apkg`, `.cull.csv`, `.coverage.csv`, manifest |
+
+`anki cull fr` runs C0 to C5. A second run with the same input gives the same
+output. The audio cache is read only.
+
+## 7. Filter
+
+Apply the rules in order. Store the first failed rule as the `reason`.
+
+| Rule | Condition                                                              | Rejected |
+| ---- | ---------------------------------------------------------------------- | -------- |
+| F1   | An English `Back` exists with 2 to 12 words                            | 95       |
+| F2   | 3 to 12 words                                                          | 162      |
+| F3   | No digit, bracket, URL, or ellipsis                                    | 2        |
+| F4   | One final mark: `.`, `?`, or `!` at the end                            | 0        |
+| F5   | Exactly one final mark                                                 | 25       |
+| F6   | No quotation mark and no dialogue dash                                 | 0        |
+| F7   | At most one internal comma, colon, or semicolon                        | 54       |
+| F8   | No proper name (a `PROPN` token)                                       | 632      |
+| F9   | The sentence text is unique                                            | 0        |
+
+Result: 4,958 of 5,928 cards pass (83.6%).
+
+- F8 removes the most cards. A name is noise in a vocabulary deck.
+- F9 removes no card. The input has no exact duplicate.
+- An optional unknown-word budget is not in the default set. A budget of 3
+  content lemmas outside the top 3,000 removes 2 cards and changes no measured
+  value.
+
+## 8. Selection
+
+### 8.1 Candidate set
+
+Each passed card has a set of content lemmas. The selector walks the candidates
+and keeps the best gain. A card can hold a capped word if it adds another
+uncapped word. This rule keeps the pool large.
+
+### 8.2 Gain
+
+```text
+gain(card) = sum over content lemmas w in card of
+             0.1 * weight(w)                         if w is exempt
+             weight(w) / (uses[w] + 1)               if w is not exempt and uses[w] < cap
+             0                                       otherwise
+weight(w)  = 1 / log2(rank(w) + 1)
+```
+
+An unranked lemma gets the weight of rank 100,000. A tie breaks on fewer
+words, then the input order.
+
+### 8.3 Stop rule
+
+Stop when the card count reaches `--max-cards`, or when every candidate has a
+gain of 0. With the defaults, the selection reaches 1,000 cards.
+
+### 8.4 Word cap
+
+| Setting          | Value                                                   |
+| ---------------- | ------------------------------------------------------- |
+| `--max-uses`     | 4                                                       |
+| `--exempt-top`   | 100 content lemmas by rank                              |
+| Exempt meaning   | A word that can appear in more than 4 cards             |
+| Cap meaning      | A non-exempt word appears in at most 4 kept cards       |
+
+A sentence that holds a non-exempt word at its cap is skipped. The top 100
+words are normal speech and are exempt, as in `fix yue`. The input cannot
+reach 1,000 cards with no exemption (section 9.3).
+
+### 8.5 Similarity
+
+Two sentences are duplicates when the Jaccard value of their content-lemma sets
+is 0.67 or more. Use the lemma sets as buckets, so a new card compares only
+with kept cards that share a lemma. Reuse `word_similarity_fr` where it fits.
+
+### 8.6 Order
+
+`--order coverage` is the default. Sort the kept cards by these keys:
+
+1. `hardest_rank`: the rank of the least frequent content lemma. Ascending.
+   An unranked lemma counts as rank 1,000,000.
+2. Word count. Ascending.
+3. Input order. Ascending.
+
+`--order input` keeps the input card order.
+
+## 9. Expected results
+
+All numbers come from a prototype of sections 4 to 8 on 2026-10-20. The input
+is the 5,928-card deck. The defaults are: 1,000 cards, 300 targets, cap 4,
+exempt top 100, spoken weight 0.5, 3 to 12 words.
+
+### 9.1 This spec against the current order
+
+| Measure                    | Current order | This spec |
+| -------------------------- | ------------- | --------- |
+| Cards                      | 1,000         | 1,000     |
+| Distinct content words     | 1,272         | 2,004     |
+| Top 200 covered            | 195           | 199       |
+| Top 300 covered            | 282           | 299       |
+| Top 500 covered            | 444           | 498       |
+| Top 300 with 2 cards       | 256           | 289       |
+| Most cards of one non-exempt word | 131    | 4         |
+| Most cards of one exempt word     | 105    | 190       |
+| `spoken_mass`              | 0.473         | 0.540     |
+
+The current order is the order of `6000_French_Sentences_w_Audio.rank.csv`,
+after the filters. The two sets share 133 cards.
+
+The most-used words in the current order: avoir 131, pas 105, ne 85, faire 53,
+plus 50, devoir 50, tout 39, pouvoir 35, vouloir 33, aller 30.
+
+The most-used words in this spec: pas 190, ne 181, pouvoir 70, faire 69, plus
+61, devoir 52, tout 46, vouloir 36, aller 32.
+
+### 9.2 Cap sweep
+
+Target 300, all other defaults.
+
+| `--max-uses` | Content | Covered | Covered 2+ | `spoken_mass` |
+| ------------ | ------- | ------- | ---------- | ------------- |
+| 2            | 1,759   | 300     | 282        | 0.517         |
+| 3            | 1,951   | 298     | 285        | 0.535         |
+| 4            | 2,004   | 299     | 289        | 0.540         |
+| 5            | 2,020   | 299     | 290        | 0.542         |
+| 6            | 2,028   | 299     | 290        | 0.542         |
+| 8            | 2,044   | 299     | 291        | 0.543         |
+
+The cap costs little after 4. A cap of 4 keeps the strict rule with a content
+loss of 40 words against a cap of 8. A cap of 2 loses 245 words.
+
+### 9.3 Exemption sweep
+
+Target 300, cap 4.
+
+| `--exempt-top` | Cards | Content | Covered | Covered 2+ |
+| -------------- | ----- | ------- | ------- | ---------- |
+| 0              | 675   | 1,490   | 295     | 271        |
+| 20             | 995   | 1,804   | 298     | 289        |
+| 30             | 1,000 | 1,868   | 300     | 291        |
+| 50             | 1,000 | 1,911   | 300     | 290        |
+| 100            | 1,000 | 2,004   | 299     | 289        |
+
+A hard cap on every word cannot reach 1,000 cards. The exempt set is necessary.
+The default of 100 follows `fix yue`.
+
+### 9.4 Target sweep
+
+Cap 4, all other defaults.
+
+| `--target-words` | Covered | Covered 2+ | Content |
+| ---------------- | ------- | ---------- | ------- |
+| 200              | 199     | 195        | 2,004   |
+| 300              | 299     | 289        | 2,004   |
+| 500              | 498     | 463        | 2,004   |
+| 800              | 791     | 661        | 2,004   |
+
+The selected set does not change, because the gain uses every ranked lemma.
+The target count changes the coverage claim, not the cards.
+
+### 9.5 Frequency weight sweep
+
+Target 300, cap 4.
+
+| `--spoken-weight` | Content | Covered | Covered 2+ | `spoken_mass` |
+| ----------------- | ------- | ------- | ---------- | ------------- |
+| 0.0               | 1,903   | 296     | 262        | 0.532         |
+| 0.3               | 1,995   | 297     | 283        | 0.538         |
+| 0.5               | 2,004   | 299     | 289        | 0.540         |
+| 0.7               | 2,008   | 299     | 291        | 0.541         |
+
+The written-only list covers fewer targets in the same 1,000 cards. Weight 0.5
+is the default. Weight 0.7 is a small gain; it is an option.
+
+### 9.6 Words without a full card set
+
+One target word has no card: `alors`. It is a target at rank 56 and it has 24
+deck occurrences, so a later run can reach it. It is the only gap of the 300.
+
+Ten targets have one card: été, déjà, français, ami, nouvelle, occuper,
+ensemble, enfin, effet, trouve. A second card is a target for a later
+parameter change, not a gate failure.
+
+## 10. Interface
+
+### 10.1 Command
+
+```bash
+uv run anki cull fr "apkg/6000_French_Sentences_w_Audio.apkg" \
+    --max-cards 1000 \
+    --target-words 300 \
+    --max-uses 4 \
+    --exempt-top 100 \
+    --spoken-weight 0.5 \
+    --output apkg/french_1000_sentences.apkg
+```
+
+### 10.2 Options
+
+| Option              | Default | Meaning                                                   |
+| ------------------- | ------- | --------------------------------------------------------- |
+| `--max-cards`       | 1000    | Card cap                                                  |
+| `--target-words`    | 300     | Target count, 200 to 500                                  |
+| `--max-uses`        | 4       | Most cards for one non-exempt word                        |
+| `--exempt-top`      | 100     | Content lemmas exempt from the cap                        |
+| `--spoken-weight`   | 0.5     | `w` in the blend                                          |
+| `--min-words`       | 3       | Minimum word count of a card                              |
+| `--max-words`       | 12      | Maximum word count of a card                              |
+| `--similarity`      | 0.67    | Lemma Jaccard limit                                       |
+| `--order`           | coverage | `coverage` or `input`                                     |
+| `--name`            | French 1000 Core Sentences | Output deck name                         |
+| `--output`          | from the input name | Output APKG                                  |
+
+### 10.3 Output files
+
+| File                                 | Content                                                    |
+| ------------------------------------ | ---------------------------------------------------------- |
+| `apkg/french_1000_sentences.apkg`    | The culled deck with the input model, fields, and audio    |
+| `apkg/french_1000_sentences.cull.csv`     | One row per input card: `kept`, `reason`, `targets`, `gain` |
+| `apkg/french_1000_sentences.coverage.csv` | One row per target: `word`, `rank`, `count`, `status`       |
+| `apkg/french_1000_sentences.manifest.json` | Counts, parameters, frequency source, and hashes        |
+
+The `.cull.csv` has these columns: `sentence`, `english`, `audio`, `kept`,
+`reason`, `targets`, `gain`, `hardest_rank`.
+
+The `.coverage.csv` has these columns: `word`, `rank`, `count`, `status`. The
+`status` is `covered`, `partial` (one card), or `absent`.
+
+### 10.4 Code changes
+
+- Add `anki_tools/cull_fr.py` with the stages C1 to C5.
+- Add `anki cull fr` to `cli.py`.
+- Reuse `AnkiPackage` for the input and the output.
+- Reuse the French spaCy model and `TOKENIZER` from the French pack.
+- Do not change `fix fr`.
+
+## 11. Quality gates and tests
+
+### 11.1 Gates
+
+`anki cull fr --check` runs the gates on the output. A failure stops the
+command with a non-zero exit code.
+
+| Gate | Check                                                                  |
+| ---- | ---------------------------------------------------------------------- |
+| G1   | The card count is `--max-cards` or the pool has no more cards           |
+| G2   | No non-exempt content lemma is in more than `--max-uses` kept cards     |
+| G3   | Target coverage is at least 0.98 of `--target-words` (measured 0.997)   |
+| G4   | At least 0.95 of the targets have 2 cards (measured 0.963)              |
+| G5   | Every kept card passes the filter rules                                 |
+| G6   | No kept card pair reaches the lemma Jaccard limit                       |
+| G7   | Every kept card has its input audio file, and the file is a valid MP3   |
+| G8   | The APKG note count equals the cull CSV `kept` count and the manifest   |
+| G9   | The APKG holds exactly the media files of the kept cards                |
+| G10  | The output deck name and the note model are the requested values        |
+| G11  | A second run gives the same kept set and the same order                 |
+| G12  | The coverage CSV has one row per target word                            |
+| G13  | The manifest hashes match the cull CSV and the coverage CSV             |
+
+### 11.2 Tests
+
+Add `tests/test_french_cull.py`. Use small fixture APKG and TSV files. Do not
+download a file and do not run a full Tatoeba pass.
+
+| Area           | Test                                                                 |
+| -------------- | -------------------------------------------------------------------- |
+| Frequency      | A count below 5 uses the written term; the weight changes the order    |
+| Lemma filter   | A function word with a low content share is not a target               |
+| Name filter    | A name in the list is not a target                                     |
+| Filter rules   | One failing card for each rule F1 to F9                               |
+| Gain           | A rare word wins over a repeated word                                  |
+| Cap            | A non-exempt word stops at 4 cards; an exempt word does not            |
+| Cap skip       | A card with a capped word can stay when it adds an uncapped word       |
+| Similarity     | Two cards with a lemma Jaccard of 0.67 are duplicates                 |
+| Order          | `hardest_rank` does not decrease                                      |
+| Determinism    | Two runs give the same card set and order                              |
+| APKG           | The output holds the kept notes and only their media files             |
+
+## 12. Risks and open questions
+
+### 12.1 Risks
+
+| Risk                                                       | Effect                            | Mitigation                                            |
+| ---------------------------------------------------------- | --------------------------------- | ----------------------------------------------------- |
+| Tatoeba is not a speech corpus                             | The target list is not truly spoken | Blend at 0.5; `--spoken-weight`; open question 1      |
+| `wordfreq` mixes written and subtitle data                 | Written words rise                | The Tatoeba term; the blend                           |
+| Lemmatizer artifacts (`as`, `taire`, `fait`)               | A target is a verb form, not a lemma | Keep the word; review the target list; open question 2 |
+| The exempt top 100 puts negation markers in 19% of the cards | The cards look alike            | `--exempt-top`; open question 3                       |
+| The F8 name filter removes 632 cards                       | Fewer candidates                  | 4,958 cards remain                                    |
+| The target count does not control the selection            | The covered set exceeds the goal  | The coverage reports; section 9.4                     |
+| The input audio license is not in the APKG                 | A public release is blocked       | Check the source before release; open question 6      |
+| The input `freq ranks` source is unknown                   | A missed cross-check              | Ignore the field; open question 5                     |
+
+### 12.2 Open questions
+
+| #   | Question                                                             | Decide at |
+| --- | -------------------------------------------------------------------- | --------- |
+| 1   | Is SUBTLEX-FR a usable spoken list, and is its license public?        | D2        |
+| 2   | Should the target list use a manual review file for lemmatizer noise? | D3        |
+| 3   | Is the exempt top 30 better than 100 for the card variety?            | D4        |
+| 4   | Should the output add a `Target` field and bold the target?           | D4        |
+| 5   | What is the source of the input `freq ranks` field?                   | D2        |
+| 6   | What is the license of the input audio and sentence text?             | D5        |
+
+## 13. Milestones
+
+| Milestone | Issue      | Task                                                  | Output                                   |
+| --------- | ---------- | ----------------------------------------------------- | ---------------------------------------- |
+| D1        | `anki-3jm` | This spec and the analysis                            | `specs/french-1000-sentence-cull.md`     |
+| D2        | `anki-mvo` | APKG extract, frequency list, Tatoeba cache            | `data/french_frequency.tsv`              |
+| D3        | `anki-3ux` | Filter, gain, cap, similarity, order                  | kept card list                           |
+| D4        | `anki-mq7` | APKG writer, cull CSV, coverage CSV, manifest, gates  | `apkg/french_1000_sentences.apkg`        |
+| D5        | `anki-7n2` | Tests, README, license check                          | release check                            |
+
+## 14. Appendix: evidence
+
+### 14.1 Filter counts
+
+| Rule | Result                          | Cards |
+| ---- | ------------------------------- | ----- |
+| F1   | English words outside 2 to 12   | 95    |
+| F2   | Word count outside 3 to 12      | 162   |
+| F3   | Digit                           | 2     |
+| F5   | More than one final mark        | 25    |
+| F7   | More than one internal mark     | 54    |
+| F8   | Proper name                     | 632   |
+| -    | Pass                            | 4,958 |
+
+F4, F6, and F9 remove no card. An optional unknown-word budget removes 2 cards
+and is not in the default set.
+
+### 14.2 First cards of the default run
+
+| # | Sentence                                                        | English                          |
+| - | --------------------------------------------------------------- | -------------------------------- |
+| 1 | Cette coupe de cheveux devint rapidement populaire auprès des jeunes. | The hairstyle soon became popular among young people. |
+| 2 | Avec notre programme de leçons, tu peux apprendre à ton propre rythme. | With our lesson plan you can learn at your own pace. |
+| 3 | Père s'est soudainement senti malade et nous avons appelé un docteur. | Father suddenly got sick and we sent for a doctor. |
+| 4 | La saison des pluies commence vers la fin du mois de juin.        | The rainy season begins towards the end of June. |
+| 5 | Si tu comptes réaliser ton rêve, tu dois travailler davantage.    | If you are to realize your dream, you must work harder. |
+| 6 | Je doute qu'il soit assez qualifié pour gérer une telle équipe!   | I doubt he is qualified enough to manage such a team! |
+| 7 | Il ouvrit la fenêtre pour laisser entrer de l'air frais.          | He opened the window to let in some fresh air. |
+| 8 | Le jeu auquel il joue n'a pas d'importance, il gagne toujours.    | It doesn't matter what game he plays, he always wins. |
+| 9 | Prenons un déjeuner rapide au petit café près du parc !           | Let's grab a quick lunch at that small coffeeshop near the park. |
+| 10 | Le bonheur au sein du mariage est entièrement une affaire de chance. | Happiness in marriage is entirely a matter of chance. |
+
+The analysis order is the gain order. The deck uses the `--order coverage`
+sort of section 8.6.
+
+### 14.3 How the numbers were made
+
+The prototype is not in the repository. It used:
+
+- The APKG of 2026-10-20, `apkg/6000_French_Sentences_w_Audio.apkg`.
+- spaCy `fr_core_news_sm` with the parser and the named-entity model disabled.
+- The Tatoeba `fra_sentences.tsv` of 2026-10-20, 728,898 sentences.
+- `wordfreq` 3.x, French list.
+- The blend of section 4, the filter of section 7, and the selection of
+  section 8.
+- The name stoplist of section 5.
+
+A count can differ by one from a later table because of a tie in the sort.
