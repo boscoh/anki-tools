@@ -426,7 +426,7 @@ Open questions:
 | C1        | `anki-55q` | Word table, review file, sew fix                  | `vocab/cantonese_word_review.csv`; G1, G15 |
 | C2        | `anki-gkd` | Language profile, tokenizer, jyutping, filters     | profile and hooks                          |
 | C3        | `anki-4ng` | Sentence pool and selection                       | `vocab/cantonese_sentences.csv`            |
-| C4        | `anki-yzf` | Audio and APKG pack                               | `agpk/swadesh_cantonese_sentences.apkg`    |
+| C4        | `anki-yzf` | Audio and APKG pack                               | `apkg/swadesh_cantonese_sentences.apkg`    |
 | C5        | `anki-y2r` | Gates and tests                                   | `tests/test_cantonese_pack.py`; G1 to G19  |
 | C6        | `anki-0wz` | README and `ATTRIBUTION.md`                       | release check                              |
 
