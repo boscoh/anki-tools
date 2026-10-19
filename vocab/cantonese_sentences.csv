@@ -1,0 +1,334 @@
+target,sentence,text_original,jyutping,english,tatoeba_id,tatoeba_author,english_id,audio_id,audio_source,audio_license,unknown_words,han_len,zipf_mean,rank_key,tier,audio_missing
+我,我覺得會發生。,我覺得會發生。,ngo5 gok3 dak1 wui5 faat3 sang1,I think it could happen.,4675914,kaenif,1541540,1025573,native,CC BY 4.0,0,6,6.25,0|0|-6.253|0|4675914,core,false
+我,我好開心可以見到你。,我好開心可以見到你。,ngo5 hou2 hoi1 sam1 ho2 ji5 gin3 dou2 nei5,I'm happy that I can see you.,661173,nickyeow,6403823,1038721,native,CC BY 4.0,0,9,6.18,0|0|-6.180|1|661173,core,false
+你,你做得好好。,你做得好好。,nei5 zou6 dak1 hou2 hou2,You did a good job.,5777471,nickyeow,707269,1000459,native,CC BY 4.0,0,5,6.26,0|0|-6.260|0|5777471,core,false
+你,你就好啦。,你就好啦。,nei5 zau6 hou2 laa1,I wish I were you.,6107254,nickyeow,6107253,994397,native,CC BY 4.0,0,4,6.22,0|0|-6.220|0|6107254,core,false
+佢,佢大我三年。,佢大我三年。,keoi5 daai6 ngo5 saam1 nin4,He's three years older than I am.,617499,nickyeow,392149,996792,native,CC BY 4.0,0,5,5.78,0|0|-5.784|0|617499,core,false
+佢,佢一路都對我好好。,佢一路都對我好好。,keoi5 jat1 lou6 dou1 deoi3 ngo5 hou2 hou2,He's always been kind to me.,5729988,nickyeow,300552,1036881,native,CC BY 4.0,0,8,5.78,0|0|-5.779|0|5729988,core,false
+我哋,我哋有好多嘢要做。,我哋有好多嘢要做。,ngo5 dei6 jau5 hou2 do1 je5 jiu3 zou6,We have lots of things to do.,1132200,nickyeow,247339,1025474,native,CC BY 4.0,0,8,5.26,0|0|-5.263|0|1132200,core,false
+我哋,我哋飛的去啦，好冇？,我哋飛的去啦，好冇？,ngo5 dei6 fei1 dik1 heoi3 laa1 hou2 mou2,"Let's go by taxi, OK?",3868859,nickyeow,1290698,1036732,native,CC BY 4.0,0,8,5.10,0|0|-5.096|0|3868859,core,false
+你哋,你哋而家喺邊？,你哋而家喺邊？,nei5 dei6 ji4 gaa1 hai2 bin1,Where are you now?,5735083,nickyeow,679375,1025661,native,CC BY 4.0,0,6,3.52,0|0|-3.525|0|5735083,core,false
+你哋,部電話係咪你哋㗎？,部電話係咪你哋㗎？,bou6 din6 waa2 hai6 mai6 nei5 dei6 gaa3,Is this your all's cellphone?,6945977,nickyeow,6945930,0,tts,,0,7,3.87,0|1|-3.870|0|6945977,core,false
+佢哋,佢哋兩個都係我啲同事。,佢哋兩個都係我啲同事。,keoi5 dei6 loeng5 go3 dou1 hai6 ngo5 di1 tung4 si6,They are both colleagues of mine.,750927,kaenif,750923,1036663,native,CC BY 4.0,0,10,4.84,0|0|-4.839|1|750927,core,false
+佢哋,佢哋就開始。,佢哋就開始。,keoi5 dei6 zau6 hoi1 ci2,They are about to start.,4534109,kaenif,306850,1000389,native,CC BY 4.0,0,5,4.80,0|0|-4.797|0|4534109,core,false
+呢個,我會處理呢個問題。,我會處理呢個問題。,ngo5 wui5 cyu5 lei5 ni1 go3 man6 tai4,I will deal with this problem.,417783,nickyeow,56695,1025332,native,CC BY 4.0,0,8,5.32,0|0|-5.320|0|417783,core,false
+呢個,我唔識呢個字。,我唔識呢個字。,ngo5 m4 sik1 ni1 go3 zi6,I don't understand this word.,402965,nickyeow,57974,1007629,native,CC BY 4.0,0,6,5.05,0|0|-5.050|0|402965,core,false
+嗰,你嗰班有幾多人㗎？,你嗰班有幾多人㗎？,nei5 go2 baan1 jau5 gei2 do1 jan4 gaa3,How many are there in your class?,2272636,nickyeow,17396,1036722,native,CC BY 4.0,0,7,5.06,0|0|-5.055|0|2272636,core,false
+嗰,我好鍾意嗰個廣告。,我好鍾意嗰個廣告。,ngo5 hou2 zung1 ji3 go2 go3 gwong2 gou3,I love that commercial.,793804,nickyeow,252926,1025448,native,CC BY 4.0,0,8,5.04,0|0|-5.035|0|793804,core,false
+呢度,我聽日唔會喺呢度。,我聽日唔會喺呢度。,ngo5 ting1 jat6 m4 wui5 hai2 nei1 dou6,Tomorrow I won't be here.,973655,nickyeow,749293,1025463,native,CC BY 4.0,0,8,5.17,0|0|-5.171|0|973655,core,false
+呢度,呢度有啲水。,呢度有啲水。,nei1 dou6 jau5 di1 seoi2,Here's some water.,5641393,kaenif,61738,1000448,native,CC BY 4.0,0,5,4.77,0|0|-4.772|0|5641393,core,false
+嗰度,佢一定要去嗰度。,佢一定要去嗰度。,keoi5 jat1 ding6 jiu3 heoi3 go2 dou6,She must go there.,4544289,kaenif,311077,1025557,native,CC BY 4.0,0,7,4.52,0|0|-4.524|0|4544289,core,false
+嗰度,嗰度都唔係人住嘅。,嗰度都唔係人住嘅。,go2 dou6 dou1 m4 hai6 jan4 zyu6 ge3,You'll find it impossible to live there.,389470,nickyeow,50965,1025287,native,CC BY 4.0,0,8,4.38,0|0|-4.380|0|389470,core,false
+邊個,負責人係邊個？,負責人係邊個？,fu6 zaak3 jan4 hai6 bin1 go3,Who is the person in charge?,795411,nickyeow,276697,996799,native,CC BY 4.0,0,6,5.28,0|0|-5.280|0|795411,core,false
+邊個,邊個話俾你聽㗎？,邊個話俾你聽㗎？,bin1 go3 waa6 bei2 nei5 teng1 gaa3,Who told you that?,6082104,nickyeow,2692364,1025748,native,CC BY 4.0,0,6,4.95,0|0|-4.946|0|6082104,core,false
+乜嘢,你知唔知佢做咗乜嘢呀？,你知唔知佢做咗乜嘢呀？,nei5 zi1 m4 zi1 keoi5 zou6 zo2 mat1 je5 aa3,Do you know what he has done?,1359743,nickyeow,283418,1042323,native,CC BY 4.0,0,10,4.37,0|0|-4.371|1|1359743,core,false
+乜嘢,你知唔知道你想做乜嘢啊？,你知唔知道你想做乜嘢啊？,nei5 zi1 m4 zi1 dou3 nei5 soeng2 zou6 mat1 je5 aa3,Do you know what you want to do?,12278312,FishlandicFishy,12278307,0,tts,,0,11,5.34,0|1|-5.338|1|12278312,core,false
+邊度,邊度有得買呀？,邊度有得買呀？,bin1 dou6 jau5 dak1 maai5 aa3,Where can I buy it?,6480918,nickyeow,1691778,1025779,native,CC BY 4.0,0,6,5.42,0|0|-5.418|0|6480918,core,false
+邊度,我唔知邊度嚟。,我唔知邊度嚟。,ngo5 m4 zi1 bin1 dou6 lai4,I don't know where that is.,5221194,kaenif,2361281,1025609,native,CC BY 4.0,0,6,4.42,0|0|-4.424|0|5221194,core,false
+幾時,幾時開始㗎？,幾時開始㗎？,gei2 si4 hoi1 ci2 gaa3,When will it begin?,840850,nickyeow,707328,990507,native,CC BY 4.0,0,4,4.95,0|0|-4.950|0|840850,core,false
+幾時,呢座廟係幾時起㗎？,呢座廟係幾時起㗎？,ni1 zo6 miu2 hai6 gei2 si4 hei2 gaa3,When was this temple built?,5360896,nickyeow,61271,1036863,native,CC BY 4.0,0,7,4.94,0|0|-4.938|0|5360896,core,false
+點樣,佢係點樣嘅人呢？,佢係點樣嘅人呢？,keoi5 hai6 dim2 joeng2 ge3 jan4 ne1,What is she like?,12580558,LeeSooHa,311820,0,tts,,0,7,4.61,0|1|-4.610|0|12580558,core,false
+點樣,你可以點樣幫到我？,你可以點樣幫到我？,nei5 ho2 ji5 dim2 joeng2 bong1 dou3 ngo5,How could you help me?,5761068,nickyeow,5760180,1036891,native,CC BY 4.0,1,8,5.53,1|0|-5.530|0|5761068,core,false
+唔,你可唔可以帶我去呀？,你可唔可以帶我去呀？,nei5 ho2 m4 ho2 ji5 daai3 ngo5 heoi3 aa3,Will you take me there?,417763,nickyeow,50863,1036638,native,CC BY 4.0,0,9,5.87,0|0|-5.870|1|417763,core,false
+唔,我永遠都唔會係你朋友。,我永遠都唔會係你朋友。,ngo5 wing5 jyun5 dou1 m4 wui5 hai6 nei5 pang4 jau5,I will never be your friend.,5221214,kaenif,1175496,1036843,native,CC BY 4.0,0,10,5.86,0|0|-5.862|1|5221214,core,false
+全部,呢啲書全部都借得。,呢啲書全部都借得。,ni1 di1 syu1 cyun4 bou6 dou1 ze3 dak1,You may borrow any of these books.,7988297,nickyeow,6740419,1037004,native,CC BY 4.0,1,8,4.95,1|0|-4.948|0|7988297,core,false
+全部,我啲書全部都係電子書嚟嘅。,我啲書全部都係電子書嚟嘅。,ngo5 di1 syu1 cyun4 bou6 dou1 hai6 din6 zi2 syu1 lai4 ge3,All of my books are digital.,5953709,nickyeow,5937730,0,tts,,1,12,4.90,1|1|-4.904|1|5953709,core,false
+多,有幾多人應該會出現㗎？,有幾多人應該會出現㗎？,jau5 gei2 do1 jan4 jing1 goi1 wui5 ceot1 jin6 gaa3,How many people are likely to show up?,6005111,kaenif,2196905,1036927,native,CC BY 4.0,0,9,5.78,0|0|-5.782|1|6005111,core,false
+多,我知道嘅就係得咁多。,我知道嘅就係得咁多。,ngo5 zi1 dou3 ge3 zau6 hai6 dak1 gam3 do1,This is all that I know.,5374516,nickyeow,555298,1038799,native,CC BY 4.0,0,9,5.46,0|0|-5.457|1|5374516,core,false
+啲,你要努力啲。,你要努力啲。,nei5 jiu3 nou5 lik6 di1,You need to work harder.,7986278,nickyeow,7859127,1007731,native,CC BY 4.0,0,5,5.39,0|0|-5.395|0|7986278,core,false
+啲,我開始有啲凍。,我開始有啲凍。,ngo5 hoi1 ci2 jau5 di1 dung3,I'm starting to get cold.,6961895,nickyeow,6961006,1025801,native,CC BY 4.0,0,6,5.32,0|0|-5.322|0|6961895,core,false
+少,英國好少地震。,英國好少地震。,jing1 gwok3 hou2 siu2 dei6 zan3,They have few earthquakes in England.,7996157,nickyeow,26159,1025840,native,CC BY 4.0,1,6,5.45,1|0|-5.447|0|7996157,core,false
+少,我好少食肉。,我好少食肉。,ngo5 hou2 siu2 sik6 juk6,I rarely eat meat.,5795773,nickyeow,5791136,1000463,native,CC BY 4.0,1,5,5.42,1|0|-5.425|0|5795773,core,false
+其他,我冇話到俾其他人聽。,我冇話到俾其他人聽。,ngo5 mou5 waa6 dou3 bei2 kei4 taa1 jan4 teng1,I haven't told anybody else.,6484988,nickyeow,6484987,1038844,native,CC BY 4.0,0,9,5.44,0|0|-5.441|1|6484988,core,false
+其他,我哋冇其他選擇。,我哋冇其他選擇。,ngo5 dei6 mou5 kei4 taa1 syun2 zaak6,We don't have another choice.,5374502,nickyeow,2269594,1025632,native,CC BY 4.0,0,7,4.16,0|0|-4.162|0|5374502,core,false
+一,我有一隻牛。,我有一隻牛。,ngo5 jau5 jat1 zek3 ngau4,I have a cow.,10645907,clowergen,2777841,1038861,native,CC BY 4.0,0,5,6.17,0|0|-6.166|0|10645907,core,false
+一,我有一個好好嘅老師。,我有一個好好嘅老師。,ngo5 jau5 jat1 go3 hou2 hou2 ge3 lou5 si1,I have a wonderful teacher.,6108466,nickyeow,6102741,1038841,native,CC BY 4.0,0,9,5.92,0|0|-5.919|1|6108466,core,false
+兩,我哋兩個都好驚。,我哋兩個都好驚。,ngo5 dei6 loeng5 go3 dou1 hou2 geng1,Both of us were scared.,9536316,nickyeow,9501167,1025846,native,CC BY 4.0,0,7,4.91,0|0|-4.914|0|9536316,core,false
+兩,佢打咗我兩下。,佢打咗我兩下。,keoi5 daa2 zo2 ngo5 loeng5 haa5,He hit me twice.,3500934,nickyeow,2926916,0,tts,,0,6,5.06,0|1|-5.062|0|3500934,core,false
+三,我哋拍咗拖三個月喇。,我哋拍咗拖三個月喇。,ngo5 dei6 paak3 zo2 to1 saam1 go3 jyut6 laa3,We've been dating for three months now.,7832959,nickyeow,3054952,1038853,native,CC BY 4.0,0,9,4.24,0|0|-4.239|1|7832959,core,false
+三,一、二、三、四、五、六、七、八、九、十。,一、二、三、四、五、六、七、八、九、十。,jat1 ji6 saam1 sei3 ng5 luk6 cat1 baat3 gau2 sap6,"One, two, three, four, five, six, seven, eight, nine, ten.",382488,nihtscua,413731,0,tts,,0,10,5.20,0|1|-5.197|1|382488,core,false
+四,我通常四點返屋企。,我通常四點返屋企。,ngo5 tung1 soeng4 sei3 dim2 faan1 uk1 kei2,I usually go home at four.,499505,nickyeow,254894,1025373,native,CC BY 4.0,1,8,4.54,1|0|-4.544|0|499505,core,false
+四,佢已經連續睇咗四個鐘書喇。,佢已經連續睇咗四個鐘書喇。,keoi5 ji5 ging1 lin4 zuk6 tai2 zo2 sei3 go3 zung1 syu1 laa3,He has been reading a book for four hours on end.,598111,nickyeow,292589,0,tts,,1,12,4.08,1|1|-4.075|1|598111,core,false
+五,我俾五蚊你啦。,我俾五蚊你啦。,ngo5 bei2 ng5 man1 nei5 laa1,I'll give you five dollars.,433553,nickyeow,433531,1007636,native,CC BY 4.0,0,6,5.05,0|0|-5.053|0|433553,core,false
+五,我叫佢五點打電話俾我。,我叫佢五點打電話俾我。,ngo5 giu3 keoi5 ng5 dim2 daa2 din6 waa2 bei2 ngo5,I asked her to call me at five o'clock.,837960,nickyeow,240032,1042331,native,CC BY 4.0,1,10,4.87,1|0|-4.866|1|837960,core,false
+大,我覺得好大壓力。,我覺得好大壓力。,ngo5 gok3 dak1 hou2 daai6 aat3 lik6,I'm feeling stressed.,5734829,nickyeow,51880,1025658,native,CC BY 4.0,0,7,6.06,0|0|-6.060|0|5734829,core,false
+大,我喺山區長大。,我喺山區長大。,ngo5 hai2 saan1 keoi1 zoeng2 daai6,I grew up in the mountains.,4464878,kaenif,2330008,1025548,native,CC BY 4.0,0,6,5.39,0|0|-5.390|0|4464878,core,false
+長,你啲頭髮長得濟。,你啲頭髮長得濟。,nei5 di1 tau4 faat3 coeng4 dak1 zai3,Your hair is too long.,425415,nickyeow,16926,0,tts,,1,7,4.68,1|1|-4.678|0|425415,core,false
+長,佢寫咗一封長信畀我。,佢寫咗一封長信畀我。,keoi5 se2 zo2 jat1 fung1 coeng4 seon3 bei2 ngo5,He wrote me a long letter.,1875302,fercheung,297685,0,tts,,1,9,4.52,1|1|-4.522|1|1875302,core,false
+厚,我去嗰度唔使厚褸。,我去嗰度唔使厚褸。,ngo5 heoi3 go2 dou6 m4 sai2 hau5 lau1,I'm not going to need a heavy coat where I'm going.,4826791,kaenif,3733860,0,tts,,1,8,3.60,1|1|-3.600|0|4826791,core,false
+重,唔重要㗎！,唔重要㗎！,m4 zung6 jiu3 gaa3,It's not important.,5797629,nickyeow,2322,990535,native,CC BY 4.0,0,3,4.92,0|0|-4.925|1|5797629,core,false
+重,我一直都好尊重你。,我一直都好尊重你。,ngo5 jat1 zik6 dou1 hou2 zyun1 zung6 nei5,I've always treated you with respect.,6127103,nickyeow,6095133,0,tts,,0,8,6.17,0|1|-6.167|0|6127103,core,false
+細,佢仲細，唔應該自己一個人去。,佢仲細，唔應該自己一個人去。,keoi5 zung6 sai3 m4 jing1 goi1 zi6 gei2 jat1 go3 jan4 heoi3,He is too young to go there alone.,395071,nickyeow,280565,0,tts,,0,12,5.14,0|1|-5.143|1|395071,core,false
+細,我細佬好有錢。,我細佬好有錢。,ngo5 sai3 lou2 hou2 jau5 cin2,My brother is rich.,1762938,nickyeow,1388691,1025527,native,CC BY 4.0,1,6,5.05,1|0|-5.053|0|1762938,core,false
+短,你着短袖唔凍嘅咩？,你着短袖唔凍嘅咩？,nei5 zoek6 dyun2 zau6 m4 dung3 ge3 me1,Aren't you cold in short sleeves?,6103511,nickyeow,4254977,1036942,native,CC BY 4.0,1,8,4.37,1|0|-4.374|0|6103511,core,false
+短,而家已經唔興著短裙喇。,而家已經唔興著短裙喇。,ji4 gaa1 ji5 ging1 m4 hing1 zoek6 dyun2 kwan4 laa3,Short skirts are already out of fashion.,1128587,nickyeow,388668,1042275,native,CC BY 4.0,2,10,4.14,2|0|-4.142|1|1128587,core,false
+窄,件衫有啲窄喎。,件衫有啲窄喎。,gin6 saam1 jau5 di1 zaak3 wo3,This suit is tight on me.,12073431,thesilhouette,464214,0,tts,,0,6,4.12,0|1|-4.123|0|12073431,core,false
+薄,有啲人覺得我意志好薄弱。,有啲人覺得我意志好薄弱。,jau5 di1 jan4 gok3 dak1 ngo5 ji3 zi3 hou2 bok6 joek6,Some people think I'm weak-willed.,1472248,nickyeow,250322,0,tts,,2,11,5.49,2|1|-5.485|1|1472248,core,false
+女人,嗰個女人係邊個嚟㗎？,嗰個女人係邊個嚟㗎？,go2 go3 neoi5 jan2 hai6 bin1 go3 lai4 gaa3,Who is that woman?,3869340,nickyeow,68238,1036733,native,CC BY 4.0,0,8,4.27,0|0|-4.275|0|3869340,core,false
+女人,佢哋話我係老女人。,佢哋話我係老女人。,keoi5 dei6 waa6 ngo5 hai6 lou5 neoi5 jan2,They say that I'm an old woman.,1974735,fercheung,68157,0,tts,,0,8,5.08,0|1|-5.080|0|1974735,core,false
+男人,個男人好老。,個男人好老。,go3 naam4 jan2 hou2 lou5,The man is old.,1692191,kaenif,1174867,1000364,native,CC BY 4.0,0,5,5.86,0|0|-5.860|0|1692191,core,false
+男人,我哋係男人。,我哋係男人。,ngo5 dei6 hai6 naam4 jan2,We are men.,1572669,nickyeow,388869,0,tts,,0,5,4.20,0|1|-4.200|0|1572669,core,false
+人,冇人幫我。,冇人幫我。,mou5 jan4 bong1 ngo5,No one would help me.,6108430,nickyeow,6104407,994398,native,CC BY 4.0,0,4,5.53,0|0|-5.532|0|6108430,core,false
+人,你做咩一個人呀？,你做咩一個人呀？,nei5 zou6 me1 jat1 go3 jan4 aa3,Why are you alone?,1132196,nickyeow,69874,1025473,native,CC BY 4.0,0,7,5.50,0|0|-5.500|0|1132196,core,false
+細路,個細路好掛住佢阿媽。,個細路好掛住佢阿媽。,go3 sai3 lou6 hou2 gwaa3 zyu6 keoi5 aa3 maa1,The child missed his mother very much.,692062,nickyeow,245985,0,tts,,0,9,4.40,0|1|-4.398|1|692062,core,false
+細路,我聽到細路唱歌。,我聽到細路唱歌。,ngo5 teng1 dou3 sai3 lou6 coeng3 go1,I heard children singing.,1079314,tigro1973,6403793,1038756,native,CC BY 4.0,1,7,4.88,1|0|-4.878|0|1079314,core,false
+老婆,帶埋你老婆嚟吖。,帶埋你老婆嚟吖。,daai3 maai4 nei5 lou5 po4 lai4 aa1,Bring your wife.,5795830,nickyeow,2245022,1025712,native,CC BY 4.0,0,7,4.52,0|0|-4.520|0|5795830,core,false
+老婆,佢成日都送禮物俾老婆。,佢成日都送禮物俾老婆。,keoi5 seng4 jat6 dou1 sung3 lai5 mat6 bei2 lou5 po4,He is always giving presents to his wife.,535805,nickyeow,290157,0,tts,,1,10,4.59,1|1|-4.594|1|535805,core,false
+老公,佢唔鍾意佢老公。,佢唔鍾意佢老公。,keoi5 m4 zung1 ji3 keoi5 lou5 gung1,She disliked her husband.,5761381,nickyeow,388376,1025682,native,CC BY 4.0,0,7,3.68,0|0|-3.684|0|5761381,core,false
+老公,佢會係一個好老公。,佢會係一個好老公。,keoi5 wui5 hai6 jat1 go3 hou2 lou5 gung1,He'll be a good husband.,392944,nickyeow,241918,0,tts,,0,8,5.38,0|1|-5.382|0|392944,core,false
+阿媽,我阿媽好早起身。,我阿媽好早起身。,ngo5 aa3 maa1 hou2 zou2 hei2 san1,My mother gets up early.,5733421,nickyeow,593274,1025651,native,CC BY 4.0,0,7,5.19,0|0|-5.194|0|5733421,core,false
+阿媽,我講咩我阿媽都信我。,我講咩我阿媽都信我。,ngo5 gong2 me1 ngo5 aa3 maa1 dou1 seon3 ngo5,"Whatever story I tell, my mom believes me.",1304766,nickyeow,1237061,0,tts,,0,9,5.30,0|1|-5.299|1|1304766,core,false
+阿爸,佢同佢阿爸好似樣。,佢同佢阿爸好似樣。,keoi5 tung4 keoi5 aa3 baa4 hou2 ci5 joeng2,He takes after his father.,787546,nickyeow,303368,1025446,native,CC BY 4.0,0,8,3.81,0|0|-3.810|0|787546,core,false
+阿爸,佢阿爸係咪醫生嚟㗎？,佢阿爸係咪醫生嚟㗎？,keoi5 aa3 baa4 hai6 mai6 ji1 sang1 lai4 gaa3,Is his father a doctor?,1542003,nickyeow,287430,1036687,native,CC BY 4.0,0,8,3.37,0|0|-3.370|0|1542003,core,false
+動物,佢鍾意動物多過鍾意人。,佢鍾意動物多過鍾意人。,keoi5 zung1 ji3 dung6 mat6 do1 gwo3 zung1 ji3 jan4,He likes animals more than people.,7832942,nickyeow,2592858,0,tts,,1,10,4.45,1|1|-4.445|1|7832942,core,false
+魚,佢唔食生魚。,佢唔食生魚。,keoi5 m4 sik6 saang1 jyu2,He doesn't eat raw fish.,5375397,nickyeow,295273,996850,native,CC BY 4.0,0,5,4.35,0|0|-4.354|0|5375397,core,false
+魚,佢唔鍾意食魚。,佢唔鍾意食魚。,keoi5 m4 zung1 ji3 sik6 jyu4,He doesn't like to eat fish.,1272702,nickyeow,710954,1007680,native,CC BY 4.0,0,6,3.97,0|0|-3.974|0|1272702,core,false
+雀,隻雀喺個天空度。,隻雀喺個天空度。,zek3 zoek3 hai2 go3 tin1 hung1 dou6,The bird is in the sky.,3840346,,3812934,0,tts,,1,7,4.69,1|1|-4.693|0|3840346,core,false
+雀,我唔識畫雀仔。,我唔識畫雀仔。,ngo5 m4 sik1 waak6 zoek3 zai2,I can't draw a bird.,5803968,nickyeow,1887125,1025725,native,CC BY 4.0,2,6,4.18,2|0|-4.180|0|5803968,core,false
+狗,我鍾意呢隻狗。,我鍾意呢隻狗。,ngo5 zung1 ji3 ni1 zek3 gau2,I like this dog.,3475950,nickyeow,439591,1025540,native,CC BY 4.0,0,6,5.44,0|0|-5.444|0|3475950,core,false
+狗,我係一隻狗。,我係一隻狗。,ngo5 hai6 jat1 zek3 gau2,I'm a dog.,1765985,nickyeow,5359762,0,tts,,0,5,5.91,0|1|-5.908|0|1765985,core,false
+蛇,佢驚蛇。,佢驚蛇。,keoi5 geng1 se4,He is afraid of snakes.,1385196,dngzz1,292670,0,tts,,0,3,3.89,0|1|-3.887|1|1385196,core,false
+蛇,我知阿湯驚蛇。,我知阿湯驚蛇。,ngo5 zi1 aa3 tong1 geng1 se4,I knew that Tom was afraid of snakes.,12134267,thesilhouette,7517380,0,tts,,2,6,3.34,2|1|-3.343|0|12134267,core,false
+蟲,光線會吸引昆蟲。,光線會吸引昆蟲。,gwong1 sin3 wui5 kap1 jan5 kwan1 cung4,Light attracts bugs.,5738678,nickyeow,5269920,0,tts,,2,7,4.88,2|1|-4.875|0|5738678,core,false
+蟲,我哋已經準備好應付千年蟲。,我哋已經準備好應付千年蟲。,ngo5 dei6 ji5 ging1 zeon2 bei6 hou2 jing3 fu6 cin1 nin4 cung4,We're thoroughly prepared for the Y2K bug.,389895,nickyeow,23542,0,tts,,2,12,4.67,2|1|-4.667|1|389895,core,false
+樹,呢啲樹係佢哋種嘅。,呢啲樹係佢哋種嘅。,ni1 di1 syu6 hai6 keoi5 dei6 zung2 ge3,These trees were planted by them.,422013,nickyeow,55065,1025337,native,CC BY 4.0,0,8,4.18,0|0|-4.176|0|422013,core,false
+樹,有啲蘋果喺棵樹度跌咗落嚟。,有啲蘋果喺棵樹度跌咗落嚟。,jau5 di1 ping4 gwo2 hai2 fo2 syu6 dou6 dit3 zo2 lok6 lai4,Some apples fell down from the tree.,485866,nickyeow,29636,0,tts,,0,12,4.12,0|1|-4.121|1|485866,core,false
+森林,我日日都去森林度散步。,我日日都去森林度散步。,ngo5 jat6 jat6 dou1 heoi3 sam1 lam4 dou6 saan3 bou6,I walk in the forest every day.,402229,nickyeow,261845,1042310,native,CC BY 4.0,1,10,5.76,1|0|-5.759|1|402229,core,false
+森林,佢哋去咗森林野餐。,佢哋去咗森林野餐。,keoi5 dei6 heoi3 zo2 sam1 lam4 je5 caan1,They went into the woods for a picnic.,554493,nickyeow,63484,1025396,native,CC BY 4.0,1,8,3.82,1|0|-3.824|0|554493,core,false
+生果,你應該食多啲生果。,你應該食多啲生果。,nei5 jing1 goi1 sik6 do1 di1 saang1 gwo2,You should eat more fruit.,534148,nickyeow,30509,1025389,native,CC BY 4.0,1,8,4.48,1|0|-4.482|0|534148,core,false
+生果,有咩生果係紅色㗎？,有咩生果係紅色㗎？,jau5 me1 saang1 gwo2 hai6 hung4 sik1 gaa3,What fruit is red?,470242,nickyeow,464572,0,tts,,1,7,4.73,1|1|-4.734|0|470242,core,false
+根,如果你冇錢，根本咩都買唔到。,如果你冇錢，根本咩都買唔到。,jyu4 gwo2 nei5 mou5 cin2 gan1 bun2 me1 dou1 maai5 m4 dou2,You can't buy anything if you have no money.,1579574,nickyeow,1579452,0,tts,,0,12,5.08,0|1|-5.083|1|1579574,core,false
+根,佢賺咁多錢，根本都用唔曬。,佢賺咁多錢，根本都用唔晒。,keoi5 zaan6 gam3 do1 cin2 gan1 bun2 dou1 jung6 m4 saai3,He earns more money than he can spend.,393389,nickyeow,297091,0,tts,,1,11,4.98,1|1|-4.978|1|393389,core,false
+花,啲花你買俾邊個㗎？,啲花你買俾邊個㗎？,di1 faa1 nei5 maai5 bei2 bin1 go3 gaa3,Who did you buy those flowers for?,5943379,nickyeow,2540336,1036918,native,CC BY 4.0,0,7,4.53,0|0|-4.528|0|5943379,core,false
+花,佢話佢好鍾意花。,佢話佢好鍾意花。,keoi5 waa6 keoi5 hou2 zung1 ji3 faa1,She said that she really likes flowers.,386769,nickyeow,5157683,0,tts,,0,7,4.45,0|1|-4.448|0|386769,core,false
+草,唔好喺個草地度行。,唔好喺個草地度行。,m4 hou2 hai2 go3 cou2 dei6 dou6 haang4,Don't trample on the grass.,395074,nickyeow,265294,1025300,native,CC BY 4.0,1,8,4.42,1|0|-4.417|0|395074,core,false
+草,牛食草。,牛食草。,ngau4 sik6 cou2,Cattle feed on grass.,6362124,nickyeow,19492,990540,native,CC BY 4.0,1,3,4.02,1|0|-4.015|1|6362124,core,false
+繩,我個女好鍾意跳繩。,我個女好鍾意跳繩。,ngo5 go3 neoi5 hou2 zung1 ji3 tiu3 sing2,My daughter loves jumping rope.,7988138,nickyeow,795246,1036998,native,CC BY 4.0,2,8,4.02,2|0|-4.020|0|7988138,core,false
+繩,坐飛機去沖繩要坐幾多個鐘㗎？,坐飛機去沖繩要坐幾多個鐘㗎？,co5 fei1 gei1 heoi3 cung1 sing4 jiu3 zo6 gei2 do1 go3 zung1 gaa3,How many hours does it take to go to Okinawa by plane?,762043,nickyeow,25594,0,tts,,2,12,4.47,2|1|-4.470|1|762043,core,false
+皮,收撚皮啦。,收撚皮啦。,sau1 nan2 pei4 laa1,Shut the fuck up.,6108472,nickyeow,6102427,0,tts,,0,4,4.12,0|1|-4.117|0|6108472,core,false
+皮,收皮啦你！,收皮啦你！,sau1 pei4 laa1 nei5,Shut up! Stop! Mind your own business.,8891963,WilliamKwok,8891969,0,tts,,1,4,5.12,1|1|-5.123|0|8891963,core,false
+肉,你食唔食肉㗎？,你食唔食肉㗎？,nei5 sik6 m4 sik6 juk6 gaa3,Do you eat meat?,1780714,nickyeow,427988,996821,native,CC BY 4.0,1,5,4.63,1|0|-4.633|0|1780714,core,false
+肉,隻狗冇食到啲肉。,隻狗冇食到啲肉。,zek3 gau2 mou5 sik6 dou3 di1 juk6,The dog didn't eat the meat.,1489812,nickyeow,48226,1025505,native,CC BY 4.0,1,7,4.28,1|0|-4.278|0|1489812,core,false
+血,你㓤我等，唔通我等唔流血咩？,你㓤我等，唔通我等唔流血咩？,nei5 gat1 ngo5 dang2 m4 tung1 ngo5 dang2 m4 lau4 hyut3 me1,"If you prick us, do we not bleed?",12093425,thesilhouette,2731128,0,tts,,1,11,5.32,1|1|-5.321|1|12093425,core,false
+血,心血少唔好睇！,心血少唔好睇！,sam1 hyut3 siu2 m4 hou2 tai2,Not for the faint-hearted!,1547109,,1547113,0,tts,,1,6,3.05,1|1|-3.047|0|1547109,core,false
+骨,我唔好鍾意食有太多骨嘅魚。,我唔好鍾意食有太多骨嘅魚。,ngo5 m4 hou2 zung1 ji3 sik6 jau5 taai3 do1 gwat1 ge3 jyu4,I don't like to eat fish with many bones.,4917636,kaistanb,241511,0,tts,,1,12,4.20,1|1|-4.199|1|4917636,core,false
+蛋,佢唔鍾意蛋。,佢唔鍾意蛋。,keoi5 m4 zung1 ji3 daan2,He doesn't like eggs.,9983848,anaga27,3273598,0,tts,,0,5,3.78,0|1|-3.777|0|9983848,core,false
+蛋,有雞先定有蛋先？,有雞先定有蛋先？,jau5 gai1 sin1 ding6 jau5 daan2 sin1,"Which came first, the chicken or the egg?",5730030,nickyeow,623300,1025648,native,CC BY 4.0,1,7,5.36,1|0|-5.357|0|5730030,core,false
+角,呢個只係問題嘅冰山一角。,呢個只係問題嘅冰山一角。,ni1 go3 zi2 hai6 man6 tai4 ge3 bing1 saan1 jat1 gok3,This is just a symptom of a much bigger problem.,6127088,nickyeow,5687925,0,tts,,0,11,5.03,0|1|-5.032|1|6127088,core,false
+角,試嚇從我個角度去諗啦。,試吓從我個角度去諗啦。,si3 haak3 cung4 ngo5 go3 gok3 dou6 heoi3 nam2 laa1,Try to look at it from my point of view.,6120123,nickyeow,6099137,0,tts,,2,10,4.82,2|1|-4.821|1|6120123,core,false
+尾,句尾要有句號。,句尾要有句號。,geoi3 mei5 jiu3 jau5 geoi3 hou6,There needs to be a period at the end of a sentence.,7999709,nickyeow,3970689,0,tts,,1,6,5.10,1|1|-5.100|0|7999709,core,false
+尾,最尾走嘅人係邊個？,最尾走嘅人係邊個？,zeoi3 mei1 zau2 ge3 jan4 hai6 bin1 go3,Who was the last one here?,12027502,thesilhouette,11957750,0,tts,,1,8,4.66,1|1|-4.662|0|12027502,core,false
+頭髮,我唔係叫咗你去剪頭髮嘅咩？,我唔係叫咗你去剪頭髮嘅咩？,ngo5 m4 hai6 giu3 zo2 nei5 heoi3 zin2 tau4 faat3 ge3 me1,I thought I told you to cut your hair.,2093584,nickyeow,1961274,0,tts,,0,12,4.70,0|1|-4.697|1|2093584,core,false
+頭髮,佢一個月剪三次頭髮。,佢一個月剪三次頭髮。,keoi5 jat1 go3 jyut6 zin2 saam1 ci3 tau4 faat3,He gets a haircut three times a month.,642564,nickyeow,295904,1038720,native,CC BY 4.0,1,9,4.90,1|0|-4.897|1|642564,core,false
+頭,日頭唔好講人。,日頭唔好講人。,jat6 tau2 m4 hou2 gong2 jan4,Speak of the devil and he is sure to appear.,392332,nickyeow,28533,1007625,native,CC BY 4.0,0,6,5.31,0|0|-5.314|0|392332,core,false
+頭,唔好掟石頭。,唔好掟石頭。,m4 hou2 deng3 sek6 tau4,Don't throw stones.,617699,nickyeow,272226,996793,native,CC BY 4.0,0,5,3.59,0|0|-3.593|0|617699,core,false
+耳仔,我隻貓好鍾意我幫佢𢯎耳仔。,我隻貓好鍾意我幫佢𢯎耳仔。,ngo5 zek3 maau1 hou2 zung1 ji3 ngo5 bong1 keoi5 ngaau1 ji5 zai2,My cat likes it when I scratch her behind the ears.,795363,nickyeow,526888,0,tts,,1,11,4.76,1|1|-4.756|1|795363,core,false
+耳仔,你想唔想露隻耳仔出嚟呀？,你想唔想露隻耳仔出嚟呀？,nei5 soeng2 m4 soeng2 lou6 zek3 ji5 zai2 ceot1 lai4 aa3,Would you like your ears to show?,676245,nickyeow,264399,0,tts,,1,11,4.46,1|1|-4.458|1|676245,core,false
+眼,有啲嘢入咗我隻眼。,有啲嘢入咗我隻眼。,jau5 di1 je5 jap6 zo2 ngo5 zek3 ngaan5,I have something in my eye.,611953,nickyeow,436687,1025411,native,CC BY 4.0,0,8,4.78,0|0|-4.781|0|611953,core,false
+眼,點解你唔眼瞓嘅？,點解你唔眼瞓嘅？,dim2 gaai2 nei5 m4 ngaan5 fan3 ge3,Why aren't you sleepy?,6961841,nickyeow,6961255,1025795,native,CC BY 4.0,0,7,4.02,0|0|-4.017|0|6961841,core,false
+鼻,我個鼻好痕。,我個鼻好痕。,ngo5 go3 bei6 hou2 han4,My nose is itchy.,984834,nickyeow,318193,996803,native,CC BY 4.0,1,5,3.81,1|0|-3.810|0|984834,core,false
+嘴,你阿媽鬧緊你嗰陣唔好駁嘴。,你阿媽鬧緊你嗰陣唔好駁嘴。,nei5 aa3 maa1 naau6 gan2 nei5 go2 zan6 m4 hou2 bok3 zeoi2,You mustn't answer your mother back when she scolds you.,418555,nickyeow,63985,0,tts,,2,12,3.98,2|1|-3.980|1|418555,core,false
+牙,龜係冇牙㗎。,龜係冇牙㗎。,gwai1 hai6 mou5 ngaa4 gaa3,Turtles don't have teeth.,5735123,nickyeow,5308161,1000453,native,CC BY 4.0,1,4,4.22,1|0|-4.220|0|5735123,core,false
+牙,去刷牙啦。,去刷牙啦。,heoi3 caat3 ngaa4 laa1,Brush your teeth.,1531721,cc_neko,263638,0,tts,,1,4,4.94,1|1|-4.943|0|1531721,core,false
+脷,琳達伸咗條脷出嚟。,琳達伸咗條脷出嚟。,lam4 daat6 san1 zo2 tiu4 lei6 ceot1 lai4,Linda stuck her tongue out.,421999,nickyeow,29597,0,tts,,2,8,3.02,2|1|-3.020|0|421999,core,false
+指甲,佢好少搽指甲油。,佢好少搽指甲油。,keoi5 hou2 siu2 caa4 zi2 gaap3 jau4,She seldom uses nail polish.,5735067,nickyeow,5397487,0,tts,,1,7,4.32,1|1|-4.315|0|5735067,core,false
+腳,佢踢咗我兩腳。,佢踢咗我兩腳。,keoi5 tek3 zo2 ngo5 loeng5 goek3,He kicked me twice.,3500935,nickyeow,2926913,0,tts,,1,6,4.67,1|1|-4.665|0|3500935,core,false
+腳,佢翹埋對腳。,佢翹埋對腳。,keoi5 kiu4 maai4 deoi3 goek3,He crossed his legs.,4778621,kaenif,3287897,0,tts,,1,5,4.60,1|1|-4.600|0|4778621,core,false
+手,你要搵人幫手。,你要搵人幫手。,nei5 jiu3 wan2 jan4 bong1 sau2,You need to seek help.,6539140,nickyeow,4950737,1025791,native,CC BY 4.0,0,6,5.23,0|0|-5.234|0|6539140,core,false
+手,有人嚟緊幫手㗎喇。,有人嚟緊幫手㗎喇。,jau5 jan4 lai4 gan2 bong1 sau2 gaa3 laa3,Help is on the way.,5360855,nickyeow,2648134,1036862,native,CC BY 4.0,0,7,3.97,0|0|-3.970|0|5360855,core,false
+肚,我真係好肚餓。,我真係好肚餓。,ngo5 zan1 hai6 hou2 tou5 ngo6,I am terribly hungry.,2104085,kaenif,52005,1025531,native,CC BY 4.0,1,6,4.88,1|0|-4.885|0|2104085,core,false
+肚,我個肚喺度咕咕叫。,我個肚喺度咕咕叫。,ngo5 go3 tou5 hai2 dou6 gu4 gu1 giu3,My stomach is growling.,385981,nickyeow,64036,1025278,native,CC BY 4.0,1,8,4.20,1|0|-4.197|0|385981,core,false
+頸,佢係個硬頸嘅女仔。,佢係個硬頸嘅女仔。,keoi5 hai6 go3 ngaang6 geng2 ge3 neoi5 zai2,She's a stubborn girl.,520150,Riko,432804,0,tts,,1,8,3.99,1|1|-3.990|0|520150,core,false
+頸,佢吊頸自殺。,佢吊頸自殺。,keoi5 diu3 geng2 zi6 saat3,He committed suicide by hanging himself.,1877383,fercheung,299273,0,tts,,1,5,3.55,1|1|-3.553|0|1877383,core,false
+背,我尋日成日都喺度背英文字。,我尋日成日都喺度背英文字。,ngo5 cam4 jat6 seng4 jat6 dou1 hai2 dou6 bui3 jing1 man2 zi6,I learned English words by heart all day yesterday.,480957,nickyeow,244498,0,tts,,1,12,4.84,1|1|-4.842|1|480957,core,false
+背,你嗰啲歌我全部都識背㗎。,你嗰啲歌我全部都識背㗎。,nei5 go2 di1 go1 ngo5 cyun4 bou6 dou1 sik1 bui3 gaa3,I know all your songs by heart.,7045382,nickyeow,4132221,0,tts,,1,10,4.61,1|1|-4.609|1|7045382,core,false
+心,你玩得開唔開心呀？,你玩得開唔開心呀？,nei5 waan2 dak1 hoi1 m4 hoi1 sam1 aa3,Did you enjoy yourself?,454806,nickyeow,21280,1025351,native,CC BY 4.0,0,8,5.43,0|0|-5.429|0|454806,core,false
+心,我見到你真係好開心。,我見到你真係好開心。,ngo5 gin3 dou2 nei5 zan1 hai6 hou2 hoi1 sam1,I'm very happy to see you.,5375406,nickyeow,432319,1038803,native,CC BY 4.0,0,9,5.34,0|0|-5.345|1|5375406,core,false
+飲,我又飲多咗喇。,我又飲多咗喇。,ngo5 jau6 jam2 do1 zo2 laa3,I drank too much again.,5734131,nickyeow,5695968,1025654,native,CC BY 4.0,0,6,4.93,0|0|-4.930|0|5734131,core,false
+飲,我請你飲嘢吖。,我請你飲嘢吖。,ngo5 ceng2 nei5 jam2 je5 aa1,I'll buy you a drink.,1248157,nickyeow,27377,1007678,native,CC BY 4.0,0,6,4.88,0|0|-4.885|0|1248157,core,false
+食,我可唔可以食少少呀？,我可唔可以食少少呀？,ngo5 ho2 m4 ho2 ji5 sik6 siu2 siu2 aa3,May I eat a little of it?,386571,nickyeow,41802,1036630,native,CC BY 4.0,0,9,5.26,0|0|-5.257|1|386571,core,false
+食,你想唔想食嘢呀？,你想唔想食嘢呀？,nei5 soeng2 m4 soeng2 sik6 je5 aa3,Do you want to eat?,1493380,cantonesespoken,773323,988868,native,CC BY 4.0,0,7,5.06,0|0|-5.056|0|1493380,core,false
+吸,呢張紙唔吸墨。,呢張紙唔吸墨。,ni1 zoeng1 zi2 m4 kap1 mak6,This paper doesn't absorb ink.,5797638,nickyeow,5266028,1025716,native,CC BY 4.0,2,6,3.99,2|0|-3.987|0|5797638,core,false
+吸,我想坐非吸煙區。,我想坐非吸煙區。,ngo5 soeng2 zo6 fei1 kap1 jin1 keoi1,I would like to sit in the non-smoking section.,843872,nickyeow,18812,1025453,native,CC BY 4.0,2,7,3.95,2|0|-3.950|0|843872,core,false
+嘔,我想嘔。,我想嘔。,ngo5 soeng2 au2,I feel like throwing up.,417780,nickyeow,279379,990490,native,CC BY 4.0,0,3,4.08,0|0|-4.085|1|417780,core,false
+吹,佢識吹口哨。,佢識吹口哨。,keoi5 sik1 ceoi1 hau2 saau3,He knows how to whistle.,7987881,nickyeow,1751977,0,tts,,1,5,3.58,1|1|-3.583|0|7987881,core,false
+呼吸,個醫生叫我慢慢噉深呼吸。,個醫生叫我慢慢噉深呼吸。,go3 ji1 sang1 giu3 ngo5 maan6 maan2 gam2 sam1 fu1 kap1,The doctor told me to inhale and exhale slowly and deeply.,683075,nickyeow,678279,0,tts,,2,11,4.98,2|1|-4.980|1|683075,core,false
+笑,我笑咗。,我笑咗。,ngo5 siu3 zo2,I laughed.,6467266,nickyeow,258713,990542,native,CC BY 4.0,0,3,5.03,0|0|-5.027|1|6467266,core,false
+笑,唔好笑佢啦。,唔好笑佢啦。,m4 hou2 siu3 keoi5 laa1,Don't laugh at him.,546754,nickyeow,285328,996786,native,CC BY 4.0,0,5,4.19,0|0|-4.190|0|546754,core,false
+睇,我以為自己睇錯。,我以為自己睇錯。,ngo5 ji5 wai4 zi6 gei2 tai2 co3,I can't believe my eyes.,7987787,nickyeow,6133,1025827,native,CC BY 4.0,0,7,5.39,0|0|-5.386|0|7987787,core,false
+睇,我完全睇唔明。,我完全睇唔明。,ngo5 jyun4 cyun4 tai2 m4 ming4,This is Greek to me.,5794880,nickyeow,5722481,1025697,native,CC BY 4.0,0,6,4.99,0|0|-4.994|0|5794880,core,false
+聽,你最好聽個醫生講。,你最好聽個醫生講。,nei5 zeoi3 hou2 teng1 go3 ji1 sang1 gong2,You'd better do as the doctor advised you.,422030,nickyeow,7810479,1025338,native,CC BY 4.0,0,8,5.72,0|0|-5.722|0|422030,core,false
+聽,聽日係我生日。,聽日係我生日。,ting1 jat6 hai6 ngo5 saang1 jat6,Tomorrow is my birthday.,1399805,nickyeow,71844,1007689,native,CC BY 4.0,0,6,5.35,0|0|-5.353|0|1399805,core,false
+知道,我好想知道佢個名。,我好想知道佢個名。,ngo5 hou2 soeng2 zi1 dou3 keoi5 go3 meng2,I really want to know her name.,5375408,nickyeow,2269662,1036873,native,CC BY 4.0,0,8,5.74,0|0|-5.740|0|5375408,core,false
+知道,如果我早啲知道就好喇。,如果我早啲知道就好喇。,jyu4 gwo2 ngo5 zou2 di1 zi1 dou3 zau6 hou2 laa3,I wish I'd known that.,5761082,nickyeow,5749868,0,tts,,0,10,5.41,0|1|-5.406|1|5761082,core,false
+諗,我都係咁諗。,我都係咁諗。,ngo5 dou1 hai6 gam2 nam2,"I think so, too.",3868854,nickyeow,262339,996829,native,CC BY 4.0,0,5,4.92,0|0|-4.922|0|3868854,core,false
+諗,我諗我搞得掂㗎喇。,我諗我搞得掂㗎喇。,ngo5 nam2 ngo5 gaau2 dak1 dim6 gaa3 laa3,I think I can handle it.,554628,nickyeow,24925,1025398,native,CC BY 4.0,0,7,4.82,0|0|-4.816|0|554628,core,false
+聞,我喺部𨋢度聞到啲煙味。,我喺部𨋢度聞到啲煙味。,ngo5 hai2 bou6 lip1 dou6 man4 dou2 di1 jin1 mei6,I smell smoke in the elevator.,431503,nickyeow,65247,0,tts,,2,9,4.40,2|1|-4.403|1|431503,core,false
+聞,我鐘意佢聞起身噶味道。,我钟意佢闻起身噶味道。,ngo5 zung1 ji3 keoi5 man4 hei2 san1 gaa1 mei6 dou6,I liked the way it smelled.,6743198,iclementine,6743182,0,tts,,2,10,4.26,2|1|-4.256|1|6743198,core,false
+驚,我覺得你驚咗。,我覺得你驚咗。,ngo5 gok3 dak1 nei5 geng1 zo2,I think you panicked.,4826843,kaenif,2409236,1025596,native,CC BY 4.0,0,6,5.29,0|0|-5.290|0|4826843,core,false
+驚,唔好驚！,唔好驚！,m4 hou2 geng1,Don't be afraid.,3465162,nickyeow,19170,990521,native,CC BY 4.0,0,3,3.61,0|0|-3.610|1|3465162,core,false
+瞓覺,我要去瞓覺喇。,我要去瞓覺喇。,ngo5 jiu3 heoi3 fan3 gaau3 laa3,I have to go to sleep.,386773,nickyeow,1277,1007621,native,CC BY 4.0,0,6,3.86,0|0|-3.862|0|386773,core,false
+瞓覺,我想瞓覺。,我想瞓覺。,ngo5 soeng2 fan3 gaau3,I want to sleep.,12431370,johnastsang,321870,0,tts,,0,4,2.96,0|1|-2.960|0|12431370,core,false
+生存,我會生存落去。,我会生存落去。,ngo5 wui5 sang1 cyun4 lok6 heoi3,I will live.,5646169,WilliamKwok,4181237,0,tts,,0,6,4.43,0|1|-4.433|0|5646169,core,false
+生存,我哋需要有植物先生存到。,我哋需要有植物先生存到。,ngo5 dei6 seoi1 jiu3 jau5 zik6 mat6 sin1 sang1 cyun4 dou3,We need plants in order to live.,10645871,clowergen,247275,0,tts,,1,11,5.18,1|1|-5.176|1|10645871,core,false
+死,我死都唔入去。,我死都唔入去。,ngo5 sei2 dou1 m4 jap6 heoi3,There's no way I'm going in there.,5798935,nickyeow,5798936,1025724,native,CC BY 4.0,0,6,5.46,0|0|-5.456|0|5798935,core,false
+死,你唔好去死？,你唔好去死？,nei5 m4 hou2 heoi3 sei2,You might as well go kill yourself.,1553748,nickyeow,1553747,994361,native,CC BY 4.0,0,5,5.39,0|0|-5.388|0|1553748,core,false
+殺,你殺咗邊個呀？,你殺咗邊個呀？,nei5 saat3 zo2 bin1 go3 aa3,Who did you kill?,7996124,nickyeow,1334388,1025838,native,CC BY 4.0,0,6,4.77,0|0|-4.774|0|7996124,core,false
+殺,我殺咗佢。,我殺咗佢。,ngo5 saat3 zo2 keoi5,I have killed him.,5738661,nickyeow,3606949,0,tts,,0,4,4.60,0|1|-4.600|0|5738661,core,false
+打交,打交解決唔到問題。,打交解決唔到問題。,daa2 gaau1 gaai2 kyut3 m4 dou2 man6 tai4,Fighting won't settle anything.,662795,nickyeow,239044,1025423,native,CC BY 4.0,0,8,4.63,0|0|-4.628|0|662795,core,false
+打,你應該打俾我吖嘛。,你應該打俾我吖嘛。,nei5 jing1 goi1 daa2 bei2 ngo5 aa1 maa3,You should've called me.,6103457,nickyeow,2718627,1036939,native,CC BY 4.0,0,8,5.14,0|0|-5.139|0|6103457,core,false
+打,今晚打俾我啦。,今晚打俾我啦。,gam1 maan5 daa2 bei2 ngo5 laa1,Give me a call tonight.,1385410,nickyeow,1387027,1007684,native,CC BY 4.0,0,6,5.11,0|0|-5.108|0|1385410,core,false
+切,佢趕得切上最後架巴士。,佢趕得切上最後架巴士。,keoi5 gon2 dak1 cit3 soeng6 zeoi3 hau6 gaa3 baa1 si2,He was in time for the last bus.,6329743,kaenif,296735,0,tts,,2,10,4.43,2|1|-4.433|1|6329743,core,false
+切,你趕唔趕得切㗎？,你趕唔趕得切㗎？,nei5 gon2 m4 gon2 dak1 cit3 gaa3,Will you make it in time?,5735064,nickyeow,5409462,0,tts,,2,6,4.39,2|1|-4.388|0|5735064,core,false
+刺,佢唔知有人密謀刺殺佢。,佢唔知有人密謀刺殺佢。,keoi5 m4 zi1 jau5 jan4 mat6 mau4 ci3 saat3 keoi5,He was ignorant of the plot to assassinate him.,6318072,kaenif,298887,0,tts,,2,10,4.28,2|1|-4.282|1|6318072,core,false
+掘,我哋喺地下掘咗個窿。,我哋喺地下掘咗個窿。,ngo5 dei6 hai2 dei6 haa2 gwat6 zo2 go3 lung1,We dug a hole in the ground.,423187,nickyeow,263150,1038696,native,CC BY 4.0,1,9,2.75,1|0|-2.750|1|423187,core,false
+游水,游水對我嚟講冇難度。,游水對我嚟講冇難度。,jau4 seoi2 deoi3 ngo5 lai4 gong2 mou5 naan4 dou6,Swimming is easy for me.,5942708,nickyeow,487827,1038836,native,CC BY 4.0,1,9,4.66,1|0|-4.664|1|5942708,core,false
+游水,呢度游水好危險㗎。,呢度游水好危險㗎。,nei1 dou6 jau4 seoi2 hou2 ngai4 him2 gaa3,It is dangerous to swim here.,392325,nickyeow,61917,1025292,native,CC BY 4.0,1,7,4.66,1|0|-4.657|0|392325,core,false
+飛,我冇飛。,我冇飛。,ngo5 mou5 fei1,I don't have a ticket.,692001,nickyeow,40223,990503,native,CC BY 4.0,0,3,5.03,0|0|-5.030|1|692001,core,false
+飛,買咗飛未啊？,買咗飛未啊？,maai5 zo2 fei1 mei6 aa3,Have you bought a ticket?,12276029,thesilhouette,12278137,0,tts,,0,5,4.95,0|1|-4.952|0|12276029,core,false
+行,我要行喇。,我要行喇。,ngo5 jiu3 haang4 laa3,I must be on my way.,5360864,nickyeow,2387252,994376,native,CC BY 4.0,0,4,4.59,0|0|-4.593|0|5360864,core,false
+行,我哋一路行一路食啦。,我哋一路行一路食啦。,ngo5 dei6 jat1 lou6 haang4 jat1 lou6 sik6 laa1,We'll eat on the way.,5360859,nickyeow,268721,1038794,native,CC BY 4.0,0,9,4.43,0|0|-4.428|1|5360859,core,false
+嚟,如果你嚟到就好喇。,如果你嚟到就好喇。,jyu4 gwo2 nei5 lai4 dou3 zau6 hou2 laa3,It would be nice if you could come.,5797622,nickyeow,5266037,1036911,native,CC BY 4.0,0,8,5.43,0|0|-5.430|0|5797622,core,false
+嚟,我係因為你先嚟㗎咋。,我係因為你先嚟㗎咋。,ngo5 hai6 jan1 wai6 nei5 sin1 lai4 gaa3 zaa3,You're the reason I came.,3500962,nickyeow,2920875,1038782,native,CC BY 4.0,0,8,5.34,0|0|-5.337|0|3500962,core,false
+瞓,我今晚想早啲瞓。,我今晚想早啲瞓。,ngo5 gam1 maan5 soeng2 zou2 di1 fan3,I want to go to bed early tonight.,5949277,nickyeow,2016646,1025739,native,CC BY 4.0,0,7,4.64,0|0|-4.642|0|5949277,core,false
+瞓,我夜晚瞓唔著覺。,我夜晚瞓唔著覺。,ngo5 je6 maan5 fan3 m4 zoek6 gok3,I can't sleep at night.,5777478,nickyeow,318679,1025690,native,CC BY 4.0,0,7,4.42,0|0|-4.425|0|5777478,core,false
+坐,我坐唔定。,我坐唔定。,ngo5 zo6 m4 ding6,I can't sit still.,6539231,nickyeow,5757995,994411,native,CC BY 4.0,0,4,5.28,0|0|-5.277|0|6539231,core,false
+坐,你唔坐呀？,你唔坐呀？,nei5 m4 zo6 aa3,Won't you sit down?,6103531,nickyeow,64718,990537,native,CC BY 4.0,0,4,5.22,0|0|-5.220|0|6103531,core,false
+企,我送你返屋企啦。,我送你返屋企啦。,ngo5 sung3 nei5 faan1 uk1 kei2 laa1,Let me take you home.,526397,nickyeow,64245,1025382,native,CC BY 4.0,0,7,5.19,0|0|-5.193|0|526397,core,false
+企,我屋企冇電腦。,我屋企冇電腦。,ngo5 uk1 kei2 mou5 din6 nou5,I don't have a computer at home.,5221239,kaenif,708138,1025610,native,CC BY 4.0,0,6,4.54,0|0|-4.540|0|5221239,core,false
+轉,乜都掉轉曬。,乜都掉轉曬。,mat1 dou1 diu6 zyun3 saai3,Everything is upside down.,4544244,kaenif,383646,1000393,native,CC BY 4.0,2,5,4.45,2|0|-4.450|0|4544244,core,false
+轉,月亮圍住地球轉。,月亮圍住地球轉。,jyut6 loeng6 wai4 zyu6 dei6 kau4 zyun2,The moon moves around the earth.,1692126,kaenif,238834,1025515,native,CC BY 4.0,2,7,4.45,2|0|-4.445|0|1692126,core,false
+跌,啲銷售率跌到好犀利。,啲銷售率跌到好犀利。,di1 siu1 sau6 seot1 dit3 dou3 hou2 sai1 lei6,The sales are slipping.,423907,nickyeow,282525,0,tts,,1,9,4.59,1|1|-4.588|1|423907,core,false
+跌,個細路喺張牀度跌咗落嚟。,個細路喺張床度跌咗落嚟。,go3 sai3 lou6 hai2 zoeng1 cong4 dou6 dit3 zo2 lok6 lai4,The boy fell off the bed.,403342,nickyeow,245655,0,tts,,1,11,4.14,1|1|-4.140|1|403342,core,false
+畀,我聽日買畀你。,我聽日買畀你。,ngo5 ting1 jat6 maai5 bei2 nei5,I'll buy it for you tomorrow.,10120920,LeeSooHa,10120906,0,tts,,0,6,5.63,0|1|-5.633|0|10120920,core,false
+畀,係畀你嘅。,係畀你嘅。,hai6 bei2 nei5 ge3,This is for you.,450979,minshirui,55752,0,tts,,0,4,4.45,0|1|-4.452|0|450979,core,false
+揸,小心啲揸車。,小心啲揸車。,siu2 sam1 di1 zaa1 ce1,Drive carefully.,5795803,nickyeow,265500,1000464,native,CC BY 4.0,0,5,3.89,0|0|-3.890|0|5795803,core,false
+揸,飲咗酒唔好揸車。,飲咗酒唔好揸車。,jam2 zo2 zau2 m4 hou2 zaa1 ce1,Don't drink and drive.,5355306,nickyeow,453605,1025611,native,CC BY 4.0,0,7,3.77,0|0|-3.773|0|5355306,core,false
+擦,我個同事真係好識擦老細鞋㗎。,我個同事真係好識擦老細鞋㗎。,ngo5 go3 tung4 si6 zan1 hai6 hou2 sik1 caat3 lou5 sai3 haai4 gaa3,My coworker really knows how to suck up to the boss.,557287,nickyeow,554939,0,tts,,2,12,3.95,2|1|-3.947|1|557287,core,false
+擦,嗰個人好識擦老細鞋㗎。,嗰個人好識擦老細鞋㗎。,go2 go3 jan4 hou2 sik1 caat3 lou5 sai3 haai4 gaa3,That man knows how to get on the president's good side.,392323,nickyeow,67965,0,tts,,2,9,3.48,2|1|-3.480|1|392323,core,false
+洗,我幫你洗碗啦。,我幫你洗碗啦。,ngo5 bong1 nei5 sai2 wun2 laa1,Let me help you with the dishes.,692881,nickyeow,244969,1007659,native,CC BY 4.0,1,6,5.45,1|0|-5.450|0|692881,core,false
+洗,可唔可以幫我洗碗？,可唔可以幫我洗碗？,ho2 m4 ho2 ji5 bong1 ngo5 sai2 wun2,Can you help me wash the dishes?,1069549,tigro1973,3462231,1038748,native,CC BY 4.0,1,8,5.27,1|0|-5.272|0|1069549,core,false
+抹,我要抹地。,我要抹地。,ngo5 jiu3 mut3 dei6,I have to scrub the floors.,12061657,thesilhouette,10276632,0,tts,,0,4,5.12,0|1|-5.117|0|12061657,core,false
+抹,渠抹走啲眼淚。,渠抹走啲眼淚。,keoi4 mut3 zau2 di1 ngaan5 leoi6,She wiped her tears away.,12095744,thesilhouette,2346031,0,tts,,1,6,3.87,1|1|-3.873|0|12095744,core,false
+拉,佢俾警察拉咗。,佢俾警察拉咗。,keoi5 bei2 ging2 caat3 laai1 zo2,She was arrested by the police.,533755,nickyeow,313384,1007645,native,CC BY 4.0,1,6,3.90,1|0|-3.900|0|533755,core,false
+拉,蕾拉好擔心你。,蕾拉好擔心你。,leoi4 laai1 hou2 daam1 sam1 nei5,Layla is worried about you.,6109472,nickyeow,6099389,0,tts,,1,6,5.45,1|1|-5.450|0|6109472,core,false
+推,你有冇啲咩書推介呀？,你有冇啲咩書推介呀？,nei5 jau5 mou5 di1 me1 syu1 teoi1 gaai3 aa3,What books do you recommend?,6120127,nickyeow,6099128,1036952,native,CC BY 4.0,0,9,4.65,0|0|-4.652|1|6120127,core,false
+縫,呢個係咪你親手縫㗎？,呢個係咪你親手縫㗎？,ni1 go3 hai6 mai6 nei5 can1 sau2 fung4 gaa3,Did you sew this by hand?,787388,nickyeow,54949,1036666,native,CC BY 4.0,1,8,4.43,1|0|-4.430|0|787388,core,false
+數,冇可能咁着數嘅。,冇可能咁着數嘅。,mou5 ho2 nang4 gam3 zoek6 sou3 ge3,There has to be a catch.,6866769,nickyeow,6866770,1025793,native,CC BY 4.0,0,7,4.55,0|0|-4.547|0|6866769,core,false
+數,我最唔鍾意數學。,我最唔鍾意數學。,ngo5 zeoi3 m4 zung1 ji3 sou3 hok6,I like math least of all.,1889225,fercheung,258918,0,tts,,1,7,5.05,1|1|-5.054|0|1889225,core,false
+講,講就容易，做就難。,講就容易，做就難。,gong2 zau6 jung4 ji6 zou6 zau6 naan4,Easier said than done.,3868196,nickyeow,239682,1036730,native,CC BY 4.0,0,7,5.85,0|0|-5.847|0|3868196,core,false
+講,你最好都係唔好同佢講。,你最好都係唔好同佢講。,nei5 zeoi3 hou2 dou1 hai6 m4 hou2 tung4 keoi5 gong2,You'd better not tell him.,1404411,nickyeow,284943,1042337,native,CC BY 4.0,0,10,5.08,0|0|-5.083|1|1404411,core,false
+唱,個演唱會點呀？,個演唱會點呀？,go3 jin2 coeng3 wui2 dim2 aa3,How was the concert?,6103436,nickyeow,895660,1025752,native,CC BY 4.0,1,6,4.87,1|0|-4.870|0|6103436,core,false
+唱,唔好叫我唔好唱歌。,唔好叫我唔好唱歌。,m4 hou2 giu3 ngo5 m4 hou2 coeng3 go1,Don't ask me not to sing.,5792957,nickyeow,5783320,1036903,native,CC BY 4.0,1,8,4.61,1|0|-4.610|0|5792957,core,false
+玩,咪玩啦。,咪玩啦。,mai5 waan2 laa1,Be serious.,6475116,nickyeow,2111954,990546,native,CC BY 4.0,0,3,4.91,0|0|-4.913|1|6475116,core,false
+玩,玩得開心啲喇！,玩得開心啲喇！,waan2 dak1 hoi1 sam1 di1 laa3,Enjoy yourself!,454805,nickyeow,21274,996773,native,CC BY 4.0,0,6,4.57,0|0|-4.572|0|454805,core,false
+流,呢個係流㗎。,呢個係流㗎。,ni1 go3 hai6 lau4 gaa3,This thing isn't real.,12100092,thesilhouette,3636012,0,tts,,0,4,4.86,0|1|-4.860|0|12100092,core,false
+流,我哋輪流揸車。,我哋輪流揸車。,ngo5 dei6 leon4 lau2 zaa1 ce1,We took turns driving the car.,562131,nickyeow,22998,1007650,native,CC BY 4.0,1,6,3.44,1|0|-3.442|0|562131,core,false
+太陽,太陽能好環保。,太陽能好環保。,taai3 joeng4 nang4 hou2 waan4 bou2,Solar power is environmentally friendly.,5734156,nickyeow,5695938,1025655,native,CC BY 4.0,1,6,5.54,1|0|-5.540|0|5734156,core,false
+太陽,太陽落緊山。,太陽落緊山。,taai3 joeng4 lok6 gan2 saan1,The sun is going down.,4778615,kaenif,275033,1000425,native,CC BY 4.0,1,5,4.38,1|0|-4.383|0|4778615,core,false
+月亮,月亮本身唔識發光㗎。,月亮本身唔識發光㗎。,jyut6 loeng6 bun2 san1 m4 sik1 faat3 gwong1 gaa3,The moon doesn't have light of its own.,1899469,fercheung,238825,0,tts,,1,8,4.37,1|1|-4.370|0|1899469,core,false
+星,我星期一教你吖。,我星期一教你吖。,ngo5 sing1 kei4 jat1 gaau3 nei5 aa1,I'll teach you how to do that on Monday.,9536282,nickyeow,9501265,1025844,native,CC BY 4.0,1,7,5.16,1|0|-5.164|0|9536282,core,false
+星,你星期二得唔得閒呀？,你星期二得唔得閒呀？,nei5 sing1 kei4 ji6 dak1 m4 dak1 haan4 aa3,Are you free on Tuesday?,392327,nickyeow,23779,1036632,native,CC BY 4.0,1,9,4.83,1|0|-4.825|1|392327,core,false
+水,泳池啲水幾多度呀？,泳池啲水幾多度呀？,wing6 ci4 di1 seoi2 gei2 do1 dou6 aa3,What is the temperature of the water in the pool?,1097588,nickyeow,682147,0,tts,,0,8,4.22,0|1|-4.217|0|1097588,core,false
+水,我想飲水呀。,我想飲水呀。,ngo5 soeng2 jam2 seoi2 aa3,I want some water.,1606909,cantonesespoken,270753,988874,native,CC BY 4.0,1,5,4.58,1|0|-4.577|0|1606909,core,false
+雨,我驚聽日會落雨。,我驚聽日會落雨。,ngo5 geng1 ting1 jat6 wui5 lok6 jyu5,I'm afraid it'll rain tomorrow.,793852,nickyeow,7873932,1025449,native,CC BY 4.0,1,7,5.18,1|0|-5.178|0|793852,core,false
+雨,報紙有冇話會落雨呀？,報紙有冇話會落雨呀？,bou3 zi2 jau5 mou5 waa6 wui5 lok6 jyu5 aa3,Did the newspaper say it was going to rain?,458853,nickyeow,26862,1036644,native,CC BY 4.0,1,9,4.81,1|0|-4.807|1|458853,core,false
+河,我睇到佢遊過河。,我睇到佢游過河。,ngo5 tai2 dou3 keoi5 jau4 gwo3 ho4,I saw him swim across the river.,4544379,kaenif,260019,0,tts,,1,7,5.03,1|1|-5.030|0|4544379,core,false
+河,你有冇試過喺條河度溜冰呀？,你有冇試過喺條河度溜冰呀？,nei5 jau5 mou5 si3 gwo3 hai2 tiu4 ho4 dou6 lau4 bing1 aa3,Have you ever tried skating on the river?,523933,nickyeow,45779,0,tts,,1,12,4.69,1|1|-4.692|1|523933,core,false
+海,呢度聽到海嘅聲。,呢度聽到海嘅聲。,nei1 dou6 teng1 dou3 hoi2 ge3 sing1,The sea can be heard from here.,5221029,kaenif,1496621,0,tts,,0,7,4.39,0|1|-4.386|0|5221029,core,false
+海,我去過北海道。,我去過北海道。,ngo5 heoi3 gwo3 bak1 hoi2 dou6,I've been to Hokkaido before.,400472,nickyeow,28375,0,tts,,1,6,5.24,1|1|-5.240|0|400472,core,false
+石,小心落石！,小心落石！,siu2 sam1 lok6 sek6,Beware of falling rocks!,2254244,KerenDeng,5401651,0,tts,,0,4,4.57,0|1|-4.570|0|2254244,core,false
+石,舊石遠睇好似人樣。,舊石遠睇好似人樣。,gau6 sek6 jyun5 tai2 hou2 ci5 jan4 joeng6,"Seen from a distance, the rock looked like a human face.",5355322,nickyeow,25850,0,tts,,1,8,4.46,1|1|-4.455|0|5355322,core,false
+沙,啲沙灘來呢度好遠㗎。,啲沙灘來呢度好遠㗎。,di1 saa1 taan1 loi4 nei1 dou6 hou2 jyun5 gaa3,Those beaches are far from here.,12101337,thesilhouette,6627518,0,tts,,1,8,4.83,1|1|-4.828|0|12101337,core,false
+沙,啲叻嘅人通常都好沙塵。,啲叻嘅人通常都好沙塵。,di1 lek1 ge3 jan4 tung1 soeng4 dou1 hou2 saa1 can4,Intelligent people are often arrogant.,6127149,nickyeow,6095089,0,tts,,1,10,4.68,1|1|-4.683|1|6127149,core,false
+塵,張枱舖滿咗塵。,張枱舖滿咗塵。,zoeng1 toi2 pou3 mun5 zo2 can4,The desk was covered with dust.,5761090,nickyeow,5735018,1025672,native,CC BY 4.0,1,6,3.66,1|0|-3.663|0|5761090,core,false
+泥,小心呀，唔好踩落啲泥到。,小心呀，唔好踩落啲泥到。,siu2 sam1 aa3 m4 hou2 caai2 lok6 di1 nai4 dou3,Be careful not to step in the mud.,5953743,nickyeow,5937694,0,tts,,1,10,4.41,1|1|-4.409|1|5953743,core,false
+雲,阿雲比佢妹妹靚。,阿雲比佢妹妹靚。,aa3 wan4 bei2 keoi5 mui4 mui2 leng3,Wan is prettier than her younger sister.,1304756,Vortarulo,1304757,0,tts,,0,7,4.43,0|1|-4.433|0|1304756,core,false
+雲,一朵雲都無。,一朵雲都無。,jat1 do2 wan4 dou1 mou4,There's not a cloud in sight.,12133432,thesilhouette,6902505,0,tts,,1,5,5.17,1|1|-5.173|0|12133432,core,false
+霧,因為好大霧，所以乜都睇唔到。,因為好大霧，所以乜都睇唔到。,jan1 wai6 hou2 daai6 mou6 so2 ji5 mat1 dou1 tai2 m4 dou2,You can't see anything because of the fog.,4778574,kaenif,9982317,1036814,native,CC BY 4.0,1,12,4.31,1|0|-4.310|1|4778574,core,false
+霧,大霧到乜都睇唔到。,大霧到乜都睇唔到。,daai6 mou6 dou3 mat1 dou1 tai2 m4 dou2,It's so foggy that I can't see anything.,4778576,kaenif,5019461,0,tts,,1,8,4.29,1|1|-4.293|0|4778576,core,false
+天,個天突然間開始變黑。,個天突然間開始變黑。,go3 tin1 dat6 jin4 gaan3 hoi1 ci2 bin3 hak1,The sky suddenly began to darken.,5942690,nickyeow,37899,1038834,native,CC BY 4.0,1,9,5.42,1|0|-5.420|1|5942690,core,false
+天,今日啲天氣啱啱好。,今日啲天氣啱啱好。,gam1 jat6 di1 tin1 hei3 ngaam1 ngaam1 hou2,The weather is just right today.,1321392,nickyeow,910328,1025482,native,CC BY 4.0,1,8,3.99,1|0|-3.992|0|1321392,core,false
+風,佢依家傷風。,佢依家傷風。,keoi5 ji1 gaa1 soeng1 fung1,He has a cold now.,4778589,kaenif,296464,1000421,native,CC BY 4.0,1,5,3.42,1|0|-3.420|0|4778589,core,false
+風,佢傷風。,佢傷風。,keoi5 soeng1 fung1,He has a cold.,5221178,kaenif,289527,1000443,native,CC BY 4.0,1,3,3.31,1|0|-3.310|1|5221178,core,false
+雪,滑雪好好玩㗎。,滑雪好好玩㗎。,waat6 syut3 hou2 hou2 waan2 gaa3,Skiing is very fun.,5375405,nickyeow,424871,0,tts,,0,5,5.48,0|1|-5.482|0|5375405,core,false
+雪,嘩，雪呀！,嘩，雪呀！,waa1 syut3 aa3,"Ah, snow!",5735086,nickyeow,5340748,0,tts,,0,3,4.30,0|1|-4.297|1|5735086,core,false
+冰,唔好喺冰上面跣親呀。,唔好喺冰上面跣親呀。,m4 hou2 hai2 bing1 soeng6 min6 sin2 can1 aa3,Don't slip on the ice.,3364554,kaenif,3022625,1038780,native,CC BY 4.0,2,9,3.42,2|0|-3.417|1|3364554,core,false
+冰,冰溶嗰陣，就會變返做水。,冰溶嗰陣，就會變返做水。,bing1 jung4 go2 zan6 zau6 wui5 bin3 faan2 zou6 seoi2,Ice turns back into water when it melts.,616294,nickyeow,318326,0,tts,,2,10,3.96,2|1|-3.956|1|616294,core,false
+煙,佢唔食煙。,佢唔食煙。,keoi5 m4 sik6 jin1,He does not smoke.,406543,nickyeow,294120,990489,native,CC BY 4.0,0,4,4.06,0|0|-4.058|0|406543,core,false
+煙,食煙唔該去出面食吖。,食煙唔該去出面食吖。,sik6 jin1 m4 goi1 heoi3 ceot1 min2 sik6 aa1,"If you are going to smoke, please go outside.",452567,nickyeow,38723,0,tts,,0,9,4.24,0|1|-4.239|1|452567,core,false
+火,你有冇打火機呀？,你有冇打火機呀？,nei5 jau5 mou5 daa2 fo2 gei1 aa3,Have you got a lighter?,364850,nickyeow,29828,1025270,native,CC BY 4.0,1,7,5.02,1|0|-5.020|0|364850,core,false
+火,我前日喺火車度撞到佢。,我前日喺火車度撞到佢。,ngo5 cin4 jat6 hai2 fo2 ce1 dou6 zong6 dou3 keoi5,I met her by chance on the train the day before yesterday.,683241,nickyeow,27769,0,tts,,1,10,4.79,1|1|-4.786|1|683241,core,false
+灰,畀個煙灰缸我吖唔該。,畀個煙灰缸我吖唔該。,bei2 go3 jin1 fui1 gong1 ngo5 aa1 m4 goi1,Please give me an ashtray.,1579631,nickyeow,593547,1038775,native,CC BY 4.0,1,9,3.87,1|0|-3.870|1|1579631,core,false
+灰,我打爛咗你個煙灰缸。,我打爛咗你個煙灰缸。,ngo5 daa2 laan6 zo2 nei5 go3 jin1 fui1 gong1,I broke your ashtray.,385534,nickyeow,22143,1036626,native,CC BY 4.0,2,9,4.62,2|0|-4.625|1|385534,core,false
+燒,我好似發燒呀。,我好似發燒呀。,ngo5 hou2 ci5 faat3 siu1 aa3,I seem to have a fever.,7009344,nickyeow,38381,1025802,native,CC BY 4.0,1,6,4.88,1|0|-4.875|0|7009344,core,false
+燒,佢係咪仲發緊燒呀？,佢係咪仲發緊燒呀？,keoi5 hai6 mai6 zung6 faat3 gan2 siu1 aa3,Does she still have a temperature?,587384,nickyeow,531879,1025404,native,CC BY 4.0,1,8,3.32,1|0|-3.318|0|587384,core,false
+路,我一路期待緊㗎喇！,我一路期待緊㗎喇！,ngo5 jat1 lou6 kei4 doi6 gan2 gaa3 laa3,I was expecting it!,6005134,kaenif,2355,1036933,native,CC BY 4.0,0,7,4.88,0|0|-4.876|0|6005134,core,false
+路,佢企喺路邊。,佢企喺路邊。,keoi5 kei5 hai2 lou6 bin1,He was standing at the side of the road.,4778630,kaenif,302064,1000429,native,CC BY 4.0,0,5,4.00,0|0|-4.004|0|4778630,core,false
+山,今日係行山嘅好日子。,今日係行山嘅好日子。,gam1 jat6 hai6 haang4 saan1 ge3 hou2 jat6 zi2,It's a great day for a hike.,12457679,thesilhouette,2643724,0,tts,,0,9,5.03,0|1|-5.026|1|12457679,core,false
+山,出太陽嗰陣，就見到富士山㗎喇。,出太陽嗰陣，就見到富士山㗎喇。,ceot1 taai3 joeng4 go2 zan6 zau6 gin3 dou2 fu3 si6 saan1 gaa3 laa3,"On a clear day, you can see Mt. Fuji.",432361,nickyeow,271550,0,tts,,1,12,4.69,1|1|-4.692|1|432361,core,false
+紅,你最鍾意紅色。,你最鍾意紅色。,nei5 zeoi3 zung1 ji3 hung4 sik1,My favourite colour is red.,9955415,Akh2403,3508914,0,tts,,1,6,5.24,1|1|-5.235|0|9955415,core,false
+紅,你鍾意藍色定係紅色？,你鍾意藍色定係紅色？,nei5 zung1 ji3 laam4 sik1 ding6 hai6 hung4 sik1,"Which color do you like more, blue or red?",5729989,nickyeow,371923,1036882,native,CC BY 4.0,2,9,4.66,2|0|-4.656|1|5729989,core,false
+綠,我唔鍾意綠茶。,我唔鍾意綠茶。,ngo5 m4 zung1 ji3 luk6 caa4,I don't care for green tea.,2962024,nickyeow,253292,1025534,native,CC BY 4.0,1,6,4.47,1|0|-4.470|0|2962024,core,false
+綠,我哋將道門油咗做綠色。,我哋將道門油咗做綠色。,ngo5 dei6 zoeng1 dou6 mun4 jau4 zo2 zou6 luk6 sik1,We painted the door green.,487477,nickyeow,248217,1042343,native,CC BY 4.0,2,10,4.39,2|0|-4.387|1|487477,core,false
+黃,我買咗黃牛。,我買咗黃牛。,ngo5 maai5 zo2 wong4 ngau4,I bought tickets from a scalper.,6116908,nickyeow,2299530,1007715,native,CC BY 4.0,0,5,5.09,0|0|-5.092|0|6116908,core,false
+黃,本書係黃色嘅。,本書係黃色嘅。,bun2 syu1 hai6 wong4 sik1 ge3,The book is yellow.,5761227,nickyeow,5256981,0,tts,,1,6,4.60,1|1|-4.602|0|5761227,core,false
+白,你明白未呀？,你明白未呀？,nei5 ming4 baak6 mei6 aa3,Do you understand?,1912445,fercheung,403063,0,tts,,0,5,5.62,0|1|-5.617|0|1912445,core,false
+白,隻馬唔係白色㗎。,隻馬唔係白色㗎。,zek3 maa5 m4 hai6 baak6 sik1 gaa3,The horse is not white.,3365053,kaenif,3143476,0,tts,,0,6,4.76,0|1|-4.763|0|3365053,core,false
+黑,政治好黑暗。,政治好黑暗。,zing3 zi6 hou2 haak1 am3,Politics is a dirty business.,5794926,nickyeow,5677436,1000460,native,CC BY 4.0,1,5,5.61,1|0|-5.610|0|5794926,core,false
+黑,我好黑仔。,我好黑仔。,ngo5 hou2 hak1 zai2,I'm not lucky.,7066668,nickyeow,3330354,994415,native,CC BY 4.0,1,4,5.42,1|0|-5.417|0|7066668,core,false
+夜晚,夜晚一唔一齊食飯呀？,夜晚一唔一齊食飯呀？,je6 maan5 jat1 m4 jat1 cai4 sik6 faan6 aa3,Will you have dinner with me?,1761662,nickyeow,249650,1036714,native,CC BY 4.0,0,9,4.42,0|0|-4.417|1|1761662,core,false
+夜晚,我哋喺夜晚到咗紐約。,我哋喺夜晚到咗紐約。,ngo5 dei6 hai2 je6 maan5 dou3 zo2 nau2 joek3,We arrived in New York at night.,520157,Riko,249433,0,tts,,1,9,3.90,1|1|-3.903|1|520157,core,false
+日,我俾一日時間你考慮。,我俾一日時間你考慮。,ngo5 bei2 jat1 jat6 si4 gaan3 nei5 haau2 leoi6,I'll give you a day to think about it.,683034,nickyeow,42921,1038726,native,CC BY 4.0,0,9,5.36,0|0|-5.363|1|683034,core,false
+日,佢個女朋友係日本人。,佢個女朋友係日本人。,keoi5 go3 neoi5 pang4 jau5 hai6 jat6 bun2 jan4,His girlfriend is Japanese.,1399834,nickyeow,476845,1038769,native,CC BY 4.0,0,9,5.31,0|0|-5.312|1|1399834,core,false
+年,我今年會結婚。,我今年會結婚。,ngo5 gam1 nin4 wui5 git3 fan1,I will get married this year.,4329760,richke,6403748,0,tts,,0,6,5.92,0|1|-5.925|0|4329760,core,false
+年,佢雖然年輕，但係好有經驗。,佢雖然年輕，但係好有經驗。,keoi5 seoi1 jin4 nin4 hing1 daan6 hai6 hou2 jau5 ging1 jim6,"He is young, but experienced.",1902783,fercheung,299095,0,tts,,0,11,5.20,0|1|-5.204|1|1902783,core,false
+暖,我幫你坐暖咗張凳。,我幫你坐暖咗張凳。,ngo5 bong1 nei5 zo6 nyun5 zo2 zoeng1 dang3,I kept the seat warm for you.,5359893,nickyeow,2396111,1036857,native,CC BY 4.0,1,8,4.69,1|0|-4.691|0|5359893,core,false
+暖,今日幾暖。,今日幾暖。,gam1 jat6 gei2 nyun5,It's warm today.,750852,kaenif,750677,1000351,native,CC BY 4.0,1,4,4.15,1|0|-4.155|0|750852,core,false
+凍,今日好凍。,今日好凍。,gam1 jat6 hou2 dung3,It's cold today.,1085588,nickyeow,242809,990508,native,CC BY 4.0,0,4,5.03,0|0|-5.033|0|1085588,core,false
+凍,今日有啲凍。,今日有啲凍。,gam1 jat6 jau5 di1 dung3,It's a little cold today.,611602,nickyeow,387411,996790,native,CC BY 4.0,0,5,4.68,0|0|-4.683|0|611602,core,false
+滿,滿月嗰陣，就有狼人出沒。,滿月嗰陣，就有狼人出沒。,mun5 jyut2 go2 zan6 zau6 jau5 long4 jan4 ceot1 mut6,Werewolves appear on the full moon.,12069064,thesilhouette,10711110,0,tts,,2,10,4.70,2|1|-4.699|1|12069064,core,false
+新,我新嚟㗎。,我新嚟㗎。,ngo5 san1 lai4 gaa3,I'm a newcomer.,6480665,nickyeow,5851266,994407,native,CC BY 4.0,0,3,5.25,0|0|-5.247|1|6480665,core,false
+新,你係咪新學生嚟㗎？,你係咪新學生嚟㗎？,nei5 hai6 mai6 san1 hok6 saang1 lai4 gaa3,Are you a new student?,10645918,clowergen,69186,1038862,native,CC BY 4.0,0,7,4.82,0|0|-4.818|0|10645918,core,false
+老,老地方見。,老地方見。,lou5 dei6 fong1 gin3,I'll meet you at the usual place.,6480882,nickyeow,1555734,994408,native,CC BY 4.0,0,4,5.62,0|0|-5.623|0|6480882,core,false
+老,我好掛住小學啲老師。,我好掛住小學啲老師。,ngo5 hou2 gwaa3 zyu6 siu2 hok6 di1 lou5 si1,I miss my elementary school teachers.,492892,nickyeow,267584,1038708,native,CC BY 4.0,0,9,5.04,0|0|-5.037|1|492892,core,false
+好,我好掛住你。,我好掛住你。,ngo5 hou2 gwaa3 zyu6 nei5,I miss you very much.,417798,nickyeow,18053,996765,native,CC BY 4.0,0,5,5.92,0|0|-5.918|0|417798,core,false
+好,你決定好未呀？,你決定好未呀？,nei5 kyut3 ding6 hou2 mei6 aa3,Have you arrived at a decision yet?,396402,nickyeow,31392,994349,native,CC BY 4.0,0,6,5.85,0|0|-5.846|0|396402,core,false
+壞,呢部電話壞咗。,呢部電話壞咗。,ni1 bou6 din6 waa2 waai6 zo2,This telephone is out of order.,458804,nickyeow,57696,1007637,native,CC BY 4.0,0,6,4.84,0|0|-4.844|0|458804,core,false
+壞,壞習慣好難改。,壞習慣好難改。,waai6 zaap6 gwaan3 hou2 naan4 goi2,It's not easy to get rid of a bad habit.,7996126,nickyeow,4150000,1025839,native,CC BY 4.0,1,6,4.78,1|0|-4.780|0|7996126,core,false
+爛,邊嗰打爛隻碟？,邊嗰打爛隻碟？,bin1 go2 daa2 laan6 zek3 dip6,Who broke the plate?,1068841,tigro1973,5401661,0,tts,,0,6,4.46,0|1|-4.458|0|1068841,core,false
+爛,你有無打爛碟啊？,你有無打爛碟啊？,nei5 jau5 mou4 daa2 laan6 dip6 aa3,Did you break any dishes?,12135902,thesilhouette,11886403,0,tts,,1,7,5.39,1|1|-5.388|0|12135902,core,false
+污糟,我唔想整污糟我隻手。,我唔想整污糟我隻手。,ngo5 m4 soeng2 zing2 wu1 zou1 ngo5 zek3 sau2,I don't want to get my hands dirty.,1393435,nickyeow,264749,1038768,native,CC BY 4.0,1,9,5.02,1|0|-5.024|1|1393435,core,false
+污糟,隻手污糟嗰陣千祈唔好捽眼。,隻手污糟嗰陣千祈唔好捽眼。,zek3 sau2 wu1 zou1 go2 zan6 cin1 kei4 m4 hou2 zeot1 ngaan5,Never rub your eyes with dirty hands.,397021,nickyeow,25715,0,tts,,2,12,3.45,2|1|-3.449|1|397021,core,false
+直,我一直都對你好好。,我一直都對你好好。,ngo5 jat1 zik6 dou1 deoi3 nei5 hou2 hou2,I've always treated you with kindness.,6127101,nickyeow,6095134,0,tts,,0,8,6.12,0|1|-6.123|0|6127101,core,false
+直,我直程去佢度。,我直程去佢度。,ngo5 zik6 cing4 heoi3 keoi5 dou6,I went to his place straight away.,446300,minshirui,286686,0,tts,,0,6,4.89,0|1|-4.886|0|446300,core,false
+圓,圓周係點計㗎話？我唔記得咗。,圓周係點計㗎話？我唔記得咗。,jyun4 zau1 hai6 dim2 gai3 gaa4 waa2 ngo5 m4 gei3 dak1 zo2,How do you calculate the length of the circumference? I've forgotten.,1393501,nickyeow,707232,0,tts,,2,11,4.38,2|1|-4.383|1|1393501,scaffold,false
+利,個律師要考慮雙方嘅利益。,個律師要考慮雙方嘅利益。,go3 leot6 si1 jiu3 haau2 leoi6 soeng1 fong1 ge3 lei6 jik1,The lawyer needed to take the interests of both parties into consideration.,7066666,nickyeow,3114438,0,tts,,0,11,5.24,0|1|-5.240|1|7066666,core,false
+利,佢為一己嘅利益做嘢。,佢為一己嘅利益做嘢。,keoi5 wai6 jat1 gei2 ge3 lei6 jik1 zou6 je5,He acted in his own interest.,6318051,kaenif,298874,1036955,native,CC BY 4.0,1,9,4.37,1|0|-4.367|1|6318051,core,false
+滑,呢塊布摸上手好滑。,呢塊布摸上手好滑。,ni1 faai3 bou3 mo2 soeng5 sau2 hou2 waat6,This cloth feels smooth.,530792,nickyeow,57400,1025386,native,CC BY 4.0,1,8,5.17,1|0|-5.174|0|530792,core,false
+滑,我鍾意游水多過滑雪。,我鍾意游水多過滑雪。,ngo5 zung1 ji3 jau4 seoi2 do1 gwo3 waat6 syut3,I prefer swimming to skiing.,537328,nickyeow,253958,1038713,native,CC BY 4.0,1,9,4.51,1|0|-4.506|1|537328,core,false
+濕,我對襪濕咗。,我對襪濕咗。,ngo5 deoi3 mat6 sap1 zo2,My socks are wet.,7988280,nickyeow,7114496,1007732,native,CC BY 4.0,1,5,4.14,1|0|-4.145|0|7988280,core,false
+乾,乾咗佢！,乾咗佢！,gon1 zo2 keoi5,Now drink up.,5795806,nickyeow,2249666,990532,native,CC BY 4.0,0,3,3.86,0|0|-3.857|1|5795806,core,false
+乾,如果啲乾草著咗火就大劑喇。,如果啲乾草著咗火就大劑喇。,jyu4 gwo2 di1 gon1 cou2 zoek3 zo2 fo2 zau6 daai6 zai1 laa3,"If the hay caught fire, it would be a real disaster.",1269943,nickyeow,21075,0,tts,,2,12,4.20,2|1|-4.199|1|1269943,core,false
+啱,呢個字形容得好啱。,呢個字形容得好啱。,ni1 go3 zi6 jing4 jung4 dak1 hou2 ngaam1,That word describes it perfectly.,422973,nickyeow,48184,1025339,native,CC BY 4.0,0,8,4.77,0|0|-4.775|0|422973,core,false
+啱,你真係講得好啱。,你真係講得好啱。,nei5 zan1 hai6 gong2 dak1 hou2 ngaam1,That's absolutely true.,6961875,nickyeow,6961094,1025798,native,CC BY 4.0,0,7,4.45,0|0|-4.446|0|6961875,core,false
+近,你最近唔係好似你。,你最近唔係好似你。,nei5 zeoi3 gan6 m4 hai6 hou2 ci5 nei5,You don't seem to be yourself these days.,4646363,kaenif,59234,1036795,native,CC BY 4.0,0,8,5.07,0|0|-5.066|0|4646363,core,false
+近,我最近肥咗。,我最近肥咗。,ngo5 zeoi3 gan6 fei4 zo2,I gained weight recently.,669086,nickyeow,5401659,996795,native,CC BY 4.0,0,5,4.84,0|0|-4.845|0|669086,core,false
+遠,佢永遠都會咁愛佢。,佢永遠都會咁愛佢。,keoi5 wing5 jyun5 dou1 wui5 gam3 oi3 keoi5,He will always love her.,5355335,nickyeow,1392349,1036851,native,CC BY 4.0,0,8,4.32,0|0|-4.323|0|5355335,core,false
+遠,我唔會永遠都喺到。,我唔會永遠都喺到。,ngo5 m4 wui5 wing5 jyun5 dou1 hai2 dou3,I'm not going to stay forever.,7987854,nickyeow,5732923,0,tts,,0,8,5.52,0|1|-5.516|0|7987854,core,false
+右,我隻右眼咩都睇唔到。,我隻右眼咩都睇唔到。,ngo5 zek3 jau6 ngaan5 me1 dou1 tai2 m4 dou2,I can't see anything with my right eye.,1323309,nickyeow,27051,1038764,native,CC BY 4.0,1,9,4.65,1|0|-4.649|1|1323309,core,false
+右,我右眼睇唔到嘢。,我右眼睇唔到嘢。,ngo5 jau6 ngaan5 tai2 m4 dou2 je5,I'm blind in the right eye.,7996114,nickyeow,6873137,1025837,native,CC BY 4.0,1,7,2.91,1|0|-2.913|0|7996114,core,false
+左,佢左右不分。,佢左右不分。,keoi5 zo2 jau2 bat1 fan1,He can't distinguish between left and right.,10645915,clowergen,816059,0,tts,,1,5,4.28,1|1|-4.280|0|10645915,core,false
+左,左邊嘅車門將會打開。,左邊嘅車門將會打開。,zo2 bin6 ge3 ce1 mun4 zoeng3 wui5 daa2 hoi1,The doors on the left side will open.,840827,nickyeow,438731,1038737,native,CC BY 4.0,2,9,4.17,2|0|-4.174|1|840827,core,false
+喺,我好想你依家喺度陪我。,我好想你依家喺度陪我。,ngo5 hou2 soeng2 nei5 ji1 gaa1 hai2 dou6 pui4 ngo5,I wish you were here with me now.,4544217,kaenif,1555437,1036763,native,CC BY 4.0,0,10,5.44,0|0|-5.441|1|4544217,core,false
+喺,我喺度。,我喺度。,ngo5 hai2 dou6,I'm here.,4778627,kaenif,2111726,1000427,native,CC BY 4.0,0,3,4.90,0|0|-4.900|1|4778627,core,false
+同,我見到你好似唔同意。,我見到你好似唔同意。,ngo5 gin3 dou2 nei5 hou2 ci5 m4 tung4 ji3,It seems to me that you don't agree.,4544275,kaenif,2349108,1036768,native,CC BY 4.0,0,9,4.95,0|0|-4.945|1|4544275,core,false
+同,我好鍾意同你講嘢。,我好鍾意同你講嘢。,ngo5 hou2 zung1 ji3 tung4 nei5 gong2 je5,I love talking to you.,5221154,kaenif,1920694,1036836,native,CC BY 4.0,0,8,4.89,0|0|-4.893|0|5221154,core,false
+同埋,我希望佢明同埋會由我啦。,我希望佢明同埋會由我啦。,ngo5 hei1 mong6 keoi5 ming4 tung4 maai4 wui5 jau4 ngo5 laa1,I hope that he's understood and that he'll leave me be.,3364352,kaenif,3364334,0,tts,,0,11,5.43,0|1|-5.426|1|3364352,core,false
+同埋,我同埋你一齊去。,我同埋你一齊去。,ngo5 tung4 maai4 nei5 jat1 cai4 heoi3,I'll join you and we'll go together.,8875176,LeeSooHa,8875177,0,tts,,0,7,5.31,0|1|-5.312|0|8875176,core,false
+如果,如果我有佢把聲就好喇！,如果我有佢把聲就好喇！,jyu4 gwo2 ngo5 jau5 keoi5 baa2 sing1 zau6 hou2 laa3,I wish I had a voice like his!,1572703,nickyeow,1572702,0,tts,,0,10,5.56,0|1|-5.557|1|1572703,core,false
+如果,如果你喺我身邊就好喇。,如果你喺我身邊就好喇。,jyu4 gwo2 nei5 hai2 ngo5 san1 bin1 zau6 hou2 laa3,I wish you were with me.,6107247,nickyeow,3769699,0,tts,,0,10,5.44,0|1|-5.438|1|6107247,core,false
+因為,你叫我嚟就係因為咁呀？,你叫我嚟就係因為咁呀？,nei5 giu3 ngo5 lai4 zau6 hai6 jan1 wai6 gam3 aa3,Is that why you asked me to come here?,7066654,nickyeow,6062295,0,tts,,0,10,5.36,0|1|-5.364|1|7066654,core,false
+因為,佢好失望，因為冇人請佢去。,佢好失望，因為冇人請佢去。,keoi5 hou2 sat1 mong6 jan1 wai6 mou5 jan4 ceng2 keoi5 heoi3,He was disappointed at not being invited.,5751015,nickyeow,292920,0,tts,,0,11,5.02,0|1|-5.024|1|5751015,core,false
+名,佢個名我記得好清楚。,佢個名我記得好清楚。,keoi5 go3 meng2 ngo5 gei3 dak1 hou2 cing1 co2,I remember that man's name very well.,401744,nickyeow,401730,1038686,native,CC BY 4.0,0,9,5.49,0|0|-5.487|1|401744,core,false
+名,我唔記得咗佢叫咩名。,我唔記得咗佢叫咩名。,ngo5 m4 gei3 dak1 zo2 keoi5 giu3 me1 meng2,I forgot his name.,617638,nickyeow,490881,1038718,native,CC BY 4.0,0,9,4.37,0|0|-4.370|1|617638,core,false
