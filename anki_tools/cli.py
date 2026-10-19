@@ -74,6 +74,7 @@ from anki_tools.yue_frequency import (
 from anki_tools.yue_select import (
     SelectionOptions,
     print_selection_summary,
+    read_names,
     select_yue_sentences,
     write_coverage_csv,
     write_select_csv,
@@ -908,6 +909,7 @@ def yue(
             known_top=known_top,
             similarity_threshold=similarity_threshold,
             final_mark=not no_final_mark,
+            names=read_names(),
         )
         print("\nStep 2: Selecting sentences...")
         frequency = load_yue_frequency(freq=freq, spoken_weight=spoken_weight)

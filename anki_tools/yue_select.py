@@ -23,12 +23,13 @@ from anki_tools.rank import (
     char_similarity_zh_same_len,
     get_chinese_chars,
 )
-from anki_tools.yue_frequency import Tokenizer, YueFrequency, han_tokens
+from anki_tools.yue_frequency import VOCAB_DIR, Tokenizer, YueFrequency, han_tokens
 
+NAMES_PATH = VOCAB_DIR / "yue_names.tsv"
 EXEMPT_TOP = 100
 UNRANKED = 1_000_000
 ORDERS = ("coverage", "score")
-RULES = ("Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7")
+RULES = ("Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8")
 FINAL_MARK_WARNING_SHARE = 0.2
 SHAPE_RULES = {
     "F2": "Y1",
@@ -60,6 +61,7 @@ class SelectionOptions:
     :param known_top: Size of the known set (rule Y7).
     :param similarity_threshold: Character Jaccard threshold for duplicates.
     :param final_mark: Apply rule Y4.
+    :param names: Foreign names for rule Y8. A name is a substring of the sentence.
     """
 
     max_sentences: int | None = None
@@ -73,6 +75,7 @@ class SelectionOptions:
     known_top: int = 2000
     similarity_threshold: float = 0.67
     final_mark: bool = True
+    names: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if self.order not in ORDERS:
@@ -137,15 +140,34 @@ class SelectionReport:
     summary: dict[str, Any] = field(default_factory=dict)
 
 
+def read_names(path: Path = NAMES_PATH) -> tuple[str, ...]:
+    """Read the foreign names of rule Y8.
+
+    The file has a header line and one name per line, in the first column.
+
+    :param path: TSV file with a ``name`` column.
+    :returns: Names, in file order. An absent file gives an empty tuple.
+    """
+    if not path.exists():
+        return ()
+    names = []
+    for number, line in enumerate(path.read_text(encoding="utf-8").splitlines()):
+        name = line.split("\t")[0].strip()
+        if number and name:
+            names.append(name)
+    return tuple(names)
+
+
 def check_sentence(
     text: str,
     tokens: list[str],
     ranks: dict[str, int],
     options: SelectionOptions,
 ) -> str:
-    """Apply rules Y1 to Y7 in order.
+    """Apply rules Y1 to Y8 in order.
 
     Rules Y1 to Y6 reuse :func:`anki_tools.mandarin_swadesh.check_sentence_shape`.
+    Rule Y8 matches the substrings of ``options.names``.
 
     :param text: Sentence text.
     :param tokens: Han tokens of the sentence.
@@ -153,8 +175,9 @@ def check_sentence(
     :param options: Filter settings.
     :returns: The first failed rule, or an empty string when the sentence passes.
     """
+    stripped = text.strip()
     key = check_sentence_shape(
-        text.strip(),
+        stripped,
         options.min_han,
         options.max_han,
         final_mark=options.final_mark,
@@ -162,7 +185,11 @@ def check_sentence(
     if key is not None:
         return SHAPE_RULES[key]
     unknown = sum(1 for t in tokens if ranks.get(t, math.inf) > options.known_top)
-    return "Y7" if unknown > options.max_unknown else ""
+    if unknown > options.max_unknown:
+        return "Y7"
+    if any(name in stripped for name in options.names):
+        return "Y8"
+    return ""
 
 
 def _hardest_rank(tokens: list[str], ranks: dict[str, int]) -> int:

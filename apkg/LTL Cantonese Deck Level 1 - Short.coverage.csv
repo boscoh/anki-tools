@@ -1,7 +1,7 @@
 word,rank,count,status
-係,1,54,covered
-我,2,200,covered
-咁,3,20,covered
+係,1,53,covered
+我,2,202,covered
+咁,3,19,covered
 嘅,4,39,covered
 呢,5,30,covered
 你,6,104,covered
@@ -11,16 +11,16 @@ word,rank,count,status
 個,10,28,covered
 嗰,11,18,covered
 都,12,22,covered
-好,13,55,covered
-有,14,27,covered
+好,13,52,covered
+有,14,26,covered
 呀,15,66,covered
-啲,16,25,covered
+啲,16,24,covered
 啊,17,4,covered
 喺,18,31,covered
 到,19,12,covered
 即係,20,0,absent
 去,21,8,covered
-咗,22,77,covered
+咗,22,76,covered
 冇,23,28,covered
 哋,24,43,covered
 嘢,25,12,covered
@@ -29,17 +29,17 @@ word,rank,count,status
 唔係,28,13,covered
 即,29,0,absent
 會,30,6,covered
-啦,31,33,covered
-又,32,5,covered
+啦,31,34,covered
+又,32,3,covered
 跟住,33,1,partial
-喇,34,45,covered
+喇,34,44,covered
 但係,35,1,partial
-要,36,8,covered
+要,36,7,covered
 一,37,1,partial
 之後,38,0,absent
 一個,39,3,covered
 的,40,1,partial
-人,41,10,covered
+人,41,9,covered
 做,42,6,covered
 可以,43,15,covered
 度,44,12,covered
@@ -48,7 +48,7 @@ word,rank,count,status
 覺得,47,3,covered
 同埋,48,0,absent
 其實,49,2,covered
-得,50,14,covered
+得,50,13,covered
 向,51,0,absent
 睇,52,6,covered
 真係,53,5,covered
@@ -58,7 +58,7 @@ word,rank,count,status
 咩,57,20,covered
 下,58,0,absent
 同,59,4,covered
-多,60,5,covered
+多,60,4,covered
 自己,61,2,covered
 中間,62,0,absent
 講,63,9,covered
@@ -83,8 +83,8 @@ word,rank,count,status
 住,82,3,covered
 先,83,1,partial
 噉樣,84,0,absent
-嗎,85,1,partial
-想,86,5,covered
+嗎,85,0,absent
+想,86,4,covered
 可能,87,2,covered
 諗,88,2,covered
 開始,89,2,covered
@@ -112,7 +112,7 @@ word,rank,count,status
 過,111,3,covered
 她,112,0,absent
 經過,113,0,absent
-返,114,2,covered
+返,114,3,covered
 說,115,0,absent
 邊,116,8,covered
 萬元,117,0,absent
@@ -130,7 +130,7 @@ word,rank,count,status
 亦,129,1,partial
 嗯,130,0,absent
 最,131,0,absent
-走,132,5,covered
+走,132,4,covered
 本報訊,133,0,absent
 譬如,134,0,absent
 及,135,0,absent
@@ -207,9 +207,9 @@ word,rank,count,status
 咋,206,2,covered
 繼續,207,0,absent
 一直,208,0,absent
-錢,209,3,covered
+錢,209,2,covered
 若,210,0,absent
-緊,211,5,covered
+緊,211,4,covered
 出黎,212,0,absent
 過去,213,1,partial
 只,214,0,absent
@@ -369,7 +369,7 @@ word,rank,count,status
 老,368,1,partial
 底,369,0,absent
 就是,370,0,absent
-瞓,371,6,covered
+瞓,371,5,covered
 最後,372,1,partial
 至於,373,0,absent
 女,374,1,partial
@@ -521,7 +521,7 @@ word,rank,count,status
 唧,520,0,absent
 料,521,0,absent
 舉行,522,0,absent
-工作,523,1,partial
+工作,523,0,absent
 大樹,524,0,absent
 理,525,0,absent
 我講,526,1,partial
@@ -876,7 +876,7 @@ word,rank,count,status
 仍未,875,0,absent
 伙,876,0,absent
 學,877,1,partial
-揸,878,4,covered
+揸,878,5,covered
 編號,879,0,absent
 座,880,2,covered
 愁,881,0,absent
@@ -1097,7 +1097,7 @@ word,rank,count,status
 大叫,1096,0,absent
 兒子,1097,0,absent
 普通,1098,0,absent
-拉,1099,6,covered
+拉,1099,0,absent
 日線,1100,0,absent
 神,1101,0,absent
 網上,1102,0,absent
@@ -1408,7 +1408,7 @@ word,rank,count,status
 喜歡,1407,0,absent
 大佬,1408,0,absent
 互動,1409,0,absent
-努力,1410,1,partial
+努力,1410,0,absent
 事後,1411,0,absent
 債券,1412,0,absent
 貧大,1413,0,absent
@@ -1492,7 +1492,7 @@ word,rank,count,status
 公務員,1491,0,absent
 路透社,1492,0,absent
 下跌,1493,0,absent
-肥,1494,1,partial
+肥,1494,0,absent
 亂,1495,1,partial
 滙豐,1496,0,absent
 中心,1497,0,absent
@@ -1503,7 +1503,6 @@ word,rank,count,status
 聽日,1518,3,covered
 病,1520,2,covered
 講得,1544,2,covered
-蘇,1552,1,partial
 倍,1554,1,partial
 掛住,1561,2,covered
 士,1581,1,partial
@@ -1528,7 +1527,6 @@ word,rank,count,status
 見過,1781,2,covered
 公仔,1789,1,partial
 麻煩,1820,1,partial
-感,1845,1,partial
 失望,1848,1,partial
 牛,1897,1,partial
 盡,1923,1,partial
@@ -1558,7 +1556,7 @@ word,rank,count,status
 星期日,2261,1,partial
 認識,2264,1,partial
 重新,2279,1,partial
-曬,2286,4,covered
+曬,2286,3,covered
 運動,2325,1,partial
 問我,2326,1,partial
 條女,2344,1,partial
@@ -1645,7 +1643,6 @@ word,rank,count,status
 生命,3731,1,partial
 忘記,3732,2,covered
 忙,3765,2,covered
-責任,3791,1,partial
 評論,3792,1,partial
 結,3793,1,partial
 搞錯,3810,2,covered
@@ -1681,7 +1678,6 @@ word,rank,count,status
 閂,4364,2,covered
 拯救,4365,1,partial
 我識,4375,2,covered
-長大,4385,1,partial
 浪費,4399,0,partial
 證實,4405,1,partial
 舖頭,4426,2,covered
@@ -1743,7 +1739,6 @@ word,rank,count,status
 侮辱,5772,0,partial
 嚇,5781,3,covered
 梳化,5802,1,partial
-遲到,5819,1,partial
 個心,5833,1,partial
 我明,5836,1,partial
 同類,5839,1,partial
@@ -1853,7 +1848,6 @@ word,rank,count,status
 好熱,10394,2,covered
 你仲,10612,1,partial
 傷風,10689,1,partial
-森美,10703,2,covered
 條仔,10715,1,partial
 刷牙,10733,1,partial
 八點,10746,1,partial
@@ -1866,7 +1860,6 @@ word,rank,count,status
 幾高,11531,1,partial
 蠟燭,11837,1,partial
 心願,11871,1,partial
-樣衰,12082,1,partial
 柏林,12146,1,partial
 手套,12210,1,partial
 愛爾蘭,12379,1,partial
@@ -1947,7 +1940,6 @@ word,rank,count,status
 愛你,23788,2,covered
 盛惠,24022,1,partial
 上當,24090,0,partial
-蕾,24424,7,covered
 會返,25221,1,partial
 論文,25595,1,partial
 會輸,25661,1,partial
@@ -2001,7 +1993,6 @@ word,rank,count,status
 因住,44896,1,partial
 買書,45049,1,partial
 信不信,45909,1,partial
-拉返,45911,1,partial
 車匙,46493,1,partial
 落緊,46789,2,covered
 食少,47355,1,partial
@@ -2036,11 +2027,9 @@ word,rank,count,status
 口哨,68138,1,partial
 正仆街,68350,2,covered
 餡餅,68844,1,partial
-稔,68917,1,partial
 食生,69914,1,partial
-想返,69980,0,partial
 好弱,70938,1,partial
-車送,72694,0,partial
+車送,72694,1,partial
 撞頭,72915,1,partial
 難移,72937,1,partial
 生返,73230,1,partial

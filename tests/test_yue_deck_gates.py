@@ -33,7 +33,7 @@ SELECT_CSV = BASE.with_name(BASE.name + ".select.csv")
 DECK = BASE.with_name(BASE.name + ".apkg")
 DECK_SENTENCES = 999
 SPEC_CARDS = 647
-SPEC_TOP500 = 224
+SPEC_TOP500 = 223
 MAX_USES = 8
 EXEMPT_TOP = 100
 SIMILARITY = 0.67
@@ -118,7 +118,7 @@ def test_g11_kept_words_and_top500(
     rank_rows: list[dict[str, str]],
 ) -> None:
     words = {token for tokens in kept_tokens for token in tokens}
-    assert len(words) >= 950
+    assert len(words) >= 940
     top500 = sum(1 for row in freq.rows[:500] if row.word in words)
     assert top500 >= SPEC_TOP500
     kept_ids = {row["note_id"] for row in rank_rows}

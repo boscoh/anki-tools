@@ -36,7 +36,7 @@ keep fewer cards, with the widest vocabulary, weighted to spoken Cantonese.
 | Change                | What it does                                                                                  | Section |
 | --------------------- | --------------------------------------------------------------------------------------------- | ------- |
 | Spoken frequency list | Blends Cifu spoken counts with written counts; `anki freq yue`                                | 5       |
-| Sentence filter       | Removes fragments, mixed script, repeats, and hard sentences                                  | 7       |
+| Sentence filter       | Removes fragments, mixed script, repeats, names, and hard sentences                                  | 7       |
 | Diversity selection   | Greedy cover of the most frequent words; a limit on uses of one word; easy-to-hard card order | 8       |
 
 ### 1.2 Result at a glance
@@ -46,8 +46,8 @@ then the value of the current ranking at the same card count.
 
 | Input                           | Sentences in | Cards | Words         | `spoken_mass` |
 | ------------------------------- | ------------ | ----- | ------------- | ------------- |
-| LTL deck                        | 999          | 647   | 961 / 764     | 66.8 / 64.0   |
-| LTL deck, cap 300               | 999          | 300   | 694 / 410     | 66.0 / 57.4   |
+| LTL deck                        | 999          | 641   | 948 / 764     | 66.8 / 64.0   |
+| LTL deck, cap 300               | 999          | 300   | 688 / 410     | 66.1 / 57.4   |
 | Tatoeba Cantonese pool          | 20,853       | 1,173 | 1,974 / 1,172 | 79.6 / 67.6   |
 | Tatoeba Cantonese pool, cap 500 | 20,853       | 500   | 1,330 / 572   | 77.2 / 60.5   |
 
@@ -135,30 +135,31 @@ The default settings are:
 
 ### 3.1 Cards at the defaults
 
-| Input                  | Sentences in | Pass Y1 to Y7 | Cards kept | Words | top500 | top1000 | top1500 | `spoken_mass` |
+| Input                  | Sentences in | Pass Y1 to Y8 | Cards kept | Words | top500 | top1000 | top1500 | `spoken_mass` |
 | ---------------------- | ------------ | ------------- | ---------- | ----- | ------ | ------- | ------- | ------------- |
-| LTL deck               | 999          | 872           | 647        | 961   | 224    | 327     | 391     | 66.8%         |
+| LTL deck               | 999          | 858           | 641        | 948   | 223    | 325     | 385     | 66.8%         |
 | Tatoeba Cantonese pool | 20,853       | 4,256         | 1,173      | 1,974 | 356    | 580     | 782     | 79.6%         |
 
-The implementation reproduces these values on 2026-10-19: 650 cards, 962
-words, top500 224, top1000 327, top1500 390, `spoken_mass` 67.1. The card count
-is 3 above 647, inside the 5 percent of gate G11. With
-`--max-sentences 300`: 692 words, 217 top500 words, `spoken_mass` 66.3 (G10).
+The implementation reproduces these values on 2026-10-19: 641 cards, 948
+words, top500 223, top1000 325, top1500 385, `spoken_mass` 66.8. The card count
+is 6 below 647, inside the 5 percent of gate G11. Before rule Y8 the run gave
+650 cards and 962 words. With `--max-sentences 300`: 688 words, 217 top500
+words, `spoken_mass` 66.1 (G10).
 
 What the selection removes, against the passed pool:
 
 | Input   | Cards removed        | Words lost     | Top 1500 words lost | `spoken_mass` lost |
 | ------- | -------------------- | -------------- | ------------------- | ------------------ |
-| LTL     | 225 of 872 (26%)     | 38 of 999      | 1                   | 0.0 points         |
+| LTL     | 217 of 858 (25%)     | 35 of 983      | 1                   | 0.0 points         |
 | Tatoeba | 3,083 of 4,256 (72%) | 1,504 of 3,478 | 9                   | 0.9 points         |
 
 Most lost words are rare, outside the target set.
 
 What the rules of section 7 remove, before the selection runs:
 
-| Input   | Effect of rules Y1 to Y7                                                  |
+| Input   | Effect of rules Y1 to Y8                                                  |
 | ------- | ------------------------------------------------------------------------- |
-| LTL     | 12 of 236 top-500 words are lost; `spoken_mass` falls from 67.7% to 66.8% |
+| LTL     | 13 of 236 top-500 words are lost; `spoken_mass` falls from 67.7% to 66.8% |
 | Tatoeba | top500 falls from 457 to 357; `spoken_mass` falls from 95.8% to 80.5%     |
 
 Rule Y1 causes most of the Tatoeba loss. It rejects 15,445 of
@@ -168,8 +169,8 @@ What the word-use cap changes, against the same run without it (14.6):
 
 | Input             | Cards | Words | `spoken_mass` | `max_uses` |
 | ----------------- | ----- | ----- | ------------- | ---------- |
-| LTL, no cap       | 681   | 984   | 66.8%         | 22         |
-| LTL, cap of 8     | 647   | 961   | 66.8%         | 8          |
+| LTL, no cap       | 674   | 970   | 66.8%         | 22         |
+| LTL, cap of 8     | 641   | 948   | 66.8%         | 8          |
 | Tatoeba, no cap   | 1,307 | 2,058 | 79.9%         | 37         |
 | Tatoeba, cap of 8 | 1,173 | 1,974 | 79.6%         | 8          |
 
@@ -184,6 +185,8 @@ What the word-use cap changes, against the same run without it (14.6):
 | Tatoeba | 1500          | 795            | 1,173          | 1,410          |
 | Tatoeba | 2000          | 1,039          | 1,419          | 1,647          |
 
+- These LTL cells come from the prototype before rule Y8. Y8 removes 14
+  sentences, so the implementation keeps 641 cards at the defaults (3.2, 3.1).
 - The LTL rows for 1000 or more are equal, because the passed deck has only
   973 ranked words.
 - At `--per-word 1`, each card carries 1.82 (LTL) or 1.89 (Tatoeba) target words.
@@ -198,9 +201,9 @@ shows the new value, then the current value.
 
 | Input   | Cards | Words         | top500    | top1000   | `spoken_mass` |
 | ------- | ----- | ------------- | --------- | --------- | ------------- |
-| LTL     | 300   | 694 / 410     | 217 / 147 | 307 / 195 | 66.0 / 57.4   |
-| LTL     | 500   | 894 / 618     | 224 / 185 | 327 / 257 | 66.8 / 62.5   |
-| LTL     | 647   | 961 / 764     | 224 / 199 | 327 / 284 | 66.8 / 64.0   |
+| LTL     | 300   | 688 / 410     | 217 / 147 | 306 / 195 | 66.1 / 57.4   |
+| LTL     | 500   | 887 / 618     | 223 / 185 | 325 / 257 | 66.8 / 62.5   |
+| LTL     | 641   | 948 / 764     | 223 / 199 | 325 / 284 | 66.8 / 64.0   |
 | Tatoeba | 300   | 977 / 357     | 316 / 138 | 476 / 179 | 74.8 / 54.8   |
 | Tatoeba | 500   | 1,330 / 572   | 335 / 178 | 527 / 244 | 77.2 / 60.5   |
 | Tatoeba | 1,000 | 1,894 / 1,026 | 356 / 237 | 580 / 355 | 79.6 / 66.5   |
@@ -212,7 +215,7 @@ score, without the similarity penalty. It is an approximation.
 
 How to read the table:
 
-- At 300 cards, the LTL selection keeps 69% more distinct words and 8.6 points more
+- At 300 cards, the LTL selection keeps 68% more distinct words and 8.7 points more
   `spoken_mass`.
 - At 500 cards, the Tatoeba selection keeps 2.3 times the distinct words and 16.7
   points more `spoken_mass`.
@@ -261,6 +264,9 @@ prototype is not in the repository. It used:
 
 A count can differ by one from a later table because of a tie in the sort.
 Gates G10, G11, and G12 and milestone M4 turn these numbers into tests.
+
+Rule Y8 came after the prototype. The LTL cells in 3.1, 3.3, 14.3, and 14.4
+include its effect. The LTL cells in 3.2, 14.5, and 14.6 predate it.
 
 ## 4. Pipeline
 
@@ -370,10 +376,18 @@ the first failed rule as the `reason`.
 | Y5   | No quotation mark                                                 | F7, same                           |
 | Y6   | At most 1 internal comma, colon, or semicolon                     | F8, same                           |
 | Y7   | At most `--max-unknown` tokens outside the known set              | New, from 8.2 of the Mandarin spec |
+| Y8   | No foreign name from `vocab/yue_names.tsv`                        | New                                |
 
 The known set is the first `--known-top` words (default 2000) of the Y1 list.
 A token is unknown when it has no rank, or a rank above `--known-top`.
 Punctuation tokens do not count.
+
+Rule Y8 reads `vocab/yue_names.tsv`. The file has a header and one name per
+line, in the `name` column. A name matches when it is a substring of the
+sentence, because the tokenizer splits a name such as 蕾拉 into two tokens.
+The first rows are 蕾拉, 森美, 康納達, and 蘇嗎. Add a row when a deck holds
+another foreign name. Latin names and English words do not need a row: rule
+Y2 rejects them.
 
 Differences from the Mandarin rules:
 
@@ -386,7 +400,7 @@ Differences from the Mandarin rules:
 Final-mark warning: if more than 20 percent of a deck fails Y4, print a
 warning that names `--no-final-mark`. That option drops Y4 for the run.
 
-Measured effect on the LTL deck: 872 of 999 sentences pass (14.3).
+Measured effect on the LTL deck: 858 of 999 sentences pass (14.3).
 
 ## 8. Selection
 
@@ -533,7 +547,7 @@ Values:
 | -------- | --------------------------------------------------------------------------------------------- |
 | `count`  | Kept sentences that contain the word                                                          |
 | `status` | `covered`, `partial` (count below `--per-word`), or `absent`                                  |
-| `reason` | `Y1` to `Y7`, `similar`, `no_gain`, `use_cap` (all from Y4), or `cap` (`--max-sentences` hit) |
+| `reason` | `Y1` to `Y8`, `similar`, `no_gain`, `use_cap` (all from Y4), or `cap` (`--max-sentences` hit) |
 
 A run prints a summary:
 
@@ -585,13 +599,13 @@ the run with a non-zero exit code. Lower a value only with a new measurement.
 | G2   | On the LTL deck, at least 92 percent of Han tokens have a spoken count (measured 92.3)                                          | M2   |
 | G3   | 係, 嘅, 唔, 我, 你 are in the first 20 ranks                                                                                    | M1   |
 | G4   | 你好, 早晨, 唔該 are in the first 3000 ranks (overrides apply)                                                                  | M1   |
-| G5   | No kept sentence fails Y1 to Y7                                                                                                 | M3   |
+| G5   | No kept sentence fails Y1 to Y8                                                                                                 | M3   |
 | G6   | No two kept sentences are duplicates by 8.3                                                                                     | M4   |
 | G7   | Every kept sentence has a row in `.select.csv`, and the row counts match the input                                              | M3   |
 | G8   | `--no-select --freq written --order score` gives the same ranking CSV as the current version                                    | M5   |
 | G9   | The kept cards have a non-decreasing `hardest_rank` when `--order coverage`                                                     | M4   |
-| G10  | LTL deck, `--max-sentences 300`: at least 650 words, 210 top500 words, and `spoken_mass` 65.0 or more (measured 694, 217, 66.0) | M4   |
-| G11  | LTL deck, defaults: 647 cards, within 5 percent (measured 647)                                                                  | M4   |
+| G10  | LTL deck, `--max-sentences 300`: at least 650 words, 210 top500 words, and `spoken_mass` 65.0 or more (measured 688, 217, 66.1) | M4   |
+| G11  | LTL deck, defaults: 641 cards, within 5 percent (measured 641)                                                                  | M4   |
 | G12  | No word outside the 100 most frequent words is in more than `--max-uses` kept sentences (8.5)                                   | M4   |
 
 G2 comes from 14.2. G10 and G11 come from 3.1 and 3.3.
@@ -611,7 +625,7 @@ tests. Patch the download function, as the existing yue tests do.
 | Cifu reader    | Skips the header; reads the empty count cells                                                                                                                     |
 | Tokenizer      | The instance does not change the global jieba result                                                                                                              |
 | Variant map    | Lookup only; card text unchanged                                                                                                                                  |
-| Rules Y1 to Y7 | A small fixture with one failing sentence for each rule                                                                                                           |
+| Rules Y1 to Y8 | A small fixture with one failing sentence for each rule                                                                                                           |
 | Greedy cover   | A rare word wins over a repeat; the `--per-word` limit stops the gain                                                                                             |
 | Similarity     | An anagram pair and a same-token pair                                                                                                                             |
 | Word-use cap   | A word outside the top 100 stops at `--max-uses` sentences; a top-100 word does not; a word twice in one sentence counts once; `--max-uses 0` turns the limit off |
@@ -657,7 +671,7 @@ tests. Patch the download function, as the existing yue tests do.
 | M0        | `anki-4uh` | Fetch Cifu to the cache; check the license; add `CIFU_PATH`             | cached file, license note               |
 | M1        | `anki-vfx` | Reader, blend, variant map, overrides, `anki freq yue`                  | `data/yue_frequency.tsv`; G1, G3, G4    |
 | M2        | `anki-d1o` | Tokenizer, `--freq` option, change report for `anki-afn`                | report of changed sentences; G2         |
-| M3        | `anki-8ox` | Rules Y1 to Y7, `.select.csv`                                           | G5, G7                                  |
+| M3        | `anki-8ox` | Rules Y1 to Y8, `.select.csv`                                           | G5, G7                                  |
 | M4        | `anki-7y5` | Greedy cover, similarity, word-use cap, learning order, `.coverage.csv` | G6, G9, G10, G11, G12; options complete |
 | M5        | `anki-0ne` | README, `ATTRIBUTION.md`, tests, regression gate G8                     | release check                           |
 | M6        | `anki-5z4` | Tatoeba Cantonese pool: download, English links, command spec           | numbers of 3.4 reproduced; second spec  |
@@ -670,7 +684,7 @@ Acceptance:
 
 | Milestone | Condition                                                                                                                                                                                                 |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| M4        | LTL deck, defaults: all 224 top-500 words of the passed set, at most 680 cards, `spoken_mass` 66.8%, no word over its limit (G10, G11, G12). The user marks 5 percent of the kept cards as good sentences |
+| M4        | LTL deck, defaults: all 223 top-500 words of the passed set, at most 680 cards, `spoken_mass` 66.8%, no word over its limit (G10, G11, G12). The user marks 5 percent of the kept cards as good sentences |
 | M6        | Tatoeba pool: 500 cards give `spoken_mass` of 77.0% or more; the default run gives about 1,200 cards (3.1, 3.3)                                                                                           |
 
 ## 14. Appendix: evidence
@@ -731,11 +745,13 @@ The table shows the first failed rule for each sentence.
 
 | Result                   | Count |
 | ------------------------ | ----- |
-| Pass                     | 872   |
-| Y1 length not 3 to 12    | 31    |
+| Pass                     | 858   |
+| Y1 length not 3 to 12    | 30    |
 | Y2 Latin letter or digit | 50    |
+| Y3 repeated pattern      | 1     |
 | Y4 not one final mark    | 14    |
 | Y7 more than 2 unknown   | 32    |
+| Y8 foreign name          | 14    |
 | Total                    | 999   |
 
 - Example of a Y2 failure: `送Tom走。` has rank 3 in the current output. The
@@ -744,12 +760,12 @@ The table shows the first failed rule for each sentence.
 
 ### 14.4 Vocabulary reach of the LTL deck
 
-| Measure                | All 999 sentences | The 872 that pass |
+| Measure                | All 999 sentences | The 858 that pass |
 | ---------------------- | ----------------- | ----------------- |
-| Words                  | 1133              | 999               |
-| Top 500 blended words  | 236               | 224               |
-| Top 1000 blended words | 345               | 328               |
-| Top 1500 blended words | 414               | 392               |
+| Words                  | 1133              | 983               |
+| Top 500 blended words  | 236               | 223               |
+| Top 1000 blended words | 345               | 326               |
+| Top 1500 blended words | 414               | 386               |
 | `spoken_mass`          | 67.7%             | 66.8%             |
 
 The LTL deck is small, so it limits the result. A selection step cannot add
@@ -822,6 +838,8 @@ one non-exempt word.
 | Tatoeba cap 500  | 8, 200        | 500   | 1,329 | 528     | 77.2%         | 8          | 3                 |
 | Tatoeba cap 500  | 8, 50         | 500   | 1,328 | 523     | 77.0%         | 8          | 31                |
 
+- The LTL cells in the table above come from the prototype before rule Y8.
+  With Y8, the defaults give 674 cards without a cap and 641 with a cap of 8.
 - A limit of 8 removes 5% of the LTL cards and 10% of the Tatoeba cards at
   the defaults. `spoken_mass` falls by 0.0 and 0.3 points.
 - With a card cap, the limit is almost free: 0.1 point or less. At Tatoeba

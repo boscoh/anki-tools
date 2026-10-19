@@ -138,8 +138,10 @@ uv run anki fix yue deck.apkg # Convert, fix jyutping, select, rank, reorder
     blend moves by more than 100 places.
 - The filter removes fragments and hard sentences. A sentence passes when it
   has 3 to 12 Han characters, no Latin letter or digit, no repeated pattern,
-  one final mark at the end, no quotation mark, at most one internal mark, and
-  at most 2 words outside the top 2000.
+  one final mark at the end, no quotation mark, at most one internal mark, at
+  most 2 words outside the top 2000, and no foreign name from
+  `vocab/yue_names.tsv` (add a row for a new name). Latin names and English
+  words fail the Latin-letter rule.
 - The selection keeps the fewest sentences that cover the 1500 most frequent
   words of the deck. Each target word gets 2 cards. One word outside the top
   100 goes in at most 8 kept sentences. The cards go from easy to hard.

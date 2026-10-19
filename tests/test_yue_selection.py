@@ -28,6 +28,7 @@ from anki_tools.yue_select import (
     SelectionReport,
     check_sentence,
     greedy_select,
+    read_names,
     select_yue_sentences,
     spoken_mass,
 )
@@ -263,8 +264,31 @@ class TestSentenceRules:
         assert self.check("我食飯。", ["我", "食", "飯", "貓"]) == ""
         assert self.check("我食飯。", ["貓", "狗", "魚"]) == "Y7"
 
+    def test_y8_foreign_name(self) -> None:
+        options = SelectionOptions(names=("蕾拉",))
+        assert check_sentence("蕾拉想走。", [], self.RANKS, options) == "Y8"
+        assert check_sentence("森美想走。", [], self.RANKS, options) == ""
+        assert check_sentence("蕾拉想走。", [], self.RANKS, self.OPTIONS) == ""
+
+    def test_y8_comes_after_the_other_rules(self) -> None:
+        options = SelectionOptions(names=("蕾拉",))
+        assert check_sentence("蕾拉想走", [], self.RANKS, options) == "Y4"
+
     def test_rules_apply_in_order(self) -> None:
         assert self.check("「Tom」") == "Y1"
+
+
+class TestNameFile:
+    def test_reads_one_name_per_line_and_skips_the_header(self, tmp_path: Path) -> None:
+        path = tmp_path / "names.tsv"
+        path.write_text("name\treason\n蕾拉\tLayla\n\n森美\tSammy\n", encoding="utf-8")
+        assert read_names(path) == ("蕾拉", "森美")
+
+    def test_an_absent_file_gives_no_names(self, tmp_path: Path) -> None:
+        assert read_names(tmp_path / "absent.tsv") == ()
+
+    def test_the_repository_file_loads(self) -> None:
+        assert "蕾拉" in read_names()
 
 
 class TestGreedyCover:
