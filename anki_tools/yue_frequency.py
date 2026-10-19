@@ -14,8 +14,9 @@ import csv
 import os
 import re
 from dataclasses import dataclass, field
+from functools import cached_property
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 import jieba
 
@@ -105,7 +106,7 @@ class YueFrequency:
     rows: list[FreqRow]
     variants: dict[str, str] = field(default_factory=dict)
 
-    @property
+    @cached_property
     def ranks(self) -> dict[str, int]:
         """Word to rank, with each variant mapped to its standard form."""
         ranks = {row.word: row.rank for row in self.rows}
@@ -443,6 +444,12 @@ def write_freq_change_csv(rows: list[dict[str, Any]], path: Path) -> None:
         writer.writerows(rows)
 
 
+class Tokenizer(Protocol):
+    """Minimal word tokenizer: a ``lcut`` method returns the tokens of a text."""
+
+    def lcut(self, text: str) -> list[str]: ...
+
+
 def build_yue_tokenizer(
     cifu: dict[str, CifuEntry],
     *,
@@ -479,7 +486,7 @@ def build_yue_tokenizer(
     return tokenizer
 
 
-def han_tokens(tokenizer: jieba.Tokenizer, text: str) -> list[str]:
+def han_tokens(tokenizer: Tokenizer, text: str) -> list[str]:
     """Split text into tokens that contain a Han character.
 
     :param tokenizer: Tokenizer from :func:`build_yue_tokenizer`.
@@ -490,7 +497,7 @@ def han_tokens(tokenizer: jieba.Tokenizer, text: str) -> list[str]:
 
 
 def spoken_token_coverage(
-    tokenizer: jieba.Tokenizer, texts: list[str], cifu: dict[str, CifuEntry]
+    tokenizer: Tokenizer, texts: list[str], cifu: dict[str, CifuEntry]
 ) -> float:
     """Share of Han tokens that have a spoken count in Cifu (gate G2).
 

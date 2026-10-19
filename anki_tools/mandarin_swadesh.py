@@ -702,13 +702,14 @@ def _count_marks(sentence: str, marks: str) -> int:
 
 
 def check_sentence_shape(
-    sentence: str, min_han: int = 4, max_han: int = 10
+    sentence: str, min_han: int = 4, max_han: int = 10, *, final_mark: bool = True
 ) -> str | None:
     """Apply filters F2 to F8 to one sentence.
 
     :param sentence: Simplified Chinese sentence.
     :param min_han: Minimum Han character count.
     :param max_han: Maximum Han character count.
+    :param final_mark: Apply filters F5 and F6 (the final-mark rules).
     :returns: The first failed filter key, or None when all filters pass.
     """
     han_len = len(get_chinese_chars(sentence))
@@ -718,10 +719,11 @@ def check_sentence_shape(
         return "F3"
     if is_repeated_zh_sentence(sentence):
         return "F4"
-    if not sentence or sentence[-1] not in FINAL_MARKS:
-        return "F5"
-    if _count_marks(sentence, FINAL_MARKS) != 1:
-        return "F6"
+    if final_mark:
+        if not sentence or sentence[-1] not in FINAL_MARKS:
+            return "F5"
+        if _count_marks(sentence, FINAL_MARKS) != 1:
+            return "F6"
     if any(char in QUOTE_MARKS for char in sentence):
         return "F7"
     if _count_marks(sentence, INTERNAL_MARKS) > 1:

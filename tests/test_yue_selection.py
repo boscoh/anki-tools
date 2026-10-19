@@ -8,6 +8,8 @@ import pytest
 from anki_tools.rank import Sentence
 from anki_tools.yue_frequency import (
     CifuEntry,
+    FreqRow,
+    YueFrequency,
     build_yue_frequency,
     build_yue_tokenizer,
     check_frequency,
@@ -18,6 +20,16 @@ from anki_tools.yue_frequency import (
     read_variants,
     write_freq_change_csv,
     write_frequency_tsv,
+)
+from anki_tools.yue_select import (
+    UNRANKED,
+    Candidate,
+    SelectionOptions,
+    SelectionReport,
+    check_sentence,
+    greedy_select,
+    select_yue_sentences,
+    spoken_mass,
 )
 
 CIFU_HEADER = "Word\tJyutPing\tSpokenAdult\tWritten"
@@ -161,7 +173,7 @@ class TestTokenizer:
 
 
 class TestRankChangeReport:
-    def test_reports_rows_past_the_threshold_sorted_by_move(self, tmp_path: Path) -> None:
+    def test_reports_rows_past_the_threshold_sorted_by_move(self) -> None:
         before = [
             Sentence(note_id=n, text=f"s{n}", original_order=n) for n in (1, 2, 3)
         ]
@@ -180,3 +192,254 @@ class TestRankChangeReport:
         lines = out.read_text(encoding="utf-8").splitlines()
         assert lines[0] == "sentence,rank_before,rank_after,move"
         assert lines[1] == "我明。,5,986,-981"
+
+
+def make_freq(words: list[str]) -> YueFrequency:
+    rows = [
+        FreqRow(word, "", 10, 1.0, 1.0, 1.0, rank=rank, source="cifu")
+        for rank, word in enumerate(words, 1)
+    ]
+    return YueFrequency(rows)
+
+
+def make_sentence(
+    text: str, order: int, complexity: float = 0.0
+) -> Sentence:
+    return Sentence(
+        note_id=order + 1,
+        text=text,
+        original_order=order,
+        complexity_score=complexity,
+    )
+
+
+class StubTokenizer:
+    def __init__(self, tokens: dict[str, list[str]]) -> None:
+        self.tokens = tokens
+
+    def lcut(self, text: str) -> list[str]:
+        return self.tokens[text]
+
+
+class TestSentenceRules:
+    RANKS = {"我": 1, "食": 2, "飯": 3, "好": 4}
+    OPTIONS = SelectionOptions()
+
+    def check(self, text: str, tokens: list[str] | None = None) -> str:
+        return check_sentence(text, tokens or [], self.RANKS, self.OPTIONS)
+
+    def test_a_complete_sentence_passes(self) -> None:
+        assert self.check("我食飯。") == ""
+
+    def test_y1_length_window(self) -> None:
+        assert self.check("食飯。") == "Y1"
+        assert self.check("我哋今日去街市買嘢食好唔好。") == "Y1"
+        assert self.check("我哋今日去街市買嘢食。") == ""
+
+    def test_y2_latin_letter_or_digit(self) -> None:
+        assert self.check("我食飯Tom。") == "Y2"
+        assert self.check("我食飯3。") == "Y2"
+
+    def test_y3_repeated_pattern(self) -> None:
+        assert self.check("我食飯我食飯。") == "Y3"
+
+    def test_y4_one_final_mark_at_the_end(self) -> None:
+        assert self.check("我食飯") == "Y4"
+        assert self.check("我食飯。？") == "Y4"
+        assert self.check("我食飯。") == ""
+
+    def test_y4_can_be_skipped(self) -> None:
+        options = SelectionOptions(final_mark=False)
+        assert check_sentence("我食飯", [], self.RANKS, options) == ""
+
+    def test_y5_quotation_mark(self) -> None:
+        assert self.check("「我食飯」。") == "Y5"
+
+    def test_y6_at_most_one_internal_mark(self) -> None:
+        assert self.check("我，食飯。") == ""
+        assert self.check("我，食，飯。") == "Y6"
+
+    def test_y7_unknown_token_budget(self) -> None:
+        assert self.check("我食飯。", ["我", "食", "飯", "貓"]) == ""
+        assert self.check("我食飯。", ["貓", "狗", "魚"]) == "Y7"
+
+    def test_rules_apply_in_order(self) -> None:
+        assert self.check("「Tom」") == "Y1"
+
+
+class TestGreedyCover:
+    def test_a_duplicate_token_counts_once_and_per_word_stops_the_gain(self) -> None:
+        ranks = {"甲": 1, "乙": 2, "丙": 500}
+        candidates = [
+            Candidate(make_sentence("甲甲。", 0), ["甲", "甲"], 2),
+            Candidate(make_sentence("甲丙。", 1), ["甲", "丙"], 2),
+            Candidate(make_sentence("乙。", 2), ["乙"], 2),
+        ]
+        result = greedy_select(candidates, ranks, SelectionOptions(per_word=1))
+        assert [c.sentence.text for c in result.kept] == ["甲丙。", "乙。"]
+        assert result.reasons[0] == "no_gain"
+
+    def test_per_word_limits_the_cards_for_one_word(self) -> None:
+        ranks = {"甲": 1}
+        candidates = [
+            Candidate(make_sentence(f"甲{word}。", i), ["甲", word], 2)
+            for i, word in enumerate(("一", "二", "三"))
+        ]
+        result = greedy_select(candidates, ranks, SelectionOptions(per_word=2))
+        assert len(result.kept) == 2
+        assert sorted(result.reasons.values()) == ["no_gain"]
+        assert result.word_counts["甲"] == 2
+
+    def test_max_sentences_stops_the_selection(self) -> None:
+        ranks = {"甲": 1, "乙": 2, "丙": 3}
+        candidates = [
+            Candidate(make_sentence("甲。", 0), ["甲"], 1),
+            Candidate(make_sentence("乙。", 1), ["乙"], 1),
+            Candidate(make_sentence("丙。", 2), ["丙"], 1),
+        ]
+        options = SelectionOptions(per_word=1, max_sentences=1)
+        result = greedy_select(candidates, ranks, options)
+        assert len(result.kept) == 1
+        assert set(result.reasons.values()) == {"cap"}
+
+
+class TestSimilarity:
+    def test_same_token_set_is_a_duplicate(self) -> None:
+        ranks = {"我": 1, "食": 2, "飯": 3}
+        candidates = [
+            Candidate(make_sentence("我食飯。", 0), ["我", "食", "飯"], 3),
+            Candidate(make_sentence("飯食我。", 1), ["我", "食", "飯"], 3),
+        ]
+        result = greedy_select(candidates, ranks, SelectionOptions())
+        assert len(result.kept) == 1
+        assert result.reasons[1] == "similar"
+
+    def test_same_unique_characters_with_a_high_jaccard_is_a_duplicate(self) -> None:
+        ranks = {"我食": 1, "飯": 2, "我": 3, "食飯": 4}
+        candidates = [
+            Candidate(make_sentence("我食飯。", 0), ["我食", "飯"], 3),
+            Candidate(make_sentence("我飯食。", 1), ["我", "食飯"], 3),
+        ]
+        result = greedy_select(candidates, ranks, SelectionOptions())
+        assert len(result.kept) == 1
+        assert result.reasons[1] == "similar"
+
+
+class TestWordUseCap:
+    def candidates(self, shared: str, words: list[str]) -> list[Candidate]:
+        return [
+            Candidate(make_sentence(f"{shared}{word}。", i), [shared, word], 2)
+            for i, word in enumerate(words)
+        ]
+
+    def test_a_word_outside_the_top_100_stops_at_the_limit(self) -> None:
+        ranks = {"甲": 2, "乙": 3, "丙": 4, "丁": 5, "學": 150}
+        options = SelectionOptions(per_word=2, max_uses=2)
+        result = greedy_select(self.candidates("學", ["甲", "乙", "丙", "丁"]), ranks, options)
+        assert len(result.kept) == 2
+        assert list(result.reasons.values()).count("use_cap") == 2
+        assert result.word_counts["學"] == 2
+
+    def test_a_top_100_word_is_exempt(self) -> None:
+        ranks = {"甲": 2, "乙": 3, "丙": 4, "丁": 5, "我": 1}
+        options = SelectionOptions(per_word=2, max_uses=2)
+        result = greedy_select(self.candidates("我", ["甲", "乙", "丙", "丁"]), ranks, options)
+        assert len(result.kept) == 4
+
+    def test_a_word_twice_in_one_sentence_counts_once(self) -> None:
+        ranks = {"甲": 2, "學": 150}
+        candidates = [
+            Candidate(make_sentence("學學。", 0), ["學", "學"], 2),
+            Candidate(make_sentence("學甲。", 1), ["學", "甲"], 2),
+        ]
+        options = SelectionOptions(per_word=2, max_uses=2)
+        result = greedy_select(candidates, ranks, options)
+        assert len(result.kept) == 2
+        assert result.word_counts["學"] == 2
+
+    def test_zero_turns_the_limit_off(self) -> None:
+        ranks = {"甲": 2, "乙": 3, "丙": 4, "丁": 5, "學": 150}
+        options = SelectionOptions(per_word=2, max_uses=0)
+        result = greedy_select(self.candidates("學", ["甲", "乙", "丙", "丁"]), ranks, options)
+        assert len(result.kept) == 4
+
+    def test_the_limit_must_be_at_least_per_word(self) -> None:
+        with pytest.raises(ValueError):
+            SelectionOptions(per_word=3, max_uses=2)
+
+
+class TestSelectSentences:
+    def report(self, order: str = "coverage") -> SelectionReport:
+        freq = make_freq(["我", "食", "飯", "麵"])
+        ranked = [
+            make_sentence("我食飯。", 0),
+            make_sentence("我食麵。", 1),
+            make_sentence("飯食我。", 2),
+        ]
+        dropped = [make_sentence("我食飯我食飯。", 3)]
+        tokenizer = StubTokenizer({
+            "我食飯。": ["我", "食", "飯"],
+            "我食麵。": ["我", "食", "麵"],
+            "飯食我。": ["我", "食", "飯"],
+            "我食飯我食飯。": ["我", "食", "飯"],
+        })
+        options = SelectionOptions(per_word=2, max_uses=0, order=order)
+        return select_yue_sentences(ranked, dropped, freq, tokenizer, options)
+
+    def test_marks_every_input_sentence_and_keeps_the_order(self) -> None:
+        report = self.report()
+        reasons = {row["sentence"]: row["reason"] for row in report.select_rows}
+        assert len(report.select_rows) == 4
+        assert reasons["我食飯。"] == ""
+        assert reasons["飯食我。"] == "similar"
+        assert reasons["我食飯我食飯。"] == "Y3"
+        assert [sentence.text for sentence in report.ordered[:2]] == [
+            "我食飯。",
+            "我食麵。",
+        ]
+
+    def test_hardest_rank_does_not_decrease(self) -> None:
+        report = self.report()
+        kept = [sentence for sentence in report.ordered if sentence.kept]
+        ranks = [sentence.hardest_rank for sentence in kept]
+        assert ranks == sorted(ranks)
+        assert kept[0].hardest_rank == 3
+        assert kept[1].hardest_rank == 4
+
+    def test_a_sentence_of_unranked_words_comes_last(self) -> None:
+        freq = make_freq(["我", "食", "飯"])
+        ranked = [
+            make_sentence("我食飯。", 0),
+            make_sentence("我食嘢。", 1),
+        ]
+        tokenizer = StubTokenizer({"我食飯。": ["我", "食", "飯"], "我食嘢。": ["我", "食", "嘢"]})
+        report = select_yue_sentences(
+            ranked, [], freq, tokenizer, SelectionOptions(per_word=2)
+        )
+        kept = [sentence for sentence in report.ordered if sentence.kept]
+        assert [sentence.text for sentence in kept] == ["我食飯。", "我食嘢。"]
+        assert kept[1].hardest_rank == UNRANKED
+
+    def test_score_order_follows_the_ranker(self) -> None:
+        report = self.report(order="score")
+        kept = [sentence.text for sentence in report.ordered if sentence.kept]
+        assert kept == ["我食飯。", "我食麵。"]
+
+    def test_coverage_rows_have_a_status_for_each_top_word(self) -> None:
+        report = self.report()
+        rows = {row["word"]: row for row in report.coverage_rows}
+        assert rows["我"]["status"] == "covered"
+        assert rows["我"]["count"] == 2
+        assert rows["麵"]["status"] == "partial"
+        assert report.summary["kept"] == 2
+        assert report.summary["top500"] == 4
+
+
+class TestSpokenMass:
+    def test_counts_the_share_of_spoken_tokens_in_the_kept_words(self) -> None:
+        freq = YueFrequency([
+            FreqRow("我", "", 75, 1.0, 1.0, 1.0, rank=1, source="cifu"),
+            FreqRow("食", "", 25, 1.0, 1.0, 1.0, rank=2, source="cifu"),
+        ])
+        candidates = [Candidate(make_sentence("我。", 0), ["我"], 1)]
+        assert spoken_mass(freq, candidates) == pytest.approx(75.0)

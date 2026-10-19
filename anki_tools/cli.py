@@ -12,7 +12,6 @@ import csv
 import os
 import re
 import shutil
-import tempfile
 import time
 from pathlib import Path
 from textwrap import dedent
@@ -44,13 +43,10 @@ from anki_tools.mandarin_swadesh import (
 from anki_tools.package import AnkiPackage
 from anki_tools.pinyin import fix_pinyin
 from anki_tools.rank import (
-    SIMILARITY_CONSIDER_DELETE_PENALTY,
     Sentence,
     YUE_FREQUENCY_ATTRIBUTION,
-    char_similarity_zh,
     char_similarity_zh_same_len,
     extract_sentences,
-    get_chinese_chars,
     rank_sentences_es,
     rank_sentences_fr,
     rank_sentences_yue,
@@ -61,15 +57,26 @@ from anki_tools.rank import (
 )
 
 
-from anki_tools.reorder import load_ranking, reorder_deck
+from anki_tools.reorder import reorder_deck
 from anki_tools.yue_frequency import (
     CIFU_ATTRIBUTION,
     FREQUENCY_PATH,
+    build_yue_tokenizer,
     check_frequency,
+    download_cifu,
     load_yue_frequency,
     rank_change_rows,
+    read_cifu,
+    read_overrides,
     write_freq_change_csv,
     write_frequency_tsv,
+)
+from anki_tools.yue_select import (
+    SelectionOptions,
+    print_selection_summary,
+    select_yue_sentences,
+    write_coverage_csv,
+    write_select_csv,
 )
 
 app = cyclopts.App(help="CLI tools for Anki package (.apkg) files")
@@ -248,7 +255,7 @@ def fields(apkg_path: Path, model_name: str | None = None):
     with AnkiPackage(str(apkg_path)) as pkg:
         models = pkg.get_models()
 
-        for model_id, model_info in models.items():
+        for _model_id, model_info in models.items():
             name = model_info.get("name", "Unknown")
 
             if model_name and model_name.lower() not in name.lower():
@@ -436,7 +443,7 @@ def _apply_style(
             all_fields.update(f["name"] for f in model.get("flds", []))
         if verbose:
             print("Deck fields:")
-            for mid, model in models.items():
+            for _mid, model in models.items():
                 print(f"  {', '.join(f['name'] for f in model['flds'])}")
 
     css_content = None
@@ -532,9 +539,12 @@ def apply(
     output = Path(output)
 
     if apkg_path.resolve() != output.resolve():
-        shutil.copy(apkg_path, output)
+        try:
+            shutil.copy(apkg_path, output)
+        except OSError as exc:
+            raise RuntimeError(f"Cannot copy {apkg_path} to {output}.") from exc
 
-    n, applied = _apply_style(
+    _n, applied = _apply_style(
         output,
         css_path=css or Path("templates/card.css"),
         front_path=front or Path("templates/front.html"),
@@ -790,19 +800,46 @@ def yue(
     output: Path | None = None,
     model_id: int | None = None,
     keep_filtered: bool = False,
+    max_sentences: int | None = None,
+    per_word: int = 2,
+    max_uses: int = 8,
+    top_words: int = 1500,
+    order: Literal["coverage", "score"] = "coverage",
+    no_select: bool = False,
+    min_han: int = 3,
+    max_han: int = 12,
+    max_unknown: int = 2,
+    known_top: int = 2000,
+    similarity_threshold: float = 0.67,
+    no_final_mark: bool = False,
     freq: Literal["blend", "spoken", "written"] = "blend",
     spoken_weight: float = 0.7,
     freq_report: bool = False,
 ):
-    """Fix Cantonese deck: convert to traditional, fix jyutping, rank, and reorder.
+    """Fix Cantonese deck: convert to traditional, fix jyutping, select, rank, and reorder.
+
     Converts simplified to traditional Chinese, generates accurate jyutping,
-    ranks by the blended spoken and written frequency and complexity, then
-    reorders the deck. Writes the ranking CSV next to the input.
+    and ranks by spoken and written frequency and complexity. Then filters
+    fragments and hard sentences, and keeps the fewest sentences that show the
+    most frequent spoken words, easiest first. Writes .rank.csv, .select.csv,
+    and .coverage.csv next to the input.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: input_reordered.apkg).
     :param model_id: Filter by specific model ID.
-    :param keep_filtered: If True, keep filtered cards (names, invalid).
+    :param keep_filtered: With --no-select, keep high-similarity cards.
+    :param max_sentences: Stop the selection at this count (default: stop at zero gain).
+    :param per_word: Cards wanted for each target word.
+    :param max_uses: Most kept sentences for one word outside the top 100 (0 is no limit).
+    :param top_words: Size of the target set.
+    :param order: coverage (easy to hard) or score (order of the ranker).
+    :param no_select: Only rank and reorder, as before.
+    :param min_han: Minimum Han characters in a sentence.
+    :param max_han: Maximum Han characters in a sentence.
+    :param max_unknown: Unknown words allowed in a sentence.
+    :param known_top: Size of the known word set.
+    :param similarity_threshold: Character Jaccard threshold for duplicates.
+    :param no_final_mark: Keep sentences with no final mark.
     :param freq: Frequency term: blend, spoken, or written.
     :param spoken_weight: Weight of the spoken term in the blend (0 to 1).
     :param freq_report: Write the sentences that the frequency change moves.
@@ -816,6 +853,8 @@ def yue(
         output = apkg_path.parent / f"{apkg_path.stem}_reordered.apkg"
 
     ranking_csv = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
+    select_csv = apkg_path.parent / f"{apkg_path.stem}.select.csv"
+    coverage_csv = apkg_path.parent / f"{apkg_path.stem}.coverage.csv"
 
     print("=" * 50)
     print("Processing Cantonese Anki Deck")
@@ -832,9 +871,8 @@ def yue(
         print("No sentences found!")
         return
 
-    ranked = rank_sentences_yue(
-        sentences, freq=freq, spoken_weight=spoken_weight
-    )
+    extracted = list(sentences)
+    ranked = rank_sentences_yue(sentences, freq=freq, spoken_weight=spoken_weight)
     if freq_report and freq != "written":
         comparison = rank_sentences_yue(
             [
@@ -846,20 +884,54 @@ def yue(
         rows = rank_change_rows(comparison, ranked)
         change_csv = apkg_path.parent / f"{apkg_path.stem}.freq_change.csv"
         write_freq_change_csv(rows, change_csv)
-        print(
-            f"  {len(rows)} sentences move by more than 100 places: {change_csv}"
+        print(f"  {len(rows)} sentences move by more than 100 places: {change_csv}")
+
+    if no_select:
+        write_ranking_csv(ranked, str(ranking_csv))
+        print("\nStep 2: Reordering deck...")
+        stats = reorder_deck(
+            str(apkg_path),
+            str(output),
+            str(ranking_csv),
+            remove_filtered=not keep_filtered,
         )
-    write_ranking_csv(ranked, str(ranking_csv))
+    else:
+        options = SelectionOptions(
+            max_sentences=max_sentences,
+            per_word=per_word,
+            max_uses=max_uses,
+            top_words=top_words,
+            order=order,
+            min_han=min_han,
+            max_han=max_han,
+            max_unknown=max_unknown,
+            known_top=known_top,
+            similarity_threshold=similarity_threshold,
+            final_mark=not no_final_mark,
+        )
+        print("\nStep 2: Selecting sentences...")
+        frequency = load_yue_frequency(freq=freq, spoken_weight=spoken_weight)
+        tokenizer = build_yue_tokenizer(
+            read_cifu(download_cifu()), extra_words=read_overrides()
+        )
+        ranked_ids = {id(sentence) for sentence in ranked}
+        dropped = [s for s in extracted if id(s) not in ranked_ids]
+        report = select_yue_sentences(ranked, dropped, frequency, tokenizer, options)
+        write_ranking_csv(report.ordered, str(ranking_csv))
+        write_select_csv(report, select_csv)
+        write_coverage_csv(report, coverage_csv)
+        print_selection_summary(report, options)
 
-    print(f"\nStep 2: Reordering deck...")
-    stats = reorder_deck(
-        str(apkg_path),
-        str(output),
-        str(ranking_csv),
-        remove_filtered=not keep_filtered,
-    )
+        print("\nStep 3: Reordering deck...")
+        stats = reorder_deck(
+            str(apkg_path),
+            str(output),
+            str(ranking_csv),
+            remove_filtered=False,
+            remove_unranked=True,
+        )
 
-    print("\nStep 3: Fixing jyutping...")
+    print("\nFixing jyutping...")
     fix_jyutping(
         output,
         output=output,
@@ -875,6 +947,9 @@ def yue(
     print(f"  Cards removed:       {stats['cards_removed']}")
     print(f"  Output:              {output}")
     print(f"  Ranking CSV:         {ranking_csv}")
+    if not no_select:
+        print(f"  Select CSV:          {select_csv}")
+        print(f"  Coverage CSV:        {coverage_csv}")
 
 
 @fix_app.command
@@ -942,7 +1017,7 @@ def es(
 
     write_ranking_csv(ranked, str(ranking_csv))
 
-    print(f"\nStep 3: Reordering deck...")
+    print("\nStep 3: Reordering deck...")
     stats = reorder_deck(
         str(apkg_path),
         str(output),
@@ -986,8 +1061,12 @@ def _parse_vocab_entries(config: dict) -> list[dict]:
     if not csv_path.is_absolute():
         csv_path = Path(__file__).parent.parent / config["vocab_file"]
     entries = []
-    with open(csv_path, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
+    try:
+        handle = open(csv_path, "r", encoding="utf-8")
+    except OSError as exc:
+        raise RuntimeError(f"Cannot read the vocabulary file {csv_path}.") from exc
+    with handle:
+        reader = csv.DictReader(handle)
         for row in reader:
             entries.append({k: v.strip() if v else v for k, v in row.items()})
 

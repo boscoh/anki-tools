@@ -140,6 +140,11 @@ The default settings are:
 | LTL deck               | 999          | 872           | 647        | 961   | 224    | 327     | 391     | 66.8%         |
 | Tatoeba Cantonese pool | 20,853       | 4,256         | 1,173      | 1,974 | 356    | 580     | 782     | 79.6%         |
 
+The implementation reproduces these values on 2026-10-19: 650 cards, 962
+words, top500 224, top1000 327, top1500 390, `spoken_mass` 67.1. The card count
+is 3 above 647, inside the 5 percent of gate G11. With
+`--max-sentences 300`: 692 words, 217 top500 words, `spoken_mass` 66.3 (G10).
+
 What the selection removes, against the passed pool:
 
 | Input   | Cards removed        | Words lost     | Top 1500 words lost | `spoken_mass` lost |
@@ -432,7 +437,9 @@ existing code.
 Sort the kept sentences so that each card uses words that earlier cards
 introduced. The sort keys, in order:
 
-1. `hardest_rank`: the rank of the least frequent known token. Ascending.
+1. `hardest_rank`: the rank of the least frequent token. Ascending. A token
+   with no rank counts as rank 1,000,000, so a sentence of only unranked words
+   comes last, not first.
 2. Complexity score from `complexity_score_zh`. Ascending.
 3. Han length. Ascending.
 4. Original order. Ascending.
@@ -500,10 +507,10 @@ Filter:
 
 Frequency:
 
-| Option            | Default | Meaning                         |
-| ----------------- | ------- | ------------------------------- |
-| `--freq`          | blend   | `blend`, `spoken`, or `written` |
-| `--spoken-weight` | 0.7     | Value of `w` in 5.2             |
+| Option            | Default | Meaning                                                    |
+| ----------------- | ------- | ---------------------------------------------------------- |
+| `--freq`          | blend   | `blend`, `spoken`, or `written`                            |
+| `--spoken-weight` | 0.7     | Value of `w` in 5.2                                        |
 | `--freq-report`   | off     | Write the sentences that move by more than 100 places (M2) |
 
 `--freq written --order score --no-select` gives a byte-identical result to
@@ -530,7 +537,7 @@ Values:
 
 A run prints a summary:
 
-- Sentences in, rejected by rule, removed by Y4, and kept.
+- Sentences in, rejected by rule, removed by the select stage (Y4), and kept.
 - The percent of the top 500 and the top 1500 words that reach `--per-word`.
 - The most uses of one word outside the top 100 (`max_uses`).
 
