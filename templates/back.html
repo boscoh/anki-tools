@@ -3,18 +3,3 @@
 <div id="chars" style="font-size: 1.5em">{{Sentence (Annotated)}}</div>
 <div id="latin">{{Sentence (Latin)}}</div>
 <div id="translation">{{Sentence (Translation)}}</div>
-
-<script>
-  function expand(elemId, url) {
-    var elem = document.getElementById(elemId);
-    if (elem) {
-      var isCJK = ch => /[\u4e00-\u9fff]/.test(ch);
-      elem.innerHTML = elem.innerHTML
-        .split("")
-        .filter(ch => !/\s/.test(ch))
-        .map(ch => isCJK(ch) ? `<a href="${url}${ch}">${ch}</a>` : ch)
-        .join("");
-    }
-  }
-  expand('chars', `https://cantonese.org/search.php?q=`)
-</script>

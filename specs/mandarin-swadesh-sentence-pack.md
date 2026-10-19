@@ -53,10 +53,10 @@ The test used jieba with a user dictionary that contains the word list.
 | Mandarin to English translation links        | 78,295           |
 | Linked sentences with a final mark           | 65,499 of 66,257 |
 | The same, CJK marks only                     | 64,397           |
-| Candidate sentences after F1 to F10          | 36,148           |
+| Candidate sentences after F1 to F10          | 17,805           |
 | Tatoeba Mandarin sentences with native audio | 5,826            |
 
-F5 accepts `。？！` and `. ! ?`. The CJK-only count is 64,397. The 36,148
+F5 accepts `。？！` and `. ! ?`. The CJK-only count is 64,397. The 17,805
 value comes from the F1 to F10 rules in section 7. The audit prints the
 current value for both counts.
 
@@ -264,7 +264,7 @@ Filter rules, applied in order:
 | Rule | Condition                                                      |
 | ---- | -------------------------------------------------------------- |
 | F1   | Has at least one English translation link                      |
-| F2   | 4 to 10 Han characters                                         |
+| F2   | 4 to 7 Han characters                                          |
 | F3   | No Latin letters and no digits                                 |
 | F4   | No repeated-pattern text (`is_repeated_zh_sentence`)           |
 | F5   | Last character is `。`, `？`, `！`, `.`, `!`, or `?`           |
@@ -284,8 +284,8 @@ starts with `a` (`a`, `ad`, `an`).
 A card sentence must read as one complete statement. These rules enforce
 that requirement:
 
-- Length. 4 to 10 Han characters. Shorter text is a fragment, longer text
-  is hard to follow by ear. Prefer 5 to 9.
+- Length. 4 to 7 Han characters. Shorter text is a fragment, longer text
+  is hard to follow by ear. Prefer 5 to 7.
 - Final mark. The text ends with `。`, `？`, or `！`. A trailing quote mark,
   Latin full stop, or a bare noun is a fragment.
 - One sentence. Exactly one sentence-final mark. A dialogue pair or a
@@ -303,16 +303,16 @@ Measured effect of the proper-sentence filters on the linked Mandarin pool:
 | Filter set                   | Pool size |
 | ---------------------------- | --------- |
 | Linked sentences, any length | 66,257    |
-| F1 to F8, no predicate test  | 41,967    |
-| F1 to F10 (the proper set)   | 36,148    |
+| F1 to F8, no predicate test  | 21,311    |
+| F1 to F10 (the proper set)   | 17,805    |
 
-The 4 to 10 window removes fragments and still yields 36,148 sentences.
-That is enough for 414 of 444 words in the wider list.
+The 4 to 7 window removes fragments and still yields 17,805 sentences.
+Of the 211 Swadesh forms, 200 have a core candidate.
 
 These counts come from the 2026-10-17 run. The audit prints the current
 values.
-Fallback window: when a word gets no candidate in 4 to 10 characters, retry
-that word with a 3 to 10 character window and drop F6 and F8. Mark such a
+Fallback window: when a word gets no candidate in 4 to 7 characters, retry
+that word with a 3 to 7 character window and drop F6 and F8. Mark such a
 card `tier=scaffold`. A scaffold card must pass F3, F4, F5, F7, F9, and F10.
 G14 exempts it from F2, F6, and F8.
 
@@ -334,7 +334,7 @@ G14 exempts it from F2, F6, and F8.
 | -------------- | ----------------------------------------------------------------- |
 | Target match   | Target word appears exactly 1 time as a token                     |
 | Unknown words  | At most 2 tokens outside the known set (1 with `--max-unknown 1`) |
-| Length         | 4 to 10 Han characters                                            |
+| Length         | 4 to 7 Han characters                                             |
 | Complete       | Passes F5 to F10; a scaffold card skips F6 and F8                 |
 | Script         | Simplified Chinese only                                           |
 | Duplicate      | No char-set Jaccard of 0.67 or more with a kept card              |
@@ -351,7 +351,7 @@ Sort candidates for each target word by this key, first item first:
 2. Native audio present, yes first.
 3. Mean Zipf value of the sentence tokens for `zh`, high first. Omit this
    term for Cantonese (6.1).
-4. Han length, 5 to 9 first.
+4. Han length, 5 to 7 first.
 5. Tatoeba sentence id, low first, for determinism.
 
 ### 8.4 Selection and coverage
@@ -369,7 +369,8 @@ Use greedy set cover:
    covered word with the lowest Swadesh index; use the primary form first.
 
 Defaults: `--per-word 2`, `--max-cards 450`, `--max-unknown 2`. The word
-list has 211 forms, so 2 cards per word gives about 420 cards. Keep the
+list has 211 forms, so 2 cards per word gives about 420 cards. The 4 to 7
+character window and the Tatoeba pool give 387 cards. Keep the
 deck below about 450 cards for daily review.
 
 Reject a card when the sentence has no English translation after pairing.
@@ -517,7 +518,7 @@ Back template:
 ```html
 {{Audio}}
 <hr id=answer>
-<div class="sentence">{{Sentence}}</div>
+<div class="sentence char-links">{{Sentence}}</div>
 <div class="pinyin">{{Pinyin}}</div>
 <div class="english">{{English}}</div>
 <div class="target">{{Target}} {{Gloss}} {{WordAudio}}</div>
@@ -527,6 +528,12 @@ Back template:
 Use `templates/card.css` and add these classes: `.front-audio`,
 `.sentence`, `.pinyin`, `.english`, `.target`, `.source`, `.hint`.
 Sentence font 2.5rem, pinyin 1.2rem, English 1.1rem, source 0.8rem gray.
+
+The class `char-links` turns each Han character of the sentence into a link
+to the CC-Canto dictionary (`https://cantonese.org/search.php?q=`). The
+script is `templates/char_links.html`. It walks the text nodes, so the
+`<b>` mark on the target word stays. The profile field `char_links` adds
+the script to the back template.
 
 ### 10.2 Tags
 
@@ -551,25 +558,28 @@ Write `apkg/swadesh_mandarin_sentences.manifest.json`:
 
 ```json
 {
-  "build_date": "2026-10-18",
-  "source_dump_date": "2026-10-17",
+  "build_date": "2026-10-19",
+  "source_dump_date": "2026-10-19",
   "counts": {
     "words": 211,
-    "cards": 420,
-    "scaffold": 24,
-    "native_audio": 120,
-    "tts_audio": 300
+    "cards": 387,
+    "scaffold": 0,
+    "native_audio": 0,
+    "tts_audio": 387
   },
-  "coverage": {"core_with_card": 0.88},
-  "voice": "zh-CN-XiaoxiaoNeural",
+  "coverage": {"core_with_card": 0.942},
+  "voice": "gtts:zh-CN",
   "pack_license": "public",
-  "audio_license_skipped": {"empty": 0, "CC BY-NC 4.0": 3},
+  "audio_license_skipped": {"empty": 0, "CC BY-NC 4.0": 0},
   "files": {"source_csv": "sha256:...", "sentences_csv": "sha256:..."},
   "licenses": [
     {"data": "Tatoeba sentences", "license": "CC BY 2.0 FR"},
     {"data": "Tatoeba audio", "license": "per recording"}
   ],
-  "excluded_words": ["骨头", "肝"]
+  "excluded_words": [
+    "虱子", "棍子", "种子", "骨头", "脂肪", "羽毛",
+    "舌头", "肠子", "乳房", "呕吐", "揉", "绑"
+  ]
 }
 ```
 
@@ -588,6 +598,10 @@ description. The file lists:
 - Tatoeba audio ids and authors, when the native tier is on.
 - The Swadesh source page and its license.
 - The TTS engine and voice.
+
+The Mandarin data goes into the `## Mandarin pack` section. Each pack
+replaces only its own section, so a rebuild keeps the Greek and French
+sections.
 
 State the licenses in the deck description and in `ATTRIBUTION.md`: word
 data CC BY-SA 4.0, sentence text CC BY 2.0 FR, and audio per recording.
@@ -618,7 +632,7 @@ Options:
 | `sentences` | `--max-cards`    | 450                  | Hard card cap                |
 | `sentences` | `--max-unknown`  | 2                    | Unknown tokens per sentence  |
 | `sentences` | `--min-han`      | 4                    | Minimum Han characters       |
-| `sentences` | `--max-han`      | 10                   | Maximum Han characters       |
+| `sentences` | `--max-han`      | 7                    | Maximum Han characters       |
 | `audio`     | `--native-audio` | none                 | `none`, `auto`, `only`       |
 | `audio`     | `--voice`        | zh-CN-XiaoxiaoNeural | edge-tts voice               |
 | `audio`     | `--slow-audio`   | off                  | Add a slow variant per card  |
@@ -670,7 +684,7 @@ code on a failure.
 | G11  | Manifest counts match the word table and the sentence CSV (10.4)                           |
 | G12  | `ATTRIBUTION.md` exists and names every audio author in the pack                           |
 | G13  | The APKG opens with `AnkiPackage` and lists the expected notes                             |
-| G14  | Core cards pass F2 to F10. Scaffold cards pass F3, F4, F5, F7, F9, F10, and length 3 to 10 |
+| G14  | Core cards pass F2 to F10. Scaffold cards pass F3, F4, F5, F7, F9, F10, and length 3 to 7  |
 | G15  | `vocab/swadesh_review.csv` exists and has no open row                                      |
 | G16  | Every card target has a valid `word_{hash}.mp3` file                                       |
 
@@ -695,7 +709,7 @@ Add unit tests in `tests/test_mandarin_pack.py` for:
 | Tatoeba text has traditional forms                      | Mixed script deck          | OpenCC conversion, keep original text for checks     |
 | jieba segmentation errors                               | Wrong target match         | User dictionary, exact substring check, review CSV   |
 | Swadesh tail has no proper sentence                     | Missing core words         | Fallback window, scaffold tier, manual frame         |
-| Strict length rule drops a natural short                | Fewer cards per word       | Fallback window 3 to 10, scaffold tier, review CSV   |
+| Strict length rule drops a natural short                | Fewer cards per word       | Fallback window 3 to 7, scaffold tier, review CSV    |
 | edge-tts is an unofficial endpoint                      | Voice service can break    | Retry, gTTS fallback, cached audio                   |
 | Tatoeba rate limits and slow downloads                  | Build time                 | 1 request per second, cache, resume                  |
 | English dump is older than the cmn dump                 | 0.84 percent of pairs drop | S0 fetch English, report missing ids                 |
@@ -731,21 +745,23 @@ pass a manual review of sentence, pinyin, gloss, and audio.
 ## 17. Implementation result
 
 Milestone M5 is complete. These values come from the full pipeline run of
-2026-10-18.
+2026-10-19. The run uses the 4 to 7 Han character window (section 7).
 
 | Measure         | Value                                                  |
 | --------------- | ------------------------------------------------------ |
-| Build date      | 2026-10-18                                             |
-| Cards           | 403 core, 0 scaffold                                   |
-| Media files     | 606 (403 sentence files and 203 word files)            |
-| Core coverage   | 199 of 207 concepts (0.961)                            |
-| Uncovered words | 虱子, 棍子, 种子, 骨头, 肠子, 乳房, 呕吐, 揉           |
+| Build date      | 2026-10-19                                             |
+| Cards           | 387 core, 0 scaffold                                   |
+| Media files     | 586 (387 sentence files and 199 word files)            |
+| Core coverage   | 195 of 207 concepts (0.942)                            |
+| Uncovered words | 虱子, 棍子, 种子, 骨头, 脂肪, 羽毛, 舌头, 肠子,       |
+|                 | 乳房, 呕吐, 揉, 绑                                     |
 | TTS engine      | gTTS, because `edge-tts` is absent; voice `gtts:zh-CN` |
 | Native audio    | 0 recordings                                           |
 | Gate result     | G1 to G16 pass; `anki swadesh audit mandarin` exits 0  |
 
-The Tatoeba pool gives no sentence for 8 concepts. The selection keeps the
-core tier only, so the pack has no scaffold card.
+The Tatoeba pool gives no sentence for 11 concepts, and the card cap cuts
+one more. The selection keeps the core tier only, so the pack has no
+scaffold card.
 
 `vocab/swadesh_review.csv` holds the Mandarin rows of the word review. The
 file has 29 reviewed rows (15 fixed and 14 kept) and no open row, so gate

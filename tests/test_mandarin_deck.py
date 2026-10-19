@@ -9,6 +9,7 @@ import pytest
 from anki_tools import mandarin_deck as deck
 from anki_tools.mandarin_swadesh import WordForm
 from anki_tools.package import AnkiPackage
+from anki_tools.templates import load_char_links
 
 FAKE_MP3 = b"ID3\x03\x00\x00\x00" + b"\x00" * 64
 
@@ -207,7 +208,8 @@ def test_pack_manifest_counts(pack_env: dict[str, Path]) -> None:
 
     attribution = pack_env["attribution"].read_text(encoding="utf-8")
     assert "Sentences come from Tatoeba (<https://tatoeba.org>)" in attribution
-    assert "## Word data" in attribution
+    assert "### Word data" in attribution
+    assert "## Mandarin pack" in attribution
     assert "gTTS" in attribution
 
 
@@ -265,4 +267,4 @@ def test_apkg_opens_with_two_cards(pack_env: dict[str, Path]) -> None:
     assert model.get("sortf") == deck.SORT_FIELD_INDEX
     template = model["tmpls"][0]
     assert template["qfmt"] == deck.FRONT_TEMPLATE
-    assert template["afmt"] == deck.BACK_TEMPLATE
+    assert template["afmt"] == f"{deck.BACK_TEMPLATE}\n{load_char_links()}"

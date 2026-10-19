@@ -13,7 +13,7 @@ from anki_tools.sentence_pack.audit import AuditInputs, gate_proper_sentences
 from anki_tools.sentence_pack.pool import check_sentence_shape
 from anki_tools.sentence_pack.languages import french
 
-MANDARIN_SHA256 = "66e679ea04187e3b7d01803a0f5d48f8600a8ef7f4f6f9b7b2d108fa884a4df6"
+MANDARIN_SHA256 = "762085840a138766b6e67c4029b0a803fd68b262ea3beda0b57645420f3f4fe2"
 TAB = "\t"
 NOUN_ROWS = 84
 

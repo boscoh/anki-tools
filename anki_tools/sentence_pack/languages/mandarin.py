@@ -31,6 +31,7 @@ from anki_tools.sentence_pack.pack import (
     ATTRIBUTION_PATH,
     audio_license_source,
     tts_engine_name,
+    write_attribution_section,
 )
 from anki_tools.sentence_pack.profile import LanguageProfile, register
 from anki_tools.sentence_pack.select import rank_order, review_status
@@ -53,7 +54,7 @@ OPEN_STATUS = "open"
 KNOWN_WORDS_TOP_N = 1000
 SIMILARITY_LIMIT = 0.67
 PREFERRED_MIN_HAN = 5
-PREFERRED_MAX_HAN = 9
+PREFERRED_MAX_HAN = 7
 FALLBACK_MIN_HAN = 3
 MIN_ENGLISH_WORDS = 2
 MAX_ENGLISH_WORDS = 12
@@ -148,7 +149,7 @@ FRONT_TEMPLATE = (
 BACK_TEMPLATE = (
     "{{Audio}}\n"
     "<hr id=answer>\n"
-    '<div class="sentence">{{Sentence}}</div>\n'
+    '<div class="sentence char-links">{{Sentence}}</div>\n'
     '<div class="pinyin">{{Pinyin}}</div>\n'
     '<div class="english">{{English}}</div>\n'
     '<div class="target">{{Target}} {{Gloss}} {{WordAudio}}</div>\n'
@@ -862,13 +863,13 @@ def build_attribution(
     rows: Sequence[dict[str, str]],
     voice: str,
     audio_authors: dict[int, str] | None = None,
-) -> str:
-    """Build the ``ATTRIBUTION.md`` text.
+) -> list[str]:
+    """Build the body lines of the Mandarin pack section.
 
     :param rows: Sentence CSV rows that entered the pack.
     :param voice: Voice value from the audio index.
     :param audio_authors: Mapping from audio id to author.
-    :returns: Markdown text of the attribution file.
+    :returns: Markdown lines of the ``## Mandarin pack`` section body.
     """
     from collections import defaultdict
 
@@ -878,33 +879,28 @@ def build_attribution(
         grouped[author].append(int(row["tatoeba_id"]))
 
     lines = [
-        "# Attribution",
-        "",
-        "Licenses: word data CC BY-SA 4.0, sentence text CC BY 2.0 FR, and",
-        "audio per recording. This pack uses synthesized audio only.",
-        "",
         "Sentences come from Tatoeba (<https://tatoeba.org>) and use the "
         "CC BY 2.0 FR license.",
         "",
-        "## Word data",
+        "### Word data",
         "",
         f"The Swadesh Mandarin list comes from <{SWADESH_URL}>.",
         "It uses the CC BY-SA 4.0 license.",
         "The reviewed forms are in `vocab/english-mandarin.csv`.",
         "",
-        "## Sentence text",
+        "### Sentence text",
         "",
         "The Tatoeba Mandarin sentences below use the CC BY 2.0 FR",
         "license. Each number is a Tatoeba sentence id.",
     ]
     for author in sorted(grouped):
         ids = ", ".join(str(value) for value in sorted(grouped[author]))
-        lines.extend(["", f"### {author}", "", ids])
+        lines.extend(["", f"#### {author}", "", ids])
 
     lines.extend(
         [
             "",
-            "## Audio",
+            "### Audio",
             "",
             f"Engine: {tts_engine_name(voice)}. Voice: {voice}.",
             "Each file is synthesized, so the engine and the voice give",
@@ -918,7 +914,7 @@ def build_attribution(
         lines.extend(
             [
                 "",
-                "## Native recordings",
+                "### Native recordings",
                 "",
                 "Tatoeba recordings keep their own license.",
                 "",
@@ -932,7 +928,7 @@ def build_attribution(
             license_text = row.get("audio_license", "") or "per recording"
             lines.append(f"| {audio_id} | {author} | {license_text} |")
 
-    return "\n".join(lines) + "\n"
+    return lines
 
 
 def write_attribution(
@@ -948,8 +944,11 @@ def write_attribution(
     :param audio_authors: Mapping from audio id to author.
     :param path: Output Markdown file.
     """
-    Path(path).write_text(
-        build_attribution(rows, voice, audio_authors), encoding="utf-8"
+    write_attribution_section(
+        Path(path),
+        "Mandarin",
+        build_attribution(rows, voice, audio_authors),
+        header=["# Attribution", ""],
     )
 
 
@@ -973,6 +972,7 @@ MANDARIN = register(
         sort_field_index=SORT_FIELD_INDEX,
         front_template=FRONT_TEMPLATE,
         back_template=BACK_TEMPLATE,
+        char_links=True,
         deck_description=DECK_DESCRIPTION,
         licenses=(
             ("Swadesh word data", "CC BY-SA 4.0"),
@@ -981,7 +981,7 @@ MANDARIN = register(
         ),
         extra_css=EXTRA_CSS,
         min_units=4,
-        max_units=10,
+        max_units=7,
         unit_name="han",
         fallback_min_units=FALLBACK_MIN_HAN,
         preferred_min_units=PREFERRED_MIN_HAN,

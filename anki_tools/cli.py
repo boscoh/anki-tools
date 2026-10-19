@@ -15,7 +15,6 @@ import re
 import shutil
 import time
 from pathlib import Path
-from textwrap import dedent
 from typing import Literal
 
 import cyclopts
@@ -67,6 +66,7 @@ from anki_tools.rank import (
 
 
 from anki_tools.reorder import reorder_deck
+from anki_tools.templates import load_char_links
 from anki_tools.yue_frequency import (
     CIFU_ATTRIBUTION,
     FREQUENCY_PATH,
@@ -491,6 +491,9 @@ def _apply_style(
             if mapping and verbose:
                 print(f"  Auto-mapping: {mapping}")
             afmt = _apply_field_mapping(afmt, mapping)
+        script = load_char_links()
+        if script and ('id="chars"' in afmt or "char-links" in afmt):
+            afmt = f"{afmt.rstrip()}\n{script}"
     elif verbose:
         print(f"No {back_path} found, skipping back template")
 
@@ -1247,22 +1250,7 @@ def _build_apkg(language: str, prune: bool = True) -> None:
     content_order = _content_field_order(csv_fields, config["audio_field_name"])
     fields = content_order + ["audio"]
 
-    char_click_script = dedent(r"""
-    <script>
-    function expand(elemId, url) {
-        var elem = document.getElementById(elemId);
-        if (elem) {
-        var isCJK = ch => /[\u4e00-\u9fff]/.test(ch);
-        elem.innerHTML = elem.innerHTML
-            .split("")
-            .filter(ch => !/\s/.test(ch))
-            .map(ch => isCJK(ch) ? `<a href="${url}${ch}">${ch}</a>` : ch)
-            .join("");
-        }
-    }
-    expand('chars', `https://cantonese.org/search.php?q=`)
-    </script>
-    """)
+    char_click_script = load_char_links()
 
     cjk_fields = {"characters", "hanzi", "cantonese", "mandarin", "chinese"}
     script_15em_fields = {"arabic", "hindi"}
@@ -1276,7 +1264,8 @@ def _build_apkg(language: str, prune: bool = True) -> None:
             answer_parts.append(f"<div style='font-size: 1.5em'>{{{{{field}}}}}</div>")
         else:
             answer_parts.append(f"<div style='font-size: 2rem'>{{{{{field}}}}}</div>")
-    answer_parts.append(char_click_script)
+    if char_click_script:
+        answer_parts.append(char_click_script)
     answer_format = "\n".join(answer_parts)
 
     cards = []
@@ -1410,7 +1399,7 @@ def sentences(
     max_cards: int = 450,
     max_unknown: int = 2,
     min_han: int = 4,
-    max_han: int = 10,
+    max_han: int = 7,
     min_words: int = 4,
     max_words: int = 10,
 ) -> None:

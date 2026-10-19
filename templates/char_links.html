@@ -1,0 +1,40 @@
+<script>
+  (function () {
+    var isCJK = function (ch) { return /[\u3400-\u4dbf\u4e00-\u9fff]/.test(ch); };
+    var url = "https://cantonese.org/search.php?q=";
+    var expand = function (elem) {
+      var walker = document.createTreeWalker(elem, NodeFilter.SHOW_TEXT);
+      var nodes = [];
+      while (walker.nextNode()) { nodes.push(walker.currentNode); }
+      nodes.forEach(function (node) {
+        var text = node.nodeValue;
+        if (!text) { return; }
+        var fragment = document.createDocumentFragment();
+        var buffer = "";
+        var flush = function () {
+          if (buffer) {
+            fragment.appendChild(document.createTextNode(buffer));
+            buffer = "";
+          }
+        };
+        Array.from(text).forEach(function (ch) {
+          if (isCJK(ch)) {
+            flush();
+            var anchor = document.createElement("a");
+            anchor.setAttribute("href", url + encodeURIComponent(ch));
+            anchor.textContent = ch;
+            fragment.appendChild(anchor);
+          } else if (/\s/.test(ch)) {
+            flush();
+          } else {
+            buffer += ch;
+          }
+        });
+        flush();
+        node.parentNode.replaceChild(fragment, node);
+      });
+    };
+    var targets = document.querySelectorAll("#chars, .char-links");
+    for (var i = 0; i < targets.length; i++) { expand(targets[i]); }
+  })();
+</script>

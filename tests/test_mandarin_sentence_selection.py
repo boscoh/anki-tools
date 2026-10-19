@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from anki_tools.mandarin_swadesh import (
+    MANDARIN,
     SENTENCE_FIELDS,
     SENTENCE_REVIEW_FIELDS,
     Candidate,
@@ -150,6 +151,14 @@ def pool_data(tmp_path: Path) -> Path:
 class TestSentenceShape:
     def test_accepts_a_complete_sentence(self) -> None:
         assert check_sentence_shape("我要喝水。") is None
+
+    def test_length_window_stops_at_seven(self) -> None:
+        assert check_sentence_shape("我们今天去学校。") is None
+        assert check_sentence_shape("我们今天要去学校。") == "F2"
+        assert check_sentence_shape("我们今天要去学校。", max_han=8) is None
+
+    def test_profile_window_is_four_to_seven(self) -> None:
+        assert (MANDARIN.min_units, MANDARIN.max_units) == (4, 7)
 
     @pytest.mark.parametrize(
         ("sentence", "expected"),

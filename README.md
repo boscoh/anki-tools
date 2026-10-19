@@ -198,7 +198,7 @@ The deck name has the entry count (for example, `Swadesh Mandarin 207`).
 ### Mandarin Swadesh Sentences
 
 Build a listening-comprehension deck for Mandarin. The deck pairs 207 Swadesh
-concepts with 403 Tatoeba sentences. Each card holds one sentence, the
+concepts with 387 Tatoeba sentences. Each card holds one sentence, the
 tone-marked pinyin, the English translation, the target word, and two MP3
 files.
 
@@ -225,10 +225,14 @@ The audio step uses gTTS because `edge-tts` is absent. `ffprobe` must be on
 the path. The audio step removes a file that fails the header or duration
 check.
 
-Measured result: 403 cards, 606 media files, and core coverage of 199 of 207
-concepts (0.961). The pack has 0 scaffold cards and 0 native recordings. These
-8 words have no selected sentence: 虱子, 棍子, 种子, 骨头, 肠子, 乳房, 呕吐, and
-揉.
+Measured result: 387 cards, 586 media files, and core coverage of 195 of 207
+concepts (0.942). The pack has 0 scaffold cards and 0 native recordings. Each
+sentence has 4 to 7 Han characters. These 12 words have no selected sentence:
+虱子, 棍子, 种子, 骨头, 脂肪, 羽毛, 舌头, 肠子, 乳房, 呕吐, 揉, and 绑.
+
+On the back of a card, each Han character of the sentence is a link to the
+CC-Canto dictionary at `https://cantonese.org`. The script is
+`templates/char_links.html`.
 
 Licenses: word data CC BY-SA 4.0, Tatoeba sentence text CC BY 2.0 FR, and
 audio per recording. This pack uses synthesized audio only.

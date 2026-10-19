@@ -70,7 +70,7 @@ _zipf = shared_pool.zipf_value
 
 
 def check_sentence_shape(
-    sentence: str, min_han: int = 4, max_han: int = 10, *, final_mark: bool = True
+    sentence: str, min_han: int = 4, max_han: int = 7, *, final_mark: bool = True
 ) -> str | None:
     """Apply filters F2 to F8 to one Mandarin sentence.
 
@@ -138,7 +138,7 @@ def build_candidate_pool(
     word_table: list[WordForm],
     data_dir: Path = Path("data/tatoeba"),
     min_han: int = 4,
-    max_han: int = 10,
+    max_han: int = 7,
     max_unknown: int = 2,
     fallback: bool = False,
 ) -> tuple[list[Candidate], dict[str, Any]]:

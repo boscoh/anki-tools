@@ -29,6 +29,7 @@ from anki_tools.sentence_pack.profile import (
     WordRow,
     excluded_forms,
 )
+from anki_tools.templates import load_char_links
 
 CSS_PATH = Path("templates/card.css")
 CHECKSUMS_PATH = Path("data/tatoeba/checksums.json")
@@ -467,6 +468,10 @@ def build_pack(
     by_target = {profile.form_text(form): form for form in table}
     rows = read_rows(csv_path)
     index = load_audio_index(audio_dir / "index.csv")
+    back_template = profile.back_template
+    script = load_char_links() if profile.char_links else ""
+    if script:
+        back_template = f"{back_template}\n{script}"
 
     used: list[tuple[WordRow, dict[str, str], dict[str, Any]]] = []
     skipped = 0
@@ -509,7 +514,7 @@ def build_pack(
         media_files=media,
         model_name=profile.model_name,
         question_format=profile.front_template,
-        answer_format=profile.back_template,
+        answer_format=back_template,
         css=load_css(css_path, profile.extra_css),
         sort_field_index=profile.sort_field_index,
         deck_description=profile.deck_description,

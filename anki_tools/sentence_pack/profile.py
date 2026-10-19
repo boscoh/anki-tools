@@ -101,6 +101,8 @@ class LanguageProfile:
     :param finalize_candidate: Hook that fills the language-specific card fields.
     :param highlight: Hook that marks the matched target tokens of a card
         sentence, None to wrap the first target substring.
+    :param char_links: True when the back template links each Han character
+        to the CC-Canto dictionary.
     """
 
     name: str
@@ -173,6 +175,7 @@ class LanguageProfile:
     excluded_words: Callable[[Sequence[Any], Collection[str]], list[str]]
     finalize_candidate: Callable[[Any, str], Any]
     highlight: Callable[[str, str], str] | None = None
+    char_links: bool = False
 
     def target_length(self, candidate: Any) -> int:
         """Give the unit length of a candidate.

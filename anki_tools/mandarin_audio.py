@@ -87,7 +87,12 @@ def choose_source(
 
 
 def synthesize_tts(
-    text: str, dest: Path, voice: str, rate: str, slow: bool
+    text: str,
+    dest: Path,
+    voice: str,
+    rate: str,
+    slow: bool,
+    profile: Any = None,
 ) -> None:
     """Write one Mandarin TTS file.
 
@@ -96,8 +101,9 @@ def synthesize_tts(
     :param voice: Requested edge-tts voice.
     :param rate: Engine rate string.
     :param slow: Slow flag for the gTTS engine.
+    :param profile: Language profile from the shared caller, MANDARIN by default.
     """
-    shared.synthesize_tts(text, dest, voice, rate, slow, MANDARIN)
+    shared.synthesize_tts(text, dest, voice, rate, slow, profile or MANDARIN)
 
 
 def generate_audio(
