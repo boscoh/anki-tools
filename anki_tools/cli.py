@@ -48,6 +48,7 @@ from anki_tools.sentence_pack import pool as sentence_pool
 from anki_tools.sentence_pack import select as sentence_select
 from anki_tools.sentence_pack import tatoeba as sentence_tatoeba
 from anki_tools.sentence_pack.audit import print_audit as print_gate_table
+from anki_tools.sentence_pack.languages import french as french_lang
 from anki_tools.sentence_pack.languages import greek as greek_lang
 from anki_tools.pinyin import fix_pinyin
 from anki_tools.rank import (
@@ -1331,6 +1332,11 @@ def _build_apkg(language: str, prune: bool = True) -> None:
     print(f"\nSuccessfully created: {output_path}")
 
 
+SENTENCE_PACK_LANGUAGES = {
+    "french": (french_lang, french_lang.FRENCH, french_lang.run_french_audit),
+    "greek": (greek_lang, greek_lang.GREEK, greek_lang.run_greek_audit),
+}
+
 SWADESH_LANGUAGES = (
     "mandarin",
     "spanish",
@@ -1410,18 +1416,21 @@ def sentences(
 ) -> None:
     """Build the sentence candidates and write the card CSV files (S1 to S3).
 
-    :param language: Language name: mandarin or greek.
+    :param language: Language name: mandarin, french, or greek.
     :param per_word: Card limit per word form.
     :param max_cards: Hard card cap.
     :param max_unknown: Unknown token budget per sentence.
     :param min_han: Minimum Han character count for a Mandarin core card.
     :param max_han: Maximum Han character count.
-    :param min_words: Minimum word count for a Greek core card.
-    :param max_words: Maximum word count for a Greek card.
+    :param min_words: Minimum word count for a sentence-pack core card.
+    :param max_words: Maximum word count for a sentence-pack card.
     """
     lang = language.lower().strip()
-    if lang == "greek":
-        _greek_sentences(
+    if lang in SENTENCE_PACK_LANGUAGES:
+        module, profile, _ = SENTENCE_PACK_LANGUAGES[lang]
+        _language_sentences(
+            module,
+            profile,
             per_word=per_word,
             max_cards=max_cards,
             max_unknown=max_unknown,
@@ -1430,7 +1439,7 @@ def sentences(
         )
         return
     if lang != "mandarin":
-        print(f"Unsupported language: {language}. Supported: mandarin, greek.")
+        print(f"Unsupported language: {language}. Supported: mandarin, french, greek.")
         return
 
     table = load_word_table()
@@ -1474,7 +1483,7 @@ def sentence_audio(
 ) -> None:
     """Generate and validate the audio files of a sentence pack (stage S4).
 
-    :param language: Language name: mandarin or greek.
+    :param language: Language name: mandarin, french, or greek.
     :param native_audio: Tatoeba tier: none, auto, or only.
     :param voice: TTS voice name. The profile default applies when empty.
     :param slow_audio: Generate the slow variant.
@@ -1482,8 +1491,11 @@ def sentence_audio(
     :param tts: TTS engine, gtts or edge. The installed engine applies when empty.
     """
     lang = language.lower().strip()
-    if lang == "greek":
-        _greek_audio(
+    if lang in SENTENCE_PACK_LANGUAGES:
+        module, profile, _ = SENTENCE_PACK_LANGUAGES[lang]
+        _language_audio(
+            module,
+            profile,
             native_audio=native_audio,
             voice=voice,
             slow_audio=slow_audio,
@@ -1492,7 +1504,7 @@ def sentence_audio(
         )
         return
     if lang != "mandarin":
-        print(f"Unsupported language: {language}. Supported: mandarin, greek.")
+        print(f"Unsupported language: {language}. Supported: mandarin, french, greek.")
         return
     if not voice:
         voice = MANDARIN_DEFAULT_VOICE
@@ -1529,15 +1541,16 @@ def pack(
 ) -> None:
     """Build one Swadesh sentence pack (stage S5).
 
-    :param language: Language name: mandarin or greek.
+    :param language: Language name: mandarin, french, or greek.
     :param pack_license: public or private.
     """
     lang = language.lower().strip()
-    if lang == "greek":
-        _greek_pack(pack_license=pack_license)
+    if lang in SENTENCE_PACK_LANGUAGES:
+        module, profile, _ = SENTENCE_PACK_LANGUAGES[lang]
+        _language_pack(module, profile, pack_license=pack_license)
         return
     if lang != "mandarin":
-        print(f"Unsupported language: {language}. Supported: mandarin, greek.")
+        print(f"Unsupported language: {language}. Supported: mandarin, french, greek.")
         return
 
     result = build_pack(pack_license=pack_license)
@@ -1556,16 +1569,17 @@ def pack(
 def audit(language: str) -> None:
     """Run the quality gates of a Swadesh sentence pack.
 
-    :param language: Language name: mandarin or greek.
+    :param language: Language name: mandarin, french, or greek.
     """
     lang = language.lower().strip()
-    if lang == "greek":
-        code = print_gate_table(greek_lang.run_greek_audit())
+    if lang in SENTENCE_PACK_LANGUAGES:
+        _, _, runner = SENTENCE_PACK_LANGUAGES[lang]
+        code = print_gate_table(runner())
         if code:
             raise SystemExit(code)
         return
     if lang != "mandarin":
-        print(f"Unsupported language: {language}. Supported: mandarin, greek.")
+        print(f"Unsupported language: {language}. Supported: mandarin, french, greek.")
         return
 
     code = print_audit(run_audit())
@@ -1573,59 +1587,80 @@ def audit(language: str) -> None:
         raise SystemExit(code)
 
 
-def _greek_sentences(
+def _language_sentences(
+    module,
+    profile,
     per_word: int,
     max_cards: int,
     max_unknown: int,
     min_words: int,
     max_words: int,
 ) -> None:
-    table = greek_lang.load_word_table()
-    failures = greek_lang.check_word_table(table)
+    """Build the candidate pool and the card CSV files of one sentence pack.
+
+    :param module: Language module of the pack.
+    :param profile: Language profile of the pack.
+    :param per_word: Card limit per word form.
+    :param max_cards: Hard card cap.
+    :param max_unknown: Unknown token budget per sentence.
+    :param min_words: Minimum word count of a core card.
+    :param max_words: Maximum word count of a card.
+    """
+    table = module.load_word_table()
+    failures = module.check_word_table(table)
     if failures:
         for failure in failures:
             print(f"Error: {failure}")
         return
-    known = greek_lang.known_words(table)
+    known = module.known_words(table)
     pool, pool_report = sentence_pool.build_candidate_pool(
         table,
-        greek_lang.GREEK,
+        profile,
         min_units=min_words,
         max_units=max_words,
         max_unknown=max_unknown,
         fallback=True,
         known_words=known,
-        make_candidate=greek_lang.make_candidate,
+        make_candidate=module.make_candidate,
     )
     cards, selection = sentence_select.select_sentences(
         pool,
         table,
-        greek_lang.GREEK,
+        profile,
         per_word=per_word,
         max_cards=max_cards,
-        finalize=greek_lang.GREEK.finalize_candidate,
+        finalize=profile.finalize_candidate,
     )
     report = sentence_pool.build_pack_report(pool_report, selection)
-    print(f"wrote {greek_lang.write_sentence_csv(cards)}")
-    print(
-        "wrote "
-        f"{greek_lang.write_sentence_review_csv(pool, table, per_word=per_word)}"
-    )
-    print(f"wrote {sentence_pool.write_pool_report(report, greek_lang.POOL_REPORT_PATH)}")
+    print(f"wrote {module.write_sentence_csv(cards)}")
+    print(f"wrote {module.write_sentence_review_csv(pool, table, per_word=per_word)}")
+    print(f"wrote {sentence_pool.write_pool_report(report, module.POOL_REPORT_PATH)}")
     sentence_pool.print_sentence_report(report)
 
 
-def _greek_audio(
+def _language_audio(
+    module,
+    profile,
     native_audio: str,
     voice: str,
     slow_audio: bool,
     pack_license: str,
     tts: str,
 ) -> None:
+    """Generate and validate the audio files of one sentence pack.
+
+    :param module: Language module of the pack.
+    :param profile: Language profile of the pack.
+    :param native_audio: Tatoeba tier: none, auto, or only.
+    :param voice: TTS voice name.
+    :param slow_audio: Generate the slow variant.
+    :param pack_license: public or private.
+    :param tts: TTS engine, gtts or edge.
+    """
     if tts and tts not in ("gtts", "edge"):
         print(f"Unsupported tts engine: {tts}. Use gtts or edge.")
         return
-    rows = pack_audio.load_sentence_rows(greek_lang.SENTENCES_PATH)
+    rows = pack_audio.load_sentence_rows(module.SENTENCES_PATH)
     engine = "gtts"
     if tts:
         engine = tts
@@ -1635,13 +1670,13 @@ def _greek_audio(
     try:
         result = pack_audio.generate_audio(
             rows,
-            greek_lang.GREEK,
-            voice=voice or greek_lang.GREEK.voice,
+            profile,
+            voice=voice or profile.voice,
             native_audio=native_audio,
             slow_audio=slow_audio,
             pack_license=pack_license,
             engine=engine,
-            csv_path=greek_lang.SENTENCES_PATH,
+            csv_path=module.SENTENCES_PATH,
         )
     except ValueError as error:
         print(f"Error: {error}")
@@ -1659,10 +1694,16 @@ def _greek_audio(
         print(f"wrote {result['csv_path']}")
 
 
-def _greek_pack(pack_license: str) -> None:
+def _language_pack(module, profile, pack_license: str) -> None:
+    """Build the APKG file, the manifest, and the attribution of one pack.
+
+    :param module: Language module of the pack.
+    :param profile: Language profile of the pack.
+    :param pack_license: public or private.
+    """
     result = sentence_pack.build_pack(
-        greek_lang.GREEK,
-        greek_lang.load_word_table,
+        profile,
+        module.load_word_table,
         pack_license=pack_license,
     )
     counts = result["manifest"]["counts"]

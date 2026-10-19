@@ -99,6 +99,8 @@ class LanguageProfile:
     :param excluded_words: Hook that lists the forms without a card, given the
         word table and the card target set.
     :param finalize_candidate: Hook that fills the language-specific card fields.
+    :param highlight: Hook that marks the matched target tokens of a card
+        sentence, None to wrap the first target substring.
     """
 
     name: str
@@ -170,6 +172,7 @@ class LanguageProfile:
     card_order: Callable[[Any, dict[str, str]], tuple]
     excluded_words: Callable[[Sequence[Any], Collection[str]], list[str]]
     finalize_candidate: Callable[[Any, str], Any]
+    highlight: Callable[[str, str], str] | None = None
 
     def target_length(self, candidate: Any) -> int:
         """Give the unit length of a candidate.

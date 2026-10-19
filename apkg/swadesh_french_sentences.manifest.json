@@ -1,0 +1,52 @@
+{
+  "build_date": "2026-10-19",
+  "source_dump_date": "2026-10-19",
+  "counts": {
+    "words": 207,
+    "cards": 412,
+    "scaffold": 0,
+    "native_audio": 0,
+    "tts_audio": 412
+  },
+  "coverage": {
+    "core_with_card": 0.9952
+  },
+  "voice": "gtts:fr",
+  "pack_license": "public",
+  "audio_license_skipped": {
+    "empty": 0,
+    "CC BY-NC 4.0": 0
+  },
+  "native_audio_available": true,
+  "noun_rows": 84,
+  "noun_gender_missing": 0,
+  "files": {
+    "source_csv": "sha256:014b1e7593affdd80cff7b101b90878bad8eb7a13a42de1361d00920a1b14604",
+    "sentences_csv": "sha256:5ba63ae158408bb074b86cc2b9bd2dcc9b175b9ae1202580a4010a7d0bd56219"
+  },
+  "licenses": [
+    {
+      "data": "French Swadesh word data",
+      "license": "CC BY-SA 4.0"
+    },
+    {
+      "data": "Tatoeba sentences",
+      "license": "CC BY 2.0 FR"
+    },
+    {
+      "data": "Tatoeba audio",
+      "license": "per recording"
+    },
+    {
+      "data": "spaCy fr_core_news_sm",
+      "license": "MIT"
+    },
+    {
+      "data": "gTTS",
+      "license": "MIT"
+    }
+  ],
+  "excluded_words": [
+    "intestins"
+  ]
+}

@@ -1,0 +1,95 @@
+index,english,current,module_terms,chosen,issue,fix,status
+2,you (singular),tu,tu|vous,tu,shared_form,vous stays with index 5,kept
+36,woman,femme,femme,femme,shared_form,femme stays with index 36,kept
+36,woman,femme,femme,femme,gender,f,fixed
+37,man,homme,homme,homme,shared_form,homme stays with index 37,kept
+37,man,homme,homme,homme,gender,m,fixed
+38,human being,homme,homme,être humain,duplicate_form,être humain avoids a duplicate of index 37,fixed
+38,human being,homme,homme,être humain,gender,m,fixed
+39,child,enfant,enfant,enfant,gender,m,fixed
+40,wife,femme,femme|épouse,épouse,shared_form,femme stays with index 36,fixed
+40,wife,femme,femme|épouse,épouse,gender,f,fixed
+41,husband,mari,mari|époux,mari,two_terms,mari is more frequent than époux,kept
+41,husband,mari,mari|époux,mari,gender,m,fixed
+42,mother,mère,mère,mère,gender,f,fixed
+43,father,père,père,père,gender,m,fixed
+44,animal,animal,animal,animal,gender,m,fixed
+45,fish,poisson,poisson,poisson,gender,m,fixed
+46,bird,oiseau,oiseau,oiseau,gender,m,fixed
+47,dog,chien,chien,chien,gender,m,fixed
+48,louse,pou,pou,pou,gender,m,fixed
+49,snake,serpent,serpent,serpent,gender,m,fixed
+50,worm,ver,ver,ver,gender,m,fixed
+51,tree,arbre,arbre,arbre,gender,m,fixed
+52,forest,forêt,forêt,forêt,gender,f,fixed
+53,stick,bâton,bâton,bâton,gender,m,fixed
+54,fruit,fruit,fruit,fruit,gender,m,fixed
+55,seed,graine,graine,graine,gender,f,fixed
+56,leaf,feuille,feuille,feuille,gender,f,fixed
+57,root,racine,racine,racine,gender,f,fixed
+58,tree bark,écorce,écorce,écorce,gender,f,fixed
+59,flower,fleur,fleur,fleur,gender,f,fixed
+60,grass,herbe,herbe,herbe,gender,f,fixed
+61,rope,corde,corde,corde,gender,f,fixed
+62,skin,peau,peau,peau,gender,f,fixed
+63,meat,viande,viande,viande,gender,f,fixed
+64,blood,sang,sang,sang,gender,m,fixed
+65,bone,os,os,os,gender,m,fixed
+66,fat (noun),graisse,graisse,graisse,gender,f,fixed
+67,egg,œuf,œuf,œuf,gender,m,fixed
+68,horn,corne,corne,corne,gender,f,fixed
+69,tail,queue,queue,queue,gender,f,fixed
+70,feather,plume,plume,plume,gender,f,fixed
+71,hair,cheveux,cheveux,cheveux,gender,m,fixed
+72,head,tête,tête,tête,gender,f,fixed
+73,ear,oreille,oreille,oreille,gender,f,fixed
+74,eye,œil,œil,œil,gender,m,fixed
+75,nose,nez,nez,nez,gender,m,fixed
+76,mouth,bouche,bouche,bouche,gender,f,fixed
+77,tooth,dent,dent,dent,gender,f,fixed
+78,tongue,langue,langue,langue,gender,f,fixed
+79,fingernail,ongle,ongle,ongle,gender,m,fixed
+80,foot,pied,pied,pied,gender,m,fixed
+81,leg,jambe,jambe,jambe,gender,f,fixed
+82,knee,genou,genou,genou,gender,m,fixed
+83,hand,main,main,main,gender,f,fixed
+84,wing,aile,aile,aile,gender,f,fixed
+85,belly,ventre,ventre,ventre,gender,m,fixed
+86,guts,entrailles,entrailles|intestins,intestins,two_terms,entrailles has 0 candidates,fixed
+86,guts,entrailles,entrailles|intestins,intestins,gender,m,fixed
+87,neck,cou,cou,cou,gender,m,fixed
+88,back,dos,dos,dos,gender,m,fixed
+89,breast,sein,sein|poitrine,sein,gender,m,fixed
+90,heart,cœur,cœur,cœur,gender,m,fixed
+91,liver,foie,foie,foie,gender,m,fixed
+147,sun,soleil,soleil,soleil,gender,m,fixed
+148,moon,lune,lune,lune,gender,f,fixed
+149,star,étoile,étoile,étoile,gender,f,fixed
+150,water,eau,eau,eau,gender,f,fixed
+151,rain,pluie,pluie,pluie,gender,f,fixed
+152,river,rivière,rivière,rivière,gender,f,fixed
+153,lake,lac,lac,lac,gender,m,fixed
+154,sea,mer,mer,mer,gender,f,fixed
+155,salt,sel,sel,sel,gender,m,fixed
+156,stone,pierre,pierre,pierre,gender,f,fixed
+157,sand,sable,sable,sable,gender,m,fixed
+158,dust,poussière,poussière,poussière,gender,f,fixed
+159,earth,terre,terre,terre,gender,f,fixed
+160,cloud,nuage,nuage,nuage,gender,m,fixed
+161,fog,brouillard,brouillard,brouillard,gender,m,fixed
+162,sky,ciel,ciel,ciel,gender,m,fixed
+163,wind,vent,vent,vent,gender,m,fixed
+164,snow,neige,neige,neige,gender,f,fixed
+165,ice,glace,glace,glace,gender,f,fixed
+166,smoke,fumée,fumée,fumée,gender,f,fixed
+167,fire,feu,feu,feu,gender,m,fixed
+168,ash,cendre,cendre,cendre,gender,f,fixed
+170,road,route,route,route,gender,f,fixed
+171,mountain,montagne,montagne,montagne,gender,f,fixed
+177,night,nuit,nuit,nuit,gender,f,fixed
+178,day,jour,jour,jour,gender,m,fixed
+179,year,an,an|année,année,two_terms,année is the general sense of year,fixed
+179,year,an,an|année,année,gender,f,fixed
+183,new,nouveau,nouveau|neuf,nouveau,two_terms,neuf means brand new,kept
+192,dull,émoussé,émoussé,émoussé,zipf,"rare form, zipf 2.42; keep because it has candidates",kept
+207,name,nom,nom,nom,gender,m,fixed

@@ -112,7 +112,10 @@ def build_card(
     :returns: Mapping from field name to value, plus a ``tags`` key.
     """
     target = row["target"]
-    sentence = row["sentence"].replace(target, f"<b>{target}</b>", 1)
+    if profile.highlight is None:
+        sentence = row["sentence"].replace(target, f"<b>{target}</b>", 1)
+    else:
+        sentence = profile.highlight(row["sentence"], target)
     tags = [
         f"swadesh::{slug(word.english)}",
         f"audio::{row.get('audio_source', '')}",

@@ -20,6 +20,7 @@ class Token:
     :param pos: Universal part-of-speech tag.
     :param morph: Morphology string, for example ``VerbForm=Fin``.
     :param punctuation: True for a punctuation token.
+    :param idx: Character offset of the token in the source text.
     """
 
     text: str
@@ -27,6 +28,7 @@ class Token:
     pos: str
     morph: str
     punctuation: bool
+    idx: int = 0
 
 
 @lru_cache(maxsize=4)
@@ -63,6 +65,7 @@ def tokenize(name: str, text: str) -> list[Token]:
             pos=token.pos_,
             morph=str(token.morph),
             punctuation=token.is_punct,
+            idx=token.idx,
         )
         for token in doc
     ]

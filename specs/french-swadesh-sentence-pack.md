@@ -1,6 +1,6 @@
 # Spec: French Swadesh Sentence Pack with Audio
 
-Status: proposed
+Status: implemented
 Date: 2026-10-18
 Owner: anki-tools
 Depends on: `specs/mandarin-swadesh-sentence-pack.md` (pipeline shape)
@@ -797,15 +797,76 @@ a manual review of sentence, gloss, and audio.
 
 ## 17. Implementation result
 
-Not implemented. This section records the probe baseline from 2026-10-18.
+Milestone M5 is complete. These values come from the full pipeline run of
+2026-10-19.
 
-| Measure             | Value                            |
-| ------------------- | -------------------------------- |
-| Word concepts       | 207                              |
-| Reviewed forms      | 207, one per concept             |
-| Candidate pool      | 247,090 sentences, 4 to 10 words |
-| Concept coverage    | 207 of 207 (1.00)                |
-| Uncovered concepts  | none                             |
-| Public native audio | 644 recordings, 67 concepts      |
-| TTS engine          | gTTS, voice `gtts:fr`            |
-| Gate result         | not run                          |
+| Measure              | Value                                                   |
+| -------------------- | ------------------------------------------------------- |
+| Build date           | 2026-10-19                                              |
+| Tatoeba dump         | 2026-10-19 (`fra`: 728,898 sentences)                   |
+| Word table           | 207 rows, 207 unique forms, 94 review rows, 0 open      |
+| Noun gender          | 84 of 84 noun rows have a gender                        |
+| Candidate pool       | 192,837 candidates, 4 to 10 words, 0 scaffold           |
+| Cards                | 412 core, 0 scaffold                                    |
+| Media files          | 618 (412 sentence files and 206 word files)             |
+| Concept coverage     | 206 of 207 concepts (0.995)                             |
+| Uncovered concepts   | 1 (`intestins`)                                         |
+| Native audio         | none, the public pack is TTS only                       |
+| TTS engine           | gTTS, voice `gtts:fr`                                   |
+| Gate result          | G1 to G20 pass; `anki swadesh audit french` exits 0     |
+
+The one uncovered word is `intestins` (index 86, guts). It has no candidate in
+the core window and none in the 3 to 10 word fallback window, so the deck has
+no scaffold card.
+
+The measured values differ from the probe of section 3 in five places:
+
+- The pool has 192,837 candidates, not 247,090. The probe pool ignored the
+  unknown-token budget of section 8.2, which the shared pool applies as filter
+  13. The F1 to F12 pass count is 222,833, and 29,996 of those sentences hold
+  more than two unknown tokens.
+- The F3 script filter removes 1,721 sentences, more than the probe expected,
+  because it rejects every letter outside the French set (for example `ñ`,
+  `ß`, and `ø`), not only digits.
+- Coverage is 206 of 207 concepts, not 207 of 207. The spaCy 3.8.0
+  morphologizer of `fr_core_news_sm` and the carrier-lemma key set of section
+  8.2 do not find `intestins` in the corpus.
+- The fallback window of section 7.1 adds 0 scaffold cards, because the one
+  uncovered word has no candidate in the wider window either.
+- The probe counts 120 nouns with a gender. A strict noun classification gives
+  84 noun rows (indices 36 to 91, 147 to 168, 170, 171, 177 to 179, and 207);
+  the other rows are pronouns, numerals, adjectives, verbs, adverbs, and
+  prepositions. The gender column is a noun column, so all 84 noun rows carry a
+  value and G20 reports 0 empty rows.
+
+G10 keeps the gate at 0.95. The measured coverage is 206 of 207 concepts
+(0.995), so the rule "measured value minus 5 points" gives a gate of 0.945; the
+spec value of 0.95 is higher and stays. The two numbers are 0.995 measured and
+0.95 required.
+
+The word table holds 207 rows, because the review file selects one form per
+concept: `tu`, `femme`, `homme`, `être humain`, `épouse`, `mari`, `intestins`,
+`année`, and `nouveau`. The module holds 217 terms in 207 rows and 214 unique
+forms after cleanup; the three shared forms are `vous`, `femme`, and `homme`.
+The review file has 94 rows: the 9 rows of section 6, one `gender` row for each
+of the 84 noun rows, and one `zipf` row for `émoussé` at 2.42, which stays
+because it has candidates.
+
+Two notes on the module reader: `Module:Swadesh/data/fr` writes 9 of its rows
+over several lines (indices 2, 3, 6, 86, 89, 123, 124, 125, and 136), so a
+single-line parser sees 198 rows and 202 terms. `french.parse_module_terms`
+counts braces and reads all 207 rows and 217 terms.
+
+The build needed these environment changes:
+
+- `pyproject.toml` pins the spaCy French model by release URL, because the
+  package is not on PyPI:
+  `https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.8.0/fr_core_news_sm-3.8.0-py3-none-any.whl`.
+  This follows the Greek pack.
+- `Token` in `sentence_pack/tokens.py` carries the character offset `idx`, so
+  the French card text can bold the matched token.
+- `LanguageProfile` carries the `highlight` hook of section 10.1. Its default
+  of None keeps the Greek and Mandarin output unchanged.
+
+The measured run time is 19 minutes for S2 and S3 over 378,561 linked
+sentences, and 10.5 minutes for 618 TTS files at one request per second.

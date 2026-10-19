@@ -1,0 +1,208 @@
+swadesh_index,english,french,gender,variant,form_kind,zipf,candidate_count,tier
+1,I,je,,primary,single,6.89,0,core
+2,you (singular),tu,,primary,single,6.50,0,core
+3,he/she/it/they (singular),il,,primary,single,6.98,0,core
+4,we,nous,,primary,single,6.43,0,core
+5,you (plural),vous,,primary,single,6.56,0,core
+6,they (plural),ils,,primary,single,6.36,0,core
+7,this,ceci,,primary,single,4.94,0,core
+8,that,cela,,primary,single,5.72,0,core
+9,here,ici,,primary,single,5.71,0,core
+10,there,là,,primary,single,5.99,0,core
+11,who,qui,,primary,single,6.89,0,core
+12,what,quoi,,primary,single,5.84,0,core
+13,where,où,,primary,single,6.07,0,core
+14,when,quand,,primary,single,6.13,0,core
+15,how,comment,,primary,single,5.74,0,core
+16,not,ne pas,,primary,discontinuous,6.52,0,core
+17,all,tout,,primary,single,6.44,0,core
+18,many,beaucoup,,primary,single,5.75,0,core
+19,some,quelques,,primary,single,5.75,0,core
+20,few,peu,,primary,single,5.99,0,core
+21,other,autre,,primary,single,5.98,0,core
+22,one,un,,primary,single,7.11,0,core
+23,two,deux,,primary,single,6.18,0,core
+24,three,trois,,primary,single,5.72,0,core
+25,four,quatre,,primary,single,5.42,0,core
+26,five,cinq,,primary,single,5.28,0,core
+27,big,grand,,primary,single,5.79,0,core
+28,long,long,,primary,single,5.31,0,core
+29,wide,large,,primary,single,4.91,0,core
+30,thick,épais,,primary,single,3.98,0,core
+31,heavy,lourd,,primary,single,4.48,0,core
+32,small,petit,,primary,single,5.67,0,core
+33,short,court,,primary,single,4.94,0,core
+34,narrow,étroit,,primary,single,3.81,0,core
+35,thin,mince,,primary,single,4.24,0,core
+36,woman,femme,f,primary,single,5.59,0,core
+37,man,homme,m,primary,single,5.71,0,core
+38,human being,être humain,m,primary,pair,4.80,0,core
+39,child,enfant,m,primary,single,5.27,0,core
+40,wife,épouse,f,primary,single,4.58,0,core
+41,husband,mari,m,primary,single,4.80,0,core
+42,mother,mère,f,primary,single,5.45,0,core
+43,father,père,m,primary,single,5.44,0,core
+44,animal,animal,m,primary,single,4.61,0,core
+45,fish,poisson,m,primary,single,4.50,0,core
+46,bird,oiseau,m,primary,single,4.31,0,core
+47,dog,chien,m,primary,single,4.86,0,core
+48,louse,pou,m,primary,single,3.57,0,core
+49,snake,serpent,m,primary,single,4.02,0,core
+50,worm,ver,m,primary,single,3.73,0,core
+51,tree,arbre,m,primary,single,4.57,0,core
+52,forest,forêt,f,primary,single,4.60,0,core
+53,stick,bâton,m,primary,single,4.10,0,core
+54,fruit,fruit,m,primary,single,4.38,0,core
+55,seed,graine,f,primary,single,3.69,0,core
+56,leaf,feuille,f,primary,single,4.41,0,core
+57,root,racine,f,primary,single,4.08,0,core
+58,tree bark,écorce,f,primary,single,3.43,0,core
+59,flower,fleur,f,primary,single,4.34,0,core
+60,grass,herbe,f,primary,single,4.18,0,core
+61,rope,corde,f,primary,single,4.11,0,core
+62,skin,peau,f,primary,single,4.81,0,core
+63,meat,viande,f,primary,single,4.51,0,core
+64,blood,sang,m,primary,single,4.98,0,core
+65,bone,os,m,primary,single,4.49,0,core
+66,fat (noun),graisse,f,primary,single,3.83,0,core
+67,egg,œuf,m,primary,single,3.94,0,core
+68,horn,corne,f,primary,single,3.61,0,core
+69,tail,queue,f,primary,single,4.43,0,core
+70,feather,plume,f,primary,single,4.13,0,core
+71,hair,cheveux,m,primary,single,4.85,0,core
+72,head,tête,f,primary,single,5.53,0,core
+73,ear,oreille,f,primary,single,4.39,0,core
+74,eye,œil,m,primary,single,4.65,0,core
+75,nose,nez,m,primary,single,4.66,0,core
+76,mouth,bouche,f,primary,single,4.79,0,core
+77,tooth,dent,f,primary,single,4.07,0,core
+78,tongue,langue,f,primary,single,5.12,0,core
+79,fingernail,ongle,m,primary,single,3.41,0,core
+80,foot,pied,m,primary,single,5.04,0,core
+81,leg,jambe,f,primary,single,4.19,0,core
+82,knee,genou,m,primary,single,4.04,0,core
+83,hand,main,f,primary,single,5.33,0,core
+84,wing,aile,f,primary,single,4.20,0,core
+85,belly,ventre,m,primary,single,4.41,0,core
+86,guts,intestins,m,primary,single,3.22,0,core
+87,neck,cou,m,primary,single,4.41,0,core
+88,back,dos,m,primary,single,4.94,0,core
+89,breast,sein,m,primary,single,5.05,0,core
+90,heart,cœur,m,primary,single,5.17,0,core
+91,liver,foie,m,primary,single,4.16,0,core
+92,to drink,boire,,primary,single,4.62,0,core
+93,to eat,manger,,primary,single,5.02,0,core
+94,to bite,mordre,,primary,single,3.59,0,core
+95,to suck,sucer,,primary,single,3.74,0,core
+96,to spit,cracher,,primary,single,3.74,0,core
+97,to vomit,vomir,,primary,single,3.85,0,core
+98,to blow,souffler,,primary,single,3.68,0,core
+99,to breathe,respirer,,primary,single,4.04,0,core
+100,to laugh,rire,,primary,single,4.79,0,core
+101,to see,voir,,primary,single,5.94,0,core
+102,to hear,entendre,,primary,single,4.98,0,core
+103,to know,savoir,,primary,single,5.51,0,core
+104,to think,penser,,primary,single,5.08,0,core
+105,to smell,sentir,,primary,single,4.68,0,core
+106,to fear,craindre,,primary,single,4.10,0,core
+107,to sleep,dormir,,primary,single,4.65,0,core
+108,to live,vivre,,primary,single,5.21,0,core
+109,to die,mourir,,primary,single,4.75,0,core
+110,to kill,tuer,,primary,single,4.77,0,core
+111,to fight,se battre,,primary,pair,4.66,0,core
+112,to hunt,chasser,,primary,single,4.01,0,core
+113,to hit,frapper,,primary,single,4.31,0,core
+114,to cut,couper,,primary,single,4.53,0,core
+115,to split,fendre,,primary,single,3.00,0,core
+116,to stab,poignarder,,primary,single,3.02,0,core
+117,to scratch,gratter,,primary,single,3.63,0,core
+118,to dig,creuser,,primary,single,3.92,0,core
+119,to swim,nager,,primary,single,3.74,0,core
+120,to fly,voler,,primary,single,4.41,0,core
+121,to walk,marcher,,primary,single,4.56,0,core
+122,to come,venir,,primary,single,5.18,0,core
+123,to lie down,s'étendre,,primary,pair,4.12,0,core
+124,to sit,s'asseoir,,primary,pair,4.09,0,core
+125,to stand,se lever,,primary,pair,4.54,0,core
+126,to turn (intransitive),tourner,,primary,single,4.68,0,core
+127,to fall,tomber,,primary,single,4.91,0,core
+128,to give,donner,,primary,single,5.41,0,core
+129,to hold,tenir,,primary,single,4.89,0,core
+130,to squeeze,serrer,,primary,single,3.94,0,core
+131,to rub,frotter,,primary,single,3.58,0,core
+132,to wash,laver,,primary,single,4.16,0,core
+133,to wipe,essuyer,,primary,single,3.43,0,core
+134,to pull,tirer,,primary,single,4.76,0,core
+135,to push,pousser,,primary,single,4.44,0,core
+136,to throw,jeter,,primary,single,4.50,0,core
+137,to tie,lier,,primary,single,3.74,0,core
+138,to sew,coudre,,primary,single,3.38,0,core
+139,to count,compter,,primary,single,4.80,0,core
+140,to say,dire,,primary,single,5.96,0,core
+141,to sing,chanter,,primary,single,4.34,0,core
+142,to play,jouer,,primary,single,5.23,0,core
+143,to float,flotter,,primary,single,3.29,0,core
+144,to flow,couler,,primary,single,4.05,0,core
+145,to freeze,geler,,primary,single,3.27,0,core
+146,to swell,gonfler,,primary,single,3.57,0,core
+147,sun,soleil,m,primary,single,5.03,0,core
+148,moon,lune,f,primary,single,4.61,0,core
+149,star,étoile,f,primary,single,4.38,0,core
+150,water,eau,f,primary,single,5.46,0,core
+151,rain,pluie,f,primary,single,4.56,0,core
+152,river,rivière,f,primary,single,4.59,0,core
+153,lake,lac,m,primary,single,4.67,0,core
+154,sea,mer,f,primary,single,5.10,0,core
+155,salt,sel,m,primary,single,4.38,0,core
+156,stone,pierre,f,primary,single,5.28,0,core
+157,sand,sable,m,primary,single,4.38,0,core
+158,dust,poussière,f,primary,single,4.11,0,core
+159,earth,terre,f,primary,single,5.33,0,core
+160,cloud,nuage,m,primary,single,4.01,0,core
+161,fog,brouillard,m,primary,single,3.81,0,core
+162,sky,ciel,m,primary,single,4.89,0,core
+163,wind,vent,m,primary,single,4.80,0,core
+164,snow,neige,f,primary,single,4.56,0,core
+165,ice,glace,f,primary,single,4.63,0,core
+166,smoke,fumée,f,primary,single,4.20,0,core
+167,fire,feu,m,primary,single,5.16,0,core
+168,ash,cendre,f,primary,single,3.23,0,core
+169,to burn,brûler,,primary,single,4.10,0,core
+170,road,route,f,primary,single,5.17,0,core
+171,mountain,montagne,f,primary,single,4.62,0,core
+172,red,rouge,,primary,single,5.13,0,core
+173,green,vert,,primary,single,4.74,0,core
+174,yellow,jaune,,primary,single,4.65,0,core
+175,white,blanc,,primary,single,5.14,0,core
+176,black,noir,,primary,single,5.13,0,core
+177,night,nuit,f,primary,single,5.38,0,core
+178,day,jour,m,primary,single,5.75,0,core
+179,year,année,f,primary,single,5.66,0,core
+180,warm,chaud,,primary,single,4.79,0,core
+181,cold,froid,,primary,single,4.82,0,core
+182,full,plein,,primary,single,5.24,0,core
+183,new,nouveau,,primary,single,5.63,0,core
+184,old,vieux,,primary,single,5.11,0,core
+185,good,bon,,primary,single,5.93,0,core
+186,bad,mauvais,,primary,single,5.03,0,core
+187,rotten,pourri,,primary,single,4.05,0,core
+188,dirty,sale,,primary,single,4.62,0,core
+189,straight,droit,,primary,single,5.56,0,core
+190,round,rond,,primary,single,4.27,0,core
+191,sharp,tranchant,,primary,single,3.48,0,core
+192,dull,émoussé,,primary,single,2.42,0,core
+193,smooth,lisse,,primary,single,3.82,0,core
+194,wet,mouillé,,primary,single,3.63,0,core
+195,dry,sec,,primary,single,4.44,0,core
+196,correct,juste,,primary,single,5.80,0,core
+197,near,près,,primary,single,5.45,0,core
+198,far,loin,,primary,single,5.39,0,core
+199,right,droite,,primary,single,5.20,0,core
+200,left,gauche,,primary,single,5.26,0,core
+201,at,à,,primary,single,7.26,0,core
+202,in,dans,,primary,single,6.91,0,core
+203,with,avec,,primary,single,6.65,0,core
+204,and,et,,primary,single,7.31,0,core
+205,if,si,,primary,single,6.46,0,core
+206,because,parce que,,primary,pair,5.71,0,core
+207,name,nom,m,primary,single,5.59,0,core

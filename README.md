@@ -292,6 +292,64 @@ form.
 
 Licenses: word data CC BY-SA 4.0, Tatoeba sentence text CC BY 2.0 FR, spaCy
 model MIT, and synthesized audio named by its engine and voice.
+
+### French Swadesh Sentences
+
+Build a listening-comprehension deck for French. The deck pairs 207 Swadesh
+concepts with 412 Tatoeba sentences. Each card holds one sentence with the
+matched token in bold, the English translation, the target word with a gender
+gloss, and two MP3 files.
+
+```bash
+uv run anki swadesh fetch --lang fra --lang eng              # cache the Tatoeba data
+uv run anki swadesh sentences french --per-word 2 --max-cards 450
+uv run anki swadesh audio french --native-audio none         # make the audio
+uv run anki swadesh pack french                              # write the APKG
+uv run anki swadesh audit french                             # gates G1 to G20
+```
+
+The commands write these files:
+
+| Path                                            | Content                            |
+| ----------------------------------------------- | ---------------------------------- |
+| `vocab/english-french.csv`                      | reviewed word table, 207 rows      |
+| `vocab/french_word_review.csv`                  | word review, 94 rows               |
+| `vocab/french_sentences.csv`                    | one row per card                   |
+| `vocab/french_sentences_review.csv`             | top candidates for the weak words  |
+| `audio/french_sentences/index.csv`              | file index of the audio cache      |
+| `apkg/swadesh_french_sentences.apkg`            | the deck                           |
+| `apkg/swadesh_french_sentences.manifest.json`   | counts, coverage, and file hashes  |
+| `ATTRIBUTION.md`                                | the `## French pack` section       |
+
+French needs three external things:
+
+1. The spaCy model `fr_core_news_sm` 3.8.0. It is not on PyPI. `pyproject.toml`
+   pins the release URL, so `uv sync` installs it.
+2. `ffprobe` on the path. The audio step removes a file that fails the header or
+   duration check.
+3. `gtts` for the voice `gtts:fr`. The optional `edge-tts` package adds the
+   voice `fr-FR-DeniseNeural` with `--tts edge --voice fr-FR-DeniseNeural`.
+
+The build reads `vocab/english-french.csv` and `vocab/french_word_review.csv`
+and never writes them. Run `uv run python scripts/build_french_word_table.py`
+to regenerate them from `Module:Swadesh/data/fr`. The module code is `fr`; the
+`fra` page does not exist.
+
+Measured result on 2026-10-19: 412 cards, 618 media files, and core coverage
+of 206 of 207 concepts (0.995). The pack has 0 scaffold cards and 0 native
+recordings. The word `intestins` (guts, index 86) has no candidate sentence.
+
+The French text uses U+202F and U+00A0 before `!`, `?`, `:`, and `;`. The build
+turns both characters into a normal space before the word count, the final-mark
+test, and the card text, and keeps the raw text in `text_original`.
+
+Tatoeba French has 9,833 recordings, but 5,754 are CC BY-NC 4.0 and 1,953 have
+no license. `--native-audio auto` keeps only a recording with a public license,
+so the public pack is TTS only.
+
+Licenses: word data CC BY-SA 4.0, Tatoeba sentence text CC BY 2.0 FR, spaCy
+model MIT, and synthesized audio named by its engine and voice.
+
 ## API Reference
 
 ### AnkiPackage Class

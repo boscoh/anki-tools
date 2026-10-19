@@ -1,0 +1,4 @@
+target,swadesh_index,english,variant,status,zipf,candidate_count,scaffold_candidates,rank,sentence,text_original,english_text,tatoeba_id,unknown_words,word_len,rank_key,tier
+intestins,86,guts,primary,uncovered,3.22,0,0,0,,,,,,,,
+émoussé,192,dull,primary,low_zipf,2.42,2,0,1,Il a été tué par une arme émoussée.,Il a été tué par une arme émoussée.,He was killed by a blunt weapon.,1684685,2,8,2|1|-5.699|0|1684685,core
+émoussé,192,dull,primary,low_zipf,2.42,2,0,2,Ces ciseaux sont émoussés.,Ces ciseaux sont émoussés.,These scissors are dull.,9845837,2,4,2|1|-4.550|1|9845837,core
