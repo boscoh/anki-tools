@@ -5,7 +5,7 @@ from pathlib import Path
 import jieba
 import pytest
 
-from anki_tools.rank import Sentence
+from anki_tools.rank import Sentence, load_frequency_data_yue, yue_frequency_path
 from anki_tools.yue_frequency import (
     CifuEntry,
     FreqRow,
@@ -443,3 +443,17 @@ class TestSpokenMass:
         ])
         candidates = [Candidate(make_sentence("我。", 0), ["我"], 1)]
         assert spoken_mass(freq, candidates) == pytest.approx(75.0)
+
+
+class TestWrittenRegression:
+    @pytest.mark.skipif(
+        not yue_frequency_path().exists(), reason="the Apple Daily cache is absent"
+    )
+    def test_written_source_does_not_read_cifu(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        def boom(*_args: object, **_kwargs: object) -> None:
+            raise AssertionError("the written source read Cifu")
+
+        monkeypatch.setattr("anki_tools.yue_frequency.load_yue_frequency", boom)
+        data = load_frequency_data_yue(source="written", max_words=1000)
+        assert data.word_freq
+        assert data.word_freq.get("係", 0) > 0

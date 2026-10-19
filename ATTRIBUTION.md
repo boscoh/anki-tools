@@ -11,6 +11,19 @@ The Swadesh Mandarin list comes from <https://en.wiktionary.org/wiki/Module:Swad
 It uses the CC BY-SA 4.0 license.
 The reviewed forms are in `vocab/english-mandarin.csv`.
 
+## Cantonese word frequency
+
+The Cantonese frequency list blends counts from these sources. Anki Tools
+downloads the files into a local cache and does not redistribute them.
+
+- Cifu (Lai and Winterstein 2020), <https://github.com/gwinterstein/Cifu>.
+  The repository has a GPL-3.0 license. The spoken adult counts come from
+  HKCanCor and CantoMap.
+- HKCanCor (Luke and Wong 2015). CC BY 4.0. The Cifu spoken counts include
+  this corpus.
+- Apple Daily frequency list,
+  <https://github.com/chaaklau/appledaily-frequency>. CC BY 4.0.
+
 ## Sentence text
 
 The Tatoeba Mandarin sentences below use the CC BY 2.0 FR

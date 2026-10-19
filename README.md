@@ -15,6 +15,7 @@ Read, edit, and manipulate Anki flashcard packages (.apkg files) using direct SQ
 - **Audio Extraction**: Extract audio files with proper filenames
 - **Deck Management**: Create decks, copy cards, move cards between decks
 - **Sentence Ranking**: Rank and filter sentences by complexity, frequency, and similarity (Chinese, French, and Cantonese)
+- **Cantonese Sentence Selection**: Filter fragments and keep the fewest sentences that show the most frequent spoken words
 - **Vocabulary Generation**: Build Swadesh vocabulary decks with audio (multiple languages)
 - **Card Deletion**: Delete cards with automatic cleanup of unused audio files
 - **Minimal Dependencies**: Direct SQLite access, no Anki installation required
@@ -45,7 +46,10 @@ uv run anki fix zh input.apkg
 # Fix French deck (rank and reorder)
 uv run anki fix fr input.apkg
 
-# Fix Cantonese deck (convert to traditional, fix jyutping, rank, reorder)
+# Build the Cantonese frequency list (blended spoken and written counts)
+uv run anki freq yue
+
+# Fix Cantonese deck (convert to traditional, fix jyutping, select, rank, reorder)
 uv run anki fix yue input.apkg
 
 # Fix Spanish deck (rank and reorder, optionally reduce to 3000 sentences)
@@ -116,17 +120,35 @@ uv run anki fix fr deck.apkg  # Rank and reorder
 
 **Cantonese (yue):**
 ```bash
-uv run anki fix yue deck.apkg  # Convert to traditional, fix jyutping, rank, reorder
+uv run anki freq yue          # Write data/yue_frequency.tsv
+uv run anki freq yue --check  # Run gates G1, G3, and G4
+uv run anki fix yue deck.apkg # Convert, fix jyutping, select, rank, reorder
 ```
 - Converts simplified to traditional Chinese
 - Generates accurate jyutping romanization
-- Character-based scoring. The frequency term uses the Apple Daily Hong Kong
-  Chinese word list (275,492 types, 494M tokens), because `wordfreq` has no
-  `yue` list. The list is written news text, not speech.
-  - The first run downloads the list to `~/.cache/anki-tools/appledaily-word-freq.tsv`
-    (3.2 MB). Set `YUE_FREQUENCY_PATH` to use another file.
-  - Data: <https://github.com/chaaklau/appledaily-frequency>, CC BY 4.0.
-- Outputs `_reordered.apkg` and `.rank.csv`
+- The frequency term blends spoken and written counts. The spoken term is the
+  Cifu `SpokenAdult` count; the written term is the mean of the Cifu and Apple
+  Daily counts. The default spoken weight is 0.7.
+  - `--freq written` uses the Apple Daily list alone. This is the old ranking.
+  - The first run downloads both files to `~/.cache/anki-tools`. Set
+    `CIFU_PATH` or `YUE_FREQUENCY_PATH` to use other files.
+  - A variant map in `vocab/yue_variants.tsv` and the overrides in
+    `vocab/yue_frequency_overrides.tsv` fix common spoken forms and greetings.
+  - `--freq-report` writes `deck.freq_change.csv` for the sentences that the
+    blend moves by more than 100 places.
+- The filter removes fragments and hard sentences. A sentence passes when it
+  has 3 to 12 Han characters, no Latin letter or digit, no repeated pattern,
+  one final mark at the end, no quotation mark, at most one internal mark, and
+  at most 2 words outside the top 2000.
+- The selection keeps the fewest sentences that cover the 1500 most frequent
+  words of the deck. Each target word gets 2 cards. One word outside the top
+  100 goes in at most 8 kept sentences. The cards go from easy to hard.
+  - `--max-sentences` caps the card count. `--per-word`, `--max-uses`,
+    `--top-words`, and `--order score` control the selection.
+  - `--no-select` gives the old output: rank and reorder only.
+- Outputs `_reordered.apkg`, `.rank.csv` (adds `hardest_rank` and `kept`),
+  `.select.csv` (one row per input sentence with the reason), and
+  `.coverage.csv` (one row per target word)
 
 **Spanish (es):**
 ```bash

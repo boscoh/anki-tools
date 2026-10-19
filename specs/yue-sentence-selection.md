@@ -2,7 +2,7 @@
 
 | Field   | Value                                                                     |
 | ------- | ------------------------------------------------------------------------- |
-| Status  | draft                                                                     |
+| Status  | M0 to M5 done; M6 (Tatoeba pool) open                                     |
 | Date    | 2026-10-19                                                                |
 | Owner   | anki-tools                                                                |
 | Issues  | epic `anki-g40`; milestones M0 to M6 (section 13); `anki-afn`, `anki-58i` |
@@ -595,6 +595,10 @@ the run with a non-zero exit code. Lower a value only with a new measurement.
 | G12  | No word outside the 100 most frequent words is in more than `--max-uses` kept sentences (8.5)                                   | M4   |
 
 G2 comes from 14.2. G10 and G11 come from 3.1 and 3.3.
+
+G8 was checked on 2026-10-19: `--no-select --freq written --order score` gives
+the same rank, note id, sentence, and score for all 998 LTL rows as the code
+before this spec.
 
 ### 11.2 Tests
 
