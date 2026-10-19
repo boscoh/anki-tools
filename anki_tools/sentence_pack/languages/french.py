@@ -43,7 +43,7 @@ AUDIO_DIR = Path("audio/french_sentences")
 MODULE_CACHE_PATH = Path("data/swadesh/fr_module.txt")
 
 MODEL_NAME = "French Swadesh Sentence"
-DECK_NAME = "French Swadesh Sentences"
+DECK_NAME = "Swadesh French Sentences"
 FIELDS = (
     "Audio",
     "Sentence",

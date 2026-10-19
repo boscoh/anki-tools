@@ -592,7 +592,7 @@ Anki tags cannot contain spaces. Map each gloss to a slug. Replace each space,
 
 ### 10.3 Deck
 
-- Deck name: `French Swadesh Sentences`.
+- Deck name: `Swadesh French Sentences`.
 - Add notes in Swadesh index order. Anki shows new cards in note order.
 - Do not split the deck. Use tags for study filters.
 

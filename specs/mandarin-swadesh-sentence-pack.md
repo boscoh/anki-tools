@@ -548,7 +548,7 @@ Replace each space, `/`, and punctuation mark with `_`.
 
 ### 10.3 Deck
 
-- Deck name: `Mandarin Swadesh Sentences`.
+- Deck name: `Swadesh Mandarin Sentences`.
 - Add notes in Swadesh index order. Anki shows new cards in note order.
 - Do not split the deck. Use tags for study filters.
 

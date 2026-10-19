@@ -195,7 +195,7 @@ has no use, and step 2 deletes it.
 
 The deck name has the entry count (for example, `Swadesh Mandarin 207`).
 
-### Mandarin Swadesh Sentences
+### Swadesh Mandarin Sentences
 
 Build a listening-comprehension deck for Mandarin. The deck pairs 207 Swadesh
 concepts with 387 Tatoeba sentences. Each card holds one sentence, the
@@ -239,7 +239,7 @@ audio per recording. This pack uses synthesized audio only.
 
 
 
-### Greek Swadesh Sentences
+### Swadesh Greek Sentences
 
 Build a listening-comprehension deck for Greek. The deck pairs 207 Swadesh
 concepts with 306 Tatoeba sentences. Each card holds one sentence, the English
@@ -297,7 +297,7 @@ form.
 Licenses: word data CC BY-SA 4.0, Tatoeba sentence text CC BY 2.0 FR, spaCy
 model MIT, and synthesized audio named by its engine and voice.
 
-### French Swadesh Sentences
+### Swadesh French Sentences
 
 Build a listening-comprehension deck for French. The deck pairs 207 Swadesh
 concepts with 412 Tatoeba sentences. Each card holds one sentence with the
@@ -354,7 +354,7 @@ so the public pack is TTS only.
 Licenses: word data CC BY-SA 4.0, Tatoeba sentence text CC BY 2.0 FR, spaCy
 model MIT, and synthesized audio named by its engine and voice.
 
-### Cantonese Swadesh Sentences
+### Swadesh Cantonese Sentences
 
 Build a listening-comprehension deck for Cantonese. The deck pairs 207 Swadesh
 concepts with 333 Tatoeba sentences. Each card holds one sentence with the

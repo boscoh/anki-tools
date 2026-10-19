@@ -183,7 +183,7 @@ The Greek pack uses the shared layer from the French spec, section 5.1. The
 | Word CSV        | `vocab/english-greek.csv`                               |
 | Sentence CSV    | `vocab/greek_sentences.csv`                             |
 | Audio directory | `audio/greek_sentences`                                 |
-| Deck name       | `Greek Swadesh Sentences`                               |
+| Deck name       | `Swadesh Greek Sentences`                               |
 | Model name      | `Greek Swadesh Sentence`                                |
 | Word window     | 4 to 10 words                                           |
 | Final marks     | `.?!;`                                                  |
@@ -593,7 +593,7 @@ line reads `Tap to show the sentence`.
 
 ### 10.3 Deck
 
-- Deck name: `Greek Swadesh Sentences`.
+- Deck name: `Swadesh Greek Sentences`.
 - Add notes in Swadesh index order.
 - Do not split the deck. Use tags for study filters.
 

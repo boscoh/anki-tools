@@ -218,7 +218,7 @@ def build_env(
     apkg_path = tmp_path / "pack.apkg"
     AnkiPackage.create(
         apkg_path,
-        "Mandarin Swadesh Sentences",
+        "Swadesh Mandarin Sentences",
         fields=FIELDS,
         cards=[{field: "" for field in FIELDS} for _ in rows],
         media_files=media,
@@ -411,7 +411,7 @@ def test_g13_rejects_a_wrong_note_count(
     env = build_env(tmp_path, monkeypatch)
     AnkiPackage.create(
         env["apkg_path"],
-        "Mandarin Swadesh Sentences",
+        "Swadesh Mandarin Sentences",
         fields=FIELDS,
         cards=[{field: "" for field in FIELDS} for _ in range(5)],
         model_name=MODEL_NAME,
