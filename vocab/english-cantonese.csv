@@ -6,7 +6,7 @@ we,我哋,ngo5 dei6
 you (plural),你哋,nei5 dei6
 they (plural),佢哋,keoi5 dei6
 this,呢個,ni1 go3
-that,嗰個,go2 go3
+that,嗰,go2
 here,呢度,ni1 dou6
 there,嗰度,go2 dou6
 who,邊個,bin1 go3
@@ -40,13 +40,13 @@ human being,人,jan4
 child,細路,sai3 lou6
 wife,老婆,lou5 po4
 husband,老公,lou5 gung1
-mother,媽咪,maa1 mi1
-father,爸爸,baa4 baa1
+mother,阿媽,aa3 maa1
+father,阿爸,aa3 baa1
 animal,動物,dung6 mat6
 fish,魚,jyu4
 bird,雀,zoek3
 dog,狗,gau2
-louse,蝨乸,sat1 naa2
+louse,蝨,sat1
 snake,蛇,se4
 worm,蟲,cung4
 tree,樹,syu6
@@ -60,14 +60,14 @@ tree bark,樹皮,syu6 pei4
 flower,花,faa1
 grass,草,cou2
 rope,繩,sing4
-skin,皮膚,pei4 fu1
+skin,皮,pei4
 meat,肉,juk6
 blood,血,hyut3
 bone,骨,gwat1
-fat (noun),肥,fei4
+fat (noun),脂肪,zi1 fong1
 egg,蛋,daan6
 horn,角,gok3
-tail,尾巴,mei5 baa1
+tail,尾,mei5
 feather,羽毛,jyu5 mou4
 hair,頭髮,tau4 faat3
 head,頭,tau4
@@ -84,7 +84,7 @@ knee,膝頭,sat1 tau4
 hand,手,sau2
 wing,翼,jik6
 belly,肚,tou5
-guts,腸肚,coeng4 tou5
+guts,腸,coeng4
 neck,頸,geng2
 back,背,bui3
 breast,胸,hung1
@@ -94,17 +94,17 @@ to drink,飲,jam2
 to eat,食,sik6
 to bite,咬,ngaau5
 to suck,吸,kap1
-to spit,吐痰,tou3 taam4
-to vomit,嘔吐,au2 tou3
+to spit,吐,tou3
+to vomit,嘔,au2
 to blow,吹,ceoi1
 to breathe,呼吸,fu1 kap1
 to laugh,笑,siu3
-to see,睇見,tai2 gin3
-to hear,聽到,teng1 dou3
+to see,睇,tai2
+to hear,聽,teng1
 to know,知道,zi1 dou3
 to think,諗,nam2
-to smell,聞到,man4 dou3
-to fear,害怕,hoi6 paa3
+to smell,聞,man4
+to fear,驚,geng1
 to sleep,瞓覺,fan3 gaau3
 to live,生存,sang1 cyun4
 to die,死,sei2
@@ -112,22 +112,22 @@ to kill,殺,saat3
 to fight,打交,daa2 gaau1
 to hunt,打獵,daa2 lip6
 to hit,打,daa2
-to cut,割,got3
+to cut,切,cit3
 to split,分開,fan1 hoi1
 to stab,刺,ci3
 to scratch,𢯎,aau1
 to dig,掘,gwat6
-to swim,游,jau4
+to swim,游水,jau4 seoi2
 to fly,飛,fei1
 to walk,行,haang4
 to come,嚟,lai4
-to lie down,瞓低,fan3 dai1
+to lie down,瞓,fan3
 to sit,坐,zo6
 to stand,企,kei5
 to turn (intransitive),轉,zyun2
-to fall,跌倒,dit3 dou2
+to fall,跌,dit3
 to give,畀,bei2
-to hold,揸住,zaa1 zyu6
+to hold,揸,zaa1
 to squeeze,搾,zaa3
 to rub,擦,caat3
 to wash,洗,sai2
@@ -136,8 +136,8 @@ to pull,拉,laai1
 to push,推,teoi1
 to throw,掟,deng3
 to tie,綁,bong2
-to sew,聯,lyun4
-to count,數數,sou2 sou3
+to sew,縫,fung4
+to count,數,sou2
 to say,講,gong2
 to sing,唱,coeng3
 to play,玩,waan2
@@ -160,14 +160,14 @@ dust,塵,can4
 earth,泥,nai4
 cloud,雲,wan4
 fog,霧,mou6
-sky,天空,tin1 hung1
+sky,天,tin1
 wind,風,fung1
 snow,雪,syut3
 ice,冰,bing1
 smoke,煙,jin1
 fire,火,fo2
 ash,灰,fui1
-to burn,燃燒,jin4 siu1
+to burn,燒,siu1
 road,路,lou6
 mountain,山,saan1
 red,紅,hung4
@@ -191,10 +191,10 @@ straight,直,zik6
 round,圓,jyun4
 sharp,利,lei6
 dull,鈍,deon6
-smooth,平滑,ping4 waat6
+smooth,滑,waat6
 wet,濕,sap1
 dry,乾,gon1
-correct,正確,zing3 kok3
+correct,啱,ngaam1
 near,近,gan6
 far,遠,jyun5
 right,右,jau6

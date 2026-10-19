@@ -185,8 +185,9 @@ revision ids in section 3.1 pin the counts. Fetch each page with
   section 3.1. O3 is closed.
 - The review file holds the Mandarin rows only. The other languages have no
   rows, and the pack spec gates G15 on the file.
-- Cantonese index 138 `聯 lyun4` is suspect. 聯 means to unite. To sew is
-  縫 fung4 or 車 ce1. Verify before release (O6).
+- Cantonese index 138 was `聯 lyun4`. 聯 means to unite. The form is now
+  縫 fung4, and `vocab/cantonese_word_review.csv` records the change. O6 is
+  closed. The pack spec keeps the two-character 縫紉 as an open question.
 
 ## 11. Rules for the next edit
 
@@ -220,7 +221,7 @@ Mandarin review rows committed, S5 gives 0 open rows.
 | O3  | Closed: counts verified on 2026-10-18 (section 3.1)                    |
 | O4  | Closed: 15 rows changed; the earlier 16 was an issue count             |
 | O5  | Review the duplicate forms in Greek, German, Spanish, and Hindi         |
-| O6  | Verify the Cantonese form for index 138 (聯)                           |
+| O6  | Closed: index 138 is 縫 fung4 (section 10)                             |
 
 ## Appendix A: Complete change list
 
@@ -301,6 +302,10 @@ transliteration. `Changed` names the fields that differ.
 | 193   | smooth        | 平滑 · ping4 wun6   | 平滑 · ping4 waat6  | reading       |
 | 200   | left          | 左 · zuo2           | 左 · zo2            | reading       |
 
+
+Row 138 changed again in the Cantonese pack: the form is now 縫 fung4, and
+`vocab/cantonese_word_review.csv` records the decision. The table above keeps
+the state after this sweep.
 ### A.3 Greek (42 rows)
 
 | Index | English                | Before     | After      | Changed |
