@@ -354,6 +354,55 @@ so the public pack is TTS only.
 Licenses: word data CC BY-SA 4.0, Tatoeba sentence text CC BY 2.0 FR, spaCy
 model MIT, and synthesized audio named by its engine and voice.
 
+### French 1000-Card Cull
+
+Cull the 5,928-card audio deck to 1,000 cards with a wide and diverse
+vocabulary. The selection is a greedy cover of the 300 most frequent French
+content lemmas, weighted to the spoken frequency list. No non-exempt word
+appears in more than 4 cards.
+
+```bash
+uv run anki cull fr "apkg/6000_French_Sentences_w_Audio.apkg" \
+    --max-cards 1000 \
+    --target-words 300 \
+    --max-uses 4 \
+    --exempt-top 100 \
+    --spoken-weight 0.5 \
+    --output apkg/french_1000_sentences.apkg
+
+# Run gates G1 to G13 on the written output
+uv run anki cull fr "apkg/6000_French_Sentences_w_Audio.apkg" \
+    --output apkg/french_1000_sentences.apkg --check
+```
+
+The defaults are the values above. The other options are `--min-words 3`,
+`--max-words 12`, `--similarity 0.67`, `--order coverage` (`coverage` or
+`input`), and `--name "French 1000 Core Sentences"`.
+
+The command writes these files:
+
+| Path                                       | Content                                                     |
+| ------------------------------------------ | ----------------------------------------------------------- |
+| `apkg/french_1000_sentences.apkg`          | the culled deck with the input model, fields, and audio     |
+| `apkg/french_1000_sentences.cull.csv`      | one row per input card: `kept`, `reason`, `targets`, `gain` |
+| `apkg/french_1000_sentences.coverage.csv`  | one row per target: `word`, `rank`, `count`, `status`       |
+| `apkg/french_1000_sentences.manifest.json` | counts, parameters, frequency source, and hashes            |
+
+The `status` of a target is `covered` for two or more cards, `partial` for
+one card, and `absent` for no card.
+
+Measured result on 2026-10-20: 1,000 cards, 2,081 distinct content lemmas,
+299 of 300 targets covered, and 288 targets with 2 cards. The most-used
+non-exempt lemma is in 4 cards, the cap. The `spoken_mass` is 0.543, and the
+output APKG is 33.6 MB.
+
+The cull keeps the audio files and the note model of the input deck. It does
+not make new TTS files. The input file is
+`apkg/6000_French_Sentences_w_Audio.apkg`.
+
+Licenses: Tatoeba sentence text CC BY 2.0 FR, `wordfreq` list Apache License
+2.0, and input audio under the license of the source deck.
+
 ### Swadesh Cantonese Sentences
 
 Build a listening-comprehension deck for Cantonese. The deck pairs 207 Swadesh
