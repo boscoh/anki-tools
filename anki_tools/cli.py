@@ -10,6 +10,7 @@ Commands:
 
 import csv
 import importlib.util
+from collections import Counter
 import os
 import re
 import shutil
@@ -20,6 +21,7 @@ from typing import Literal
 import cyclopts
 from gtts import gTTS
 
+from anki_tools import cull_fr as french_cull
 from anki_tools.jyutping import fix_jyutping
 from anki_tools.mandarin_audio import (
     DEFAULT_VOICE as MANDARIN_DEFAULT_VOICE,
@@ -47,6 +49,7 @@ from anki_tools.sentence_pack import pool as sentence_pool
 from anki_tools.sentence_pack import select as sentence_select
 from anki_tools.sentence_pack import tatoeba as sentence_tatoeba
 from anki_tools.sentence_pack.audit import print_audit as print_gate_table
+from anki_tools.sentence_pack.audit import sha256_value
 from anki_tools.sentence_pack.languages import cantonese as cantonese_lang
 from anki_tools.sentence_pack.languages import french as french_lang
 from anki_tools.sentence_pack.languages import greek as greek_lang
@@ -611,6 +614,198 @@ def freq_yue(
         failed = failed or not ok
     if failed:
         raise SystemExit(1)
+
+
+
+# =============================================================================
+# Cull commands - reduce a sentence deck to a smaller deck
+# =============================================================================
+
+cull_app = cyclopts.App(name="cull", help="Cull a sentence deck to a smaller deck")
+app.command(cull_app)
+
+
+@cull_app.command(name="fr")
+def cull_fr(
+    apkg_path: Path,
+    *,
+    max_cards: int = 1000,
+    target_words: int = 300,
+    max_uses: int = 4,
+    exempt_top: int = 100,
+    spoken_weight: float = 0.5,
+    min_words: int = 3,
+    max_words: int = 12,
+    similarity: float = 0.67,
+    order: Literal["coverage", "input"] = "coverage",
+    name: str = "French 1000 Core Sentences",
+    output: Path | None = None,
+    check: bool = False,
+) -> None:
+    """Cull the French sentence deck.
+
+    :param apkg_path: Input .apkg file.
+    :param max_cards: Card cap.
+    :param target_words: Target count, 200 to 500.
+    :param max_uses: Most cards that hold one non-exempt word.
+    :param exempt_top: Content lemmas exempt from the card cap.
+    :param spoken_weight: Weight of the Tatoeba term in the blend, 0 to 1.
+    :param min_words: Minimum word count of a card.
+    :param max_words: Maximum word count of a card.
+    :param similarity: Lemma Jaccard limit of a duplicate pair.
+    :param order: ``coverage`` or ``input`` card order.
+    :param name: Output deck name.
+    :param output: Output .apkg file (default: from the input name).
+    :param check: Run gates G1 to G13 on an existing output and exit with
+        code 1 on a failure. The check does not run the selection again.
+    """
+    output_path = output or french_cull.default_output(apkg_path)
+    if check:
+        _print_cull_gates(french_cull.gate_inputs(output_path))
+        return
+
+    cards = french_cull.load_input_deck(apkg_path)
+    frequency = french_cull.load_frequency()
+    ranks = french_cull.frequency_ranks(frequency, spoken_weight=spoken_weight)
+    names = french_cull.read_names()
+    tokens = french_cull.tokenize_deck(cards)
+    targets, content_lemmas = french_cull.build_targets(
+        cards, tokens, ranks, names, target_words=target_words
+    )
+    passed, reasons = french_cull.filter_cards(
+        cards, tokens, min_words=min_words, max_words=max_words
+    )
+    selection = french_cull.select_cards(
+        cards,
+        tokens,
+        targets,
+        ranks,
+        max_cards=max_cards,
+        max_uses=max_uses,
+        exempt_top=exempt_top,
+        similarity=similarity,
+        passed=passed,
+    )
+    ordered = french_cull.order_cards(selection.kept, tokens, ranks, order=order)
+
+    rejected = Counter(reasons)
+    kept_lemmas = {
+        lemma
+        for index in selection.kept
+        for lemma, pos in tokens[index]
+        if pos in french_cull.CONTENT_POS
+    }
+    covered = sum(1 for target in targets if selection.uses[target.lemma])
+    twice = sum(1 for target in targets if selection.uses[target.lemma] >= 2)
+    exempt = selection.exempt
+    non_exempt_max = max(
+        (
+            count
+            for lemma, count in selection.uses.items()
+            if lemma not in exempt
+        ),
+        default=0,
+    )
+    exempt_max = max(
+        (
+            count
+            for lemma, count in selection.uses.items()
+            if lemma in exempt
+        ),
+        default=0,
+    )
+    mass = french_cull.spoken_mass(frequency, kept_lemmas)
+
+    print(f"Input:              {apkg_path}")
+    print(f"Input cards:        {len(cards)}")
+    print(f"Passed:             {len(passed)}")
+    for rule in french_cull.FILTER_RULES:
+        print(f"  Rejected {rule}:       {rejected.get(rule, 0)}")
+    print(f"Targets:            {len(targets)}")
+    print(f"Content lemmas:     {content_lemmas}")
+    print(f"Cards:              {len(selection.kept)}")
+    print(f"Distinct lemmas:    {len(kept_lemmas)}")
+    print(f"Covered targets:    {covered}")
+    print(f"Targets with 2:     {twice}")
+    print(f"Max uses capped:    {non_exempt_max}")
+    print(f"Max uses exempt:    {exempt_max}")
+    print(f"spoken_mass:        {mass:.3f}")
+    print()
+    print("First 10 kept cards")
+    target_ranks = {target.lemma: target.rank for target in targets}
+    for position, index in enumerate(ordered[:10], start=1):
+        card = cards[index]
+        hits = sorted(
+            {
+                lemma
+                for lemma, pos in tokens[index]
+                if pos in french_cull.CONTENT_POS and lemma in target_ranks
+            },
+            key=lambda lemma: target_ranks[lemma],
+        )
+        print(f"{position:>2}. {card.sentence}")
+        print(f"    {card.english}")
+        print(f"    targets: {', '.join(hits)}")
+
+    cull_csv, coverage_csv, manifest_path = french_cull.side_paths(output_path)
+    french_cull.write_cull_csv(cards, reasons, selection, ordered, cull_csv)
+    french_cull.write_coverage_csv(targets, selection, coverage_csv)
+    french_cull.write_deck(apkg_path, cards, ordered, output_path, name)
+    kept_order = french_cull.kept_order_hash(cards, ordered)
+    french_cull.write_manifest(
+        manifest_path,
+        source={
+            "input": str(apkg_path),
+            "deck": name,
+            "model": french_cull.MODEL_NAME,
+        },
+        params={
+            "max_cards": max_cards,
+            "target_words": target_words,
+            "max_uses": max_uses,
+            "exempt_top": exempt_top,
+            "spoken_weight": spoken_weight,
+            "min_words": min_words,
+            "max_words": max_words,
+            "similarity": similarity,
+            "order": order,
+            "name": name,
+        },
+        counts={
+            "input": len(cards),
+            "passed": len(passed),
+            "cards": len(ordered),
+            "content": len(kept_lemmas),
+            "targets": len(targets),
+            "covered": covered,
+            "covered2": twice,
+        },
+        frequency={
+            "path": str(french_cull.FREQUENCY_PATH),
+            "spoken_weight": spoken_weight,
+        },
+        files={
+            "cull_csv": sha256_value(cull_csv),
+            "coverage_csv": sha256_value(coverage_csv),
+            "input_apkg": sha256_value(apkg_path),
+        },
+        kept_order=kept_order,
+    )
+    print()
+    print(f"wrote {output_path}")
+    print(f"wrote {cull_csv}")
+    print(f"wrote {coverage_csv}")
+    print(f"wrote {manifest_path}")
+
+
+def _print_cull_gates(inputs) -> None:
+    """Print the gates of a cull output and exit on a failure.
+
+    :param inputs: Lazy reader of the output APKG and its side files.
+    """
+    code = print_gate_table(french_cull.run_gates(inputs))
+    if code:
+        raise SystemExit(code)
 
 
 # =============================================================================
