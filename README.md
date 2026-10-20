@@ -394,7 +394,7 @@ one card, and `absent` for no card.
 Measured result on 2026-10-20: 1,000 cards, 2,081 distinct content lemmas,
 299 of 300 targets covered, and 288 targets with 2 cards. The most-used
 non-exempt lemma is in 4 cards, the cap. The `spoken_mass` is 0.543, and the
-output APKG is 33.6 MB.
+output APKG is about 32 MB.
 
 The cull keeps the audio files and the note model of the input deck. It does
 not make new TTS files. The input file is
