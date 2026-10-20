@@ -1,5 +1,5 @@
 {
-  "build_date": "2026-10-20T03:01:54+00:00",
+  "build_date": "2026-10-20T03:47:29+00:00",
   "source": {
     "input": "apkg/6000_French_Sentences_w_Audio.apkg",
     "deck": "French 1000 Core Sentences",
@@ -21,18 +21,22 @@
     "input": 5928,
     "passed": 4958,
     "cards": 1000,
-    "content": 2081,
+    "frequency_cards": 802,
+    "reserve": 198,
+    "content": 1981,
     "targets": 300,
-    "covered": 299,
-    "covered2": 289
+    "covered": 297,
+    "covered2": 287,
+    "swadesh_covered": 206,
+    "swadesh_total": 207
   },
   "frequency": {
     "path": "data/french_frequency.tsv",
     "spoken_weight": 0.5
   },
   "files": {
-    "cull_csv": "sha256:3fce07e49ac2a485d5f1ab430400f144ab4f5eb91f66a94adb7b5e02d78e7b62",
-    "coverage_csv": "sha256:5e8183a6bda5caea8f52d0b3d859f4d963f3b1703e5b455d13168bb0b0ec266b",
+    "cull_csv": "sha256:09a602bb255594f89c3c1a3e3941c211d1839c51d7f9e749e03f622458623c46",
+    "coverage_csv": "sha256:1623649b7b3d7b501af6ccc40132f1a56a79c5e8984011dbdaededc68f0c537d",
     "input_apkg": "sha256:230dd01bcf6223bcb8a5ea303eee01fd4a55e19ce418d0bf66a81193037024b5"
   },
   "licenses": {
@@ -40,5 +44,9 @@
     "wordfreq": "wordfreq list: Apache License 2.0",
     "audio": "Input audio: license of the source deck"
   },
-  "kept_order": "sha256:2dfdc34d57e864329729355b5fff48edfae6edc8ba6ac9e4e343cedbc0aff32c"
+  "kept_order": "sha256:7e7e6b8e94acfa2821a29e9e898ebbb8b6d8681b4edd6c521f4242913fc8d92d",
+  "reserve_pack": "apkg/swadesh_french_sentences.apkg",
+  "swadesh_exceptions": [
+    "intestins"
+  ]
 }

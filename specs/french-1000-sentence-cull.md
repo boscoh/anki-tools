@@ -458,8 +458,9 @@ uv run anki cull fr "apkg/6000_French_Sentences_w_Audio.apkg" \
 | `apkg/french_1000_sentences.coverage.csv` | One row per target: `word`, `rank`, `count`, `status`       |
 | `apkg/french_1000_sentences.manifest.json` | Counts, parameters, frequency source, and hashes        |
 
-The `.cull.csv` has these columns: `sentence`, `english`, `audio`, `kept`,
-`reason`, `targets`, `gain`, `hardest_rank`.
+The `.cull.csv` has these columns: `source`, `sentence`, `english`, `audio`,
+`kept`, `reason`, `targets`, `gain`, `hardest_rank`. The `source` is `swadesh`
+or `frequency`. The reserve rows come first.
 
 The `.coverage.csv` has these columns: `word`, `rank`, `count`, `status`. The
 `status` is `covered`, `partial` (one card), or `absent`.
@@ -485,7 +486,7 @@ command with a non-zero exit code.
 | G2   | No non-exempt content lemma is in more than `--max-uses` kept cards     |
 | G3   | Target coverage is at least 0.98 of `--target-words` (measured 0.997)   |
 | G4   | At least 0.95 of the targets have 2 cards (measured 0.963)              |
-| G5   | Every kept card passes the filter rules                                 |
+| G5   | Every kept card passes the filter rules. The reserve cards skip the name rule F8, because the Swadesh pack already validated them. |
 | G6   | No kept card pair reaches the lemma Jaccard limit                       |
 | G7   | Every kept card has its input audio file, and the file is a valid MP3   |
 | G8   | The APKG note count equals the cull CSV `kept` count and the manifest   |
@@ -494,6 +495,7 @@ command with a non-zero exit code.
 | G11  | A second run gives the same kept set and the same order                 |
 | G12  | The coverage CSV has one row per target word                            |
 | G13  | The manifest hashes match the cull CSV and the coverage CSV             |
+| G14  | The merged deck covers 206 of 207 Swadesh concepts, with `intestins` as the exception |
 
 ### 11.2 Tests
 
@@ -549,6 +551,7 @@ download a file and do not run a full Tatoeba pass.
 | D3        | `anki-3ux` | Filter, gain, cap, similarity, order                  | kept card list                           |
 | D4        | `anki-mq7` | APKG writer, cull CSV, coverage CSV, manifest, gates  | `apkg/french_1000_sentences.apkg`        |
 | D5        | `anki-7n2` | Tests, README, license check                          | release check                            |
+| D6        | `anki-c5g` | Swadesh reserve, merged writer, gate G14              | 206 / 207 Swadesh, 1,000 cards           |
 
 ## 14. Appendix: evidence
 
@@ -616,8 +619,9 @@ concept and one audio file per card.
 | One card per concept                 | 206         |
 | Exact duplicate of an input sentence | 3           |
 | Near duplicate of an input sentence  | 4           |
-| Reserve cards after duplicate check  | 199         |
-| Reserve cards with audio             | 199         |
+| Duplicate reserve card               | 1           |
+| Reserve cards after duplicate check  | 198         |
+| Reserve cards with audio             | 198         |
 | Concept with no source sentence      | `intestins` |
 
 The pack is read with `AnkiPackage`. The note model is
@@ -645,8 +649,8 @@ guid is a UUID. The tags include `swadesh`.
 1. Load the input deck and the reserve cards.
 2. Drop a reserve card whose sentence is in the input deck.
 3. Drop a reserve card that reaches the lemma Jaccard limit 0.67 with an input
-   card. The input deck is the source of the frequency cards, so this keeps the
-   merged deck below the gate G6 limit.
+   card or with an earlier reserve card. The input deck is the source of the
+   frequency cards, and two reserve cards must not duplicate each other.
 4. Add the reserve lemma sets to the `uses` of the selector.
 5. Keep every reserve card. The frequency pass fills `max_cards` minus the
    reserve count.
@@ -674,17 +678,17 @@ default exception list is `["intestins"]`, because no source sentence exists.
 
 ### 16.6 Expected result
 
-The measured merge of 199 reserve cards and 801 frequency cards:
+The measured merge of 198 reserve cards and 802 frequency cards:
 
 | Measure                    | Frequency only | With reserve |
 | -------------------------- | -------------- | ------------ |
 | Swadesh concepts covered   | 162 / 207      | 206 / 207    |
 | Top 300 frequency words    | 299            | 297          |
-| Top 300 with 2 cards       | 289            | 286          |
+| Top 300 with 2 cards       | 289            | 287          |
 | Distinct content lemmas    | 2,081          | 1,981        |
 | Cards                      | 1,000          | 1,000        |
 | Most cards of one non-exempt frequency word | 4 | 4        |
-| Most cards of one non-exempt reserve word   | - | 35       |
+| Most cards of one non-exempt reserve word   | - | 34       |
 
 The reserve and the frequency cards together cover 206 of 207 concepts. The 7
 reserve cards that the duplicate check drops are covered by frequency cards.

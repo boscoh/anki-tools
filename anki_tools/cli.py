@@ -641,6 +641,8 @@ def cull_fr(
     name: str = "French 1000 Core Sentences",
     output: Path | None = None,
     check: bool = False,
+    swadesh_pack: Path = Path("apkg/swadesh_french_sentences.apkg"),
+    no_swadesh: bool = False,
 ) -> None:
     """Cull the French sentence deck.
 
@@ -656,8 +658,10 @@ def cull_fr(
     :param order: ``coverage`` or ``input`` card order.
     :param name: Output deck name.
     :param output: Output .apkg file (default: from the input name).
-    :param check: Run gates G1 to G13 on an existing output and exit with
-        code 1 on a failure. The check does not run the selection again.
+    :param check: Run the gates on an existing output and exit with code 1 on
+        a failure. The check does not run the selection again.
+    :param swadesh_pack: French Swadesh APKG with the reserve cards.
+    :param no_swadesh: Run the frequency cull without the Swadesh reserve.
     """
     output_path = output or french_cull.default_output(apkg_path)
     if check:
@@ -675,6 +679,16 @@ def cull_fr(
     passed, reasons = french_cull.filter_cards(
         cards, tokens, min_words=min_words, max_words=max_words
     )
+    reserve = []
+    reserve_sets = []
+    all_reserve = []
+    if not no_swadesh:
+        all_reserve = french_cull.load_reserve(swadesh_pack)
+        reserve = list(all_reserve)
+        reserve_sets = french_cull.reserve_lemma_sets(reserve)
+        reserve, reserve_sets = french_cull.dedupe_reserve_sets(
+            reserve, reserve_sets, cards, tokens, similarity
+        )
     selection = french_cull.select_cards(
         cards,
         tokens,
@@ -685,27 +699,22 @@ def cull_fr(
         exempt_top=exempt_top,
         similarity=similarity,
         passed=passed,
+        reserved=reserve,
+        reserved_sets=reserve_sets,
     )
     ordered = french_cull.order_cards(selection.kept, tokens, ranks, order=order)
 
     rejected = Counter(reasons)
-    kept_lemmas = {
+    kept_lemmas = set().union(*reserve_sets) if reserve_sets else set()
+    kept_lemmas.update(
         lemma
         for index in selection.kept
         for lemma, pos in tokens[index]
         if pos in french_cull.CONTENT_POS
-    }
+    )
     covered = sum(1 for target in targets if selection.uses[target.lemma])
     twice = sum(1 for target in targets if selection.uses[target.lemma] >= 2)
     exempt = selection.exempt
-    non_exempt_max = max(
-        (
-            count
-            for lemma, count in selection.uses.items()
-            if lemma not in exempt
-        ),
-        default=0,
-    )
     exempt_max = max(
         (
             count
@@ -714,6 +723,37 @@ def cull_fr(
         ),
         default=0,
     )
+    frequency_uses = Counter()
+    for index in selection.kept:
+        frequency_uses.update(
+            {
+                lemma
+                for lemma, pos in tokens[index]
+                if pos in french_cull.CONTENT_POS
+            }
+        )
+    reserve_uses = Counter()
+    for lemma_set in reserve_sets:
+        reserve_uses.update(lemma_set)
+    frequency_max = max(
+        (count for lemma, count in frequency_uses.items() if lemma not in exempt),
+        default=0,
+    )
+    reserve_max = max(
+        (count for lemma, count in reserve_uses.items() if lemma not in exempt),
+        default=0,
+    )
+    all_concepts = [card.target for card in all_reserve]
+    if reserve:
+        all_concepts += list(french_cull.SWADESH_EXCEPTIONS)
+        merged_sentences = [card.sentence for card in reserve]
+        merged_sentences += [cards[index].sentence for index in ordered]
+        merged_tokens = french_cull.tokenize_texts(merged_sentences)
+        swadesh_covered, swadesh_total = french_cull.swadesh_coverage(
+            all_concepts, merged_sentences, merged_tokens
+        )
+    else:
+        swadesh_covered, swadesh_total = 0, french_cull.SWADESH_TOTAL
     mass = french_cull.spoken_mass(frequency, kept_lemmas)
 
     print(f"Input:              {apkg_path}")
@@ -723,11 +763,15 @@ def cull_fr(
         print(f"  Rejected {rule}:       {rejected.get(rule, 0)}")
     print(f"Targets:            {len(targets)}")
     print(f"Content lemmas:     {content_lemmas}")
-    print(f"Cards:              {len(selection.kept)}")
+    print(f"Reserve:            {len(reserve)}")
+    print(f"Swadesh:            {swadesh_covered}/{swadesh_total}")
+    print(f"Cards:              {len(selection.kept) + len(reserve)}")
+    print(f"  Frequency cards:  {len(selection.kept)}")
     print(f"Distinct lemmas:    {len(kept_lemmas)}")
     print(f"Covered targets:    {covered}")
     print(f"Targets with 2:     {twice}")
-    print(f"Max uses capped:    {non_exempt_max}")
+    print(f"Max uses frequency: {frequency_max}")
+    print(f"Max uses reserve:   {reserve_max}")
     print(f"Max uses exempt:    {exempt_max}")
     print(f"spoken_mass:        {mass:.3f}")
     print()
@@ -748,10 +792,20 @@ def cull_fr(
         print(f"    targets: {', '.join(hits)}")
 
     cull_csv, coverage_csv, manifest_path = french_cull.side_paths(output_path)
-    french_cull.write_cull_csv(cards, reasons, selection, ordered, cull_csv)
+    french_cull.write_cull_csv(
+        cards, reasons, selection, ordered, cull_csv, reserve=reserve
+    )
     french_cull.write_coverage_csv(targets, selection, coverage_csv)
-    french_cull.write_deck(apkg_path, cards, ordered, output_path, name)
-    kept_order = french_cull.kept_order_hash(cards, ordered)
+    french_cull.write_deck(
+        apkg_path,
+        cards,
+        ordered,
+        output_path,
+        name,
+        reserve=reserve,
+        reserve_pack_path=swadesh_pack,
+    )
+    kept_order = french_cull.kept_order_hash(cards, ordered, reserve=reserve)
     french_cull.write_manifest(
         manifest_path,
         source={
@@ -774,11 +828,15 @@ def cull_fr(
         counts={
             "input": len(cards),
             "passed": len(passed),
-            "cards": len(ordered),
+            "cards": len(ordered) + len(reserve),
+            "frequency_cards": len(ordered),
+            "reserve": len(reserve),
             "content": len(kept_lemmas),
             "targets": len(targets),
             "covered": covered,
             "covered2": twice,
+            "swadesh_covered": swadesh_covered,
+            "swadesh_total": swadesh_total,
         },
         frequency={
             "path": str(french_cull.FREQUENCY_PATH),
@@ -790,6 +848,8 @@ def cull_fr(
             "input_apkg": sha256_value(apkg_path),
         },
         kept_order=kept_order,
+        reserve_pack=str(swadesh_pack) if reserve else "",
+        swadesh_exceptions=french_cull.SWADESH_EXCEPTIONS if reserve else (),
     )
     print()
     print(f"wrote {output_path}")
