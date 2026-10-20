@@ -665,9 +665,12 @@ guid is a UUID. The tags include `swadesh`.
 ### 16.5 Gate G14
 
 `G14`: the output holds at least `swadesh_total - len(exceptions)` Swadesh
-concepts. The manifest holds `counts.swadesh_covered`, `counts.swadesh_total`,
-and `swadesh_exceptions`. The default exception list is `["intestins"]`, because
-no source sentence exists.
+concepts. A concept is covered when its form, or the lemma of its head word,
+appears in at least one kept card. The card does not need to be assigned to
+that concept. Example: the reserve card "Un nuage flottait dans le ciel." is
+the card for `flotter`, and it covers `nuage`. The manifest holds
+`counts.swadesh_covered`, `counts.swadesh_total`, and `swadesh_exceptions`. The
+default exception list is `["intestins"]`, because no source sentence exists.
 
 ### 16.6 Expected result
 
