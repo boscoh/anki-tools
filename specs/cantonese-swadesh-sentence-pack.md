@@ -321,6 +321,12 @@ The `sentences` command takes `--min-words` and `--max-words`. Without them the
 profile window applies, which is 3 to 12 for Cantonese and 4 to 10 for Greek
 and French.
 
+The back template has `class="sentence char-links"` on the `Sentence`
+field. The profile field `char_links` adds `templates/char_links.html`, which
+links each Han character of the sentence to the CC-Canto dictionary
+(`https://cantonese.org/search.php?q=`), the same as the Mandarin sentence
+pack.
+
 ## 11. Quality gates
 
 `anki swadesh audit cantonese` runs these gates. A failure stops the command
