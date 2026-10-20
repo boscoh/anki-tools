@@ -2,7 +2,7 @@
 
 | Field   | Value                                                          |
 | ------- | -------------------------------------------------------------- |
-| Status  | proposed                                                       |
+| Status  | implemented                                                       |
 | Date    | 2026-10-20                                                     |
 | Owner   | anki-tools                                                     |
 | Input   | `apkg/6000_French_Sentences_w_Audio.apkg`                      |
@@ -18,7 +18,7 @@ and diverse vocabulary, weighted to the most frequent spoken French words. No
 non-exempt word appears in more than 4 cards.
 
 The current order gives 1,272 distinct content words in 1,000 cards. The
-selection of this spec gives 2,004, and it covers 299 of the 300 target words.
+selection of this spec gives 2,081, and it covers 299 of the 300 target words.
 The count of the most-used non-exempt word falls from 131 cards to 4.
 
 ### 1.1 Result at a glance
@@ -26,12 +26,12 @@ The count of the most-used non-exempt word falls from 131 cards to 4.
 | Measure                    | Current order | This spec |
 | -------------------------- | ------------- | --------- |
 | Cards                      | 1,000         | 1,000     |
-| Distinct content words     | 1,272         | 2,004     |
+| Distinct content words     | 1,272         | 2,081     |
 | Top 300 words covered      | 282           | 299       |
 | Top 300 words with 2 cards | 256           | 289       |
 | Most cards of one non-exempt word | 131    | 4         |
-| Most cards of one exempt word     | 105    | 190       |
-| `spoken_mass`              | 0.473         | 0.540     |
+| Most cards of one exempt word     | 105    | 172       |
+| `spoken_mass`              | 0.473         | 0.543     |
 
 `spoken_mass` is the share of the Tatoeba French tokens that the kept words
 cover (section 3.2). Use it to compare methods. Do not use it as a claim about
@@ -215,9 +215,9 @@ A target is a content lemma that appears in the deck:
 
 The content-share rule removes function words that a tagger sometimes marks as
 content: être, avoir, un, une, que, est, tu, lui, son, si, te, ça, ton, où,
-cet, ta. The name list removes marie, mary, tom, jean, and similar lemmas.
+cet, ta. The name list removes jean, marie, mary, tom, and similar lemmas.
 
-The filters leave 1,688 content lemmas. The target list is the first
+The filters leave about 1,684 content lemmas. The target list is the first
 `--target-words` of them in the blend order. The default is 300, and the
 accepted range is 200 to 500.
 
@@ -245,14 +245,14 @@ Apply the rules in order. Store the first failed rule as the `reason`.
 
 | Rule | Condition                                                              | Rejected |
 | ---- | ---------------------------------------------------------------------- | -------- |
-| F1   | An English `Back` exists with 2 to 12 words                            | 95       |
-| F2   | 3 to 12 words                                                          | 162      |
-| F3   | No digit, bracket, URL, or ellipsis                                    | 2        |
+| F1   | An English `Back` exists with 2 to 12 words                            | 163      |
+| F2   | 3 to 12 words                                                          | 115      |
+| F3   | No digit, bracket, URL, or ellipsis                                    | 1        |
 | F4   | One final mark: `.`, `?`, or `!` at the end                            | 0        |
 | F5   | Exactly one final mark                                                 | 25       |
 | F6   | No quotation mark and no dialogue dash                                 | 0        |
-| F7   | At most one internal comma, colon, or semicolon                        | 54       |
-| F8   | No proper name (a `PROPN` token)                                       | 632      |
+| F7   | At most one internal comma, colon, or semicolon                        | 45       |
+| F8   | No proper name (a `PROPN` token)                                       | 621      |
 | F9   | The sentence text is unique                                            | 0        |
 
 Result: 4,958 of 5,928 cards pass (83.6%).
@@ -268,8 +268,8 @@ Result: 4,958 of 5,928 cards pass (83.6%).
 ### 8.1 Candidate set
 
 Each passed card has a set of content lemmas. The selector walks the candidates
-and keeps the best gain. A card can hold a capped word if it adds another
-uncapped word. This rule keeps the pool large.
+and keeps the best gain. The gain of a card counts only its uncapped words.
+Section 8.4 then removes a card that holds a capped word.
 
 ### 8.2 Gain
 
@@ -321,23 +321,24 @@ with kept cards that share a lemma. Reuse `word_similarity_fr` where it fits.
 
 ## 9. Expected results
 
-All numbers come from a prototype of sections 4 to 8 on 2026-10-20. The input
-is the 5,928-card deck. The defaults are: 1,000 cards, 300 targets, cap 4,
-exempt top 100, spoken weight 0.5, 3 to 12 words.
+The 9.1 default row and the appendix come from the built deck on 2026-10-20.
+Tables 9.2 to 9.5 come from a prototype of sections 4 to 8. The input is the
+5,928-card deck. The defaults are: 1,000 cards, 300 targets, cap 4, exempt top
+100, spoken weight 0.5, 3 to 12 words.
 
 ### 9.1 This spec against the current order
 
 | Measure                    | Current order | This spec |
 | -------------------------- | ------------- | --------- |
 | Cards                      | 1,000         | 1,000     |
-| Distinct content words     | 1,272         | 2,004     |
+| Distinct content words     | 1,272         | 2,081     |
 | Top 200 covered            | 195           | 199       |
 | Top 300 covered            | 282           | 299       |
 | Top 500 covered            | 444           | 498       |
 | Top 300 with 2 cards       | 256           | 289       |
 | Most cards of one non-exempt word | 131    | 4         |
-| Most cards of one exempt word     | 105    | 190       |
-| `spoken_mass`              | 0.473         | 0.540     |
+| Most cards of one exempt word     | 105    | 172       |
+| `spoken_mass`              | 0.473         | 0.543     |
 
 The current order is the order of `6000_French_Sentences_w_Audio.rank.csv`,
 after the filters. The two sets share 133 cards.
@@ -362,7 +363,9 @@ Target 300, all other defaults.
 | 8            | 2,044   | 299     | 291        | 0.543         |
 
 The cap costs little after 4. A cap of 4 keeps the strict rule with a content
-loss of 40 words against a cap of 8. A cap of 2 loses 245 words.
+loss of 40 words against a cap of 8. A cap of 2 loses 245 words. The cap-4 row
+reads 2,004 from the prototype; the built default reads 2,081 because the
+filter order differs.
 
 ### 9.3 Exemption sweep
 
@@ -405,14 +408,14 @@ Target 300, cap 4.
 | 0.7               | 2,008   | 299     | 291        | 0.541         |
 
 The written-only list covers fewer targets in the same 1,000 cards. Weight 0.5
-is the default. Weight 0.7 is a small gain; it is an option.
+is the default. Weight 0.7 is a small gain; it is an option. The built default
+at weight 0.5 reads 2,081 content lemmas and 0.543.
 
 ### 9.6 Words without a full card set
 
-One target word has no card: `alors`. It is a target at rank 56 and it has 24
-deck occurrences, so a later run can reach it. It is the only gap of the 300.
+One target word has no card: `an` (year). It is the only gap of the 300.
 
-Ten targets have one card: été, déjà, français, ami, nouvelle, occuper,
+Ten targets have one card: été, alors, français, sens, nouvelle, occuper,
 ensemble, enfin, effet, trouve. A second card is a target for a later
 parameter change, not a gate failure.
 
@@ -520,7 +523,7 @@ download a file and do not run a full Tatoeba pass.
 | Tatoeba is not a speech corpus                             | The target list is not truly spoken | Blend at 0.5; `--spoken-weight`; open question 1      |
 | `wordfreq` mixes written and subtitle data                 | Written words rise                | The Tatoeba term; the blend                           |
 | Lemmatizer artifacts (`as`, `taire`, `fait`)               | A target is a verb form, not a lemma | Keep the word; review the target list; open question 2 |
-| The exempt top 100 puts negation markers in 19% of the cards | The cards look alike            | `--exempt-top`; open question 3                       |
+| The exempt top 100 puts negation markers in 17% of the cards | The cards look alike            | `--exempt-top`; open question 3                       |
 | The F8 name filter removes 632 cards                       | Fewer candidates                  | 4,958 cards remain                                    |
 | The target count does not control the selection            | The covered set exceeds the goal  | The coverage reports; section 9.4                     |
 | The input audio license is not in the APKG                 | A public release is blocked       | Check the source before release; open question 6      |
@@ -553,12 +556,12 @@ download a file and do not run a full Tatoeba pass.
 
 | Rule | Result                          | Cards |
 | ---- | ------------------------------- | ----- |
-| F1   | English words outside 2 to 12   | 95    |
-| F2   | Word count outside 3 to 12      | 162   |
-| F3   | Digit                           | 2     |
+| F1   | English words outside 2 to 12   | 163   |
+| F2   | Word count outside 3 to 12      | 115   |
+| F3   | Digit, bracket, URL, ellipsis   | 1     |
 | F5   | More than one final mark        | 25    |
-| F7   | More than one internal mark     | 54    |
-| F8   | Proper name                     | 632   |
+| F7   | More than one internal mark     | 45    |
+| F8   | Proper name                     | 621   |
 | -    | Pass                            | 4,958 |
 
 F4, F6, and F9 remove no card. An optional unknown-word budget removes 2 cards
@@ -568,23 +571,23 @@ and is not in the default set.
 
 | # | Sentence                                                        | English                          |
 | - | --------------------------------------------------------------- | -------------------------------- |
-| 1 | Cette coupe de cheveux devint rapidement populaire auprès des jeunes. | The hairstyle soon became popular among young people. |
-| 2 | Avec notre programme de leçons, tu peux apprendre à ton propre rythme. | With our lesson plan you can learn at your own pace. |
-| 3 | Père s'est soudainement senti malade et nous avons appelé un docteur. | Father suddenly got sick and we sent for a doctor. |
-| 4 | La saison des pluies commence vers la fin du mois de juin.        | The rainy season begins towards the end of June. |
-| 5 | Si tu comptes réaliser ton rêve, tu dois travailler davantage.    | If you are to realize your dream, you must work harder. |
-| 6 | Je doute qu'il soit assez qualifié pour gérer une telle équipe!   | I doubt he is qualified enough to manage such a team! |
-| 7 | Il ouvrit la fenêtre pour laisser entrer de l'air frais.          | He opened the window to let in some fresh air. |
-| 8 | Le jeu auquel il joue n'a pas d'importance, il gagne toujours.    | It doesn't matter what game he plays, he always wins. |
-| 9 | Prenons un déjeuner rapide au petit café près du parc !           | Let's grab a quick lunch at that small coffeeshop near the park. |
-| 10 | Le bonheur au sein du mariage est entièrement une affaire de chance. | Happiness in marriage is entirely a matter of chance. |
+| 1 | Je fus capable de réussir grâce à votre conseil. | I was able to succeed because of your advice. |
+| 2 | J'ai réfléchi à propos de quel pauvre type j'ai été. | I thought about what a jerk I had been. |
+| 3 | Je suis surpris qu'ils n'aient eu quoi que ce soit à faire. | I'm surprised they didn't have anything to do. |
+| 4 | J'ignore si je serai en mesure d'assister à la réunion de demain. | I don't know whether I'll be able to attend tomorrow's meeting. |
+| 5 | Vu d'avion, cette île a l'air très belle. | Seen from the plane, the island looks very beautiful. |
+| 6 | J'ai comme la vague idée que boracasli utilise un deuxième compte. | I have a hunch boracasli is using a second account. |
+| 7 | Le jeu auquel il joue n'a pas d'importance, il gagne toujours. | It doesn't matter what game he plays, he always wins. |
+| 8 | Le téléphone ne fonctionne pas actuellement. | The phone doesn't work right now. |
+| 9 | Cette réponse n'est pas nécessairement fausse. | This answer may not necessarily be wrong. |
+| 10 | Ne t'inquiète pas d'une chose aussi bête. | Don't worry about such a silly thing. |
 
-The analysis order is the gain order. The deck uses the `--order coverage`
-sort of section 8.6.
+The table is the built `--order coverage` order.
 
 ### 14.3 How the numbers were made
 
-The prototype is not in the repository. It used:
+The numbers of tables 9.2 to 9.5 come from a prototype that is not in the
+repository. It used:
 
 - The APKG of 2026-10-20, `apkg/6000_French_Sentences_w_Audio.apkg`.
 - spaCy `fr_core_news_sm` with the parser and the named-entity model disabled.

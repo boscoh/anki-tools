@@ -1,0 +1,44 @@
+{
+  "build_date": "2026-10-20T03:01:54+00:00",
+  "source": {
+    "input": "apkg/6000_French_Sentences_w_Audio.apkg",
+    "deck": "French 1000 Core Sentences",
+    "model": "French Sentences"
+  },
+  "params": {
+    "max_cards": 1000,
+    "target_words": 300,
+    "max_uses": 4,
+    "exempt_top": 100,
+    "spoken_weight": 0.5,
+    "min_words": 3,
+    "max_words": 12,
+    "similarity": 0.67,
+    "order": "coverage",
+    "name": "French 1000 Core Sentences"
+  },
+  "counts": {
+    "input": 5928,
+    "passed": 4958,
+    "cards": 1000,
+    "content": 2081,
+    "targets": 300,
+    "covered": 299,
+    "covered2": 289
+  },
+  "frequency": {
+    "path": "data/french_frequency.tsv",
+    "spoken_weight": 0.5
+  },
+  "files": {
+    "cull_csv": "sha256:3fce07e49ac2a485d5f1ab430400f144ab4f5eb91f66a94adb7b5e02d78e7b62",
+    "coverage_csv": "sha256:5e8183a6bda5caea8f52d0b3d859f4d963f3b1703e5b455d13168bb0b0ec266b",
+    "input_apkg": "sha256:230dd01bcf6223bcb8a5ea303eee01fd4a55e19ce418d0bf66a81193037024b5"
+  },
+  "licenses": {
+    "tatoeba": "Tatoeba sentence text: CC BY 2.0 FR",
+    "wordfreq": "wordfreq list: Apache License 2.0",
+    "audio": "Input audio: license of the source deck"
+  },
+  "kept_order": "sha256:2dfdc34d57e864329729355b5fff48edfae6edc8ba6ac9e4e343cedbc0aff32c"
+}
