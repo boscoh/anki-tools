@@ -553,7 +553,129 @@ def test_run_gates_passes_on_a_tiny_output(
     rows = cull_fr.run_gates(cull_fr.gate_inputs(output))
 
     assert [gate for gate, _passed, _message in rows] == [
-        f"G{number}" for number in range(1, 14)
+        f"G{number}" for number in range(1, 15)
     ]
     for gate, passed, message in rows:
         assert passed, f"{gate}: {message}"
+
+
+SWADESH_FIELDS = [
+    "Audio",
+    "Sentence",
+    "English",
+    "Target",
+    "Gloss",
+    "WordAudio",
+    "Source",
+]
+
+
+def _tiny_swadesh_deck(tmp_path: Path) -> Path:
+    audio = tmp_path / "tts_reserve.mp3"
+    audio.write_bytes(b"ID3\x03\x00\x00\x00\x00\x00\x00" + bytes(40))
+    word = tmp_path / "word_reserve.mp3"
+    word.write_bytes(b"ID3\x03\x00\x00\x00\x00\x00\x00" + bytes(40))
+    source = tmp_path / "swadesh.apkg"
+    AnkiPackage.create(
+        source,
+        "Swadesh Source",
+        fields=SWADESH_FIELDS,
+        cards=[
+            {
+                "Audio": "[sound:tts_reserve.mp3]",
+                "Sentence": "<b>Je</b> suis ici.",
+                "English": "I am here.",
+                "Target": "je",
+                "Gloss": "I",
+                "WordAudio": "[sound:word_reserve.mp3]",
+                "Source": "Tatoeba #1",
+            }
+        ],
+        media_files=[str(audio), str(word)],
+        model_name="French Swadesh Sentence",
+    )
+    return source
+
+
+def test_load_reserve_reads_the_plain_and_bold_sentence(tmp_path: Path) -> None:
+    reserve = cull_fr.load_reserve(_tiny_swadesh_deck(tmp_path))
+
+    assert len(reserve) == 1
+    assert reserve[0].sentence == "Je suis ici."
+    assert reserve[0].html == "<b>Je</b> suis ici."
+    assert reserve[0].target == "je"
+    assert reserve[0].audio == "tts_reserve.mp3"
+
+
+def test_write_deck_inserts_the_reserve_card(tmp_path: Path) -> None:
+    source = _tiny_deck(tmp_path)
+    cards = cull_fr.load_input_deck(source)
+    swadesh = _tiny_swadesh_deck(tmp_path)
+    reserve = cull_fr.load_reserve(swadesh)
+    output = tmp_path / "merged.apkg"
+
+    counts = cull_fr.write_deck(
+        source,
+        cards,
+        [0, 1],
+        output,
+        DECK_NAME,
+        reserve=reserve,
+        reserve_pack_path=swadesh,
+    )
+
+    with AnkiPackage(output) as package:
+        notes = [dict(note) for note in package.get_notes()]
+        media = set(package.get_media_mapping().values())
+        models = {model.get("name") for model in package.get_models().values()}
+
+    assert counts == {"notes": 3, "media": 3, "items": 3}
+    assert media == {"a0.mp3", "a1.mp3", "tts_reserve.mp3"}
+    assert models == {cull_fr.MODEL_NAME}
+    fields = [str(note["flds"]).split("\x1f") for note in notes]
+    assert any("<b>Je</b> suis ici." in row[0] for row in fields)
+    reserve_row = next(row for row in fields if "<b>Je</b>" in row[0])
+    assert reserve_row[1] == "[sound:tts_reserve.mp3]"
+    assert reserve_row[2] == "I am here. — je (I)"
+
+
+def test_swadesh_coverage_counts_a_word_from_another_card() -> None:
+    sentence = "Un nuage flottait dans le ciel."
+    tokens = cull_fr.tokenize_texts([sentence])
+
+    covered, total = cull_fr.swadesh_coverage(
+        ["nuage", "intestins"], [sentence], tokens
+    )
+
+    assert covered == 1
+    assert total == cull_fr.SWADESH_TOTAL
+
+
+def test_dedupe_reserve_drops_an_internal_duplicate() -> None:
+    reserve = [
+        cull_fr.ReserveCard(
+            sentence="Le chat est ici.",
+            html="Le <b>chat</b> est ici.",
+            english="The cat is here.",
+            target="chat",
+            gloss="cat",
+            audio="a.mp3",
+        ),
+        cull_fr.ReserveCard(
+            sentence="Le chat est ici aussi.",
+            html="Le <b>chat</b> est ici aussi.",
+            english="The cat is here too.",
+            target="chat",
+            gloss="cat",
+            audio="b.mp3",
+        ),
+    ]
+    sets = [
+        {"chat", "ici", "aussi"},
+        {"chat", "ici", "aussi", "le"},
+    ]
+
+    kept, kept_sets = cull_fr.dedupe_reserve_sets(reserve, sets, [], [])
+
+    assert len(kept) == 1
+    assert kept_sets == [{"chat", "ici", "aussi"}]
