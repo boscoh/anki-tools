@@ -598,3 +598,84 @@ repository. It used:
 - The name stoplist of section 5.
 
 A count can differ by one from a later table because of a tie in the sort.
+
+## 16. Swadesh reserve
+
+The frequency pass covers 162 of the 207 Swadesh concepts. The input deck does
+not hold 37 of the missing 45. Selection cannot add a word that the input does
+not have. This section adds a reserved Swadesh set to the cull.
+
+### 16.1 Source
+
+The French Swadesh pack `apkg/swadesh_french_sentences.apkg` holds one card per
+concept and one audio file per card.
+
+| Measure                              | Value       |
+| ------------------------------------ | ----------- |
+| Swadesh concepts in the pack         | 206 of 207  |
+| One card per concept                 | 206         |
+| Exact duplicate of an input sentence | 3           |
+| Reserve cards after duplicate check  | about 203   |
+| Reserve cards with audio             | about 203   |
+| Concept with no source sentence      | `intestins` |
+
+The pack is read with `AnkiPackage`. The note model is
+`French Swadesh Sentence`. The fields are `Audio`, `Sentence`, `English`,
+`Target`, `Gloss`, `WordAudio`, and `Source`. The audio file comes from the
+pack media, so no external audio directory is needed.
+
+### 16.2 Merge into the input model
+
+The output keeps the input model `French Sentences` and the input template.
+Each reserve card becomes one note of that model:
+
+| Input field  | Reserve value                                             |
+| ------------ | --------------------------------------------------------- |
+| `French`     | The sentence with the target token in `<b>` tags          |
+| `sound`      | `[sound:<file>]` of the pack audio                        |
+| `Back`       | `English — target (gloss)`                                |
+| `freq ranks` | Empty                                                     |
+
+The note id and card id come after the highest id of the input package. The
+guid is a UUID. The tags include `swadesh`.
+
+### 16.3 Selection
+
+1. Load the input deck and the reserve cards.
+2. Drop a reserve card whose sentence is in the input deck.
+3. Drop a reserve card that reaches the lemma Jaccard limit 0.67 with a kept
+   card. Compare only the kept set, after the frequency pass.
+4. Add the reserve lemma sets to the `uses` of the selector.
+5. Keep every reserve card. The frequency pass fills `max_cards` minus the
+   reserve count.
+6. A reserve card counts toward the cap of a non-exempt word. A Swadesh word
+   appears in one reserve card, so three frequency cards can still hold it.
+
+### 16.4 Option
+
+| Option            | Default                              | Meaning                     |
+| ----------------- | ------------------------------------ | --------------------------- |
+| `--swadesh-pack`  | `apkg/swadesh_french_sentences.apkg` | Reserve source              |
+| `--no-swadesh`    | off                                  | Run the frequency cull only |
+
+### 16.5 Gate G14
+
+`G14`: the output holds at least `swadesh_total - len(exceptions)` Swadesh
+concepts. The manifest holds `counts.swadesh_covered`, `counts.swadesh_total`,
+and `swadesh_exceptions`. The default exception list is `["intestins"]`, because
+no source sentence exists.
+
+### 16.6 Expected result
+
+A rough merge of 203 reserve cards and the first 797 frequency cards:
+
+| Measure                  | Frequency only | With reserve |
+| ------------------------ | -------------- | ------------ |
+| Swadesh concepts covered | 162 / 207      | 206 / 207    |
+| Top 300 frequency words  | 299            | 297          |
+| Top 300 with 2 cards     | 289            | 266          |
+| Distinct content lemmas  | 2,081          | 1,844        |
+| Cards                    | 1,000          | 1,000        |
+
+The frequency pass sees the reserve lemmas and picks complementary cards, so
+the built result can be higher than this rough cut.
