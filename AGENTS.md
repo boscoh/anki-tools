@@ -17,15 +17,9 @@ When writing code:
 - reuse existing functions if possible
 - include types
 
-## File Edits (MANDATORY)
+## File Edits
 
-Do not change file content with a Python script, sed, awk, perl, or a heredoc.
-
-- Use the `replace` and `insert` tools. These tools change lines by anchor.
-- Use `write` only for a new file or a full rewrite.
-- Run a script only when you must generate new content for many files at the same time. Do not use a script to patch text that you already know.
-
-
+Do not edit files with a Python script, `sed`, `awk`, `perl`, or a heredoc. Use `replace` and `insert`, which check anchors and support undo. Use `write` for a new file or a complete rewrite only.
 
 
 ## Beads Workflow (MANDATORY)
