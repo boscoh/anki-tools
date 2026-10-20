@@ -30,7 +30,8 @@ from typing import Any, Callable, Collection, Iterable, Iterator, Sequence
 from anki_tools.package import AnkiPackage
 from anki_tools.sentence_pack.audit import sha256_value
 from anki_tools.sentence_pack.audio import probe_duration
-from anki_tools.sentence_pack.languages.french import TOKENIZER
+from anki_tools.sentence_pack.languages.french import EXTRA_CSS, TOKENIZER
+from anki_tools.sentence_pack.pack import load_css
 
 FREQUENCY_PATH = Path("data/french_frequency.tsv")
 NAMES_PATH = Path("vocab/french_names.txt")
@@ -51,6 +52,33 @@ SWADESH_AUDIO_FIELD = "Audio"
 SWADESH_TOTAL = 207
 SWADESH_EXCEPTIONS = ("intestins",)
 RESERVE_TAGS = " swadesh "
+CARD_CSS_PATH = Path(__file__).parent.parent / "templates" / "card.css"
+FRONT_HINT = "Tap to show the sentence"
+REVERSE_HINT = "Tap to show the French"
+FRONT_TEMPLATE = (
+    '<div class="front-audio">{{sound}}</div>'
+    f'<div class="hint">{FRONT_HINT}</div>'
+)
+BACK_TEMPLATE = (
+    "{{sound}}"
+    "<hr id=answer>"
+    '<div class="sentence">{{French}}</div>'
+    '<div class="english">{{Back}}</div>'
+)
+REVERSE_FRONT_TEMPLATE = (
+    '<div class="english">{{Back}}</div>'
+    f'<div class="hint">{REVERSE_HINT}</div>'
+)
+REVERSE_BACK_TEMPLATE = (
+    "{{Back}}"
+    "<hr id=answer>"
+    '<div class="sentence">{{French}}</div>'
+    '<div class="front-audio">{{sound}}</div>'
+)
+CARD_TEMPLATES = (
+    (FRONT_TEMPLATE, BACK_TEMPLATE),
+    (REVERSE_FRONT_TEMPLATE, REVERSE_BACK_TEMPLATE),
+)
 
 CONTENT_POS = frozenset({"NOUN", "VERB", "ADJ", "ADV"})
 CONTENT_SHARE = 0.5
@@ -1245,6 +1273,40 @@ def insert_reserve_cards(
     package._modified = True
 
 
+def card_css(css_path: Path = CARD_CSS_PATH) -> str:
+    """Give the CSS of the culled deck.
+
+    The classes and the sizes are the same as the French Swadesh pack, so the
+    two decks look alike.
+
+    :param css_path: Base CSS file of the card classes.
+    :returns: The base CSS and the French pack classes.
+    """
+    return load_css(css_path, EXTRA_CSS)
+
+
+def apply_card_templates(
+    package: AnkiPackage, model_id: str | None = None
+) -> None:
+    """Set the Swadesh-style templates and CSS on the deck model.
+
+    The model keeps a template that the note does not use, so the function
+    writes only the templates that the model has.
+
+    :param package: Open package.
+    :param model_id: Model id, or None to find the French sentence model.
+    :raises RuntimeError: The package has no French sentence model.
+    """
+    models = package.get_models(include_templates=True)
+    model_id = model_id or _find_model_id(models)
+    package.update_model_template(model_id=model_id, css=card_css())
+    count = len(models[model_id].get("tmpls", ()))
+    for index, (qfmt, afmt) in enumerate(CARD_TEMPLATES[:count]):
+        package.update_model_template(
+            model_id=model_id, qfmt=qfmt, afmt=afmt, template_index=index
+        )
+
+
 def write_deck(
     input_path: Path,
     cards: Sequence[InputCard],
@@ -1284,6 +1346,7 @@ def write_deck(
         if reserve:
             deck_id = int(next(iter(package.get_decks())))
             insert_reserve_cards(package, reserve, reserve_pack_path, deck_id)
+        apply_card_templates(package)
         package.save(target)
 
     expected = len(kept_notes) + len(reserve)
@@ -1501,10 +1564,20 @@ def _read_output(path: Path) -> dict[str, Any]:
 
     :param path: Output APKG file.
     :returns: Cards, note count, model names, deck names, media names, and the
-        audio duration per file.
+    :returns: Cards, note count, model names, deck names, media names, the
+        card templates and CSS per model, and the audio duration per file.
     """
     with AnkiPackage(path) as package:
-        models = {key: model.get("name") for key, model in package.get_models().items()}
+        full = package.get_models(include_templates=True)
+        models = {key: model.get("name") for key, model in full.items()}
+        templates = {
+            model.get("name"): [
+                (tmpl.get("qfmt", ""), tmpl.get("afmt", ""))
+                for tmpl in model.get("tmpls", ())
+            ]
+            for model in full.values()
+        }
+        css = {model.get("name"): model.get("css", "") for model in full.values()}
         notes = package.get_notes()
         cards = _deck_cards(package)
         media = package.get_media_mapping()
@@ -1518,6 +1591,8 @@ def _read_output(path: Path) -> dict[str, Any]:
         "decks": decks,
         "media": set(media.values()),
         "audio": durations,
+        "templates": templates,
+        "css": css,
     }
 
 
@@ -1811,6 +1886,27 @@ def gate_swadesh(inputs: GateInputs) -> tuple[bool, str]:
     return True, f"Swadesh {covered}/{total}, {len(exceptions)} exception(s)"
 
 
+def gate_card_templates(inputs: GateInputs) -> tuple[bool, str]:
+    """G15: the deck model holds the Swadesh-style templates and CSS."""
+    output = inputs.output()
+    templates = output["templates"].get(MODEL_NAME, [])
+    if not templates:
+        return False, f"the model {MODEL_NAME!r} has no card template"
+    expected = CARD_TEMPLATES[: len(templates)]
+    problems = [
+        f"card {index + 1} is {qfmt!r} / {afmt!r}"
+        for index, (qfmt, afmt) in enumerate(templates)
+        if (qfmt, afmt) != expected[index]
+    ]
+    css = output["css"].get(MODEL_NAME, "")
+    for name in ("sentence", "english", "hint"):
+        if f".{name}" not in css:
+            problems.append(f"the CSS has no .{name} class")
+    if problems:
+        return False, f"{len(problems)} template problem(s): {_sample(problems)}"
+    return True, f"{len(templates)} card template(s) and the CSS classes match"
+
+
 GATES: tuple[tuple[str, GateCheck], ...] = (
     ("G1", gate_card_count),
     ("G2", gate_use_cap),
@@ -1826,6 +1922,7 @@ GATES: tuple[tuple[str, GateCheck], ...] = (
     ("G12", gate_coverage_rows),
     ("G13", gate_manifest_hashes),
     ("G14", gate_swadesh),
+    ("G15", gate_card_templates),
 )
 
 

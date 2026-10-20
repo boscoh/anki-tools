@@ -494,6 +494,44 @@ def test_write_deck_keeps_the_notes_and_their_media(tmp_path: Path) -> None:
     ]
 
 
+def test_write_deck_sets_the_swadesh_templates(tmp_path: Path) -> None:
+    source = _tiny_deck(tmp_path)
+    cards = cull_fr.load_input_deck(source)
+    output = tmp_path / "templated.apkg"
+
+    cull_fr.write_deck(source, cards, [0], output, DECK_NAME)
+
+    with AnkiPackage(output) as package:
+        models = package.get_models(include_templates=True)
+    model = next(
+        item for item in models.values() if item.get("name") == cull_fr.MODEL_NAME
+    )
+    templates = [tuple(template[k] for k in ("qfmt", "afmt")) for template in model["tmpls"]]
+
+    assert templates == [cull_fr.CARD_TEMPLATES[0]]
+    assert ".sentence" in model["css"]
+    assert ".english" in model["css"]
+    assert ".hint" in model["css"]
+
+
+def test_gate_card_templates_fails_on_a_wrong_front(tmp_path: Path) -> None:
+    source = _tiny_deck(tmp_path)
+    cards = cull_fr.load_input_deck(source)
+    output = tmp_path / "wrong.apkg"
+    cull_fr.write_deck(source, cards, [0], output, DECK_NAME)
+
+    with AnkiPackage(output) as package:
+        package.update_model_template(
+            qfmt="{{French}}", afmt=cull_fr.CARD_TEMPLATES[0][1]
+        )
+        package.save()
+
+    rows = cull_fr.run_gates(cull_fr.gate_inputs(output))
+    message = dict((gate, passed) for gate, passed, _ in rows)["G15"]
+
+    assert message is False
+
+
 def _fake_tokens(self: cull_fr.GateInputs) -> list[list[tuple[str, str]]]:
     return [DECK_TOKENS[card.sentence] for card in self.output()["cards"]]
 
@@ -553,7 +591,7 @@ def test_run_gates_passes_on_a_tiny_output(
     rows = cull_fr.run_gates(cull_fr.gate_inputs(output))
 
     assert [gate for gate, _passed, _message in rows] == [
-        f"G{number}" for number in range(1, 15)
+        f"G{number}" for number in range(1, 16)
     ]
     for gate, passed, message in rows:
         assert passed, f"{gate}: {message}"

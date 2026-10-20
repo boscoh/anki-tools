@@ -496,6 +496,7 @@ command with a non-zero exit code.
 | G12  | The coverage CSV has one row per target word                            |
 | G13  | The manifest hashes match the cull CSV and the coverage CSV             |
 | G14  | The merged deck covers 206 of 207 Swadesh concepts, with `intestins` as the exception |
+| G15  | The deck model holds the Swadesh-style front and back templates and CSS |
 
 ### 11.2 Tests
 
@@ -631,8 +632,9 @@ pack media, so no external audio directory is needed.
 
 ### 16.2 Merge into the input model
 
-The output keeps the input model `French Sentences` and the input template.
-Each reserve card becomes one note of that model:
+The output keeps the input model `French Sentences` but replaces its card
+templates and CSS with the Swadesh style of section 16.7. Each reserve card
+becomes one note of that model:
 
 | Input field  | Reserve value                                             |
 | ------------ | --------------------------------------------------------- |
@@ -693,3 +695,23 @@ The measured merge of 198 reserve cards and 802 frequency cards:
 The reserve and the frequency cards together cover 206 of 207 concepts. The 7
 reserve cards that the duplicate check drops are covered by frequency cards.
 `intestins` is the only gap.
+
+### 16.7 Card templates
+
+The output replaces the input templates with the Swadesh style, so the two
+decks look alike. The model keeps its two card directions.
+
+Card 1 (comprehension):
+
+- Front: the audio and the hint `Tap to show the sentence`.
+- Back: the audio, the French sentence, and the `Back` field.
+
+Card 2 (production):
+
+- Front: the `Back` field and the hint `Tap to show the French`.
+- Back: the `Back` field, the French sentence, and the audio.
+
+The CSS is the base `templates/card.css` plus the French pack classes
+(`.front-audio`, `.sentence`, `.english`, `.hint`). The `Back` field of a
+reserve card already holds `English — target (gloss)`, so the target and the
+gloss appear with the English text. Gate G15 checks the templates and the CSS.
