@@ -615,8 +615,9 @@ concept and one audio file per card.
 | Swadesh concepts in the pack         | 206 of 207  |
 | One card per concept                 | 206         |
 | Exact duplicate of an input sentence | 3           |
-| Reserve cards after duplicate check  | about 203   |
-| Reserve cards with audio             | about 203   |
+| Near duplicate of an input sentence  | 4           |
+| Reserve cards after duplicate check  | 199         |
+| Reserve cards with audio             | 199         |
 | Concept with no source sentence      | `intestins` |
 
 The pack is read with `AnkiPackage`. The note model is
@@ -643,13 +644,16 @@ guid is a UUID. The tags include `swadesh`.
 
 1. Load the input deck and the reserve cards.
 2. Drop a reserve card whose sentence is in the input deck.
-3. Drop a reserve card that reaches the lemma Jaccard limit 0.67 with a kept
-   card. Compare only the kept set, after the frequency pass.
+3. Drop a reserve card that reaches the lemma Jaccard limit 0.67 with an input
+   card. The input deck is the source of the frequency cards, so this keeps the
+   merged deck below the gate G6 limit.
 4. Add the reserve lemma sets to the `uses` of the selector.
 5. Keep every reserve card. The frequency pass fills `max_cards` minus the
    reserve count.
-6. A reserve card counts toward the cap of a non-exempt word. A Swadesh word
-   appears in one reserve card, so three frequency cards can still hold it.
+6. The reserve cards are exempt from the cap. The cap applies to the frequency
+   cards only. A common word can appear in many reserve cards, because the
+   reserve holds one card per concept. The report gives the two maximums
+   separately.
 
 ### 16.4 Option
 
@@ -667,15 +671,18 @@ no source sentence exists.
 
 ### 16.6 Expected result
 
-A rough merge of 203 reserve cards and the first 797 frequency cards:
+The measured merge of 199 reserve cards and 801 frequency cards:
 
-| Measure                  | Frequency only | With reserve |
-| ------------------------ | -------------- | ------------ |
-| Swadesh concepts covered | 162 / 207      | 206 / 207    |
-| Top 300 frequency words  | 299            | 297          |
-| Top 300 with 2 cards     | 289            | 266          |
-| Distinct content lemmas  | 2,081          | 1,844        |
-| Cards                    | 1,000          | 1,000        |
+| Measure                    | Frequency only | With reserve |
+| -------------------------- | -------------- | ------------ |
+| Swadesh concepts covered   | 162 / 207      | 206 / 207    |
+| Top 300 frequency words    | 299            | 297          |
+| Top 300 with 2 cards       | 289            | 286          |
+| Distinct content lemmas    | 2,081          | 1,981        |
+| Cards                      | 1,000          | 1,000        |
+| Most cards of one non-exempt frequency word | 4 | 4        |
+| Most cards of one non-exempt reserve word   | - | 35       |
 
-The frequency pass sees the reserve lemmas and picks complementary cards, so
-the built result can be higher than this rough cut.
+The reserve and the frequency cards together cover 206 of 207 concepts. The 7
+reserve cards that the duplicate check drops are covered by frequency cards.
+`intestins` is the only gap.
