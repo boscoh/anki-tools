@@ -53,7 +53,6 @@ CORE_BACK_TEMPLATE = (
 )
 CORE_TEMPLATES = (
     (CORE_FRONT_TEMPLATE, CORE_BACK_TEMPLATE),
-    cull.CARD_TEMPLATES[1],
 )
 
 CONTENT_POS = cull.CONTENT_POS
@@ -1069,11 +1068,13 @@ def _write_core_model(
             )
             filled += 1
         package.update_model_template(model_id=model_id, css=cull.card_css())
-        count = len(models[model_id].get("tmpls", ()))
-        for number, (qfmt, afmt) in enumerate(CORE_TEMPLATES[:count]):
+        for number, (qfmt, afmt) in enumerate(CORE_TEMPLATES):
             package.update_model_template(
                 model_id=model_id, qfmt=qfmt, afmt=afmt, template_index=number
             )
+        have = len(models[model_id].get("tmpls", ()))
+        for number in reversed(range(len(CORE_TEMPLATES), have)):
+            package.remove_model_template(model_id, number)
         package._modified = True
         package.save(output_path)
     return filled

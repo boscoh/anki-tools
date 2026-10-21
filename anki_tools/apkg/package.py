@@ -562,6 +562,57 @@ class AnkiPackage:
         self._modified = True
         return len(fields) - 1
 
+    def remove_model_template(self, model_id: str, template_index: int) -> int:
+        """
+        Remove a card template from a note type, with all the cards that use it.
+
+        The method reads the legacy ``anki2`` format only. The later templates
+        and their cards move down by one place.
+
+        :param model_id: Model ID to change.
+        :param template_index: Zero-based index of the template to remove.
+        :raises NotImplementedError: The package is not in the ``anki2`` format.
+        :raises ValueError: If the model or the template is not found, or the
+            template is the last one.
+        :returns: The count of deleted cards.
+        """
+        if self._db_format != "anki2":
+            raise NotImplementedError(
+                f"remove_model_template needs the anki2 format, not {self._db_format}"
+            )
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT models FROM col")
+        models = json.loads(cursor.fetchone()[0])
+        if model_id not in models:
+            raise ValueError(f"Model {model_id} not found")
+        templates = models[model_id]["tmpls"]
+        if not 0 <= template_index < len(templates):
+            raise ValueError(f"Template {template_index} not found")
+        if len(templates) == 1:
+            raise ValueError("A model must keep one template")
+
+        marks = "SELECT id FROM notes WHERE mid = ?"
+        cursor.execute(
+            f"DELETE FROM cards WHERE ord = ? AND nid IN ({marks})",
+            (template_index, int(model_id)),
+        )
+        deleted = cursor.rowcount
+        cursor.execute(
+            f"UPDATE cards SET ord = ord - 1 WHERE ord > ? AND nid IN ({marks})",
+            (template_index, int(model_id)),
+        )
+        del templates[template_index]
+        for number, template in enumerate(templates):
+            template["ord"] = number
+        models[model_id]["mod"] = int(time.time())
+        models[model_id]["usn"] = -1
+        cursor.execute(
+            "UPDATE col SET models = ? WHERE id = 1", (json.dumps(models),)
+        )
+        self.conn.commit()
+        self._modified = True
+        return deleted
+
     def get_notes(self) -> list[sqlite3.Row]:
         """
         Get all notes from the collection.

@@ -447,8 +447,8 @@ class TestCardDesign:
 
         assert order == sorted(order)
 
-    def test_the_reverse_card_is_the_cull_card(self) -> None:
-        assert core.CORE_TEMPLATES[1] == cull.CARD_TEMPLATES[1]
+    def test_the_deck_has_one_card_template(self) -> None:
+        assert len(core.CORE_TEMPLATES) == 1
 
     def test_the_model_gets_the_core_field_and_templates(self, tmp_path: Path) -> None:
         source = _tiny_deck(tmp_path)
@@ -485,7 +485,10 @@ class TestCardDesign:
             }
 
         assert names == ["French", "sound", "Back", "freq ranks", "Core"]
-        assert templates == [tuple(pair) for pair in core.CORE_TEMPLATES[: len(templates)]]
+        assert templates == [tuple(pair) for pair in core.CORE_TEMPLATES]
+        with AnkiPackage(output) as package:
+            ords = [row["ord"] for row in package.get_cards()]
+        assert ords == [0, 0, 0]
         assert values["Le chat dort."][4] == "chat"
         assert values["Le chat mange."][4] == "chat"
         assert values["Le lapin court."][4] == ""

@@ -360,7 +360,7 @@ def gate_templates(files: CoreFiles) -> tuple[bool, str]:
     css = [output["css"].get(name, "") for name in used]
     expected = [list(pair) for pair in core.CORE_TEMPLATES]
     ok_templates = all(
-        [list(pair) for pair in value] == expected[: len(value)]
+        [list(pair) for pair in value] == expected
         for value in templates
     )
     wanted_css = cull.card_css()

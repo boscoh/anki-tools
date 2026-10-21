@@ -400,28 +400,27 @@ Code changes:
 
 ## 8. Card design
 
-The note ids do not change. The model gains one field, `Core`. Card 1 has its own
-front and back. Card 2 and the CSS are the cull values, so the deck looks like
-the 1,000-card deck and the Swadesh deck.
+The note ids do not change. The model gains one field, `Core`, and keeps one
+card template, so each note has one card. The CSS is the cull value, so the deck
+looks like the 1,000-card deck and the Swadesh deck.
 
-| Card             | Front                                              | Back                                                                     |
-| ---------------- | -------------------------------------------------- | ------------------------------------------------------------------------ |
-| 1, comprehension | the audio only                                     | the audio, the sentence with the bold target, the English, the core word |
-| 2, production    | the English, and the hint `Tap to show the French` | the English, the sentence with the bold target, the audio                |
+| Card             | Front          | Back                                                                     |
+| ---------------- | -------------- | ------------------------------------------------------------------------ |
+| 1, comprehension | the audio only | the audio, the sentence with the bold target, the English, the core word |
 
-| Part      | Value                                                                                     |
-| --------- | ----------------------------------------------------------------------------------------- |
-| Templates | `CORE_TEMPLATES`: the core card 1 and `CARD_TEMPLATES[1]`, written by `_write_core_model` |
-| CSS       | `card_css()`: `templates/card.css` plus the language `EXTRA_CSS`                          |
-| Classes   | `.front-audio`, `.sentence`, `.english`, `.hint`, `.target`                               |
-| Fields    | the input fields and `Core`                                                               |
-| Audio     | the input MP3 file                                                                        |
+| Part      | Value                                                                  |
+| --------- | ---------------------------------------------------------------------- |
+| Templates | `CORE_TEMPLATES`, one card, written by `_write_core_model`             |
+| CSS       | `card_css()`: `templates/card.css` plus the language `EXTRA_CSS`       |
+| Classes   | `.front-audio`, `.sentence`, `.english`, `.target`                     |
+| Fields    | the input fields and `Core`                                            |
+| Audio     | the input MP3 file                                                     |
 
 The `assigned` target of section 6 is bold in the `French` field. A card can
 hold more than one target, and only the assigned target is bold. This marks
 the word in the sentence.
 
-The `Core` field holds the core word for the back of card 1. It is the form of
+The `Core` field holds the core word for the back of the card. It is the form of
 the assigned target. A card with no assigned target, such as a second example,
 gets the held target of the lowest position. A tail card that holds no target
 has an empty `Core` field, and the template hides the line.
@@ -677,7 +676,7 @@ to E5 are closed. Section 14.5 lists what remains.
 | `anki_tools/languages/french/core.py`       | targets, filter C1 to C5, sense, driver, CSV files, manifest, bold |
 | `anki_tools/languages/french/core_gates.py` | gates K1 to K18                                                    |
 | `anki_tools/cli.py`                         | `anki fix fr --core` and its options                               |
-| `anki_tools/apkg/package.py`                | `add_model_field`: add a field to an `anki2` model                 |
+| `anki_tools/apkg/package.py`                | `add_model_field` and `remove_model_template` for `anki2` models   |
 | `vocab/french_core_senses.tsv`              | 51 rows: the top 50 tier F words and `ne`                          |
 | `vocab/french_loanwords.txt`                | 28 words                                                           |
 | `tests/test_core_deck.py`                   | 31 tests                                                           |
