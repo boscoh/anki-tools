@@ -430,6 +430,23 @@ gives the tagger a subject or an article, so the lemma is the citation lemma.
 Bold only the matched token on the card. For a form with an article in the
 sentence, bold the noun, not the article.
 
+
+An English sense check rejects a wrong sense of a homograph. Each risky form
+has two English word lists: sense words and false-friend words. A candidate
+passes when the paired English holds a sense word, or holds no false-friend
+word. The `SENSE_CHECKS` table in `greek.py` holds the lists:
+
+| Form     | Sense words | False-friend words
+| -------- | ----------- | --------------------------------- |
+| γλώσσα   | tongue      | language, languages               |
+| δέρμα    | skin        | leather                           |
+| θάλασσα  | sea         | mess, messed                      |
+| νέος     | new         | young, younger, youngest          |
+| χρόνος   | year        | time, times                       |
+| γυρίζω   | turn        | return, returned, returning       |
+| με       | with        | me                                |
+
+Gate G20 checks the built deck against the stored English text.
 ### 8.3 Ranking key
 
 Sort candidates for each target word by this key, first item first:
@@ -718,6 +735,7 @@ a failure.
 | G17  | Every card field is NFC, monotonic, and has no `ς` inside a word                           |
 | G18  | No card has `audio_source=native`                                                          |
 | G19  | Every card target is in the 206-word table and is not `variant=shared`                     |
+| G20  | No card English holds a false-friend sense for its target                                  |
 
 G10 uses the measured coverage. The probe measures 168 of 207 concepts (0.812)
 in the 4 to 10 word window. This spec sets the gate at 0.76, which is the
@@ -794,7 +812,7 @@ Milestone M5 is complete. These values come from the full pipeline run of
 | Uncovered concepts | 44                                                      |
 | Native audio       | none                                                    |
 | TTS engine         | gTTS, voice `gtts:el`                                   |
-| Gate result        | G1 to G19 pass; `anki swadesh audit greek` exits 0      |
+| Gate result        | G1 to G20 pass; `anki swadesh audit greek` exits 0      |
 
 The uncovered words are πλατύς, παχύς, ψείρα, σκουλήκι, ραβδί, σπόρος,
 φλοιός του δέντρου, χόρτο, λίπος, κέρατο, πούπουλο, αυτί, νύχι, γόνατο,

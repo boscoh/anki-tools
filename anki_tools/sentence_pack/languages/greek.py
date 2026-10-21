@@ -28,7 +28,7 @@ from anki_tools.sentence_pack.pack import (
     attribution_lines,
     write_attribution_section,
 )
-from anki_tools.sentence_pack.profile import LanguageProfile, register
+from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
 from anki_tools.sentence_pack.tokens import Token, has_finite_verb, tokenize
 
 WORD_CSV_PATH = Path("vocab/english-greek.csv")
@@ -481,6 +481,41 @@ def token_matches(sentence: str, form: str) -> int:
             or (token.lemma and surface_key(token.lemma) in keys)
         )
     )
+
+
+SENSE_CHECKS: dict[str, tuple[frozenset[str], frozenset[str]]] = {
+    "γλώσσα": (
+        frozenset({"tongue", "tongues"}),
+        frozenset({"language", "languages"}),
+    ),
+    "δέρμα": (
+        frozenset({"skin", "skins"}),
+        frozenset({"leather"}),
+    ),
+    "θάλασσα": (
+        frozenset({"sea", "seas"}),
+        frozenset({"messed", "mess"}),
+    ),
+    "νέος": (
+        frozenset({"new", "newer", "newest"}),
+        frozenset({"young", "younger", "youngest"}),
+    ),
+    "χρόνος": (
+        frozenset({"year", "years"}),
+        frozenset({"time", "times"}),
+    ),
+    "γυρίζω": (
+        frozenset({"turn", "turns", "turned", "turning"}),
+        frozenset({"return", "returns", "returned", "returning"}),
+    ),
+    "με": (
+        frozenset({"with"}),
+        frozenset({"me"}),
+    ),
+}
+
+
+sense_filter = make_sense_filter(SENSE_CHECKS)
 
 
 def hits(sentence: str, forms: Collection[str]) -> dict[str, int]:
@@ -1131,6 +1166,7 @@ GREEK = register(
         extra_manifest=greek_extra_manifest,
         attribution=greek_attribution,
         finalize_candidate=lambda card, target: card,
+        sense_filter=sense_filter,
     )
 )
 
@@ -1268,8 +1304,28 @@ def gate_targets(
     return True, f"{len(rows)} card targets are table forms with a card"
 
 
+def gate_no_sense_mismatch(
+    inputs: AuditInputs, profile: LanguageProfile
+) -> tuple[bool, str]:
+    """Greek gate G20: no card English holds a false-friend sense.
+
+    :param inputs: Lazy file reader of the audit.
+    :param profile: Language profile.
+    :returns: Pass flag and detail text.
+    """
+    rows = inputs.rows()
+    bad = [
+        f"{row.get('target', '')} in {row.get('sentence', '')}"
+        for row in rows
+        if sense_filter(row.get("target", ""), row.get("english", ""))
+    ]
+    if bad:
+        return False, f"{len(bad)} card(s) use the target in a different sense: {bad[0]}"
+    return True, f"{len(rows)} cards use each target in its Swadesh sense"
+
+
 def greek_gates() -> tuple[tuple[str, Any], ...]:
-    """Give the ordered gate list G1 to G19 of the Greek pack.
+    """Give the ordered gate list G1 to G20 of the Greek pack.
 
     :returns: Pairs of gate name and gate function.
     """
@@ -1310,6 +1366,7 @@ def greek_gates() -> tuple[tuple[str, Any], ...]:
         ("G17", gate_script),
         ("G18", gate_no_native),
         ("G19", gate_target_in_table),
+        ("G20", gate_no_sense_mismatch),
     )
 
 
@@ -1323,7 +1380,7 @@ def run_greek_audit(
     manifest_path: Path | None = None,
     attribution_path: Path = ATTRIBUTION_PATH,
 ) -> list[GateRow]:
-    """Run the Greek quality gates G1 to G19.
+    """Run the Greek quality gates G1 to G20.
 
     :param apkg_path: APKG file of the pack.
     :param sentences_csv: Sentence CSV with one row per card.

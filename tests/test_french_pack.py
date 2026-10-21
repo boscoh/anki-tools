@@ -165,6 +165,15 @@ def test_form_key_rule_with_pluie_manger_and_elision() -> None:
     assert french.token_matches("La voiture est en panne.", "eau") == 0
 
 
+def test_sense_filter_rejects_false_friend_english() -> None:
+    assert french.sense_filter("queue", "I didn't wait in line.")
+    assert not french.sense_filter("queue", "The dog wagged its tail.")
+    assert french.sense_filter("sentir", "I feel fine.")
+    assert not french.sense_filter("sentir", "I smell smoke.")
+    assert french.sense_filter("voler", "I've been robbed.")
+    assert not french.sense_filter("voler", "The birds were flying.")
+
+
 def test_form_key_rule_for_pairs_and_elided_clitics() -> None:
     assert french.token_matches("Ils se battent dans la rue.", "se battre") == 1
     assert french.token_matches("Il aime battre le tambour.", "se battre") == 0

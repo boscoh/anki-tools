@@ -395,6 +395,26 @@ The target match uses the form-key rule of section 3.3:
 Reuse `word_similarity_fr` and `latin_text_dedup_key` from
 `anki_tools/rank.py`. Do not copy them.
 
+
+An English sense check rejects a wrong sense of a homograph. Each risky form
+has two English word lists: sense words and false-friend words. A candidate
+passes when the paired English holds a sense word, or holds no false-friend
+word. The `SENSE_CHECKS` table in `french.py` holds the lists:
+
+| Form    | Sense words | False-friend words
+| ------- | ----------- | ---------------------------- |
+| queue   | tail        | queue, line, wait            |
+| sentir  | smell       | feel, felt, feeling          |
+| voler   | fly         | steal, stole, robbed, theft  |
+| tirer   | pull        | shoot, shot, shooting        |
+| langue  | tongue      | language, languages          |
+| plume   | feather     | pen, quill                   |
+| foie    | liver       | chicken, scared, afraid      |
+| gonfler | swell       | bold, nerve, cheeky          |
+| rond    | round       | money, cash, penny, dime     |
+| droit   | straight    | right, allowed, entitled     |
+
+Gate G21 checks the built deck against the stored English text.
 ### 8.3 Ranking key
 
 Sort candidates for each target word by this key, first item first:
@@ -736,6 +756,7 @@ a failure.
 | G18  | A public pack has no card with a CC BY-NC 4.0 audio file                                   |
 | G19  | No card has `form_kind=discontinuous` without both parts in the sentence (8.2)             |
 | G20  | Noun rows with an empty `gender` are reported; the count is in the manifest                |
+| G21  | No card English holds a false-friend sense for its target                                  |
 
 G10 uses the measured coverage. The probe measures 207 of 207 concepts (1.00).
 This spec sets the gate at 0.95, which is the measured value minus 5 points.
@@ -813,7 +834,7 @@ Milestone M5 is complete. These values come from the full pipeline run of
 | Uncovered concepts   | 1 (`intestins`)                                         |
 | Native audio         | none, the public pack is TTS only                       |
 | TTS engine           | gTTS, voice `gtts:fr`                                   |
-| Gate result          | G1 to G20 pass; `anki swadesh audit french` exits 0     |
+| Gate result          | G1 to G21 pass; `anki swadesh audit french` exits 0     |
 
 The one uncovered word is `intestins` (index 86, guts). It has no candidate in
 the core window and none in the 3 to 10 word fallback window, so the deck has

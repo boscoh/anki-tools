@@ -30,7 +30,7 @@ from anki_tools.sentence_pack.pack import (
     attribution_lines,
     write_attribution_section,
 )
-from anki_tools.sentence_pack.profile import LanguageProfile, register
+from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
 from anki_tools.sentence_pack.tokens import Token, has_finite_verb, tokenize
 
 WORD_CSV_PATH = Path("vocab/english-french.csv")
@@ -522,6 +522,53 @@ def token_matches(sentence: str, form: str) -> int:
         return _phrase_count(tokens, parts)
     keys = carrier_keys(form)
     return sum(1 for token in tokens if _token_matches(token, keys))
+
+
+SENSE_CHECKS: dict[str, tuple[frozenset[str], frozenset[str]]] = {
+    "queue": (
+        frozenset({"tail", "tails"}),
+        frozenset({"queue", "queues", "queuing", "queued", "line", "lines", "wait", "waiting"}),
+    ),
+    "sentir": (
+        frozenset({"smell", "smells", "smelled", "smelt", "smelling", "scent", "scents"}),
+        frozenset({"feel", "feels", "felt", "feeling"}),
+    ),
+    "voler": (
+        frozenset({"fly", "flies", "flew", "flying", "flown", "flight"}),
+        frozenset({"steal", "steals", "stole", "stolen", "stealing", "rob", "robbed", "theft"}),
+    ),
+    "tirer": (
+        frozenset({"pull", "pulls", "pulled", "pulling", "drag", "drags", "dragged"}),
+        frozenset({"shoot", "shoots", "shot", "shooting"}),
+    ),
+    "langue": (
+        frozenset({"tongue", "tongues"}),
+        frozenset({"language", "languages"}),
+    ),
+    "plume": (
+        frozenset({"feather", "feathers", "plumage"}),
+        frozenset({"pen", "pens", "quill", "quills"}),
+    ),
+    "foie": (
+        frozenset({"liver", "livers"}),
+        frozenset({"chicken", "scared", "afraid", "fear", "frightened", "feet"}),
+    ),
+    "gonfler": (
+        frozenset({"swell", "swells", "swelled", "swollen", "swelling", "inflate", "inflated"}),
+        frozenset({"bold", "nerve", "cheeky", "cheek", "gall"}),
+    ),
+    "rond": (
+        frozenset({"round", "rounded", "circle", "circular"}),
+        frozenset({"dime", "dimes", "penny", "pennies", "money", "cash", "coin", "coins"}),
+    ),
+    "droit": (
+        frozenset({"straight"}),
+        frozenset({"right", "rights", "allowed", "entitled", "permit", "permission"}),
+    ),
+}
+
+
+sense_filter = make_sense_filter(SENSE_CHECKS)
 
 
 def hits(sentence: str, forms: Collection[str]) -> dict[str, int]:
@@ -1301,6 +1348,7 @@ FRENCH = register(
         attribution=french_attribution,
         finalize_candidate=lambda card, target: card,
         highlight=highlight,
+        sense_filter=sense_filter,
     )
 )
 
@@ -1477,8 +1525,28 @@ def gate_noun_gender(
     return True, f"{len(nouns)} noun row(s) have a gender (manifest {counted})"
 
 
+def gate_no_sense_mismatch(
+    inputs: AuditInputs, profile: LanguageProfile
+) -> tuple[bool, str]:
+    """French gate G21: no card English holds a false-friend sense.
+
+    :param inputs: Lazy file reader of the audit.
+    :param profile: Language profile.
+    :returns: Pass flag and detail text.
+    """
+    rows = inputs.rows()
+    bad = [
+        f"{row.get('target', '')} in {row.get('sentence', '')}"
+        for row in rows
+        if sense_filter(row.get("target", ""), row.get("english", ""))
+    ]
+    if bad:
+        return False, f"{len(bad)} card(s) use the target in a different sense: {bad[0]}"
+    return True, f"{len(rows)} cards use each target in its Swadesh sense"
+
+
 def french_gates() -> tuple[tuple[str, Any], ...]:
-    """Give the ordered gate list G1 to G20 of the French pack.
+    """Give the ordered gate list G1 to G21 of the French pack.
 
     :returns: Pairs of gate name and gate function.
     """
@@ -1519,6 +1587,7 @@ def french_gates() -> tuple[tuple[str, Any], ...]:
         ("G18", gate_no_blocked_license),
         ("G19", gate_discontinuous),
         ("G20", gate_noun_gender),
+        ("G21", gate_no_sense_mismatch),
     )
 
 
@@ -1532,7 +1601,7 @@ def run_french_audit(
     manifest_path: Path | None = None,
     attribution_path: Path = ATTRIBUTION_PATH,
 ) -> list[GateRow]:
-    """Run the French quality gates G1 to G20.
+    """Run the French quality gates G1 to G21.
 
     :param apkg_path: APKG file of the pack.
     :param sentences_csv: Sentence CSV with one row per card.

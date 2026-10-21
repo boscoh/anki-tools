@@ -148,6 +148,15 @@ def test_target_inside_a_longer_word_does_not_match() -> None:
     assert greek.token_matches("Τα νερά είναι κρύα.", "νερό") == 1
 
 
+def test_sense_filter_rejects_false_friend_english() -> None:
+    assert greek.sense_filter("γλώσσα", "I love this language.")
+    assert not greek.sense_filter("γλώσσα", "I bit my tongue.")
+    assert greek.sense_filter("νέος", "My father is young.")
+    assert not greek.sense_filter("νέος", "This is a new car.")
+    assert greek.sense_filter("χρόνος", "I don't have time.")
+    assert not greek.sense_filter("χρόνος", "It is three years.")
+
+
 def test_unknown_word_filter_with_the_top_1000_list() -> None:
     table = greek.load_word_table()
     known = greek.known_words(table)
