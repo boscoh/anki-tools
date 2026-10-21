@@ -72,6 +72,9 @@ of its targets, and it holds 541 content lemmas in total: 314 core targets and
 227 support words. The support words are the small set that the sentences need
 to stay natural.
 
+This deck is not the best choice for the most words per card. Section 5.4
+compares it with a breadth deck and with a core deck plus a breadth tail.
+
 `--core` cannot cover a Swadesh form that the input deck does not hold. The
 French input holds 164 of the 203 distinct forms. Section 8 gives the reserve
 option for the other 39 forms.
@@ -266,6 +269,9 @@ completion:  stop[w] = quota[w], demand as 4.2, lambda = --lambda-new
              goal: fill a target that the depth pass leaves short
 top-up:      stop[w] = 3 for the first --third-examples targets
              goal: a third example for the top of the core list
+tail:        gain counts only the content lemmas that no kept card holds
+             no quota, no cost, at most --tail-cards cards
+             goal: the widest vocabulary in the remaining card budget
 ```
 
 - The seed pass cannot end with a gap, unless the pool has no sentence for the
@@ -274,6 +280,10 @@ top-up:      stop[w] = 3 for the first --third-examples targets
 - The completion pass protects the quota. It is the only pass that accepts a
   card with a negative score. It stops at `--completion-cards` (120) and at
   `--max-cards`.
+- The tail pass is the breadth option of section 5.4. It runs last, and it
+  keeps a card only when the card brings a new content lemma. It does not
+  take a card from a target below quota, because the earlier passes fill the
+  quota first.
 - `--lambda-seed` is 0.01. A small cost in the seed pass is a tie-break between
   cheap and expensive candidates.
 
@@ -398,6 +408,34 @@ The outside set is almost constant at about 230 lemmas. A larger core absorbs
 the frequent support words, so the total vocabulary grows by the core size and
 not by twice the core size.
 
+### 5.4 Bang for buck
+
+The bang is `spoken_mass`: the share of the Tatoeba French content tokens
+that the kept content lemmas cover. The buck is one card. The prototype
+measured these decks on the same pool and with the same filter.
+
+| Deck                    | Cards | Distinct content lemmas | `spoken_mass` | Mass per card |
+| ----------------------- | ----- | ----------------------- | ------------- | ------------- |
+| Core, quota 2, X=150    | 300   | 518                     | 0.372         | 0.0012        |
+| Core, quota 2, X=0      | 186   | 398                     | 0.310         | 0.0017        |
+| Core X=0, then a breadth tail | 300 | 894                  | 0.464         | 0.0015        |
+| Breadth only            | 300   | 1,201                   | 0.497         | 0.0017        |
+| Breadth only            | 1,000 | 2,239                   | 0.555         | 0.0006        |
+
+- A breadth selection wins on mass per card. At 300 cards it covers 33%
+  more mass and 2.3 times the lemmas. It gives no second example of a word.
+- The core mode wins on mass per lemma: 7.2e-4 against 4.1e-4. Its cards go
+  to frequent words, and its support set is small.
+- The tail is the middle choice. `--tail-cards` adds cards that bring only
+  new words. The split at 300 cards holds the Swadesh depth, and it adds 0.09
+  mass and 376 lemmas to the 300-card core deck of the first row.
+- The mass saturates. The tail from 300 to 400 cards adds 0.033 mass. A
+  1,000-card deck adds 0.058 mass over the 300-card breadth deck. The knee
+  is near 300 to 400 cards.
+
+The default is `--tail-cards 0`, because the mode targets a core list. A
+caller who wants the largest frequency mass per card sets a larger value.
+
 ## 6. Card order
 
 The mode writes the order into the ranking CSV and lets `reorder_deck` set the
@@ -499,6 +537,7 @@ rank mode stays the default.
 | `--max-cards`       | 400          | Card cap                                             |
 | `--completion-cards`| 120          | Card cap of the completion pass                      |
 | `--outside-budget`  | 0            | Cap on the outside set; 0 is no cap                  |
+| `--tail-cards`      | 0            | Cards after the core passes that only bring new words |
 | `--support-top`     | 1000         | Outside rank that costs 1.0                          |
 | `--hard-top`        | 3000         | Outside rank that costs 1.8, above is 3.0            |
 | `--lambda-new`      | 0.1          | Cost of one new outside word                         |
@@ -561,6 +600,7 @@ command with a non-zero exit code.
 | K13  | The manifest hashes match the core CSV and the coverage CSV           |
 | K14  | Every target with a kept card holds the form or lemma in that card    |
 | K15  | The templates and the CSS are the input values                        |
+| K16  | Every tail card brings at least one new content lemma                  |
 
 ### 10.2 Tests
 
@@ -583,6 +623,8 @@ file. Do not download a file.
 | Determinism  | Two runs give the same card set and order                          |
 | Budget check | A small `--max-cards` stops with a clear message                   |
 | APKG         | The output holds the kept notes and only their media files         |
+| Tail pass    | A tail card brings a new lemma, and no tail card repeats a core card |
+| Tail pass    | `--tail-cards 0` keeps the core set and the core order             |
 
 ## 11. Risks and open questions
 
@@ -609,6 +651,7 @@ file. Do not download a file.
 | 4   | Does the output need a `Target` field to show the assigned word?        | E4        |
 | 5   | Does the order interleave tier S and tier F, or follow the core list?   | E3        |
 | 6   | Is a second example of the same word in the same week useful, or should the order spread it? | E3 |
+| 7   | Should `--tail-cards` have a default above 0 for a deck of 300 cards? | E3 |
 
 ## 12. Milestones
 
@@ -720,3 +763,25 @@ targets, and the support words arrive one or two at a time.
 
 The prototype did not store the exact sentences. E4 records the list in the
 manifest for the review.
+
+### 13.7 Bang-for-buck comparison
+
+The comparator of section 5.4 is a breadth greedy selection. It uses the same
+pool, the same filter, and the same similarity test. Its gain is the sum of
+`1 / log2(rank + 1)` over the content lemmas of a card that no kept card
+holds yet. There is no quota and no outside cost, so it never repeats a
+word.
+
+The tail rows start from the kept core cards. The tail then adds cards with
+the breadth gain until the card limit. `spoken_mass` comes from
+`cull.spoken_mass`, with the Tatoeba counts of `data/french_frequency.tsv`.
+It counts the content lemmas only, because a function word is not a target.
+
+| Core                      | Cards | Vocab | `spoken_mass` |
+| ------------------------- | ----- | ----- | ------------- |
+| Swadesh only, quota 2     | 186   | 398   | 0.310         |
+| Swadesh, then tail to 300 | 300   | 894   | 0.464         |
+| Swadesh, then tail to 400 | 400   | 1,194 | 0.497         |
+| Core X=50, quota 2        | 211   | 418   | 0.339         |
+| Core X=50, then tail to 300 | 300 | 809   | 0.455         |
+| Core X=150, quota 2       | 300   | 518   | 0.372         |
