@@ -703,10 +703,9 @@ def zh(
     ranked = deck.ranked
     stats = deck.stats
 
-    print("\nStep 3: Reordering deck...")
 
     if not no_pinyin_fix:
-        print("\nStep 4: Fixing pinyin...")
+        print("\nFixing pinyin...")
         fix_pinyin(
             paths.output_path,
             output=paths.output_path,
@@ -716,7 +715,7 @@ def zh(
 
     styles_applied = 0
     if not no_style:
-        print("\nStep 5: Applying card styles...")
+        print("\nApplying card styles...")
         styles_applied, applied = _apply_style(
             Path(paths.output_path),
             css_path=Path("templates/card.css"),
@@ -858,7 +857,6 @@ def fr(
         print("No sentences found!")
         return
 
-    print("\nStep 2: Reordering deck...")
     ranked = deck.ranked
     stats = deck.stats
 
@@ -1106,7 +1104,6 @@ def es(
 
     print(f"Extracted {len(deck.sentences)} sentences")
 
-    print("\nStep 3: Reordering deck...")
     ranked = deck.ranked
     stats = deck.stats
 

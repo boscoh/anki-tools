@@ -68,7 +68,6 @@ in `docs/swadesh-sentence-flow.md`.
 
 One package per language. The package holds all the code of that language.
 
-| Path                                         | Content                                  |
 | Path                                          | Content                                        |
 | --------------------------------------------- | ---------------------------------------------- |
 | `anki_tools/languages/registry.py`            | `LANGUAGES`, `ALIASES`, and the CLI list       |

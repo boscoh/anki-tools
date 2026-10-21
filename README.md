@@ -410,8 +410,8 @@ audio. The frequency pass fills the rest of the 1,000 cards. Use
 `--reserve-pack` to select another pack, or `--no-reserve` for the frequency
 cull alone.
 
-Measured result on 2026-10-20: 1,000 cards, 198 reserve cards, 802 frequency
-cards, 1,981 distinct content lemmas, 297 of 300 frequency targets covered,
+Measured result on 2026-10-21: 1,000 cards, 194 reserve cards, 806 frequency
+cards, 2,002 distinct content lemmas, 299 of 300 frequency targets covered,
 287 targets with 2 cards, and 206 of 207 Swadesh concepts covered. `intestins`
 is the only Swadesh gap. The most-used non-exempt frequency lemma is in 4
 cards, the cap; the reserve has a separate maximum of 34. The `spoken_mass` is
