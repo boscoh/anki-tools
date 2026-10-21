@@ -17,7 +17,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from anki_tools.mandarin.swadesh import check_sentence_shape
+from anki_tools.sentence_pack.guards import check_sentence_shape
+from anki_tools.sentence_pack.languages.cantonese import CANTONESE
 from anki_tools.ranking.rank import (
     Sentence,
     char_similarity_zh_same_len,
@@ -171,7 +172,7 @@ def check_sentence(
 ) -> str:
     """Apply rules Y1 to Y8 in order.
 
-    Rules Y1 to Y6 reuse :func:`anki_tools.mandarin.swadesh.check_sentence_shape`.
+    Rules Y1 to Y6 reuse :func:`anki_tools.sentence_pack.guards.check_sentence_shape`.
     Rule Y8 matches the substrings of ``options.names``.
 
     :param text: Sentence text.
@@ -183,6 +184,7 @@ def check_sentence(
     stripped = text.strip()
     key = check_sentence_shape(
         stripped,
+        CANTONESE,
         options.min_han,
         options.max_han,
         final_mark=options.final_mark,

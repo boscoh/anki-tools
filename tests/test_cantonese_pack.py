@@ -10,7 +10,7 @@ import pytest
 
 from anki_tools.sentence_pack import pool
 from anki_tools.sentence_pack.languages import cantonese
-from anki_tools.sentence_pack.pool import check_sentence_shape
+from anki_tools.sentence_pack.guards import check_sentence_shape
 
 
 @pytest.fixture(autouse=True)

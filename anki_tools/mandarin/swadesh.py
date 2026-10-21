@@ -10,6 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from anki_tools.sentence_pack import guards as shared_guards
 from anki_tools.sentence_pack import pool as shared_pool
 from anki_tools.sentence_pack.pool import FILTER_KEYS, FILTER_NAMES  # noqa: F401
 from anki_tools.sentence_pack import select as shared_select
@@ -80,7 +81,7 @@ def check_sentence_shape(
     :param final_mark: Apply filters F5 and F6 (the final-mark rules).
     :returns: The first failed filter key, or None when all filters pass.
     """
-    return shared_pool.check_sentence_shape(
+    return shared_guards.check_sentence_shape(
         sentence, MANDARIN, min_han, max_han, final_mark=final_mark
     )
 

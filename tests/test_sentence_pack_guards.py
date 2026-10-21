@@ -5,6 +5,7 @@ from typing import Any
 
 from anki_tools.sentence_pack import audit, pool
 from anki_tools.sentence_pack.guards import (
+    check_sentence_shape,
     compound_spans,
     inside_spans,
     occurrences,
@@ -37,7 +38,7 @@ def test_record_pass_counts_every_guard_before_the_failure() -> None:
 
 def test_shape_failure_applies_only_the_requested_keys() -> None:
     sentence = "我要喝水"
-    assert pool.check_sentence_shape(sentence, MANDARIN, 4, 7) == "F5"
+    assert check_sentence_shape(sentence, MANDARIN, 4, 7) == "F5"
     assert (
         pool.shape_failure(
             sentence, MANDARIN, 4, 7, keys=pool.SCAFFOLD_SHAPE_KEYS

@@ -25,9 +25,9 @@ from anki_tools.sentence_pack.audio import (
 )
 from anki_tools.sentence_pack.english_sense import sense_mismatches
 from anki_tools.sentence_pack.pack import WORD_PREFIX, load_audio_index
+from anki_tools.sentence_pack.guards import check_sentence_shape
 from anki_tools.sentence_pack.pool import (
     SCAFFOLD_SHAPE_KEYS,
-    check_sentence_shape,
     shape_failure,
 )
 from anki_tools.sentence_pack.profile import (

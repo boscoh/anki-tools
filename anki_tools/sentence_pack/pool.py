@@ -216,26 +216,6 @@ def shape_failure(
     return None
 
 
-def check_sentence_shape(
-    sentence: str,
-    profile: LanguageProfile,
-    min_units: int,
-    max_units: int,
-    *,
-    final_mark: bool = True,
-) -> str | None:
-    """Apply filters F2 to F8 to one sentence.
-
-    :param sentence: Prepared sentence text.
-    :param profile: Language profile.
-    :param min_units: Minimum unit count.
-    :param max_units: Maximum unit count.
-    :param final_mark: Apply filters F5 and F6 (the final-mark rules).
-    :returns: The first failed filter key, or None when all filters pass.
-    """
-    return shape_failure(
-        sentence, profile, min_units, max_units, final_mark=final_mark
-    )
 
 
 @dataclass(frozen=True)
@@ -453,9 +433,9 @@ def build_candidate_pool(
         english_id, english_text = pair
         sentence = profile.prepare_text(raw).strip()
         unit_len = profile.unit_count(sentence)
-        shape = check_sentence_shape(sentence, profile, min_units, max_units)
+        shape = shape_failure(sentence, profile, min_units, max_units)
         relax_shape = (
-            check_sentence_shape(
+            shape_failure(
                 sentence, profile, profile.fallback_min_units, max_units
             )
             if fallback
