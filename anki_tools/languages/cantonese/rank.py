@@ -1,35 +1,37 @@
 """Cantonese sentence ranking.
 
-The ranking reuses the Han character scoring of the shared rank module and the
-Cantonese frequency sources of :mod:`anki_tools.languages.cantonese.frequency`.
-The Apple Daily list is written Hong Kong Chinese; the ``spoken`` and ``blend``
-sources add the Cifu spoken counts. See
-``specs/yue-sentence-selection.md``.
+The ranking reuses the Han character scoring of
+:mod:`anki_tools.languages.mandarin.characters` and the Cantonese frequency
+sources of :mod:`anki_tools.languages.cantonese.frequency`. The Apple Daily
+list is written Hong Kong Chinese; the ``spoken`` and ``blend`` sources add the
+Cifu spoken counts. See ``specs/yue-sentence-selection.md``.
 """
-
 from __future__ import annotations
 
 from pathlib import Path
 
+from anki_tools.languages.cantonese.frequency import (
+    YUE_FREQUENCY_ATTRIBUTION,
+    YUE_FREQUENCY_MAX_WORDS,
+    _build_frequency_data,
+    _read_word_count_tsv,
+    download_yue_frequency,
+    load_yue_frequency,
+    to_frequency_data,
+)
 from anki_tools.languages.cantonese.jyutping import (
     get_jyutping,
     simplified_to_traditional,
 )
-from anki_tools.ranking.rank import (
-    YUE_FREQUENCY_MAX_WORDS,
-    YUE_FREQUENCY_ATTRIBUTION,
-    FrequencyData,
-    Sentence,
-    _build_frequency_data,
-    _read_word_count_tsv,
+from anki_tools.languages.mandarin.characters import (
     compute_similarity_penalties_zh,
-    download_yue_frequency,
-    rank_character_based,
+    is_repeated_zh_sentence,
 )
 from anki_tools.languages.mandarin.rank import (
     complexity_score_zh,
     frequency_score_zh,
 )
+from anki_tools.ranking.rank import FrequencyData, Sentence, rank_character_based
 
 
 def load_frequency_data_yue(
@@ -57,11 +59,6 @@ def load_frequency_data_yue(
     :returns: Filled :class:`FrequencyData`.
     """
     if source != "written":
-        from anki_tools.languages.cantonese.frequency import (
-            load_yue_frequency,
-            to_frequency_data,
-        )
-
         data = to_frequency_data(
             load_yue_frequency(freq=source, spoken_weight=spoken_weight), max_words
         )
@@ -121,6 +118,7 @@ def rank_sentences_yue(
         freq_loader=lambda: load_frequency_data_yue(
             source=freq, spoken_weight=spoken_weight
         ),
+        repeated_filter=is_repeated_zh_sentence,
     )
 
 

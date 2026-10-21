@@ -1,13 +1,13 @@
 """Shared sentence ranking helpers.
 
 The module holds the sentence data class, the frequency tables, the download
-helpers, the Han character helpers, the similarity engine, the ranking CSV
-writer, and the stratified reduction. It also holds
-:func:`rank_character_based`, the driver that the character-based languages
-share.
+helpers, the similarity engine, the ranking CSV writer, and the stratified
+reduction. It also holds :func:`rank_character_based`, the score driver that
+a character-based language calls with its own metrics.
 
 The module holds no language data and imports no language package. The word
-metrics of a language live in ``anki_tools/languages/<lang>/rank.py``.
+metrics of a language live in ``anki_tools/languages/<lang>/rank.py``, and the
+Han character helpers live in ``anki_tools/languages/mandarin/characters.py``.
 
 See SPEC_RANK_SENTENCES.md for the specification.
 """
@@ -15,7 +15,6 @@ See SPEC_RANK_SENTENCES.md for the specification.
 from __future__ import annotations
 
 import csv
-import os
 import re
 import shutil
 from dataclasses import dataclass, field
@@ -34,10 +33,10 @@ from anki_tools.apkg.package import AnkiPackage
 
 @dataclass
 class Sentence:
-    """A sentence extracted from an Anki deck (ZH or FR pipeline).
+    """A sentence extracted from an Anki deck.
 
     :param note_id: Note ID in the deck.
-    :param text: Main sentence text (Chinese or French).
+    :param text: Main sentence text.
     :param original_order: Original card order index.
     :param complexity_score: Structural complexity (0-100).
     :param frequency_score: Word frequency score (0-100).
@@ -72,12 +71,12 @@ class FrequencyData:
 
     :param word_freq: Word to frequency rank.
     :param char_freq: Character to frequency rank.
-    :param hsk_vocab: Word or character to HSK level.
+    :param vocab_levels: Word or character to vocabulary level.
     """
 
     word_freq: dict[str, int] = field(default_factory=dict)
     char_freq: dict[str, int] = field(default_factory=dict)
-    hsk_vocab: dict[str, int] = field(default_factory=dict)  # word -> HSK level
+    vocab_levels: dict[str, int] = field(default_factory=dict)  # word -> level
 
 
 # =============================================================================
@@ -198,51 +197,29 @@ def _load_frequency_data_wordfreq(
     lang: str,
     *,
     lower_keys: bool = False,
-    build_char_freq: bool = False,
+    char_filter: Callable[[str], bool] | None = None,
 ) -> FrequencyData:
     """Load the ``wordfreq`` list of one language.
 
     :param lang: ``wordfreq`` language code, for example ``fr``.
     :param lower_keys: Store the words with lowercase keys.
-    :param build_char_freq: Fill the character ranks from the word ranks.
+    :param char_filter: Fill the character ranks from the letters that pass
+        this test. No character ranks are built when it is None.
     :returns: Filled :class:`FrequencyData`.
     """
     data = FrequencyData()
     for rank, word in enumerate(iter_wordlist(lang, wordlist="best"), 1):
         key = word.lower() if lower_keys else word
         data.word_freq[key] = rank
-    if build_char_freq:
+    if char_filter is not None:
         for word, rank in data.word_freq.items():
             for char in word:
-                if is_chinese_char(char) and char not in data.char_freq:
+                if char_filter(char) and char not in data.char_freq:
                     data.char_freq[char] = rank
     print(f"Loaded {len(data.word_freq)} words from wordfreq")
     return data
 
 
-YUE_FREQUENCY_URL = (
-    "https://raw.githubusercontent.com/chaaklau/appledaily-frequency"
-    "/master/release/word-freq.tsv"
-)
-YUE_FREQUENCY_ATTRIBUTION = (
-    "Cantonese word frequency: chaaklau/appledaily-frequency (CC BY 4.0)"
-)
-YUE_FREQUENCY_MAX_WORDS = 50000
-
-
-def yue_frequency_path() -> Path:
-    """Return the cache path of the Cantonese frequency list.
-
-    Set the environment variable ``YUE_FREQUENCY_PATH`` to use another file.
-
-    :returns: Path to the cached TSV file.
-    """
-    override = os.environ.get("YUE_FREQUENCY_PATH")
-    if override:
-        return Path(override)
-    cache_home = os.environ.get("XDG_CACHE_HOME")
-    base = Path(cache_home) if cache_home else Path.home() / ".cache"
-    return base / "anki-tools" / "appledaily-word-freq.tsv"
 
 
 def download_cached_file(url: str, dest: Path, *, force: bool = False) -> Path:
@@ -271,119 +248,6 @@ def download_cached_file(url: str, dest: Path, *, force: bool = False) -> Path:
     return dest
 
 
-def download_yue_frequency(path: Path | None = None, *, force: bool = False) -> Path:
-    """Download the Apple Daily Cantonese frequency list into the cache.
-
-    The file has two tab-separated columns: word and occurrence count.
-
-    :param path: Cache destination. Defaults to :func:`yue_frequency_path`.
-    :param force: Download again when the cached file already exists.
-    :returns: Path to the cached TSV file.
-    """
-    dest = Path(path) if path else yue_frequency_path()
-    try:
-        return download_cached_file(YUE_FREQUENCY_URL, dest, force=force)
-    except RuntimeError as exc:
-        raise RuntimeError(
-            f"Cannot download {YUE_FREQUENCY_URL}. "
-            "Set YUE_FREQUENCY_PATH to a local copy of the file."
-        ) from exc
-
-
-def _read_word_count_tsv(path: Path) -> dict[str, int]:
-    """Read a two-column word and count TSV file.
-
-    Lines with no integer count are skipped, so a header line is ignored.
-
-    :param path: Path to the TSV file.
-    :returns: Word to occurrence count.
-    """
-    try:
-        text = path.read_text(encoding="utf-8")
-    except OSError as exc:
-        raise RuntimeError(
-            f"Cannot read the Cantonese frequency file {path}. "
-            "Set YUE_FREQUENCY_PATH to a valid file."
-        ) from exc
-    counts: dict[str, int] = {}
-    for line in text.splitlines():
-        parts = line.split("\t")
-        if len(parts) != 2 or not parts[1].isdigit():
-            continue
-        word, count = parts
-        counts[word] = counts.get(word, 0) + int(count)
-    return counts
-
-
-def frequency_data_from_ranks(ranks: dict[str, int]) -> FrequencyData:
-    """Build word and character rank tables from word ranks.
-
-    Characters take the rank of the first word that contains them, as in
-    :func:`_load_frequency_data_wordfreq`.
-
-    :param ranks: Word to rank, 1 is most frequent.
-    :returns: Filled :class:`FrequencyData`.
-    """
-    data = FrequencyData()
-    data.word_freq.update(ranks)
-    for word, rank in sorted(ranks.items(), key=lambda item: item[1]):
-        for char in get_chinese_chars(word):
-            data.char_freq.setdefault(char, rank)
-    return data
-
-
-def _build_frequency_data(counts: dict[str, int], max_words: int) -> FrequencyData:
-    """Build rank tables from word counts.
-
-    :param counts: Word to occurrence count.
-    :param max_words: Number of most common words to keep.
-    :returns: Filled :class:`FrequencyData`.
-    """
-    ordered = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
-    ranks = {word: rank for rank, (word, _) in enumerate(ordered[:max_words], 1)}
-    return frequency_data_from_ranks(ranks)
-
-
-# =============================================================================
-# Han character helpers
-# =============================================================================
-
-
-def is_repeated_zh_sentence(text: str) -> bool:
-    """Check if Chinese chars in text form a pure repetition pattern.
-
-    Catches '是 是', '走吧走吧', '好了，好了', '谢谢你，谢谢你', etc.
-
-    :param text: Sentence text.
-    :returns: True if the Chinese character sequence is a repeated sub-sequence.
-    """
-    chars = get_chinese_chars(text)
-    n = len(chars)
-    if n < 2:
-        return False
-    for period in range(1, n // 2 + 1):
-        if n % period == 0 and chars == chars[:period] * (n // period):
-            return True
-    return False
-
-
-def is_chinese_char(char: str) -> bool:
-    """Check if a character is a Chinese character.
-
-    :param char: Single character.
-    :returns: True if in CJK Unified Ideographs range.
-    """
-    return "\u4e00" <= char <= "\u9fff"
-
-
-def get_chinese_chars(text: str) -> list[str]:
-    """Extract Chinese characters from text.
-
-    :param text: Arbitrary text.
-    :returns: List of Chinese characters in order.
-    """
-    return [c for c in text if is_chinese_char(c)]
-
 
 # =============================================================================
 # Phase 4: Similarity Analysis
@@ -402,33 +266,6 @@ def jaccard_similarity(items_a: set, items_b: set) -> float:
     return len(items_a & items_b) / len(items_a | items_b)
 
 
-def char_similarity_zh(sent_a: str, sent_b: str) -> float:
-    """Calculate Jaccard similarity between character sets.
-
-    :param sent_a: First Chinese sentence.
-    :param sent_b: Second Chinese sentence.
-    :returns: Similarity between 0 (no overlap) and 1 (identical).
-    """
-    chars_a = set(get_chinese_chars(sent_a))
-    chars_b = set(get_chinese_chars(sent_b))
-    return jaccard_similarity(chars_a, chars_b)
-
-
-def char_similarity_zh_same_len(sent_a: str, sent_b: str) -> float:
-    """Jaccard similarity of character sets, only for equal unique-character counts.
-
-    The unique-character count avoids stutter anchors: '是 是' does not match
-    '是的' only because both have 2 Chinese characters.
-
-    :param sent_a: First Chinese sentence.
-    :param sent_b: Second Chinese sentence.
-    :returns: Similarity between 0 (no overlap or different sizes) and 1.
-    """
-    chars_a = set(get_chinese_chars(sent_a))
-    chars_b = set(get_chinese_chars(sent_b))
-    if len(chars_a) != len(chars_b) or not chars_a:
-        return 0.0
-    return jaccard_similarity(chars_a, chars_b)
 
 
 def compute_similarity_penalties(
@@ -462,16 +299,6 @@ def compute_similarity_penalties(
     return penalties, similar_to_rank_indices, similar_to_rank_texts
 
 
-def compute_similarity_penalties_zh(
-    sentences: list[Sentence], top_n: int = 100
-) -> tuple[list[float], list[int | None], list[str | None]]:
-    """Compute similarity penalties (character-based, ZH and YUE).
-
-    :param sentences: Sentences in rank order.
-    :param top_n: Number of higher-ranked sentences to compare.
-    :returns: Penalties, similar ranks, and similar texts.
-    """
-    return compute_similarity_penalties(sentences, char_similarity_zh, top_n)
 
 
 SIMILARITY_PENALTY_SCALE = 20
@@ -504,8 +331,9 @@ def rank_character_based(
     ],
     preprocess: Callable[[list[Sentence]], None] | None = None,
     freq_loader: Callable[[], FrequencyData],
+    repeated_filter: Callable[[str], bool] | None = None,
 ) -> list[Sentence]:
-    """Rank sentences with a character-based score.
+    """Rank sentences with the scores of one language.
 
     The caller gives the word metrics of its language, so the driver holds no
     language data. Mandarin and Cantonese use it.
@@ -518,16 +346,19 @@ def rank_character_based(
     :param preprocess: Optional preprocessing, for example the traditional
         conversion and the romanization of the Cantonese pipeline.
     :param freq_loader: Frequency data loader of the language.
+    :param repeated_filter: Test that marks a sentence with a repeated pattern.
+        Repeating sentences are dropped before the scores are computed.
     :returns: The same list, sorted by final score, best first.
     """
     if preprocess:
         preprocess(sentences)
 
-    before = len(sentences)
-    sentences = [s for s in sentences if not is_repeated_zh_sentence(s.text)]
-    removed = before - len(sentences)
-    if removed:
-        print(f"Filtered {removed} repeated-character sentences")
+    if repeated_filter is not None:
+        before = len(sentences)
+        sentences = [s for s in sentences if not repeated_filter(s.text)]
+        removed = before - len(sentences)
+        if removed:
+            print(f"Filtered {removed} repeated-pattern sentences")
 
     freq_data = freq_loader()
 
@@ -673,8 +504,8 @@ def reduce_sentences_stratified(
 
     Note: deduplication runs within each bin independently. Cross-bin near-duplicates
     (e.g. a simple sentence in Bin 1 and its repetition-pattern variant in Bin 2) are
-    not caught here. For Chinese, is_repeated_zh_sentence() removes the worst offenders
-    before this step is reached.
+    not caught here. A language with a repeated-pattern filter runs that filter
+    before this step, so the worst offenders are already gone.
 
     Bins are computed dynamically based on actual complexity distribution:
     - Bin 1 (P0-P40): 35% of target (beginner focus)

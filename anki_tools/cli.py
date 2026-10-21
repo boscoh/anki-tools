@@ -59,13 +59,12 @@ from anki_tools.languages import (
 )
 from anki_tools.languages.cantonese.rank import rank_sentences_yue
 from anki_tools.languages.french.rank import rank_sentences_fr
+from anki_tools.languages.mandarin.characters import char_similarity_zh_same_len
 from anki_tools.languages.mandarin.rank import rank_sentences_zh
 from anki_tools.languages.spanish.rank import rank_sentences_es
 from anki_tools.ranking.latin import latin_word_similarity
 from anki_tools.ranking.rank import (
     Sentence,
-    YUE_FREQUENCY_ATTRIBUTION,
-    char_similarity_zh_same_len,
     extract_sentences,
     reduce_sentences_stratified,
     write_ranking_csv,
@@ -76,6 +75,7 @@ from anki_tools.ranking.reorder import reorder_deck
 from anki_tools.apkg.templates import load_char_links
 from anki_tools.languages.cantonese.frequency import (
     CIFU_ATTRIBUTION,
+    YUE_FREQUENCY_ATTRIBUTION,
     FREQUENCY_PATH,
     build_yue_tokenizer,
     check_frequency,

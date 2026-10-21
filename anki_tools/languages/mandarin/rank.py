@@ -3,7 +3,8 @@
 The module holds the Mandarin word frequency table, the Mandarin complexity and
 frequency scores, and the Mandarin ranking driver. The shared helpers of
 :mod:`anki_tools.ranking.rank` hold the sentence data class, the frequency
-tables, the Han character helpers, and the similarity engine.
+tables, and the similarity engine. :mod:`anki_tools.languages.mandarin.
+characters` holds the Han character helpers.
 
 See SPEC_RANK_SENTENCES.md for the specification.
 """
@@ -12,13 +13,16 @@ from __future__ import annotations
 
 import jieba
 
+from anki_tools.languages.mandarin.characters import (
+    compute_similarity_penalties_zh,
+    get_chinese_chars,
+    is_chinese_char,
+    is_repeated_zh_sentence,
+)
 from anki_tools.ranking.rank import (
     FrequencyData,
     Sentence,
     _load_frequency_data_wordfreq,
-    compute_similarity_penalties_zh,
-    get_chinese_chars,
-    is_chinese_char,
     rank_character_based,
 )
 
@@ -28,7 +32,7 @@ def load_frequency_data_zh() -> FrequencyData:
 
     :returns: Filled :class:`FrequencyData`.
     """
-    return _load_frequency_data_wordfreq("zh", build_char_freq=True)
+    return _load_frequency_data_wordfreq("zh", char_filter=is_chinese_char)
 
 
 def complexity_score_zh(sentence: str) -> float:
@@ -110,14 +114,14 @@ def frequency_score_zh(sentence: str, freq_data: FrequencyData) -> float:
     top_1000 = sum(1 for r in ranks if r <= 1000) / len(ranks)
     top_5000 = sum(1 for r in ranks if r <= 5000) / len(ranks)
 
-    if freq_data.hsk_vocab:
+    if freq_data.vocab_levels:
         hsk_count = 0
         for w in chinese_words:
-            if freq_data.hsk_vocab.get(w, 7) <= 4:
+            if freq_data.vocab_levels.get(w, 7) <= 4:
                 hsk_count += 1
             else:
                 chars = get_chinese_chars(w)
-                if chars and all(freq_data.hsk_vocab.get(c, 7) <= 4 for c in chars):
+                if chars and all(freq_data.vocab_levels.get(c, 7) <= 4 for c in chars):
                     hsk_count += 1
         hsk_coverage = hsk_count / len(chinese_words)
     else:
@@ -155,6 +159,7 @@ def rank_sentences_zh(
         frequency=frequency_score_zh,
         penalties=compute_similarity_penalties_zh,
         freq_loader=load_frequency_data_zh,
+        repeated_filter=is_repeated_zh_sentence,
     )
 
 

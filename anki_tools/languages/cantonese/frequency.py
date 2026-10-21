@@ -20,15 +20,8 @@ from typing import Any, Protocol
 
 import jieba
 
-from anki_tools.ranking.rank import (
-    FrequencyData,
-    Sentence,
-    _read_word_count_tsv,
-    download_cached_file,
-    download_yue_frequency,
-    frequency_data_from_ranks,
-    yue_frequency_path,
-)
+from anki_tools.languages.mandarin.characters import get_chinese_chars
+from anki_tools.ranking.rank import FrequencyData, Sentence, download_cached_file
 
 CIFU_URL = "https://raw.githubusercontent.com/gwinterstein/Cifu/master/Lexicon/Cifu-v1.txt"
 CIFU_ATTRIBUTION = (
@@ -38,6 +31,14 @@ VOCAB_DIR = Path(__file__).resolve().parents[3] / "vocab"
 VARIANTS_PATH = VOCAB_DIR / "cantonese_variants.tsv"
 OVERRIDES_PATH = VOCAB_DIR / "cantonese_frequency_overrides.tsv"
 FREQUENCY_PATH = Path("data/cantonese_frequency.tsv")
+YUE_FREQUENCY_URL = (
+    "https://raw.githubusercontent.com/chaaklau/appledaily-frequency"
+    "/master/release/word-freq.tsv"
+)
+YUE_FREQUENCY_ATTRIBUTION = (
+    "Cantonese word frequency: chaaklau/appledaily-frequency (CC BY 4.0)"
+)
+YUE_FREQUENCY_MAX_WORDS = 50000
 
 MIN_SPOKEN_COUNT = 5
 SPOKEN_DICT_WEIGHT = 40
@@ -510,3 +511,96 @@ def spoken_token_coverage(
     if not tokens:
         return 0.0
     return sum(1 for t in tokens if t in cifu and cifu[t].spoken > 0) / len(tokens)
+
+
+# =============================================================================
+# Apple Daily written frequency download and rank tables
+# =============================================================================
+
+
+def yue_frequency_path() -> Path:
+    """Return the cache path of the Cantonese frequency list.
+
+    Set the environment variable ``YUE_FREQUENCY_PATH`` to use another file.
+
+    :returns: Path to the cached TSV file.
+    """
+    override = os.environ.get("YUE_FREQUENCY_PATH")
+    if override:
+        return Path(override)
+    cache_home = os.environ.get("XDG_CACHE_HOME")
+    base = Path(cache_home) if cache_home else Path.home() / ".cache"
+    return base / "anki-tools" / "appledaily-word-freq.tsv"
+
+
+def download_yue_frequency(path: Path | None = None, *, force: bool = False) -> Path:
+    """Download the Apple Daily Cantonese frequency list into the cache.
+
+    The file has two tab-separated columns: word and occurrence count.
+
+    :param path: Cache destination. Defaults to :func:`yue_frequency_path`.
+    :param force: Download again when the cached file already exists.
+    :returns: Path to the cached TSV file.
+    """
+    dest = Path(path) if path else yue_frequency_path()
+    try:
+        return download_cached_file(YUE_FREQUENCY_URL, dest, force=force)
+    except RuntimeError as exc:
+        raise RuntimeError(
+            f"Cannot download {YUE_FREQUENCY_URL}. "
+            "Set YUE_FREQUENCY_PATH to a local copy of the file."
+        ) from exc
+
+
+def _read_word_count_tsv(path: Path) -> dict[str, int]:
+    """Read a two-column word and count TSV file.
+
+    Lines with no integer count are skipped, so a header line is ignored.
+
+    :param path: Path to the TSV file.
+    :returns: Word to occurrence count.
+    """
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise RuntimeError(
+            f"Cannot read the Cantonese frequency file {path}. "
+            "Set YUE_FREQUENCY_PATH to a valid file."
+        ) from exc
+    counts: dict[str, int] = {}
+    for line in text.splitlines():
+        parts = line.split("\t")
+        if len(parts) != 2 or not parts[1].isdigit():
+            continue
+        word, count = parts
+        counts[word] = counts.get(word, 0) + int(count)
+    return counts
+
+
+def frequency_data_from_ranks(ranks: dict[str, int]) -> FrequencyData:
+    """Build word and character rank tables from word ranks.
+
+    Characters take the rank of the first word that contains them, as in
+    :func:`anki_tools.ranking.rank._load_frequency_data_wordfreq`.
+
+    :param ranks: Word to rank, 1 is most frequent.
+    :returns: Filled :class:`FrequencyData`.
+    """
+    data = FrequencyData()
+    data.word_freq.update(ranks)
+    for word, rank in sorted(ranks.items(), key=lambda item: item[1]):
+        for char in get_chinese_chars(word):
+            data.char_freq.setdefault(char, rank)
+    return data
+
+
+def _build_frequency_data(counts: dict[str, int], max_words: int) -> FrequencyData:
+    """Build rank tables from word counts.
+
+    :param counts: Word to occurrence count.
+    :param max_words: Number of most common words to keep.
+    :returns: Filled :class:`FrequencyData`.
+    """
+    ordered = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
+    ranks = {word: rank for rank, (word, _) in enumerate(ordered[:max_words], 1)}
+    return frequency_data_from_ranks(ranks)

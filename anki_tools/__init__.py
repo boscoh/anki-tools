@@ -25,7 +25,6 @@ from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking.rank import (
     FrequencyData,
     Sentence,
-    char_similarity_zh,
     extract_sentences,
     reduce_sentences_stratified,
     write_ranking_csv,
@@ -34,6 +33,10 @@ from anki_tools.ranking.reorder import load_ranking, reorder_deck
 
 _LAZY: dict[str, tuple[str, str]] = {
     "fix_pinyin": ("anki_tools.languages.mandarin.pinyin", "fix_pinyin"),
+    "char_similarity_zh": (
+        "anki_tools.languages.mandarin.characters",
+        "char_similarity_zh",
+    ),
     "complexity_score_zh": (
         "anki_tools.languages.mandarin.rank",
         "complexity_score_zh",

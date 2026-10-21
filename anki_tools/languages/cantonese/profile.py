@@ -31,7 +31,7 @@ import opencc
 from wordfreq import top_n_list, zipf_frequency
 
 from anki_tools.languages.cantonese.jyutping import get_jyutping
-from anki_tools.ranking.rank import (
+from anki_tools.languages.mandarin.characters import (
     char_similarity_zh,
     get_chinese_chars,
     is_chinese_char,

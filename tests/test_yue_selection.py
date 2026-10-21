@@ -6,7 +6,7 @@ import jieba
 import pytest
 
 from anki_tools.languages.cantonese.rank import load_frequency_data_yue
-from anki_tools.ranking.rank import Sentence, yue_frequency_path
+from anki_tools.ranking.rank import Sentence
 from anki_tools.languages.cantonese.frequency import (
     CifuEntry,
     FreqRow,
@@ -21,6 +21,7 @@ from anki_tools.languages.cantonese.frequency import (
     read_variants,
     write_freq_change_csv,
     write_frequency_tsv,
+    yue_frequency_path,
 )
 from anki_tools.languages.cantonese.select import (
     UNRANKED,

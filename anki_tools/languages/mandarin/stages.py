@@ -41,7 +41,7 @@ from anki_tools.languages.mandarin.profile import (
     write_sentence_csv,
     write_sentence_review_csv,
 )
-from anki_tools.ranking.rank import get_chinese_chars
+from anki_tools.languages.mandarin.characters import get_chinese_chars
 from anki_tools.sentence_pack import audio as shared_audio
 from anki_tools.sentence_pack import guards as shared_guards
 from anki_tools.sentence_pack import pack as shared_pack

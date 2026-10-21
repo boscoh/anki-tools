@@ -3,17 +3,17 @@
 import pytest
 
 from anki_tools.languages.cantonese.rank import load_frequency_data_yue
+from anki_tools.languages.mandarin.characters import (
+    char_similarity_zh,
+    get_chinese_chars,
+    is_chinese_char,
+)
 from anki_tools.languages.mandarin.rank import (
     complexity_score_zh,
     frequency_score_zh,
     get_word_rank_zh,
 )
-from anki_tools.ranking.rank import (
-    FrequencyData,
-    char_similarity_zh,
-    get_chinese_chars,
-    is_chinese_char,
-)
+from anki_tools.ranking.rank import FrequencyData
 
 
 class TestHelpers:
@@ -62,7 +62,7 @@ class TestFrequencyScore:
             "不": 6,
         }
         data.char_freq = data.word_freq.copy()
-        data.hsk_vocab = {
+        data.vocab_levels = {
             "我": 1,
             "你": 1,
             "好": 1,
