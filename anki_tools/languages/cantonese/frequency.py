@@ -344,9 +344,7 @@ def to_frequency_data(data: YueFrequency, max_words: int) -> FrequencyData:
     :returns: Filled :class:`FrequencyData`.
     """
     ranks = {row.word: row.rank for row in data.rows if row.rank <= max_words}
-    for variant, standard in data.variants.items():
-        if standard in ranks:
-            ranks.setdefault(variant, ranks[standard])
+    add_variant_ranks(ranks, data.variants)
     return frequency_data_from_ranks(ranks)
 
 
@@ -595,13 +593,31 @@ def frequency_data_from_ranks(ranks: dict[str, int]) -> FrequencyData:
     return data
 
 
-def _build_frequency_data(counts: dict[str, int], max_words: int) -> FrequencyData:
+def add_variant_ranks(ranks: dict[str, int], variants: dict[str, str]) -> None:
+    """Give each variant the rank of its standard form.
+
+    A variant with no ranked standard form keeps no rank.
+
+    :param ranks: Word to rank. The function adds the variant keys.
+    :param variants: Variant to standard form.
+    """
+    for variant, standard in variants.items():
+        if standard in ranks:
+            ranks.setdefault(variant, ranks[standard])
+
+
+def _build_frequency_data(
+    counts: dict[str, int], max_words: int, variants: dict[str, str] | None = None
+) -> FrequencyData:
     """Build rank tables from word counts.
 
     :param counts: Word to occurrence count.
     :param max_words: Number of most common words to keep.
+    :param variants: Variant to standard form. The written Apple Daily list
+        needs the map, because it holds news-standard characters only.
     :returns: Filled :class:`FrequencyData`.
     """
     ordered = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
     ranks = {word: rank for rank, (word, _) in enumerate(ordered[:max_words], 1)}
+    add_variant_ranks(ranks, variants or {})
     return frequency_data_from_ranks(ranks)

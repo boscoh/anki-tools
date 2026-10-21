@@ -49,7 +49,7 @@ This ensures atomic commits per task and clean git history.
 ### Session End
 1. Close completed issues: `bd close <id>`
 2. Create follow-up issues if needed
-3. Run `bd sync` to commit/push
+3. Run `bd export -o .beads/issues.jsonl` and commit the export (see anki-t6l: `bd sync` fails on the dolt remote)
 4. Leave git clean
 
 
@@ -65,7 +65,7 @@ This ensures atomic commits per task and clean git history.
 4. **PUSH TO REMOTE** - This is MANDATORY:
    ```bash
    git pull --rebase
-   bd sync
+   bd export -o .beads/issues.jsonl   # bd sync fails: the dolt remote has no branches
    git push
    git status  # MUST show "up to date with origin"
    ```

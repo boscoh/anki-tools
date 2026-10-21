@@ -9,6 +9,7 @@ from anki_tools.languages.cantonese.rank import load_frequency_data_yue
 from anki_tools.ranking.rank import Sentence
 from anki_tools.languages.cantonese.frequency import (
     CifuEntry,
+    _build_frequency_data,
     FreqRow,
     YueFrequency,
     build_yue_frequency,
@@ -134,6 +135,17 @@ class TestVariantsAndOverrides:
         overrides.write_text("word\trank_like\treason\n你好\t多謝\tx\n", encoding="utf-8")
         assert read_variants(variants) == {"噉": "咁"}
         assert read_overrides(overrides) == {"你好": "多謝"}
+
+    def test_written_ranks_carry_the_variant_map(self) -> None:
+        """The written Apple Daily path applies the variant map too."""
+        data = _build_frequency_data({"咁": 100, "枱": 50}, 10, {"噉": "咁", "檯": "枱"})
+        assert data.word_freq["噉"] == data.word_freq["咁"] == 1
+        assert data.word_freq["檯"] == data.word_freq["枱"] == 2
+        assert data.char_freq["噉"] == 1
+
+    def test_variant_without_a_standard_form_gets_no_rank(self) -> None:
+        data = _build_frequency_data({"咁": 100}, 10, {"噉": "無此詞"})
+        assert "噉" not in data.word_freq
 
 
 class TestOutputAndGates:

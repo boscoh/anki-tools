@@ -17,6 +17,7 @@ from anki_tools.languages.cantonese.frequency import (
     _read_word_count_tsv,
     download_yue_frequency,
     load_yue_frequency,
+    read_variants,
     to_frequency_data,
 )
 from anki_tools.languages.cantonese.jyutping import (
@@ -68,7 +69,7 @@ def load_frequency_data_yue(
     counts = _read_word_count_tsv(freq_path)
     if not counts:
         raise ValueError(f"No word counts found in {freq_path}")
-    data = _build_frequency_data(counts, max_words)
+    data = _build_frequency_data(counts, max_words, read_variants())
     print(f"Loaded {len(data.word_freq)} words from {YUE_FREQUENCY_ATTRIBUTION}")
     return data
 
