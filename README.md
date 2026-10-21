@@ -115,11 +115,15 @@ uv run anki fix zh deck.apkg --max-sentences 2600   # Also deduplicate and reduc
 ```bash
 uv run anki fix fr deck.apkg           # Rank mode: rank and reorder
 uv run anki fix fr deck.apkg --select  # Select mode: the 1000-card cull
+uv run anki fix fr deck.apkg --core    # Core mode: a small core-word deck
 ```
 - Rank mode ranks by word-based complexity and similarity and reorders the
   deck. It writes `_reordered.apkg` and `.rank.csv`.
 - Select mode runs the 1000-card cull. It writes `_culled.apkg` with its CSV
   files and manifest. See "French 1000-Card Cull" below.
+- Core mode builds a small deck from the core word list. It writes
+  `_core.apkg` with its CSV files and manifest. See "French Core-Word Deck"
+  below.
 - Uses wordfreq for frequency data
 - Optional spaCy grammar scoring: `uv run python -m spacy download fr_core_news_sm`
 
@@ -420,6 +424,61 @@ cards, the cap; the reserve has a separate maximum of 34. The `spoken_mass` is
 The cull keeps the audio files and the note model of the input deck. It does
 not make new TTS files. The input file is
 `apkg/6000_French_Sentences_w_Audio.apkg`.
+
+Licenses: Tatoeba sentence text CC BY 2.0 FR, `wordfreq` list Apache License
+2.0, and input audio under the license of the source deck.
+
+### French Core-Word Deck
+
+Build a small deck from a fixed core word list. Each core word gets 2
+examples. A sentence that brings many words outside the core costs more, so
+the deck adds few other words.
+
+```bash
+uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --core \
+    --core-words 50 --per-word 2 --core-max-cards 300 --tail-cards 120
+# Run gates K1 to K18 on the built deck
+uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --core \
+    --output apkg/french_core_300.apkg --check
+```
+
+The core list starts with the reviewed Swadesh forms of the language. It then
+adds `--core-words` content lemmas in blended frequency order. A target that
+more than `--ubiquitous-share` (0.25) of the candidates hold gets one example,
+because a second example adds no skill.
+
+A card must pass the cull filter F1 to F9 and the guards C1 to C5: a
+predicate, a main clause, no name, no loan word, and an audio file. The
+window is 5 to 9 words. `--core-min-words` and `--core-max-words` move it.
+
+The selection is a greedy cover. Each card has a value from the target
+examples that it adds, minus a cost for the words outside the core. A new
+rare word costs 3 times a frequent one. See
+`specs/core-word-small-deck.md` sections 4 and 5.
+
+The default output is `<input>_core.apkg`. `--output` sets another path. The
+command writes the deck and four side files beside it:
+
+| Suffix           | Content                                                                           |
+| ---------------- | --------------------------------------------------------------------------------- |
+| `.apkg`          | the kept cards in core order, with the input model and audio                      |
+| `.core.csv`      | one row per input card: `kept`, `pass`, `reason`, `targets`, `assigned`           |
+| `.coverage.csv`  | one row per target: `key`, `word`, `tier`, `position`, `quota`, `count`, `status` |
+| `.manifest.json` | counts, options, frequency source, and hashes                                     |
+| `.rank.csv`      | the ranking CSV of `reorder_deck`                                                 |
+
+A target `status` is `covered` for two or more cards, `partial` for one
+card, `absent` for no candidate, `absent_sense` when every candidate fails
+the sense test, and `unchecked` when the target has no sense row.
+
+`--bold-target` is on by default. The assigned target of each kept card is
+bold on the answer side of the card.
+
+Measured result on 2026-10-21 with the command above: 300 cards for 209
+targets (159 Swadesh forms and 50 frequency lemmas). 183 targets have 2
+cards, 21 have one, and 5 are `absent_sense`. The core cards hold 247
+support words, of which 18 are rare, and the tail adds 346 new words. Gates
+K1 to K18 pass.
 
 Licenses: Tatoeba sentence text CC BY 2.0 FR, `wordfreq` list Apache License
 2.0, and input audio under the license of the source deck.
