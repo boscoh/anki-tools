@@ -210,6 +210,8 @@ uv run anki swadesh pack mandarin                           # write the APKG
 uv run anki swadesh audit mandarin                          # gates G1 to G18
 ```
 
+See `docs/swadesh-sentence-flow.md` for the stage order and the guard order.
+
 The commands write these files:
 
 | Path                                            | Content                            |

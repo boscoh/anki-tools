@@ -137,6 +137,7 @@ Tatoeba audio download method, verified 2026-10-18:
 
 Each stage reads its input files and writes deterministic output. Each stage
 is safe to re-run. A stage skips work when its cache is complete.
+The guard order and the stage diagram are in `docs/swadesh-sentence-flow.md`.
 
 ## 6. S1: Swadesh word table
 

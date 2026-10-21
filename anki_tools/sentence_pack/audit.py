@@ -24,7 +24,11 @@ from anki_tools.sentence_pack.audio import (
     probe_duration,
 )
 from anki_tools.sentence_pack.pack import WORD_PREFIX, load_audio_index
-from anki_tools.sentence_pack.pool import check_sentence_shape
+from anki_tools.sentence_pack.pool import (
+    SCAFFOLD_SHAPE_KEYS,
+    check_sentence_shape,
+    shape_failure,
+)
 from anki_tools.sentence_pack.profile import (
     LanguageProfile,
     WordRow,
@@ -252,20 +256,20 @@ def scaffold_problem(sentence: str, profile: LanguageProfile) -> str | None:
     :param profile: Language profile.
     :returns: Failure text, or None when the sentence passes.
     """
-    unit_len = profile.unit_count(sentence)
-    if not profile.fallback_min_units <= unit_len <= profile.max_units:
+    key = shape_failure(
+        sentence,
+        profile,
+        profile.fallback_min_units,
+        profile.max_units,
+        keys=SCAFFOLD_SHAPE_KEYS,
+    )
+    if key == "F2":
         return (
-            f"F2 length {unit_len} outside "
+            f"F2 length {profile.unit_count(sentence)} outside "
             f"{profile.fallback_min_units} to {profile.max_units}"
         )
-    if not profile.script_ok(sentence):
-        return "F3 script"
-    if profile.is_repeated(sentence):
-        return "F4 repeated pattern"
-    if not sentence or sentence[-1] not in profile.final_marks:
-        return "F5 final mark"
-    if any(char in profile.quote_marks for char in sentence):
-        return "F7 quotation mark"
+    if key is not None:
+        return f"{key} failed"
     if not profile.has_predicate(sentence):
         return "F9 predicate tag"
     if profile.has_orphan(sentence):

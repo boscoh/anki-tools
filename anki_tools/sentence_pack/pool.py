@@ -1,16 +1,17 @@
 """Candidate sentence pool (stage S2).
 
 The pool applies filters F1 to F12, the unknown-token budget, and the English
-sense test in order and reports how many sentences each filter removes. A
-sentence that fails no filter becomes a candidate for the lowest-index word it
-covers. With ``fallback``, a sentence in the wider window that fails only F6 or
-F8 becomes a scaffold candidate for a word that has no core candidate.
+sense test in order. The guard tables give the order, and each report count is
+the number of sentences that pass the guard. A sentence that fails no filter
+becomes a candidate for the lowest-index word it covers. With ``fallback``, a
+sentence in the wider window that fails only F6 or F8 becomes a scaffold
+candidate for a word that has no core candidate.
 """
 
 from __future__ import annotations
 
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Collection, Sequence
@@ -115,6 +116,106 @@ def count_marks(sentence: str, marks: str) -> int:
     return sum(1 for char in sentence if char in marks)
 
 
+@dataclass(frozen=True)
+class ShapeInput:
+    """Measured values of the F2 to F8 shape guards.
+
+    :param sentence: Prepared sentence text.
+    :param profile: Language profile.
+    :param unit_len: Word or character count of the sentence.
+    :param min_units: Minimum unit count of the window.
+    :param max_units: Maximum unit count of the window.
+    :param final_mark: Apply filters F5 and F6 (the final-mark rules).
+    """
+
+    sentence: str
+    profile: LanguageProfile
+    unit_len: int
+    min_units: int
+    max_units: int
+    final_mark: bool = True
+
+
+def _passes_length(item: ShapeInput) -> bool:
+    return item.min_units <= item.unit_len <= item.max_units
+
+
+def _passes_script(item: ShapeInput) -> bool:
+    return item.profile.script_ok(item.sentence)
+
+
+def _passes_repeat(item: ShapeInput) -> bool:
+    return not item.profile.is_repeated(item.sentence)
+
+
+def _passes_final_mark(item: ShapeInput) -> bool:
+    return not item.final_mark or (
+        bool(item.sentence) and item.sentence[-1] in item.profile.final_marks
+    )
+
+
+def _passes_one_final_mark(item: ShapeInput) -> bool:
+    return not item.final_mark or (
+        count_marks(item.sentence, item.profile.final_marks) == 1
+    )
+
+
+def _passes_quote(item: ShapeInput) -> bool:
+    return not any(char in item.profile.quote_marks for char in item.sentence)
+
+
+def _passes_internal_marks(item: ShapeInput) -> bool:
+    return count_marks(item.sentence, item.profile.internal_marks) <= 1
+
+
+SHAPE_GUARDS: tuple[tuple[str, Callable[[ShapeInput], bool]], ...] = (
+    ("F2", _passes_length),
+    ("F3", _passes_script),
+    ("F4", _passes_repeat),
+    ("F5", _passes_final_mark),
+    ("F6", _passes_one_final_mark),
+    ("F7", _passes_quote),
+    ("F8", _passes_internal_marks),
+)
+SCAFFOLD_SHAPE_FAILURES = frozenset(("F6", "F8"))
+SCAFFOLD_SHAPE_KEYS = frozenset(
+    key for key, _ in SHAPE_GUARDS if key not in SCAFFOLD_SHAPE_FAILURES
+)
+
+
+def shape_failure(
+    sentence: str,
+    profile: LanguageProfile,
+    min_units: int,
+    max_units: int,
+    *,
+    final_mark: bool = True,
+    keys: Collection[str] = (),
+) -> str | None:
+    """Give the first failed guard of filters F2 to F8.
+
+    :param sentence: Prepared sentence text.
+    :param profile: Language profile.
+    :param min_units: Minimum unit count of the window.
+    :param max_units: Maximum unit count of the window.
+    :param final_mark: Apply filters F5 and F6 (the final-mark rules).
+    :param keys: Guard keys to apply, empty for every key.
+    :returns: The first failed filter key, or None when the guards pass.
+    """
+    data = ShapeInput(
+        sentence=sentence,
+        profile=profile,
+        unit_len=profile.unit_count(sentence),
+        min_units=min_units,
+        max_units=max_units,
+        final_mark=final_mark,
+    )
+    for key, test in SHAPE_GUARDS:
+        if (not keys or key in keys) and not test(data):
+            return key
+    return None
+
+
 def check_sentence_shape(
     sentence: str,
     profile: LanguageProfile,
@@ -132,23 +233,95 @@ def check_sentence_shape(
     :param final_mark: Apply filters F5 and F6 (the final-mark rules).
     :returns: The first failed filter key, or None when all filters pass.
     """
-    unit_len = profile.unit_count(sentence)
-    if not min_units <= unit_len <= max_units:
-        return "F2"
-    if not profile.script_ok(sentence):
-        return "F3"
-    if profile.is_repeated(sentence):
-        return "F4"
-    if final_mark:
-        if not sentence or sentence[-1] not in profile.final_marks:
-            return "F5"
-        if count_marks(sentence, profile.final_marks) != 1:
-            return "F6"
-    if any(char in profile.quote_marks for char in sentence):
-        return "F7"
-    if count_marks(sentence, profile.internal_marks) > 1:
-        return "F8"
+    return shape_failure(
+        sentence, profile, min_units, max_units, final_mark=final_mark
+    )
+
+
+@dataclass(frozen=True)
+class FactInput:
+    """Measured values of the F9 to sense guards.
+
+    :param predicate: True when the sentence has a predicate tag.
+    :param orphan: True when the sentence starts with an orphan conjunction.
+    :param english_words: Word count of the English translation.
+    :param english_bounds: Accepted English word-count window.
+    :param duplicate: True when the dedupe key is already kept.
+    :param unknown_words: Token count outside the known set.
+    :param max_unknown: Unknown token budget.
+    :param hits: Forms that the form filter keeps.
+    :param sense_hits: Forms whose paired English holds the card sense.
+    """
+
+    predicate: bool
+    orphan: bool
+    english_words: int
+    english_bounds: tuple[int, int]
+    duplicate: bool
+    unknown_words: int
+    max_unknown: int
+    hits: tuple[str, ...]
+    sense_hits: tuple[str, ...]
+
+
+def _passes_predicate(item: FactInput) -> bool:
+    return item.predicate
+
+
+def _passes_orphan(item: FactInput) -> bool:
+    return not item.orphan
+
+
+def _passes_english(item: FactInput) -> bool:
+    low, high = item.english_bounds
+    return low <= item.english_words <= high
+
+
+def _passes_unique(item: FactInput) -> bool:
+    return not item.duplicate
+
+
+def _passes_unknown(item: FactInput) -> bool:
+    return item.unknown_words <= item.max_unknown
+
+
+def _passes_sense(item: FactInput) -> bool:
+    return not item.hits or bool(item.sense_hits)
+
+
+FACT_GUARDS: tuple[tuple[str, Callable[[FactInput], bool]], ...] = (
+    ("F9", _passes_predicate),
+    ("F10", _passes_orphan),
+    ("F11", _passes_english),
+    ("F12", _passes_unique),
+    ("unknown", _passes_unknown),
+    ("sense", _passes_sense),
+)
+SCAFFOLD_SKIP_GUARDS = frozenset(("sense",))
+
+
+def fact_failure(data: FactInput, *, skip: Collection[str] = ()) -> str | None:
+    """Give the first failed guard of filters F9 to sense.
+
+    :param data: Measured values of the sentence.
+    :param skip: Guard keys to leave out.
+    :returns: The first failed guard key, or None when the guards pass.
+    """
+    for key, test in FACT_GUARDS:
+        if key not in skip and not test(data):
+            return key
     return None
+
+
+def record_pass(counts: dict[str, int], failure: str | None) -> None:
+    """Count one sentence as a pass of every guard before its first failure.
+
+    :param counts: Filter counts of the pool report.
+    :param failure: First failed guard key, or None when the guards pass.
+    """
+    stop = len(FILTER_KEYS) if failure is None else FILTER_KEYS.index(failure)
+    for key in FILTER_KEYS[:stop]:
+        counts[key] += 1
 
 
 def zipf_value(word: str, lang: str) -> float:
@@ -198,12 +371,6 @@ def pair_english(
     if best is None:
         return None
     return best[1], best[2]
-
-
-def _stage_number(key: str) -> int:
-    if key == "unknown":
-        return len(FILTER_KEYS)
-    return int(key[1:])
 
 
 def pool_paths(profile: LanguageProfile, data_dir: Path) -> dict[str, Path]:
@@ -288,21 +455,23 @@ def build_candidate_pool(
         unit_len = profile.unit_count(sentence)
         shape = check_sentence_shape(sentence, profile, min_units, max_units)
         relax_shape = (
-            check_sentence_shape(sentence, profile, profile.fallback_min_units, max_units)
+            check_sentence_shape(
+                sentence, profile, profile.fallback_min_units, max_units
+            )
             if fallback
-            else "F2"
+            else None
         )
-        relax_ok = relax_shape is None or relax_shape in ("F6", "F8")
-        if shape is not None and not (fallback and relax_ok):
-            for key in FILTER_KEYS[: _stage_number(shape) - 1]:
-                counts[key] += 1
+        relax_ok = fallback and (
+            relax_shape is None or relax_shape in SCAFFOLD_SHAPE_FAILURES
+        )
+        if shape is not None and not relax_ok:
+            record_pass(counts, shape)
             continue
 
         predicate = profile.has_predicate(sentence)
         orphan = profile.has_orphan(sentence)
         unknown_words = profile.count_unknown(sentence, known_words)
         english_words = len(english_text.split())
-        english_ok = MIN_ENGLISH_WORDS <= english_words <= MAX_ENGLISH_WORDS
         dedupe = profile.dedupe_key(sentence)
 
         hits = tuple(sorted(profile.hits(sentence, form_set)))
@@ -318,26 +487,21 @@ def build_candidate_pool(
             if holds_sense(gloss_by_form.get(form, ""), english_text)
         )
 
-        fail: int | None = _stage_number(shape) if shape is not None else None
-        if fail is None:
-            if not predicate:
-                fail = 9
-            elif orphan:
-                fail = 10
-            elif not english_ok:
-                fail = 11
-            elif dedupe in seen:
-                fail = 12
-            elif unknown_words > max_unknown:
-                fail = 13
-            elif hits and not sense_hits:
-                fail = len(FILTER_KEYS)
+        measured = FactInput(
+            predicate=predicate,
+            orphan=orphan,
+            english_words=english_words,
+            english_bounds=(MIN_ENGLISH_WORDS, MAX_ENGLISH_WORDS),
+            duplicate=dedupe in seen,
+            unknown_words=unknown_words,
+            max_unknown=max_unknown,
+            hits=hits,
+            sense_hits=sense_hits,
+        )
+        failure = shape if shape is not None else fact_failure(measured)
+        record_pass(counts, failure)
         hits = sense_hits
-        passed = (fail - 1) if fail is not None else len(FILTER_KEYS)
-        for key in FILTER_KEYS[:passed]:
-            counts[key] += 1
-
-        if fail is None and hits:
+        if failure is None and hits:
             seen.add(dedupe)
             audio_id, audio_license = audio.get(sentence_id, (0, ""))
             core_facts.append(
@@ -357,15 +521,16 @@ def build_candidate_pool(
                 )
             )
         elif (
-            fallback
-            and relax_ok
-            and predicate
-            and not orphan
-            and english_ok
-            and unknown_words <= max_unknown
+            relax_ok
             and hits
-            and dedupe not in seen
-            and dedupe not in relax_seen
+            and fact_failure(
+                replace(
+                    measured,
+                    duplicate=measured.duplicate or dedupe in relax_seen,
+                ),
+                skip=SCAFFOLD_SKIP_GUARDS,
+            )
+            is None
         ):
             relax_seen.add(dedupe)
             audio_id, audio_license = audio.get(sentence_id, (0, ""))
