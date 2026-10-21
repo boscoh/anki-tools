@@ -353,12 +353,12 @@ def gate_hit(files: CoreFiles) -> tuple[bool, str]:
 
 
 def gate_templates(files: CoreFiles) -> tuple[bool, str]:
-    """K14: the templates and the CSS are the cull values."""
+    """K14: the templates are the core templates and the CSS is the cull CSS."""
     output = files.output()
     used = [name for name in output["note_models"] if name]
     templates = [output["templates"].get(name, []) for name in used]
     css = [output["css"].get(name, "") for name in used]
-    expected = [list(pair) for pair in cull.CARD_TEMPLATES]
+    expected = [list(pair) for pair in core.CORE_TEMPLATES]
     ok_templates = all(
         [list(pair) for pair in value] == expected[: len(value)]
         for value in templates

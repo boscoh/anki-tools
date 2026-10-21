@@ -471,8 +471,10 @@ A target `status` is `covered` for two or more cards, `partial` for one
 card, `absent` for no candidate, `absent_sense` when every candidate fails
 the sense test, and `unchecked` when the target has no sense row.
 
-`--bold-target` is on by default. The assigned target of each kept card is
-bold on the answer side of the card.
+Card 1 shows only the play button on the front. The back shows the play
+button, the French sentence, the English translation, and the core word. The
+model gains a `Core` field for the core word. `--bold-target` is on by default,
+and the assigned target is bold in the sentence.
 
 Measured result on 2026-10-21 with the command above: 300 cards for 209
 targets (159 Swadesh forms and 50 frequency lemmas). 183 targets have 2

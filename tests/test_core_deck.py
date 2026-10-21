@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+from anki_tools.apkg.package import AnkiPackage
 from anki_tools.languages.french import core, cull
 from anki_tools.ranking.core import (
     CoreCandidate,
@@ -400,3 +401,103 @@ class TestFiles:
 
     def test_the_default_output_uses_the_core_suffix(self, tmp_path: Path) -> None:
         assert core.default_output(tmp_path / "deck.apkg").name == "deck_core.apkg"
+
+
+def _tiny_deck(tmp_path: Path) -> Path:
+    sentences = ["Le chat dort.", "Le chat mange.", "Le lapin court."]
+    media = []
+    for index in range(len(sentences)):
+        path = tmp_path / f"a{index}.mp3"
+        path.write_bytes(b"ID3\x03\x00\x00\x00\x00\x00\x00" + bytes(40))
+        media.append(str(path))
+    rows = [
+        {
+            "French": sentence,
+            "sound": f"[sound:a{index}.mp3]",
+            "Back": f"English {index}.",
+            "freq ranks": "[ 1 2 ]",
+        }
+        for index, sentence in enumerate(sentences)
+    ]
+    source = tmp_path / "input.apkg"
+    AnkiPackage.create(
+        source,
+        "Source Deck",
+        fields=["French", "sound", "Back", "freq ranks"],
+        cards=rows,
+        media_files=media,
+        model_name=cull.MODEL_NAME,
+    )
+    return source
+
+
+class TestCardDesign:
+    def test_the_front_shows_only_the_audio(self) -> None:
+        front = core.CORE_FRONT_TEMPLATE
+
+        assert "{{sound}}" in front
+        assert "{{French}}" not in front
+        assert "{{Back}}" not in front
+        assert "{{Core}}" not in front
+        assert "hint" not in front
+
+    def test_the_back_shows_audio_sentence_english_and_core_word(self) -> None:
+        back = core.CORE_BACK_TEMPLATE
+        order = [back.index(f"{{{{{name}}}}}") for name in ("sound", "French", "Back", "Core")]
+
+        assert order == sorted(order)
+
+    def test_the_reverse_card_is_the_cull_card(self) -> None:
+        assert core.CORE_TEMPLATES[1] == cull.CARD_TEMPLATES[1]
+
+    def test_the_model_gets_the_core_field_and_templates(self, tmp_path: Path) -> None:
+        source = _tiny_deck(tmp_path)
+        cards = cull.load_input_deck(source)
+        output = tmp_path / "core.apkg"
+        cull.write_deck(source, cards, [0, 1, 2], output, "Core Deck")
+        targets = [_target("S1:chat", form="chat")]
+        candidates = [
+            CoreCandidate(index=0, targets=("S1:chat",), outside=(), units=3),
+            CoreCandidate(index=1, targets=("S1:chat",), outside=(), units=3),
+            CoreCandidate(index=2, targets=(), outside=(), units=3),
+        ]
+        result = CoreResult(
+            kept=[0, 1, 2],
+            uses=Counter(),
+            quotas={},
+            assigned={0: "S1:chat"},
+            order=[0, 1, 2],
+        )
+
+        filled = core._write_core_model(
+            output, cards, result, [0, 1, 2], targets, candidates
+        )
+
+        assert filled == 2
+        with AnkiPackage(output) as package:
+            models = package.get_models(include_templates=True)
+            model = next(m for m in models.values() if m["name"] == cull.MODEL_NAME)
+            names = [f["name"] for f in model["flds"]]
+            templates = [(t["qfmt"], t["afmt"]) for t in model["tmpls"]]
+            values = {
+                row["flds"].split("\x1f")[0]: row["flds"].split("\x1f")
+                for row in package.get_notes()
+            }
+
+        assert names == ["French", "sound", "Back", "freq ranks", "Core"]
+        assert templates == [tuple(pair) for pair in core.CORE_TEMPLATES[: len(templates)]]
+        assert values["Le chat dort."][4] == "chat"
+        assert values["Le chat mange."][4] == "chat"
+        assert values["Le lapin court."][4] == ""
+        assert values["Le chat dort."][3] == "[ 1 2 ]"
+
+    def test_adding_the_field_twice_changes_nothing(self, tmp_path: Path) -> None:
+        source = _tiny_deck(tmp_path)
+        with AnkiPackage(source) as package:
+            model_id = cull._find_model_id(package.get_models(include_templates=True))
+            first = package.add_model_field(model_id, "Core")
+            second = package.add_model_field(model_id, "Core")
+            widths = {len(row["flds"].split("\x1f")) for row in package.get_notes()}
+
+        assert first == second == 4
+        assert widths == {5}

@@ -41,6 +41,20 @@ MODEL_NAME = cull.MODEL_NAME
 FRENCH_FIELD = cull.FRENCH_FIELD
 AUDIO_FIELD = cull.AUDIO_FIELD
 ENGLISH_FIELD = cull.ENGLISH_FIELD
+CORE_FIELD = "Core"
+
+CORE_FRONT_TEMPLATE = '<div class="front-audio">{{sound}}</div>'
+CORE_BACK_TEMPLATE = (
+    "{{sound}}"
+    "<hr id=answer>"
+    '<div class="sentence">{{French}}</div>'
+    '<div class="english">{{Back}}</div>'
+    '{{#Core}}<div class="target">{{Core}}</div>{{/Core}}'
+)
+CORE_TEMPLATES = (
+    (CORE_FRONT_TEMPLATE, CORE_BACK_TEMPLATE),
+    cull.CARD_TEMPLATES[1],
+)
 
 CONTENT_POS = cull.CONTENT_POS
 CORE_COLUMNS: tuple[str, ...] = (
@@ -647,6 +661,7 @@ def run_core(request: CoreRequest) -> CoreRun:
     cull.write_deck(apkg_path, cards, ordered, temporary, request.name)
     reorder_deck(str(temporary), str(output_path), str(rank_csv))
     temporary.unlink(missing_ok=True)
+    _write_core_model(output_path, cards, result, ordered, targets, candidates)
     bolded, unbolded = (
         _write_bold(apkg_path, output_path, cards, result, ordered, targets)
         if request.bold_target
@@ -1009,6 +1024,59 @@ def _write_bold(
         package._modified = True
         package.save(output_path)
     return bolded, len(ordered) - bolded
+
+
+def _write_core_model(
+    output_path: Path,
+    cards: Sequence[cull.InputCard],
+    result: CoreResult,
+    ordered: Sequence[int],
+    targets: Sequence[CoreTarget],
+    candidates: Sequence[CoreCandidate],
+) -> int:
+    """Set the core card templates and fill the core word field.
+
+    The function adds the ``Core`` field to the model, writes the core word of
+    each card into it, and sets the core templates and the CSS. The core word is
+    the assigned target. A card with no assigned target gets the held target of
+    the lowest position. A card that holds no target gets no core word.
+
+    :param output_path: Output APKG file.
+    :param cards: Input cards.
+    :param result: Selection result with the assignment.
+    :param ordered: Kept cards in card order.
+    :param targets: Core list.
+    :param candidates: Cards that passed the filter, with the targets they hold.
+    :returns: The count of cards that hold a core word.
+    """
+    by_key = {target.key: target for target in targets}
+    held = {candidate.index: candidate.targets for candidate in candidates}
+    filled = 0
+    with AnkiPackage(output_path) as package:
+        models = package.get_models(include_templates=True)
+        model_id = cull._find_model_id(models)
+        field_index = package.add_model_field(model_id, CORE_FIELD)
+        for index in ordered:
+            target = result.assigned.get(index)
+            if target is None and held.get(index):
+                target = min(
+                    held[index], key=lambda key: (by_key[key].position, key)
+                )
+            if target is None:
+                continue
+            package.update_note_field(
+                cards[index].note_id, field_index, by_key[target].form
+            )
+            filled += 1
+        package.update_model_template(model_id=model_id, css=cull.card_css())
+        count = len(models[model_id].get("tmpls", ()))
+        for number, (qfmt, afmt) in enumerate(CORE_TEMPLATES[:count]):
+            package.update_model_template(
+                model_id=model_id, qfmt=qfmt, afmt=afmt, template_index=number
+            )
+        package._modified = True
+        package.save(output_path)
+    return filled
 
 
 def _model_id(apkg_path: Path) -> str:

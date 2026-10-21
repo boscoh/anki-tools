@@ -70,12 +70,12 @@ the full filter. Section 3.2 explains the gap, and 5.3 the reserve option.
 | Selection       | greedy cover of a value minus a cost for outside words     |
 | Sentence rules  | simple, complete, unique, no name, no loan word, audio     |
 | Sense           | a card gets credit only when the English shows the sense    |
-| Card design     | the cull templates and CSS, with the target in bold        |
+| Card design     | audio-only front; the back adds the core word              |
 | Output size     | about 1.0 card per target at quota 2                       |
 | Swadesh reserve | off. 198 cards cannot fit a 300-card core deck             |
 
-Not in scope: new audio or TTS, a new note model or field, a grammar
-syllabus, and a change to the cull window.
+Not in scope: new audio or TTS, a new note model, a grammar syllabus, and a
+change to the cull window.
 
 ## 2. Target set
 
@@ -400,37 +400,45 @@ Code changes:
 
 ## 8. Card design
 
-The note model, its fields, and the note ids do not change. The model takes
-the templates and the CSS of `languages/french/cull.py`, so the deck looks
-like the 1,000-card deck and the Swadesh deck.
+The note ids do not change. The model gains one field, `Core`. Card 1 has its own
+front and back. Card 2 and the CSS are the cull values, so the deck looks like
+the 1,000-card deck and the Swadesh deck.
 
-| Card | Front                                            | Back                                                     |
-| ---- | ------------------------------------------------ | -------------------------------------------------------- |
-| 1, comprehension | the audio, and the hint `Tap to show the sentence` | the audio, the sentence with the bold target, the English |
-| 2, production    | the English, and the hint `Tap to show the French` | the English, the sentence with the bold target, the audio |
+| Card             | Front                                              | Back                                                                     |
+| ---------------- | -------------------------------------------------- | ------------------------------------------------------------------------ |
+| 1, comprehension | the audio only                                     | the audio, the sentence with the bold target, the English, the core word |
+| 2, production    | the English, and the hint `Tap to show the French` | the English, the sentence with the bold target, the audio                |
 
-| Part      | Value                                                            |
-| --------- | ---------------------------------------------------------------- |
-| Templates | `CARD_TEMPLATES`, written by `apply_card_templates`               |
-| CSS       | `card_css()`: `templates/card.css` plus the language `EXTRA_CSS`  |
-| Classes   | `.front-audio`, `.sentence`, `.english`, `.hint`, `.target`        |
-| Fields    | the input fields, no new field                                    |
-| Audio     | the input MP3 file                                                |
+| Part      | Value                                                                                     |
+| --------- | ----------------------------------------------------------------------------------------- |
+| Templates | `CORE_TEMPLATES`: the core card 1 and `CARD_TEMPLATES[1]`, written by `_write_core_model` |
+| CSS       | `card_css()`: `templates/card.css` plus the language `EXTRA_CSS`                          |
+| Classes   | `.front-audio`, `.sentence`, `.english`, `.hint`, `.target`                               |
+| Fields    | the input fields and `Core`                                                               |
+| Audio     | the input MP3 file                                                                        |
 
 The `assigned` target of section 6 is bold in the `French` field. A card can
 hold more than one target, and only the assigned target is bold. This marks
-the word on the answer side and needs no new field.
+the word in the sentence.
 
-| Input field  | Value of a kept card                                |
-| ------------ | --------------------------------------------------- |
-| `French`     | the sentence, with the assigned target in `<b>` tags |
-| `sound`      | `[sound:<input audio file>]`                        |
-| `Back`       | the English text of the card                        |
-| `freq ranks` | unchanged                                           |
+The `Core` field holds the core word for the back of card 1. It is the form of
+the assigned target. A card with no assigned target, such as a second example,
+gets the held target of the lowest position. A tail card that holds no target
+has an empty `Core` field, and the template hides the line.
+
+| Field        | Value of a kept card                                                           |
+| ------------ | ------------------------------------------------------------------------------ |
+| `French`     | the sentence, with the assigned target in `<b>` tags                           |
+| `sound`      | `[sound:<input audio file>]`                                                   |
+| `Back`       | the English text of the card                                                   |
+| `freq ranks` | unchanged                                                                      |
+| `Core`       | the core word of the card, as described above; empty for a card with no target |
 
 - `--bold-target` is on by default. `--no-bold-target` writes plain text.
 - The CSV holds the plain sentence; the markup stays in the APKG.
   `_plain_sentence` removes it on a later extract.
+- The `Core` field changes the note model. Anki can ask for a full sync when you
+  import the deck over an older copy of it.
 
 ## 9. Interface
 
@@ -505,7 +513,7 @@ non-zero.
 | K11  | the coverage CSV has one row per target, the counts match the cards, and every status is valid |
 | K12  | the manifest hashes match the two CSVs                               |
 | K13  | each target's cards hold its form or lemma                           |
-| K14  | the templates equal `CARD_TEMPLATES` and the CSS equals `card_css()` |
+| K14  | the templates equal `CORE_TEMPLATES` and the CSS equals `card_css()` |
 | K15  | the bold text is the assigned target, and the CSV holds plain text    |
 | K16  | every target with a card has a sense row, or the unchecked count is within `--max-unchecked-sense` |
 | K17  | no kept card holds a name or a loan word, and the manifest gives both counts |
@@ -669,6 +677,7 @@ to E5 are closed. Section 14.5 lists what remains.
 | `anki_tools/languages/french/core.py`       | targets, filter C1 to C5, sense, driver, CSV files, manifest, bold |
 | `anki_tools/languages/french/core_gates.py` | gates K1 to K18                                                    |
 | `anki_tools/cli.py`                         | `anki fix fr --core` and its options                               |
+| `anki_tools/apkg/package.py`                | `add_model_field`: add a field to an `anki2` model                 |
 | `vocab/french_core_senses.tsv`              | 51 rows: the top 50 tier F words and `ne`                          |
 | `vocab/french_loanwords.txt`                | 28 words                                                           |
 | `tests/test_core_deck.py`                   | 31 tests                                                           |
@@ -693,7 +702,7 @@ to E5 are closed. Section 14.5 lists what remains.
 | K11  | the coverage CSV agrees with the card CSV                                         |
 | K12  | the manifest hashes match the two CSV files                                       |
 | K13  | each target's cards hold its form or lemma                                        |
-| K14  | the templates and the CSS equal the cull values                                   |
+| K14  | the templates equal `CORE_TEMPLATES` and the CSS equals the cull CSS              |
 | K15  | 182 cards hold the bold assignment; the CSV holds plain text                      |
 | K16  | 0 unchecked targets                                                               |
 | K17  | 0 names and 0 loan words in the kept cards                                        |
@@ -714,6 +723,7 @@ to E5 are closed. Section 14.5 lists what remains.
 | Support words in the core cards | 247, of which 18 rare                                             |
 | New words from the tail         | 346                                                               |
 | Bold cards                      | 182, plain 118                                                    |
+| Cards with a core word          | 273                                                               |
 | Cards by pass                   | seed 99, depth 25, completion 82, tail 94                         |
 | Filter reasons                  | F1 163, F2 1,869, F5 22, F7 22, F8 410, C1 39, C2 8, C3 25, C4 32 |
 | Other reasons                   | similar 6, card cap 3,032                                         |

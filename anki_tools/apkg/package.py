@@ -515,6 +515,53 @@ class AnkiPackage:
         self.conn.commit()
         self._modified = True
 
+    def add_model_field(self, model_id: str, name: str) -> int:
+        """
+        Add a field to the end of a note type and give every note an empty value.
+
+        The method reads the legacy ``anki2`` format only. A model that already
+        has the field is left as it is.
+
+        :param model_id: Model ID to change.
+        :param name: Name of the new field.
+        :raises NotImplementedError: The package is not in the ``anki2`` format.
+        :raises ValueError: If model not found.
+        :returns: Zero-based index of the field.
+        """
+        if self._db_format != "anki2":
+            raise NotImplementedError(
+                f"add_model_field needs the anki2 format, not {self._db_format}"
+            )
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT models FROM col")
+        models = json.loads(cursor.fetchone()[0])
+        if model_id not in models:
+            raise ValueError(f"Model {model_id} not found")
+        model = models[model_id]
+        fields = model["flds"]
+        for index, existing in enumerate(fields):
+            if existing["name"] == name:
+                return index
+
+        template = dict(fields[-1])
+        template.update({"name": name, "ord": len(fields), "media": []})
+        fields.append(template)
+        model["mod"] = int(time.time())
+        model["usn"] = -1
+        cursor.execute(
+            "UPDATE col SET models = ? WHERE id = 1", (json.dumps(models),)
+        )
+        cursor.execute("SELECT id, flds FROM notes WHERE mid = ?", (int(model_id),))
+        mod_time = int(time.time())
+        for row in cursor.fetchall():
+            cursor.execute(
+                "UPDATE notes SET flds = ?, mod = ?, usn = -1 WHERE id = ?",
+                (row["flds"] + "\x1f", mod_time, row["id"]),
+            )
+        self.conn.commit()
+        self._modified = True
+        return len(fields) - 1
+
     def get_notes(self) -> list[sqlite3.Row]:
         """
         Get all notes from the collection.
