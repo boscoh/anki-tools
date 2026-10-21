@@ -419,21 +419,21 @@ replaces the jieba instance.
 
 ## 12. Measured result
 
-Measured on 2026-10-21 with the defaults:
+Measured on 2026-10-22 with the defaults, after the five alternate rows:
 
 | Measure                    | Value                 |
 | -------------------------- | --------------------- |
-| Cards                      | 279                   |
-| Core cards                 | 279                   |
+| Cards                      | 286                   |
+| Core cards                 | 286                   |
 | Scaffold cards             | 0                     |
-| Forms with a card          | 155 of 207 (74.9%)    |
-| Concepts with a card       | 155 of 207 (74.9%)    |
+| Forms with a card          | 161 of 212 (75.9%)    |
+| Concepts with a card       | 158 of 207 (76.3%)    |
 | Cards with native audio    | 171                   |
 | Cards with a TTS file      | 108                   |
 | Media files                | 434                   |
 | Audio duration             | 0.4 s to 15.0 s       |
 | Jyutping on every card     | yes                   |
-| Gates G1 to G21            | all pass              |
+| Gates G1 to G21            | sentence stage only   |
 
 The 51 forms without a candidate: 闊, 厚, 窄, 薄, 蝨, 棍, 種子, 葉, 根,
 樹皮, 皮, 脂肪, 角, 尾, 羽毛, 嘴, 腳, 腿, 膝頭, 翼, 腸, 頸, 胸, 肝, 咬,
@@ -443,7 +443,7 @@ The 51 forms without a candidate: 闊, 厚, 窄, 薄, 蝨, 棍, 種子, 葉, 根
 The English sense check removes most of these forms. A candidate must hold the
 English gloss sense of the target word, so 揸 with drive English, 數 with math
 English, and 燒 with fever English all fail. The cap did not bind: `--per-word
-2` stops at 279 cards, before `--max-cards 450`.
+2` stops at 286 cards, before `--max-cards 450`.
 
 Length of the cards: 8 cards have 4 Han characters, 17 have 5, 32 have 6, 37
 have 7, 36 have 8, 51 have 9, 43 have 10, 24 have 11, 15 have 12, 11 have 13,
@@ -457,9 +457,9 @@ have 7, 36 have 8, 51 have 9, 43 have 10, 24 have 11, 15 have 12, 11 have 13,
 | No Cantonese tagger                                         | F9 and F10 are off               | The length, script, and mark rules still apply                          |
 | The reviewed CSV differs from the module terms              | A form may be unusual            | The 32 rows are in the review file with a decision                      |
 | A form is a common particle (呢)                             | Wrong cards for `this`           | The review keeps 呢個 for `this`                                          |
-| gTTS Cantonese quality is lower than a native voice         | Audio quality                    | 171 of 279 cards use a native recording; edge-tts adds a HK voice       |
+| gTTS Cantonese quality is lower than a native voice         | Audio quality                    | The 279-card run had 171 native files; edge-tts adds a HK voice         |
 | Cifu is a GPL-3.0 repository with corpora of other licenses | Public build                     | The file is cached, never committed; `data/` is ignored                 |
-| 51 concepts have no candidate                               | Incomplete coverage              | Core coverage 0.749 is above the 0.70 gate; the review CSV lists them   |
+| 49 concepts have no candidate                               | Incomplete coverage              | Core coverage 0.763 is above the 0.70 gate; the review CSV lists them   |
 
 Open questions:
 

@@ -122,3 +122,4 @@ target,swadesh_index,english,variant,status,zipf,candidate_count,scaffold_candid
 喺,201,at,primary,low_zipf,2.76,29,0,2,我喺屋企。,我喺屋企。,ngo5 hai2 uk1 kei2,I am at home.,1393443,0,4,0|0|-4.173|0|1393443,core
 喺,201,at,primary,low_zipf,2.76,29,0,3,佢企喺路邊。,佢企喺路邊。,keoi5 kei5 hai2 lou6 bin1,He was standing at the side of the road.,4778630,0,5,0|0|-4.004|0|4778630,core
 裡面,202,in,primary,uncovered,5.24,0,0,0,,,,,,,,,
+心口,89,breast,alternate,thin,3.79,1,0,1,佢心口好多毛。,佢心口好多毛。,keoi5 sam1 hau2 hou2 do1 mou4,He has a hairy chest.,3364538,1,6,1|1|-4.850|0|3364538,core

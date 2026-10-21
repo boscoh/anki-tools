@@ -64,11 +64,12 @@ def _write_tsv(path: Path, rows: list[tuple[object, ...]]) -> Path:
     return path
 
 
-def test_reviewed_table_has_207_rows() -> None:
+def test_reviewed_table_has_207_concepts() -> None:
     table = cantonese.load_word_table()
 
-    assert len(table) == 207
-    assert len({form.cantonese for form in table}) == 207
+    assert len({form.swadesh_index for form in table}) == 207
+    assert len(table) == 212
+    assert len({form.cantonese for form in table}) == 212
     assert all(form.jyutping for form in table)
 
 
@@ -82,9 +83,11 @@ def test_sew_form_is_the_verb_to_sew() -> None:
 
 
 def _module_terms() -> dict[int, tuple[str, ...]]:
-    return {
-        form.swadesh_index: (form.cantonese,) for form in cantonese.load_word_table()
-    }
+    """Give every form of an index, so an alternate row keeps its primary."""
+    terms: dict[int, list[str]] = {}
+    for form in cantonese.load_word_table():
+        terms.setdefault(form.swadesh_index, []).append(form.cantonese)
+    return {index: tuple(forms) for index, forms in terms.items()}
 
 
 def test_check_word_table_accepts_the_reviewed_files(

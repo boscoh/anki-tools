@@ -61,6 +61,7 @@ from anki_tools.languages.cantonese.frequency import (
 DEFAULT_CSV_PATH = Path("vocab/english-cantonese.csv")
 DEFAULT_SWADESH_PATH = Path("vocab/swadesh.txt")
 DEFAULT_REVIEW_PATH = Path("vocab/cantonese_word_review.csv")
+DEFAULT_VARIANT_ROWS_PATH = Path("vocab/cantonese_variant_rows.csv")
 SENTENCES_PATH = Path("vocab/cantonese_sentences.csv")
 SENTENCE_REVIEW_PATH = Path("vocab/cantonese_sentences_review.csv")
 POOL_REPORT_PATH = Path("data/cantonese_pool_report.json")
@@ -357,14 +358,31 @@ def form_kind(form: str) -> str:
     return "single" if " " not in form.strip() else "phrase"
 
 
+def read_variant_rows(path: Path = DEFAULT_VARIANT_ROWS_PATH) -> list[dict[str, str]]:
+    """Read the alternate form rows of the Cantonese word table.
+
+    :param path: CSV file of variant rows. A missing file gives no rows.
+    :returns: One mapping per row.
+    """
+    if not Path(path).exists():
+        return []
+    return read_csv_rows(path)
+
+
 def load_word_table(
-    csv_path: Path = DEFAULT_CSV_PATH, swadesh_path: Path = DEFAULT_SWADESH_PATH
+    csv_path: Path = DEFAULT_CSV_PATH,
+    swadesh_path: Path = DEFAULT_SWADESH_PATH,
+    variant_path: Path = DEFAULT_VARIANT_ROWS_PATH,
 ) -> list[WordForm]:
     """Load the reviewed Cantonese word table.
 
     :param csv_path: Reviewed word CSV with columns
         ``english,cantonese,transliteration``.
     :param swadesh_path: File with one English label per line.
+    :param variant_path: Optional CSV of alternate forms. A variant row
+        carries ``swadesh_index``, ``cantonese``, and ``transliteration``. It
+        joins the table as ``variant=alternate``, so it gets its own cards
+        and the primary form keeps the first place.
     :raises ValueError: The row count or a form is wrong.
     :returns: One :class:`WordForm` per concept.
     """
@@ -388,6 +406,22 @@ def load_word_table(
                 zipf=zipf_frequency(convert_to_simplified(form), "zh"),
                 candidate_count=int(row.get("candidate_count") or 0),
                 tier=row.get("tier") or "core",
+            )
+        )
+    for row in read_variant_rows(variant_path):
+        index = int(row["swadesh_index"])
+        form = prepare_text(row.get("cantonese", ""))
+        if not form:
+            raise ValueError(f"variant row {index}: empty Cantonese form")
+        table.append(
+            WordForm(
+                swadesh_index=index,
+                english=labels[index - 1],
+                cantonese=form,
+                jyutping=row.get("transliteration", "").strip(),
+                variant=row.get("variant") or "alternate",
+                form_kind=form_kind(form),
+                zipf=zipf_frequency(convert_to_simplified(form), "zh"),
             )
         )
     return table
