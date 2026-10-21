@@ -5,16 +5,20 @@ Core classes:
     AnkiPackage - Read, edit, and create .apkg files
 
 Modules:
-    package  - Core AnkiPackage class
-    rank     - Sentence ranking by frequency/complexity
-    reorder  - Deck reordering based on ranking
-    pinyin   - Pinyin correction and formatting
-    cli      - Command-line interface
+    apkg.package    - Core AnkiPackage class
+    apkg.templates  - Card template partials
+    ranking.rank    - Sentence ranking by frequency and complexity
+    ranking.reorder - Deck reordering based on ranking
+    ranking.cull_fr - French cull pipeline
+    mandarin        - Mandarin audio, audit, deck, fetch, swadesh, pinyin
+    cantonese       - Cantonese jyutping, frequency, and sentence selection
+    sentence_pack   - Shared Swadesh sentence pack stages
+    cli             - Command-line interface
 """
 
-from anki_tools.package import AnkiPackage
-from anki_tools.pinyin import fix_pinyin
-from anki_tools.rank import (
+from anki_tools.apkg.package import AnkiPackage
+from anki_tools.mandarin.pinyin import fix_pinyin
+from anki_tools.ranking.rank import (
     FrequencyData,
     Sentence,
     char_similarity_zh,
@@ -26,7 +30,7 @@ from anki_tools.rank import (
     reduce_sentences_stratified,
     write_ranking_csv,
 )
-from anki_tools.reorder import load_ranking, reorder_deck
+from anki_tools.ranking.reorder import load_ranking, reorder_deck
 
 __all__ = [
     "AnkiPackage",

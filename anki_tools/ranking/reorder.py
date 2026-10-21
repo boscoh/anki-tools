@@ -7,8 +7,8 @@ Reads ranking from CSV and updates card order in the APKG file.
 import csv
 import sys
 
-from anki_tools.package import AnkiPackage
-from anki_tools.rank import SIMILARITY_CONSIDER_DELETE_PENALTY
+from anki_tools.apkg.package import AnkiPackage
+from anki_tools.ranking.rank import SIMILARITY_CONSIDER_DELETE_PENALTY
 
 csv.field_size_limit(sys.maxsize)
 

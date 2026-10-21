@@ -18,7 +18,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Callable, Iterable, Sequence
 
-from anki_tools.package import AnkiPackage
+from anki_tools.apkg.package import AnkiPackage
 from anki_tools.sentence_pack.audio import (
     NATIVE_LICENSE_BLOCK,
     PRIVATE_PACK,
@@ -29,7 +29,7 @@ from anki_tools.sentence_pack.profile import (
     WordRow,
     excluded_forms,
 )
-from anki_tools.templates import load_char_links
+from anki_tools.apkg.templates import load_char_links
 
 CSS_PATH = Path("templates/card.css")
 CHECKSUMS_PATH = Path("data/tatoeba/checksums.json")

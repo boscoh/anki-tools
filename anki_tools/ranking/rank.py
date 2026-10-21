@@ -17,8 +17,8 @@ from urllib.request import urlopen
 import jieba
 from wordfreq import iter_wordlist
 
-from anki_tools.jyutping import get_jyutping, simplified_to_traditional
-from anki_tools.package import AnkiPackage
+from anki_tools.cantonese.jyutping import get_jyutping, simplified_to_traditional
+from anki_tools.apkg.package import AnkiPackage
 
 try:
     import spacy
@@ -366,7 +366,7 @@ def load_frequency_data_yue(
     that the Mandarin ``zh`` list misses. The genre is written Chinese.
 
     The ``spoken`` and ``blend`` sources use the Cifu spoken counts. See
-    :mod:`anki_tools.yue_frequency`.
+    :mod:`anki_tools.cantonese.frequency`.
 
     The download runs when a cached file is absent.
 
@@ -377,7 +377,10 @@ def load_frequency_data_yue(
     :returns: Filled :class:`FrequencyData`.
     """
     if source != "written":
-        from anki_tools.yue_frequency import load_yue_frequency, to_frequency_data
+        from anki_tools.cantonese.frequency import (
+            load_yue_frequency,
+            to_frequency_data,
+        )
 
         data = to_frequency_data(
             load_yue_frequency(freq=source, spoken_weight=spoken_weight), max_words

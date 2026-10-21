@@ -28,6 +28,8 @@ uv sync
 
 After installation, the `anki` command is available via `uv run anki`.
 
+See `docs/anki-tools-layout.md` for the package layout.
+
 ## Quick Start
 
 ### CLI Commands

@@ -15,8 +15,8 @@ from typing import Collection
 
 import pytest
 
-from anki_tools import cull_fr
-from anki_tools.package import AnkiPackage
+from anki_tools.ranking import cull_fr
+from anki_tools.apkg.package import AnkiPackage
 from anki_tools.sentence_pack.audit import sha256_value
 
 ENGLISH = "A short English line."

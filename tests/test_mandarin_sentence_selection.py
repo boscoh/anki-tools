@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from anki_tools.mandarin_swadesh import (
+from anki_tools.mandarin.swadesh import (
     MANDARIN,
     SENTENCE_FIELDS,
     SENTENCE_REVIEW_FIELDS,

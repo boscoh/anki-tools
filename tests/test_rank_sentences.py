@@ -2,7 +2,7 @@
 
 import pytest
 
-from anki_tools.rank import (
+from anki_tools.ranking.rank import (
     FrequencyData,
     complexity_score_zh,
     frequency_score_zh,

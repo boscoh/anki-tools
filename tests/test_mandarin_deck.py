@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from anki_tools import mandarin_deck as deck
-from anki_tools.mandarin_swadesh import WordForm
-from anki_tools.package import AnkiPackage
-from anki_tools.templates import load_char_links
+from anki_tools.mandarin import deck
+from anki_tools.mandarin.swadesh import WordForm
+from anki_tools.apkg.package import AnkiPackage
+from anki_tools.apkg.templates import load_char_links
 
 FAKE_MP3 = b"ID3\x03\x00\x00\x00" + b"\x00" * 64
 

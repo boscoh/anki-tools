@@ -38,8 +38,8 @@ from anki_tools.sentence_pack.languages.mandarin import (
     check_word_table,
     load_word_table,
 )
-from anki_tools.mandarin_deck import audio_author_map
-from anki_tools.rank import get_chinese_chars
+from anki_tools.mandarin.deck import audio_author_map
+from anki_tools.ranking.rank import get_chinese_chars
 from anki_tools.sentence_pack.audio import AUDIO_INDEX_NAME
 
 OUTPUT_PATH = MANDARIN.output_apkg

@@ -2,7 +2,7 @@
 
 from anki_tools.sentence_pack.languages.cantonese import CANTONESE
 from anki_tools.sentence_pack.languages.mandarin import MANDARIN
-from anki_tools.templates import CHAR_LINKS_PATH, load_char_links
+from anki_tools.apkg.templates import CHAR_LINKS_PATH, load_char_links
 
 
 def test_script_links_to_cc_canto() -> None:

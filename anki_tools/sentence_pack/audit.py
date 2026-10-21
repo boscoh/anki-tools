@@ -16,7 +16,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Callable, Iterable, Sequence
 
-from anki_tools.package import AnkiPackage
+from anki_tools.apkg.package import AnkiPackage
 from anki_tools.sentence_pack.audio import (
     AUDIO_INDEX_NAME,
     MAX_DURATION_S,

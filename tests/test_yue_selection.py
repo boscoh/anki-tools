@@ -5,8 +5,12 @@ from pathlib import Path
 import jieba
 import pytest
 
-from anki_tools.rank import Sentence, load_frequency_data_yue, yue_frequency_path
-from anki_tools.yue_frequency import (
+from anki_tools.ranking.rank import (
+    Sentence,
+    load_frequency_data_yue,
+    yue_frequency_path,
+)
+from anki_tools.cantonese.frequency import (
     CifuEntry,
     FreqRow,
     YueFrequency,
@@ -21,7 +25,7 @@ from anki_tools.yue_frequency import (
     write_freq_change_csv,
     write_frequency_tsv,
 )
-from anki_tools.yue_select import (
+from anki_tools.cantonese.select import (
     UNRANKED,
     Candidate,
     SelectionOptions,
@@ -477,7 +481,7 @@ class TestWrittenRegression:
         def boom(*_args: object, **_kwargs: object) -> None:
             raise AssertionError("the written source read Cifu")
 
-        monkeypatch.setattr("anki_tools.yue_frequency.load_yue_frequency", boom)
+        monkeypatch.setattr("anki_tools.cantonese.frequency.load_yue_frequency", boom)
         data = load_frequency_data_yue(source="written", max_words=1000)
         assert data.word_freq
         assert data.word_freq.get("係", 0) > 0

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from anki_tools import mandarin_audio as audio
+from anki_tools.mandarin import audio
 
 VOICE = "zh-CN-XiaoxiaoNeural"
 RATE = "-10%"

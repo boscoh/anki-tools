@@ -26,8 +26,8 @@ from path import Path
 from rich.console import Console
 from rich.pretty import Pretty
 
-from anki_tools.package import AnkiPackage
-from anki_tools.rank import latin_text_dedup_key, word_similarity_fr
+from anki_tools.apkg.package import AnkiPackage
+from anki_tools.ranking.rank import latin_text_dedup_key, word_similarity_fr
 
 _ROOT = Path(__file__).absolute().parent.parent
 _ARCHIVE = _ROOT / "archive" / "tibetan"

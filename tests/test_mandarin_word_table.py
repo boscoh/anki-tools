@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from anki_tools.mandarin_swadesh import (
+from anki_tools.mandarin.swadesh import (
     SWADESH_ROWS,
     WordForm,
     check_word_table,

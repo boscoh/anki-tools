@@ -27,7 +27,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Collection, Iterable, Iterator, Sequence
 
-from anki_tools.package import AnkiPackage
+from anki_tools.apkg.package import AnkiPackage
 from anki_tools.sentence_pack.audit import sha256_value
 from anki_tools.sentence_pack.audio import probe_duration
 from anki_tools.sentence_pack.languages.french import EXTRA_CSS, TOKENIZER
@@ -52,7 +52,7 @@ SWADESH_AUDIO_FIELD = "Audio"
 SWADESH_TOTAL = 207
 SWADESH_EXCEPTIONS = ("intestins",)
 RESERVE_TAGS = " swadesh "
-CARD_CSS_PATH = Path(__file__).parent.parent / "templates" / "card.css"
+CARD_CSS_PATH = Path(__file__).parent.parent.parent / "templates" / "card.css"
 FRONT_HINT = "Tap to show the sentence"
 REVERSE_HINT = "Tap to show the French"
 FRONT_TEMPLATE = (

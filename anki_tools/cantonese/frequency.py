@@ -20,7 +20,7 @@ from typing import Any, Protocol
 
 import jieba
 
-from anki_tools.rank import (
+from anki_tools.ranking.rank import (
     FrequencyData,
     Sentence,
     _read_word_count_tsv,
@@ -34,7 +34,7 @@ CIFU_URL = "https://raw.githubusercontent.com/gwinterstein/Cifu/master/Lexicon/C
 CIFU_ATTRIBUTION = (
     "Cantonese spoken frequency: Cifu, Lai and Winterstein 2020 (gwinterstein/Cifu)"
 )
-VOCAB_DIR = Path(__file__).resolve().parent.parent / "vocab"
+VOCAB_DIR = Path(__file__).resolve().parent.parent.parent / "vocab"
 VARIANTS_PATH = VOCAB_DIR / "yue_variants.tsv"
 OVERRIDES_PATH = VOCAB_DIR / "yue_frequency_overrides.tsv"
 FREQUENCY_PATH = Path("data/yue_frequency.tsv")

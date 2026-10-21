@@ -17,13 +17,18 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from anki_tools.mandarin_swadesh import check_sentence_shape
-from anki_tools.rank import (
+from anki_tools.mandarin.swadesh import check_sentence_shape
+from anki_tools.ranking.rank import (
     Sentence,
     char_similarity_zh_same_len,
     get_chinese_chars,
 )
-from anki_tools.yue_frequency import VOCAB_DIR, Tokenizer, YueFrequency, han_tokens
+from anki_tools.cantonese.frequency import (
+    VOCAB_DIR,
+    Tokenizer,
+    YueFrequency,
+    han_tokens,
+)
 
 NAMES_PATH = VOCAB_DIR / "yue_names.tsv"
 EXEMPT_TOP = 100
@@ -166,7 +171,7 @@ def check_sentence(
 ) -> str:
     """Apply rules Y1 to Y8 in order.
 
-    Rules Y1 to Y6 reuse :func:`anki_tools.mandarin_swadesh.check_sentence_shape`.
+    Rules Y1 to Y6 reuse :func:`anki_tools.mandarin.swadesh.check_sentence_shape`.
     Rule Y8 matches the substrings of ``options.names``.
 
     :param text: Sentence text.
@@ -318,7 +323,7 @@ def select_yue_sentences(
 ) -> SelectionReport:
     """Filter and select sentences, then set the selection fields on each.
 
-    :param ranked: Sentences from :func:`anki_tools.rank.rank_sentences_yue`, best first.
+    :param ranked: Sentences from :func:`anki_tools.ranking.rank.rank_sentences_yue`, best first.
     :param dropped: Sentences that the ranker removed as repeats (reason Y3).
     :param freq: The ranked frequency list.
     :param tokenizer: Cantonese tokenizer.

@@ -30,8 +30,8 @@ import jieba
 import opencc
 from wordfreq import top_n_list, zipf_frequency
 
-from anki_tools.jyutping import get_jyutping
-from anki_tools.rank import (
+from anki_tools.cantonese.jyutping import get_jyutping
+from anki_tools.ranking.rank import (
     char_similarity_zh,
     get_chinese_chars,
     is_chinese_char,
@@ -50,7 +50,7 @@ from anki_tools.sentence_pack.guards import (
 )
 from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
 from anki_tools.sentence_pack.select import rank_order, review_status
-from anki_tools.yue_frequency import (
+from anki_tools.cantonese.frequency import (
     build_yue_tokenizer,
     cifu_path,
     download_cifu,

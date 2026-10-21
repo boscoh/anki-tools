@@ -5,7 +5,7 @@ from pathlib import Path
 
 import opencc
 
-from anki_tools.package import AnkiPackage
+from anki_tools.apkg.package import AnkiPackage
 
 try:
     import ToJyutping

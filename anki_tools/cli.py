@@ -21,17 +21,17 @@ from typing import Literal
 import cyclopts
 from gtts import gTTS
 
-from anki_tools import cull_fr as french_cull
-from anki_tools.jyutping import fix_jyutping
-from anki_tools.mandarin_audio import (
+from anki_tools.ranking import cull_fr as french_cull
+from anki_tools.cantonese.jyutping import fix_jyutping
+from anki_tools.mandarin.audio import (
     DEFAULT_VOICE as MANDARIN_DEFAULT_VOICE,
     generate_audio,
     load_sentence_rows,
 )
-from anki_tools.mandarin_audit import print_audit, run_audit
-from anki_tools.mandarin_deck import build_pack
-from anki_tools.mandarin_fetch import fetch_tatoeba
-from anki_tools.mandarin_swadesh import (
+from anki_tools.mandarin.audit import print_audit, run_audit
+from anki_tools.mandarin.deck import build_pack
+from anki_tools.mandarin.fetch import fetch_tatoeba
+from anki_tools.mandarin.swadesh import (
     build_candidate_pool,
     build_pack_report,
     check_word_table,
@@ -42,7 +42,7 @@ from anki_tools.mandarin_swadesh import (
     write_sentence_csv,
     write_sentence_review_csv,
 )
-from anki_tools.package import AnkiPackage
+from anki_tools.apkg.package import AnkiPackage
 from anki_tools.sentence_pack import audio as pack_audio
 from anki_tools.sentence_pack import pack as sentence_pack
 from anki_tools.sentence_pack import pool as sentence_pool
@@ -53,8 +53,8 @@ from anki_tools.sentence_pack.audit import sha256_value
 from anki_tools.sentence_pack.languages import cantonese as cantonese_lang
 from anki_tools.sentence_pack.languages import french as french_lang
 from anki_tools.sentence_pack.languages import greek as greek_lang
-from anki_tools.pinyin import fix_pinyin
-from anki_tools.rank import (
+from anki_tools.mandarin.pinyin import fix_pinyin
+from anki_tools.ranking.rank import (
     Sentence,
     YUE_FREQUENCY_ATTRIBUTION,
     char_similarity_zh_same_len,
@@ -69,9 +69,9 @@ from anki_tools.rank import (
 )
 
 
-from anki_tools.reorder import reorder_deck
-from anki_tools.templates import load_char_links
-from anki_tools.yue_frequency import (
+from anki_tools.ranking.reorder import reorder_deck
+from anki_tools.apkg.templates import load_char_links
+from anki_tools.cantonese.frequency import (
     CIFU_ATTRIBUTION,
     FREQUENCY_PATH,
     build_yue_tokenizer,
@@ -84,7 +84,7 @@ from anki_tools.yue_frequency import (
     write_freq_change_csv,
     write_frequency_tsv,
 )
-from anki_tools.yue_select import (
+from anki_tools.cantonese.select import (
     SelectionOptions,
     print_selection_summary,
     read_names,

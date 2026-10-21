@@ -6,7 +6,7 @@ from pathlib import Path
 
 from pypinyin import Style, pinyin
 
-from anki_tools.package import AnkiPackage
+from anki_tools.apkg.package import AnkiPackage
 
 POLYPHONIC_SKIP = {
     "音樂",
