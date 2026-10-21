@@ -1,6 +1,7 @@
 # anki_tools Package Layout
 
-The package groups the modules by domain. Each file below has one job.
+The package groups the modules by domain. Each file has one job. A language
+lives in one directory only.
 
 ## 1. Top level
 
@@ -8,6 +9,9 @@ The package groups the modules by domain. Each file below has one job.
 | ------------------------ | ------------------------------------------------ |
 | `anki_tools/__init__.py` | Public exports of the package                    |
 | `anki_tools/cli.py`      | Cyclopts command tree and the `anki` entry point |
+
+`__init__.py` loads a language helper on first use. Importing the package loads
+no language package.
 
 ## 2. apkg
 
@@ -18,54 +22,75 @@ The package groups the modules by domain. Each file below has one job.
 
 ## 3. ranking
 
-| Path                            | Content                                             |
-| ------------------------------- | --------------------------------------------------- |
-| `anki_tools/ranking/rank.py`    | Rank sentences by frequency, complexity, similarity |
-| `anki_tools/ranking/reorder.py` | Reorder a deck from a ranking CSV                   |
-| `anki_tools/ranking/cull_fr.py` | French 1000-sentence cull pipeline                  |
+Shared ranking code only. No language data.
 
-## 4. mandarin
+| Path                             | Content                                          |
+| -------------------------------- | ------------------------------------------------ |
+| `anki_tools/ranking/rank.py`     | Frequency, complexity, and similarity scores     |
+| `anki_tools/ranking/latin.py`    | Shared Latin-script text helpers                 |
+| `anki_tools/ranking/reorder.py`  | Reorder a deck from a ranking CSV                |
 
-These modules keep the Mandarin caller code for the shared stages.
-
-| Path                             | Content                                         |
-| -------------------------------- | ----------------------------------------------- |
-| `anki_tools/mandarin/pinyin.py`  | Pinyin repair for Chinese cards                 |
-| `anki_tools/mandarin/fetch.py`   | S0 Tatoeba fetch caller                         |
-| `anki_tools/mandarin/swadesh.py` | S1 to S3 word table, pool, and selection caller |
-| `anki_tools/mandarin/audio.py`   | S4 audio cache caller                           |
-| `anki_tools/mandarin/deck.py`    | S5 APKG build caller                            |
-| `anki_tools/mandarin/audit.py`   | Gates G1 to G18 for the Mandarin pack           |
-
-## 5. cantonese
-
-| Path                                | Content                                             |
-| ----------------------------------- | --------------------------------------------------- |
-| `anki_tools/cantonese/jyutping.py`  | Jyutping repair and Traditional conversion          |
-| `anki_tools/cantonese/frequency.py` | Blended spoken and written frequency list           |
-| `anki_tools/cantonese/select.py`    | Rules Y1 to Y8 and the Cantonese sentence selection |
-
-## 6. sentence_pack
+## 4. sentence_pack
 
 The shared Swadesh sentence pipeline. The stage order and the guard order are
 in `docs/swadesh-sentence-flow.md`.
 
-| Path                                      | Content                                |
-| ----------------------------------------- | -------------------------------------- |
-| `anki_tools/sentence_pack/pool.py`        | S2 candidate pool and guard tables     |
-| `anki_tools/sentence_pack/select.py`      | S3 greedy cover and duplicate guard    |
-| `anki_tools/sentence_pack/audio.py`       | S4 audio cache                         |
-| `anki_tools/sentence_pack/pack.py`        | S5 APKG build                          |
-| `anki_tools/sentence_pack/audit.py`       | Gate runner and language-neutral gates |
-| `anki_tools/sentence_pack/guards.py`      | Shared span and occurrence helpers     |
-| `anki_tools/sentence_pack/languages/*.py` | One profile per language               |
+| Path                                     | Content                                |
+| ---------------------------------------- | -------------------------------------- |
+| `anki_tools/sentence_pack/profile.py`    | Profile dataclass and the profile registry |
+| `anki_tools/sentence_pack/tatoeba.py`    | S0 Tatoeba fetch cache                 |
+| `anki_tools/sentence_pack/pool.py`       | S2 candidate pool and guard tables     |
+| `anki_tools/sentence_pack/select.py`     | S3 greedy cover and duplicate guard    |
+| `anki_tools/sentence_pack/audio.py`      | S4 audio cache                         |
+| `anki_tools/sentence_pack/pack.py`       | S5 APKG build                          |
+| `anki_tools/sentence_pack/audit.py`      | Gate runner and language-neutral gates |
+| `anki_tools/sentence_pack/guards.py`     | Shared sentence-shape and span helpers |
+| `anki_tools/sentence_pack/tokens.py`     | Shared token and romanization helpers  |
+| `anki_tools/sentence_pack/english_sense.py` | English gloss sense check           |
 
-## 7. Import rules
+## 5. languages
 
-- `sentence_pack` holds the shared pipeline. A language package holds the
-  caller code and the language data.
-- `apkg` holds the file model and the template resources. It does not import a
+One package per language. The package holds all the code of that language.
+
+| Path                                         | Content                                  |
+| -------------------------------------------- | ---------------------------------------- |
+| `anki_tools/languages/registry.py`           | `LANGUAGES`, `ALIASES`, and the CLI list |
+| `anki_tools/languages/cantonese/profile.py`  | Cantonese profile and word metrics       |
+| `anki_tools/languages/cantonese/frequency.py` | Spoken and written frequency list       |
+| `anki_tools/languages/cantonese/jyutping.py` | Jyutping repair and Traditional convert  |
+| `anki_tools/languages/cantonese/select.py`   | Rules Y1 to Y8 and the sentence selection |
+| `anki_tools/languages/cantonese/rank.py`     | Cantonese sentence ranking               |
+| `anki_tools/languages/mandarin/profile.py`   | Mandarin profile and word metrics        |
+| `anki_tools/languages/mandarin/pinyin.py`    | Pinyin repair for Chinese cards          |
+| `anki_tools/languages/mandarin/rank.py`      | Mandarin sentence ranking                |
+| `anki_tools/languages/mandarin/stages.py`    | S1 to S3 caller of the shared pipeline   |
+| `anki_tools/languages/french/profile.py`     | French profile and form matching         |
+| `anki_tools/languages/french/rank.py`        | French sentence ranking                  |
+| `anki_tools/languages/french/cull.py`        | French 1000-sentence cull pipeline       |
+| `anki_tools/languages/greek/profile.py`      | Greek profile and form matching          |
+| `anki_tools/languages/greek/rank.py`         | Greek sentence ranking                   |
+| `anki_tools/languages/spanish/rank.py`       | Spanish sentence ranking                 |
+
+Each language package gives the profile names, so
+`from anki_tools.languages import cantonese` gives the same names as a flat
+language module.
+
+A language with no profile module (`spanish`) has ranking code only. The
+`anki swadesh build` command serves it from `vocab/english-<lang>.csv` and an
+audio directory.
+
+## 6. Import rules
+
+- `languages/<lang>/` holds all the code of a language. No other directory
+  holds language code.
+- `sentence_pack` and `ranking` hold the shared stages and the shared scores.
+  They import no language package.
+- `apkg` holds the file model and the template resources. It imports no
   language package.
-- `ranking.rank` holds the shared ranking functions. It also holds the Chinese
-  and Cantonese similarity helpers.
-- `cli.py` is the only module that imports every package.
+- `cli.py` builds the command list from `languages.registry`. It is the only
+  module that imports every package.
+- One key for each language. `languages.registry.ALIASES` maps a short code
+  (`yue`, `cmn`, `zh`, `el`) to the canonical name.
+
+`tests/test_language_layout.py` enforces the rule for `ranking` and
+`sentence_pack`.

@@ -11,7 +11,7 @@ import pytest
 from anki_tools.sentence_pack import audio, pack, pool, select
 from anki_tools.sentence_pack.audit import AuditInputs, gate_target_in_table
 from anki_tools.sentence_pack.guards import check_sentence_shape
-from anki_tools.sentence_pack.languages import greek
+from anki_tools.languages import greek
 
 
 def _form(

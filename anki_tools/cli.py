@@ -50,10 +50,11 @@ from anki_tools.sentence_pack import select as sentence_select
 from anki_tools.sentence_pack import tatoeba as sentence_tatoeba
 from anki_tools.sentence_pack.audit import print_audit as print_gate_table
 from anki_tools.sentence_pack.audit import sha256_value
-from anki_tools.sentence_pack.languages import (
+from anki_tools.languages import (
     LANGUAGES,
     get_profile,
     profile_languages,
+    resolve,
     swadesh_languages,
 )
 from anki_tools.languages.cantonese.rank import rank_sentences_yue
@@ -1596,7 +1597,7 @@ def build(language: str, prune: bool = True):
     :param language: One of the supported languages, or all.
     :param prune: Delete audio files that the current list does not use.
     """
-    lang = language.lower().strip()
+    lang = resolve(language)
     if lang == "all":
         for name in SWADESH_LANGUAGES:
             _build_apkg(name, prune=prune)
@@ -1664,7 +1665,7 @@ def sentences(
     :param max_words: Maximum word count for a sentence-pack card. The profile
         default applies when empty.
     """
-    lang = language.lower().strip()
+    lang = resolve(language)
     entry = LANGUAGES.get(lang)
     if entry is not None and entry.module is not None:
         _language_sentences(
@@ -1732,7 +1733,7 @@ def sentence_audio(
     :param pack_license: public or private.
     :param tts: TTS engine, gtts or edge. The installed engine applies when empty.
     """
-    lang = language.lower().strip()
+    lang = resolve(language)
     entry = LANGUAGES.get(lang)
     if entry is not None and entry.module is not None:
         _language_audio(
@@ -1789,7 +1790,7 @@ def pack(
     :param language: Language name: mandarin, french, greek, or cantonese.
     :param pack_license: public or private.
     """
-    lang = language.lower().strip()
+    lang = resolve(language)
     entry = LANGUAGES.get(lang)
     if entry is not None and entry.module is not None:
         _language_pack(entry.module, entry.profile, pack_license=pack_license)
@@ -1819,7 +1820,7 @@ def audit(language: str) -> None:
 
     :param language: Language name: mandarin, french, greek, or cantonese.
     """
-    lang = language.lower().strip()
+    lang = resolve(language)
     entry = LANGUAGES.get(lang)
     if entry is not None and entry.audit is not None:
         code = print_gate_table(entry.audit())

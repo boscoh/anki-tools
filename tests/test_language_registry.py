@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-from anki_tools.sentence_pack.languages import (
+from anki_tools.languages import (
+    ALIASES,
     LANGUAGES,
     PROFILES,
     pipeline_languages,
     profile_languages,
+    resolve,
     swadesh_languages,
 )
 
@@ -33,3 +35,18 @@ def test_build_list_matches_the_vocabulary_languages() -> None:
 
 def test_build_list_is_a_subset_of_the_registry() -> None:
     assert set(swadesh_languages()) <= set(LANGUAGES)
+
+
+def test_alias_gives_the_canonical_name() -> None:
+    assert resolve(" yue ") == "cantonese"
+    assert resolve("cmn") == "mandarin"
+    assert resolve("zh") == "mandarin"
+    assert resolve("el") == "greek"
+
+
+def test_unknown_name_folds_to_lowercase() -> None:
+    assert resolve("Klingon") == "klingon"
+
+
+def test_every_alias_points_at_a_registry_name() -> None:
+    assert set(ALIASES.values()) <= set(LANGUAGES)

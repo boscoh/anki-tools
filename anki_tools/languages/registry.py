@@ -1,15 +1,18 @@
 """Language registry of the ``anki swadesh`` command.
 
-This package is the one home of the language lists. :data:`LANGUAGES` names
-every Swadesh language once and gives each language its capability:
+:data:`LANGUAGES` names every Swadesh language once and gives each language its
+capability:
 
 * a sentence-pack module, which the shared pipeline drives;
 * a profile only, for a language with its own caller code;
 * neither, for a vocabulary-only language, which the age-old ``build`` command
   serves from an ``english-<lang>.csv`` file and an audio directory.
 
-Importing this package also registers the Mandarin, French, Greek, and
-Cantonese profiles of :data:`anki_tools.sentence_pack.profile.PROFILES`.
+:data:`ALIASES` maps the short codes that a user types to the one canonical
+name of the language.
+
+Importing this module also registers the Mandarin, French, Greek, and Cantonese
+profiles of :data:`anki_tools.sentence_pack.profile.PROFILES`.
 """
 
 from __future__ import annotations
@@ -82,15 +85,30 @@ LANGUAGES: dict[str, CliLanguage] = {
     )
 }
 
+ALIASES: dict[str, str] = {
+    "yue": "cantonese",
+    "cmn": "mandarin",
+    "zh": "mandarin",
+    "el": "greek",
+}
+
+
+def resolve(name: str) -> str:
+    """Give the one canonical language name of a user input.
+
+    :param name: Language name or short code, for example ``yue``.
+    :returns: The canonical name, or the folded input when no alias matches.
+    """
+    key = name.strip().lower()
+    return ALIASES.get(key, key)
+
 
 def swadesh_languages() -> tuple[str, ...]:
     """Give the language names of the ``build`` command, in display order.
 
     :returns: Every Swadesh language name.
     """
-    return tuple(
-        language.name for language in LANGUAGES.values() if language.build
-    )
+    return tuple(language.name for language in LANGUAGES.values() if language.build)
 
 
 def profile_languages() -> tuple[CliLanguage, ...]:
@@ -106,12 +124,11 @@ def pipeline_languages() -> tuple[str, ...]:
 
     :returns: Names of the languages with a pipeline module, in display order.
     """
-    return tuple(
-        language.name for language in LANGUAGES.values() if language.module
-    )
+    return tuple(language.name for language in LANGUAGES.values() if language.module)
 
 
 __all__ = [
+    "ALIASES",
     "LANGUAGES",
     "PROFILES",
     "CliLanguage",
@@ -123,5 +140,6 @@ __all__ = [
     "pipeline_languages",
     "profile_languages",
     "profile_names",
+    "resolve",
     "swadesh_languages",
 ]

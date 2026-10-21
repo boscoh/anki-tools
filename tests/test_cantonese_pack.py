@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from anki_tools.sentence_pack import pool
-from anki_tools.sentence_pack.languages import cantonese
+from anki_tools.languages import cantonese
 from anki_tools.sentence_pack.guards import check_sentence_shape
 
 
@@ -51,8 +51,10 @@ class FakeTokenizer:
 def fake_tokenizer(monkeypatch: pytest.MonkeyPatch) -> None:
     """Use a small tokenizer and an empty form table in the tests."""
     words = ["我哋", "你哋", "佢哋", "食飯", "今日", "龍", "茶", "好", "食", "我"]
-    monkeypatch.setattr(cantonese, "tokenizer", lambda: FakeTokenizer(words))
-    monkeypatch.setattr(cantonese, "table_forms", lambda: frozenset({"我", "我哋"}))
+    monkeypatch.setattr(cantonese.profile, "tokenizer", lambda: FakeTokenizer(words))
+    monkeypatch.setattr(
+        cantonese.profile, "table_forms", lambda: frozenset({"我", "我哋"})
+    )
     cantonese.han_spans.cache_clear()
 
 
@@ -88,7 +90,7 @@ def _module_terms() -> dict[int, tuple[str, ...]]:
 def test_check_word_table_accepts_the_reviewed_files(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    monkeypatch.setattr(cantonese, "module_terms", _module_terms)
+    monkeypatch.setattr(cantonese.profile, "module_terms", _module_terms)
     review = tmp_path / "review.csv"
     with review.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=cantonese.WORD_REVIEW_FIELDS)
@@ -105,7 +107,7 @@ def test_check_word_table_accepts_the_reviewed_files(
 def test_check_word_table_marks_an_open_review_row(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    monkeypatch.setattr(cantonese, "module_terms", _module_terms)
+    monkeypatch.setattr(cantonese.profile, "module_terms", _module_terms)
     review = tmp_path / "review.csv"
     review.write_text(
         "index,english,current,module_terms,chosen,issue,fix,status\n"
