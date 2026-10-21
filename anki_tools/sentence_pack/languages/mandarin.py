@@ -27,6 +27,7 @@ from anki_tools.rank import (
     is_chinese_char,
     is_repeated_zh_sentence,
 )
+from anki_tools.sentence_pack.guards import compound_spans, inside_spans, occurrences
 from anki_tools.sentence_pack.pack import (
     ATTRIBUTION_PATH,
     audio_license_source,
@@ -696,17 +697,7 @@ def false_friend_spans(sentence: str, form: str) -> list[tuple[int, int]]:
     :returns: ``(start, end)`` offsets in the Han character stream.
     """
     chars = "".join(get_chinese_chars(sentence))
-    spans: list[tuple[int, int]] = []
-    for sequence in FALSE_FRIENDS.get(form, ()):
-        position = chars.find(sequence)
-        while position != -1:
-            spans.append((position, position + len(sequence)))
-            position = chars.find(sequence, position + 1)
-    return spans
-
-
-def _inside(position: int, spans: Sequence[tuple[int, int]]) -> bool:
-    return any(start <= position < end for start, end in spans)
+    return compound_spans(chars, FALSE_FRIENDS.get(form, ()))
 
 
 sense_filter = make_sense_filter(SENSE_CHECKS)
@@ -723,13 +714,11 @@ def form_occurrences(sentence: str, form: str) -> list[int]:
         return []
     chars = "".join(get_chinese_chars(sentence))
     blocked = false_friend_spans(sentence, form)
-    found: list[int] = []
-    position = chars.find(form)
-    while position != -1:
-        if not _inside(position, blocked):
-            found.append(position)
-        position = chars.find(form, position + 1)
-    return found
+    return [
+        position
+        for position in occurrences(chars, form)
+        if not inside_spans(position, blocked)
+    ]
 
 
 def count_form_occurrences(sentence: str, form: str) -> int:
@@ -1106,6 +1095,7 @@ MANDARIN = register(
         extra_manifest=_extra_manifest,
         attribution=write_attribution,
         sense_filter=sense_filter,
+        false_friend_spans=false_friend_spans,
         finalize_candidate=lambda card, target: replace(
             card, pinyin=sentence_pinyin(card.sentence)
         ),

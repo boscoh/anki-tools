@@ -30,7 +30,6 @@ from anki_tools.sentence_pack.pack import (
     attribution_lines,
     write_attribution_section,
 )
-from anki_tools.sentence_pack.english_sense import sense_mismatches
 from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
 from anki_tools.sentence_pack.tokens import Token, has_finite_verb, tokenize
 
@@ -1526,25 +1525,6 @@ def gate_noun_gender(
     return True, f"{len(nouns)} noun row(s) have a gender (manifest {counted})"
 
 
-def gate_no_sense_mismatch(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """French gate G21: no card English holds a different sense.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    rows = inputs.rows()
-    gloss_by_form = {
-        profile.form_text(form): form.english for form in inputs.table()
-    }
-    bad = sense_mismatches(rows, gloss_by_form, sense_filter)
-    if bad:
-        return False, f"{len(bad)} card(s) use the target in a different sense: {bad[0]}"
-    return True, f"{len(rows)} cards use each target in its Swadesh sense"
-
-
 def french_gates() -> tuple[tuple[str, Any], ...]:
     """Give the ordered gate list G1 to G21 of the French pack.
 
@@ -1555,6 +1535,7 @@ def french_gates() -> tuple[tuple[str, Any], ...]:
         gate_coverage,
         gate_manifest_counts,
         gate_media_count,
+        gate_no_sense_mismatch,
         gate_proper_sentences,
         gate_review_file,
         gate_sentence_audio,

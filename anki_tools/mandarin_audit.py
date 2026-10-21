@@ -16,6 +16,8 @@ from anki_tools.sentence_pack.audit import (
     gate_apkg,
     gate_coverage,
     gate_manifest_counts,
+    gate_no_false_friend,
+    gate_no_sense_mismatch,
     gate_media_count,
     gate_proper_sentences,
     gate_review_file,
@@ -31,13 +33,10 @@ from anki_tools.sentence_pack.audit import (
     sample,
 )
 from anki_tools.sentence_pack.audio import probe_duration
-from anki_tools.sentence_pack.english_sense import sense_mismatches
 from anki_tools.sentence_pack.languages.mandarin import (
     MANDARIN,
     check_word_table,
     load_word_table,
-    false_friend_spans,
-    sense_filter,
 )
 from anki_tools.mandarin_deck import audio_author_map
 from anki_tools.rank import get_chinese_chars
@@ -112,47 +111,6 @@ def _gate_g12(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
     return True, f"{len(names)} native audio author(s) named in {path}"
 
 
-def _gate_g17(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
-    """Gate G17: no card uses its target in a different sense.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    rows = inputs.rows()
-    bad = [
-        f"{row.get('target', '')} in {row.get('sentence', '')}"
-        for row in rows
-        if false_friend_spans(row.get("sentence", ""), row.get("target", ""))
-    ]
-    if bad:
-        return False, (
-            f"{len(bad)} card(s) use the target in a different sense: "
-            f"{sample(bad)}"
-        )
-    return True, f"{len(rows)} cards use each target in its Swadesh sense"
-
-
-def _gate_g18(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
-    """Gate G18: no card English holds a different sense.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    rows = inputs.rows()
-    gloss_by_form = {
-        profile.form_text(form): form.english for form in inputs.table()
-    }
-    bad = sense_mismatches(rows, gloss_by_form, sense_filter)
-    if bad:
-        return False, (
-            f"{len(bad)} card(s) use the target in a different sense: "
-            f"{sample(bad)}"
-        )
-    return True, f"{len(rows)} cards use each target in its Swadesh sense"
-
-
 GATES: tuple[tuple[str, GateCheck], ...] = (
     ("G1", _gate_g1),
     ("G2", gate_unique_forms),
@@ -170,8 +128,8 @@ GATES: tuple[tuple[str, GateCheck], ...] = (
     ("G14", gate_proper_sentences),
     ("G15", gate_review_file),
     ("G16", gate_word_audio),
-    ("G17", _gate_g17),
-    ("G18", _gate_g18),
+    ("G17", gate_no_false_friend),
+    ("G18", gate_no_sense_mismatch),
 )
 
 

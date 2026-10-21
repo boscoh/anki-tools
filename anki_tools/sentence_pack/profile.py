@@ -105,6 +105,8 @@ class LanguageProfile:
         to the CC-Canto dictionary.
     :param sense_filter: Hook that rejects a form whose paired English holds a
         false-friend sense, given the form and the English text.
+    :param false_friend_spans: Hook that gives the spans where a form sits in a
+        different-sense compound, given the sentence and the form.
     """
 
     name: str
@@ -179,6 +181,7 @@ class LanguageProfile:
     highlight: Callable[[str, str], str] | None = None
     char_links: bool = False
     sense_filter: Callable[[str, str], bool] | None = None
+    false_friend_spans: Callable[[str, str], Sequence[tuple[int, int]]] | None = None
 
     def target_length(self, candidate: Any) -> int:
         """Give the unit length of a candidate.

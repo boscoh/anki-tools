@@ -43,7 +43,11 @@ from anki_tools.sentence_pack.pack import (
     tts_engine_name,
     write_attribution_section,
 )
-from anki_tools.sentence_pack.english_sense import sense_mismatches
+from anki_tools.sentence_pack.guards import (
+    compound_spans,
+    inside_spans,
+    occurrences,
+)
 from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
 from anki_tools.sentence_pack.select import rank_order, review_status
 from anki_tools.yue_frequency import (
@@ -692,17 +696,7 @@ def false_friend_spans(sentence: str, form: str) -> list[tuple[int, int]]:
     :param form: Word-table form.
     :returns: ``(start, end)`` offsets of each matching compound.
     """
-    spans: list[tuple[int, int]] = []
-    for compound in FALSE_FRIENDS.get(form, ()):
-        position = sentence.find(compound)
-        while position != -1:
-            spans.append((position, position + len(compound)))
-            position = sentence.find(compound, position + 1)
-    return spans
-
-
-def _inside(position: int, spans: Sequence[tuple[int, int]]) -> bool:
-    return any(start <= position < end for start, end in spans)
+    return compound_spans(sentence, FALSE_FRIENDS.get(form, ()))
 
 
 sense_filter = make_sense_filter(SENSE_CHECKS)
@@ -729,14 +723,13 @@ def form_offsets(sentence: str, form: str) -> list[int]:
     targets = table_forms()
     blocked = false_friend_spans(sentence, form)
     found: list[int] = []
-    position = sentence.find(form)
-    while position != -1:
-        if not _inside(position, blocked):
-            if position in starts and position + len(form) in ends:
-                found.append(position)
-            elif _token_at(spans, position) not in targets:
-                found.append(position)
-        position = sentence.find(form, position + 1)
+    for position in occurrences(sentence, form):
+        if inside_spans(position, blocked):
+            continue
+        if position in starts and position + len(form) in ends:
+            found.append(position)
+        elif _token_at(spans, position) not in targets:
+            found.append(position)
     return found
 
 
@@ -1167,6 +1160,7 @@ CANTONESE = register(
         attribution=write_attribution,
         highlight=highlight,
         sense_filter=sense_filter,
+        false_friend_spans=false_friend_spans,
         finalize_candidate=lambda card, _target: replace(
             card, jyutping=sentence_jyutping(card.sentence)
         ),
@@ -1406,49 +1400,6 @@ def gate_native_license(
     return True, f"{native} native card(s) keep a license"
 
 
-def gate_no_false_friend(
-    inputs: Any, _profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Cantonese gate G20: no card uses its target in a different sense.
-
-    :param inputs: Lazy file reader of the audit.
-    :param _profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    rows = inputs.rows()
-    bad = [
-        f"{row.get('target', '')} in {row.get('sentence', '')}"
-        for row in rows
-        if false_friend_spans(row.get("sentence", ""), row.get("target", ""))
-    ]
-    if bad:
-        return False, (
-            f"{len(bad)} card(s) use the target in a different sense: {bad[0]}"
-        )
-    return True, f"{len(rows)} cards use each target in its Swadesh sense"
-
-
-def gate_no_sense_mismatch(
-    inputs: Any, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Cantonese gate G21: no card English holds a different sense.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    rows = inputs.rows()
-    gloss_by_form = {
-        profile.form_text(form): form.english for form in inputs.table()
-    }
-    bad = sense_mismatches(rows, gloss_by_form, sense_filter)
-    if bad:
-        return False, (
-            f"{len(bad)} card(s) use the target in a different sense: {bad[0]}"
-        )
-    return True, f"{len(rows)} cards use each target in its Swadesh sense"
-
-
 def cantonese_gates() -> tuple[tuple[str, Any], ...]:
     """Give the ordered gate list G1 to G21 of the Cantonese pack.
 
@@ -1459,6 +1410,8 @@ def cantonese_gates() -> tuple[tuple[str, Any], ...]:
         gate_coverage,
         gate_manifest_counts,
         gate_media_count,
+        gate_no_false_friend,
+        gate_no_sense_mismatch,
         gate_proper_sentences,
         gate_review_file,
         gate_sentence_audio,

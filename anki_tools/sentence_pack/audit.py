@@ -23,6 +23,7 @@ from anki_tools.sentence_pack.audio import (
     MIN_DURATION_S,
     probe_duration,
 )
+from anki_tools.sentence_pack.english_sense import sense_mismatches
 from anki_tools.sentence_pack.pack import WORD_PREFIX, load_audio_index
 from anki_tools.sentence_pack.pool import (
     SCAFFOLD_SHAPE_KEYS,
@@ -676,6 +677,52 @@ def gate_target_in_table(
     if problems:
         return False, f"{len(problems)} target(s) invalid: {sample(problems)}"
     return True, f"{len(rows)} card targets are table forms with a card"
+
+
+def gate_no_false_friend(
+    inputs: AuditInputs, profile: LanguageProfile
+) -> tuple[bool, str]:
+    """Gate: no card uses its target in a different-sense compound.
+
+    :param inputs: Lazy file reader of the audit.
+    :param profile: Language profile.
+    :returns: Pass flag and detail text.
+    """
+    if profile.false_friend_spans is None:
+        return True, "the language has no false-friend guard"
+    rows = inputs.rows()
+    bad: list[str] = []
+    for row in rows:
+        sentence = row.get("sentence", "")
+        target = row.get("target", "")
+        if profile.false_friend_spans(sentence, target):
+            bad.append(f"{target} in {sentence}")
+    if bad:
+        return False, (
+            f"{len(bad)} card(s) use the target in a different sense: {sample(bad)}"
+        )
+    return True, f"{len(rows)} cards use each target in its Swadesh sense"
+
+
+def gate_no_sense_mismatch(
+    inputs: AuditInputs, profile: LanguageProfile
+) -> tuple[bool, str]:
+    """Gate: no card English holds a different sense.
+
+    :param inputs: Lazy file reader of the audit.
+    :param profile: Language profile.
+    :returns: Pass flag and detail text.
+    """
+    rows = inputs.rows()
+    gloss_by_form = {
+        profile.form_text(form): form.english for form in inputs.table()
+    }
+    bad = sense_mismatches(rows, gloss_by_form, profile.sense_filter)
+    if bad:
+        return False, (
+            f"{len(bad)} card(s) use the target in a different sense: {sample(bad)}"
+        )
+    return True, f"{len(rows)} cards use each target in its Swadesh sense"
 
 
 GENERIC_GATES: tuple[tuple[str, GateCheck], ...] = (

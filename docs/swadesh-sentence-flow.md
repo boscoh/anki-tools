@@ -173,7 +173,71 @@ selector sorts the candidates with this rank key:
 `assign_target` gives the sentence to the lowest covered form that still
 needs a card. Thus one sentence never becomes two cards.
 
-## 5. Audit gates
+## 5. Language guards
+
+Two form-level guards add language data. The shared scan code is in
+`anki_tools/sentence_pack/guards.py`. The data is in the language module.
+
+### 5.1 False-friend compound
+
+The `FALSE_FRIENDS` table maps a word-table form to compounds that use the
+form in a different sense. An occurrence inside one of those compounds does not
+count as a hit.
+
+| Pack      | Example        | Result                        |
+| --------- | -------------- | ----------------------------- |
+| Mandarin  | 闻 inside 新闻 | the occurrence does not count |
+| Mandarin  | 闻 in 我闻花香 | the occurrence counts         |
+| Cantonese | 聽 inside 聽日 | the occurrence does not count |
+| Cantonese | 聽 in 我聽音樂 | the occurrence counts         |
+
+`compound_spans` and `inside_spans` give the blocked spans and the test.
+Mandarin applies the helpers to the Han character stream. Cantonese applies
+them to the sentence text.
+
+### 5.2 Form sense filter
+
+The `SENSE_CHECKS` table maps a form to two word sets: the sense words and the
+false-friend words. `make_sense_filter` builds the filter. The filter rejects a
+form when the paired English holds a false-friend word and no sense word.
+
+| Pack      | Form | The filter rejects when the English holds |
+| --------- | ---- | ----------------------------------------- |
+| Mandarin  | 抓   | grab, catch, arrest, with no scratch word |
+| Cantonese | 揸   | drive, fly, pilot, with no hold word      |
+
+The S2 measure step applies this filter to the hits. A form that the filter
+rejects does not enter the hit list.
+
+### 5.3 English gloss sense
+
+`holds_sense` compares the English of a sentence with the Swadesh gloss of the
+card word. The S2 `sense` guard rejects a sentence when every hit fails this
+test. The guard keeps a sentence that has no hit.
+
+### 5.4 Whole-token match
+
+Cantonese 我 and 我哋 are different concepts. `form_offsets` accepts a form
+only when it holds whole tokens. An occurrence inside a longer word counts when
+that word is not itself a target form. So 食 counts inside 食飯, and 我 does not
+count inside 我哋.
+
+Mandarin uses `form_occurrences` on the Han character stream, because jieba
+merges some forms into a longer token. So 水 counts inside 喝水.
+
+### 5.5 Gate numbers
+
+| Pack      | False-friend gate | English sense gate |
+| --------- | ----------------- | ------------------ |
+| Mandarin  | G17               | G18                |
+| Cantonese | G20               | G21                |
+| French    | none              | G21                |
+| Greek     | none              | G20                |
+
+The gates call the shared functions in `audit.py`. A pack gives the gate
+number only.
+
+## 6. Audit gates
 
 The audit reads the output files only. The gates fall in these groups:
 
@@ -184,22 +248,23 @@ The audit reads the output files only. The gates fall in these groups:
 | audio          | G7, G8, G16        | sentence file, word file, media count               |
 | manifest       | G11, G13           | counts, hashes, APKG note count                     |
 | coverage       | G10                | core coverage against `coverage_min`                |
-| language rules | G20, G21           | false-friend compound, English sense                |
+| language rules | per pack           | false-friend compound, English sense                |
 | attribution    | G12                | author names                                        |
 
 A language pack can add a gate. For example, Cantonese adds G20 and G21.
 
-## 6. File map
+## 7. File map
 
 | Path                                      | Content                                 |
 | ----------------------------------------- | --------------------------------------- |
 | `anki_tools/sentence_pack/pool.py`        | S2 guards, measure step, pool report    |
 | `anki_tools/sentence_pack/select.py`      | S3 rank key, duplicate index, set cover |
 | `anki_tools/sentence_pack/audit.py`       | gate table and gate implementations     |
+| `anki_tools/sentence_pack/guards.py`      | shared span and occurrence helpers      |
 | `anki_tools/sentence_pack/profile.py`     | language values and hook functions      |
 | `anki_tools/sentence_pack/languages/*.py` | one module per language                 |
 
-## 7. Guard invariants
+## 8. Guard invariants
 
 - The guard keys must equal `FILTER_KEYS[1:]` in order. The test
   `tests/test_sentence_pack_guards.py` checks this rule.
@@ -209,3 +274,5 @@ A language pack can add a gate. For example, Cantonese adds G20 and G21.
   `FILTER_KEYS` before it can go into a guard table.
 - The audit shape checks use the same guard table. The core check applies all
   shape keys. The scaffold check applies `SCAFFOLD_SHAPE_KEYS`.
+- A language gate function lives in `audit.py`. The language module gives only
+  the gate number and the `false_friend_spans` or `sense_filter` profile hook.
