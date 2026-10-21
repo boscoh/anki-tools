@@ -192,8 +192,8 @@ The Greek pack uses the shared layer from the French spec, section 5.1. The
 | `wordfreq` code | `el`                                                    |
 | Tokenizer       | spaCy `el_core_news_sm`                                 |
 | Predicate rule  | POS `VERB` or `AUX` with morph `VerbForm=Fin`           |
-| Similarity      | new `word_similarity_el` in `anki_tools/rank.py`        |
-| Dedupe key      | new `greek_text_dedup_key` in `anki_tools/rank.py`      |
+| Similarity      | new `word_similarity_el` in `languages/greek/rank.py`   |
+| Dedupe key      | new `greek_text_dedup_key` in `languages/greek/rank.py` |
 | TTS voice       | `gtts:el` by default, `el-GR-AthinaNeural` for edge-tts |
 | Native audio    | disabled                                                |
 

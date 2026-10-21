@@ -398,8 +398,8 @@ The target match uses the form-key rule of section 3.3:
 4. For `form_kind=discontinuous`, both parts must appear in the sentence, in
    that order. The probe counts 21,163 such sentences for `ne ... pas`.
 
-Reuse `word_similarity_fr` and `latin_text_dedup_key` from
-`anki_tools/rank.py`. Do not copy them.
+Reuse `latin_word_similarity` and `latin_text_dedup_key` from
+`anki_tools/ranking/latin.py`. Do not copy them.
 
 
 The shared English sense test covers all 207 glosses. The table

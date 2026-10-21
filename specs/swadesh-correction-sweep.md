@@ -128,8 +128,8 @@ The sweep does not change the frequency findings. Greek and Hindi scores
 have low value, because the corpora store inflected forms, not citation
 forms. For example, δαγκώνω scores 0.00 and δαγκώνει scores 3.56. The
 Cantonese scan is void, because `wordfreq` has no `yue` list. The Apple Daily
-list in `anki_tools/rank.py` does not fill this gap for the sweep, because
-its genre is written news text.
+list in `anki_tools/languages/cantonese/frequency.py` does not fill this gap for
+the sweep, because its genre is written news text.
 
 ## 7. Defect classes
 

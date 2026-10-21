@@ -382,7 +382,7 @@ false-friend word. The `SENSE_CHECKS` table in `mandarin.py` holds the lists:
 
 Gate G18 checks the built deck against the stored English text.
 Reuse `char_similarity_zh` and `is_repeated_zh_sentence` from
-`anki_tools/rank.py`.
+`anki_tools/languages/mandarin/characters.py`.
 
 ### 8.3 Ranking key
 

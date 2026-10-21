@@ -444,8 +444,8 @@ Two sentences are duplicates in either case:
   value is at or above `--similarity-threshold` (default 0.67, as in `fix zh`).
 - They have the same token set.
 
-Reuse `char_similarity_zh` and `_char_similarity_zh_same_len` from the
-existing code.
+Reuse `char_similarity_zh` and `char_similarity_zh_same_len` from
+`anki_tools/languages/mandarin/characters.py`.
 
 ### 8.4 Learning order
 

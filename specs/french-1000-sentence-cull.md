@@ -306,7 +306,7 @@ reach 1,000 cards with no exemption (section 9.3).
 
 Two sentences are duplicates when the Jaccard value of their content-lemma sets
 is 0.67 or more. Use the lemma sets as buckets, so a new card compares only
-with kept cards that share a lemma. Reuse `word_similarity_fr` where it fits.
+with kept cards that share a lemma. Reuse `latin_word_similarity` where it fits.
 
 ### 8.6 Order
 
