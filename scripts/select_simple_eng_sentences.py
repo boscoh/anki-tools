@@ -27,7 +27,7 @@ from rich.console import Console
 from rich.pretty import Pretty
 
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.ranking.rank import latin_text_dedup_key, word_similarity_fr
+from anki_tools.ranking.latin import latin_text_dedup_key, latin_word_similarity
 
 _ROOT = Path(__file__).absolute().parent.parent
 _ARCHIVE = _ROOT / "archive" / "tibetan"
@@ -503,7 +503,7 @@ def greedy_near_dedup(
         for k in kept:
             if min_chars and (s_n < min_chars or len(k.replace(" ", "")) < min_chars):
                 continue
-            if word_similarity_fr(s, k) >= threshold:
+            if latin_word_similarity(s, k) >= threshold:
                 skip = True
                 break
         if not skip:
@@ -541,7 +541,7 @@ def _passes_similarity_gate(
             s_ns < min_chars or len(k.replace(" ", "")) < min_chars
         ):
             continue
-        if word_similarity_fr(candidate, k) >= threshold:
+        if latin_word_similarity(candidate, k) >= threshold:
             return False
     return True
 

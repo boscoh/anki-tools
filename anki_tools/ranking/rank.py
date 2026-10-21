@@ -390,7 +390,7 @@ def get_chinese_chars(text: str) -> list[str]:
 # =============================================================================
 
 
-def _jaccard_similarity(items_a: set, items_b: set) -> float:
+def jaccard_similarity(items_a: set, items_b: set) -> float:
     """Calculate Jaccard similarity between two sets.
 
     :param items_a: First set of items.
@@ -411,7 +411,7 @@ def char_similarity_zh(sent_a: str, sent_b: str) -> float:
     """
     chars_a = set(get_chinese_chars(sent_a))
     chars_b = set(get_chinese_chars(sent_b))
-    return _jaccard_similarity(chars_a, chars_b)
+    return jaccard_similarity(chars_a, chars_b)
 
 
 def char_similarity_zh_same_len(sent_a: str, sent_b: str) -> float:
@@ -428,10 +428,10 @@ def char_similarity_zh_same_len(sent_a: str, sent_b: str) -> float:
     chars_b = set(get_chinese_chars(sent_b))
     if len(chars_a) != len(chars_b) or not chars_a:
         return 0.0
-    return _jaccard_similarity(chars_a, chars_b)
+    return jaccard_similarity(chars_a, chars_b)
 
 
-def _compute_similarity_penalties(
+def compute_similarity_penalties(
     sentences: list[Sentence],
     similarity_fn: Callable[[str, str], float],
     top_n: int = 100,
@@ -471,7 +471,7 @@ def compute_similarity_penalties_zh(
     :param top_n: Number of higher-ranked sentences to compare.
     :returns: Penalties, similar ranks, and similar texts.
     """
-    return _compute_similarity_penalties(sentences, char_similarity_zh, top_n)
+    return compute_similarity_penalties(sentences, char_similarity_zh, top_n)
 
 
 SIMILARITY_PENALTY_SCALE = 20

@@ -60,7 +60,8 @@ from anki_tools.languages import (
 from anki_tools.languages.cantonese.rank import rank_sentences_yue
 from anki_tools.languages.french.rank import rank_sentences_fr
 from anki_tools.languages.mandarin.rank import rank_sentences_zh
-from anki_tools.languages.spanish.rank import rank_sentences_es, word_similarity_es
+from anki_tools.languages.spanish.rank import rank_sentences_es
+from anki_tools.ranking.latin import latin_word_similarity
 from anki_tools.ranking.rank import (
     Sentence,
     YUE_FREQUENCY_ATTRIBUTION,
@@ -1284,7 +1285,7 @@ def es(
             ranked,
             target_count=max_sentences,
             similarity_threshold=similarity_threshold,
-            similarity_fn=word_similarity_es,
+            similarity_fn=latin_word_similarity,
         )
 
     write_ranking_csv(ranked, str(ranking_csv))

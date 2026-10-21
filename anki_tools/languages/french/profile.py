@@ -23,8 +23,7 @@ from typing import Any, Collection, Sequence
 
 from wordfreq import top_n_list, zipf_frequency
 
-from anki_tools.languages.french.rank import word_similarity_fr
-from anki_tools.ranking.latin import latin_text_dedup_key
+from anki_tools.ranking.latin import latin_text_dedup_key, latin_word_similarity
 from anki_tools.sentence_pack.audit import AuditInputs, GateRow, sample
 from anki_tools.sentence_pack.pack import (
     ATTRIBUTION_PATH,
@@ -1330,7 +1329,7 @@ FRENCH = register(
         candidate_length=lambda card: card.word_len,
         count_unknown=count_unknown,
         zipf_words=token_words,
-        similarity=word_similarity_fr,
+        similarity=latin_word_similarity,
         dedupe_key=latin_text_dedup_key,
         similarity_keys=lambda sentence: {
             surface_key(word) for word in token_words(sentence)

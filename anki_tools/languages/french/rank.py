@@ -1,9 +1,10 @@
 """French sentence ranking.
 
-The module holds the French word metrics, the French grammar score, the French
-similarity term, and the French ranking driver. The shared helpers of
-:mod:`anki_tools.ranking.rank` hold the sentence data class, the frequency
-tables, and the similarity engine.
+The module holds the French frequency loader, the French grammar score, and
+the French ranking driver. The shared helpers of
+:mod:`anki_tools.ranking.latin` hold the Latin-script word metrics. The
+shared helpers of :mod:`anki_tools.ranking.rank` hold the sentence data
+class, the frequency tables, and the similarity engine.
 
 See SPEC_RANK_SENTENCES.md for the specification.
 """
@@ -12,14 +13,18 @@ from __future__ import annotations
 
 import re
 
-from anki_tools.ranking.latin import latin_word_similarity, tokenize_latin
+from anki_tools.ranking.latin import (
+    complexity_score_latin,
+    frequency_score_latin,
+    latin_word_similarity,
+)
 from anki_tools.ranking.rank import (
     STRUCTURAL_COMPLEXITY_BLEND,
     FrequencyData,
     Sentence,
-    _compute_similarity_penalties,
     _load_frequency_data_wordfreq,
     _structural_score,
+    compute_similarity_penalties,
 )
 
 
@@ -31,65 +36,6 @@ def load_frequency_data_fr() -> FrequencyData:
     return _load_frequency_data_wordfreq("fr", lower_keys=True)
 
 
-def complexity_score_fr(sentence: str) -> float:
-    """Calculate the complexity score (0-100) of a French sentence.
-
-    :param sentence: French sentence.
-    :returns: Score from 0 to 100, higher for a more complex sentence.
-    """
-    words = tokenize_latin(sentence)
-    if not words:
-        return 0.0
-
-    word_count = len(words)
-    unique_words = len(set(words))
-    avg_word_len = sum(len(w) for w in words) / len(words)
-    char_count = sum(len(w) for w in words)
-
-    word_norm = min(word_count / 25, 1.0)
-    unique_norm = min(unique_words / 20, 1.0)
-    avg_len_norm = min(avg_word_len / 8, 1.0)
-    char_norm = min(char_count / 150, 1.0)
-
-    score = (
-        word_norm * 0.25
-        + unique_norm * 0.25
-        + avg_len_norm * 0.25
-        + char_norm * 0.25
-    )
-    return score * 100
-
-
-def get_word_rank_fr(word: str, freq_data: FrequencyData, max_rank: int = 100000) -> int:
-    """Get the frequency rank of one French word.
-
-    :param word: Word to look up, in any case.
-    :param freq_data: Loaded frequency data.
-    :param max_rank: Rank of a word that the list does not hold.
-    :returns: Frequency rank, lower for a more common word.
-    """
-    return freq_data.word_freq.get(word.lower(), max_rank)
-
-
-def frequency_score_fr(sentence: str, freq_data: FrequencyData) -> float:
-    """Calculate the frequency score (0-100) of a French sentence.
-
-    :param sentence: French sentence.
-    :param freq_data: Loaded frequency data.
-    :returns: Score from 0 to 100, higher for more common words.
-    """
-    words = tokenize_latin(sentence)
-    if not words:
-        return 0.0
-    if not freq_data.word_freq:
-        return 50.0
-
-    max_rank = 100000
-    ranks = [get_word_rank_fr(w, freq_data, max_rank) for w in words]
-    avg_rank = sum(ranks) / len(ranks)
-    avg_score = 1.0 - min(avg_rank / max_rank, 1.0)
-    top_5k = sum(1 for r in ranks if r <= 5000) / len(ranks)
-    return (avg_score * 0.6 + top_5k * 0.4) * 100
 
 
 def _grammar_score_fr_spacy(sentence: str) -> float | None:
@@ -180,28 +126,6 @@ def grammar_score_fr(sentence: str) -> float:
     return min(score, 100.0)
 
 
-def word_similarity_fr(sent_a: str, sent_b: str) -> float:
-    """Give the Jaccard similarity of two French word sets.
-
-    :param sent_a: First sentence.
-    :param sent_b: Second sentence.
-    :returns: Similarity between 0 and 1.
-    """
-    return latin_word_similarity(sent_a, sent_b)
-
-
-def compute_similarity_penalties_fr(
-    sentences: list[Sentence], top_n: int = 100
-) -> tuple[list[float], list[int | None], list[str | None]]:
-    """Compute the word-based similarity penalties of French sentences.
-
-    :param sentences: Sentences in rank order.
-    :param top_n: Number of higher-ranked sentences to compare.
-    :returns: Penalties, similar ranks, and similar texts.
-    """
-    return _compute_similarity_penalties(sentences, word_similarity_fr, top_n)
-
-
 def rank_sentences_fr(
     sentences: list[Sentence],
     weights: dict[str, float] | None = None,
@@ -229,11 +153,11 @@ def rank_sentences_fr(
 
     print("Calculating complexity scores...")
     for sent in sentences:
-        sent.complexity_score = complexity_score_fr(sent.text)
+        sent.complexity_score = complexity_score_latin(sent.text)
 
     print("Calculating frequency scores...")
     for sent in sentences:
-        sent.frequency_score = frequency_score_fr(sent.text, freq_data)
+        sent.frequency_score = frequency_score_latin(sent.text, freq_data)
 
     print("Calculating grammar scores...")
     for sent in sentences:
@@ -252,7 +176,7 @@ def rank_sentences_fr(
 
     print("Calculating similarity penalties...")
     penalties, similar_to_rank_indices, similar_to_texts = (
-        compute_similarity_penalties_fr(sentences)
+        compute_similarity_penalties(sentences, latin_word_similarity)
     )
     for sent, penalty, similar_to_rank, sim_text in zip(
         sentences, penalties, similar_to_rank_indices, similar_to_texts
@@ -276,12 +200,7 @@ def rank_sentences_fr(
 
 
 __all__ = [
-    "complexity_score_fr",
-    "compute_similarity_penalties_fr",
-    "frequency_score_fr",
-    "get_word_rank_fr",
     "grammar_score_fr",
     "load_frequency_data_fr",
     "rank_sentences_fr",
-    "word_similarity_fr",
 ]

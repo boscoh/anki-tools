@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 import unicodedata
 
-from anki_tools.ranking.rank import _jaccard_similarity
+from anki_tools.ranking.rank import jaccard_similarity
 
 GREEK_LETTER_PATTERN = re.compile(r"[\u0370-\u03ff\u1f00-\u1fff]+")
 
@@ -45,7 +45,7 @@ def word_similarity_el(sent_a: str, sent_b: str) -> float:
     """
     words_a = set(_tokenize_words_el(sent_a))
     words_b = set(_tokenize_words_el(sent_b))
-    return _jaccard_similarity(words_a, words_b)
+    return jaccard_similarity(words_a, words_b)
 
 
 __all__ = ["greek_text_dedup_key", "word_similarity_el"]
