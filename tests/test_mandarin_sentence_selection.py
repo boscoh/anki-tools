@@ -235,28 +235,27 @@ class TestTokenChecks:
 
 class TestRankingKey:
     def test_key_order(self) -> None:
-        best = _candidate(
-            unknown_words=0, audio_id=7, zipf_mean=5.0, han_len=5, tatoeba_id=1
-        )
-        high_id = _candidate(audio_id=7, han_len=5, tatoeba_id=9)
-        low_zipf = _candidate(audio_id=7, zipf_mean=3.0, han_len=5, tatoeba_id=4)
-        short = _candidate(audio_id=7, han_len=4, tatoeba_id=5)
+        """Mandarin has no native tier, so the audio term is always 0."""
+        best = _candidate(unknown_words=0, zipf_mean=5.0, han_len=5, tatoeba_id=1)
+        high_id = _candidate(han_len=5, tatoeba_id=9)
+        low_zipf = _candidate(zipf_mean=3.0, han_len=5, tatoeba_id=4)
+        short = _candidate(han_len=4, tatoeba_id=5)
         no_audio = _candidate(han_len=5, tatoeba_id=3)
-        more_unknown = _candidate(unknown_words=1, audio_id=7, han_len=5, tatoeba_id=2)
-        shuffled = [more_unknown, no_audio, short, low_zipf, high_id, best]
+        more_unknown = _candidate(unknown_words=1, han_len=5, tatoeba_id=2)
+        shuffled = [more_unknown, short, no_audio, low_zipf, high_id, best]
         assert sorted(shuffled, key=rank_order) == [
             best,
+            no_audio,
             high_id,
             short,
             low_zipf,
-            no_audio,
             more_unknown,
         ]
 
     def test_key_serialization(self) -> None:
         candidate = _candidate(unknown_words=2, zipf_mean=5.1234, tatoeba_id=42)
-        assert candidate.rank_key == "2|1|-5.123|1|42"
-        assert rank_key_parts(candidate) == (2, 1, -5.1234, 1, 42)
+        assert candidate.rank_key == "2|0|-5.123|1|42"
+        assert rank_key_parts(candidate) == (2, 0, -5.1234, 1, 42)
 
 
 class TestCandidatePool:
@@ -291,16 +290,39 @@ class TestCandidatePool:
             assert candidate.tatoeba_author
             assert candidate.audio_source in {"native", "tts"}
 
-    def test_native_audio_and_author_are_loaded(
+    def test_audio_tier_is_off_and_author_is_loaded(
         self, pool_table: list[WordForm], pool_data: Path
     ) -> None:
+        """Decision anki-gj6: the Mandarin profile has no native tier."""
         pool, _ = build_candidate_pool(pool_table, data_dir=pool_data)
         first = next(candidate for candidate in pool if candidate.tatoeba_id == 1)
-        assert first.audio_id == 5001
-        assert first.audio_license == "CC BY 2.0 FR"
-        assert first.audio_source == "native"
-        assert first.audio_missing is False
+        assert first.audio_id == 0
+        assert first.audio_license == ""
+        assert first.audio_source == "tts"
+        assert first.audio_missing is True
+        assert first.tatoeba_author == "alice"
         assert first.english == "I want to drink water."
+
+    def test_audio_term_follows_the_profile_flag(self) -> None:
+        from types import SimpleNamespace
+
+        from anki_tools.sentence_pack.select import rank_key_parts as shared_parts
+
+        def profile(prefer_native: bool) -> SimpleNamespace:
+            return SimpleNamespace(
+                prefer_native_audio=prefer_native,
+                preferred_min_units=4,
+                preferred_max_units=8,
+                target_length=lambda candidate: 5,
+            )
+
+        with_audio = _candidate(audio_id=7)
+        without_audio = _candidate()
+
+        assert shared_parts(with_audio, profile(True))[1] == 0
+        assert shared_parts(without_audio, profile(True))[1] == 1
+        assert shared_parts(with_audio, profile(False))[1] == 0
+        assert shared_parts(without_audio, profile(False))[1] == 0
 
     def test_unknown_budget(self, pool_table: list[WordForm], pool_data: Path) -> None:
         _, strict = build_candidate_pool(pool_table, data_dir=pool_data, max_unknown=0)

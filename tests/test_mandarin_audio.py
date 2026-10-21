@@ -91,11 +91,22 @@ def test_native_license_private_allows_all() -> None:
 
 
 def test_choose_source_public_prefers_tts_for_nc_row() -> None:
+    """The license rule runs on a profile that has a native tier."""
+    from anki_tools.languages.french.profile import FRENCH
+
     row = {"audio_id": "26082", "audio_license": "CC BY-NC 4.0"}
 
-    assert audio.choose_source(row, "auto", "public") == "tts"
-    assert audio.choose_source(row, "auto", "private") == "native"
-    assert audio.choose_source(row, "none", "private") == "tts"
+    assert shared_audio.choose_source(row, "auto", "public", FRENCH) == "tts"
+    assert shared_audio.choose_source(row, "auto", "private", FRENCH) == "native"
+    assert shared_audio.choose_source(row, "none", "private", FRENCH) == "tts"
+
+
+def test_mandarin_choose_source_has_no_native_tier() -> None:
+    row = {"audio_id": "26082", "audio_license": "CC BY 2.0 FR"}
+
+    with pytest.raises(ValueError):
+        audio.choose_source(row, "auto", "public")
+    assert audio.choose_source(row, "none", "public") == "tts"
 
 
 def test_has_mp3_header_accepts_id3_and_frame_sync(
@@ -242,3 +253,18 @@ def test_generate_audio_marks_failure_and_removes_file(
     assert result["failed"] == 2
     assert not list(audio_dir.glob("*.mp3"))
     assert result["failures"][0]["error"] == "validation failed"
+
+
+def test_mandarin_profile_has_no_native_tier() -> None:
+    """Decision anki-gj6: no recording has a usable public license."""
+    from anki_tools.languages.mandarin.profile import MANDARIN
+
+    row = {"audio_id": "123", "audio_license": "CC BY 2.0 FR"}
+
+    assert MANDARIN.native_audio is False
+    assert MANDARIN.prefer_native_audio is False
+    with pytest.raises(ValueError):
+        shared_audio.choose_source(row, "auto", "public", MANDARIN)
+    with pytest.raises(ValueError):
+        shared_audio.choose_source(row, "only", "public", MANDARIN)
+    assert shared_audio.choose_source(row, "none", "public", MANDARIN) == "tts"

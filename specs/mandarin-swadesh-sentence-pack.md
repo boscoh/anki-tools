@@ -111,10 +111,11 @@ Rules:
 - Record the Tatoeba sentence author and the audio author in the manifest.
 - Check the native audio license before distribution. In the 2026-10-17
   export, 5,742 of 5,826 Mandarin recordings have an empty license column,
-  and 84 recordings have the CC BY-NC 4.0 license. The default build uses
-  TTS. The native audio tier is opt-in with `--native-audio auto`.
-- Leave CC BY-NC recordings out of a public pack. Keep them only in a
-  personal pack that sets `--pack-license private`.
+  and 84 recordings have the CC BY-NC 4.0 license. No recording has any other
+  license text, so no recording can enter a public pack.
+- The Mandarin profile has no native tier (decision 2026-10-21, anki-gj6).
+  `--native-audio auto` raises an error, and every card uses TTS. A private
+  pack has no path either, because the profile flag is off.
 
 Tatoeba audio download method, verified 2026-10-18:
 
@@ -473,9 +474,11 @@ before release.
 | B    | edge-tts       | Default, all other cards                                                                     |
 | C    | gTTS           | Fallback when edge-tts fails                                                                 |
 
-Default mode is `--native-audio none`. Ship TTS audio only until a license
-check on the two main Mandarin audio contributors completes. Skip a
-recording with the CC BY-NC 4.0 license unless `--pack-license private`.
+The shipped pack is TTS only. Decision 2026-10-21 (anki-gj6): the Mandarin
+profile sets `native_audio=False`, so tier A does not exist. Every recording
+in the 2026-10-17 export has an empty license or the CC BY-NC 4.0 license, so
+a native tier would ship zero files in a public pack. To restore tier A, first
+collect a license from the audio authors, then set the profile flags again.
 
 ### 9.2 TTS settings
 
