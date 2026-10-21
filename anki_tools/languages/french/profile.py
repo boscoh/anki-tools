@@ -41,7 +41,7 @@ SENTENCES_PATH = Path("vocab/french_sentences.csv")
 SENTENCE_REVIEW_PATH = Path("vocab/french_sentences_review.csv")
 POOL_REPORT_PATH = Path("data/french_pool_report.json")
 AUDIO_DIR = Path("audio/french_sentences")
-MODULE_CACHE_PATH = Path("data/swadesh/fr_module.txt")
+MODULE_CACHE_PATH = Path("data/swadesh/french_module.txt")
 
 MODEL_NAME = "French Swadesh Sentence"
 DECK_NAME = "Swadesh French Sentences"

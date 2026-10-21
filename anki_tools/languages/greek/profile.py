@@ -38,7 +38,7 @@ SENTENCES_PATH = Path("vocab/greek_sentences.csv")
 SENTENCE_REVIEW_PATH = Path("vocab/greek_sentences_review.csv")
 POOL_REPORT_PATH = Path("data/greek_pool_report.json")
 AUDIO_DIR = Path("audio/greek_sentences")
-MODULE_CACHE_PATH = Path("data/swadesh/el_module.txt")
+MODULE_CACHE_PATH = Path("data/swadesh/greek_module.txt")
 
 MODEL_NAME = "Greek Swadesh Sentence"
 DECK_NAME = "Swadesh Greek Sentences"

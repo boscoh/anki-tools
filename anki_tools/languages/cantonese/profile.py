@@ -66,8 +66,8 @@ SENTENCE_REVIEW_PATH = Path("vocab/cantonese_sentences_review.csv")
 POOL_REPORT_PATH = Path("data/cantonese_pool_report.json")
 AUDIO_DIR = Path("audio/cantonese_sentences")
 AUDIO_TSV_PATH = Path("data/tatoeba/yue_sentences_with_audio.tsv")
-MODULE_CACHE_PATH = Path("data/swadesh/yue_module.txt")
-FREQUENCY_PATH = Path("data/yue_frequency.tsv")
+MODULE_CACHE_PATH = Path("data/swadesh/cantonese_module.txt")
+FREQUENCY_PATH = Path("data/cantonese_frequency.tsv")
 
 SWADESH_ROWS = 207
 MIN_FORMS = 205

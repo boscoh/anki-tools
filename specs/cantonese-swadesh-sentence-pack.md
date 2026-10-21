@@ -44,7 +44,7 @@ Out of scope:
 - The `anki fix yue` selection of section 8 of `specs/yue-sentence-selection.md`.
 - Grammar explanations or spaced-repetition tuning.
 - A new Cantonese frequency list. The pack reads the optional
-  `data/yue_frequency.tsv` and does not write it.
+  `data/cantonese_frequency.tsv` and does not write it.
 
 ## 3. Data
 
@@ -292,9 +292,9 @@ The window of 3 to 12 Han characters follows rule Y1 of
 fallback window of the scaffold tier starts at 3 too.
 
 The known set of the unknown-token budget holds the reviewed forms and the
-first 2,000 words of `data/yue_frequency.tsv`. Without that file, it holds the
-top 1,000 `wordfreq` Chinese words in Traditional characters. A sentence may
-hold at most 2 unknown tokens.
+first 2,000 words of `data/cantonese_frequency.tsv`. Without that file, it
+holds the top 1,000 `wordfreq` Chinese words in Traditional characters. A
+sentence may hold at most 2 unknown tokens.
 
 Measured effect: F2 removes 2,423 of 7,038 linked sentences. The unknown
 budget removes 566 more.

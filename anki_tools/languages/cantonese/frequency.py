@@ -35,9 +35,9 @@ CIFU_ATTRIBUTION = (
     "Cantonese spoken frequency: Cifu, Lai and Winterstein 2020 (gwinterstein/Cifu)"
 )
 VOCAB_DIR = Path(__file__).resolve().parents[3] / "vocab"
-VARIANTS_PATH = VOCAB_DIR / "yue_variants.tsv"
-OVERRIDES_PATH = VOCAB_DIR / "yue_frequency_overrides.tsv"
-FREQUENCY_PATH = Path("data/yue_frequency.tsv")
+VARIANTS_PATH = VOCAB_DIR / "cantonese_variants.tsv"
+OVERRIDES_PATH = VOCAB_DIR / "cantonese_frequency_overrides.tsv"
+FREQUENCY_PATH = Path("data/cantonese_frequency.tsv")
 
 MIN_SPOKEN_COUNT = 5
 SPOKEN_DICT_WEIGHT = 40

@@ -31,7 +31,7 @@ from anki_tools.languages.cantonese.frequency import (
     han_tokens,
 )
 
-NAMES_PATH = VOCAB_DIR / "yue_names.tsv"
+NAMES_PATH = VOCAB_DIR / "cantonese_names.tsv"
 EXEMPT_TOP = 100
 UNRANKED = 1_000_000
 ORDERS = ("coverage", "score")

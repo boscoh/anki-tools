@@ -273,7 +273,7 @@ include its effect. The LTL cells in 3.2, 14.5, and 14.6 predate it.
 | Stage | Name           | Input              | Output                                        |
 | ----- | -------------- | ------------------ | --------------------------------------------- |
 | Y0    | Fetch          | network            | cached Cifu and Apple Daily files             |
-| Y1    | Frequency list | Y0, override files | `data/yue_frequency.tsv`                      |
+| Y1    | Frequency list | Y0, override files | `data/cantonese_frequency.tsv`                |
 | Y2    | Tokenize       | Y1, deck sentences | tokens per sentence                           |
 | Y3    | Filter         | Y2                 | passed and rejected sentences, reasons        |
 | Y4    | Select         | Y3, Y1             | kept sentences in learning order              |
@@ -287,7 +287,7 @@ include its effect. The LTL cells in 3.2, 14.5, and 14.6 predate it.
 
 ### 5.1 Output file
 
-`data/yue_frequency.tsv` has one row per word, sorted by `rank`.
+`data/cantonese_frequency.tsv` has one row per word, sorted by `rank`.
 
 | Column         | Type   | Example | Meaning                                          |
 | -------------- | ------ | ------- | ------------------------------------------------ |
@@ -326,7 +326,7 @@ those sentences to `deck.freq_change.csv`.
 The written lists use news-standard characters. Spoken text uses common
 variants (`anki-58i`).
 
-- File: `vocab/yue_variants.tsv`, columns `variant` and `standard`.
+- File: `vocab/cantonese_variants.tsv`, columns `variant` and `standard`.
 - Use: apply the map to a token for the frequency lookup only. Never change
   the card text.
 - Direction: pick the form that has the larger count in Cifu. Record the
@@ -339,7 +339,8 @@ variants (`anki-58i`).
 
 ### 5.4 Overrides
 
-- File: `vocab/yue_frequency_overrides.tsv`, columns `word`, `rank_like`, and
+- File: `vocab/cantonese_frequency_overrides.tsv`, columns `word`, `rank_like`,
+  and `reason`.
   `reason`.
 - Effect: a row gives the word the blend value of the word in `rank_like`.
 - Example row: `你好`, `多謝`, `HKCanCor splits the greeting`.
@@ -376,13 +377,13 @@ the first failed rule as the `reason`.
 | Y5   | No quotation mark                                                 | F7, same                           |
 | Y6   | At most 1 internal comma, colon, or semicolon                     | F8, same                           |
 | Y7   | At most `--max-unknown` tokens outside the known set              | New, from 8.2 of the Mandarin spec |
-| Y8   | No foreign name from `vocab/yue_names.tsv`                        | New                                |
+| Y8   | No foreign name from `vocab/cantonese_names.tsv`                  | New                                |
 
 The known set is the first `--known-top` words (default 2000) of the Y1 list.
 A token is unknown when it has no rank, or a rank above `--known-top`.
 Punctuation tokens do not count.
 
-Rule Y8 reads `vocab/yue_names.tsv`. The file has a header and one name per
+Rule Y8 reads `vocab/cantonese_names.tsv`. The file has a header and one name
 line, in the `name` column. A name matches when it is a substring of the
 sentence, because the tokenizer splits a name such as 蕾拉 into two tokens.
 The first rows are 蕾拉, 森美, 康納達, and 蘇嗎. Add a row when a deck holds
@@ -487,7 +488,7 @@ falls by 0.0 and 0.3 points (3.1). With a card cap, the loss is 0.1 point or les
 ### 9.1 New command
 
 ```bash
-anki freq yue                        # Y0, Y1: write data/yue_frequency.tsv
+anki freq yue                        # Y0, Y1: write data/cantonese_frequency.tsv
 anki freq yue --spoken-weight 0.8
 anki freq yue --refresh              # download the sources again
 anki freq yue --check                # run gates G1, G3, G4
@@ -579,7 +580,8 @@ Rules:
 - The Cifu repository has a GPL-3.0 `LICENSE` file. The data comes from
   corpora with other licenses. Do not copy Cifu into the repository. Check
   the license status before any public release (M0).
-- Write the generated list to `data/yue_frequency.tsv`. The `data/` folder is
+- Write the generated list to `data/cantonese_frequency.tsv`. The `data/`
+  folder is in `.gitignore`.
   in `.gitignore`.
 - `YUE_FREQUENCY_PATH` keeps its meaning for the Apple Daily file. Add
   `CIFU_PATH` for the Cifu file.
@@ -595,7 +597,7 @@ the run with a non-zero exit code. Lower a value only with a new measurement.
 
 | Gate | Check                                                                                                                           | From |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------- | ---- |
-| G1   | `data/yue_frequency.tsv` has at least 40,000 rows, and its ranks are 1 to N with no gap                                         | M1   |
+| G1   | `data/cantonese_frequency.tsv` has at least 40,000 rows, and its ranks are 1 to N with no gap                                  | M1   |
 | G2   | On the LTL deck, at least 92 percent of Han tokens have a spoken count (measured 92.3)                                          | M2   |
 | G3   | 係, 嘅, 唔, 我, 你 are in the first 20 ranks                                                                                    | M1   |
 | G4   | 你好, 早晨, 唔該 are in the first 3000 ranks (overrides apply)                                                                  | M1   |
@@ -669,7 +671,7 @@ tests. Patch the download function, as the existing yue tests do.
 | Milestone | Issue      | Task                                                                    | Output                                  |
 | --------- | ---------- | ----------------------------------------------------------------------- | --------------------------------------- |
 | M0        | `anki-4uh` | Fetch Cifu to the cache; check the license; add `CIFU_PATH`             | cached file, license note               |
-| M1        | `anki-vfx` | Reader, blend, variant map, overrides, `anki freq yue`                  | `data/yue_frequency.tsv`; G1, G3, G4    |
+| M1        | `anki-vfx` | Reader, blend, variant map, overrides, `anki freq yue`                  | `data/cantonese_frequency.tsv`; G1, G3, G4 |
 | M2        | `anki-d1o` | Tokenizer, `--freq` option, change report for `anki-afn`                | report of changed sentences; G2         |
 | M3        | `anki-8ox` | Rules Y1 to Y8, `.select.csv`                                           | G5, G7                                  |
 | M4        | `anki-7y5` | Greedy cover, similarity, word-use cap, learning order, `.coverage.csv` | G6, G9, G10, G11, G12; options complete |

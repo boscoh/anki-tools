@@ -122,7 +122,7 @@ uv run anki fix fr deck.apkg  # Rank and reorder
 
 **Cantonese (yue):**
 ```bash
-uv run anki freq yue          # Write data/yue_frequency.tsv
+uv run anki freq yue          # Write data/cantonese_frequency.tsv
 uv run anki freq yue --check  # Run gates G1, G3, and G4
 uv run anki fix yue deck.apkg # Convert, fix jyutping, select, rank, reorder
 ```
@@ -134,15 +134,16 @@ uv run anki fix yue deck.apkg # Convert, fix jyutping, select, rank, reorder
   - `--freq written` uses the Apple Daily list alone. This is the old ranking.
   - The first run downloads both files to `~/.cache/anki-tools`. Set
     `CIFU_PATH` or `YUE_FREQUENCY_PATH` to use other files.
-  - A variant map in `vocab/yue_variants.tsv` and the overrides in
-    `vocab/yue_frequency_overrides.tsv` fix common spoken forms and greetings.
+  - A variant map in `vocab/cantonese_variants.tsv` and the overrides in
+    `vocab/cantonese_frequency_overrides.tsv` fix common spoken forms and
+    greetings.
   - `--freq-report` writes `deck.freq_change.csv` for the sentences that the
     blend moves by more than 100 places.
 - The filter removes fragments and hard sentences. A sentence passes when it
   has 3 to 12 Han characters, no Latin letter or digit, no repeated pattern,
   one final mark at the end, no quotation mark, at most one internal mark, at
   most 2 words outside the top 2000, and no foreign name from
-  `vocab/yue_names.tsv` (add a row for a new name). Latin names and English
+  `vocab/cantonese_names.tsv` (add a row for a new name). Latin names and
   words fail the Latin-letter rule.
 - The selection keeps the fewest sentences that cover the 1500 most frequent
   words of the deck. Each target word gets 2 cards. One word outside the top
