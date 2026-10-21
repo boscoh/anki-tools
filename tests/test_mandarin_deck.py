@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from anki_tools.mandarin import deck
-from anki_tools.mandarin.swadesh import WordForm
+from anki_tools.languages.mandarin import stages as deck
+from anki_tools.languages.mandarin.profile import WordForm
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.templates import load_char_links
 

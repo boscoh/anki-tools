@@ -16,7 +16,7 @@ Modules:
 """
 
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.mandarin.pinyin import fix_pinyin
+from anki_tools.languages.mandarin.pinyin import fix_pinyin
 from anki_tools.languages.mandarin.rank import (
     complexity_score_zh,
     frequency_score_zh,

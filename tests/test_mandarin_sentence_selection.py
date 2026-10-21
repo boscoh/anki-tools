@@ -6,30 +6,32 @@ from pathlib import Path
 
 import pytest
 
-from anki_tools.mandarin.swadesh import (
+from anki_tools.languages.mandarin.profile import (
     MANDARIN,
     SENTENCE_FIELDS,
     SENTENCE_REVIEW_FIELDS,
     Candidate,
     WordForm,
-    build_candidate_pool,
     build_known_set,
-    build_pack_report,
-    check_sentence_shape,
     count_form_occurrences,
     han_tokens,
     has_orphan_conjunction,
     has_predicate,
-    rank_key_parts,
-    rank_order,
-    select_sentences,
+    sense_filter,
     sentence_hits,
     sentence_pinyin,
-    serialize_rank_key,
     write_sentence_csv,
     write_sentence_review_csv,
 )
-from anki_tools.languages.mandarin.profile import sense_filter
+from anki_tools.languages.mandarin.stages import (
+    build_candidate_pool,
+    build_pack_report,
+    check_sentence_shape,
+    rank_key_parts,
+    rank_order,
+    select_sentences,
+    serialize_rank_key,
+)
 
 POOL_SENTENCES = [
     (1, "我要喝水。", 100, "I want to drink water.", "alice", (5001, "CC BY 2.0 FR")),

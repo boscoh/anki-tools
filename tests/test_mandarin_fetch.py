@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from anki_tools.mandarin import fetch
+from anki_tools.languages.mandarin import stages as fetch
 
 SAMPLE_TSV = b"1\tcmn\t\xe4\xbd\xa0\xe5\xa5\xbd\n2\tcmn\t\xe5\x86\x8d\xe8\xa7\x81\n"
 SAMPLE_URL = "https://example.invalid/cmn_sentences.tsv.bz2"

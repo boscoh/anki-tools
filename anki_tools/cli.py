@@ -23,20 +23,20 @@ from gtts import gTTS
 
 from anki_tools.languages.french import cull as french_cull
 from anki_tools.languages.cantonese.jyutping import fix_jyutping
-from anki_tools.mandarin.audio import (
+from anki_tools.languages.mandarin.pinyin import fix_pinyin
+from anki_tools.languages.mandarin.stages import (
     DEFAULT_VOICE as MANDARIN_DEFAULT_VOICE,
-    generate_audio,
-    load_sentence_rows,
-)
-from anki_tools.mandarin.audit import print_audit, run_audit
-from anki_tools.mandarin.deck import build_pack
-from anki_tools.mandarin.fetch import fetch_tatoeba
-from anki_tools.mandarin.swadesh import (
     build_candidate_pool,
+    build_pack,
     build_pack_report,
     check_word_table,
+    fetch_tatoeba,
+    generate_audio,
+    load_sentence_rows,
     load_word_table,
+    print_audit,
     print_sentence_report,
+    run_audit,
     select_sentences,
     write_pool_report,
     write_sentence_csv,
@@ -56,7 +56,6 @@ from anki_tools.sentence_pack.languages import (
     profile_languages,
     swadesh_languages,
 )
-from anki_tools.mandarin.pinyin import fix_pinyin
 from anki_tools.languages.cantonese.rank import rank_sentences_yue
 from anki_tools.languages.french.rank import rank_sentences_fr
 from anki_tools.languages.mandarin.rank import rank_sentences_zh

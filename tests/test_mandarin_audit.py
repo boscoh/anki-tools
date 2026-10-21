@@ -7,10 +7,14 @@ from pathlib import Path
 
 import pytest
 
-from anki_tools.mandarin import audit
-from anki_tools.mandarin.audit import print_audit, run_audit
-from anki_tools.mandarin.deck import FIELDS, MODEL_NAME
-from anki_tools.mandarin.swadesh import SENTENCE_FIELDS, WordForm
+from anki_tools.languages.mandarin import stages as audit
+from anki_tools.languages.mandarin.profile import (
+    FIELDS,
+    MODEL_NAME,
+    SENTENCE_FIELDS,
+    WordForm,
+)
+from anki_tools.languages.mandarin.stages import print_audit, run_audit
 from anki_tools.apkg.package import AnkiPackage
 
 FAKE_MP3 = b"ID3\x03\x00\x00\x00" + b"\x00" * 64

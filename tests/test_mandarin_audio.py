@@ -5,7 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from anki_tools.mandarin import audio
+from anki_tools.languages.mandarin import stages as audio
+from anki_tools.sentence_pack import audio as shared_audio
 
 VOICE = "zh-CN-XiaoxiaoNeural"
 RATE = "-10%"
@@ -48,43 +49,45 @@ def patched_audio(monkeypatch: pytest.MonkeyPatch) -> list[str]:
 
 
 def test_audio_hash_is_deterministic() -> None:
-    first = audio.audio_hash("我要喝水。", VOICE, RATE)
-    second = audio.audio_hash("我要喝水。", VOICE, RATE)
+    first = shared_audio.audio_hash("我要喝水。", VOICE, RATE)
+    second = shared_audio.audio_hash("我要喝水。", VOICE, RATE)
 
     assert first == second
     assert len(first) == 12
-    assert first != audio.audio_hash("我要喝水。", VOICE, "-25%")
+    assert first != shared_audio.audio_hash("我要喝水。", VOICE, "-25%")
 
 
 def test_sentence_audio_name_native() -> None:
-    name = audio.sentence_audio_name("我要喝水。", VOICE, RATE, "native", 1276691)
+    name = shared_audio.sentence_audio_name(
+        "我要喝水。", VOICE, RATE, "native", 1276691
+    )
 
     assert name == "ta_1276691.mp3"
 
 
 def test_sentence_audio_name_tts() -> None:
-    name = audio.sentence_audio_name("我要喝水。", VOICE, RATE, "tts", 0)
+    name = shared_audio.sentence_audio_name("我要喝水。", VOICE, RATE, "tts", 0)
 
-    expected = audio.audio_hash("我要喝水。", VOICE, RATE)
+    expected = shared_audio.audio_hash("我要喝水。", VOICE, RATE)
     assert name == f"tts_{expected}.mp3"
     assert name.isascii()
 
 
 def test_word_audio_name() -> None:
-    name = audio.word_audio_name("水", VOICE, RATE)
+    name = shared_audio.word_audio_name("水", VOICE, RATE)
 
-    assert name == f"word_{audio.audio_hash('水', VOICE, RATE)}.mp3"
+    assert name == f"word_{shared_audio.audio_hash('水', VOICE, RATE)}.mp3"
 
 
 def test_native_license_public_blocks_empty_and_nc() -> None:
-    assert not audio.license_allows("", "public")
-    assert not audio.license_allows("CC BY-NC 4.0", "public")
-    assert audio.license_allows("CC BY 2.0 FR", "public")
+    assert not shared_audio.license_allows("", "public")
+    assert not shared_audio.license_allows("CC BY-NC 4.0", "public")
+    assert shared_audio.license_allows("CC BY 2.0 FR", "public")
 
 
 def test_native_license_private_allows_all() -> None:
-    assert audio.license_allows("", "private")
-    assert audio.license_allows("CC BY-NC 4.0", "private")
+    assert shared_audio.license_allows("", "private")
+    assert shared_audio.license_allows("CC BY-NC 4.0", "private")
 
 
 def test_choose_source_public_prefers_tts_for_nc_row() -> None:
@@ -105,9 +108,9 @@ def test_has_mp3_header_accepts_id3_and_frame_sync(
     plain = tmp_path / "plain.mp3"
     plain.write_bytes(b"\x00\x01\x02\x03")
 
-    assert audio.has_mp3_header(id3)
-    assert audio.has_mp3_header(sync)
-    assert not audio.has_mp3_header(plain)
+    assert shared_audio.has_mp3_header(id3)
+    assert shared_audio.has_mp3_header(sync)
+    assert not shared_audio.has_mp3_header(plain)
 
 
 def test_validate_audio_accepts_good_header(
@@ -158,10 +161,10 @@ def test_generate_audio_writes_files_index_and_csv(
 
     voice = audio.GTTS_VOICE
     sentence_files = [
-        audio.sentence_audio_name(row["sentence"], voice, RATE, "tts", 0)
+        shared_audio.sentence_audio_name(row["sentence"], voice, RATE, "tts", 0)
         for row in BASE_ROWS
     ]
-    word_files = [audio.word_audio_name("水", voice, RATE)]
+    word_files = [shared_audio.word_audio_name("水", voice, RATE)]
 
     assert result["sentences"] == 2
     assert result["tts"] == 2
@@ -172,10 +175,12 @@ def test_generate_audio_writes_files_index_and_csv(
     for name in sentence_files + word_files:
         assert (audio_dir / name).is_file()
 
-    with (audio_dir / audio.AUDIO_INDEX_NAME).open(encoding="utf-8") as handle:
+    with (audio_dir / shared_audio.AUDIO_INDEX_NAME).open(
+        encoding="utf-8"
+    ) as handle:
         index = list(csv.DictReader(handle))
     assert [entry["filename"] for entry in index] == sentence_files + [
-        audio.word_audio_name(word, voice, RATE) for word in ("水", "火")
+        shared_audio.word_audio_name(word, voice, RATE) for word in ("水", "火")
     ]
     assert index[0]["source"] == "tts"
     assert index[0]["audio_id"] == "0"
