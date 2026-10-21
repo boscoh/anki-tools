@@ -1881,6 +1881,7 @@ def _language_sentences(
         fallback=True,
         known_words=known,
         make_candidate=module.make_candidate,
+        frames_path=sentence_pool.default_frames_path(profile),
     )
     cards, selection = sentence_select.select_sentences(
         pool,

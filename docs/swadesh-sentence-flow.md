@@ -62,9 +62,11 @@ S5  APKG, manifest, attribution
 
 ## 3. S2 guard chain
 
-The pool walks the linked sentences in Tatoeba id order. Each sentence goes
-through the guards in one fixed order. The order is the `FILTER_KEYS` list in
-`anki_tools/sentence_pack/pool.py`.
+The pool walks the linked sentences in Tatoeba id order. Then it appends the
+manual frame sentences of `vocab/<language>_frames.csv`. A frame carries
+Tatoeba id 0 and the author `manual`, and it passes the same guards. Each
+sentence goes through the guards in one fixed order. The order is the
+`FILTER_KEYS` list in `anki_tools/sentence_pack/pool.py`.
 
 ### 3.1 Shape guards
 
@@ -158,6 +160,7 @@ The selector walks the forms in Swadesh index order, primary form first.
 | card cap           | the card count is below `max_cards`                      |
 | form quota         | the assigned form has fewer cards than `per_word`        |
 | unused sentence    | the Tatoeba id is not used by an earlier card            |
+| frame sentence     | a manual frame has id 0, so the unused rule skips it     |
 | open form          | the sentence covers a form that still needs a card       |
 | duplicate distance | the Jaccard value stays below `profile.similarity_limit` |
 

@@ -10,6 +10,7 @@ candidate for a word that has no core candidate.
 
 from __future__ import annotations
 
+import csv
 from collections import Counter
 from dataclasses import dataclass, replace
 from functools import lru_cache
@@ -373,6 +374,42 @@ def pool_paths(profile: LanguageProfile, data_dir: Path) -> dict[str, Path]:
     return paths
 
 
+FRAME_FIELDS = ("target", "sentence", "english")
+
+
+def default_frames_path(
+    profile: LanguageProfile, vocab_dir: Path = Path("vocab")
+) -> Path:
+    """Give the manual frame-sentence file of one language.
+
+    :param profile: Language profile.
+    :param vocab_dir: Directory of the vocabulary files.
+    :returns: Path of the frame file, which may not exist.
+    """
+    return vocab_dir / f"{profile.name}_frames.csv"
+
+
+def read_frames(path: Path) -> list[dict[str, str]]:
+    """Read the manual frame sentences of one language.
+
+    The file has the columns target, sentence, and english. A missing file
+    gives an empty list, so a language needs no frame file. A row with an
+    empty sentence is skipped.
+
+    :param path: Path of the frame CSV file.
+    :returns: The rows, in file order.
+    """
+    if not path.exists():
+        return []
+    with path.open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        return [
+            row
+            for row in reader
+            if (row.get("sentence") or "").strip()
+        ]
+
+
 def build_candidate_pool(
     word_table: Sequence[WordRow],
     profile: LanguageProfile,
@@ -384,6 +421,7 @@ def build_candidate_pool(
     fallback: bool = False,
     known_words: Collection[str] = (),
     make_candidate: Callable[..., Any],
+    frames_path: Path | None = None,
 ) -> tuple[list[Any], dict[str, Any]]:
     """Build the S2 candidate pool from the Tatoeba exports.
 
@@ -398,6 +436,8 @@ def build_candidate_pool(
     :param fallback: Add scaffold candidates for forms with no core candidate.
     :param known_words: Known word set of the unknown-token filter.
     :param make_candidate: Callable that builds a card object from the facts.
+    :param frames_path: Optional CSV file of manual frame sentences. A frame
+        passes the same guards as a Tatoeba sentence.
     :returns: The candidate list and the pool report.
     """
     min_units = profile.min_units if min_units is None else min_units
@@ -531,6 +571,59 @@ def build_candidate_pool(
                 )
             )
 
+    frame_counts: dict[str, int] = dict.fromkeys(FILTER_KEYS, 0)
+    frames = read_frames(frames_path) if frames_path is not None else []
+    frame_added = 0
+    for row in frames:
+        raw = row["sentence"].strip()
+        target_form = (row.get("target") or "").strip()
+        frame_english = (row.get("english") or "").strip()
+        sentence = profile.prepare_text(raw).strip()
+        shape = shape_failure(sentence, profile, min_units, max_units)
+        if shape is not None:
+            record_pass(frame_counts, shape)
+            continue
+        hits = tuple(sorted(profile.hits(sentence, form_set)))
+        if target_form and target_form not in hits:
+            record_pass(frame_counts, "sense")
+            continue
+        dedupe = profile.dedupe_key(sentence)
+        measured = FactInput(
+            predicate=profile.has_predicate(sentence),
+            orphan=profile.has_orphan(sentence),
+            english_words=len(frame_english.split()),
+            english_bounds=(MIN_ENGLISH_WORDS, MAX_ENGLISH_WORDS),
+            duplicate=dedupe in seen,
+            unknown_words=profile.count_unknown(sentence, known_words),
+            max_unknown=max_unknown,
+            hits=hits,
+            sense_hits=hits,
+        )
+        failure = fact_failure(measured)
+        record_pass(frame_counts, failure)
+        if failure is not None or not hits:
+            continue
+        seen.add(dedupe)
+        frame_added += 1
+        core_facts.append(
+            SentenceFacts(
+                sentence=sentence,
+                text_original=raw,
+                tatoeba_id=0,
+                tatoeba_author="manual",
+                english=frame_english,
+                english_id=0,
+                audio_id=0,
+                audio_license="",
+                unknown_words=measured.unknown_words,
+                unit_len=profile.unit_count(sentence),
+                zipf_mean=mean_zipf(
+                    profile.zipf_words(sentence), profile.wordfreq_lang
+                ),
+                hits=hits,
+            )
+        )
+
     core_covered: Counter[str] = Counter()
     pool: list[Any] = []
     for facts in core_facts:
@@ -579,6 +672,10 @@ def build_candidate_pool(
         "filter_names": filter_names(profile),
         "pool_candidates": len(pool),
         "core_sentences": len(core_facts),
+        "frames_path": str(frames_path) if frames_path is not None else "",
+        "frame_rows": len(frames),
+        "frame_sentences": frame_added,
+        "frame_counts": frame_counts,
         "scaffold_sentences": len(scaffold_texts),
         "scaffold_candidates": scaffold_count,
         "forms_with_core_candidate": len(core_covered),

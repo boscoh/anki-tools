@@ -806,44 +806,48 @@ and audio.
 ## 17. Implementation result
 
 Milestone M5 is complete. These values come from the full pipeline run of
-2026-10-21.
+2026-10-21, and the sentence stage was rerun on 2026-10-22 after the frame
+sentences and the two match fixes. The media and gate rows need a new pack
+build.
 
 | Measure            | Value                                                   |
 | ------------------ | ------------------------------------------------------- |
 | Build date         | 2026-10-21                                              |
 | Word table         | 207 rows, 206 unique forms, 146 review rows, 0 open     |
-| Candidate pool     | 7,382 candidates, 4 to 10 words, 2 scaffold             |
-| Cards              | 300 (298 core, 2 scaffold)                              |
-| Media files        | 460 (300 sentence files and 160 word files)             |
-| Concept coverage   | 160 of 207 concepts (0.773)                             |
-| Uncovered concepts | 47                                                      |
+| Candidate pool     | 7,873 candidates, 4 to 10 words, 1 scaffold             |
+| Cards              | 340 (339 core, 1 scaffold)                              |
+| Media files        | 460 from the 300-card run; rebuild the pack             |
+| Concept coverage   | 198 of 207 concepts (0.957)                             |
+| Uncovered concepts | 8                                                       |
 | Native audio       | none                                                    |
 | TTS engine         | gTTS, voice `gtts:el`                                   |
 | Gate result        | G1 to G20 pass; `anki swadesh audit greek` exits 0      |
 
-The uncovered words are πλατύς, παχύς, ψείρα, σκουλήκι, ραβδί, σπόρος,
-φλοιός του δέντρου, χόρτο, λίπος, κέρατο, πούπουλο, αυτί, νύχι, πόδι,
-γόνατο, φτερό, κοιλιά, σπλάχνα, λαιμός, συκώτι, ρουφώ, ξερνώ, φυσάω, κυνηγώ,
-χτυπάω, μαχαιρώνω, ξύνω, σκάβω, πετάω, ξαπλώνω, σφίγγω, τρίβω, σκουπίζω,
-τραβάω, δένω, μετράω, πλέω, ρέω, παγώνω, πρήζομαι, σκόνη, στάχτη, σάπιος,
-στρογγυλός, αιχμηρός, στομωμένος, λείος.
+The uncovered words are ψείρα, σπόρος, λίπος, πούπουλο, νύχι, ξύνω, πλέω,
+and στρογγυλός. They reach the pool but lose the selection to a similar
+sentence that is already kept.
+
+The other 39 concepts of the first run now have a card, because of two
+changes: the 47 manual frame sentences in `vocab/greek_frames.csv`, and two
+match fixes. :func:`hits` counted one token twice when its surface key and
+its lemma key both named the form, so a single clear match could fail the
+exactly-one test. The selection also treated every manual sentence as the
+same Tatoeba id 0, so only the first frame could enter the deck.
 
 The measured values differ from the probe of section 3.3 in four places:
 
-- The pool has 7,382 candidates, not 18,190. The shared pool applies the
-  unknown-token budget of section 8.2 as filter 13, so 4,048 sentences that
+- The pool has 7,873 candidates, not 18,190. The shared pool applies the
+  unknown-token budget of section 8.2 as filter 13, so the sentences that
   pass F1 to F12 with more than two unknown tokens leave the pool.
-- The English sense test removes 1,656 more sentences. A sentence stays only
-  when the paired English shows the gloss sense of a covered word.
-- Coverage is 160 concepts, not 168, and the deck has 300 cards, not 324.
-  The spaCy 3.8.0 tagger and lemmatizer of `el_core_news_sm` and the
-  carrier-lemma key set of section 8.2 find fewer targets than the probe.
-- The fallback window of section 7.1 adds 2 scaffold cards for the 47
-  uncovered words.
+- The English sense test removes more sentences. A sentence stays only when
+  the paired English shows the gloss sense of a covered word.
+- Coverage is 198 concepts, not 168, and the deck has 340 cards, not 324,
+  because the 47 frame sentences cover 39 more concepts than the probe.
+- The fallback window of section 7.1 adds 1 scaffold card for the 8
+  still-uncovered words.
 
 The coverage denominator is the 207 Swadesh concepts. Index 81 shares the
-form `πόδι` with index 80, so the deck leaves both forms without a card. G10
-at 0.76 still passes (0.773).
+form `πόδι` with index 80. G10 at 0.76 passes with a wide margin (0.957).
 
 The word review file has 146 rows: 83 article strips, 6 note removals, 2
 slash choices, 1 shared row, 23 module differences, and 31 rare forms. The

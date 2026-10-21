@@ -531,10 +531,12 @@ def hits(sentence: str, forms: Collection[str]) -> dict[str, int]:
     for token in tokens:
         if token.punctuation:
             continue
+        matched: set[str] = set()
         for key in {surface_key(token.text), surface_key(token.lemma)}:
-            for form in index.get(key, ()):
-                if len(form.split()) == 1:
-                    counts[form] = counts.get(form, 0) + 1
+            matched.update(index.get(key, ()))
+        for form in matched:
+            if len(form.split()) == 1:
+                counts[form] = counts.get(form, 0) + 1
     found = {form: count for form, count in counts.items() if count == 1}
     for form in forms:
         parts = form.split()

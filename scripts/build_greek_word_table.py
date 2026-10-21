@@ -14,7 +14,7 @@ import csv
 import io
 import subprocess
 
-from anki_tools.sentence_pack.languages.greek import (
+from anki_tools.languages.greek.profile import (
     MIN_ZIPF,
     SWADESH_ROWS,
     WORD_CSV_PATH,

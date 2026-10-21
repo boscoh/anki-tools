@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import csv
 
-from anki_tools.sentence_pack.languages.cantonese import (
+from anki_tools.languages.cantonese.profile import (
     DEFAULT_CSV_PATH,
     DEFAULT_REVIEW_PATH,
     SWADESH_ROWS,

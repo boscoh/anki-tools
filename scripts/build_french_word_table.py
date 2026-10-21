@@ -19,7 +19,7 @@ import csv
 
 from wordfreq import zipf_frequency
 
-from anki_tools.sentence_pack.languages.french import (
+from anki_tools.languages.french.profile import (
     MIN_ZIPF,
     NOUN_INDICES,
     SWADESH_ROWS,

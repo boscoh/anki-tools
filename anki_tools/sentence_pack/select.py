@@ -182,13 +182,14 @@ def select_sentences(
         for candidate in by_form.get(form, ()):
             if len(kept) >= max_cards or counts[form] >= per_word:
                 break
-            if candidate.tatoeba_id in used:
+            if candidate.tatoeba_id and candidate.tatoeba_id in used:
                 continue
             target = assign_target(candidate.covered, positions, counts, per_word)
             if target is None or index.too_similar(candidate.sentence):
                 continue
             counts[target] += 1
-            used.add(candidate.tatoeba_id)
+            if candidate.tatoeba_id:
+                used.add(candidate.tatoeba_id)
             index.add(candidate.sentence)
             card = replace(candidate, target=target)
             if finalize is not None:
