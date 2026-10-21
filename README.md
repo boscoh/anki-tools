@@ -45,7 +45,7 @@ uv run anki swadesh build mandarin
 # Fix Chinese deck (rank, reorder, fix pinyin, apply styling)
 uv run anki fix zh input.apkg
 
-# Fix French deck (rank and reorder)
+# Fix French deck (rank and reorder, or select with --select)
 uv run anki fix fr input.apkg
 
 # Build the Cantonese frequency list (blended spoken and written counts)
@@ -113,12 +113,15 @@ uv run anki fix zh deck.apkg --max-sentences 2600   # Also deduplicate and reduc
 
 **French (fr):**
 ```bash
-uv run anki fix fr deck.apkg  # Rank and reorder
+uv run anki fix fr deck.apkg           # Rank mode: rank and reorder
+uv run anki fix fr deck.apkg --select  # Select mode: the 1000-card cull
 ```
-- Word-based complexity and similarity
+- Rank mode ranks by word-based complexity and similarity and reorders the
+  deck. It writes `_reordered.apkg` and `.rank.csv`.
+- Select mode runs the 1000-card cull. It writes `_culled.apkg` with its CSV
+  files and manifest. See "French 1000-Card Cull" below.
 - Uses wordfreq for frequency data
 - Optional spaCy grammar scoring: `uv run python -m spacy download fr_core_news_sm`
-- Outputs `_reordered.apkg` and `.rank.csv`
 
 **Cantonese (yue):**
 ```bash
@@ -367,8 +370,12 @@ vocabulary. The selection is a greedy cover of the 300 most frequent French
 content lemmas, weighted to the spoken frequency list. No non-exempt word
 appears in more than 4 cards.
 
+`anki fix fr` has two modes. Rank mode is the default: it ranks the sentences
+and writes `<input>_reordered.apkg`. Select mode adds `--select` and runs the
+cull: it writes `<input>_culled.apkg`.
+
 ```bash
-uv run anki cull fr "apkg/6000_French_Sentences_w_Audio.apkg" \
+uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
     --max-cards 1000 \
     --target-words 300 \
     --max-uses 4 \
@@ -376,14 +383,14 @@ uv run anki cull fr "apkg/6000_French_Sentences_w_Audio.apkg" \
     --spoken-weight 0.5 \
     --output apkg/french_1000_sentences.apkg
 
-# Run gates G1 to G13 on the written output
-uv run anki cull fr "apkg/6000_French_Sentences_w_Audio.apkg" \
+# Run gates G1 to G15 on the written output
+uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
     --output apkg/french_1000_sentences.apkg --check
 ```
 
-The defaults are the values above. The other options are `--min-words 3`,
-`--max-words 12`, `--similarity 0.67`, `--order coverage` (`coverage` or
-`input`), and `--name "French 1000 Core Sentences"`.
+The defaults are the values above. The other select mode options are
+`--min-words 3`, `--max-words 12`, `--similarity 0.67`, `--order coverage`
+(`coverage` or `input`), and `--name "French 1000 Core Sentences"`.
 
 The command writes these files:
 
@@ -400,7 +407,7 @@ one card, and `absent` for no card.
 The cull adds a Swadesh reserve from
 `apkg/swadesh_french_sentences.apkg`: one card per Swadesh concept, with its
 audio. The frequency pass fills the rest of the 1,000 cards. Use
-`--swadesh-pack` to select another pack, or `--no-swadesh` for the frequency
+`--reserve-pack` to select another pack, or `--no-reserve` for the frequency
 cull alone.
 
 Measured result on 2026-10-20: 1,000 cards, 198 reserve cards, 802 frequency

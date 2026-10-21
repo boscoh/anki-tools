@@ -10,7 +10,6 @@ See ``specs/yue-sentence-selection.md`` sections 7 and 8.
 from __future__ import annotations
 
 import csv
-import heapq
 import math
 from collections import Counter
 from dataclasses import dataclass, field
@@ -23,6 +22,7 @@ from anki_tools.languages.mandarin.characters import (
     char_similarity_zh_same_len,
     get_chinese_chars,
 )
+from anki_tools.ranking.cover import greedy_cover
 from anki_tools.ranking.rank import Sentence
 from anki_tools.languages.cantonese.frequency import (
     VOCAB_DIR,
@@ -247,10 +247,6 @@ def greedy_select(
             index,
         )
 
-    heap = [key(i, gain(c)) for i, c in enumerate(candidates)]
-    heapq.heapify(heap)
-    kept: list[Candidate] = []
-    reasons: dict[int, str] = {}
     by_size: dict[int, list[str]] = {}
     token_sets: set[frozenset[str]] = set()
 
@@ -263,24 +259,16 @@ def greedy_select(
             for other in by_size.get(len(set(get_chinese_chars(text))), ())
         )
 
-    limit = options.max_sentences
-    while heap and (limit is None or len(kept) < limit):
-        stored, *_, index = heapq.heappop(heap)
+    def reject(index: int) -> str | None:
         candidate = candidates[index]
-        value = gain(candidate)
-        candidate.gain = value
-        if value <= 0:
-            reasons[index] = "no_gain"
-            continue
-        if abs(value + stored) > 1e-12:
-            heapq.heappush(heap, key(index, value))
-            continue
         if too_similar(candidate):
-            reasons[index] = "similar"
-            continue
+            return "similar"
         if at_limit(candidate):
-            reasons[index] = "use_cap"
-            continue
+            return "use_cap"
+        return None
+
+    def on_pick(index: int, _value: float) -> None:
+        candidate = candidates[index]
         token_sets.add(frozenset(candidate.words))
         text = candidate.sentence.text
         by_size.setdefault(len(set(get_chinese_chars(text))), []).append(text)
@@ -288,12 +276,26 @@ def greedy_select(
             uses[word] += 1
             if word in target_set:
                 chosen[word] += 1
-        kept.append(candidate)
 
-    for *_, index in heap:
-        candidate = candidates[index]
-        candidate.gain = gain(candidate)
-        reasons[index] = "cap" if candidate.gain > 0 else "no_gain"
+    def on_measure(index: int, value: float) -> None:
+        candidates[index].gain = value
+
+    kept_indices, reasons = greedy_cover(
+        range(len(candidates)),
+        gain=lambda index: gain(candidates[index]),
+        key=key,
+        reject=reject,
+        on_pick=on_pick,
+        limit=options.max_sentences,
+        include_zero=True,
+        on_measure=on_measure,
+    )
+    kept = [candidates[index] for index in kept_indices]
+    picked = set(kept_indices)
+    for index, candidate in enumerate(candidates):
+        if index not in picked and index not in reasons:
+            candidate.gain = gain(candidate)
+            reasons[index] = "cap" if candidate.gain > 0 else "no_gain"
     return SelectionResult(kept, reasons, uses, targets)
 
 

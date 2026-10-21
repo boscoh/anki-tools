@@ -10,7 +10,6 @@ Commands:
 
 import csv
 import importlib.util
-from collections import Counter
 import os
 import re
 import shutil
@@ -49,7 +48,6 @@ from anki_tools.sentence_pack import pool as sentence_pool
 from anki_tools.sentence_pack import select as sentence_select
 from anki_tools.sentence_pack import tatoeba as sentence_tatoeba
 from anki_tools.sentence_pack.audit import print_audit as print_gate_table
-from anki_tools.sentence_pack.audit import sha256_value
 from anki_tools.languages import (
     LANGUAGES,
     get_profile,
@@ -71,6 +69,7 @@ from anki_tools.ranking.rank import (
 )
 
 
+from anki_tools.ranking.pipeline import rank_paths, run_ranked_deck
 from anki_tools.ranking.reorder import reorder_deck
 from anki_tools.apkg.templates import load_char_links
 from anki_tools.languages.cantonese.frequency import (
@@ -619,258 +618,6 @@ def freq_yue(
         raise SystemExit(1)
 
 
-
-# =============================================================================
-# Cull commands - reduce a sentence deck to a smaller deck
-# =============================================================================
-
-cull_app = cyclopts.App(name="cull", help="Cull a sentence deck to a smaller deck")
-app.command(cull_app)
-
-
-@cull_app.command(name="fr")
-def cull_fr(
-    apkg_path: Path,
-    *,
-    max_cards: int = 1000,
-    target_words: int = 300,
-    max_uses: int = 4,
-    exempt_top: int = 100,
-    spoken_weight: float = 0.5,
-    min_words: int = 3,
-    max_words: int = 12,
-    similarity: float = 0.67,
-    order: Literal["coverage", "input"] = "coverage",
-    name: str = "French 1000 Core Sentences",
-    output: Path | None = None,
-    check: bool = False,
-    swadesh_pack: Path = Path("apkg/swadesh_french_sentences.apkg"),
-    no_swadesh: bool = False,
-) -> None:
-    """Cull the French sentence deck.
-
-    :param apkg_path: Input .apkg file.
-    :param max_cards: Card cap.
-    :param target_words: Target count, 200 to 500.
-    :param max_uses: Most cards that hold one non-exempt word.
-    :param exempt_top: Content lemmas exempt from the card cap.
-    :param spoken_weight: Weight of the Tatoeba term in the blend, 0 to 1.
-    :param min_words: Minimum word count of a card.
-    :param max_words: Maximum word count of a card.
-    :param similarity: Lemma Jaccard limit of a duplicate pair.
-    :param order: ``coverage`` or ``input`` card order.
-    :param name: Output deck name.
-    :param output: Output .apkg file (default: from the input name).
-    :param check: Run the gates on an existing output and exit with code 1 on
-        a failure. The check does not run the selection again.
-    :param swadesh_pack: French Swadesh APKG with the reserve cards.
-    :param no_swadesh: Run the frequency cull without the Swadesh reserve.
-    """
-    output_path = output or french_cull.default_output(apkg_path)
-    if check:
-        _print_cull_gates(french_cull.gate_inputs(output_path))
-        return
-
-    cards = french_cull.load_input_deck(apkg_path)
-    frequency = french_cull.load_frequency()
-    ranks = french_cull.frequency_ranks(frequency, spoken_weight=spoken_weight)
-    names = french_cull.read_names()
-    tokens = french_cull.tokenize_deck(cards)
-    targets, content_lemmas = french_cull.build_targets(
-        cards, tokens, ranks, names, target_words=target_words
-    )
-    passed, reasons = french_cull.filter_cards(
-        cards, tokens, min_words=min_words, max_words=max_words
-    )
-    reserve = []
-    reserve_sets = []
-    all_reserve = []
-    if not no_swadesh:
-        all_reserve = french_cull.load_reserve(swadesh_pack)
-        reserve = list(all_reserve)
-        reserve_sets = french_cull.reserve_lemma_sets(reserve)
-        reserve, reserve_sets = french_cull.dedupe_reserve_sets(
-            reserve, reserve_sets, cards, tokens, similarity
-        )
-    selection = french_cull.select_cards(
-        cards,
-        tokens,
-        targets,
-        ranks,
-        max_cards=max_cards,
-        max_uses=max_uses,
-        exempt_top=exempt_top,
-        similarity=similarity,
-        passed=passed,
-        reserved=reserve,
-        reserved_sets=reserve_sets,
-    )
-    ordered = french_cull.order_cards(selection.kept, tokens, ranks, order=order)
-
-    rejected = Counter(reasons)
-    kept_lemmas = set().union(*reserve_sets) if reserve_sets else set()
-    kept_lemmas.update(
-        lemma
-        for index in selection.kept
-        for lemma, pos in tokens[index]
-        if pos in french_cull.CONTENT_POS
-    )
-    covered = sum(1 for target in targets if selection.uses[target.lemma])
-    twice = sum(1 for target in targets if selection.uses[target.lemma] >= 2)
-    exempt = selection.exempt
-    exempt_max = max(
-        (
-            count
-            for lemma, count in selection.uses.items()
-            if lemma in exempt
-        ),
-        default=0,
-    )
-    frequency_uses = Counter()
-    for index in selection.kept:
-        frequency_uses.update(
-            {
-                lemma
-                for lemma, pos in tokens[index]
-                if pos in french_cull.CONTENT_POS
-            }
-        )
-    reserve_uses = Counter()
-    for lemma_set in reserve_sets:
-        reserve_uses.update(lemma_set)
-    frequency_max = max(
-        (count for lemma, count in frequency_uses.items() if lemma not in exempt),
-        default=0,
-    )
-    reserve_max = max(
-        (count for lemma, count in reserve_uses.items() if lemma not in exempt),
-        default=0,
-    )
-    all_concepts = [card.target for card in all_reserve]
-    if reserve:
-        all_concepts += list(french_cull.SWADESH_EXCEPTIONS)
-        merged_sentences = [card.sentence for card in reserve]
-        merged_sentences += [cards[index].sentence for index in ordered]
-        merged_tokens = french_cull.tokenize_texts(merged_sentences)
-        swadesh_covered, swadesh_total = french_cull.swadesh_coverage(
-            all_concepts, merged_sentences, merged_tokens
-        )
-    else:
-        swadesh_covered, swadesh_total = 0, french_cull.SWADESH_TOTAL
-    mass = french_cull.spoken_mass(frequency, kept_lemmas)
-
-    print(f"Input:              {apkg_path}")
-    print(f"Input cards:        {len(cards)}")
-    print(f"Passed:             {len(passed)}")
-    for rule in french_cull.FILTER_RULES:
-        print(f"  Rejected {rule}:       {rejected.get(rule, 0)}")
-    print(f"Targets:            {len(targets)}")
-    print(f"Content lemmas:     {content_lemmas}")
-    print(f"Reserve:            {len(reserve)}")
-    print(f"Swadesh:            {swadesh_covered}/{swadesh_total}")
-    print(f"Cards:              {len(selection.kept) + len(reserve)}")
-    print(f"  Frequency cards:  {len(selection.kept)}")
-    print(f"Distinct lemmas:    {len(kept_lemmas)}")
-    print(f"Covered targets:    {covered}")
-    print(f"Targets with 2:     {twice}")
-    print(f"Max uses frequency: {frequency_max}")
-    print(f"Max uses reserve:   {reserve_max}")
-    print(f"Max uses exempt:    {exempt_max}")
-    print(f"spoken_mass:        {mass:.3f}")
-    print()
-    print("First 10 kept cards")
-    target_ranks = {target.lemma: target.rank for target in targets}
-    for position, index in enumerate(ordered[:10], start=1):
-        card = cards[index]
-        hits = sorted(
-            {
-                lemma
-                for lemma, pos in tokens[index]
-                if pos in french_cull.CONTENT_POS and lemma in target_ranks
-            },
-            key=lambda lemma: target_ranks[lemma],
-        )
-        print(f"{position:>2}. {card.sentence}")
-        print(f"    {card.english}")
-        print(f"    targets: {', '.join(hits)}")
-
-    cull_csv, coverage_csv, manifest_path = french_cull.side_paths(output_path)
-    french_cull.write_cull_csv(
-        cards, reasons, selection, ordered, cull_csv, reserve=reserve
-    )
-    french_cull.write_coverage_csv(targets, selection, coverage_csv)
-    french_cull.write_deck(
-        apkg_path,
-        cards,
-        ordered,
-        output_path,
-        name,
-        reserve=reserve,
-        reserve_pack_path=swadesh_pack,
-    )
-    kept_order = french_cull.kept_order_hash(cards, ordered, reserve=reserve)
-    french_cull.write_manifest(
-        manifest_path,
-        source={
-            "input": str(apkg_path),
-            "deck": name,
-            "model": french_cull.MODEL_NAME,
-        },
-        params={
-            "max_cards": max_cards,
-            "target_words": target_words,
-            "max_uses": max_uses,
-            "exempt_top": exempt_top,
-            "spoken_weight": spoken_weight,
-            "min_words": min_words,
-            "max_words": max_words,
-            "similarity": similarity,
-            "order": order,
-            "name": name,
-        },
-        counts={
-            "input": len(cards),
-            "passed": len(passed),
-            "cards": len(ordered) + len(reserve),
-            "frequency_cards": len(ordered),
-            "reserve": len(reserve),
-            "content": len(kept_lemmas),
-            "targets": len(targets),
-            "covered": covered,
-            "covered2": twice,
-            "swadesh_covered": swadesh_covered,
-            "swadesh_total": swadesh_total,
-        },
-        frequency={
-            "path": str(french_cull.FREQUENCY_PATH),
-            "spoken_weight": spoken_weight,
-        },
-        files={
-            "cull_csv": sha256_value(cull_csv),
-            "coverage_csv": sha256_value(coverage_csv),
-            "input_apkg": sha256_value(apkg_path),
-        },
-        kept_order=kept_order,
-        reserve_pack=str(swadesh_pack) if reserve else "",
-        swadesh_exceptions=french_cull.SWADESH_EXCEPTIONS if reserve else (),
-    )
-    print()
-    print(f"wrote {output_path}")
-    print(f"wrote {cull_csv}")
-    print(f"wrote {coverage_csv}")
-    print(f"wrote {manifest_path}")
-
-
-def _print_cull_gates(inputs) -> None:
-    """Print the gates of a cull output and exit on a failure.
-
-    :param inputs: Lazy reader of the output APKG and its side files.
-    """
-    code = print_gate_table(french_cull.run_gates(inputs))
-    if code:
-        raise SystemExit(code)
-
-
 # =============================================================================
 # Fix commands - optimize decks by language
 # =============================================================================
@@ -915,35 +662,25 @@ def zh(
         0.5 would also remove valid pairs that share 2 of 4 unique chars ('我在这'/'你在这').
     :param min_chars: Skip dedup for sentences with fewer raw chars than this (default 0 = off).
     """
-    if output is None:
-        output = apkg_path.parent / f"{apkg_path.stem}_reordered.apkg"
-
-    ranking_csv = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
+    paths = rank_paths(apkg_path, output)
 
     print("=" * 50)
     print("Processing Chinese Anki Deck")
     print("=" * 50)
-    print(f"Input:   {apkg_path}")
-    print(f"Output:  {output}")
-    print(f"Ranking: {ranking_csv}")
+    print(f"Input:   {paths.input_path}")
+    print(f"Output:  {paths.output_path}")
+    print(f"Ranking: {paths.ranking_path}")
     if max_sentences:
         print(f"Target:  {max_sentences} sentences (stratified reduction)")
     print()
 
     print("Step 1: Ranking sentences...")
-    sentences = extract_sentences(
-        str(apkg_path), model_id, romanization_candidates=("Pinyin",)
-    )
 
-    if not sentences:
-        print("No sentences found!")
-        return
-
-    ranked = rank_sentences_zh(sentences)
-
-    if max_sentences and len(ranked) > max_sentences:
+    def reduce_ranked(ranked: list[Sentence]) -> list[Sentence]:
+        if not max_sentences or len(ranked) <= max_sentences:
+            return ranked
         print(f"\nStep 2: Reducing to {max_sentences} sentences...")
-        ranked = reduce_sentences_stratified(
+        return reduce_sentences_stratified(
             ranked,
             target_count=max_sentences,
             similarity_threshold=similarity_threshold,
@@ -951,22 +688,28 @@ def zh(
             min_chars=min_chars,
         )
 
-    write_ranking_csv(ranked, str(ranking_csv))
-
-    print("\nStep 3: Reordering deck...")
-    stats = reorder_deck(
-        str(apkg_path),
-        str(output),
-        str(ranking_csv),
-        remove_filtered=not keep_filtered,
+    deck = run_ranked_deck(
+        paths,
+        rank=rank_sentences_zh,
+        model_id=model_id,
+        romanization_candidates=("Pinyin",),
+        keep_filtered=keep_filtered,
+        reduce=reduce_ranked,
         remove_unranked=bool(max_sentences),
     )
+    if not deck.sentences:
+        print("No sentences found!")
+        return
+    ranked = deck.ranked
+    stats = deck.stats
+
+    print("\nStep 3: Reordering deck...")
 
     if not no_pinyin_fix:
         print("\nStep 4: Fixing pinyin...")
         fix_pinyin(
-            output,
-            output=output,
+            paths.output_path,
+            output=paths.output_path,
             csv_output=Path("/dev/null"),
             verbose=verbose,
         )
@@ -975,7 +718,7 @@ def zh(
     if not no_style:
         print("\nStep 5: Applying card styles...")
         styles_applied, applied = _apply_style(
-            Path(output),
+            Path(paths.output_path),
             css_path=Path("templates/card.css"),
             front_path=Path("templates/front.html"),
             back_path=Path("templates/back.html"),
@@ -992,8 +735,8 @@ def zh(
     print(f"  Cards reordered:     {stats['cards_reordered']}")
     print(f"  Cards removed:       {stats['cards_removed']}")
     print(f"  Styles applied:      {styles_applied} model(s)")
-    print(f"  Output:              {output}")
-    print(f"  Ranking CSV:         {ranking_csv}")
+    print(f"  Output:              {paths.output_path}")
+    print(f"  Ranking CSV:         {paths.ranking_path}")
 
 
 DEFAULT_FRENCH_APKG = Path("apkg/6000_French_Sentences_w_Audio.apkg")
@@ -1007,53 +750,117 @@ def fr(
     model_id: int | None = None,
     text_field: str = "French",
     keep_filtered: bool = False,
+    select: bool = False,
+    max_cards: int = 1000,
+    target_words: int = 300,
+    max_uses: int = 4,
+    exempt_top: int = 100,
+    spoken_weight: float = 0.5,
+    min_words: int = 3,
+    max_words: int = 12,
+    similarity: float = 0.67,
+    order: Literal["coverage", "input"] = "coverage",
+    name: str = "French 1000 Core Sentences",
+    reserve_pack: Path = Path("apkg/swadesh_french_sentences.apkg"),
+    reserve: bool = True,
+    check: bool = False,
 ):
-    """Fix French deck: rank and reorder by complexity, frequency, and uniqueness.
+    """Fix French deck: rank and reorder it, or select a smaller deck.
 
-    Uses word-based scoring. Ranks sentences and reorders the deck optimally.
+    Rank mode is the default. It ranks the sentences and writes
+    ``<input>_reordered.apkg`` and ``.rank.csv``. Select mode, with
+    ``--select``, runs the 1000-card cull and writes ``<input>_culled.apkg``
+    with its CSV files and manifest.
+
+    ``--model-id``, ``--text-field``, and ``--keep-filtered`` apply to rank
+    mode only. The other options apply to select mode only.
 
     :param apkg_path: Input .apkg file.
-    :param output: Output .apkg file (default: input_reordered.apkg).
-    :param model_id: Filter by specific model ID.
-    :param text_field: Preferred sentence field (default: French); inferred from deck if missing.
-    :param keep_filtered: If True, keep filtered cards instead of removing.
+    :param output: Output .apkg file (default: from the input name).
+    :param model_id: Rank mode: filter by specific model ID.
+    :param text_field: Rank mode: preferred sentence field (default: French).
+    :param keep_filtered: Rank mode: keep filtered cards instead of removing.
+    :param select: Run the card cull instead of the rank and reorder.
+    :param max_cards: Select mode: card cap.
+    :param target_words: Select mode: target count, 200 to 500.
+    :param max_uses: Select mode: most cards that hold one non-exempt word.
+    :param exempt_top: Select mode: content lemmas exempt from the card cap.
+    :param spoken_weight: Select mode: weight of the Tatoeba term, 0 to 1.
+    :param min_words: Select mode: minimum word count of a card.
+    :param max_words: Select mode: maximum word count of a card.
+    :param similarity: Select mode: lemma Jaccard limit of a duplicate pair.
+    :param order: Select mode: ``coverage`` or ``input`` card order.
+    :param name: Select mode: output deck name.
+    :param reserve_pack: Select mode: Swadesh APKG with the reserve cards.
+    :param reserve: Select mode: add the Swadesh reserve cards.
+    :param check: Select mode: run the gates on the output and do not run
+        the selection again.
     """
     apkg_path = Path(apkg_path)
     if not apkg_path.exists():
         print(f"Error: File not found: {apkg_path}")
         return
 
-    if output is None:
-        output = apkg_path.parent / f"{apkg_path.stem}_reordered.apkg"
+    if not select and check:
+        print("Error: --check needs --select.")
+        return
 
-    ranking_csv = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
+    if select:
+        if model_id is not None:
+            print("Error: --model-id does not apply with --select.")
+            return
+        output_path = output or french_cull.default_output(apkg_path)
+        if check:
+            code = french_cull.check_cull(output_path)
+            if code:
+                raise SystemExit(code)
+            return
+        french_cull.run_cull(
+            french_cull.CullRequest(
+                input_path=apkg_path,
+                output_path=output_path,
+                max_cards=max_cards,
+                target_words=target_words,
+                max_uses=max_uses,
+                exempt_top=exempt_top,
+                spoken_weight=spoken_weight,
+                min_words=min_words,
+                max_words=max_words,
+                similarity=similarity,
+                order=order,
+                name=name,
+                reserve_pack=reserve_pack,
+                no_reserve=not reserve,
+            )
+        )
+        return
+
+    paths = rank_paths(apkg_path, output)
 
     print("=" * 50)
     print("Processing French Anki Deck")
     print("=" * 50)
-    print(f"Input:   {apkg_path}")
-    print(f"Output:  {output}")
-    print(f"Ranking: {ranking_csv}")
+    print(f"Input:   {paths.input_path}")
+    print(f"Output:  {paths.output_path}")
+    print(f"Ranking: {paths.ranking_path}")
     print()
 
     print("Step 1: Ranking sentences...")
-    sentences = extract_sentences(
-        str(apkg_path), model_id, text_field=text_field, text_candidates=("French",)
+    deck = run_ranked_deck(
+        paths,
+        rank=rank_sentences_fr,
+        model_id=model_id,
+        text_field=text_field,
+        text_candidates=("French",),
+        keep_filtered=keep_filtered,
     )
-    if not sentences:
+    if not deck.sentences:
         print("No sentences found!")
         return
 
-    ranked = rank_sentences_fr(sentences)
-    write_ranking_csv(ranked, str(ranking_csv))
-
     print("\nStep 2: Reordering deck...")
-    stats = reorder_deck(
-        str(apkg_path),
-        str(output),
-        str(ranking_csv),
-        remove_filtered=not keep_filtered,
-    )
+    ranked = deck.ranked
+    stats = deck.stats
 
     print()
     print("=" * 50)
@@ -1062,8 +869,8 @@ def fr(
     print(f"  Sentences ranked:    {len(ranked)}")
     print(f"  Cards reordered:     {stats['cards_reordered']}")
     print(f"  Cards removed:       {stats['cards_removed']}")
-    print(f"  Output:              {output}")
-    print(f"  Ranking CSV:         {ranking_csv}")
+    print(f"  Output:              {paths.output_path}")
+    print(f"  Ranking CSV:         {paths.ranking_path}")
 
 
 DEFAULT_CANTONESE_APKG = Path("apkg/LTL Cantonese Deck Level 1 - Short.apkg")
@@ -1259,51 +1066,49 @@ def es(
         print(f"Error: File not found: {apkg_path}")
         return
 
-    if output is None:
-        output = apkg_path.parent / f"{apkg_path.stem}_reordered.apkg"
-
-    ranking_csv = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
+    paths = rank_paths(apkg_path, output)
 
     print("=" * 50)
     print("Processing Spanish Anki Deck")
     print("=" * 50)
-    print(f"Input:   {apkg_path}")
-    print(f"Output:  {output}")
-    print(f"Ranking: {ranking_csv}")
+    print(f"Input:   {paths.input_path}")
+    print(f"Output:  {paths.output_path}")
+    print(f"Ranking: {paths.ranking_path}")
     if max_sentences:
         print(f"Target:  {max_sentences} sentences (stratified reduction)")
     print()
 
     print("Step 1: Ranking sentences...")
-    sentences = extract_sentences(str(apkg_path), model_id, text_field=text_field)
-    if not sentences:
-        print("No sentences found!")
-        return
 
-    print(f"Extracted {len(sentences)} sentences")
-
-    ranked = rank_sentences_es(sentences)
-
-    # Step 2: Reduce sentences if max_sentences specified
-    if max_sentences and len(ranked) > max_sentences:
+    def reduce_ranked(ranked: list[Sentence]) -> list[Sentence]:
+        if not max_sentences or len(ranked) <= max_sentences:
+            return ranked
         print(f"\nStep 2: Reducing to {max_sentences} sentences...")
-        ranked = reduce_sentences_stratified(
+        return reduce_sentences_stratified(
             ranked,
             target_count=max_sentences,
             similarity_threshold=similarity_threshold,
             similarity_fn=latin_word_similarity,
         )
 
-    write_ranking_csv(ranked, str(ranking_csv))
+    deck = run_ranked_deck(
+        paths,
+        rank=rank_sentences_es,
+        model_id=model_id,
+        text_field=text_field,
+        keep_filtered=keep_filtered,
+        reduce=reduce_ranked,
+        remove_unranked=bool(max_sentences),
+    )
+    if not deck.sentences:
+        print("No sentences found!")
+        return
+
+    print(f"Extracted {len(deck.sentences)} sentences")
 
     print("\nStep 3: Reordering deck...")
-    stats = reorder_deck(
-        str(apkg_path),
-        str(output),
-        str(ranking_csv),
-        remove_filtered=not keep_filtered,
-        remove_unranked=bool(max_sentences),  # Remove unranked cards when reducing
-    )
+    ranked = deck.ranked
+    stats = deck.stats
 
     print()
     print("=" * 50)
@@ -1312,8 +1117,8 @@ def es(
     print(f"  Sentences ranked:    {len(ranked)}")
     print(f"  Cards reordered:     {stats['cards_reordered']}")
     print(f"  Cards removed:       {stats['cards_removed']}")
-    print(f"  Output:              {output}")
-    print(f"  Ranking CSV:         {ranking_csv}")
+    print(f"  Output:              {paths.output_path}")
+    print(f"  Ranking CSV:         {paths.ranking_path}")
 
 
 # =============================================================================

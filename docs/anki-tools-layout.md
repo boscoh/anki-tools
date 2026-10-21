@@ -28,15 +28,23 @@ no language package.
 
 Shared ranking code only. No language data.
 
-| Path                            | Content                                               |
-| ------------------------------- | ----------------------------------------------------- |
-| `anki_tools/ranking/rank.py`    | Sentence data, frequency tables, shared score drivers |
-| `anki_tools/ranking/latin.py`   | Shared Latin-script text helpers and word metrics     |
-| `anki_tools/ranking/reorder.py` | Reorder a deck from a ranking CSV                     |
+| Path                             | Content                                               |
+| -------------------------------- | ----------------------------------------------------- |
+| `anki_tools/ranking/rank.py`     | Sentence data, frequency tables, shared score drivers |
+| `anki_tools/ranking/latin.py`    | Shared Latin-script text helpers and word metrics     |
+| `anki_tools/ranking/reorder.py`  | Reorder a deck from a ranking CSV                     |
+| `anki_tools/ranking/cover.py`    | Generic greedy cover over items with changing gains   |
+| `anki_tools/ranking/pipeline.py` | Shared extract, rank, write, and reorder stages       |
 
 `rank_word_based` and `rank_character_based` are the shared score drivers.
 `jaccard_similarity`, `compute_similarity_penalties`, and the word metrics of
 `latin.py` are the public shared helpers. A language package calls them.
+
+`cover.greedy_cover` holds the selection loop. A language module gives the
+gain, the heap key, the reject test, and the callbacks, so each language
+keeps its own reason labels. `pipeline.run_ranked_deck` calls the ranker and
+the optional reducer of a language, then writes the ranking CSV and reorders
+the deck.
 
 ## 4. sentence_pack
 

@@ -120,7 +120,7 @@ release (open question 6).
 
 ### 3.3 In scope
 
-- One cull command for a French sentence deck with audio.
+- One cull mode of `anki fix fr` for a French sentence deck with audio.
 - A frequency list from public corpora, cached locally.
 - A filter, a selection, an APKG writer, a report, and gates.
 - Options for the card count, the target count, the word cap, and the order.
@@ -130,7 +130,7 @@ release (open question 6).
 - New audio or TTS.
 - New card templates or a new note model.
 - Changes to the French Swadesh pack.
-- A general cull command for other languages (a later spec).
+- A general cull mode for other languages (a later spec).
 
 ## 4. Frequency analysis
 
@@ -236,8 +236,8 @@ more than the target list (section 9.4).
 | C4    | Select     | C1, C2, C3                   | kept cards in learning order        |
 | C5    | Write      | C0, C4                       | `.apkg`, `.cull.csv`, `.coverage.csv`, manifest |
 
-`anki cull fr` runs C0 to C5. A second run with the same input gives the same
-output. The audio cache is read only.
+`anki fix fr --select` runs C0 to C5. A second run with the same input gives
+the same output. The audio cache is read only.
 
 ## 7. Filter
 
@@ -424,7 +424,7 @@ parameter change, not a gate failure.
 ### 10.1 Command
 
 ```bash
-uv run anki cull fr "apkg/6000_French_Sentences_w_Audio.apkg" \
+uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
     --max-cards 1000 \
     --target-words 300 \
     --max-uses 4 \
@@ -435,19 +435,20 @@ uv run anki cull fr "apkg/6000_French_Sentences_w_Audio.apkg" \
 
 ### 10.2 Options
 
-| Option              | Default | Meaning                                                   |
-| ------------------- | ------- | --------------------------------------------------------- |
-| `--max-cards`       | 1000    | Card cap                                                  |
-| `--target-words`    | 300     | Target count, 200 to 500                                  |
-| `--max-uses`        | 4       | Most cards for one non-exempt word                        |
-| `--exempt-top`      | 100     | Content lemmas exempt from the cap                        |
-| `--spoken-weight`   | 0.5     | `w` in the blend                                          |
-| `--min-words`       | 3       | Minimum word count of a card                              |
-| `--max-words`       | 12      | Maximum word count of a card                              |
-| `--similarity`      | 0.67    | Lemma Jaccard limit                                       |
-| `--order`           | coverage | `coverage` or `input`                                     |
-| `--name`            | French 1000 Core Sentences | Output deck name                         |
-| `--output`          | from the input name | Output APKG                                  |
+| Option            | Default                    | Meaning                                      |
+| ----------------- | -------------------------- | -------------------------------------------- |
+| `--max-cards`     | 1000                       | Card cap                                     |
+| `--target-words`  | 300                        | Target count, 200 to 500                     |
+| `--max-uses`      | 4                          | Most cards for one non-exempt word           |
+| `--exempt-top`    | 100                        | Content lemmas exempt from the cap           |
+| `--spoken-weight` | 0.5                        | `w` in the blend                             |
+| `--min-words`     | 3                          | Minimum word count of a card                 |
+| `--max-words`     | 12                         | Maximum word count of a card                 |
+| `--similarity`    | 0.67                       | Lemma Jaccard limit                          |
+| `--order`         | coverage                   | `coverage` or `input`                        |
+| `--name`          | French 1000 Core Sentences | Output deck name                             |
+| `--output`        | from the input name        | Output APKG                                  |
+| `--select`        | off                        | Run the cull instead of the rank and reorder |
 
 ### 10.3 Output files
 
@@ -467,18 +468,22 @@ The `.coverage.csv` has these columns: `word`, `rank`, `count`, `status`. The
 
 ### 10.4 Code changes
 
-- Add `anki_tools/cull_fr.py` with the stages C1 to C5.
-- Add `anki cull fr` to `cli.py`.
+- Add `anki_tools/languages/french/cull.py` with the stages C1 to C5.
+- Add the `--select` option to `anki fix fr` in `cli.py`. Rank mode stays the
+  default. The CLI builds a `CullRequest` and calls `run_cull` or `check_cull`.
+- Add `anki_tools/ranking/cover.py` for the greedy cover that both language
+  selectors use.
+- Add `anki_tools/ranking/pipeline.py` for the shared extract, rank, write, and
+  reorder stages.
 - Reuse `AnkiPackage` for the input and the output.
 - Reuse the French spaCy model and `TOKENIZER` from the French pack.
-- Do not change `fix fr`.
 
 ## 11. Quality gates and tests
 
 ### 11.1 Gates
 
-`anki cull fr --check` runs the gates on the output. A failure stops the
-command with a non-zero exit code.
+`anki fix fr --select --check` runs the gates on the output. A failure stops
+the command with a non-zero exit code.
 
 | Gate | Check                                                                  |
 | ---- | ---------------------------------------------------------------------- |
@@ -665,8 +670,8 @@ guid is a UUID. The tags include `swadesh`.
 
 | Option            | Default                              | Meaning                     |
 | ----------------- | ------------------------------------ | --------------------------- |
-| `--swadesh-pack`  | `apkg/swadesh_french_sentences.apkg` | Reserve source              |
-| `--no-swadesh`    | off                                  | Run the frequency cull only |
+| `--reserve-pack`  | `apkg/swadesh_french_sentences.apkg` | Reserve source              |
+| `--no-reserve`    | off                                  | Run the frequency cull only |
 
 ### 16.5 Gate G14
 

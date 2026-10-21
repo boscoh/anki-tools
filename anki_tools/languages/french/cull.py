@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import csv
 import hashlib
-import heapq
 import json
 import math
 import re
@@ -28,10 +27,11 @@ from pathlib import Path
 from typing import Any, Callable, Collection, Iterable, Iterator, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.sentence_pack.audit import sha256_value
+from anki_tools.sentence_pack.audit import print_audit, sha256_value
 from anki_tools.sentence_pack.audio import probe_duration
 from anki_tools.languages.french.profile import EXTRA_CSS, TOKENIZER
 from anki_tools.sentence_pack.pack import load_css
+from anki_tools.ranking.cover import greedy_cover
 
 FREQUENCY_PATH = Path("data/french_frequency.tsv")
 NAMES_PATH = Path("vocab/french_names.txt")
@@ -822,36 +822,32 @@ def select_cards(
         )
 
     indices = list(range(len(cards))) if passed is None else list(passed)
-    heap: list[tuple[float, int, int]] = []
-    for index in indices:
-        value = gain(index)
-        if value > 0:
-            heapq.heappush(heap, (-value, len(tokens[index]), index))
-
-    kept: list[int] = []
     picked: dict[int, float] = {}
-    reasons: dict[int, str] = {}
     shared: dict[str, list[int]] = {}
 
-    while heap and len(kept) < frequency_cards:
-        stored, _words, index = heapq.heappop(heap)
-        current = gain(index)
-        if capped(index):
-            reasons[index] = "use_cap"
-            continue
-        if current <= 0:
-            continue
-        if abs(current + stored) > 1e-12:
-            heapq.heappush(heap, (-current, len(tokens[index]), index))
-            continue
+    def key(index: int, value: float) -> tuple[float, int, int]:
+        return (-value, len(tokens[index]), index)
+
+    def reject(index: int) -> str | None:
         if _is_similar(sets[index], sets, shared, similarity):
-            reasons[index] = "similar"
-            continue
-        picked[index] = current
-        kept.append(index)
+            return "similar"
+        return None
+
+    def on_pick(index: int, value: float) -> None:
+        picked[index] = value
         for lemma in sets[index]:
             uses[lemma] += 1
             shared.setdefault(lemma, []).append(index)
+
+    kept, reasons = greedy_cover(
+        indices,
+        gain=gain,
+        key=key,
+        reject=reject,
+        on_pick=on_pick,
+        limit=frequency_cards,
+        precheck=lambda index: "use_cap" if capped(index) else None,
+    )
 
     for index in indices:
         if index not in picked:
@@ -1924,6 +1920,281 @@ GATES: tuple[tuple[str, GateCheck], ...] = (
     ("G14", gate_swadesh),
     ("G15", gate_card_templates),
 )
+
+
+@dataclass(frozen=True)
+class CullRequest:
+    """Options of one cull run.
+
+    :param input_path: Input APKG file.
+    :param output_path: Output APKG file.
+    :param max_cards: Card cap.
+    :param target_words: Number of target words.
+    :param max_uses: Most kept cards that hold one non-exempt lemma.
+    :param exempt_top: Number of top targets that are exempt from the cap.
+    :param spoken_weight: Weight of the Tatoeba term, 0 to 1.
+    :param min_words: Minimum word count of a card.
+    :param max_words: Maximum word count of a card.
+    :param similarity: Lemma Jaccard limit of a duplicate pair.
+    :param order: ``coverage`` or ``input`` card order.
+    :param name: Output deck name.
+    :param reserve_pack: Swadesh APKG with the reserve cards.
+    :param no_reserve: Run the frequency cull without the Swadesh reserve.
+    """
+
+    input_path: Path
+    output_path: Path
+    max_cards: int = 1000
+    target_words: int = 300
+    max_uses: int = 4
+    exempt_top: int = 100
+    spoken_weight: float = 0.5
+    min_words: int = 3
+    max_words: int = 12
+    similarity: float = 0.67
+    order: str = "coverage"
+    name: str = "French 1000 Core Sentences"
+    reserve_pack: Path = SWADESH_PACK_PATH
+    no_reserve: bool = False
+
+
+@dataclass(frozen=True)
+class CullRun:
+    """Written files and counts of one cull run.
+
+    :param output_path: Output APKG file.
+    :param cull_csv: Cull CSV file.
+    :param coverage_csv: Coverage CSV file.
+    :param manifest_path: Manifest JSON file.
+    :param cards: Count of kept cards, with the reserve cards.
+    :param frequency_cards: Count of kept input cards.
+    :param reserve: Count of kept reserve cards.
+    :param targets: Count of target words.
+    """
+
+    output_path: Path
+    cull_csv: Path
+    coverage_csv: Path
+    manifest_path: Path
+    cards: int
+    frequency_cards: int
+    reserve: int
+    targets: int
+
+
+def check_cull(output_path: Path) -> int:
+    """Run gates G1 to G15 on the files of a cull output.
+
+    :param output_path: Output APKG file.
+    :returns: The exit code of the gate table, 0 on a pass.
+    """
+    return print_audit(run_gates(gate_inputs(output_path)))
+
+
+def run_cull(request: CullRequest) -> CullRun:
+    """Run stages C0 to C5 of the cull and write the four output files.
+
+    :param request: Options of the run.
+    :returns: The written paths and the counts of the run.
+    """
+    apkg_path = request.input_path
+    output_path = request.output_path
+    cards = load_input_deck(apkg_path)
+    frequency = load_frequency()
+    ranks = frequency_ranks(frequency, spoken_weight=request.spoken_weight)
+    names = read_names()
+    tokens = tokenize_deck(cards)
+    targets, content_lemmas = build_targets(
+        cards, tokens, ranks, names, target_words=request.target_words
+    )
+    passed, reasons = filter_cards(
+        cards, tokens, min_words=request.min_words, max_words=request.max_words
+    )
+    reserve: list[ReserveCard] = []
+    reserve_sets: list[set[str]] = []
+    all_reserve: list[ReserveCard] = []
+    if not request.no_reserve:
+        all_reserve = load_reserve(request.reserve_pack)
+        reserve = list(all_reserve)
+        reserve_sets = reserve_lemma_sets(reserve)
+        reserve, reserve_sets = dedupe_reserve_sets(
+            reserve, reserve_sets, cards, tokens, request.similarity
+        )
+    selection = select_cards(
+        cards,
+        tokens,
+        targets,
+        ranks,
+        max_cards=request.max_cards,
+        max_uses=request.max_uses,
+        exempt_top=request.exempt_top,
+        similarity=request.similarity,
+        passed=passed,
+        reserved=reserve,
+        reserved_sets=reserve_sets,
+    )
+    ordered = order_cards(selection.kept, tokens, ranks, order=request.order)
+
+    rejected = Counter(reasons)
+    kept_lemmas = set().union(*reserve_sets) if reserve_sets else set()
+    kept_lemmas.update(
+        lemma
+        for index in selection.kept
+        for lemma, pos in tokens[index]
+        if pos in CONTENT_POS
+    )
+    covered = sum(1 for target in targets if selection.uses[target.lemma])
+    twice = sum(1 for target in targets if selection.uses[target.lemma] >= 2)
+    exempt = selection.exempt
+    exempt_max = max(
+        (
+            count
+            for lemma, count in selection.uses.items()
+            if lemma in exempt
+        ),
+        default=0,
+    )
+    frequency_uses: Counter[str] = Counter()
+    for index in selection.kept:
+        frequency_uses.update(
+            {
+                lemma
+                for lemma, pos in tokens[index]
+                if pos in CONTENT_POS
+            }
+        )
+    reserve_uses: Counter[str] = Counter()
+    for lemma_set in reserve_sets:
+        reserve_uses.update(lemma_set)
+    frequency_max = max(
+        (count for lemma, count in frequency_uses.items() if lemma not in exempt),
+        default=0,
+    )
+    reserve_max = max(
+        (count for lemma, count in reserve_uses.items() if lemma not in exempt),
+        default=0,
+    )
+    all_concepts = [card.target for card in all_reserve]
+    if reserve:
+        all_concepts += list(SWADESH_EXCEPTIONS)
+        merged_sentences = [card.sentence for card in reserve]
+        merged_sentences += [cards[index].sentence for index in ordered]
+        merged_tokens = tokenize_texts(merged_sentences)
+        swadesh_covered, swadesh_total = swadesh_coverage(
+            all_concepts, merged_sentences, merged_tokens
+        )
+    else:
+        swadesh_covered, swadesh_total = 0, SWADESH_TOTAL
+    mass = spoken_mass(frequency, kept_lemmas)
+
+    print(f"Input:              {apkg_path}")
+    print(f"Input cards:        {len(cards)}")
+    print(f"Passed:             {len(passed)}")
+    for rule in FILTER_RULES:
+        print(f"  Rejected {rule}:       {rejected.get(rule, 0)}")
+    print(f"Targets:            {len(targets)}")
+    print(f"Content lemmas:     {content_lemmas}")
+    print(f"Reserve:            {len(reserve)}")
+    print(f"Swadesh:            {swadesh_covered}/{swadesh_total}")
+    print(f"Cards:              {len(selection.kept) + len(reserve)}")
+    print(f"  Frequency cards:  {len(selection.kept)}")
+    print(f"Distinct lemmas:    {len(kept_lemmas)}")
+    print(f"Covered targets:    {covered}")
+    print(f"Targets with 2:     {twice}")
+    print(f"Max uses frequency: {frequency_max}")
+    print(f"Max uses reserve:   {reserve_max}")
+    print(f"Max uses exempt:    {exempt_max}")
+    print(f"spoken_mass:        {mass:.3f}")
+    print()
+    print("First 10 kept cards")
+    target_ranks = {target.lemma: target.rank for target in targets}
+    for position, index in enumerate(ordered[:10], start=1):
+        card = cards[index]
+        hits = sorted(
+            {
+                lemma
+                for lemma, pos in tokens[index]
+                if pos in CONTENT_POS and lemma in target_ranks
+            },
+            key=lambda lemma: target_ranks[lemma],
+        )
+        print(f"{position:>2}. {card.sentence}")
+        print(f"    {card.english}")
+        print(f"    targets: {', '.join(hits)}")
+
+    cull_csv, coverage_csv, manifest_path = side_paths(output_path)
+    write_cull_csv(cards, reasons, selection, ordered, cull_csv, reserve=reserve)
+    write_coverage_csv(targets, selection, coverage_csv)
+    write_deck(
+        apkg_path,
+        cards,
+        ordered,
+        output_path,
+        request.name,
+        reserve=reserve,
+        reserve_pack_path=request.reserve_pack,
+    )
+    kept_order = kept_order_hash(cards, ordered, reserve=reserve)
+    write_manifest(
+        manifest_path,
+        source={
+            "input": str(apkg_path),
+            "deck": request.name,
+            "model": MODEL_NAME,
+        },
+        params={
+            "max_cards": request.max_cards,
+            "target_words": request.target_words,
+            "max_uses": request.max_uses,
+            "exempt_top": request.exempt_top,
+            "spoken_weight": request.spoken_weight,
+            "min_words": request.min_words,
+            "max_words": request.max_words,
+            "similarity": request.similarity,
+            "order": request.order,
+            "name": request.name,
+        },
+        counts={
+            "input": len(cards),
+            "passed": len(passed),
+            "cards": len(ordered) + len(reserve),
+            "frequency_cards": len(ordered),
+            "reserve": len(reserve),
+            "content": len(kept_lemmas),
+            "targets": len(targets),
+            "covered": covered,
+            "covered2": twice,
+            "swadesh_covered": swadesh_covered,
+            "swadesh_total": swadesh_total,
+        },
+        frequency={
+            "path": str(FREQUENCY_PATH),
+            "spoken_weight": request.spoken_weight,
+        },
+        files={
+            "cull_csv": sha256_value(cull_csv),
+            "coverage_csv": sha256_value(coverage_csv),
+            "input_apkg": sha256_value(apkg_path),
+        },
+        kept_order=kept_order,
+        reserve_pack=str(request.reserve_pack) if reserve else "",
+        swadesh_exceptions=SWADESH_EXCEPTIONS if reserve else (),
+    )
+    print()
+    print(f"wrote {output_path}")
+    print(f"wrote {cull_csv}")
+    print(f"wrote {coverage_csv}")
+    print(f"wrote {manifest_path}")
+    return CullRun(
+        output_path=output_path,
+        cull_csv=cull_csv,
+        coverage_csv=coverage_csv,
+        manifest_path=manifest_path,
+        cards=len(ordered) + len(reserve),
+        frequency_cards=len(ordered),
+        reserve=len(reserve),
+        targets=len(targets),
+    )
 
 
 def build_frequency_cache(
