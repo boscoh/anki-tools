@@ -143,7 +143,8 @@ Section 8 gives the reserve option for the other 48 forms.
 ### 2.4 Out of scope
 
 - New audio or TTS.
-- A new note model or a new template. The mode changes the card order only.
+- A new note model, a new field, or a new card design. The mode reuses the
+  cull templates and CSS (7.3).
 - A curated grammar syllabus, and a new corpus download.
 - Changes to the 1,000-card cull and to the Swadesh sentence packs.
 
@@ -625,6 +626,90 @@ The French pack has no `SENSE_CHECKS` rows, so the French core run needs a new
 sense file before K17 can pass. That file is the E2 task. A rough first pass
 is enough: the sentence pairs of the deck show the senses.
 
+### 7.3 K6 card design
+
+K6 writes the deck with the card design of the cull. The note model, its
+fields, and the note ids do not change. The model takes the templates and the
+CSS of `languages/french/cull.py`, so the core deck looks like the 1,000-card
+deck and the Swadesh deck.
+
+| Card | Front                                                    | Back                                                      |
+| ---- | -------------------------------------------------------- | --------------------------------------------------------- |
+| 1, comprehension | the audio, and the hint `Tap to show the sentence` | the audio, the sentence with the bold target, and the English |
+| 2, production    | the English, and the hint `Tap to show the French`  | the English, the sentence with the bold target, and the audio |
+
+| Part    | Value                                                                    |
+| ------- | ------------------------------------------------------------------------ |
+| Templates | `CARD_TEMPLATES` of `cull.py`, written by `apply_card_templates`       |
+| CSS     | `card_css()`: `templates/card.css` plus `EXTRA_CSS` of the language, through `pack.load_css` |
+| Classes | `.front-audio`, `.sentence`, `.english`, `.hint`, `.target`, `.source`   |
+| Fields  | the input fields, no new field                                           |
+| Audio   | the input MP3 file, not a new TTS file                                   |
+| Deck    | `--name`, or the input deck name                                         |
+
+The model keeps the number of card directions that it has. The cull template
+set has two, so a model with two directions gets both.
+
+### 7.3.1 Field mapping
+
+| Input field | Value of a kept card                                  |
+| ----------- | ----------------------------------------------------- |
+| `French`    | the sentence, with the assigned target in `<b>` tags   |
+| `sound`     | `[sound:<input audio file>]`                          |
+| `Back`      | the English text of the card                          |
+| `freq ranks`| unchanged                                             |
+
+The target is the `assigned` target of section 6. A card can hold more than
+one target, and only the assigned target is bold. The bold word shows the
+learner what the card teaches, and it needs no new field.
+
+- `--bold-target` is on by default. `--no-bold-target` writes the plain
+  sentence.
+- The core CSV holds the plain sentence. The bold markup stays in the APKG
+  only.
+- `_plain_sentence` of `cull.py` removes the markup on a later extract, so a
+  second run on this output is safe.
+- `--front-hint` and `--back-hint` change the hint text of the two cards.
+
+Gate K15 checks the template and CSS values. Gate K21 checks the bold target
+and the plain CSV text.
+
+### 7.4 Relation to the cull filter
+
+The four guards and the window can improve the cull. They cannot replace it.
+The two modes want different pools, and one measurement shows why: the cull
+selection at 1,000 cards, with the same targets and options.
+
+| Cull pool                    | Pool | Cards | Content lemmas | `spoken_mass` |
+| ---------------------------- | ---- | ----- | -------------- | ------------- |
+| wide window 3 to 12 words    | 4,912 | 1,000 | 2,079         | 0.544         |
+| tight window 5 to 9 words    | 3,403 | 1,000 | 1,856         | 0.523         |
+
+- The tight window costs the cull 223 lemmas and 0.021 mass, and it puts the
+  lemma count below the 1,900 aim of the cull spec. The cull keeps the wide
+  window.
+- C1 and C2 cost little and remove fragments. The predicate guard removes 46
+  cards of 4,958. The cull adopts C1 and C2.
+- C3 adds a name guard for a language without a `PROPN` tag. The cull keeps
+  F8 and adds C3 for the languages of F8 that have no tagger.
+- C4 is a taste rule with a manual list. It stays in the core mode.
+- The sense guard improves the credit of a target, so the cull adopts it as
+  an option. The cull counts a hit today without a sense test.
+
+The shared code is one function with a profile:
+
+| Value            | `core` profile          | `cull` profile          |
+| ---------------- | ----------------------- | ----------------------- |
+| Length window    | the 7.1.1 window        | 3 to 12 words, or the pack window |
+| C1, C2           | on                      | on                      |
+| C3               | on for every language   | on when F8 has no tagger |
+| C4               | on when a list exists   | off                     |
+| Sense guard      | on, K17 fails          | on when a sense file exists |
+
+This relation is a decision for E2. It needs a small refactor of
+`cull.filter_cards` into `filter_reason(card, tokens, profile)`. The cull
+keeps its output files and its gates. The cull part is `anki-0h8`.
+
 ## 8. Swadesh reserve
 
 A core word with no source sentence in the input deck is `absent`. The French
@@ -751,12 +836,13 @@ command with a non-zero exit code.
 | K12  | The coverage CSV has one row per target, and `count` matches the cards |
 | K13  | The manifest hashes match the core CSV and the coverage CSV           |
 | K14  | Every target with a kept card holds the form or lemma in that card    |
-| K15  | The templates and the CSS are the input values                        |
+| K15  | The two templates equal `CARD_TEMPLATES`, and the CSS equals `card_css()` |
 | K16  | Every tail card brings at least one new content lemma                  |
 | K17  | Every target with a card has a sense row, or the unchecked count is within `--max-unchecked-sense` |
 | K18  | No kept card holds a name from the name list or a word from the loan list |
 | K19  | Every kept card has a predicate, and its unit count is inside the window |
 | K20  | The coverage CSV gives the status `absent`, `partial`, `covered`, or `unchecked`, and the manifest counts agree |
+| K21  | Every kept card has the assigned target in `<b>` when `--bold-target`, and the CSV holds the plain sentence |
 
 ### 10.2 Tests
 
