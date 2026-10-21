@@ -1,7 +1,7 @@
 """Tests for the shared CC-Canto character-link script."""
 
-from anki_tools.sentence_pack.languages.cantonese import CANTONESE
-from anki_tools.sentence_pack.languages.mandarin import MANDARIN
+from anki_tools.languages.cantonese.profile import CANTONESE
+from anki_tools.languages.mandarin.profile import MANDARIN
 from anki_tools.apkg.templates import CHAR_LINKS_PATH, load_char_links
 
 

@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, Callable, Iterable, Sequence
 
 from anki_tools.sentence_pack import pack as shared
-from anki_tools.sentence_pack.languages.mandarin import (
+from anki_tools.languages.mandarin.profile import (
     AUDIO_DIR,
     AUDIO_TSV_PATH,
     BACK_TEMPLATE,

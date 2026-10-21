@@ -21,7 +21,7 @@ from typing import Any, Collection, Sequence
 
 from wordfreq import zipf_frequency
 
-from anki_tools.ranking.rank import greek_text_dedup_key, word_similarity_el
+from anki_tools.languages.greek.rank import greek_text_dedup_key, word_similarity_el
 from anki_tools.sentence_pack.audit import AuditInputs, GateRow, sample
 from anki_tools.sentence_pack.pack import (
     ATTRIBUTION_PATH,

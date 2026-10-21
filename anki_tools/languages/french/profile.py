@@ -23,7 +23,8 @@ from typing import Any, Collection, Sequence
 
 from wordfreq import top_n_list, zipf_frequency
 
-from anki_tools.ranking.rank import latin_text_dedup_key, word_similarity_fr
+from anki_tools.languages.french.rank import word_similarity_fr
+from anki_tools.ranking.latin import latin_text_dedup_key
 from anki_tools.sentence_pack.audit import AuditInputs, GateRow, sample
 from anki_tools.sentence_pack.pack import (
     ATTRIBUTION_PATH,

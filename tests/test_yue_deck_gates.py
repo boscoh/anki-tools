@@ -15,7 +15,7 @@ from pathlib import Path
 import pytest
 
 from anki_tools.ranking.rank import char_similarity_zh_same_len, get_chinese_chars
-from anki_tools.cantonese.frequency import (
+from anki_tools.languages.cantonese.frequency import (
     Tokenizer,
     YueFrequency,
     build_yue_tokenizer,

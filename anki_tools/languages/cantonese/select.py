@@ -18,13 +18,13 @@ from pathlib import Path
 from typing import Any
 
 from anki_tools.sentence_pack.guards import check_sentence_shape
-from anki_tools.sentence_pack.languages.cantonese import CANTONESE
+from anki_tools.languages.cantonese.profile import CANTONESE
 from anki_tools.ranking.rank import (
     Sentence,
     char_similarity_zh_same_len,
     get_chinese_chars,
 )
-from anki_tools.cantonese.frequency import (
+from anki_tools.languages.cantonese.frequency import (
     VOCAB_DIR,
     Tokenizer,
     YueFrequency,

@@ -10,10 +10,10 @@ from anki_tools.sentence_pack.guards import (
     inside_spans,
     occurrences,
 )
-from anki_tools.sentence_pack.languages.cantonese import CANTONESE
+from anki_tools.languages.cantonese.profile import CANTONESE
 from anki_tools.languages.french.profile import FRENCH
-from anki_tools.sentence_pack.languages.greek import GREEK
-from anki_tools.sentence_pack.languages.mandarin import MANDARIN
+from anki_tools.languages.greek.profile import GREEK
+from anki_tools.languages.mandarin.profile import MANDARIN
 
 
 def test_guard_table_matches_the_filter_order() -> None:

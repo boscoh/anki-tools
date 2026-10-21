@@ -1,0 +1,287 @@
+"""French sentence ranking.
+
+The module holds the French word metrics, the French grammar score, the French
+similarity term, and the French ranking driver. The shared helpers of
+:mod:`anki_tools.ranking.rank` hold the sentence data class, the frequency
+tables, and the similarity engine.
+
+See SPEC_RANK_SENTENCES.md for the specification.
+"""
+
+from __future__ import annotations
+
+import re
+
+from anki_tools.ranking.latin import latin_word_similarity, tokenize_latin
+from anki_tools.ranking.rank import (
+    STRUCTURAL_COMPLEXITY_BLEND,
+    FrequencyData,
+    Sentence,
+    _compute_similarity_penalties,
+    _load_frequency_data_wordfreq,
+    _structural_score,
+)
+
+
+def load_frequency_data_fr() -> FrequencyData:
+    """Load French word frequency data from wordfreq.
+
+    :returns: Filled :class:`FrequencyData`.
+    """
+    return _load_frequency_data_wordfreq("fr", lower_keys=True)
+
+
+def complexity_score_fr(sentence: str) -> float:
+    """Calculate the complexity score (0-100) of a French sentence.
+
+    :param sentence: French sentence.
+    :returns: Score from 0 to 100, higher for a more complex sentence.
+    """
+    words = tokenize_latin(sentence)
+    if not words:
+        return 0.0
+
+    word_count = len(words)
+    unique_words = len(set(words))
+    avg_word_len = sum(len(w) for w in words) / len(words)
+    char_count = sum(len(w) for w in words)
+
+    word_norm = min(word_count / 25, 1.0)
+    unique_norm = min(unique_words / 20, 1.0)
+    avg_len_norm = min(avg_word_len / 8, 1.0)
+    char_norm = min(char_count / 150, 1.0)
+
+    score = (
+        word_norm * 0.25
+        + unique_norm * 0.25
+        + avg_len_norm * 0.25
+        + char_norm * 0.25
+    )
+    return score * 100
+
+
+def get_word_rank_fr(word: str, freq_data: FrequencyData, max_rank: int = 100000) -> int:
+    """Get the frequency rank of one French word.
+
+    :param word: Word to look up, in any case.
+    :param freq_data: Loaded frequency data.
+    :param max_rank: Rank of a word that the list does not hold.
+    :returns: Frequency rank, lower for a more common word.
+    """
+    return freq_data.word_freq.get(word.lower(), max_rank)
+
+
+def frequency_score_fr(sentence: str, freq_data: FrequencyData) -> float:
+    """Calculate the frequency score (0-100) of a French sentence.
+
+    :param sentence: French sentence.
+    :param freq_data: Loaded frequency data.
+    :returns: Score from 0 to 100, higher for more common words.
+    """
+    words = tokenize_latin(sentence)
+    if not words:
+        return 0.0
+    if not freq_data.word_freq:
+        return 50.0
+
+    max_rank = 100000
+    ranks = [get_word_rank_fr(w, freq_data, max_rank) for w in words]
+    avg_rank = sum(ranks) / len(ranks)
+    avg_score = 1.0 - min(avg_rank / max_rank, 1.0)
+    top_5k = sum(1 for r in ranks if r <= 5000) / len(ranks)
+    return (avg_score * 0.6 + top_5k * 0.4) * 100
+
+
+def _grammar_score_fr_spacy(sentence: str) -> float | None:
+    """Give the spaCy grammar score of a French sentence.
+
+    :param sentence: French sentence.
+    :returns: Score from 0 to 100, or None when spaCy or the model is absent.
+    """
+    try:
+        import spacy
+    except ImportError:
+        return None
+    try:
+        nlp = spacy.load("fr_core_news_sm")
+    except OSError:
+        return None
+    cleaned = re.sub(r"<[^>]+>", "", sentence)
+    if not cleaned.strip():
+        return 0.0
+    doc = nlp(cleaned)
+    if not doc:
+        return 0.0
+    max_depth = 0
+    for token in doc:
+        depth = 0
+        t = token
+        while t.head != t:
+            depth += 1
+            t = t.head
+        max_depth = max(max_depth, depth)
+    verb_count = sum(1 for t in doc if t.pos_ == "VERB" or t.pos_ == "AUX")
+    subj_count = sum(1 for t in doc if t.dep_ == "nsubj" or t.dep_ == "csubj")
+    score = min(100.0, max_depth * 8 + verb_count * 5 + subj_count * 3)
+    return score
+
+
+def grammar_score_fr(sentence: str) -> float:
+    """Calculate the grammar score (0-100) of a French sentence.
+
+    The score uses spaCy when the model is present. Otherwise it counts the
+    subjunctive, the relative pronouns, the conditionals, and the commas.
+
+    :param sentence: French sentence.
+    :returns: Score from 0 to 100.
+    """
+    spacy_score = _grammar_score_fr_spacy(sentence)
+    if spacy_score is not None:
+        return min(100.0, spacy_score)
+
+    cleaned = re.sub(r"<[^>]+>", "", sentence)
+    lower = cleaned.lower()
+    score = 0.0
+
+    subjunctive_triggers = [
+        "il faut que", "il faut qu'", "pour que", "bien que", "avant que",
+        "quoique", "à moins que", "jusqu'à ce que", "pourvu que", "afin que",
+        "bien qu'", "quoiqu'", "pour qu'", "avant qu'", "à moins qu'",
+    ]
+    for trigger in subjunctive_triggers:
+        if trigger in lower:
+            score += 12
+            break
+
+    relative_markers = [
+        "lequel", "laquelle", "lesquels", "lesquelles", "dont",
+        " auquel", " à laquelle", " auxquels", " auxquelles",
+    ]
+    for m in relative_markers:
+        if m in lower:
+            score += 10
+            break
+
+    if re.search(r"\bqui\b", lower):
+        score += 3
+    que_count = lower.count(" que ") + lower.count(" qu'")
+    if que_count >= 2:
+        score += 6
+    elif que_count >= 1:
+        score += 2
+    if re.search(r"\bsi\b.*\b(était|avait|pouvait|faisait|allait|venait|voulait)", lower):
+        score += 8
+    comma_count = lower.count(",") + lower.count(";")
+    if comma_count >= 2:
+        score += min(comma_count * 3, 15)
+    elif comma_count == 1:
+        score += 3
+
+    return min(score, 100.0)
+
+
+def word_similarity_fr(sent_a: str, sent_b: str) -> float:
+    """Give the Jaccard similarity of two French word sets.
+
+    :param sent_a: First sentence.
+    :param sent_b: Second sentence.
+    :returns: Similarity between 0 and 1.
+    """
+    return latin_word_similarity(sent_a, sent_b)
+
+
+def compute_similarity_penalties_fr(
+    sentences: list[Sentence], top_n: int = 100
+) -> tuple[list[float], list[int | None], list[str | None]]:
+    """Compute the word-based similarity penalties of French sentences.
+
+    :param sentences: Sentences in rank order.
+    :param top_n: Number of higher-ranked sentences to compare.
+    :returns: Penalties, similar ranks, and similar texts.
+    """
+    return _compute_similarity_penalties(sentences, word_similarity_fr, top_n)
+
+
+def rank_sentences_fr(
+    sentences: list[Sentence],
+    weights: dict[str, float] | None = None,
+    structural_blend: float = STRUCTURAL_COMPLEXITY_BLEND,
+) -> list[Sentence]:
+    """Rank French sentences by the combined score.
+
+    The structural term blends the complexity score and the grammar score, so
+    the two correlated measures count once.
+
+    :param sentences: Sentences to rank.
+    :param weights: Weights of structural, frequency, and similarity_penalty.
+    :param structural_blend: Share of the complexity term in the structural
+        score.
+    :returns: The same list, sorted by final score, best first.
+    """
+    if weights is None:
+        weights = {
+            "structural": 0.35,
+            "frequency": 0.45,
+            "similarity_penalty": 0.2,
+        }
+
+    freq_data = load_frequency_data_fr()
+
+    print("Calculating complexity scores...")
+    for sent in sentences:
+        sent.complexity_score = complexity_score_fr(sent.text)
+
+    print("Calculating frequency scores...")
+    for sent in sentences:
+        sent.frequency_score = frequency_score_fr(sent.text, freq_data)
+
+    print("Calculating grammar scores...")
+    for sent in sentences:
+        sent.grammar_score = grammar_score_fr(sent.text)
+
+    for sent in sentences:
+        structural = _structural_score(
+            sent.complexity_score, sent.grammar_score, structural_blend
+        )
+        sent.final_score = (
+            sent.frequency_score * weights["frequency"]
+            + (100 - structural) * weights["structural"]
+        )
+
+    sentences.sort(key=lambda s: s.final_score, reverse=True)
+
+    print("Calculating similarity penalties...")
+    penalties, similar_to_rank_indices, similar_to_texts = (
+        compute_similarity_penalties_fr(sentences)
+    )
+    for sent, penalty, similar_to_rank, sim_text in zip(
+        sentences, penalties, similar_to_rank_indices, similar_to_texts
+    ):
+        sent.similarity_penalty = penalty
+        sent.similar_to_rank = similar_to_rank
+        sent.similar_to_text = sim_text
+
+    for sent in sentences:
+        structural = _structural_score(
+            sent.complexity_score, sent.grammar_score, structural_blend
+        )
+        sent.final_score = (
+            sent.frequency_score * weights["frequency"]
+            + (100 - structural) * weights["structural"]
+            - sent.similarity_penalty * weights["similarity_penalty"]
+        )
+
+    sentences.sort(key=lambda s: s.final_score, reverse=True)
+    return sentences
+
+
+__all__ = [
+    "complexity_score_fr",
+    "compute_similarity_penalties_fr",
+    "frequency_score_fr",
+    "get_word_rank_fr",
+    "grammar_score_fr",
+    "load_frequency_data_fr",
+    "rank_sentences_fr",
+    "word_similarity_fr",
+]

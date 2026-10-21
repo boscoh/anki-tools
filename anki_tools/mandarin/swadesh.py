@@ -1,7 +1,7 @@
 """Mandarin caller of the shared word table, pool, and selection stages.
 
 The Mandarin word table, the jieba and pinyin helpers, and the profile live in
-``anki_tools.sentence_pack.languages.mandarin``. This module keeps the names and
+``anki_tools.languages.mandarin.profile``. This module keeps the names and
 the signatures that the CLI, the audit, and the tests use.
 """
 
@@ -15,7 +15,7 @@ from anki_tools.sentence_pack import pool as shared_pool
 from anki_tools.sentence_pack.pool import FILTER_KEYS, FILTER_NAMES  # noqa: F401
 from anki_tools.sentence_pack import select as shared_select
 from anki_tools.sentence_pack import tatoeba
-from anki_tools.sentence_pack.languages.mandarin import (  # noqa: F401
+from anki_tools.languages.mandarin.profile import (  # noqa: F401
     AUDIO_DIR,
     AUDIO_TSV_PATH,
     DEFAULT_CSV_PATH,

@@ -29,7 +29,7 @@ from anki_tools.mandarin.swadesh import (
     write_sentence_csv,
     write_sentence_review_csv,
 )
-from anki_tools.sentence_pack.languages.mandarin import sense_filter
+from anki_tools.languages.mandarin.profile import sense_filter
 
 POOL_SENTENCES = [
     (1, "我要喝水。", 100, "I want to drink water.", "alice", (5001, "CC BY 2.0 FR")),

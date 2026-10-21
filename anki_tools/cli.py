@@ -22,7 +22,7 @@ import cyclopts
 from gtts import gTTS
 
 from anki_tools.languages.french import cull as french_cull
-from anki_tools.cantonese.jyutping import fix_jyutping
+from anki_tools.languages.cantonese.jyutping import fix_jyutping
 from anki_tools.mandarin.audio import (
     DEFAULT_VOICE as MANDARIN_DEFAULT_VOICE,
     generate_audio,
@@ -57,24 +57,23 @@ from anki_tools.sentence_pack.languages import (
     swadesh_languages,
 )
 from anki_tools.mandarin.pinyin import fix_pinyin
+from anki_tools.languages.cantonese.rank import rank_sentences_yue
+from anki_tools.languages.french.rank import rank_sentences_fr
+from anki_tools.languages.mandarin.rank import rank_sentences_zh
+from anki_tools.languages.spanish.rank import rank_sentences_es, word_similarity_es
 from anki_tools.ranking.rank import (
     Sentence,
     YUE_FREQUENCY_ATTRIBUTION,
     char_similarity_zh_same_len,
     extract_sentences,
-    rank_sentences_es,
-    rank_sentences_fr,
-    rank_sentences_yue,
-    rank_sentences_zh,
     reduce_sentences_stratified,
-    word_similarity_es,
     write_ranking_csv,
 )
 
 
 from anki_tools.ranking.reorder import reorder_deck
 from anki_tools.apkg.templates import load_char_links
-from anki_tools.cantonese.frequency import (
+from anki_tools.languages.cantonese.frequency import (
     CIFU_ATTRIBUTION,
     FREQUENCY_PATH,
     build_yue_tokenizer,
@@ -87,7 +86,7 @@ from anki_tools.cantonese.frequency import (
     write_freq_change_csv,
     write_frequency_tsv,
 )
-from anki_tools.cantonese.select import (
+from anki_tools.languages.cantonese.select import (
     SelectionOptions,
     print_selection_summary,
     read_names,

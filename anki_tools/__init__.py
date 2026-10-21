@@ -7,26 +7,27 @@ Core classes:
 Modules:
     apkg.package    - Core AnkiPackage class
     apkg.templates  - Card template partials
-    ranking.rank    - Sentence ranking by frequency and complexity
+    ranking.rank    - Shared sentence ranking helpers
+    ranking.latin   - Shared Latin-script text helpers
     ranking.reorder - Deck reordering based on ranking
-    languages.french - French language profile and cull pipeline
-    mandarin        - Mandarin audio, audit, deck, fetch, swadesh, pinyin
-    cantonese       - Cantonese jyutping, frequency, and sentence selection
+    languages       - One package per language: profile, rank, frequency, cull
     sentence_pack   - Shared Swadesh sentence pack stages
     cli             - Command-line interface
 """
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.mandarin.pinyin import fix_pinyin
+from anki_tools.languages.mandarin.rank import (
+    complexity_score_zh,
+    frequency_score_zh,
+    rank_sentences_zh,
+)
+from anki_tools.languages.spanish.rank import rank_sentences_es
 from anki_tools.ranking.rank import (
     FrequencyData,
     Sentence,
     char_similarity_zh,
-    complexity_score_zh,
     extract_sentences,
-    frequency_score_zh,
-    rank_sentences_es,
-    rank_sentences_zh,
     reduce_sentences_stratified,
     write_ranking_csv,
 )

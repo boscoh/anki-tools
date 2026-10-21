@@ -2,15 +2,17 @@
 
 import pytest
 
-from anki_tools.ranking.rank import (
-    FrequencyData,
+from anki_tools.languages.cantonese.rank import load_frequency_data_yue
+from anki_tools.languages.mandarin.rank import (
     complexity_score_zh,
     frequency_score_zh,
     get_word_rank_zh,
+)
+from anki_tools.ranking.rank import (
+    FrequencyData,
     char_similarity_zh,
     get_chinese_chars,
     is_chinese_char,
-    load_frequency_data_yue,
 )
 
 

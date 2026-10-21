@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Callable, Sequence
 
 from anki_tools.sentence_pack import audio as shared
-from anki_tools.sentence_pack.languages.mandarin import AUDIO_DIR, MANDARIN
+from anki_tools.languages.mandarin.profile import AUDIO_DIR, MANDARIN
 
 AUDIO_INDEX_NAME = shared.AUDIO_INDEX_NAME
 SENTENCES_PATH = MANDARIN.sentence_csv

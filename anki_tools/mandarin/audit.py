@@ -33,7 +33,7 @@ from anki_tools.sentence_pack.audit import (
     sample,
 )
 from anki_tools.sentence_pack.audio import probe_duration
-from anki_tools.sentence_pack.languages.mandarin import (
+from anki_tools.languages.mandarin.profile import (
     MANDARIN,
     check_word_table,
     load_word_table,
