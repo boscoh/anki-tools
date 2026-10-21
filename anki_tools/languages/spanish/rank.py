@@ -21,9 +21,9 @@ from anki_tools.ranking.rank import (
     STRUCTURAL_COMPLEXITY_BLEND,
     FrequencyData,
     Sentence,
-    _load_frequency_data_wordfreq,
-    _structural_score,
     compute_similarity_penalties,
+    load_wordfreq_data,
+    structural_score,
 )
 
 
@@ -32,7 +32,7 @@ def load_frequency_data_es() -> FrequencyData:
 
     :returns: Filled :class:`FrequencyData`.
     """
-    return _load_frequency_data_wordfreq("es", lower_keys=True)
+    return load_wordfreq_data("es", lower_keys=True)
 
 
 def grammar_score_es(sentence: str) -> float:
@@ -116,7 +116,7 @@ def rank_sentences_es(
         sent.grammar_score = grammar_score_es(sent.text)
 
     for sent in sentences:
-        structural = _structural_score(
+        structural = structural_score(
             sent.complexity_score, sent.grammar_score, structural_blend
         )
         sent.final_score = (
@@ -138,7 +138,7 @@ def rank_sentences_es(
         sent.similar_to_text = sim_text
 
     for sent in sentences:
-        structural = _structural_score(
+        structural = structural_score(
             sent.complexity_score, sent.grammar_score, structural_blend
         )
         sent.final_score = (

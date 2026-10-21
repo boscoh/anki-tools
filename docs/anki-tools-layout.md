@@ -9,7 +9,11 @@ lives in one directory only.
 | ------------------------ | ------------------------------------------------ |
 | `anki_tools/__init__.py` | Public exports of the package                    |
 | `anki_tools/cli.py`      | Cyclopts command tree and the `anki` entry point |
+| `anki_tools/cache.py`    | Download a file into the cache                   |
 
+`cli.py` also holds the deck field-name aliases that each `fix` command
+passes to `extract_sentences`. A field name of one language stays in the
+command, not in the shared module.
 `__init__.py` loads a language helper on first use. Importing the package loads
 no language package.
 
@@ -95,6 +99,8 @@ audio directory.
   They import no language package.
 - `apkg` holds the file model and the template resources. It imports no
   language package.
+- `cache.py` holds the download helper that fills the XDG cache. It imports
+  no language package.
 - `cli.py` builds the command list from `languages.registry`. It is the only
   module that imports every package.
 - One key for each language. `languages.registry.ALIASES` maps a short code

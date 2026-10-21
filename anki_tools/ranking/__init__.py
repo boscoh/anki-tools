@@ -1,1 +1,1 @@
-"""Sentence ranking, deck reordering, and the French cull pipeline."""
+"""Shared sentence ranking and deck reordering."""

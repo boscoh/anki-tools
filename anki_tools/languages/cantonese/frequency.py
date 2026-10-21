@@ -21,7 +21,8 @@ from typing import Any, Protocol
 import jieba
 
 from anki_tools.languages.mandarin.characters import get_chinese_chars
-from anki_tools.ranking.rank import FrequencyData, Sentence, download_cached_file
+from anki_tools.cache import download_cached_file
+from anki_tools.ranking.rank import FrequencyData, Sentence
 
 CIFU_URL = "https://raw.githubusercontent.com/gwinterstein/Cifu/master/Lexicon/Cifu-v1.txt"
 CIFU_ATTRIBUTION = (
@@ -581,7 +582,7 @@ def frequency_data_from_ranks(ranks: dict[str, int]) -> FrequencyData:
     """Build word and character rank tables from word ranks.
 
     Characters take the rank of the first word that contains them, as in
-    :func:`anki_tools.ranking.rank._load_frequency_data_wordfreq`.
+    :func:`anki_tools.ranking.rank.load_wordfreq_data`.
 
     :param ranks: Word to rank, 1 is most frequent.
     :returns: Filled :class:`FrequencyData`.

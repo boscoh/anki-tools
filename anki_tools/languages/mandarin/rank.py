@@ -22,7 +22,7 @@ from anki_tools.languages.mandarin.characters import (
 from anki_tools.ranking.rank import (
     FrequencyData,
     Sentence,
-    _load_frequency_data_wordfreq,
+    load_wordfreq_data,
     rank_character_based,
 )
 
@@ -32,7 +32,7 @@ def load_frequency_data_zh() -> FrequencyData:
 
     :returns: Filled :class:`FrequencyData`.
     """
-    return _load_frequency_data_wordfreq("zh", char_filter=is_chinese_char)
+    return load_wordfreq_data("zh", char_filter=is_chinese_char)
 
 
 def complexity_score_zh(sentence: str) -> float:

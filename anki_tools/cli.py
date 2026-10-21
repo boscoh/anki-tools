@@ -931,7 +931,9 @@ def zh(
     print()
 
     print("Step 1: Ranking sentences...")
-    sentences = extract_sentences(str(apkg_path), model_id)
+    sentences = extract_sentences(
+        str(apkg_path), model_id, romanization_candidates=("Pinyin",)
+    )
 
     if not sentences:
         print("No sentences found!")
@@ -1035,7 +1037,9 @@ def fr(
     print()
 
     print("Step 1: Ranking sentences...")
-    sentences = extract_sentences(str(apkg_path), model_id, text_field=text_field)
+    sentences = extract_sentences(
+        str(apkg_path), model_id, text_field=text_field, text_candidates=("French",)
+    )
     if not sentences:
         print("No sentences found!")
         return
@@ -1137,7 +1141,9 @@ def yue(
     print()
 
     print("Step 1: Ranking sentences...")
-    sentences = extract_sentences(str(apkg_path), model_id)
+    sentences = extract_sentences(
+        str(apkg_path), model_id, romanization_candidates=("Jyutping",)
+    )
 
     if not sentences:
         print("No sentences found!")

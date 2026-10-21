@@ -16,11 +16,8 @@ from __future__ import annotations
 
 import csv
 import re
-import shutil
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Callable
-from urllib.request import urlopen
+from typing import Callable, Sequence
 
 from wordfreq import iter_wordlist
 
@@ -43,9 +40,9 @@ class Sentence:
     :param similarity_penalty: Penalty for similarity to higher-ranked sentences.
     :param similar_to_rank: Rank (1-based) of most similar higher-ranked sentence.
     :param final_score: Combined ranking score.
-    :param hardest_rank: Cantonese selection: rank of the least frequent known token.
-    :param reject_reason: Cantonese selection: rule or step that removed the sentence.
-    :param kept: Cantonese selection: True when kept, None when no selection ran.
+    :param hardest_rank: Rank of the least frequent known token.
+    :param reject_reason: Rule or step that removed the sentence.
+    :param kept: True when kept, None when no selection ran.
     """
 
     note_id: int
@@ -55,12 +52,12 @@ class Sentence:
     frequency_score: float = 0.0
     similarity_penalty: float = 0.0
     similar_to_rank: int | None = None  # Rank of most similar higher-ranked sentence
-    similar_to_text: str | None = None  # Closest sentence text (French pipeline)
-    grammar_score: float = 0.0  # Grammar complexity 0-100 (French pipeline)
-    romanization: str = ""  # Romanization (jyutping for Cantonese)
+    similar_to_text: str | None = None  # Closest sentence text
+    grammar_score: float = 0.0  # Grammar complexity 0-100
+    romanization: str = ""  # Romanization of the sentence text
     final_score: float = 0.0
     complexity_bin: int = 0  # Complexity bin (0-3) for stratified reduction
-    hardest_rank: int = 0  # Rank of the least frequent known token (Cantonese selection)
+    hardest_rank: int = 0  # Rank of the least frequent known token
     reject_reason: str = ""  # Rule or selection step that removed the sentence
     kept: bool | None = None  # None when no selection ran
 
@@ -84,16 +81,25 @@ class FrequencyData:
 # =============================================================================
 
 
+#: Main sentence field names of an Anki deck that use no language name.
+TEXT_FIELD_FALLBACKS = ("Sentence", "sentence", "Front")
+
+#: Romanization field names of an Anki deck that use no language name.
+ROMANIZATION_FIELD_FALLBACKS = ("Romanization", "romanization")
+
+
 def _resolve_extract_fields(
     field_names: list[str],
     text_prefer: str | None,
+    text_candidates: Sequence[str],
+    romanization_candidates: Sequence[str],
 ) -> tuple[str, str | None, str | None]:
     deck = set(field_names)
     text = None
     if text_prefer and text_prefer in deck:
         text = text_prefer
     if not text:
-        for c in ("Sentence", "French", "sentence", "Front"):
+        for c in (*text_candidates, *TEXT_FIELD_FALLBACKS):
             if c in deck:
                 text = c
                 break
@@ -101,7 +107,7 @@ def _resolve_extract_fields(
         text = field_names[0] if field_names else "Front"
     order = "[counter 2]" if "[counter 2]" in deck else None
     romanization = None
-    for c in ("Jyutping", "Pinyin", "Romanization", "jyutping", "pinyin"):
+    for c in (*romanization_candidates, *ROMANIZATION_FIELD_FALLBACKS):
         if c in deck:
             romanization = c
             break
@@ -113,15 +119,20 @@ def extract_sentences(
     model_id: int | None = None,
     *,
     text_field: str | None = None,
+    text_candidates: Sequence[str] = (),
+    romanization_candidates: Sequence[str] = (),
 ) -> list[Sentence]:
     """Extract sentences from an Anki package.
 
-    Main text and order fields are inferred from each model's field names.
-    Pass text_field to prefer a specific main field (e.g. "French").
+    The main text and order fields are inferred from each model's field names.
+    Pass text_field to name the main field, or pass the field names of the
+    language as a candidate list.
 
     :param apkg_path: Path to the .apkg file.
     :param model_id: Optional model ID to filter by; extracts all if None.
     :param text_field: Preferred main sentence field (inferred if None).
+    :param text_candidates: Main field names of the language, tried in order.
+    :param romanization_candidates: Romanization field names of the language.
     :returns: List of :class:`Sentence` objects.
     """
     sentences = []
@@ -148,7 +159,7 @@ def extract_sentences(
             field_names = [f["name"] for f in model.get("flds", [])]
             if card_model_id not in resolved_by_model:
                 resolved_by_model[card_model_id] = _resolve_extract_fields(
-                    field_names, text_field
+                    field_names, text_field, text_candidates, romanization_candidates
                 )
             text_f, order_f, romanization_f = resolved_by_model[card_model_id]
 
@@ -193,7 +204,7 @@ def extract_sentences(
 # =============================================================================
 
 
-def _load_frequency_data_wordfreq(
+def load_wordfreq_data(
     lang: str,
     *,
     lower_keys: bool = False,
@@ -222,30 +233,6 @@ def _load_frequency_data_wordfreq(
 
 
 
-def download_cached_file(url: str, dest: Path, *, force: bool = False) -> Path:
-    """Download a file into the cache.
-
-    The download writes a temporary file first, then renames it.
-
-    :param url: Source URL.
-    :param dest: Cache destination.
-    :param force: Download again when the file already exists.
-    :returns: Path to the cached file.
-    """
-    if dest.exists() and not force:
-        return dest
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    tmp = dest.with_name(dest.name + ".tmp")
-    print(f"Downloading {url}")
-    try:
-        with urlopen(url, timeout=120) as response, open(tmp, "wb") as out:
-            shutil.copyfileobj(response, out)
-    except OSError as exc:
-        tmp.unlink(missing_ok=True)
-        raise RuntimeError(f"Cannot download {url}.") from exc
-    tmp.replace(dest)
-    print(f"Saved {dest} ({dest.stat().st_size} bytes)")
-    return dest
 
 
 
@@ -309,7 +296,7 @@ SIMILARITY_CONSIDER_DELETE_PENALTY = SIMILARITY_PENALTY_SCALE * SIMILARITY_DELET
 STRUCTURAL_COMPLEXITY_BLEND = 0.6
 
 
-def _structural_score(
+def structural_score(
     complexity: float, grammar: float, blend: float = STRUCTURAL_COMPLEXITY_BLEND
 ) -> float:
     return blend * complexity + (1.0 - blend) * grammar
@@ -417,7 +404,7 @@ def write_ranking_csv(
     structural_blend: float = STRUCTURAL_COMPLEXITY_BLEND,
     similar_to_threshold: float = SIMILARITY_CONSIDER_DELETE_PENALTY,
 ) -> None:
-    """Write ranking CSV for reorder_deck and inspection (ZH and FR).
+    """Write the ranking CSV for reorder_deck and for inspection.
 
     Columns: rank, note_id, sentence, romanization (if present), original_order, frequency,
     complexity, grammar, structural, similarity, similar_to, final_score, and
@@ -450,7 +437,7 @@ def write_ranking_csv(
         writer.writerow(header)
 
         for rank, sent in enumerate(sentences, 1):
-            structural = _structural_score(
+            structural = structural_score(
                 sent.complexity_score, sent.grammar_score, structural_blend
             )
             similar_to_text = (
