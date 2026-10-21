@@ -50,9 +50,12 @@ from anki_tools.sentence_pack import select as sentence_select
 from anki_tools.sentence_pack import tatoeba as sentence_tatoeba
 from anki_tools.sentence_pack.audit import print_audit as print_gate_table
 from anki_tools.sentence_pack.audit import sha256_value
-from anki_tools.sentence_pack.languages import cantonese as cantonese_lang
-from anki_tools.sentence_pack.languages import french as french_lang
-from anki_tools.sentence_pack.languages import greek as greek_lang
+from anki_tools.sentence_pack.languages import (
+    LANGUAGES,
+    get_profile,
+    profile_languages,
+    swadesh_languages,
+)
 from anki_tools.mandarin.pinyin import fix_pinyin
 from anki_tools.ranking.rank import (
     Sentence,
@@ -1577,24 +1580,9 @@ def _build_apkg(language: str, prune: bool = True) -> None:
     print(f"\nSuccessfully created: {output_path}")
 
 
-SENTENCE_PACK_LANGUAGES = {
-    "cantonese": (
-        cantonese_lang,
-        cantonese_lang.CANTONESE,
-        cantonese_lang.run_cantonese_audit,
-    ),
-    "french": (french_lang, french_lang.FRENCH, french_lang.run_french_audit),
-    "greek": (greek_lang, greek_lang.GREEK, greek_lang.run_greek_audit),
-}
-
-SWADESH_LANGUAGES = (
-    "mandarin",
-    "spanish",
-    "greek",
-    "german",
-    "cantonese",
-    "arabic",
-    "hindi",
+SWADESH_LANGUAGES = swadesh_languages()
+SENTENCE_PACK_LANGUAGE_NAMES = ", ".join(
+    language.name for language in profile_languages()
 )
 
 swadesh_app = cyclopts.App(
@@ -1644,7 +1632,8 @@ def fetch(*, refresh: bool = False, lang: list[str] | None = None) -> None:
     for code in lang:
         files.update(
             sentence_tatoeba.language_files(
-                code, native_audio=code != greek_lang.GREEK.tatoeba_lang
+                code,
+                native_audio=code != (get_profile("greek").tatoeba_lang),
             )
         )
     if "eng" not in lang:
@@ -1678,11 +1667,11 @@ def sentences(
         default applies when empty.
     """
     lang = language.lower().strip()
-    if lang in SENTENCE_PACK_LANGUAGES:
-        module, profile, _ = SENTENCE_PACK_LANGUAGES[lang]
+    entry = LANGUAGES.get(lang)
+    if entry is not None and entry.module is not None:
         _language_sentences(
-            module,
-            profile,
+            entry.module,
+            entry.profile,
             per_word=per_word,
             max_cards=max_cards,
             max_unknown=max_unknown,
@@ -1691,7 +1680,10 @@ def sentences(
         )
         return
     if lang != "mandarin":
-        print(f"Unsupported language: {language}. Supported: mandarin, french, greek, cantonese.")
+        print(
+            f"Unsupported language: {language}. "
+            f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
+        )
         return
 
     table = load_word_table()
@@ -1743,11 +1735,11 @@ def sentence_audio(
     :param tts: TTS engine, gtts or edge. The installed engine applies when empty.
     """
     lang = language.lower().strip()
-    if lang in SENTENCE_PACK_LANGUAGES:
-        module, profile, _ = SENTENCE_PACK_LANGUAGES[lang]
+    entry = LANGUAGES.get(lang)
+    if entry is not None and entry.module is not None:
         _language_audio(
-            module,
-            profile,
+            entry.module,
+            entry.profile,
             native_audio=native_audio,
             voice=voice,
             slow_audio=slow_audio,
@@ -1756,7 +1748,10 @@ def sentence_audio(
         )
         return
     if lang != "mandarin":
-        print(f"Unsupported language: {language}. Supported: mandarin, french, greek, cantonese.")
+        print(
+            f"Unsupported language: {language}. "
+            f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
+        )
         return
     if not voice:
         voice = MANDARIN_DEFAULT_VOICE
@@ -1797,12 +1792,15 @@ def pack(
     :param pack_license: public or private.
     """
     lang = language.lower().strip()
-    if lang in SENTENCE_PACK_LANGUAGES:
-        module, profile, _ = SENTENCE_PACK_LANGUAGES[lang]
-        _language_pack(module, profile, pack_license=pack_license)
+    entry = LANGUAGES.get(lang)
+    if entry is not None and entry.module is not None:
+        _language_pack(entry.module, entry.profile, pack_license=pack_license)
         return
     if lang != "mandarin":
-        print(f"Unsupported language: {language}. Supported: mandarin, french, greek, cantonese.")
+        print(
+            f"Unsupported language: {language}. "
+            f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
+        )
         return
 
     result = build_pack(pack_license=pack_license)
@@ -1824,14 +1822,17 @@ def audit(language: str) -> None:
     :param language: Language name: mandarin, french, greek, or cantonese.
     """
     lang = language.lower().strip()
-    if lang in SENTENCE_PACK_LANGUAGES:
-        _, _, runner = SENTENCE_PACK_LANGUAGES[lang]
-        code = print_gate_table(runner())
+    entry = LANGUAGES.get(lang)
+    if entry is not None and entry.audit is not None:
+        code = print_gate_table(entry.audit())
         if code:
             raise SystemExit(code)
         return
     if lang != "mandarin":
-        print(f"Unsupported language: {language}. Supported: mandarin, french, greek, cantonese.")
+        print(
+            f"Unsupported language: {language}. "
+            f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
+        )
         return
 
     code = print_audit(run_audit())
