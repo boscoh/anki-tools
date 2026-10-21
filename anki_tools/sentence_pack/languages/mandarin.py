@@ -657,17 +657,70 @@ def count_form_tokens(sentence: str, form: str) -> int:
     return sum(1 for word in han_tokens(sentence) if word == form)
 
 
-def count_form_occurrences(sentence: str, form: str) -> int:
-    """Count the exact form occurrences in the Han character stream.
+FALSE_FRIENDS: dict[str, tuple[str, ...]] = {
+    "切": ("一切",),
+    "闻": ("新闻", "传闻"),
+    "数": ("数学", "数大"),
+    "烧": ("发烧",),
+    "抓": ("抓住",),
+    "挖": ("挖苦",),
+    "挤": ("挤满",),
+}
 
-    The count does not use the token list, because jieba merges some forms into
-    a longer word. For example, 水 stays inside the token 喝水.
+
+def false_friend_spans(sentence: str, form: str) -> list[tuple[int, int]]:
+    """Give the spans where the form takes a different sense.
 
     :param sentence: Simplified Chinese sentence.
     :param form: Word-table form.
-    :returns: Non-overlapping occurrence count of the form.
+    :returns: ``(start, end)`` offsets in the Han character stream.
     """
-    return "".join(get_chinese_chars(sentence)).count(form)
+    chars = "".join(get_chinese_chars(sentence))
+    spans: list[tuple[int, int]] = []
+    for sequence in FALSE_FRIENDS.get(form, ()):
+        position = chars.find(sequence)
+        while position != -1:
+            spans.append((position, position + len(sequence)))
+            position = chars.find(sequence, position + 1)
+    return spans
+
+
+def _inside(position: int, spans: Sequence[tuple[int, int]]) -> bool:
+    return any(start <= position < end for start, end in spans)
+
+
+def form_occurrences(sentence: str, form: str) -> list[int]:
+    """Give the offsets of the form occurrences that keep the Swadesh sense.
+
+    :param sentence: Simplified Chinese sentence.
+    :param form: Word-table form.
+    :returns: Start offsets in the Han character stream.
+    """
+    if not form:
+        return []
+    chars = "".join(get_chinese_chars(sentence))
+    blocked = false_friend_spans(sentence, form)
+    found: list[int] = []
+    position = chars.find(form)
+    while position != -1:
+        if not _inside(position, blocked):
+            found.append(position)
+        position = chars.find(form, position + 1)
+    return found
+
+
+def count_form_occurrences(sentence: str, form: str) -> int:
+    """Count the form occurrences that keep the Swadesh sense.
+
+    The count does not use the token list, because jieba merges some forms into
+    a longer word. For example, 水 stays inside the token 喝水. An occurrence
+    inside a false-friend compound never counts, so 闻 does not hit inside 新闻.
+
+    :param sentence: Simplified Chinese sentence.
+    :param form: Word-table form.
+    :returns: Occurrence count outside a different-sense compound.
+    """
+    return len(form_occurrences(sentence, form))
 
 
 def sentence_hits(sentence: str, forms: Iterable[str]) -> dict[str, int]:
@@ -682,7 +735,7 @@ def sentence_hits(sentence: str, forms: Iterable[str]) -> dict[str, int]:
     hits: dict[str, int] = {}
     for form in set(forms):
         if form and form[0] in present:
-            count = chars.count(form)
+            count = len(form_occurrences(sentence, form))
             if count:
                 hits[form] = count
     return hits
@@ -693,14 +746,14 @@ def single_hits(sentence: str, forms: Iterable[str]) -> dict[str, int]:
 
     :param sentence: Simplified Chinese sentence.
     :param forms: Word-table forms to look for.
-    :returns: Mapping from form to 1, for forms with one occurrence.
+    :returns: Mapping from form to 1, for forms with one sense-keeping hit.
     """
     chars = "".join(get_chinese_chars(sentence))
     present = set(chars)
     return {
         form: 1
         for form in set(forms)
-        if form and form[0] in present and chars.count(form) == 1
+        if form and form[0] in present and len(form_occurrences(sentence, form)) == 1
     }
 
 

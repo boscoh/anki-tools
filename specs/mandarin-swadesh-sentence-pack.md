@@ -340,6 +340,26 @@ G14 exempts it from F2, F6, and F8.
 | Duplicate      | No char-set Jaccard of 0.67 or more with a kept card              |
 | Duplicate card | One card per sentence and per target word pair                    |
 
+
+A false-friend compound never counts as a target match. The reviewed list in
+`anki_tools/sentence_pack/languages/mandarin.py` holds these compounds:
+
+| Form | Sense      | Blocked compounds                       |
+| ---- | ---------- | --------------------------------------- |
+| 切   | to cut     | 一切 (everything)                       |
+| 闻   | to smell   | 新闻 (news), 传闻 (rumor)               |
+| 数   | to count   | 数学 (mathematics), 数大 (number sense) |
+| 烧   | to burn    | 发烧 (fever)                            |
+| 抓   | to scratch | 抓住 (to grab)                          |
+| 挖   | to dig     | 挖苦 (to ridicule)                      |
+| 挤   | to squeeze | 挤满 (crowded)                          |
+
+Gate G17 checks the built deck. A card fails when its target sits inside one
+of these compounds.
+
+The list does not catch every case. A polyphone can change the sense
+(数 shù means number or math, not to count). A bare verb can carry a
+different sense. Those cases stay for a later review.
 Reuse `char_similarity_zh` and `is_repeated_zh_sentence` from
 `anki_tools/rank.py`.
 
@@ -687,6 +707,7 @@ code on a failure.
 | G14  | Core cards pass F2 to F10. Scaffold cards pass F3, F4, F5, F7, F9, F10, and length 3 to 7  |
 | G15  | `vocab/swadesh_review.csv` exists and has no open row                                      |
 | G16  | Every card target has a valid `word_{hash}.mp3` file                                       |
+| G17  | No card uses its target inside a false-friend compound                                     |
 
 G10 is provisional. M1 measures the real coverage. This spec then keeps
 the measured value minus 5 points as the gate.

@@ -214,6 +214,13 @@ class TestTokenChecks:
         assert sentence_hits("我要喝水。", ["水", "火"]) == {"水": 1}
         assert sentence_hits("我要喝水，水很凉。", ["水"]) == {"水": 2}
 
+    def test_false_friend_compound_does_not_hit(self) -> None:
+        assert count_form_occurrences("你看新闻吗？", "闻") == 0
+        assert count_form_occurrences("我闻花香。", "闻") == 1
+        assert count_form_occurrences("一切都好。", "切") == 0
+        assert count_form_occurrences("他的数学很好。", "数") == 0
+        assert sentence_hits("一切都好。", ["切", "好"]) == {"好": 1}
+
 
 class TestRankingKey:
     def test_key_order(self) -> None:
