@@ -150,7 +150,7 @@ class TestRankMode:
 
         cli.fr(deck_file, check=True)
 
-        assert "Error: --check needs --select." in capsys.readouterr().out
+        assert "Error: --check needs --select or --core." in capsys.readouterr().out
 
     def test_a_missing_input_prints_an_error(
         self, tmp_path: Path, capsys
