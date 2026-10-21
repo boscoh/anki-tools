@@ -1,10 +1,10 @@
 """Candidate sentence pool (stage S2).
 
-The pool applies filters F1 to F12 in order and reports how many sentences each
-filter removes. A sentence that fails no filter becomes a candidate for the
-lowest-index word it covers. With ``fallback``, a sentence in the wider window
-that fails only F6 or F8 becomes a scaffold candidate for a word that has no
-core candidate.
+The pool applies filters F1 to F12, the unknown-token budget, and the English
+sense test in order and reports how many sentences each filter removes. A
+sentence that fails no filter becomes a candidate for the lowest-index word it
+covers. With ``fallback``, a sentence in the wider window that fails only F6 or
+F8 becomes a scaffold candidate for a word that has no core candidate.
 """
 
 from __future__ import annotations
@@ -15,6 +15,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Collection, Sequence
 
+from anki_tools.sentence_pack.english_sense import holds_sense
 from anki_tools.sentence_pack.profile import LanguageProfile, WordRow
 from anki_tools.sentence_pack.tatoeba import (
     read_audio,
@@ -39,6 +40,7 @@ FILTER_KEYS = [
     "F11",
     "F12",
     "unknown",
+    "sense",
 ]
 FILTER_NAMES = {
     "F1": "english link",
@@ -54,6 +56,7 @@ FILTER_NAMES = {
     "F11": "english word count",
     "F12": "unique text",
     "unknown": "unknown token budget",
+    "sense": "english sense",
 }
 MIN_ENGLISH_WORDS = 2
 MAX_ENGLISH_WORDS = 12
@@ -255,6 +258,7 @@ def build_candidate_pool(
     forms = [profile.form_text(form) for form in word_table]
     form_set = set(forms)
     positions = profile.form_positions(word_table)
+    gloss_by_form = {profile.form_text(form): form.english for form in word_table}
     paths = pool_paths(profile, Path(data_dir))
     links = read_links(paths["links"])
     sentences = read_sentences(paths["sentences"])
@@ -301,6 +305,19 @@ def build_candidate_pool(
         english_ok = MIN_ENGLISH_WORDS <= english_words <= MAX_ENGLISH_WORDS
         dedupe = profile.dedupe_key(sentence)
 
+        hits = tuple(sorted(profile.hits(sentence, form_set)))
+        if profile.sense_filter is not None:
+            hits = tuple(
+                form
+                for form in hits
+                if not profile.sense_filter(form, english_text)
+            )
+        sense_hits = tuple(
+            form
+            for form in hits
+            if holds_sense(gloss_by_form.get(form, ""), english_text)
+        )
+
         fail: int | None = _stage_number(shape) if shape is not None else None
         if fail is None:
             if not predicate:
@@ -313,17 +330,13 @@ def build_candidate_pool(
                 fail = 12
             elif unknown_words > max_unknown:
                 fail = 13
+            elif hits and not sense_hits:
+                fail = len(FILTER_KEYS)
+        hits = sense_hits
         passed = (fail - 1) if fail is not None else len(FILTER_KEYS)
         for key in FILTER_KEYS[:passed]:
             counts[key] += 1
 
-        hits = tuple(sorted(profile.hits(sentence, form_set)))
-        if profile.sense_filter is not None:
-            hits = tuple(
-                form
-                for form in hits
-                if not profile.sense_filter(form, english_text)
-            )
         if fail is None and hits:
             seen.add(dedupe)
             audio_id, audio_license = audio.get(sentence_id, (0, ""))

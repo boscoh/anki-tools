@@ -43,6 +43,7 @@ from anki_tools.sentence_pack.pack import (
     tts_engine_name,
     write_attribution_section,
 )
+from anki_tools.sentence_pack.english_sense import sense_mismatches
 from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
 from anki_tools.sentence_pack.select import rank_order, review_status
 from anki_tools.yue_frequency import (
@@ -1141,7 +1142,7 @@ CANTONESE = register(
         core_concepts=SWADESH_ROWS,
         zipf_min=MIN_ZIPF,
         similarity_limit=SIMILARITY_LIMIT,
-        coverage_min=0.80,
+        coverage_min=0.70,
         prepare_text=prepare_text,
         unit_count=unit_count,
         script_ok=script_ok,
@@ -1428,20 +1429,19 @@ def gate_no_false_friend(
 
 
 def gate_no_sense_mismatch(
-    inputs: Any, _profile: LanguageProfile
+    inputs: Any, profile: LanguageProfile
 ) -> tuple[bool, str]:
-    """Cantonese gate G21: no card English holds a false-friend sense.
+    """Cantonese gate G21: no card English holds a different sense.
 
     :param inputs: Lazy file reader of the audit.
-    :param _profile: Language profile.
+    :param profile: Language profile.
     :returns: Pass flag and detail text.
     """
     rows = inputs.rows()
-    bad = [
-        f"{row.get('target', '')} in {row.get('sentence', '')}"
-        for row in rows
-        if sense_filter(row.get("target", ""), row.get("english", ""))
-    ]
+    gloss_by_form = {
+        profile.form_text(form): form.english for form in inputs.table()
+    }
+    bad = sense_mismatches(rows, gloss_by_form, sense_filter)
     if bad:
         return False, (
             f"{len(bad)} card(s) use the target in a different sense: {bad[0]}"

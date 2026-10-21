@@ -3,13 +3,13 @@
   "source_dump_date": "2026-10-19",
   "counts": {
     "words": 207,
-    "cards": 329,
-    "scaffold": 1,
-    "native_audio": 204,
-    "tts_audio": 125
+    "cards": 279,
+    "scaffold": 0,
+    "native_audio": 171,
+    "tts_audio": 108
   },
   "coverage": {
-    "core_with_card": 0.8502
+    "core_with_card": 0.7488
   },
   "voice": "gtts:yue",
   "pack_license": "public",
@@ -23,7 +23,7 @@
   },
   "files": {
     "source_csv": "sha256:95ec2804373a0cf876099cd70b6d437d056aadccbf41cfa93a0110333cdb5006",
-    "sentences_csv": "sha256:ba953f2ec9260f92921c4cf54eeeaa57e7e504207a9e52c38fcb3799e8dc16c2"
+    "sentences_csv": "sha256:72c69a32e67c18d5d5bdb1653ea4557d4fb0f96aa4ba2ec57579bb33b08172cb"
   },
   "licenses": [
     {
@@ -41,35 +41,56 @@
   ],
   "excluded_words": [
     "闊",
+    "厚",
+    "窄",
+    "薄",
     "蝨",
     "棍",
     "種子",
     "葉",
+    "根",
     "樹皮",
+    "皮",
     "脂肪",
+    "角",
+    "尾",
     "羽毛",
+    "嘴",
+    "腳",
     "腿",
     "膝頭",
     "翼",
     "腸",
+    "頸",
     "胸",
     "肝",
     "咬",
     "吐",
+    "吹",
     "打獵",
     "切",
     "分開",
+    "刺",
     "𢯎",
     "搾",
-    "掟",
+    "擦",
+    "推",
     "綁",
+    "數",
     "浮",
+    "流",
     "結冰",
     "脹",
     "湖",
     "鹽",
+    "沙",
+    "灰",
     "燒",
+    "爛",
+    "圓",
+    "利",
     "鈍",
+    "乾",
     "裡面"
   ]
 }

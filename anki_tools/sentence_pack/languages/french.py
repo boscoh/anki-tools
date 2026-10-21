@@ -30,6 +30,7 @@ from anki_tools.sentence_pack.pack import (
     attribution_lines,
     write_attribution_section,
 )
+from anki_tools.sentence_pack.english_sense import sense_mismatches
 from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
 from anki_tools.sentence_pack.tokens import Token, has_finite_verb, tokenize
 
@@ -1528,18 +1529,17 @@ def gate_noun_gender(
 def gate_no_sense_mismatch(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
-    """French gate G21: no card English holds a false-friend sense.
+    """French gate G21: no card English holds a different sense.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
     :returns: Pass flag and detail text.
     """
     rows = inputs.rows()
-    bad = [
-        f"{row.get('target', '')} in {row.get('sentence', '')}"
-        for row in rows
-        if sense_filter(row.get("target", ""), row.get("english", ""))
-    ]
+    gloss_by_form = {
+        profile.form_text(form): form.english for form in inputs.table()
+    }
+    bad = sense_mismatches(rows, gloss_by_form, sense_filter)
     if bad:
         return False, f"{len(bad)} card(s) use the target in a different sense: {bad[0]}"
     return True, f"{len(rows)} cards use each target in its Swadesh sense"

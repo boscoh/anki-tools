@@ -247,16 +247,23 @@ The list does not catch every case. A bare verb can carry a different sense
 fever). A polyphone can change the sense (數 sou3 means number or fate).
 Those cases stay for a later review.
 
-An English sense check catches those cases. Each risky form has two English
-word lists: sense words and false-friend words. A candidate passes when the
-paired English holds a sense word, or holds no false-friend word. The
-`SENSE_CHECKS` table in `cantonese.py` holds the lists:
+The shared English sense test covers all 207 glosses. The table
+`vocab/english_senses.json` holds, for each gloss, the English words and phrases
+that show its sense. A candidate passes when the paired English holds one of
+them. `scripts/build_english_senses.py` writes the table from WordNet plus a
+reviewed list of extra words. This test is what catches a bare verb with the
+wrong sense, such as 揸 with drive English.
 
-| Form | Sense words             | False-friend words
-| ---- | ----------------------- | ---------------------------------- |
-| 揸   | hold, grip, grasp       | drive, drove, driving, driver      |
-| 數   | count, counts, counted  | math, mathematics, number, numbers |
-| 燒   | burn, burned, fire      | fever, temperature                 |
+The form-level table adds a check for a compound with the wrong sense. Each
+risky form has two English word lists: sense words and false-friend words. A
+candidate passes when the paired English holds a sense word, or holds no
+false-friend word. The `SENSE_CHECKS` table in `cantonese.py` holds the lists:
+
+| Form | Sense words            | False-friend words                 |
+| ---- | ---------------------- | ---------------------------------- |
+| 揸    | hold, grip, grasp      | drive, drove, driving, driver      |
+| 數    | count, counts, counted | math, mathematics, number, numbers |
+| 燒    | burn, burned, fire     | fever, temperature                 |
 
 Gate G21 checks the built deck against the stored English text.
 
@@ -364,29 +371,29 @@ pack.
 `anki swadesh audit cantonese` runs these gates. A failure stops the command
 with a non-zero exit code.
 
-| Gate | Check                                                                     |
-| ---- | ------------------------------------------------------------------------- |
+| Gate | Check                                                                          |
+| ---- | ------------------------------------------------------------------------------ |
 | G1   | The word table passes the row count, index, label, jyutping, and review checks |
-| G2   | No two reviewed forms are the same                                        |
-| G3   | Every card target is a reviewed form                                      |
-| G4   | Every card has a unique Tatoeba id                                        |
-| G5   | The target matches exactly one whole token in the sentence                |
-| G6   | No two cards reach the 0.67 character Jaccard limit                       |
-| G7   | Every card has a valid sentence MP3                                       |
-| G8   | The media count in the manifest matches the APKG                          |
-| G9   | No card sentence or target holds a Latin letter or a digit                |
-| G10  | Core coverage is at least 0.80                                            |
-| G11  | The manifest counts and hashes match the files                            |
-| G12  | The `## Cantonese pack` section names every sentence author               |
-| G13  | The APKG opens and its note count matches the CSV                         |
-| G14  | Every card passes the proper-sentence rules                               |
-| G15  | The word review file has no `open` row                                    |
-| G16  | Every card target has a valid word MP3                                    |
-| G17  | Every card has a jyutping reading                                         |
-| G18  | Every native card keeps a license                                         |
-| G19  | Every card target is a reviewed form with a card                          |
-| G20  | No card uses its target inside a false-friend compound                     |
-| G21  | No card English holds a false-friend sense for its target                  |
+| G2   | No two reviewed forms are the same                                             |
+| G3   | Every card target is a reviewed form                                           |
+| G4   | Every card has a unique Tatoeba id                                             |
+| G5   | The target matches exactly one whole token in the sentence                     |
+| G6   | No two cards reach the 0.67 character Jaccard limit                            |
+| G7   | Every card has a valid sentence MP3                                            |
+| G8   | The media count in the manifest matches the APKG                               |
+| G9   | No card sentence or target holds a Latin letter or a digit                     |
+| G10  | Core coverage is at least 0.70                                                 |
+| G11  | The manifest counts and hashes match the files                                 |
+| G12  | The `## Cantonese pack` section names every sentence author                    |
+| G13  | The APKG opens and its note count matches the CSV                              |
+| G14  | Every card passes the proper-sentence rules                                    |
+| G15  | The word review file has no `open` row                                         |
+| G16  | Every card target has a valid word MP3                                         |
+| G17  | Every card has a jyutping reading                                              |
+| G18  | Every native card keeps a license                                              |
+| G19  | Every card target is a reviewed form with a card                               |
+| G20  | No card uses its target inside a false-friend compound                         |
+| G21  | No card English holds a different sense than the card word                     |
 
 ### 11.1 Tests
 
@@ -412,47 +419,47 @@ replaces the jieba instance.
 
 ## 12. Measured result
 
-Measured on 2026-10-20 with the defaults:
+Measured on 2026-10-21 with the defaults:
 
 | Measure                    | Value                 |
 | -------------------------- | --------------------- |
-| Cards                      | 329                   |
-| Core cards                 | 328                   |
-| Scaffold cards             | 1                     |
-| Forms with a card          | 176 of 207 (85.0%)    |
-| Concepts with a card       | 176 of 207 (85.0%)    |
-| Cards with native audio    | 204                   |
-| Cards with a TTS file      | 125                   |
-| Media files                | 505                   |
+| Cards                      | 279                   |
+| Core cards                 | 279                   |
+| Scaffold cards             | 0                     |
+| Forms with a card          | 155 of 207 (74.9%)    |
+| Concepts with a card       | 155 of 207 (74.9%)    |
+| Cards with native audio    | 171                   |
+| Cards with a TTS file      | 108                   |
+| Media files                | 434                   |
 | Audio duration             | 0.4 s to 15.0 s       |
 | Jyutping on every card     | yes                   |
 | Gates G1 to G21            | all pass              |
 
-The 31 forms without a card: 闊, 蝨, 棍, 種子, 葉, 樹皮, 脂肪, 羽毛, 腿,
-膝頭, 翼, 腸, 胸, 肝, 咬, 吐, 打獵, 切, 分開, 𢯎, 搾, 掟, 綁, 浮, 結冰, 脹, 湖,
-鹽, 燒, 鈍, 裡面.
+The 51 forms without a candidate: 闊, 厚, 窄, 薄, 蝨, 棍, 種子, 葉, 根,
+樹皮, 皮, 脂肪, 角, 尾, 羽毛, 嘴, 腳, 腿, 膝頭, 翼, 腸, 頸, 胸, 肝, 咬,
+吐, 吹, 打獵, 切, 分開, 刺, 搾, 擦, 推, 綁, 數, 浮, 流, 結冰, 脹, 湖, 鹽,
+沙, 灰, 燒, 爛, 圓, 利, 鈍, 乾, 裡面. The form 𢯎 has a candidate but no card.
 
-The cap did not bind: `--per-word 2` stops at 329 cards, before `--max-cards
-450`. Three forms have a candidate but no card: 𢯎, 掟, and 燒. 燒 lost its
-candidates to the English sense check (fever and temperature are not the
-burn sense). 切 has no candidate left, because its only candidates held the
-false-friend compounds 趕得切 and 一切.
+The English sense check removes most of these forms. A candidate must hold the
+English gloss sense of the target word, so 揸 with drive English, 數 with math
+English, and 燒 with fever English all fail. The cap did not bind: `--per-word
+2` stops at 279 cards, before `--max-cards 450`.
 
-Length of the cards: 13 cards have 3 Han characters, 21 have 4, 38 have 5, 56
-have 6, 47 have 7, 53 have 8, 42 have 9, 26 have 10, 15 have 11, and 18 have
-12.
+Length of the cards: 8 cards have 4 Han characters, 17 have 5, 32 have 6, 37
+have 7, 36 have 8, 51 have 9, 43 have 10, 24 have 11, 15 have 12, 11 have 13,
+4 have 14, and 1 has 20.
 
 ## 13. Risks and open questions
 
-| Risk                                                       | Effect                          | Mitigation                                        |
-| ---------------------------------------------------------- | ------------------------------- | ------------------------------------------------- |
-| `wordfreq` has no `yue` list                               | A rare Cantonese form looks rare | The value only orders candidates; `anki freq yue` gives the spoken rank |
-| No Cantonese tagger                                        | F9 and F10 are off              | The length, script, and mark rules still apply    |
-| The reviewed CSV differs from the module terms             | A form may be unusual           | The 32 rows are in the review file with a decision |
-| A form is a common particle (呢)                           | Wrong cards for `this`          | The review keeps 呢個 for `this`                  |
-| gTTS Cantonese quality is lower than a native voice        | Audio quality                   | 208 of 333 cards use a native recording; edge-tts adds a HK voice |
-| Cifu is a GPL-3.0 repository with corpora of other licenses | Public build                    | The file is cached, never committed; `data/` is ignored |
-| 29 concepts have no candidate                              | Incomplete coverage             | Core coverage 0.86 is above the 0.80 gate; the review CSV lists them |
+| Risk                                                        | Effect                           | Mitigation                                                              |
+| ----------------------------------------------------------- | -------------------------------- | ----------------------------------------------------------------------- |
+| `wordfreq` has no `yue` list                                | A rare Cantonese form looks rare | The value only orders candidates; `anki freq yue` gives the spoken rank |
+| No Cantonese tagger                                         | F9 and F10 are off               | The length, script, and mark rules still apply                          |
+| The reviewed CSV differs from the module terms              | A form may be unusual            | The 32 rows are in the review file with a decision                      |
+| A form is a common particle (呢)                             | Wrong cards for `this`           | The review keeps 呢個 for `this`                                          |
+| gTTS Cantonese quality is lower than a native voice         | Audio quality                    | 171 of 279 cards use a native recording; edge-tts adds a HK voice       |
+| Cifu is a GPL-3.0 repository with corpora of other licenses | Public build                     | The file is cached, never committed; `data/` is ignored                 |
+| 51 concepts have no candidate                               | Incomplete coverage              | Core coverage 0.749 is above the 0.70 gate; the review CSV lists them   |
 
 Open questions:
 

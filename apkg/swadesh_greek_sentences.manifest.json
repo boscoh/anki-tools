@@ -1,15 +1,15 @@
 {
-  "build_date": "2026-10-20",
+  "build_date": "2026-10-21",
   "source_dump_date": "2026-10-19",
   "counts": {
     "words": 207,
-    "cards": 306,
-    "scaffold": 0,
+    "cards": 300,
+    "scaffold": 2,
     "native_audio": 0,
-    "tts_audio": 306
+    "tts_audio": 300
   },
   "coverage": {
-    "core_with_card": 0.7826
+    "core_with_card": 0.7729
   },
   "voice": "gtts:el",
   "pack_license": "public",
@@ -20,7 +20,7 @@
   "native_audio_available": false,
   "files": {
     "source_csv": "sha256:d644478c802f432ebe4fccc2468971cd025573b1388fd8401e024b2f89a1c21c",
-    "sentences_csv": "sha256:a4a9eb573129a10c28212d864f3b16a71f55405bd30fbbcc89d56483f830ad00"
+    "sentences_csv": "sha256:41c7a0b484a04ce5e1d677ef7ef9eeb5e0f17ace5cf436932123ce6dd60ea3d6"
   },
   "licenses": [
     {
@@ -55,6 +55,7 @@
     "φτερό",
     "κοιλιά",
     "σπλάχνα",
+    "λαιμός",
     "συκώτι",
     "ρουφώ",
     "ξερνώ",
@@ -65,6 +66,7 @@
     "ξύνω",
     "σκάβω",
     "πετάω",
+    "ξαπλώνω",
     "σφίγγω",
     "τρίβω",
     "σκουπίζω",

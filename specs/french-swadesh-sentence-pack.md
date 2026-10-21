@@ -164,16 +164,17 @@ parts with different rules.
 
 Add `anki_tools/sentence_pack/` with these modules:
 
-| Module       | Content                                                            |
-| ------------ | ------------------------------------------------------------------ |
-| `profile.py` | `LanguageProfile` dataclass, profile registry                      |
-| `tatoeba.py` | TSV readers, fetch and checksum cache (from `mandarin_fetch.py`)   |
-| `pool.py`    | filters F2 to F8, dedupe, pool report (from `mandarin_swadesh.py`) |
-| `select.py`  | set cover and ranking (from `mandarin_swadesh.py`)                 |
-| `audio.py`   | TTS, native download, probe, index (from `mandarin_audio.py`)      |
-| `pack.py`    | genanki model, templates, manifest (from `mandarin_deck.py`)       |
-| `audit.py`   | gate runner and gate functions (from `mandarin_audit.py`)          |
-| `languages/` | `mandarin.py`, `french.py`, `greek.py`                             |
+| Module             | Content                                                            |
+| ------------------ | ------------------------------------------------------------------ |
+| `profile.py`       | `LanguageProfile` dataclass, profile registry                      |
+| `tatoeba.py`       | TSV readers, fetch and checksum cache (from `mandarin_fetch.py`)   |
+| `pool.py`          | filters F2 to F8, dedupe, pool report (from `mandarin_swadesh.py`) |
+| `select.py`        | set cover and ranking (from `mandarin_swadesh.py`)                 |
+| `audio.py`         | TTS, native download, probe, index (from `mandarin_audio.py`)      |
+| `pack.py`          | genanki model, templates, manifest (from `mandarin_deck.py`)       |
+| `audit.py`         | gate runner and gate functions (from `mandarin_audit.py`)          |
+| `english_sense.py` | shared English gloss sense test and data loader                    |
+| `languages/`       | `mandarin.py`, `french.py`, `greek.py`                             |
 
 `LanguageProfile` holds every language-specific value: Tatoeba code, word CSV
 path, sentence CSV path, audio directory, deck and model names, word window,
@@ -316,6 +317,11 @@ Filter rules, applied in order:
 | F11  | English text has 2 to 12 words                                                 |
 | F12  | Not a duplicate under `latin_text_dedup_key`                                   |
 
+A candidate whose target word passes F1 to F12 then passes the shared English
+sense test of section 8.2. The test compares the paired English with the
+English gloss of the covered word. A candidate whose only target word fails the
+test does not enter the pool. The pool report counts this stage as `sense`.
+
 A word is a run of letters, plus `'`, `’`, and `-` inside a word. Count
 `aujourd'hui` as one word. Count an elided form as two tokens after the
 apostrophe split: `l'eau` gives `l'` and `eau`.
@@ -396,23 +402,31 @@ Reuse `word_similarity_fr` and `latin_text_dedup_key` from
 `anki_tools/rank.py`. Do not copy them.
 
 
-An English sense check rejects a wrong sense of a homograph. Each risky form
-has two English word lists: sense words and false-friend words. A candidate
-passes when the paired English holds a sense word, or holds no false-friend
-word. The `SENSE_CHECKS` table in `french.py` holds the lists:
+The shared English sense test covers all 207 glosses. The table
+`vocab/english_senses.json` holds, for each gloss, the English words and phrases
+that show its sense. A candidate passes when the paired English holds one of
+them. `scripts/build_english_senses.py` writes the table from WordNet plus a
+reviewed list of extra words. For example, `dull` accepts `blunt` and rejects
+`boring`; `to hold` rejects `drive`.
 
-| Form    | Sense words | False-friend words
-| ------- | ----------- | ---------------------------- |
-| queue   | tail        | queue, line, wait            |
-| sentir  | smell       | feel, felt, feeling          |
-| voler   | fly         | steal, stole, robbed, theft  |
-| tirer   | pull        | shoot, shot, shooting        |
-| langue  | tongue      | language, languages          |
-| plume   | feather     | pen, quill                   |
-| foie    | liver       | chicken, scared, afraid      |
-| gonfler | swell       | bold, nerve, cheeky          |
-| rond    | round       | money, cash, penny, dime     |
-| droit   | straight    | right, allowed, entitled     |
+The form-level table adds a check for a homograph whose gloss sense is close
+to the wrong sense. Each risky form has two English word lists: sense words
+and false-friend words. A candidate passes when the paired English holds a
+sense word, or holds no false-friend word. The `SENSE_CHECKS` table in
+`french.py` holds the lists:
+
+| Form    | Sense words | False-friend words          |
+| ------- | ----------- | --------------------------- |
+| queue   | tail        | queue, line, wait           |
+| sentir  | smell       | feel, felt, feeling         |
+| voler   | fly         | steal, stole, robbed, theft |
+| tirer   | pull        | shoot, shot, shooting       |
+| langue  | tongue      | language, languages         |
+| plume   | feather     | pen, quill                  |
+| foie    | liver       | chicken, scared, afraid     |
+| gonfler | swell       | bold, nerve, cheeky         |
+| rond    | round       | money, cash, penny, dime    |
+| droit   | straight    | right, allowed, entitled    |
 
 Gate G21 checks the built deck against the stored English text.
 ### 8.3 Ranking key
@@ -736,6 +750,8 @@ a failure.
 
 | Gate | Check                                                                                      |
 | ---- | ------------------------------------------------------------------------------------------ |
+| Gate | Check                                                                                      |
+| ---- | ------------------------------------------------------------------------------------------ |
 | G1   | Word table: 207 rows, 207 forms, no gap                                                    |
 | G2   | No duplicate word form                                                                     |
 | G3   | Every card target exists in the reviewed CSV                                               |
@@ -756,7 +772,7 @@ a failure.
 | G18  | A public pack has no card with a CC BY-NC 4.0 audio file                                   |
 | G19  | No card has `form_kind=discontinuous` without both parts in the sentence (8.2)             |
 | G20  | Noun rows with an empty `gender` are reported; the count is in the manifest                |
-| G21  | No card English holds a false-friend sense for its target                                  |
+| G21  | No card English holds a different sense than the card word (8.2)                           |
 
 G10 uses the measured coverage. The probe measures 207 of 207 concepts (1.00).
 This spec sets the gate at 0.95, which is the measured value minus 5 points.
@@ -819,15 +835,15 @@ a manual review of sentence, gloss, and audio.
 ## 17. Implementation result
 
 Milestone M5 is complete. These values come from the full pipeline run of
-2026-10-19.
+2026-10-21.
 
 | Measure              | Value                                                   |
 | -------------------- | ------------------------------------------------------- |
-| Build date           | 2026-10-19                                              |
+| Build date           | 2026-10-21                                              |
 | Tatoeba dump         | 2026-10-19 (`fra`: 728,898 sentences)                   |
 | Word table           | 207 rows, 207 unique forms, 94 review rows, 0 open      |
 | Noun gender          | 84 of 84 noun rows have a gender                        |
-| Candidate pool       | 192,837 candidates, 4 to 10 words, 0 scaffold           |
+| Candidate pool       | 171,463 candidates, 4 to 10 words, 0 scaffold           |
 | Cards                | 412 core, 0 scaffold                                    |
 | Media files          | 618 (412 sentence files and 206 word files)             |
 | Concept coverage     | 206 of 207 concepts (0.995)                             |
@@ -840,12 +856,15 @@ The one uncovered word is `intestins` (index 86, guts). It has no candidate in
 the core window and none in the 3 to 10 word fallback window, so the deck has
 no scaffold card.
 
-The measured values differ from the probe of section 3 in five places:
+The measured values differ from the probe of section 3 in six places:
 
-- The pool has 192,837 candidates, not 247,090. The probe pool ignored the
+- The pool has 171,463 candidates, not 247,090. The probe pool ignored the
   unknown-token budget of section 8.2, which the shared pool applies as filter
-  13. The F1 to F12 pass count is 222,833, and 29,996 of those sentences hold
+  13. The F1 to F12 pass count is 251,342, and 28,337 of those sentences hold
   more than two unknown tokens.
+- The English sense test removes 21,134 more sentences (223,005 down to
+  201,871). A sentence stays only when the paired English shows the gloss
+  sense of a covered word.
 - The F3 script filter removes 1,721 sentences, more than the probe expected,
   because it rejects every letter outside the French set (for example `ñ`,
   `ß`, and `ø`), not only digits.

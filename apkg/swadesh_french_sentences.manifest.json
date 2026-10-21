@@ -1,5 +1,5 @@
 {
-  "build_date": "2026-10-20",
+  "build_date": "2026-10-21",
   "source_dump_date": "2026-10-19",
   "counts": {
     "words": 207,
@@ -22,7 +22,7 @@
   "noun_gender_missing": 0,
   "files": {
     "source_csv": "sha256:014b1e7593affdd80cff7b101b90878bad8eb7a13a42de1361d00920a1b14604",
-    "sentences_csv": "sha256:5ba63ae158408bb074b86cc2b9bd2dcc9b175b9ae1202580a4010a7d0bd56219"
+    "sentences_csv": "sha256:5aefce0fe4e070d114a44671450fe0cd4f83ba9b66fc4e2839a39b050e4b6405"
   },
   "licenses": [
     {

@@ -3,22 +3,22 @@ je,Je suis l'un de vous.,Je suis l'un de vous.,I'm one of you.,5579298,Aiji,3728
 je,Je n'en ai pas.,Je n'en ai pas.,I don't have one.,2284634,sacredceltic,2283761,0,tts,,0,5,6.83,0|0|-6.834|0|2284634,core,single,false
 tu,Peux-tu me dire ce que c'est ?,Peux-tu me dire ce que c'est ?,Can you tell me what this is?,333967,sysko,55865,0,tts,,0,8,6.54,0|0|-6.537|0|333967,core,single,false
 tu,Tu ne m'as toujours pas dit qui il est.,Tu ne m'as toujours pas dit qui il est.,You still haven't told me who he is.,1840152,sacredceltic,1839656,0,tts,,0,10,6.53,0|0|-6.526|1|1840152,core,single,false
-il,En est-il ainsi ?,En est-il ainsi ?,Is that so?,1121154,sacredceltic,1120776,0,tts,,0,4,6.79,0|0|-6.785|1|1121154,core,single,false
 il,Il n'est pas à l'intérieur.,Il n'est pas à l'intérieur.,He's not in.,1308992,sacredceltic,1300772,0,tts,,0,7,6.78,0|0|-6.783|0|1308992,core,single,false
+il,Il n'est pas là.,Il n'est pas là.,He's not in.,1309178,sacredceltic,1300772,0,tts,,0,5,6.76,0|0|-6.764|0|1309178,core,single,false
 nous,C'est à nous.,C'est à nous.,It's ours.,6324570,Yemana,2123588,0,tts,,0,4,6.94,0|0|-6.940|1|6324570,core,single,false
 nous,C'était à nous.,C'était à nous.,That was ours.,5591340,Aiji,4397573,0,tts,,0,4,6.70,0|0|-6.697|1|5591340,core,single,false
 vous,C'est tout à vous.,C'est tout à vous.,It's all yours.,5406025,Aiji,1122840,0,tts,,0,5,6.87,0|0|-6.866|0|5406025,core,single,false
 vous,Je suis l'un d'entre vous.,Je suis l'un d'entre vous.,I'm one of you.,5579299,Aiji,3728978,0,tts,,0,7,6.73,0|0|-6.729|0|5579299,core,single,false
-ils,Il n'est pas là.,Il n'est pas là.,He's not in.,1309178,sacredceltic,1300772,0,tts,,0,5,6.76,0|0|-6.764|0|1309178,core,single,false
-ils,Il a plus de livres que je n'en ai.,Il a plus de livres que je n'en ai.,He has more books than I do.,132342,Aiji,298042,0,tts,,0,10,6.75,0|0|-6.755|1|132342,core,single,false
+ils,Sont-ils en train de parler français ?,Sont-ils en train de parler français ?,Are they speaking French?,6465275,Aiji,2451616,0,tts,,0,7,6.31,0|0|-6.311|0|6465275,core,single,false
+ils,Que devraient-ils faire dans cette situation ?,Que devraient-ils faire dans cette situation ?,What should they do in this situation?,337011,sysko,60417,0,tts,,0,7,6.14,0|0|-6.140|0|337011,core,single,false
 ceci,Que savez-vous de tout ceci ?,Que savez-vous de tout ceci ?,What do you know about all this?,5402340,Aiji,2892534,0,tts,,0,6,6.23,0|0|-6.232|0|5402340,core,single,false
-ceci,Ceci est un livre.,Ceci est un livre.,It is a book.,1450483,martin9,42097,0,tts,,0,4,6.13,0|0|-6.128|1|1450483,core,single,false
-cela,Qui a fait ça ?,Qui a fait ça ?,Who did it?,2269525,MartinShadock,276223,0,tts,,0,4,6.71,0|0|-6.713|1|2269525,core,single,false
+ceci,Je ne peux pas lire ceci.,Je ne peux pas lire ceci.,I can't read this.,4220444,Alexs,1954727,0,tts,,0,6,6.06,0|0|-6.058|0|4220444,core,single,false
 cela,On a fait ça.,On a fait ça.,We did that.,5350934,Aiji,2241070,0,tts,,0,4,6.67,0|0|-6.668|1|5350934,core,single,false
+cela,"En gros, c'est ça.","En gros, c'est ça.",That's about it.,1683238,belgavox,32806,0,tts,,0,5,6.64,0|0|-6.638|0|1683238,core,single,false
 ici,Elle n'est pas ici.,Elle n'est pas ici.,She's not here.,1684391,belgavox,783222,0,tts,,0,5,6.61,0|0|-6.610|0|1684391,core,single,false
 ici,Qui d'autre est ici ?,Qui d'autre est ici ?,Who else is here?,3325730,JulieMDM,3325659,0,tts,,0,5,6.58,0|0|-6.584|0|3325730,core,single,false
-là,Il n'est pas là en ce moment.,Il n'est pas là en ce moment.,He isn't here now.,914859,Quazel,591771,0,tts,,0,8,6.68,0|0|-6.679|0|914859,core,single,false
-là,Je vais voir s'il est là.,Je vais voir s'il est là.,I'll see if he is in.,1170457,rene1596,30354,0,tts,,0,7,6.44,0|0|-6.444|0|1170457,core,single,false
+là,Je n'étais pas là-bas à cette époque.,Je n'étais pas là-bas à cette époque.,I wasn't there at that time.,5955813,Aiji,5245392,0,tts,,0,9,6.24,0|0|-6.238|0|5955813,core,single,false
+là,Un bon nombre de personnes étaient là.,Un bon nombre de personnes étaient là.,A good many people were there.,10983,sacredceltic,63622,0,tts,,0,7,6.19,0|0|-6.187|0|10983,core,single,false
 qui,Qui l'a fait ?,Qui l'a fait ?,Who did it?,579927,sacredceltic,276223,0,tts,,0,4,6.89,0|0|-6.895|1|579927,core,single,false
 qui,C'est la chambre de qui ?,C'est la chambre de qui ?,Whose room is this?,516032,Goofy,55514,0,tts,,0,6,6.89,0|0|-6.885|0|516032,core,single,false
 quoi,C'est pour quoi faire ?,C'est pour quoi faire ?,What's this for?,7414790,lbdx,1886682,0,tts,,0,5,6.65,0|0|-6.646|0|7414790,core,single,false
@@ -35,42 +35,42 @@ tout,Il est tout à toi.,Il est tout à toi.,It's all yours.,5406024,Aiji,112284
 tout,C'est tout à toi.,C'est tout à toi.,It's all yours.,5406022,Aiji,1122840,0,tts,,0,5,6.73,0|0|-6.726|0|5406022,core,single,false
 beaucoup,Il a beaucoup de livres d'Histoire.,Il a beaucoup de livres d'Histoire.,He has a lot of books on history.,332664,sysko,304790,0,tts,,0,7,6.45,0|0|-6.451|0|332664,core,single,false
 beaucoup,Il me faut beaucoup de temps.,Il me faut beaucoup de temps.,I need lots of time.,3530935,Rovo,2387495,0,tts,,0,6,6.45,0|0|-6.445|0|3530935,core,single,false
-quelques,C'est quelqu'un de bien.,C'est quelqu'un de bien.,He's a good person.,4244,TRANG,2368,0,tts,,0,6,6.42,0|0|-6.417|0|4244,core,single,false
 quelques,Je sens que quelque chose ne va pas.,Je sens que quelque chose ne va pas.,I feel that something is wrong.,9706,sacredceltic,25284,0,tts,,0,8,6.30,0|0|-6.305|0|9706,core,single,false
+quelques,Quelque chose ne va pas ?,Quelque chose ne va pas ?,Is something wrong?,181178,Romira,323844,0,tts,,0,5,6.20,0|0|-6.196|0|181178,core,single,false
 peu,Il a peu d'amis.,Il a peu d'amis.,He has few friends.,2948070,nimfeo,304403,0,tts,,0,5,6.47,0|0|-6.474|0|2948070,core,single,false
 peu,Je connais un peu de français.,Je connais un peu de français.,I know a little French.,5494656,Aiji,2451645,0,tts,,0,6,6.42,0|0|-6.425|0|5494656,core,single,false
 autre,J'en prendrai un autre.,J'en prendrai un autre.,I'll have another.,4451150,franlexcois,2247759,0,tts,,0,5,6.08,0|0|-6.078|0|4451150,core,single,false
 autre,J'en prendrai une autre.,J'en prendrai une autre.,I'll have another.,4451147,franlexcois,2247759,0,tts,,0,5,6.06,0|0|-6.056|0|4451147,core,single,false
 un,J'en ai une.,J'en ai une.,I have one.,2433241,nimfeo,2245891,0,tts,,0,4,6.82,0|0|-6.820|1|2433241,core,single,false
-un,Ça n'est pas un jeu.,Ça n'est pas un jeu.,It's not a game.,2910675,nimfeo,2649001,0,tts,,0,6,6.66,0|0|-6.663|0|2910675,core,single,false
+un,J'en ai vu un.,J'en ai vu un.,I saw one.,5380312,Aiji,3168241,0,tts,,0,5,6.62,0|0|-6.620|0|5380312,core,single,false
 deux,On peut le faire tous les deux.,On peut le faire tous les deux.,We can both do it.,4128742,sbamsbamsbam,2953563,0,tts,,0,7,6.59,0|0|-6.590|0|4128742,core,single,false
 deux,On l'a fait deux fois.,On l'a fait deux fois.,We did it twice.,11252508,lbdx,5758285,0,tts,,0,6,6.59,0|0|-6.588|0|11252508,core,single,false
-trois,C'est le trois octobre.,C'est le trois octobre.,It's October the third.,9971,pierrephi,398977,0,tts,,0,5,6.47,0|0|-6.466|0|9971,core,single,false
-trois,Je l'ai eu pour trois fois rien.,Je l'ai eu pour trois fois rien.,I got it for nothing.,7082,hirymnak,254794,0,tts,,0,8,6.36,0|0|-6.364|0|7082,core,single,false
+trois,Ça s'est passé il y a trois heures.,Ça s'est passé il y a trois heures.,It happened three hours ago.,5730115,Aiji,3129803,0,tts,,0,9,6.36,0|0|-6.360|0|5730115,core,single,false
+trois,Nous n'attendrons que trois heures de plus.,Nous n'attendrons que trois heures de plus.,We'll only wait three more hours.,5662082,Aiji,3312189,0,tts,,0,8,6.01,0|0|-6.015|0|5662082,core,single,false
 quatre,Elle en a quatre.,Elle en a quatre.,She has four of them.,3272695,Micsmithel,3272694,0,tts,,0,4,6.52,0|1|-6.520|1|3272695,core,single,false
 quatre,J'ai quatre ans de plus que mon frère.,J'ai quatre ans de plus que mon frère.,I'm four years older than my brother.,6850108,Delapouite,6861555,0,tts,,0,9,6.37,0|1|-6.372|0|6850108,core,single,false
 cinq,Elle a cinq ans.,Elle a cinq ans.,She's five.,2028518,Petro1,2764336,0,tts,,0,4,6.19,0|0|-6.192|1|2028518,core,single,false
 cinq,La vue est l'un des cinq sens.,La vue est l'un des cinq sens.,Sight is one of the five senses.,1239365,alexmarcelo,263374,0,tts,,0,8,6.54,0|1|-6.537|0|1239365,core,single,false
-grand,Il est aussi grand qu'elle.,Il est aussi grand qu'elle.,He is as tall as her.,133153,nimfeo,302633,0,tts,,0,6,6.57,0|0|-6.568|0|133153,core,single,false
 grand,C'est très grand.,C'est très grand.,It's very big.,5372463,pititnatole,450003,0,tts,,0,4,6.50,0|0|-6.495|1|5372463,core,single,false
+grand,C'est trop grand.,C'est trop grand.,It's too big.,1072503,sacredceltic,435409,0,tts,,0,4,6.42,0|0|-6.423|1|1072503,core,single,false
 long,C'est une longue histoire.,C'est une longue histoire.,It's a long story.,1314671,sacredceltic,1345586,0,tts,,0,5,6.34,0|0|-6.338|0|1314671,core,single,false
 long,Il a un long nez.,Il a un long nez.,He has a long nose.,132036,Archibald,296383,0,tts,,0,5,6.21,0|0|-6.212|0|132036,core,single,false
 large,"La vie n'est pas longue, elle est large !","La vie n'est pas longue, elle est large !","Life is not long, it is wide!",4005,TRANG,2181,0,tts,,0,9,6.42,0|1|-6.417|0|4005,core,discontinuous,false
 large,C'est trop large.,C'est trop large.,That's too wide.,12148778,Rovo,8838788,0,tts,,0,4,6.20,0|1|-6.203|1|12148778,core,single,false
 épais,Le sang est plus épais que l'eau.,Le sang est plus épais que l'eau.,Blood is thicker than water.,8835,sacredceltic,238754,0,tts,,0,8,6.25,0|1|-6.247|0|8835,core,single,false
-épais,"Elle est épaisse, pour ne pas dire grosse.","Elle est épaisse, pour ne pas dire grosse.","She is large, not to say fat.",6864004,GB3,315642,0,tts,,0,8,6.13,0|1|-6.128|0|6864004,core,discontinuous,false
+épais,Ce livre est très épais.,Ce livre est très épais.,This book is very thick.,838866,Scott,682176,0,tts,,0,5,5.87,0|1|-5.868|0|838866,core,single,false
 lourd,Que vous êtes lourde !,Que vous êtes lourde !,How heavy you are!,2163523,sacredceltic,669926,0,tts,,0,4,5.80,0|0|-5.798|1|2163523,core,single,false
 lourd,Quel est le plus lourd des deux ?,Quel est le plus lourd des deux ?,Which is the heavier of the two?,10495553,sacredceltic,280825,0,tts,,0,7,6.36,0|1|-6.356|0|10495553,core,single,false
 petit,Le monde est petit.,Le monde est petit.,What a small world!,435907,gall,36078,0,tts,,0,4,6.54,0|0|-6.545|1|435907,core,single,false
 petit,C'est très petit.,C'est très petit.,It's very small.,2218974,sacredceltic,2213537,0,tts,,0,4,6.46,0|0|-6.465|1|2218974,core,single,false
-court,Je suis à court d'idées.,Je suis à court d'idées.,I'm out of ideas.,4043,TRANG,2549307,0,tts,,0,6,6.23,0|0|-6.227|0|4043,core,single,false
-court,Nous sommes à court d'argent.,Nous sommes à court d'argent.,Our money ran out.,433303,qdii,64634,0,tts,,0,6,6.08,0|0|-6.075|0|433303,core,single,false
+court,Que la vie est courte !,Que la vie est courte !,How short life is!,128728,Scott,486263,0,tts,,0,5,6.42,0|1|-6.422|0|128728,core,single,false
+court,Il est toujours à court d'argent.,Il est toujours à court d'argent.,He's always short of money.,130727,Scott,289048,0,tts,,0,7,6.40,0|1|-6.404|0|130727,core,single,false
 étroit,Je ne suis pas étroit d'esprit.,Je ne suis pas étroit d'esprit.,I'm not narrow-minded.,4856951,sacredceltic,3330308,0,tts,,0,7,6.11,0|1|-6.111|0|4856951,core,single,false
-étroit,Il a l'esprit étroit.,Il a l'esprit étroit.,He's closed-minded.,2306119,sacredceltic,2304695,0,tts,,0,5,6.04,0|1|-6.036|0|2306119,core,single,false
-mince,Ce n'est pas un mince problème.,Ce n'est pas un mince problème.,This isn't a small problem.,1532699,sacredceltic,7492680,0,tts,,0,7,6.34,0|1|-6.341|0|1532699,core,discontinuous,false
+étroit,Ils ont marché le long d'un chemin étroit.,Ils ont marché le long d'un chemin étroit.,They walked along a narrow path.,748146,Aiji,306383,0,tts,,0,9,5.96,0|1|-5.959|0|748146,core,single,false
 mince,Il est grand et mince.,Il est grand et mince.,He's tall and slim.,133118,Aiji,1944041,0,tts,,0,5,6.30,0|1|-6.304|0|133118,core,single,false
+mince,C'était un homme grand et mince.,C'était un homme grand et mince.,"He was a tall, thin man.",6488546,sacredceltic,802930,0,tts,,0,7,6.18,0|1|-6.180|0|6488546,core,single,false
 femme,Qui est cette femme ?,Qui est cette femme ?,Who's this woman?,431320,qdii,10533114,0,tts,,0,4,6.51,0|0|-6.508|1|431320,core,single,false
-femme,Je n'ai pas tué ma femme.,Je n'ai pas tué ma femme.,I didn't kill my wife.,10625835,lbdx,7113860,0,tts,,0,7,6.19,0|0|-6.190|0|10625835,core,single,false
+femme,La place d'une femme est à la maison.,La place d'une femme est à la maison.,A woman's place is in the home.,1625062,Scott,3387125,0,tts,,0,9,6.69,0|1|-6.693|0|1625062,core,single,false
 homme,Il est ce qu'on appelle un homme d'action.,Il est ce qu'on appelle un homme d'action.,He is what is called a man of action.,335379,sysko,289300,0,tts,,0,10,6.47,0|0|-6.467|1|335379,core,single,false
 homme,Je suis un homme.,Je suis un homme.,I'm a man.,127479,sacredceltic,580774,0,tts,,0,4,6.46,0|0|-6.457|1|127479,core,single,false
 être humain,Il en va de même pour tous les êtres humains.,Il en va de même pour tous les êtres humains.,The same is true of all human beings.,1035300,sacredceltic,847145,0,tts,,1,10,6.36,1|1|-6.356|1|1035300,core,single,false
@@ -89,7 +89,7 @@ animal,Je lis un livre sur les animaux.,Je lis un livre sur les animaux.,I'm rea
 animal,C'est l'animal en moi qui le veut.,C'est l'animal en moi qui le veut.,It's the animal in me that wants it.,549779,Scott,41746,0,tts,,0,9,6.57,0|1|-6.571|0|549779,core,single,false
 poisson,Il n'aime pas le poisson.,Il n'aime pas le poisson.,He doesn't like fish.,337207,sysko,295268,0,tts,,0,6,6.33,0|0|-6.333|0|337207,core,single,false
 poisson,Je ne mange pas de poisson.,Je ne mange pas de poisson.,I don't eat fish.,7411954,lbdx,5858616,0,tts,,0,6,6.22,0|0|-6.218|0|7411954,core,single,false
-oiseau,Cet oiseau ne peut pas voler.,Cet oiseau ne peut pas voler.,This bird cannot fly.,427698,Archibald,57817,0,tts,,0,6,5.71,0|0|-5.710|0|427698,core,discontinuous,false
+oiseau,Cet oiseau ne peut pas voler.,Cet oiseau ne peut pas voler.,This bird cannot fly.,427698,Archibald,57817,0,tts,,0,6,5.71,0|0|-5.710|0|427698,core,single,false
 oiseau,Quel est cet oiseau ?,Quel est cet oiseau ?,What's that bird?,444812,Archibald,67082,0,tts,,0,4,5.66,0|0|-5.655|1|444812,core,single,false
 chien,Ce chien n'est à personne.,Ce chien n'est à personne.,This dog is nobody's.,10966579,lbdx,10846505,0,tts,,0,6,6.41,0|0|-6.413|0|10966579,core,single,false
 chien,Où est le chien ?,Où est le chien ?,Where's the dog?,3628062,fleur74,2549425,0,tts,,0,4,6.37,0|0|-6.370|1|3628062,core,single,false
@@ -97,180 +97,180 @@ pou,Cet enfant est plein de poux.,Cet enfant est plein de poux.,This child is fu
 pou,Il y a beaucoup de poux dans l'écurie.,Il y a beaucoup de poux dans l'écurie.,There are a lot of lice in the stable.,11226211,LdjuherTaqvaylit,11767925,0,tts,,1,9,6.13,1|1|-6.126|0|11226211,core,single,false
 serpent,Il n'a pas du tout peur des serpents.,Il n'a pas du tout peur des serpents.,He's not at all afraid of snakes.,428133,dominiko,292669,0,tts,,0,9,6.35,0|1|-6.347|0|428133,core,single,false
 serpent,Je ne suis pas un serpent.,Je ne suis pas un serpent.,I'm not a snake.,9742034,Rovo,9741917,0,tts,,0,6,6.30,0|1|-6.305|0|9742034,core,single,false
-ver,Il n'y a pas de vent aujourd'hui.,Il n'y a pas de vent aujourd'hui.,There's no wind today.,678663,Paiooooo,242969,0,tts,,0,8,6.53,0|1|-6.525|0|678663,core,single,false
-ver,Le ver de terre est dans le sol.,Le ver de terre est dans le sol.,The earthworm is in the ground.,9978384,lbdx,5977801,0,tts,,0,8,6.32,0|1|-6.319|0|9978384,core,single,false
+ver,Le ver est dans le fruit.,Le ver est dans le fruit.,The worm is in the fruit.,5107322,sicerabibax,11178005,0,tts,,0,6,6.15,0|1|-6.153|0|5107322,core,single,false
+ver,Il se tord comme un ver.,Il se tord comme un ver.,He is writhing like a worm.,8537634,Aiji,7722268,0,tts,,1,6,5.75,1|1|-5.753|0|8537634,core,single,false
 arbre,Il y a un arbre.,Il y a un arbre.,There is a tree.,8467204,Adelpa,8467200,0,tts,,0,5,6.43,0|1|-6.426|0|8467204,core,single,false
 arbre,L'arbre est sur le point de tomber.,L'arbre est sur le point de tomber.,The tree is ready to fall.,11682539,Julien_PDC,11682542,0,tts,,0,8,6.42,0|1|-6.415|0|11682539,core,single,false
 forêt,Je suis dans la forêt.,Je suis dans la forêt.,I'm in the woods.,8326932,Adelpa,11628714,0,tts,,0,5,6.39,0|1|-6.390|0|8326932,core,single,false
 forêt,La forêt est en feu.,La forêt est en feu.,The forest is on fire.,14035122,Myrano_,11849827,0,tts,,0,5,6.31,0|1|-6.312|0|14035122,core,single,false
-bâton,La langue est un bon bâton.,La langue est un bon bâton.,The tongue wounds more than a lance.,727212,Dejo,240545,0,tts,,0,6,6.15,0|1|-6.148|0|727212,core,single,false
 bâton,Il marchait un bâton à la main.,Il marchait un bâton à la main.,He was walking with a stick in his hand.,181441,Romira,290303,0,tts,,0,7,6.00,0|1|-6.004|0|181441,core,single,false
+bâton,Je cherche un bâton.,Je cherche un bâton.,I'm looking for a stick.,7869721,Rovo,2939937,0,tts,,0,4,5.78,0|1|-5.777|1|7869721,core,single,false
 fruit,Je mange des fruits.,Je mange des fruits.,I eat fruit.,1121067,sacredceltic,1120822,0,tts,,0,4,5.79,0|0|-5.793|1|1121067,core,single,false
 fruit,Ce fruit n'est pas pour vous.,Ce fruit n'est pas pour vous.,This fruit isn't for you.,7829802,Ricardo14,3818156,0,tts,,0,7,6.51,0|1|-6.507|0|7829802,core,single,false
 graine,Les oiseaux mangent des graines.,Les oiseaux mangent des graines.,Birds eat seeds.,13222822,lbdx,11968227,0,tts,,0,5,5.36,0|1|-5.364|0|13222822,core,single,false
 graine,J'aime manger des graines de tournesols.,J'aime manger des graines de tournesols.,I like cracking sunflower seeds.,800294,sysko,800261,0,tts,,1,7,5.52,1|1|-5.521|0|800294,core,single,false
 feuille,Les feuilles sont tombées.,Les feuilles sont tombées.,The leaves fell.,1831445,Rovo,324880,0,tts,,0,4,5.39,0|0|-5.390|1|1831445,core,single,false
-feuille,Qu'est-il écrit sur cette feuille ?,Qu'est-il écrit sur cette feuille ?,What's written on this sheet?,4956906,sacredceltic,3168529,0,tts,,0,7,6.24,0|1|-6.241|0|4956906,core,single,false
+feuille,Il ne reste plus de feuilles sur cet arbre.,Il ne reste plus de feuilles sur cet arbre.,There are no leaves left on that tree.,6818198,Rockaround,6816016,0,tts,,0,9,6.12,0|1|-6.123|0|6818198,core,single,false
 racine,L'argent est la racine de tous les maux.,L'argent est la racine de tous les maux.,Money is the root of all evil.,9127,LowMemory,18505,0,tts,,0,9,6.27,0|1|-6.268|0|9127,core,single,false
 racine,Nous devons prendre le problème à la racine.,Nous devons prendre le problème à la racine.,We must get to the root of the problem.,12466950,lbdx,6063889,0,tts,,0,8,6.02,0|1|-6.016|0|12466950,core,single,false
-écorce,On presse l'orange et on jette l'écorce.,On presse l'orange et on jette l'écorce.,We squeeze the orange and throw away the rind.,6572623,felix63,6579272,0,tts,,1,9,5.85,1|1|-5.846|0|6572623,core,single,false
 écorce,L'écorce de cet arbre est très rugueuse.,L'écorce de cet arbre est très rugueuse.,The bark of this tree is very rough.,11405082,lbdx,2985507,0,tts,,1,8,5.58,1|1|-5.580|0|11405082,core,single,false
+écorce,L'écorce du bouleau est blanche.,L'écorce du bouleau est blanche.,The birch's bark is white.,13446036,Rovo,13561990,0,tts,,1,6,5.47,1|1|-5.473|0|13446036,core,single,false
 fleur,Il n'y a pas de fleurs ici.,Il n'y a pas de fleurs ici.,There are no flowers here.,8885471,carlosalberto,8885425,0,tts,,0,8,6.52,0|1|-6.520|0|8885471,core,single,false
 fleur,Elle a des fleurs à la main.,Elle a des fleurs à la main.,She has flowers in her hand.,666065,bluepie88,314870,0,tts,,0,7,6.48,0|1|-6.476|0|666065,core,single,false
-herbe,Il n'y a pas d'herbe sur la lune.,Il n'y a pas d'herbe sur la lune.,There's no grass on the moon.,2081322,Despear,9435055,0,tts,,0,10,6.42,0|1|-6.423|1|2081322,core,single,false
+herbe,Il n'y a pas d'herbe sur la lune.,Il n'y a pas d'herbe sur la lune.,There's no grass on the moon.,2081322,Despear,9435055,0,tts,,0,10,6.42,0|1|-6.423|1|2081322,core,discontinuous,false
 herbe,Il a le pied dans l'herbe.,Il a le pied dans l'herbe.,He has the foot in the grass.,5304019,Scorpionvenin14,434906,0,tts,,0,7,6.39,0|1|-6.389|0|5304019,core,single,false
 corde,J'ai tiré sur la corde.,J'ai tiré sur la corde.,I pulled the rope.,10339381,lbdx,5858306,0,tts,,0,6,5.99,0|0|-5.988|0|10339381,core,single,false
-corde,Ce n'est pas dans mes cordes.,Ce n'est pas dans mes cordes.,That's not in my wheelhouse.,12497904,lbdx,8271751,0,tts,,0,7,6.34,0|1|-6.336|0|12497904,core,discontinuous,false
+corde,Il y a des cordes tout autour de l'endroit.,Il y a des cordes tout autour de l'endroit.,Ropes surround the place.,13795,Aiji,29445,0,tts,,0,10,6.32,0|1|-6.317|1|13795,core,single,false
 peau,Elle n'a que la peau sur les os.,Elle n'a que la peau sur les os.,She is all skin and bone.,133950,sacredceltic,310687,0,tts,,0,9,6.44,0|1|-6.440|0|133950,core,single,false
-peau,"À force de vivre ici, on a la peau dure.","À force de vivre ici, on a la peau dure.",Living here has made us tough.,13633311,Myrano_,13633313,0,tts,,0,10,6.17,0|1|-6.167|1|13633311,core,single,false
+peau,J'ai un sérieux problème de peau.,J'ai un sérieux problème de peau.,I have a serious skin problem.,525353,Snout,282660,0,tts,,0,7,6.16,0|1|-6.157|0|525353,core,single,false
 viande,Je ne peux pas manger de viande.,Je ne peux pas manger de viande.,I can't eat meat.,656415,qdii,64134,0,tts,,0,7,6.20,0|0|-6.200|0|656415,core,single,false
 viande,Je mange de la viande presque tous les jours.,Je mange de la viande presque tous les jours.,I eat meat almost every day.,5708077,Aiji,1740230,0,tts,,0,9,6.14,0|0|-6.144|0|5708077,core,single,false
 sang,J'ai craché du sang.,J'ai craché du sang.,I coughed up blood.,3440568,GB3,279380,0,tts,,0,5,5.67,0|0|-5.674|0|3440568,core,single,false
 sang,Je perdais beaucoup de sang.,Je perdais beaucoup de sang.,I was bleeding a lot.,10492934,lbdx,2809990,0,tts,,0,5,5.63,0|0|-5.634|0|10492934,core,single,false
 os,C'est un os.,C'est un os.,It’s a bone.,11161515,Igider,13365006,0,tts,,0,4,6.42,0|1|-6.418|1|11161515,core,single,false
-os,J'aime ça à l'os.,J'aime ça à l'os.,I like it very much.,8045112,marioo,1647,0,tts,,0,6,6.29,0|1|-6.285|0|8045112,core,single,false
+os,Il y a beaucoup d'os dans ton corps.,Il y a beaucoup d'os dans ton corps.,There are many bones in your body.,13810740,mervert1,680397,0,tts,,0,9,6.21,0|1|-6.212|0|13810740,core,single,false
 graisse,Où se trouve la graisse ?,Où se trouve la graisse ?,Where is the fat located?,398049,Scott,37456,0,tts,,0,5,5.88,0|1|-5.880|0|398049,core,single,false
 graisse,Tom a perdu de la graisse.,Tom a perdu de la graisse.,Tom lost fat.,9846450,Rovo,9851394,0,tts,,1,6,5.93,1|1|-5.927|0|9846450,core,single,false
 œuf,Je veux des œufs.,Je veux des œufs.,I want eggs.,2427354,sacredceltic,2247442,0,tts,,0,4,5.96,0|0|-5.955|1|2427354,core,single,false
 œuf,Nous mangions des œufs.,Nous mangions des œufs.,We ate eggs.,3463848,GB3,2293029,0,tts,,0,4,4.97,0|0|-4.970|1|3463848,core,single,false
-corne,Elle corna la page et mis le livre de côté.,Elle corna la page et mis le livre de côté.,She dog-eared the page and set the book aside.,1980065,sacredceltic,1979490,0,tts,,1,10,5.86,1|1|-5.863|1|1980065,core,single,false
 corne,Tu dois prendre le taureau par les cornes.,Tu dois prendre le taureau par les cornes.,You must take the bull by the horns.,749583,Erwan29200,736668,0,tts,,1,8,5.74,1|1|-5.737|0|749583,core,single,false
-queue,Je n'ai pas fait la queue.,Je n'ai pas fait la queue.,I didn't wait in line.,9771791,lbdx,5851236,0,tts,,0,7,6.47,0|0|-6.470|0|9771791,core,single,false
-queue,Je n'aime pas faire la queue.,Je n'aime pas faire la queue.,I don't like queuing.,6087548,christian63,4699627,0,tts,,0,7,6.32,0|1|-6.323|0|6087548,core,single,false
-plume,C'est ma plume.,C'est ma plume.,It's my pen.,13626930,Rovo,13621281,0,tts,,0,4,6.05,0|1|-6.050|1|13626930,core,single,false
-plume,Elle vit de sa plume.,Elle vit de sa plume.,She lives by her pen.,134658,fucongcong,316888,0,tts,,0,5,5.89,0|1|-5.892|0|134658,core,single,false
+corne,Les vaches ont des cornes.,Les vaches ont des cornes.,Cows have horns.,7136090,Micsmithel,1739383,0,tts,,1,5,5.65,1|1|-5.652|0|7136090,core,single,false
+queue,J'ai mal à la queue !,J'ai mal à la queue !,My tail hurts!,4524196,pfpillon,4522696,0,tts,,0,6,6.32,0|1|-6.318|0|4524196,core,single,false
+queue,Elle est toujours en queue de classe.,Elle est toujours en queue de classe.,She is always at the bottom of the class.,819603,sacredceltic,310387,0,tts,,0,7,6.29,0|1|-6.293|0|819603,core,single,false
+plume,Pourquoi les oiseaux ont-ils des plumes ?,Pourquoi les oiseaux ont-ils des plumes ?,Why do birds have feathers?,12735283,Adelpa,12734731,0,tts,,0,7,5.86,0|1|-5.857|0|12735283,core,single,false
+plume,Vous avez une plume dans vos cheveux.,Vous avez une plume dans vos cheveux.,You have a feather in your hair.,1863561,Rovo,1624828,0,tts,,0,7,5.79,0|1|-5.793|0|1863561,core,single,false
 cheveux,J'ai vu une fille avec de longs cheveux.,J'ai vu une fille avec de longs cheveux.,I saw a girl with long hair.,332511,sysko,278062,0,tts,,0,9,6.09,0|0|-6.089|0|332511,core,single,false
 cheveux,Elle a de longs cheveux.,Elle a de longs cheveux.,She has long hair.,3666794,Rovo,315861,0,tts,,0,5,6.08,0|0|-6.080|0|3666794,core,single,false
-tête,Je n'ai plus mal à la tête.,Je n'ai plus mal à la tête.,My headache has gone.,590264,qdii,280175,0,tts,,0,8,6.57,0|0|-6.572|0|590264,core,single,false
 tête,Il avait mal à la tête.,Il avait mal à la tête.,His head ached.,133045,Archibald,302007,0,tts,,0,6,6.48,0|0|-6.483|0|133045,core,single,false
+tête,C'est ce que j'ai en tête !,C'est ce que j'ai en tête !,That's what's on my mind!,3214813,Dreamk33,1498287,0,tts,,0,8,6.72,0|1|-6.716|0|3214813,core,single,false
 oreille,Il a une bonne oreille pour la musique.,Il a une bonne oreille pour la musique.,He has a good ear for music.,3259612,nimfeo,3259613,0,tts,,0,8,6.34,0|1|-6.339|0|3259612,core,single,false
-oreille,Je n'en crois pas mes oreilles.,Je n'en crois pas mes oreilles.,I don't believe what I'm hearing.,4426340,sacredceltic,2361119,0,tts,,0,7,6.19,0|1|-6.187|0|4426340,core,single,false
+oreille,Elle a de très grandes oreilles.,Elle a de très grandes oreilles.,She has very large ears.,8463613,Aiji,7937005,0,tts,,0,6,6.14,0|1|-6.138|0|8463613,core,single,false
 œil,Je ne vois rien du tout de mon œil droit.,Je ne vois rien du tout de mon œil droit.,I can't see anything with my right eye.,14039,sacredceltic,27051,0,tts,,0,10,6.25,0|0|-6.253|1|14039,core,single,false
 œil,Elle a l'œil pour le beau.,Elle a l'œil pour le beau.,She has an eye for beauty.,1311794,sacredceltic,388449,0,tts,,0,7,6.43,0|1|-6.427|0|1311794,core,single,false
-nez,Il a le nez fin.,Il a le nez fin.,He's intuitive.,11462293,Rafik,12993863,0,tts,,0,5,6.33,0|1|-6.332|0|11462293,core,single,false
 nez,Elle se fait le nez.,Elle se fait le nez.,She's picking her nose.,846049,sacredceltic,846042,0,tts,,0,5,6.30,0|1|-6.298|0|846049,core,single,false
+nez,J'ai un nez plus grand que toi.,J'ai un nez plus grand que toi.,I have a bigger nose than you.,8483824,felix63,8502469,0,tts,,0,8,6.29,0|1|-6.285|0|8483824,core,single,false
 bouche,Nous utilisons notre bouche pour manger.,Nous utilisons notre bouche pour manger.,We eat with our mouths.,339606,sysko,263011,0,tts,,0,6,5.42,0|0|-5.415|0|339606,core,single,false
 bouche,La bouche de l'enfant est rouge.,La bouche de l'enfant est rouge.,The mouth of the child is red.,11987967,carlosalberto,11987963,0,tts,,0,7,6.39,0|1|-6.394|0|11987967,core,single,false
 dent,J'ai les dents de travers.,J'ai les dents de travers.,I have crooked teeth.,10923724,lbdx,263635,0,tts,,0,6,6.27,0|0|-6.275|0|10923724,core,single,false
 dent,Quelle est la dent qui fait mal ?,Quelle est la dent qui fait mal ?,Which tooth hurts?,901954,U2FS,403281,0,tts,,0,7,6.14,0|0|-6.139|0|901954,core,single,false
-langue,L'anglais est une langue internationale.,L'anglais est une langue internationale.,English is an international language.,9840,sacredceltic,26277,0,tts,,0,6,6.11,0|0|-6.113|0|9840,core,single,false
 langue,Je me suis mordu la langue.,Je me suis mordu la langue.,I bit my tongue.,824814,Snout,2226329,0,tts,,0,6,5.88,0|0|-5.883|0|824814,core,single,false
+langue,T'as perdu ta langue ?,T'as perdu ta langue ?,The cat got your tongue?,4860209,sacredceltic,7248461,0,tts,,0,5,5.59,0|0|-5.594|0|4860209,core,single,false
 ongle,Je ne me coupe jamais les ongles le soir.,Je ne me coupe jamais les ongles le soir.,I never cut my nails at night.,181584,superbolo,261987,0,tts,,0,9,6.11,0|1|-6.107|0|181584,core,single,false
 ongle,Je ne me coupe jamais les ongles la nuit.,Je ne me coupe jamais les ongles la nuit.,I never cut my nails at night.,1318447,Mutusen,261987,0,tts,,0,9,6.10,0|1|-6.103|0|1318447,core,single,false
 pied,Elle a de petits pieds.,Elle a de petits pieds.,She has small feet.,134523,zmoo,315604,0,tts,,0,5,6.25,0|0|-6.248|0|134523,core,single,false
-pied,Je vais toujours à pied.,Je vais toujours à pied.,I always walk.,1962852,nimfeo,398889,0,tts,,0,5,6.14,0|0|-6.142|0|1962852,core,single,false
+pied,J'ai encore mal aux pieds.,J'ai encore mal aux pieds.,My feet still hurt.,10599310,lbdx,10597655,0,tts,,0,6,6.01,0|0|-6.012|0|10599310,core,single,false
 jambe,Il a de longues jambes.,Il a de longues jambes.,He has long legs.,130367,Archibald,287067,0,tts,,0,5,6.13,0|0|-6.132|0|130367,core,single,false
-jambe,J'ai encore mal aux jambes.,J'ai encore mal aux jambes.,My legs still hurt.,11153372,lbdx,250648,0,tts,,0,6,5.94,0|0|-5.943|0|11153372,core,single,false
+jambe,Un chien a mordu sa jambe.,Un chien a mordu sa jambe.,A dog bit her leg.,4725364,Trost,1047232,0,tts,,0,6,5.49,0|0|-5.488|0|4725364,core,single,false
 genou,La France est à genoux.,La France est à genoux.,France is on its knees.,11996763,Fenrir,12808101,0,tts,,0,5,6.41,0|1|-6.414|0|11996763,core,single,false
 genou,Il s'est fait mal au genou.,Il s'est fait mal au genou.,He hurt his knee.,11217664,lbdx,7385319,0,tts,,0,7,6.23,0|1|-6.234|0|11217664,core,single,false
 main,Je vais le faire à la main.,Je vais le faire à la main.,I'll do it manually.,10940173,lbdx,3822878,0,tts,,0,7,6.60,0|0|-6.597|0|10940173,core,single,false
 main,Il m'a pris par la main.,Il m'a pris par la main.,He took me by the hand.,132298,sysko,297634,0,tts,,0,7,6.45,0|0|-6.453|0|132298,core,single,false
 aile,La vérité a des ailes.,La vérité a des ailes.,Truth has wings.,6203523,Sorgan,6075333,0,tts,,0,5,6.17,0|1|-6.174|0|6203523,core,single,false
 aile,Il m'a pris sous son aile.,Il m'a pris sous son aile.,He took me under his wing.,8701024,Aiji,3318891,0,tts,,0,7,6.04,0|1|-6.037|0|8701024,core,single,false
-ventre,Il a du ventre.,Il a du ventre.,He has a potbelly.,4702251,sacredceltic,2654890,0,tts,,0,4,6.35,0|1|-6.345|1|4702251,core,single,false
-ventre,Tu as eu les yeux plus gros que le ventre.,Tu as eu les yeux plus gros que le ventre.,You've bitten off more than you can chew.,10624460,lbdx,874054,0,tts,,0,10,6.15,0|1|-6.146|1|10624460,core,single,false
+ventre,Je l'ai frappé au ventre.,Je l'ai frappé au ventre.,I hit him in the belly.,846384,U2FS,401967,0,tts,,0,6,6.03,0|1|-6.030|0|846384,core,single,false
+ventre,J'ai frappé l'homme au ventre.,J'ai frappé l'homme au ventre.,I hit the man on the belly.,139462,hortusdei,254550,0,tts,,0,7,5.95,0|1|-5.950|0|139462,core,single,false
 cou,J'ai encore mal au cou.,J'ai encore mal au cou.,My neck still hurts.,11166484,lbdx,3436690,0,tts,,0,6,6.00,0|0|-6.003|0|11166484,core,single,false
 cou,Il m'a pris par le cou.,Il m'a pris par le cou.,He seized me by the neck.,132301,sacredceltic,297895,0,tts,,0,7,6.31,0|1|-6.310|0|132301,core,single,false
 dos,Je dors sur le dos.,Je dors sur le dos.,I sleep on my back.,10510804,lbdx,9237008,0,tts,,0,5,6.01,0|0|-6.008|0|10510804,core,single,false
-dos,Il me l'a mis sur le dos.,Il me l'a mis sur le dos.,He blamed it on me.,4718656,sacredceltic,2564716,0,tts,,0,8,6.50,0|1|-6.501|0|4718656,core,single,false
+dos,J'ai des problèmes de dos.,J'ai des problèmes de dos.,I have back problems.,2042001,sacredceltic,1887359,0,tts,,0,6,6.33,0|1|-6.328|0|2042001,core,single,false
 sein,Il a été heureux au sein de sa famille.,Il a été heureux au sein de sa famille.,He was happy in the bosom of his family.,1421835,sacredceltic,24083,0,tts,,0,9,6.28,0|1|-6.283|0|1421835,core,single,false
-sein,Elle a de gros seins.,Elle a de gros seins.,She's well stacked.,784421,sacredceltic,562278,0,tts,,0,5,6.17,0|1|-6.172|0|784421,core,single,false
-cœur,Je n'ai pas le cœur à le faire.,Je n'ai pas le cœur à le faire.,I don't feel like doing it.,3637176,sacredceltic,2266932,0,tts,,0,9,6.72,0|1|-6.719|0|3637176,core,single,false
+sein,Elle a des gros seins.,Elle a des gros seins.,She has big boobs.,777151,sysko,777125,0,tts,,0,5,6.07,0|1|-6.066|0|777151,core,single,false
 cœur,Il a un cœur de pierre.,Il a un cœur de pierre.,He has a hard heart.,1238839,sacredceltic,13594928,0,tts,,0,6,6.54,0|1|-6.537|0|1238839,core,single,false
-foie,Je n'ai pas les foies.,Je n'ai pas les foies.,I'm not chicken.,4841738,sacredceltic,2248130,0,tts,,0,6,6.15,0|1|-6.153|0|4841738,core,single,false
-foie,Il commence à avoir les foies.,Il commence à avoir les foies.,He's getting cold feet.,4711317,sacredceltic,303271,0,tts,,0,6,5.90,0|1|-5.897|0|4711317,core,single,false
+cœur,J'ai l'as de cœur.,J'ai l'as de cœur.,I have the ace of hearts.,6843613,Aiji,2267002,0,tts,,0,6,6.50,0|1|-6.502|0|6843613,core,single,false
+foie,L'exercice physique est l'ami du foie.,L'exercice physique est l'ami du foie.,Exercise is your liver's friend.,6592610,GB3,6589806,0,tts,,1,8,5.95,1|1|-5.949|0|6592610,core,single,false
+foie,Mon foie est très endommagé.,Mon foie est très endommagé.,My liver is heavily damaged.,12364303,lbdx,1072414,0,tts,,1,5,5.46,1|1|-5.462|0|12364303,core,single,false
 boire,Il a un peu bu.,Il a un peu bu.,He drank a little.,415539,jerom,299592,0,tts,,0,5,6.24,0|0|-6.236|0|415539,core,single,false
 boire,Je vais te payer à boire.,Je vais te payer à boire.,I'll buy you a drink.,14004,nimfeo,27377,0,tts,,0,6,5.89,0|0|-5.887|0|14004,core,single,false
 manger,On est sur le point de manger.,On est sur le point de manger.,We're about to eat.,11470681,lbdx,1830504,0,tts,,0,7,6.62,0|0|-6.616|0|11470681,core,single,false
-manger,C'est l'heure de manger.,C'est l'heure de manger.,It's supper time.,1719910,belgavox,3733132,0,tts,,0,6,6.57,0|0|-6.570|0|1719910,core,single,false
-mordre,Un chien a mordu sa jambe.,Un chien a mordu sa jambe.,A dog bit her leg.,4725364,Trost,1047232,0,tts,,0,6,5.49,0|0|-5.488|0|4725364,core,single,false
-mordre,Le dernier de la bande est mordu par les chiens.,Le dernier de la bande est mordu par les chiens.,Devil take the hindmost.,3375258,Adelpa,277372,0,tts,,0,10,6.20,0|1|-6.201|1|3375258,core,single,false
+manger,Je n'ai pas mangé.,Je n'ai pas mangé.,I haven't eaten.,2299592,sysko,2245903,0,tts,,0,5,6.26,0|0|-6.264|0|2299592,core,single,false
+mordre,Il s'est mordu la langue.,Il s'est mordu la langue.,He bit his tongue.,9190866,Rafik,10036497,0,tts,,0,6,6.11,0|1|-6.115|0|9190866,core,single,false
+mordre,Il s'est fait mordre par un serpent.,Il s'est fait mordre par un serpent.,He was bitten by a snake.,13086535,lbdx,12409564,0,tts,,0,8,6.07,0|1|-6.072|0|13086535,core,single,false
 sucer,J'ai envie de te sucer.,J'ai envie de te sucer.,I want to blow you.,13186834,menaud,13186835,0,tts,,0,6,5.95,0|1|-5.947|0|13186834,core,single,false
 sucer,J'aime sucer des glaces en été.,J'aime sucer des glaces en été.,I like to suck on frozen ice cream bars in the summer.,330250,hortusdei,256463,0,tts,,0,7,5.77,0|1|-5.767|0|330250,core,single,false
 cracher,Elle m'a craché dessus.,Elle m'a craché dessus.,She spit on me.,8824000,Aiji,6045744,0,tts,,0,5,5.68,0|1|-5.682|0|8824000,core,single,false
-cracher,C'est le moment de cracher le morceau.,C'est le moment de cracher le morceau.,It's time to fess up.,11932340,lbdx,1548573,0,tts,,1,8,6.28,1|1|-6.282|0|11932340,core,single,false
+cracher,Je ne peux pas supporter sa manière de cracher.,Je ne peux pas supporter sa manière de cracher.,I can't put up with the way he spits.,1347555,sacredceltic,287074,0,tts,,1,9,5.96,1|1|-5.961|0|1347555,core,single,false
 vomir,On dirait qu'elle est sur le point de vomir.,On dirait qu'elle est sur le point de vomir.,She looks like she's about to throw up.,2186755,sacredceltic,2182793,0,tts,,0,10,6.33,0|1|-6.328|1|2186755,core,single,false
 vomir,On dirait que tu es sur le point de vomir.,On dirait que tu es sur le point de vomir.,You look like you're about to throw up.,2186759,sacredceltic,2182792,0,tts,,0,10,6.21,0|1|-6.214|1|2186759,core,single,false
-souffler,Il me faut du temps pour souffler.,Il me faut du temps pour souffler.,I need time to breathe.,6907401,Rockaround,6907574,0,tts,,0,7,6.13,0|1|-6.127|0|6907401,core,single,false
-souffler,Le vent du Nord a soufflé toute la journée.,Le vent du Nord a soufflé toute la journée.,The north wind held on all day.,435356,qdii,321297,0,tts,,0,9,5.95,0|1|-5.946|0|435356,core,single,false
+souffler,Le vent souffle sous la porte.,Le vent souffle sous la porte.,The wind is blowing underneath the door.,1492949,martin9,11863358,0,tts,,0,6,5.89,0|1|-5.892|0|1492949,core,single,false
+souffler,Le vent a soufflé toute la journée.,Le vent a soufflé toute la journée.,The wind blew all day.,1071073,sacredceltic,319700,0,tts,,0,7,5.89,0|1|-5.889|0|1071073,core,single,false
 respirer,Je peux à peine respirer.,Je peux à peine respirer.,I can barely breathe.,11242109,lbdx,5958246,0,tts,,0,5,5.81,0|0|-5.806|0|11242109,core,single,false
 respirer,Respirer est de plus en plus dur.,Respirer est de plus en plus dur.,The breathing becomes more and more hard.,3465005,Lulantis,3464872,0,tts,,0,7,6.34,0|1|-6.343|0|3465005,core,single,false
 rire,Ce n'est pas bien de rire des autres.,Ce n'est pas bien de rire des autres.,It is not good to laugh at others.,1176382,sacredceltic,270143,0,tts,,0,9,6.62,0|1|-6.624|0|1176382,core,discontinuous,false
-rire,Il n'y a pas lieu de rire !,Il n'y a pas lieu de rire !,No reason to laugh!,1734647,alexmarcelo,749340,0,tts,,0,8,6.52,0|1|-6.518|0|1734647,core,single,false
-voir,C'est à toi de voir.,C'est à toi de voir.,It's up to you.,339706,TRANG,237713,0,tts,,0,6,6.80,0|0|-6.802|0|339706,core,single,false
-voir,J'en ai vu un.,J'en ai vu un.,I saw one.,5380312,Aiji,3168241,0,tts,,0,5,6.62,0|0|-6.620|0|5380312,core,single,false
+rire,Il n'y a pas lieu de rire !,Il n'y a pas lieu de rire !,No reason to laugh!,1734647,alexmarcelo,749340,0,tts,,0,8,6.52,0|1|-6.518|0|1734647,core,discontinuous,false
+voir,Va voir qui c'est.,Va voir qui c'est.,Go and see who it is.,129217,gillux,276272,0,tts,,0,5,6.59,0|0|-6.590|0|129217,core,single,false
+voir,Je l'ai vu.,Je l'ai vu.,I've seen it.,9442,sacredceltic,254808,0,tts,,0,4,6.58,0|0|-6.580|1|9442,core,single,false
 entendre,Elle n'a pas encore entendu la nouvelle.,Elle n'a pas encore entendu la nouvelle.,She's not yet heard the news.,334290,sysko,312223,0,tts,,0,8,6.41,0|0|-6.405|0|334290,core,discontinuous,false
 entendre,J'ai entendu parler de vous.,J'ai entendu parler de vous.,I've heard about you.,181352,Romira,70826,0,tts,,0,6,6.31,0|0|-6.312|0|181352,core,single,false
 savoir,Je ne sais pas si je peux le faire.,Je ne sais pas si je peux le faire.,I don't know if I can do it.,5304998,Aiji,2543849,0,tts,,0,9,6.54,0|0|-6.541|0|5304998,core,discontinuous,false
 savoir,Je sais que c'est vrai.,Je sais que c'est vrai.,I know it's true.,4242080,mouche,2376080,0,tts,,0,6,6.54,0|0|-6.540|0|4242080,core,single,false
 penser,Je pense à vous tout le temps.,Je pense à vous tout le temps.,I think of you all the time.,14296,Aiji,252805,0,tts,,0,7,6.58,0|0|-6.579|0|14296,core,single,false
 penser,C'est ce que je pensais.,C'est ce que je pensais.,That's what I thought.,14157,sacredceltic,271588,0,tts,,0,6,6.58,0|0|-6.575|0|14157,core,single,false
-sentir,Je me sens bien.,Je me sens bien.,I feel fine.,465921,mamat,321586,0,tts,,0,4,6.27,0|0|-6.268|1|465921,core,single,false
-sentir,Je me sens en sécurité.,Je me sens en sécurité.,I feel safe.,4679167,sacredceltic,2245751,0,tts,,0,5,6.22,0|0|-6.222|0|4679167,core,single,false
+sentir,Ça sent vraiment bon.,Ça sent vraiment bon.,It smells really good.,10709123,lbdx,10708209,0,tts,,0,4,5.75,0|0|-5.748|1|10709123,core,single,false
+sentir,Tu ne sens pas bon du tout.,Tu ne sens pas bon du tout.,You don't smell good at all.,2135636,sacredceltic,679888,0,tts,,0,7,6.44,0|1|-6.436|0|2135636,core,single,false
 craindre,Il ne craignait pas la mort.,Il ne craignait pas la mort.,He didn't fear death.,504597,qdii,297223,0,tts,,0,6,6.20,0|0|-6.203|0|504597,core,single,false
 craindre,Je crains de ne pas être d'accord avec vous.,Je crains de ne pas être d'accord avec vous.,I'm afraid I don't agree with you.,5458154,Aiji,2712891,0,tts,,0,10,6.43,0|1|-6.428|1|5458154,core,single,false
+dormir,C'est l'heure de dormir.,C'est l'heure de dormir.,It's time to sleep.,10749642,lbdx,936657,0,tts,,0,6,6.51,0|0|-6.508|0|10749642,core,single,false
 dormir,Il ne dort pas.,Il ne dort pas.,He doesn't sleep.,3954460,Scorpionvenin14,2431663,0,tts,,0,4,6.19,0|0|-6.190|1|3954460,core,single,false
-dormir,Il dort le jour et travaille la nuit.,Il dort le jour et travaille la nuit.,He sleeps by day and works by night.,333993,sysko,301559,0,tts,,0,8,6.14,0|0|-6.141|0|333993,core,single,false
 vivre,Je suis facile à vivre.,Je suis facile à vivre.,I'm easygoing.,337806,sysko,249550,0,tts,,0,5,6.12,0|0|-6.116|0|337806,core,single,false
 vivre,Nous vivons à la campagne durant l'été.,Nous vivons à la campagne durant l'été.,We live in the country during the summer.,341835,sysko,24366,0,tts,,0,8,6.09,0|0|-6.091|0|341835,core,single,false
 mourir,Je n'ai pas peur de mourir.,Je n'ai pas peur de mourir.,I'm not afraid to die.,4862757,sacredceltic,2547172,0,tts,,0,7,6.38,0|0|-6.381|0|4862757,core,single,false
 mourir,Le chien est en train de mourir.,Le chien est en train de mourir.,The dog is dying.,407428,qdii,48251,0,tts,,0,7,6.32,0|0|-6.319|0|407428,core,single,false
 tuer,Qui a été tué ?,Qui a été tué ?,Who was killed?,5783156,Aiji,2254892,0,tts,,0,4,6.21,0|0|-6.213|1|5783156,core,single,false
-tuer,Je n'ai jamais tué personne.,Je n'ai jamais tué personne.,I've never killed anyone.,11166899,lbdx,1891197,0,tts,,0,6,6.06,0|0|-6.060|0|11166899,core,single,false
+tuer,Je n'ai pas tué ma femme.,Je n'ai pas tué ma femme.,I didn't kill my wife.,10625835,lbdx,7113860,0,tts,,0,7,6.19,0|0|-6.190|0|10625835,core,single,false
 se battre,Tout le monde était en train de se battre.,Tout le monde était en train de se battre.,Everyone was fighting.,6153799,Aiji,4498622,0,tts,,1,9,6.36,1|1|-6.364|0|6153799,core,single,false
 se battre,Il se bat avec les autres.,Il se bat avec les autres.,He fights with others.,13567185,Aghanim,13567193,0,tts,,1,6,6.31,1|1|-6.313|0|13567185,core,single,false
-chasser,Ne me chasse pas comme si j'étais un chien.,Ne me chasse pas comme si j'étais un chien.,Don't shoo me as though I were a dog.,11221350,lbdx,4330507,0,tts,,0,10,6.15,0|1|-6.153|1|11221350,core,single,false
 chasser,Le fils du roi chasse toujours dans les bois.,Le fils du roi chasse toujours dans les bois.,The king's son is always hunting in the woods.,7664105,tras,7593118,0,tts,,0,9,6.09,0|1|-6.092|0|7664105,core,single,false
-frapper,Tu aurais pu frapper.,Tu aurais pu frapper.,You could've knocked.,10623458,lbdx,2646684,0,tts,,0,4,5.34,0|0|-5.345|1|10623458,core,single,false
-frapper,Il l'a frappé à la tête.,Il l'a frappé à la tête.,He banged his head.,2196401,sacredceltic,2195236,0,tts,,0,7,6.55,0|1|-6.549|0|2196401,core,single,false
-couper,Il est temps de se faire couper les cheveux.,Il est temps de se faire couper les cheveux.,It's time to get a haircut.,9668567,Aiji,4042263,0,tts,,0,9,6.38,0|1|-6.378|0|9668567,core,single,false
-couper,À toi de couper !,À toi de couper !,Your turn to split!,791619,sacredceltic,791621,0,tts,,0,4,6.33,0|1|-6.332|1|791619,core,single,false
-fendre,Il fait un froid à pierre fendre.,Il fait un froid à pierre fendre.,It’s like the dead of winter out there.,8695891,Julien_PDC,13823923,0,tts,,0,7,5.84,0|1|-5.840|0|8695891,core,single,false
-fendre,Ça me fend vraiment le cœur.,Ça me fend vraiment le cœur.,This is really heartbreaking.,11229538,lbdx,5734682,0,tts,,0,6,5.70,0|1|-5.703|0|11229538,core,single,false
+chasser,Je ne vais pas chasser autant qu'avant.,Je ne vais pas chasser autant qu'avant.,I don't go hunting as often as I used to.,7528704,tras,7528372,0,tts,,0,8,6.03,0|1|-6.034|0|7528704,core,single,false
+frapper,"C'est elle qui m'a frappé, pas lui.","C'est elle qui m'a frappé, pas lui.","She hit me, not him.",4765007,sacredceltic,887216,0,tts,,0,9,6.48,0|1|-6.478|0|4765007,core,single,false
+frapper,"C'est moi qu'elle a frappé, pas lui.","C'est moi qu'elle a frappé, pas lui.","She hit me, not him.",4973745,sacredceltic,887216,0,tts,,0,9,6.45,0|1|-6.452|0|4973745,core,single,false
+couper,Il s'est fait couper les cheveux.,Il s'est fait couper les cheveux.,He had his hair cut.,181070,Romira,302453,0,tts,,0,7,6.25,0|1|-6.253|0|181070,core,single,false
+couper,Dois-je le couper en deux ?,Dois-je le couper en deux ?,Shall I cut it in half?,4434984,sacredceltic,2711735,0,tts,,0,6,6.20,0|1|-6.198|0|4434984,core,single,false
+fendre,Ça me fend le cœur !,Ça me fend le cœur !,It breaks my heart!,519999,zmoo,662631,0,tts,,0,5,5.68,0|1|-5.684|0|519999,core,single,false
+fendre,Un coup de tonnerre fendit le ciel en deux.,Un coup de tonnerre fendit le ciel en deux.,A sharp crack of thunder split the sky.,394719,Scott,325172,0,tts,,1,9,5.74,1|1|-5.739|0|394719,core,single,false
 poignarder,Il ne sait pas qui l'a poignardé.,Il ne sait pas qui l'a poignardé.,He doesn't know who stabbed him.,10619926,Naya,7384233,0,tts,,0,8,6.32,0|1|-6.316|0|10619926,core,single,false
-poignarder,Elle l'a poignardé dans le dos.,Elle l'a poignardé dans le dos.,She backstabbed him.,1341659,sacredceltic,2947527,0,tts,,0,7,6.19,0|1|-6.191|0|1341659,core,single,false
+poignarder,Il l'a poignardé.,Il l'a poignardé.,He stabbed him.,13581828,LdjuherTaqvaylit,13588612,0,tts,,0,4,6.16,0|1|-6.157|1|13581828,core,single,false
 gratter,Il s'est gratté la tête.,Il s'est gratté la tête.,He scratched his head.,1997370,sacredceltic,1996928,0,tts,,0,6,6.07,0|1|-6.072|0|1997370,core,single,false
 gratter,J'ai envie de me gratter le nez.,J'ai envie de me gratter le nez.,I want to scratch my nose.,3670087,sacredceltic,1205633,0,tts,,0,8,5.99,0|1|-5.991|0|3670087,core,single,false
 creuser,J'ai du mal à creuser à cause des pierres.,J'ai du mal à creuser à cause des pierres.,I'm having trouble digging because of the stones.,12200629,carlosalberto,12200624,0,tts,,0,10,6.11,0|1|-6.114|1|12200629,core,single,false
-creuser,Ne t'arrête pas de creuser.,Ne t'arrête pas de creuser.,Keep digging.,7355641,Micsmithel,2111650,0,tts,,0,6,6.09,0|1|-6.092|0|7355641,core,discontinuous,false
+creuser,Ne t'arrête pas de creuser.,Ne t'arrête pas de creuser.,Keep digging.,7355641,Micsmithel,2111650,0,tts,,0,6,6.09,0|1|-6.092|0|7355641,core,single,false
 nager,Il est en train de nager.,Il est en train de nager.,He's swimming now.,1314105,sacredceltic,289261,0,tts,,0,6,6.33,0|0|-6.332|0|1314105,core,single,false
 nager,Il a peur de nager.,Il a peur de nager.,He is afraid to swim.,130905,nimfeo,289994,0,tts,,0,5,6.13,0|0|-6.128|0|130905,core,single,false
-voler,On m'a volé.,On m'a volé.,I've been robbed.,10699644,lbdx,2549296,0,tts,,0,4,6.05,0|0|-6.047|1|10699644,core,single,false
 voler,Les oiseaux volaient en groupe.,Les oiseaux volaient en groupe.,The birds were flying in a group.,336496,sysko,278195,0,tts,,0,5,5.43,0|0|-5.430|0|336496,core,single,false
-marcher,J'espère que ça va marcher.,J'espère que ça va marcher.,I hope it pans out.,10071068,lbdx,65449,0,tts,,0,6,6.00,0|0|-5.998|0|10071068,core,single,false
+voler,J'ai volé un peu partout dans le monde.,J'ai volé un peu partout dans le monde.,I've flown all over the world.,8984866,carlosalberto,10123574,0,tts,,0,9,6.19,0|1|-6.192|0|8984866,core,single,false
 marcher,J'ai marché seul.,J'ai marché seul.,I walked alone.,764660,U2FS,259738,0,tts,,0,4,5.98,0|0|-5.978|1|764660,core,single,false
-venir,Je viens juste de le voir.,Je viens juste de le voir.,I saw him just now.,1398778,Delapouite,255041,0,tts,,0,6,6.48,0|0|-6.475|0|1398778,core,single,false
+marcher,J'ai marché d'un bon pas.,J'ai marché d'un bon pas.,I walked at a brisk pace.,9917469,lbdx,9233506,0,tts,,0,7,6.50,0|1|-6.501|0|9917469,core,single,false
 venir,Je vous ai dit de ne pas venir ici.,Je vous ai dit de ne pas venir ici.,I told you not to come here.,5503650,Aiji,2543797,0,tts,,0,9,6.46,0|0|-6.463|0|5503650,core,single,false
+venir,Je ne viens pas.,Je ne viens pas.,I'm not coming along.,9766029,lbdx,664125,0,tts,,0,4,6.44,0|0|-6.442|1|9766029,core,single,false
 s'étendre,La ville s'étend au pied d'une montagne.,La ville s'étend au pied d'une montagne.,This city lies at the base of a mountain.,1855612,sacredceltic,1164091,0,tts,,1,9,6.04,1|1|-6.041|0|1855612,core,single,false
 s'étendre,La vie s'étend devant vous.,La vie s'étend devant vous.,Life lies in front of you.,482183,sacredceltic,17509,0,tts,,1,6,6.01,1|1|-6.012|0|482183,core,single,false
-s'asseoir,Il n'y a plus de place pour s'asseoir.,Il n'y a plus de place pour s'asseoir.,There's nowhere left to sit.,8961236,lbdx,3223037,0,tts,,1,10,6.47,1|1|-6.472|1|8961236,core,single,false
+s'asseoir,Il n'y a plus de place pour s'asseoir.,Il n'y a plus de place pour s'asseoir.,There's nowhere left to sit.,8961236,lbdx,3223037,0,tts,,1,10,6.47,1|1|-6.472|1|8961236,core,pair,false
 s'asseoir,Tout le monde veut s'asseoir à côté d'elle.,Tout le monde veut s'asseoir à côté d'elle.,Everybody wants to sit beside her.,13499,michelnialon,32165,0,tts,,1,10,6.24,1|1|-6.238|1|13499,core,single,false
 se lever,Il a essayé de se lever.,Il a essayé de se lever.,He tried to stand up.,133513,sysko,304658,0,tts,,1,6,6.23,1|0|-6.233|0|133513,core,single,false
-se lever,Le soleil se lève.,Le soleil se lève.,The sun is rising.,332414,TRANG,281049,0,tts,,1,4,5.83,1|0|-5.835|1|332414,core,pair,false
+se lever,Ils se levèrent tous en même temps.,Ils se levèrent tous en même temps.,They all stood up at the same time.,567491,sacredceltic,564212,0,tts,,1,7,5.83,1|1|-5.833|0|567491,core,single,false
 tourner,La voiture a tourné à droite.,La voiture a tourné à droite.,The car turned right.,10948215,lbdx,4506293,0,tts,,0,6,6.08,0|0|-6.077|0|10948215,core,single,false
 tourner,J'ai tourné à droite.,J'ai tourné à droite.,I turned right.,1241570,rene1596,258392,0,tts,,0,5,5.99,0|0|-5.990|0|1241570,core,single,false
-tomber,N'y va pas après la nuit tombée.,N'y va pas après la nuit tombée.,Don't go out after dark.,1329230,sacredceltic,28454,0,tts,,0,8,6.17,0|0|-6.169|0|1329230,core,discontinuous,false
-tomber,J'ai juste laissé tomber.,J'ai juste laissé tomber.,I just gave up.,12629,mouche,676490,0,tts,,0,5,5.72,0|0|-5.724|0|12629,core,single,false
-donner,Je ne fais que donner un coup de main.,Je ne fais que donner un coup de main.,I'm just helping out.,3141030,Aiji,2547731,0,tts,,0,9,6.37,0|0|-6.373|0|3141030,core,single,false
+tomber,Il tomba en arrière.,Il tomba en arrière.,He fell backward.,330362,hortusdei,295395,0,tts,,0,4,5.64,0|0|-5.640|1|330362,core,single,false
+tomber,La pluie commença à tomber.,La pluie commença à tomber.,The rain began to fall.,334834,sysko,26900,0,tts,,0,5,5.61,0|0|-5.612|0|334834,core,single,false
 donner,Je ne leur ai rien donné.,Je ne leur ai rien donné.,I didn't give them anything.,5594113,Aiji,3826634,0,tts,,0,6,6.25,0|0|-6.245|0|5594113,core,single,false
+donner,Je lui ai donné le livre.,Je lui ai donné le livre.,I gave him the book.,1414621,Delapouite,284589,0,tts,,0,6,6.24,0|0|-6.242|0|1414621,core,single,false
 tenir,Je tiens un journal.,Je tiens un journal.,I keep a journal.,5353213,Aiji,2374673,0,tts,,0,4,5.97,0|0|-5.970|1|5353213,core,single,false
-tenir,Tu t'es bien tenu aujourd'hui ?,Tu t'es bien tenu aujourd'hui ?,Did you behave today?,8435,Petro1,242840,0,tts,,0,6,5.88,0|0|-5.877|0|8435,core,single,false
-serrer,Il a serré la main de son ami.,Il a serré la main de son ami.,He shook hands with his friend.,136460,minti,304380,0,tts,,0,8,6.25,0|1|-6.250|0|136460,core,single,false
-serrer,Il n'a pas voulu me serrer la main.,Il n'a pas voulu me serrer la main.,He didn't want to shake my hand.,12766507,lbdx,12761736,0,tts,,0,9,6.18,0|1|-6.178|0|12766507,core,single,false
+tenir,Ils se tenaient les mains.,Ils se tenaient les mains.,They held hands.,3224734,Dreamk33,2243152,0,tts,,0,5,5.75,0|0|-5.748|0|3224734,core,single,false
+serrer,Ils étaient serrés l'un contre l'autre.,Ils étaient serrés l'un contre l'autre.,They were squeezed against each other.,8412900,Aiji,5392416,0,tts,,0,8,6.12,0|1|-6.121|0|8412900,core,single,false
+serrer,Elles étaient serrés l'une contre l'autre.,Elles étaient serrés l'une contre l'autre.,They were squeezed against each other.,8412902,Aiji,5392416,0,tts,,0,8,6.02,0|1|-6.020|0|8412902,core,single,false
 frotter,Ça ne vous ferait rien de me frotter les pieds ?,Ça ne vous ferait rien de me frotter les pieds ?,Would you mind rubbing my feet?,3884725,sacredceltic,3731720,0,tts,,0,10,6.01,0|1|-6.014|1|3884725,core,single,false
 frotter,Elle s'est frotté les yeux.,Elle s'est frotté les yeux.,She rubbed her eyes.,4758402,sacredceltic,317196,0,tts,,0,6,5.94,0|1|-5.942|0|4758402,core,single,false
 laver,Je l'ai lavée.,Je l'ai lavée.,I washed it.,4681771,sacredceltic,2247534,0,tts,,0,4,5.88,0|0|-5.875|1|4681771,core,single,false
 laver,Ma voiture a besoin d'être lavée.,Ma voiture a besoin d'être lavée.,My car needs washing.,341895,sysko,251071,0,tts,,0,7,5.73,0|0|-5.730|0|341895,core,single,false
-essuyer,Elle a essuyé la poussière de la main.,Elle a essuyé la poussière de la main.,She brushed away the dust.,12182703,lbdx,312172,0,tts,,0,8,6.08,0|1|-6.081|0|12182703,core,single,false
 essuyer,Qui l'a essuyée ?,Qui l'a essuyée ?,Who wiped it?,7355786,Micsmithel,7355889,0,tts,,0,4,5.81,0|1|-5.812|1|7355786,core,single,false
-tirer,Qui s'est fait tirer dessus ?,Qui s'est fait tirer dessus ?,Who's been shot?,4450585,franlexcois,2254903,0,tts,,0,6,6.20,0|0|-6.195|0|4450585,core,single,false
-tirer,On m'a tiré dessus.,On m'a tiré dessus.,I got shot.,9749122,lbdx,5828885,0,tts,,0,5,5.97,0|0|-5.970|0|9749122,core,single,false
-pousser,Qui t'a poussé à le faire ?,Qui t'a poussé à le faire ?,Who put you up to it?,11967906,lbdx,276251,0,tts,,0,7,6.48,0|1|-6.484|0|11967906,core,single,false
-pousser,Je l'ai poussée à aller à la fête.,Je l'ai poussée à aller à la fête.,I goaded her into going to the party.,9735685,lbdx,9735684,0,tts,,0,9,6.36,0|1|-6.357|0|9735685,core,single,false
+essuyer,Laisse-moi t'aider à l'essuyer.,Laisse-moi t'aider à l'essuyer.,Let me help you wipe it off.,549786,Scott,41878,0,tts,,0,7,5.81,0|1|-5.809|0|549786,core,single,false
+tirer,Il l'a tiré.,Il l'a tiré.,He pulled it.,12027375,Tighra_tlelli,12341934,0,tts,,0,4,6.44,0|1|-6.438|1|12027375,core,single,false
+tirer,Il lui a tiré les cheveux.,Il lui a tiré les cheveux.,He pulled her hair.,4702222,sacredceltic,2583098,0,tts,,0,6,6.13,0|1|-6.132|0|4702222,core,single,false
+pousser,Merci de ne pas pousser.,Merci de ne pas pousser.,Please refrain from pushing forward.,458787,sacredceltic,39464,0,tts,,0,5,6.29,0|1|-6.286|0|458787,core,single,false
+pousser,Je n'aime pas être poussé.,Je n'aime pas être poussé.,I don't like to be pushed.,9481331,Micsmithel,2361332,0,tts,,0,6,6.12,0|1|-6.118|0|9481331,core,single,false
 jeter,Il a été jeté de la voiture.,Il a été jeté de la voiture.,He was thrown from the car.,10309025,Aiji,3669308,0,tts,,0,7,6.38,0|1|-6.384|0|10309025,core,single,false
 jeter,Je lui ai dit de ne pas jeter de pierres.,Je lui ai dit de ne pas jeter de pierres.,I told him not to throw stones.,127636,sacredceltic,260253,0,tts,,0,10,6.35,0|1|-6.347|1|127636,core,single,false
-lier,Je ne lui suis pas lié.,Je ne lui suis pas lié.,I am not acquainted with him.,127680,sacredceltic,260497,0,tts,,0,6,6.23,0|1|-6.235|0|127680,core,single,false
 lier,Je ne veux pas être lié à une seule société.,Je ne veux pas être lié à une seule société.,I don't want to be tied to one company.,1202813,sacredceltic,256038,0,tts,,0,10,6.23,0|1|-6.227|1|1202813,core,single,false
+lier,Il se peut que ceci soit lié.,Il se peut que ceci soit lié.,Perhaps this can be linked.,10985058,sacredceltic,10985057,0,tts,,0,7,6.01,0|1|-6.011|0|10985058,core,single,false
 coudre,Es-tu en train de coudre ?,Es-tu en train de coudre ?,Are you sewing?,11920902,zogwarg,11920891,0,tts,,0,6,5.95,0|1|-5.948|0|11920902,core,single,false
 coudre,Je ne sais pas coudre.,Je ne sais pas coudre.,I can't sew.,9112563,qweruiop,9112562,0,tts,,0,5,5.92,0|1|-5.920|0|9112563,core,single,false
 compter,Tu peux me compter dans le nombre.,Tu peux me compter dans le nombre.,Count me in.,1291381,sacredceltic,42880,0,tts,,0,7,6.14,0|0|-6.136|0|1291381,core,single,false
@@ -283,22 +283,22 @@ jouer,Je ne veux pas jouer.,Je ne veux pas jouer.,I don't want to play.,3692449,
 jouer,J'ai joué avec des amis.,J'ai joué avec des amis.,I played with friends.,1706444,sacredceltic,1699185,0,tts,,0,6,6.17,0|0|-6.170|0|1706444,core,single,false
 flotter,Il avait l'impression de flotter.,Il avait l'impression de flotter.,He felt as if he were floating.,2694489,Anthaus,5069987,0,tts,,0,6,6.05,0|1|-6.048|0|2694489,core,single,false
 flotter,Un nuage flottait dans le ciel.,Un nuage flottait dans le ciel.,A cloud floated across the sky.,1226661,rene1596,26527,0,tts,,0,6,5.51,0|1|-5.512|0|1226661,core,single,false
-couler,Le mieux est de laisser couler l'eau.,Le mieux est de laisser couler l'eau.,The best way is to take things as they come.,4132312,chelita2,4132310,0,tts,,0,8,6.23,0|1|-6.228|0|4132312,core,single,false
 couler,Je pense que j'ai laissé couler l'eau.,Je pense que j'ai laissé couler l'eau.,I think I left the water running.,5688413,Aiji,4013474,0,tts,,0,9,6.02,0|1|-6.020|0|5688413,core,single,false
+couler,Ne laisse pas l'eau couler.,Ne laisse pas l'eau couler.,Don't leave the water running.,128759,Julien_PDC,270859,0,tts,,0,6,5.94,0|1|-5.938|0|128759,core,discontinuous,false
 geler,Le sol est gelé.,Le sol est gelé.,The ground is frozen.,9978157,lbdx,9738355,0,tts,,0,4,5.74,0|0|-5.740|1|9978157,core,single,false
 geler,Le lac était gelé.,Le lac était gelé.,The lake was frozen.,341842,TRANG,239985,0,tts,,0,4,5.42,0|0|-5.415|1|341842,core,single,false
-gonfler,C'est gonflé de ta part de dire ça.,C'est gonflé de ta part de dire ça.,It is bold of you to say such a thing.,1183081,rene1596,41346,0,tts,,0,9,6.31,0|1|-6.311|0|1183081,core,single,false
-gonfler,"Il est gonflé, ce mec.","Il est gonflé, ce mec.","He's got some nerve, this guy.",6096449,Blabla,11823184,0,tts,,0,5,5.95,0|1|-5.950|0|6096449,core,single,false
-soleil,"Sans le soleil, il n'y a pas de vie !","Sans le soleil, il n'y a pas de vie !",Without the sun there is no life!,9042661,carlosalberto,933648,0,tts,,0,10,6.62,0|1|-6.615|1|9042661,core,single,false
+gonfler,Mon œil a gonflé.,Mon œil a gonflé.,My eye has swollen up.,772184,rike,642489,0,tts,,0,4,5.36,0|1|-5.362|1|772184,core,single,false
+gonfler,Vos pieds ont gonflé.,Vos pieds ont gonflé.,Your feet have swelled up.,12441208,lbdx,9483510,0,tts,,0,4,5.10,0|1|-5.100|1|12441208,core,single,false
+soleil,"Sans le soleil, il n'y a pas de vie !","Sans le soleil, il n'y a pas de vie !",Without the sun there is no life!,9042661,carlosalberto,933648,0,tts,,0,10,6.62,0|1|-6.615|1|9042661,core,discontinuous,false
 soleil,Qui a fait le Soleil ?,Qui a fait le Soleil ?,Who made the sun?,10126288,carlosalberto,4464827,0,tts,,0,5,6.54,0|1|-6.540|0|10126288,core,single,false
 lune,Je ne demande pas la lune.,Je ne demande pas la lune.,I'm not asking for the moon.,372950,sysko,322832,0,tts,,0,6,6.36,0|0|-6.355|0|372950,core,single,false
-lune,Il n'y a pas de vie sur la Lune.,Il n'y a pas de vie sur la Lune.,There's no life on the moon.,2886667,mela,2886720,0,tts,,0,10,6.65,0|1|-6.648|1|2886667,core,single,false
-étoile,Il n'y a pas d'étoiles ce soir.,Il n'y a pas d'étoiles ce soir.,There are no stars tonight.,6443899,Aiji,3405252,0,tts,,0,9,6.46,0|1|-6.456|0|6443899,core,single,false
+lune,Il n'y a pas de vie sur la Lune.,Il n'y a pas de vie sur la Lune.,There's no life on the moon.,2886667,mela,2886720,0,tts,,0,10,6.65,0|1|-6.648|1|2886667,core,discontinuous,false
+étoile,Il n'y a pas d'étoiles ce soir.,Il n'y a pas d'étoiles ce soir.,There are no stars tonight.,6443899,Aiji,3405252,0,tts,,0,9,6.46,0|1|-6.456|0|6443899,core,discontinuous,false
 étoile,Elle a fait de moi une étoile.,Elle a fait de moi une étoile.,She made me a star.,1410407,sacredceltic,314418,0,tts,,0,7,6.45,0|1|-6.450|0|1410407,core,single,false
 eau,Je veux de l'eau.,Je veux de l'eau.,I want water.,14411,gillux,5085314,0,tts,,0,5,6.58,0|0|-6.580|0|14411,core,single,false
 eau,Voici un peu d'eau.,Voici un peu d'eau.,Here's some water.,332239,TRANG,61738,0,tts,,0,5,6.16,0|0|-6.164|0|332239,core,single,false
 pluie,C'est notre saison des pluies.,C'est notre saison des pluies.,It is our rainy season.,337127,sysko,282487,0,tts,,0,6,6.06,0|0|-6.060|0|337127,core,single,false
-pluie,La pluie commença à tomber.,La pluie commença à tomber.,The rain began to fall.,334834,sysko,26900,0,tts,,0,5,5.61,0|0|-5.612|0|334834,core,single,false
+pluie,Le temps est à la pluie.,Le temps est à la pluie.,The weather is rainy.,8059886,Rovo,1766697,0,tts,,0,6,6.64,0|1|-6.635|0|8059886,core,single,false
 rivière,Il y a une rivière à côté de la maison.,Il y a une rivière à côté de la maison.,There is a river beside the house.,817414,sacredceltic,49395,0,tts,,0,10,6.54,0|1|-6.544|1|817414,core,single,false
 rivière,Sa maison est de l'autre côté de la rivière.,Sa maison est de l'autre côté de la rivière.,Her house is across the river.,133743,Aiji,309104,0,tts,,0,10,6.52,0|1|-6.519|1|133743,core,single,false
 lac,On a nagé dans le lac.,On a nagé dans le lac.,We swam in the lake.,11054568,lbdx,248098,0,tts,,0,6,5.89,0|0|-5.887|0|11054568,core,single,false
@@ -307,36 +307,36 @@ mer,C'est le passage vers la mer.,C'est le passage vers la mer.,This is the pass
 mer,Nous avons nagé dans la mer.,Nous avons nagé dans la mer.,We swam in the sea.,525055,zmoo,248497,0,tts,,0,6,5.68,0|0|-5.678|0|525055,core,single,false
 sel,Il n'y a plus de sel.,Il n'y a plus de sel.,There's no more salt.,427417,Archibald,467337,0,tts,,0,7,6.55,0|0|-6.549|0|427417,core,single,false
 sel,Il m'a demandé de lui passer le sel.,Il m'a demandé de lui passer le sel.,He asked me to pass him the salt.,348832,sysko,25736,0,tts,,0,9,6.26,0|0|-6.257|0|348832,core,single,false
-pierre,Je m'appelle Pierre.,Je m'appelle Pierre.,My name is Pierre.,3605783,masaragiovanni,11839452,0,tts,,0,4,5.89,0|0|-5.888|1|3605783,core,single,false
 pierre,On n'est plus à l'âge de pierre.,On n'est plus à l'âge de pierre.,We're no longer living in the stone age.,12455467,lbdx,4921912,0,tts,,0,9,6.65,0|1|-6.653|0|12455467,core,single,false
+pierre,La maison est en pierre.,La maison est en pierre.,The house is made of stone.,4551355,sacredceltic,49350,0,tts,,0,5,6.52,0|1|-6.522|0|4551355,core,single,false
 sable,C'est du sable.,C'est du sable.,It's sand.,5579309,Aiji,2123581,0,tts,,0,4,6.36,0|0|-6.360|1|5579309,core,single,false
 sable,Il y a du sable dans le lit.,Il y a du sable dans le lit.,There's sand in the bed.,6576551,GB3,6576532,0,tts,,0,8,6.39,0|1|-6.389|0|6576551,core,single,false
-poussière,J'ai des poussières dans les yeux.,J'ai des poussières dans les yeux.,My eyes feel gritty.,11646383,lbdx,323694,0,tts,,0,7,6.17,0|1|-6.169|0|11646383,core,single,false
-poussière,J'ai une poussière dans l'œil.,J'ai une poussière dans l'œil.,I have something in my eye.,181943,lbdx,436687,0,tts,,0,7,6.15,0|1|-6.149|0|181943,core,single,false
+poussière,Elle a essuyé la poussière de la main.,Elle a essuyé la poussière de la main.,She brushed away the dust.,12182703,lbdx,312172,0,tts,,0,8,6.08,0|1|-6.081|0|12182703,core,single,false
+poussière,C'est sec comme la poussière.,C'est sec comme la poussière.,It's dry as dust.,8366,Petro1,243583,0,tts,,0,6,6.08,0|1|-6.077|0|8366,core,single,false
 terre,Il est vrai que la Terre est ronde.,Il est vrai que la Terre est ronde.,It's true that the earth is round.,337407,sysko,7580830,0,tts,,0,8,6.38,0|0|-6.381|0|337407,core,single,false
 terre,J'ai dormi par terre.,J'ai dormi par terre.,I slept on the ground.,9978178,lbdx,5916848,0,tts,,0,5,5.84,0|0|-5.840|0|9978178,core,single,false
 nuage,"Il y avait des nuages, hier.","Il y avait des nuages, hier.",It was cloudy yesterday.,8290,sacredceltic,244466,0,tts,,0,6,6.00,0|0|-5.995|0|8290,core,single,false
-nuage,Il n'y a pas de nuages dans le ciel.,Il n'y a pas de nuages dans le ciel.,There are no clouds in the sky.,425815,Scott,425820,0,tts,,0,10,6.51,0|1|-6.507|1|425815,core,single,false
+nuage,Il n'y a pas de nuages dans le ciel.,Il n'y a pas de nuages dans le ciel.,There are no clouds in the sky.,425815,Scott,425820,0,tts,,0,10,6.51,0|1|-6.507|1|425815,core,discontinuous,false
 brouillard,Il y a du brouillard.,Il y a du brouillard.,It is foggy.,4895879,sacredceltic,456111,0,tts,,0,5,6.25,0|1|-6.250|0|4895879,core,single,false
 brouillard,Il y a souvent du brouillard le matin.,Il y a souvent du brouillard le matin.,There is often fog in the morning.,3258265,nimfeo,3258266,0,tts,,0,8,6.18,0|1|-6.176|0|3258265,core,single,false
 ciel,Le Soleil est dans le ciel.,Le Soleil est dans le ciel.,The sun is in the sky.,1121564,sacredceltic,1121308,0,tts,,0,6,6.45,0|1|-6.455|0|1121564,core,single,false
-ciel,Il n'y a pas un nuage dans le ciel.,Il n'y a pas un nuage dans le ciel.,There's not a cloud in the sky.,335467,TRANG,507297,0,tts,,0,10,6.44,0|1|-6.437|1|335467,core,single,false
+ciel,Il n'y a pas un nuage dans le ciel.,Il n'y a pas un nuage dans le ciel.,There's not a cloud in the sky.,335467,TRANG,507297,0,tts,,0,10,6.44,0|1|-6.437|1|335467,core,discontinuous,false
+vent,Il n'y a pas de vent.,Il n'y a pas de vent.,There's no wind.,6112560,Blabla,6133930,0,tts,,0,7,6.65,0|1|-6.654|0|6112560,core,discontinuous,false
 vent,Il y a du vent et de la pluie.,Il y a du vent et de la pluie.,It's windy and it's raining.,11154834,carlosalberto,11154813,0,tts,,0,9,6.58,0|1|-6.580|0|11154834,core,single,false
-vent,Il y a un peu de vent.,Il y a un peu de vent.,It's slightly windy.,529811,zmoo,1214904,0,tts,,0,7,6.58,0|1|-6.576|0|529811,core,single,false
 neige,Nous avons eu beaucoup de neige l'année dernière.,Nous avons eu beaucoup de neige l'année dernière.,We had a lot of snow last year.,336734,sysko,19421,0,tts,,0,9,5.99,0|0|-5.991|0|336734,core,single,false
 neige,Nous nous attendions à beaucoup de neige.,Nous nous attendions à beaucoup de neige.,We were expecting a lot of snow.,5573184,Aiji,5551148,0,tts,,0,7,5.89,0|0|-5.886|0|5573184,core,single,false
 glace,J'ai besoin de glace.,J'ai besoin de glace.,I need ice.,3249776,nimfeo,2246006,0,tts,,0,5,6.19,0|0|-6.186|0|3249776,core,single,false
 glace,C'est de la glace.,C'est de la glace.,This is ice.,12854028,menaud,1211442,0,tts,,0,5,6.76,0|1|-6.762|0|12854028,core,single,false
 fumée,Je ne peux pas voir à cause de la fumée.,Je ne peux pas voir à cause de la fumée.,I can't see because of the smoke.,11383401,carlosalberto,11383392,0,tts,,0,10,6.41,0|1|-6.410|1|11383401,core,single,false
-fumée,Il n'y a pas de fumée sans feu.,Il n'y a pas de fumée sans feu.,There's no smoke without fire.,135958,Aiji,995879,0,tts,,0,9,6.36,0|1|-6.360|0|135958,core,single,false
-feu,J'ai entendu des coups de feu.,J'ai entendu des coups de feu.,I heard some shots.,7411787,lbdx,5860565,0,tts,,0,7,6.13,0|0|-6.133|0|7411787,core,single,false
+fumée,Il n'y a pas de fumée sans feu.,Il n'y a pas de fumée sans feu.,There's no smoke without fire.,135958,Aiji,995879,0,tts,,0,9,6.36,0|1|-6.360|0|135958,core,discontinuous,false
 feu,Ma maison était en feu.,Ma maison était en feu.,My house was on fire.,9605,Rovo,24148,0,tts,,0,5,6.02,0|0|-6.018|0|9605,core,single,false
-cendre,La maison était en cendres.,La maison était en cendres.,The house burned down completely.,3642120,sacredceltic,24150,0,tts,,0,5,6.06,0|1|-6.060|0|3642120,core,single,false
+feu,C'est en feu.,C'est en feu.,It's on fire.,1830975,sacredceltic,1829474,0,tts,,0,4,6.60,0|1|-6.600|1|1830975,core,single,false
 cendre,La maison a été réduite en cendres.,La maison a été réduite en cendres.,The house was burned to ashes.,352325,Barbiche0,49347,0,tts,,1,7,5.93,1|1|-5.927|0|352325,core,single,false
+cendre,Tout a été réduit en cendres.,Tout a été réduit en cendres.,Everything was burnt to ashes.,8548133,Aiji,51673,0,tts,,1,6,5.89,1|1|-5.887|0|8548133,core,single,false
 brûler,Je l'ai brûlé.,Je l'ai brûlé.,I burned it.,2720047,Wakano,2245630,0,tts,,0,4,6.13,0|0|-6.135|1|2720047,core,single,false
 brûler,Je l'ai brûlée.,Je l'ai brûlée.,I burned it.,4679061,sacredceltic,2245630,0,tts,,0,4,6.05,0|0|-6.055|1|4679061,core,single,false
-route,Ils sont en route.,Ils sont en route.,They're on their way.,11238325,lbdx,2647058,0,tts,,0,4,6.29,0|0|-6.287|1|11238325,core,single,false
 route,Tu peux prendre la route que tu veux.,Tu peux prendre la route que tu veux.,You can take whichever road you like.,336543,sysko,37987,0,tts,,0,8,6.19,0|0|-6.189|0|336543,core,single,false
+route,Il est temps de prendre la route.,Il est temps de prendre la route.,It's time to hit the road.,12488254,lbdx,10156672,0,tts,,0,7,6.58,0|1|-6.584|0|12488254,core,single,false
 montagne,Il y a de la neige sur la montagne.,Il y a de la neige sur la montagne.,There is snow on the mountain.,1562627,sacredceltic,1562150,0,tts,,0,9,6.55,0|1|-6.549|0|1562627,core,single,false
 montagne,Il fait des montagnes de tout.,Il fait des montagnes de tout.,He makes mountains out of molehills.,4552111,sacredceltic,292278,0,tts,,0,6,6.52,0|1|-6.515|0|4552111,core,single,false
 rouge,J'ai une voiture rouge.,J'ai une voiture rouge.,I have a red car.,3979741,nimfeo,3058028,0,tts,,0,5,6.09,0|0|-6.086|0|3979741,core,single,false
@@ -347,66 +347,66 @@ jaune,Il y en a aussi un jaune.,Il y en a aussi un jaune.,There's also a yellow 
 jaune,Il y en a également une jaune.,Il y en a également une jaune.,There's also a yellow one.,5951351,Aiji,3133503,0,tts,,0,7,6.41,0|1|-6.409|0|5951351,core,single,false
 blanc,"L'un est rouge, l'autre est blanc.","L'un est rouge, l'autre est blanc.",One is red and the other is white.,620646,qdii,27206,0,tts,,0,8,6.54,0|1|-6.535|0|620646,core,single,false
 blanc,"En été, je ne porte que du blanc.","En été, je ne porte que du blanc.","In summer, I only wear white.",4347933,nimfeo,11201654,0,tts,,0,8,6.46,0|1|-6.455|0|4347933,core,single,false
-noir,Il fait de plus en plus noir.,Il fait de plus en plus noir.,It's getting darker and darker.,761141,pandark,759367,0,tts,,0,7,6.68,0|1|-6.679|0|761141,core,single,false
 noir,Le noir est à moi.,Le noir est à moi.,The black one is mine.,823525,sacredceltic,823527,0,tts,,0,5,6.62,0|1|-6.622|0|823525,core,single,false
-nuit,Elle l'appelle toutes les nuits.,Elle l'appelle toutes les nuits.,She calls him every night.,1099341,sacredceltic,887030,0,tts,,0,6,6.02,0|0|-6.025|0|1099341,core,single,false
-nuit,C'est le milieu de la nuit.,C'est le milieu de la nuit.,It's the dead of the night.,8626377,Aiji,31586,0,tts,,0,7,6.73,0|1|-6.726|0|8626377,core,single,false
+noir,Tout n'est pas noir et blanc.,Tout n'est pas noir et blanc.,Not everything is black and white.,1600668,sacredceltic,1552235,0,tts,,0,7,6.41,0|1|-6.410|0|1600668,core,discontinuous,false
+nuit,N'y va pas après la nuit tombée.,N'y va pas après la nuit tombée.,Don't go out after dark.,1329230,sacredceltic,28454,0,tts,,0,8,6.17,0|0|-6.169|0|1329230,core,discontinuous,false
+nuit,Il dort le jour et travaille la nuit.,Il dort le jour et travaille la nuit.,He sleeps by day and works by night.,333993,sysko,301559,0,tts,,0,8,6.14,0|0|-6.141|0|333993,core,single,false
 jour,Je viens tous les jours.,Je viens tous les jours.,I come every day.,6307943,Aiji,6374552,0,tts,,0,5,6.22,0|0|-6.218|0|6307943,core,single,false
 jour,Je fais du sport tous les jours.,Je fais du sport tous les jours.,I play sports every day.,2500483,avqXb0uv,871719,0,tts,,0,7,6.22,0|0|-6.217|0|2500483,core,single,false
-année,C'était il y a des années.,C'était il y a des années.,It was ages ago.,12353,engone,42556,0,tts,,0,7,6.62,0|0|-6.619|0|12353,core,single,false
 année,Des années ont passé.,Des années ont passé.,Years passed.,337993,Corvus,282197,0,tts,,0,4,6.12,0|0|-6.120|1|337993,core,single,false
+année,C'est la fin de l'année.,C'est la fin de l'année.,It's the end of the year.,5963303,Aiji,5697129,0,tts,,0,7,6.82,0|1|-6.824|0|5963303,core,single,false
 chaud,C'est plus chaud.,C'est plus chaud.,It's warmer.,2284691,sacredceltic,2283750,0,tts,,0,4,6.38,0|0|-6.385|1|2284691,core,single,false
 chaud,Il fait plus chaud.,Il fait plus chaud.,It's warmer.,2284692,sacredceltic,2283750,0,tts,,0,4,6.22,0|0|-6.220|1|2284692,core,single,false
-froid,Il ne fait pas si froid aujourd'hui.,Il ne fait pas si froid aujourd'hui.,Today isn't so cold.,3225845,Dreamk33,7492772,0,tts,,0,7,6.29,0|0|-6.286|0|3225845,core,single,false
+froid,Il ne fait pas si froid aujourd'hui.,Il ne fait pas si froid aujourd'hui.,Today isn't so cold.,3225845,Dreamk33,7492772,0,tts,,0,7,6.29,0|0|-6.286|0|3225845,core,discontinuous,false
 froid,Il a fait très froid le mois dernier.,Il a fait très froid le mois dernier.,It was very cold last month.,128915,Aiji,272691,0,tts,,0,8,6.23,0|0|-6.228|0|128915,core,single,false
 plein,Il est plein d'énergie.,Il est plein d'énergie.,He is full of energy.,336475,sysko,294885,0,tts,,0,5,6.31,0|0|-6.310|0|336475,core,single,false
-plein,Ils en ont plein.,Ils en ont plein.,They have plenty.,10973118,lbdx,4493752,0,tts,,0,4,6.26,0|0|-6.263|1|10973118,core,single,false
+plein,Je travaille à plein temps.,Je travaille à plein temps.,I work full time.,8412179,lbdx,4500112,0,tts,,0,5,6.05,0|0|-6.048|0|8412179,core,single,false
 nouveau,Il y a du nouveau ?,Il y a du nouveau ?,Anything new?,3693045,Elliv,25313,0,tts,,0,5,6.61,0|0|-6.614|0|3693045,core,single,false
-nouveau,Nous voici donc de nouveau au même point.,Nous voici donc de nouveau au même point.,Here we are again.,3451160,Scorpionvenin14,2648536,0,tts,,0,8,6.18,0|0|-6.183|0|3451160,core,single,false
+nouveau,J'ai acheté une nouvelle voiture.,J'ai acheté une nouvelle voiture.,I bought a new car.,330957,TRANG,258821,0,tts,,0,6,5.93,0|0|-5.928|0|330957,core,single,false
 vieux,Elle est plus vieille que lui.,Elle est plus vieille que lui.,She's older than him.,1204235,rene1596,887619,0,tts,,0,6,6.38,0|0|-6.383|0|1204235,core,single,false
 vieux,Je ne suis pas vieux.,Je ne suis pas vieux.,I'm not old.,4841796,sacredceltic,2248165,0,tts,,0,5,6.36,0|0|-6.362|0|4841796,core,single,false
-bon,C'est pas bon.,C'est pas bon.,This is bad.,1112215,sacredceltic,1110424,0,tts,,0,4,6.75,0|0|-6.750|1|1112215,core,single,false
-bon,Ce n'est pas bon.,Ce n'est pas bon.,This is bad.,1112217,sacredceltic,1110424,0,tts,,0,5,6.71,0|0|-6.712|0|1112217,core,discontinuous,false
+bon,Il n'y a rien de bon d'en parler.,Il n'y a rien de bon d'en parler.,It's no good talking about it.,334803,sysko,8864963,0,tts,,0,10,6.65,0|0|-6.651|1|334803,core,single,false
+bon,C'est le bon moment.,C'est le bon moment.,It's the right time.,11388581,lbdx,3722913,0,tts,,0,5,6.60,0|0|-6.602|0|11388581,core,single,false
 mauvais,C'est un mauvais exemple.,C'est un mauvais exemple.,It's a bad example.,7414881,lbdx,3564114,0,tts,,0,5,6.32,0|0|-6.322|0|7414881,core,single,false
 mauvais,C'est très mauvais.,C'est très mauvais.,It's really bad.,1498360,Scott,2249201,0,tts,,0,4,6.30,0|0|-6.305|1|1498360,core,single,false
 pourri,J'ai eu une journée pourrie.,J'ai eu une journée pourrie.,I've had a lousy day.,10087848,lbdx,2359811,0,tts,,0,6,5.79,0|0|-5.790|0|10087848,core,single,false
 pourri,Je sens quelque chose de pourri.,Je sens quelque chose de pourri.,I smell something rotten.,4682064,sacredceltic,25034,0,tts,,0,6,5.89,0|1|-5.893|0|4682064,core,single,false
 sale,On sait que l'eau de la rivière est sale.,On sait que l'eau de la rivière est sale.,It is known that the water from the river is dirty.,11894832,carlosalberto,11894807,0,tts,,0,10,6.33,0|1|-6.334|1|11894832,core,single,false
-sale,Elle est dans un sale état.,Elle est dans un sale état.,She's in a bad way.,14065091,Myrano_,11538879,0,tts,,0,6,6.33,0|1|-6.325|0|14065091,core,single,false
-droit,Ils ont le droit de le faire.,Ils ont le droit de le faire.,They have the right to do so.,11227408,lbdx,305063,0,tts,,0,7,6.70,0|1|-6.703|0|11227408,core,single,false
-droit,On n'a pas le droit de faire ça ici.,On n'a pas le droit de faire ça ici.,We're not allowed to do that here.,8422055,lbdx,6252622,0,tts,,0,10,6.65,0|1|-6.653|1|8422055,core,single,false
-rond,Je n'ai pas un rond sur moi.,Je n'ai pas un rond sur moi.,I don't have a dime on me.,11972454,lbdx,470044,0,tts,,0,8,6.42,0|1|-6.415|0|11972454,core,single,false
-rond,Je n'ai plus un rond.,Je n'ai plus un rond.,I do not even have a penny.,6559824,Blabla,6582585,0,tts,,0,6,6.34,0|1|-6.343|0|6559824,core,single,false
+sale,C'est un travail difficile et sale.,C'est un travail difficile et sale.,"It's a hard, dirty job.",479368,sacredceltic,42718,0,tts,,0,7,6.27,0|1|-6.273|0|479368,core,single,false
+droit,Je l'ai regardé droit dans les yeux.,Je l'ai regardé droit dans les yeux.,I looked directly into his eyes.,3473568,sacredceltic,3467907,0,tts,,0,8,6.26,0|1|-6.265|0|3473568,core,single,false
+droit,N'allez pas tout droit !,N'allez pas tout droit !,Don't go straight!,8817712,carlosalberto,8817701,0,tts,,0,5,6.17,0|1|-6.174|0|8817712,core,discontinuous,false
+rond,On n'a fait que tourner en rond.,On n'a fait que tourner en rond.,We've just been running around in circles.,11136783,lbdx,9630569,0,tts,,0,8,6.25,0|1|-6.247|0|11136783,core,single,false
+rond,J'ai l'impression de tourner en rond.,J'ai l'impression de tourner en rond.,I feel like I'm running in circles.,11699430,lbdx,6783654,0,tts,,0,8,6.15,0|1|-6.154|0|11699430,core,single,false
 tranchant,"Le couteau est tranchant, ne te coupe pas !","Le couteau est tranchant, ne te coupe pas !",The knife is sharp – don’t cut yourself!,12003081,lbdx,9210347,0,tts,,1,8,5.89,1|1|-5.886|0|12003081,core,discontinuous,false
 tranchant,Il s'est coupé avec un couteau tranchant.,Il s'est coupé avec un couteau tranchant.,He cut himself with a sharp knife.,12854166,lbdx,7383447,0,tts,,1,8,5.82,1|1|-5.819|0|12854166,core,single,false
 émoussé,Il a été tué par une arme émoussée.,Il a été tué par une arme émoussée.,He was killed by a blunt weapon.,1684685,sacredceltic,1683005,0,tts,,2,8,5.70,2|1|-5.699|0|1684685,core,single,false
 émoussé,Ces ciseaux sont émoussés.,Ces ciseaux sont émoussés.,These scissors are dull.,9845837,Boblitore,8813203,0,tts,,2,4,4.55,2|1|-4.550|1|9845837,core,single,false
-lisse,Je me lisse les cheveux tous les jours.,Je me lisse les cheveux tous les jours.,I straighten my hair every day.,11570804,Aiji,2505867,0,tts,,0,8,6.02,0|1|-6.016|0|11570804,core,single,false
 lisse,La mer était aussi lisse que le verre.,La mer était aussi lisse que le verre.,The sea was as smooth as glass.,341833,sysko,22225,0,tts,,1,8,5.99,1|0|-5.992|0|341833,core,single,false
+lisse,C'est lisse comme le derrière d'un nouveau-né.,C'est lisse comme le derrière d'un nouveau-né.,It's as smooth as a baby's bottom.,827074,Scott,327779,0,tts,,1,10,6.15,1|1|-6.148|1|827074,core,single,false
 mouillé,L'herbe est mouillée.,L'herbe est mouillée.,The grass is wet.,10485882,lbdx,10257349,0,tts,,1,4,5.47,1|0|-5.475|1|10485882,core,single,false
 mouillé,Je ne veux pas me mouiller les pieds.,Je ne veux pas me mouiller les pieds.,I don't want to get my feet wet.,2254332,sacredceltic,2254315,0,tts,,1,8,6.02,1|1|-6.018|0|2254332,core,single,false
-sec,Il est à sec.,Il est à sec.,He is out of pocket.,15339,Julien_PDC,288230,0,tts,,0,4,6.47,0|1|-6.470|1|15339,core,single,false
 sec,On a eu un été sec.,On a eu un été sec.,We had a dry summer.,10812432,Sorasama,9442411,0,tts,,0,6,6.19,0|1|-6.193|0|10812432,core,single,false
-juste,Je pense que c'est juste.,Je pense que c'est juste.,I think that's fair.,2473978,arnxy20,2408164,0,tts,,0,6,6.56,0|0|-6.562|0|2473978,core,single,false
-juste,Je veux juste la vérité.,Je veux juste la vérité.,I just want the truth.,11542513,lbdx,2011655,0,tts,,0,5,6.15,0|0|-6.150|0|11542513,core,single,false
+sec,C'est très sec.,C'est très sec.,It's very dry.,1617528,sacredceltic,1615217,0,tts,,0,4,6.16,0|1|-6.158|1|1617528,core,single,false
+juste,C'est tout à fait juste.,C'est tout à fait juste.,That's absolutely right.,1053351,sacredceltic,433664,0,tts,,0,6,6.67,0|1|-6.667|0|1053351,core,single,false
+juste,Ce n'est pas le mot juste.,Ce n'est pas le mot juste.,It's not the correct word.,13170855,Rovo,6549618,0,tts,,0,7,6.57,0|1|-6.571|0|13170855,core,discontinuous,false
 près,C'est près d'ici ?,C'est près d'ici ?,Is it nearby?,7414757,lbdx,2248463,0,tts,,0,5,6.47,0|0|-6.474|0|7414757,core,single,false
 près,Ma maison est près de l'église.,Ma maison est près de l'église.,My house is near the church.,338022,sysko,338021,0,tts,,0,7,6.30,0|0|-6.300|0|338022,core,single,false
-loin,"Pas à pas, on va loin.","Pas à pas, on va loin.",Take it one step at a time.,338406,sysko,2472520,0,tts,,0,6,6.57,0|0|-6.568|0|338406,core,single,false
 loin,C'est loin d'ici ?,C'est loin d'ici ?,Is it far from here?,3470,SUZIE,1651,0,tts,,0,5,6.46,0|0|-6.462|0|3470,core,single,false
+loin,C'est de loin le meilleur.,C'est de loin le meilleur.,This is by far the best.,1831649,nimfeo,56316,0,tts,,0,6,6.64,0|1|-6.642|0|1831649,core,single,false
 droite,Le bureau est sur la droite.,Le bureau est sur la droite.,The office is on the right.,8587157,Aiji,7048495,0,tts,,0,6,6.50,0|1|-6.498|0|8587157,core,single,false
 droite,La porte de sortie est à droite.,La porte de sortie est à droite.,The exit door is on the right.,12109114,carlosalberto,12107283,0,tts,,0,7,6.48,0|1|-6.481|0|12109114,core,single,false
 gauche,"C'est en bas de la rue, sur la gauche.","C'est en bas de la rue, sur la gauche.","This is down the street, on the left.",649663,mamat,1170875,0,tts,,0,10,6.65,0|1|-6.647|1|649663,core,single,false
 gauche,L'enfant est à gauche de la maison.,L'enfant est à gauche de la maison.,The child is on the left side of the house.,6774575,Micsmithel,3647265,0,tts,,0,8,6.61,0|1|-6.611|0|6774575,core,single,false
-à,C'est à elle.,C'est à elle.,That's hers.,3029768,Rovo,2187267,0,tts,,0,4,6.96,0|0|-6.955|1|3029768,core,single,false
-à,Je suis à vous.,Je suis à vous.,I'm yours.,4910708,sacredceltic,2111665,0,tts,,0,4,6.71,0|0|-6.707|1|4910708,core,single,false
+à,Il est à la maison aujourd'hui.,Il est à la maison aujourd'hui.,He is at home today.,132067,nimfeo,296616,0,tts,,0,6,6.67,0|0|-6.670|0|132067,core,single,false
+à,Je suis à la maison.,Je suis à la maison.,I'm at home.,13849,sacredceltic,404046,0,tts,,0,5,6.65,0|0|-6.646|0|13849,core,single,false
 dans,Il y a un téléphone dans ma chambre.,Il y a un téléphone dans ma chambre.,There's a telephone in my room.,14283,sacredceltic,473576,0,tts,,0,8,6.34,0|0|-6.339|0|14283,core,single,false
 dans,Je vais attendre dans la voiture.,Je vais attendre dans la voiture.,I'll wait in the car.,4245045,mouche,2547801,0,tts,,0,6,6.17,0|0|-6.170|0|4245045,core,single,false
 avec,Je ne suis pas d'accord avec toi.,Je ne suis pas d'accord avec toi.,I disagree with you.,333129,sysko,252710,0,tts,,0,8,6.47,0|0|-6.470|0|333129,core,single,false
 avec,Je suis avec lui.,Je suis avec lui.,I'm with him.,7411499,lbdx,3436420,0,tts,,0,4,6.46,0|0|-6.465|1|7411499,core,single,false
-et,"Je vais bien, et vous ?","Je vais bien, et vous ?",I'm fine. How about you?,872451,sacredceltic,239427,0,tts,,0,5,6.54,0|0|-6.542|0|872451,core,single,false
 et,Je parle français et anglais.,Je parle français et anglais.,I speak French and English.,6463142,Aiji,2406539,0,tts,,0,5,6.14,0|0|-6.136|0|6463142,core,single,false
+et,Je suis à elle et elle est à moi.,Je suis à elle et elle est à moi.,I'm hers and she's mine.,1788159,sacredceltic,6872926,0,tts,,0,9,6.80,0|1|-6.799|0|1788159,core,single,false
 si,On ne sait même pas si c'est vrai.,On ne sait même pas si c'est vrai.,We don't even know if it's true.,5391222,Aiji,4012265,0,tts,,0,9,6.46,0|0|-6.460|0|5391222,core,discontinuous,false
-si,C'était si bon.,C'était si bon.,It was so good.,5364611,Aiji,3824353,0,tts,,0,4,6.37,0|0|-6.373|1|5364611,core,single,false
+si,Nous ne savons même pas si c'est vrai.,Nous ne savons même pas si c'est vrai.,We don't even know if it's true.,5391223,Aiji,4012265,0,tts,,0,9,6.31,0|0|-6.314|0|5391223,core,single,false
 parce que,C'est parce que je l'aime.,C'est parce que je l'aime.,It's because I love him.,2021708,sacredceltic,2021209,0,tts,,0,7,6.65,0|1|-6.649|0|2021708,core,single,false
 parce que,C'est parce que je n'ai pas entendu.,C'est parce que je n'ai pas entendu.,It's because I didn't hear.,691791,sysko,10814756,0,tts,,0,9,6.54,0|1|-6.541|0|691791,core,single,false
 nom,Je n'ai pas de nom.,Je n'ai pas de nom.,I have no name.,5552408,sacredceltic,4343499,0,tts,,0,6,6.71,0|0|-6.712|0|5552408,core,single,false

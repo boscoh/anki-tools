@@ -19,6 +19,7 @@ target,swadesh_index,english,variant,status,zipf,candidate_count,scaffold_candid
 φτερό,84,wing,primary,uncovered,3.70,0,0,0,,,,,,,,
 κοιλιά,85,belly,primary,uncovered,4.34,0,0,0,,,,,,,,
 σπλάχνα,86,guts,primary,uncovered,3.19,0,0,0,,,,,,,,
+λαιμός,87,neck,primary,uncovered,3.68,0,0,0,,,,,,,,
 στήθος,89,breast,primary,thin,4.52,1,0,1,Ο Τομ έχει τριχωτό στήθος.,Ο Τομ έχει τριχωτό στήθος.,Tom has a hairy chest.,5506679,2,5,2|0|-5.230|0|5506679,core
 συκώτι,91,liver,primary,uncovered,4.00,0,0,0,,,,,,,,
 δαγκώνω,94,to bite,primary,low_zipf,0.00,2,0,1,Αυτός ο σκύλος δαγκώνει.,Αυτός ο σκύλος δαγκώνει.,This dog bites.,5485800,0,4,0|0|-5.200|1|5485800,core
@@ -28,20 +29,23 @@ target,swadesh_index,english,variant,status,zipf,candidate_count,scaffold_candid
 ξερνώ,97,to vomit,primary,uncovered,0.00,0,0,0,,,,,,,,
 φυσάω,98,to blow,primary,uncovered,0.00,0,0,0,,,,,,,,
 αναπνέω,99,to breathe,primary,thin,3.35,1,0,1,Ο Τομ αναπνέει κανονικά.,Ο Τομ αναπνέει κανονικά.,Tom is breathing normally.,5304584,2,4,2|0|-5.062|1|5304584,core
+παλεύω,111,to fight,primary,thin,3.75,1,0,1,Ο Τζον παλεύει με τον Τομ.,Ο Τζον παλεύει με τον Τομ.,John is wrestling with Tom.,5528539,1,6,1|0|-5.828|0|5528539,core
 κυνηγώ,112,to hunt,primary,uncovered,0.00,0,0,0,,,,,,,,
 χτυπάω,113,to hit,primary,uncovered,3.64,0,0,0,,,,,,,,
-σπάω,115,to split,primary,thin,3.40,1,0,1,Η καρδιά μου πάει να σπάσει.,Η καρδιά μου πάει να σπάσει.,My heart is pounding.,1400275,0,6,0|0|-6.115|0|1400275,core
+σπάω,115,to split,primary,scaffold_only,3.40,1,1,1,Αυτό θα σπάσει.,Αυτό θα σπάσει.,It will break.,3550263,0,3,0|0|-5.917|1|3550263,scaffold
 μαχαιρώνω,116,to stab,primary,uncovered,0.00,0,0,0,,,,,,,,
 ξύνω,117,to scratch,primary,uncovered,0.00,0,0,0,,,,,,,,
 σκάβω,118,to dig,primary,uncovered,0.00,0,0,0,,,,,,,,
 πετάω,120,to fly,primary,uncovered,3.94,0,0,0,,,,,,,,
-ξαπλώνω,123,to lie down,primary,thin,3.05,1,0,1,Ποτέ δεν ξαπλώνω πριν τα μεσάνυχτα.,Ποτέ δεν ξαπλώνω πριν τα μεσάνυχτα.,I never go to bed before midnight.,9889297,1,6,1|0|-5.503|0|9889297,core
+ξαπλώνω,123,to lie down,primary,uncovered,3.05,0,0,0,,,,,,,,
 στέκομαι,125,to stand,primary,thin,3.55,1,0,1,"Τα άτομα που στέκονται εδώ, περιμένουν το λεωφορείο.","Τα άτομα που στέκονται εδώ, περιμένουν το λεωφορείο.",The people who stand here are waiting for the bus.,2386159,2,8,2|0|-5.735|0|2386159,core
+γυρίζω,126,to turn (intransitive),primary,scaffold_only,4.01,1,1,1,Να γυρίσω εκεί;,Να γυρίσω εκεί;,Do I turn there?,11225139,0,3,0|0|-5.807|1|11225139,scaffold
 σφίγγω,130,to squeeze,primary,uncovered,0.00,0,0,0,,,,,,,,
 τρίβω,131,to rub,primary,uncovered,0.00,0,0,0,,,,,,,,
 σκουπίζω,133,to wipe,primary,uncovered,0.00,0,0,0,,,,,,,,
 τραβάω,134,to pull,primary,uncovered,3.59,0,0,0,,,,,,,,
 σπρώχνω,135,to push,primary,thin,0.00,1,0,1,Ο Τομ συνέχισε να σπρώχνει.,Ο Τομ συνέχισε να σπρώχνει.,Tom kept pushing.,5599199,1,5,1|0|-5.570|0|5599199,core
+ρίχνω,136,to throw,primary,thin,3.80,1,0,1,Τ' αγόρι ρίχνει μια πέτρα.,Τ' αγόρι ρίχνει μια πέτρα.,A boy is throwing a stone.,10165096,2,5,2|0|-5.088|0|10165096,core
 δένω,137,to tie,primary,uncovered,0.00,0,0,0,,,,,,,,
 ράβω,138,to sew,primary,thin,0.00,1,0,1,Θα σας μάθω να ράβετε και να υφαίνετε.,Θα σας μάθω να ράβετε και να υφαίνετε.,I'll teach you how to sew and to weave.,9638973,2,8,2|0|-5.037|0|9638973,core
 μετράω,139,to count,primary,uncovered,3.61,0,0,0,,,,,,,,
@@ -53,9 +57,9 @@ target,swadesh_index,english,variant,status,zipf,candidate_count,scaffold_candid
 σκόνη,158,dust,primary,uncovered,4.34,0,0,0,,,,,,,,
 άνεμος,163,wind,primary,thin,4.13,1,0,1,Κάποτε θα μπορώ να τρέχω τόσο γρήγορα όπως ο άνεμος.,Κάποτε θα μπορώ να τρέχω τόσο γρήγορα όπως ο άνεμος.,Sometimes I can run as fast as the wind.,1562581,1,10,1|0|-5.735|1|1562581,core
 στάχτη,168,ash,primary,uncovered,3.88,0,0,0,,,,,,,,
-καίω,169,to burn,primary,low_zipf,0.00,8,0,1,Το σπίτι σας καίγεται!,Το σπίτι σας καίγεται!,Your house is on fire!,5506335,0,4,0|0|-5.950|1|5506335,core
-καίω,169,to burn,primary,low_zipf,0.00,8,0,2,Καίγεται το σπίτι σας!,Καίγεται το σπίτι σας!,Your house is on fire!,5506337,0,4,0|0|-5.950|1|5506337,core
-καίω,169,to burn,primary,low_zipf,0.00,8,0,3,Καίγεται το σπίτι σου!,Καίγεται το σπίτι σου!,Your house is on fire!,5506336,0,4,0|0|-5.947|1|5506336,core
+καίω,169,to burn,primary,low_zipf,0.00,5,0,1,Το σπίτι σας καίγεται!,Το σπίτι σας καίγεται!,Your house is on fire!,5506335,0,4,0|0|-5.950|1|5506335,core
+καίω,169,to burn,primary,low_zipf,0.00,5,0,2,Καίγεται το σπίτι σας!,Καίγεται το σπίτι σας!,Your house is on fire!,5506337,0,4,0|0|-5.950|1|5506337,core
+καίω,169,to burn,primary,low_zipf,0.00,5,0,3,Καίγεται το σπίτι σου!,Καίγεται το σπίτι σου!,Your house is on fire!,5506336,0,4,0|0|-5.947|1|5506336,core
 σάπιος,187,rotten,primary,uncovered,0.00,0,0,0,,,,,,,,
 βρόμικος,188,dirty,primary,low_zipf,0.00,9,0,1,Το σπίτι μου είναι βρόμικο.,Το σπίτι μου είναι βρόμικο.,My house is dirty.,2632531,0,5,0|0|-6.002|0|2632531,core
 βρόμικος,188,dirty,primary,low_zipf,0.00,9,0,2,Το αμάξι μου είναι βρόμικο.,Το αμάξι μου είναι βρόμικο.,My car's dirty.,5609794,1,5,1|0|-5.798|0|5609794,core

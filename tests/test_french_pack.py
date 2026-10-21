@@ -13,7 +13,7 @@ from anki_tools.sentence_pack.audit import AuditInputs, gate_proper_sentences
 from anki_tools.sentence_pack.pool import check_sentence_shape
 from anki_tools.sentence_pack.languages import french
 
-MANDARIN_SHA256 = "cb3b27f2b80b06ec6c76827455fdfa6b36337929787c255b968fe35528b357fe"
+MANDARIN_SHA256 = "862e07a6b5c7baa2766b9729734ddc72821496e89cdb76e3156f39245157b581"
 TAB = "\t"
 NOUN_ROWS = 84
 
@@ -485,7 +485,7 @@ def test_sentence_csv_columns() -> None:
     assert header == french.SENTENCE_FIELDS
 
 
-def test_mandarin_sentences_csv_is_unchanged() -> None:
+def test_mandarin_sentences_csv_matches_the_snapshot() -> None:
     digest = hashlib.sha256(
         Path("vocab/mandarin_sentences.csv").read_bytes()
     ).hexdigest()

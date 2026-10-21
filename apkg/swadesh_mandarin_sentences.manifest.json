@@ -3,13 +3,13 @@
   "source_dump_date": "2026-10-19",
   "counts": {
     "words": 211,
-    "cards": 385,
-    "scaffold": 0,
+    "cards": 371,
+    "scaffold": 2,
     "native_audio": 0,
-    "tts_audio": 385
+    "tts_audio": 371
   },
   "coverage": {
-    "core_with_card": 0.942
+    "core_with_card": 0.9227
   },
   "voice": "gtts:zh-CN",
   "pack_license": "public",
@@ -23,7 +23,7 @@
   },
   "files": {
     "source_csv": "sha256:8509d2e9b3312f903ece8d8bef027391ff41e3e2aaac4450e9747ae275d89350",
-    "sentences_csv": "sha256:cb3b27f2b80b06ec6c76827455fdfa6b36337929787c255b968fe35528b357fe"
+    "sentences_csv": "sha256:862e07a6b5c7baa2766b9729734ddc72821496e89cdb76e3156f39245157b581"
   },
   "licenses": [
     {
@@ -43,14 +43,18 @@
     "虱子",
     "棍子",
     "种子",
+    "根",
     "骨头",
     "脂肪",
     "羽毛",
-    "舌头",
     "肠子",
     "乳房",
+    "肝",
     "呕吐",
+    "分开",
     "揉",
-    "绑"
+    "绑",
+    "肿",
+    "灰"
   ]
 }

@@ -38,3 +38,8 @@ fr-core-news-sm = { url = "https://github.com/explosion/spacy-models/releases/do
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "nltk>=3.10.3",
+]

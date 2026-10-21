@@ -1,6 +1,6 @@
 target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_id,audio_id,audio_source,audio_license,unknown_words,han_len,zipf_mean,rank_key,tier,audio_missing
-我,这是我们的。,這是我們的。,zhè shì wǒ men de,This is ours.,10322368,DaoSeng,2295681,0,tts,,0,5,7.04,0|0|-7.043|0|10322368,core,false
 我,你是我的一切。,你是我的一切。,nǐ shì wǒ de yí qiè,You're everything to me.,333179,fucongcong,8332955,0,tts,,0,6,6.83,0|0|-6.830|0|333179,core,false
+我,这是我的书。,这是我的书。,zhè shì wǒ de shū,This is my book.,334383,fucongcong,463306,0,tts,,0,5,6.79,0|0|-6.794|0|334383,core,false
 你,这是我给你做的。,這是我給你做的。,zhè shì wǒ gěi nǐ zuò de,I made this for you.,10668649,DaoSeng,2380432,0,tts,,0,7,6.79,0|0|-6.793|0|10668649,core,false
 你,你想我了？,你想我了？,nǐ xiǎng wǒ le,Did you miss me?,334429,fucongcong,1561,0,tts,,0,4,6.71,0|0|-6.705|1|334429,core,false
 他,他是美国人。,他是美国人。,tā shì měi guó rén,He's American.,332941,fucongcong,5226614,0,tts,,0,5,6.68,0|0|-6.683|0|332941,core,false
@@ -9,18 +9,18 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 她,她是我们的教师。,她是我們的教師。,tā shì wǒ men de jiào shī,She's our teacher.,10361394,DaoSeng,67828,0,tts,,0,7,6.58,0|0|-6.584|0|10361394,core,false
 它,它是你的书。,它是你的書。,tā shì nǐ de shū,It's your book.,825185,Martha,515538,0,tts,,0,5,6.61,0|1|-6.612|0|825185,core,false
 它,它是免费的。,它是免費的。,tā shì miǎn fèi de,It's free.,825127,Martha,435782,0,tts,,0,5,6.55,0|1|-6.555|0|825127,core,false
+我们,这是我们的。,這是我們的。,zhè shì wǒ men de,This is ours.,10322368,DaoSeng,2295681,0,tts,,0,5,7.04,0|0|-7.043|0|10322368,core,false
 我们,我们同时到的。,我們同時到的。,wǒ men tóng shí dào de,We arrived at the same time.,10596608,DaoSeng,10589344,0,tts,,0,6,6.65,0|0|-6.647|0|10596608,core,false
-我们,我们是学生。,我們是學生。,wǒ men shì xué shēng,We are students.,13138940,LeviHighway,248532,0,tts,,0,5,6.47,0|0|-6.473|0|13138940,core,false
 你们,你们吃过了吗？,你們吃過了嗎？,nǐ men chī guò le ma,Have you all eaten?,10616262,DaoSeng,7262709,0,tts,,0,6,6.24,0|0|-6.244|0|10616262,core,false
 你们,你们能帮我们吗？,你們能幫我們嗎？,nǐ men néng bāng wǒ men ma,Can you help out?,13213024,LeviHighway,4499362,0,tts,,0,7,6.06,0|0|-6.064|0|13213024,core,false
 他们,他们要更多的钱。,他們要更多的錢。,tā men yào gèng duō de qián,They want more money.,13068516,DaoSeng,4502817,0,tts,,0,7,6.44,0|0|-6.440|0|13068516,core,false
 他们,他们死了吗？,他們死了嗎？,tā men sǐ le ma,Are they dead?,13537474,LeviHighway,2244916,0,tts,,0,5,6.42,0|0|-6.415|0|13537474,core,false
 她们,她们是学生吗？,她們是學生嗎？,tā men shì xué shēng ma,Are they students?,13138942,LeviHighway,3962743,0,tts,,0,6,6.14,0|0|-6.140|0|13138942,core,false
 她们,她们走了吗？,她們走了嗎？,tā men zǒu le ma,Are they gone?,10314460,DaoSeng,2244918,0,tts,,0,5,6.12,0|0|-6.117|0|10314460,core,false
-这,这是我的书。,这是我的书。,zhè shì wǒ de shū,This is my book.,334383,fucongcong,463306,0,tts,,0,5,6.79,0|0|-6.794|0|334383,core,false
-这,这是你的信。,这是你的信。,zhè shì nǐ de xìn,Here is a letter for you.,333502,fucongcong,18067,0,tts,,0,5,6.70,0|0|-6.696|0|333502,core,false
+这,这是什么啊？,這是什麼啊？,zhè shì shén me a,What's this?,4,Martha,413821,0,tts,,0,5,6.52,0|0|-6.518|0|4,core,false
+这,哦，这是什么？,哦，这是什么？,ó zhè shì shén me,"Oh, what is this?",334207,fucongcong,33021,0,tts,,0,5,6.34,0|0|-6.345|0|334207,core,false
 那,那不完全是错的。,那不完全是錯的。,nà bù wán quán shì cuò de,That's not entirely wrong.,10526942,DaoSeng,8947356,0,tts,,0,7,6.40,0|0|-6.403|0|10526942,core,false
-那,那对我很重要。,那對我很重要。,nà duì wǒ hěn zhòng yào,"For me, it's important.",10495853,DaoSeng,604215,0,tts,,0,6,6.32,0|0|-6.322|0|10495853,core,false
+那,我没想那么说。,我沒想那麼說。,wǒ méi xiǎng nà me shuō,I didn't mean to say that.,13137955,LeviHighway,6531676,0,tts,,0,6,6.26,0|0|-6.264|0|13137955,core,false
 这里,从这里开始。,從這裡開始。,cóng zhè lǐ kāi shǐ,Start here.,13531819,LeviHighway,2111524,0,tts,,0,5,5.98,0|0|-5.983|0|13531819,core,false
 这里,我需要你在这里。,我需要你在這裡。,wǒ xū yào nǐ zài zhè lǐ,I need you here.,6075557,verdastelo9604,1887591,0,tts,,0,7,6.48,0|1|-6.482|0|6075557,core,false
 那里,那里发生什么了？,那里发生什么了？,nà lǐ fā shēng shén me le,What happened there?,10460434,GlossaMatik,4499235,0,tts,,0,7,6.14,0|0|-6.138|0|10460434,core,false
@@ -33,8 +33,8 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 哪里,这是你哪里拿的？,这是你哪里拿的？,zhè shì nǐ nǎ lǐ ná de,Where did you get this?,864280,kooler,41861,0,tts,,0,7,6.54,0|1|-6.540|0|864280,core,false
 什么时候,什么时候开始？,什么时候开始？,shén me shí hòu kāi shǐ,When does it begin?,332585,fucongcong,42781,0,tts,,0,6,5.39,0|0|-5.390|0|332585,core,false
 什么时候,什么时候发生的？,什麼時候發生的？,shén me shí hòu fā shēng de,When did it happen?,5382963,egg0073,687502,0,tts,,0,7,6.12,0|1|-6.123|0|5382963,core,false
-怎么,你怎么说？,你怎麼說？,nǐ zěn me shuō,What do you say?,12346842,DaoSeng,1174872,0,tts,,0,4,6.44,0|0|-6.440|1|12346842,core,false
 怎么,你怎么会不知道？,你怎么会不知道？,nǐ zěn me huì bù zhī dào,How come you don't know this?,334830,fucongcong,38690,0,tts,,0,7,6.40,0|0|-6.396|0|334830,core,false
+怎么,这东西怎么吃啊？,這東西怎麼吃啊？,zhè dōng xī zěn me chī a,How does one eat this?,10617194,DaoSeng,1490279,0,tts,,0,7,5.99,0|0|-5.990|0|10617194,core,false
 不,我不知道。,我不知道。,wǒ bù zhī dào,I don't know.,10,Sprachprofi,349064,0,tts,,0,4,6.56,0|0|-6.560|1|10,core,false
 不,这不可能！,这不可能！,zhè bù kě néng,It can't be!,334699,fucongcong,1501,0,tts,,0,4,6.48,0|0|-6.483|1|334699,core,false
 所有,所有鸟都会飞吗？,所有鸟都会飞吗？,suǒ yǒu niǎo dū huì fēi ma,Can all birds fly?,677005,sysko,444178,0,tts,,0,7,5.83,0|1|-5.827|0|677005,core,false
@@ -43,43 +43,42 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 多,她有很多事要做。,她有很多事要做。,tā yǒu hěn duō shì yào zuò,She has plenty of work to do.,332760,fucongcong,311528,0,tts,,0,7,6.16,0|0|-6.163|0|332760,core,false
 一些,他要了一些钱。,他要了一些錢。,tā yào le yì xiē qián,He asked for some money.,832973,Martha,295461,0,tts,,0,6,6.35,0|1|-6.352|0|832973,core,false
 一些,我有一些钱。,我有一些錢。,wǒ yǒu yì xiē qián,I have some money.,1962158,egg0073,258649,0,tts,,0,5,6.31,0|1|-6.315|0|1962158,core,false
-少,你的电话是多少？,你的电话是多少？,nǐ de diàn huà shì duō shǎo,What's your phone number?,10966785,xjjAstrus,466624,0,tts,,0,7,6.51,0|1|-6.508|0|10966785,core,false
-少,这是多少？,這是多少？,zhè shì duō shǎo,How much is this?,6047133,xjjAstrus,925040,0,tts,,0,4,6.43,0|1|-6.430|1|6047133,core,false
+少,很少人这么认为。,很少人这么认为。,hěn shǎo rén zhè me rèn wéi,Few people think so.,332422,fucongcong,51060,0,tts,,1,7,5.76,1|0|-5.763|0|332422,core,false
+少,这样想的人很少。,这样想的人很少。,zhè yàng xiǎng de rén hěn shǎo,Few people think so.,788636,bfsutian,51060,0,tts,,1,7,6.26,1|1|-6.256|0|788636,core,false
 其他,其他的一切都好。,其他的一切都好。,qí tā de yí qiè dōu hǎo,Everything else is fine.,332555,fucongcong,33599,0,tts,,0,7,6.40,0|0|-6.398|0|332555,core,false
 其他,其他学生都笑了。,其他学生都笑了。,qí tā xué shēng dōu xiào le,The other students laughed.,9453452,BobbyLee,3402129,0,tts,,0,7,6.10,0|1|-6.096|0|9453452,core,false
-一,下一个是我吗？,下一個是我嗎？,xià yí gè shì wǒ ma,Am I next?,13275168,LeviHighway,11651974,0,tts,,0,6,6.66,0|0|-6.662|0|13275168,core,false
-一,他和我一样高。,他和我一样高。,tā hé wǒ yí yàng gāo,He's as tall as me.,333772,fucongcong,5528543,0,tts,,0,6,6.40,0|0|-6.398|0|333772,core,false
-二,不，是二手的。,不，是二手的。,bú shì èr shǒu de,"No, it's second-hand.",6017295,xjjAstrus,13201836,0,tts,,1,5,6.41,1|1|-6.412|0|6017295,core,false
-二,是的，下个星期二。,是的，下個星期二。,shì de xià gè xīng qī èr,"Yes, next Tuesday.",6057731,xjjAstrus,9408774,0,tts,,1,7,5.85,1|1|-5.855|0|6057731,core,false
+一,我要一个。,我要一个。,wǒ yào yí gè,I needed one.,9970092,GlossaMatik,2873264,0,tts,,0,4,6.66,0|1|-6.657|1|9970092,core,false
+一,我们有一个吗？,我们有一个吗？,wǒ men yǒu yí gè ma,Do we have one?,5549988,verdastelo9604,2649164,0,tts,,0,6,6.61,0|1|-6.612|0|5549988,core,false
+二,第二课很简单。,第二課很簡單。,dì èr kè hěn jiǎn dān,Lesson Two is easy.,346863,nickyeow,276007,0,tts,,1,6,5.05,1|1|-5.047|0|346863,core,false
+二,我不能一心二用。,我不能一心二用。,wǒ bù néng yì xīn èr yòng,I can't do two things at once.,372373,nickyeow,2301957,0,tts,,1,7,4.88,1|1|-4.883|0|372373,core,false
 三,我们是三个人。,我們是三個人。,wǒ men shì sān gè rén,We are three people.,6057674,xjjAstrus,7782953,0,tts,,0,6,6.41,0|1|-6.412|0|6057674,core,false
 三,这我要三个。,这我要三个。,zhè wǒ yào sān gè,I'd like three of these.,462042,fucongcong,54957,0,tts,,0,5,6.33,0|1|-6.325|0|462042,core,false
-四,四月来了，又走了。,四月來了，又走了。,sì yuè lái le yòu zǒu le,April came and went.,13175397,LeviHighway,11050194,0,tts,,1,7,6.15,1|1|-6.150|0|13175397,core,false
 四,我有四个孩子。,我有四个孩子。,wǒ yǒu sì gè hái zi,I have four children.,4831137,feichaishu,4091700,0,tts,,1,6,6.06,1|1|-6.062|0|4831137,core,false
+四,我四点要离开。,我四點要離開。,wǒ sì diǎn yào lí kāi,I am leaving at four.,917776,Martha,72584,0,tts,,1,6,5.66,1|1|-5.657|0|917776,core,false
 五,五个人死了。,五個人死了。,wǔ gè rén sǐ le,Five people died.,13206622,LeviHighway,6442751,0,tts,,1,5,6.01,1|1|-6.015|0|13206622,core,false
 五,我们家有五口人。,我们家有五口人。,wǒ men jiā yǒu wǔ kǒu rén,Our family consists of five members.,493521,biglion,24187,0,tts,,1,7,5.89,1|1|-5.890|0|493521,core,false
 大,好大的狗！,好大的狗！,hǎo dà de gǒu,What a huge dog!,10508845,DaoSeng,572577,0,tts,,0,4,6.36,0|0|-6.357|1|10508845,core,false
-大,大家在说什么啊？,大家在說什麼啊？,dà jiā zài shuō shén me a,What's everyone talking about?,13550655,LeviHighway,6373572,0,tts,,0,7,6.31,0|0|-6.306|0|13550655,core,false
-长,你长这么大了!,你長這麼大了!,nǐ zhǎng zhè me dà le,How you've grown!,777701,Martha,275477,0,tts,,0,6,6.31,0|1|-6.306|0|777701,core,false
+大,这个好大啊。,這個好大啊。,zhè ge hǎo dà a,This one is so big.,13504537,LeviHighway,13635708,0,tts,,0,5,6.17,0|0|-6.173|0|13504537,core,false
 长,你的头发太长了。,你的頭髮太長了。,nǐ de tóu fà tài zhǎng le,Your hair is too long.,425414,nickyeow,16926,0,tts,,0,7,6.29,0|1|-6.285|0|425414,core,false
+长,他的腿很长。,他的腿很长。,tā de tuǐ hěn zhǎng,He has long legs.,453742,peipei,287067,0,tts,,0,5,6.25,0|1|-6.246|0|453742,core,false
 宽,海非常宽。,海非常宽。,hǎi fēi cháng kuān,The sea is very wide.,782693,fucongcong,22230,0,tts,,0,4,5.04,0|1|-5.040|1|782693,core,false
 宽,汤姆肩膀很宽。,汤姆肩膀很宽。,tāng mǔ jiān bǎng hěn kuān,Tom has very broad shoulders.,10048873,GlossaMatik,5412622,0,tts,,2,6,4.73,2|1|-4.732|0|10048873,core,false
 厚,这本书好厚。,這本書好厚。,zhè běn shū hǎo hòu,This book is too thick.,6321863,xjjAstrus,6379584,0,tts,,1,5,5.42,1|1|-5.420|0|6321863,core,false
 厚,这本书非常厚。,这本书非常厚。,zhè běn shū fēi cháng hòu,This book is very thick.,839835,fucongcong,682176,0,tts,,1,6,5.26,1|1|-5.258|0|839835,core,false
-重,那其实不重要了。,那其實不重要了。,nà qí shí bú zhòng yào le,It doesn't really matter.,10551914,DaoSeng,2272039,0,tts,,0,7,6.22,0|0|-6.218|0|10551914,core,false
-重,这非常重要。,這非常重要。,zhè fēi cháng zhòng yào,This is very important.,10361401,DaoSeng,463326,0,tts,,0,5,6.01,0|0|-6.007|0|10361401,core,false
+重,我的书很重。,我的书很重。,wǒ de shū hěn zhòng,My book is very heavy.,2915893,j0rd4nkzf,2915895,0,tts,,0,5,6.30,0|1|-6.300|0|2915893,core,false
+重,这台电视很重。,这台电视很重。,zhè tái diàn shì hěn zhòng,This television is very heavy.,2915889,j0rd4nkzf,2915890,0,tts,,0,6,5.74,0|1|-5.742|0|2915889,core,false
 小,有小的吗？,有小的嗎？,yǒu xiǎo de ma,Do you have small ones?,6158462,xjjAstrus,6276499,0,tts,,0,4,6.76,0|1|-6.760|1|6158462,core,false
-小,我不看他的小说。,我不看他的小說。,wǒ bú kàn tā de xiǎo shuō,I do not read his novels.,364928,nickyeow,286737,0,tts,,0,7,6.59,0|1|-6.587|0|364928,core,false
+小,有一个小问题。,有一个小问题。,yǒu yí gè xiǎo wèn tí,There's one small problem.,10740689,megamanenm,2663476,0,tts,,0,6,6.37,0|1|-6.367|0|10740689,core,false
 短,她的头发很短。,她的头发很短。,tā de tóu fà hěn duǎn,Her hair is very short.,687036,peipei,309629,0,tts,,0,6,5.96,0|1|-5.964|0|687036,core,false
 短,他把头发剪短了。,他把头发剪短了。,tā bǎ tóu fā jiǎn duǎn le,He had his hair cut short.,333115,fucongcong,302449,0,tts,,1,7,5.55,1|0|-5.548|0|333115,core,false
 窄,到村庄有条窄路。,到村莊有條窄路。,dào cūn zhuāng yǒu tiáo zhǎi lù,There's narrow road to the village.,798069,Martha,45550,0,tts,,2,7,5.15,2|1|-5.150|0|798069,core,false
 薄,把肉切成薄片。,把肉切成薄片。,bǎ ròu qiè chéng báo piàn,Cut the meat into thin slices.,395212,nickyeow,281021,0,tts,,2,6,4.33,2|1|-4.332|0|395212,core,false
-薄,女人薄情善变。,女人薄情善变。,nǚ rén bó qíng shàn biàn,A woman is ever fickle and changeable.,4764586,ryanwoo,4761456,0,tts,,2,6,3.98,2|1|-3.983|0|4764586,core,false
 女人,我是女人。,我是女人。,wǒ shì nǚ rén,I'm a woman.,747591,Shishir,1122514,0,tts,,0,4,6.52,0|1|-6.523|1|747591,core,false
 女人,你是个女人。,你是个女人。,nǐ shì gè nǚ rén,You're a woman.,9961365,GlossaMatik,1228740,0,tts,,0,5,6.42,0|1|-6.418|0|9961365,core,false
 男人,我是个男人。,我是个男人。,wǒ shì gè nán rén,I'm a man.,333655,fucongcong,580774,0,tts,,0,5,6.46,0|0|-6.465|0|333655,core,false
 男人,男人应该工作。,男人应该工作。,nán rén yīng gāi gōng zuò,Men should work.,334672,fucongcong,1479231,0,tts,,0,6,5.74,0|0|-5.743|0|334672,core,false
-人,没人喜欢我。,沒人喜歡我。,méi rén xǐ huān wǒ,Nobody likes me.,10541696,DaoSeng,6220052,0,tts,,0,5,6.37,0|0|-6.373|0|10541696,core,false
-人,没有人理解我。,没有人理解我。,méi yǒu rén lǐ jiě wǒ,Nobody understands me.,334907,fucongcong,1484,0,tts,,0,6,6.31,0|0|-6.312|0|334907,core,false
+人,我们是人。,我们是人。,wǒ men shì rén,We're humans.,335262,fucongcong,9494304,0,tts,,0,4,6.81,0|1|-6.813|1|335262,core,false
+人,你和我都是男人。,你和我都是男人。,nǐ hé wǒ dōu shì nán rén,Both you and I are men.,4845084,pig8322,2684788,0,tts,,0,7,6.61,0|1|-6.610|0|4845084,core,false
 孩子,这是谁的孩子 ?,這是誰的孩子 ?,zhè shì shuí de hái zi,Whose child is this?,13259257,mimosawang,8764395,0,tts,,0,6,6.62,0|1|-6.620|0|13259257,core,false
 孩子,你的孩子多大了？,你的孩子多大了？,nǐ de hái zi duō dà le,How old are your children?,478790,biglion,64463,0,tts,,0,7,6.61,0|1|-6.613|0|478790,core,false
 妻子,这是我的妻子。,这是我的妻子。,zhè shì wǒ de qī zǐ,This is my wife.,5640760,verdastelo9604,1898100,0,tts,,0,6,6.73,0|1|-6.732|0|5640760,core,false
@@ -87,7 +86,7 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 丈夫,他是我丈夫。,他是我丈夫。,tā shì wǒ zhàng fū,He is my husband.,13260802,atitarev,3534048,0,tts,,0,5,6.41,0|1|-6.407|0|13260802,core,false
 丈夫,我丈夫也是老师。,我丈夫也是老师。,wǒ zhàng fū yě shì lǎo shī,"My husband is a teacher, too.",12686310,soueihin,8341253,0,tts,,0,7,6.19,0|1|-6.188|0|12686310,core,false
 妈妈,这是我的妈妈。,这是我的妈妈。,zhè shì wǒ de mā mā,This is my mother.,330581,vermouthmjl,413771,0,tts,,0,6,6.77,0|1|-6.766|0|330581,core,false
-妈妈,他和妈妈来的。,他和媽媽來的。,tā hé mā mā lái de,He came with his brother.,13117558,LeviHighway,7384666,0,tts,,0,6,6.60,0|1|-6.604|0|13117558,core,false
+妈妈,他问了我的妈妈。,他问了我的妈妈。,tā wèn le wǒ de mā mā,He asked my mother.,760707,ednorog,749761,0,tts,,0,7,6.57,0|1|-6.572|0|760707,core,false
 爸爸,你爸爸很高。,你爸爸很高。,nǐ bà bà hěn gāo,Your father is tall.,334118,fucongcong,70957,0,tts,,0,5,5.90,0|0|-5.900|0|334118,core,false
 爸爸,他是我的爸爸。,他是我的爸爸。,tā shì wǒ de bà bà,He's my father.,6051010,verdakoro,1109899,0,tts,,0,6,6.69,0|1|-6.694|0|6051010,core,false
 动物,他喜欢动物。,他喜歡動物。,tā xǐ huān dòng wù,He likes animals.,10355118,DaoSeng,2805893,0,tts,,0,5,5.86,0|0|-5.857|0|10355118,core,false
@@ -110,15 +109,13 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 水果,你吃了多少水果？,你吃了多少水果？,nǐ chī le duō shǎo shuǐ guǒ,How much fruit did you eat?,13543159,LeviHighway,9337211,0,tts,,0,7,5.88,0|1|-5.878|0|13543159,core,false
 叶子,叶子落了。,叶子落了。,yè zi là le,The leaves fell.,1411639,asosan,324880,0,tts,,1,4,5.17,1|1|-5.167|1|1411639,core,false
 叶子,秋天，叶子会落下。,秋天，叶子会落下。,qiū tiān yè zi huì là xià,The leaves fall in autumn.,667351,albuseer,5165604,0,tts,,2,7,4.59,2|1|-4.593|0|667351,core,false
-根,他根本不相信我。,他根本不相信我。,tā gēn běn bù xiāng xìn wǒ,He doesn't believe me at all.,408843,fucongcong,260520,0,tts,,0,7,6.24,0|1|-6.236|0|408843,core,false
-根,你根本没有注意。,你根本沒有注意。,nǐ gēn běn méi yǒu zhù yì,You're not even paying attention.,6673088,verdastelo9604,3185880,0,tts,,0,7,5.96,0|1|-5.955|0|6673088,core,false
 树皮,桦树有白树皮。,桦树有白树皮。,huà shù yǒu bái shù pí,Birch trees have white bark.,10752795,GlossaMatik,3317907,0,tts,,1,6,4.32,1|1|-4.320|0|10752795,core,false
 花,这花是黄的。,這花是黃的。,zhè huā shì huáng de,The flower is yellow.,5581827,verdastelo9604,4308372,0,tts,,0,5,6.39,0|1|-6.392|0|5581827,core,false
 花,这是花吗？,这是花吗？,zhè shì huā ma,Is this a flower?,1187312,Vortarulo,1187305,0,tts,,0,4,6.38,0|1|-6.385|1|1187312,core,false
-草,我吃了你的草莓。,我吃了你的草莓。,wǒ chī le nǐ de cǎo méi,I ate your strawberries.,8848658,crescat,6796815,0,tts,,1,7,6.36,1|1|-6.362|0|8848658,core,false
-草,你喜欢草莓吗？,你喜歡草莓嗎？,nǐ xǐ huān cǎo méi ma,Do you like strawberries?,6392169,verdastelo9604,982239,0,tts,,1,6,5.73,1|1|-5.725|0|6392169,core,false
-绳子,绳子按米卖。,繩子按米賣。,shéng zi àn mǐ mài,String is sold by the metre.,10518640,DaoSeng,10516010,0,tts,,0,5,4.89,0|1|-4.895|0|10518640,core,false
-绳子,他抓住了绳子。,他抓住了绳子。,tā zhuā zhù le shéng zi,He caught the cord.,510886,fucongcong,1008568,0,tts,,1,6,5.55,1|1|-5.547|0|510886,core,false
+草,从草地里出来。,從草地裏出來。,cóng cǎo dì lǐ chū lái,Stay off the grass.,5295474,xjjAstrus,1538934,0,tts,,1,6,5.47,1|1|-5.473|0|5295474,core,false
+草,我躺在草地上。,我躺在草地上。,wǒ tǎng zài cǎo dì shàng,I lie on the grass.,785072,Martha,265292,0,tts,,1,6,5.39,1|1|-5.390|0|785072,core,false
+绳子,我放开了绳子。,我放开了绳子。,wǒ fàng kāi le shéng zi,I let go of the rope.,924076,jessie0422,261966,0,tts,,1,6,5.53,1|1|-5.532|0|924076,core,false
+绳子,绳子被拉断了。,繩子被拉斷了。,shéng zi bèi lā duàn le,The rope broke under the strain.,866182,Martha,240989,0,tts,,1,6,5.22,1|1|-5.223|0|866182,core,false
 皮肤,你的皮肤真好。,你的皮膚真好。,nǐ de pí fū zhēn hǎo,You have nice skin.,776933,Martha,754751,0,tts,,0,6,6.18,0|1|-6.184|0|776933,core,false
 皮肤,她的皮肤光滑。,她的皮膚光滑。,tā de pí fū guāng huá,Her skin is smooth.,892495,Martha,309622,0,tts,,1,6,5.60,1|1|-5.603|0|892495,core,false
 肉,我不喜欢吃肉了。,我不喜歡吃肉了。,wǒ bù xǐ huān chī ròu le,I don't like eating meat.,6057151,xjjAstrus,7795620,0,tts,,0,7,6.17,0|1|-6.173|0|6057151,core,false
@@ -127,14 +124,13 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 血,您的血压很低。,您的血壓很低。,nín de xuè yā hěn dī,Your blood pressure's low.,10335033,DaoSeng,3831480,0,tts,,1,6,5.71,1|0|-5.714|0|10335033,core,false
 蛋,你的蛋要怎么做?,你的蛋要怎麼做?,nǐ de dàn yào zěn me zuò,How do you like your eggs done?,882158,Martha,325223,0,tts,,0,7,6.27,0|1|-6.265|0|882158,core,false
 蛋,这是个蛋。,這是箇蛋。,zhè shì gè dàn,This is an egg.,5576780,verdastelo9604,1761900,0,tts,,0,4,6.17,0|1|-6.172|1|5576780,core,false
-角,他站在街角。,他站在街角。,tā zhàn zài jiē jiǎo,He was standing at the street corner.,333711,fucongcong,301685,0,tts,,1,5,5.67,1|0|-5.665|0|333711,core,false
-角,你摔角吗？,你摔角嗎？,nǐ shuāi jiǎo ma,Do you wrestle?,13138266,LeviHighway,11950320,0,tts,,1,4,5.44,1|0|-5.443|1|13138266,core,false
+角,牛有角。,牛有角。,niú yǒu jiǎo,Cows have horns.,10522506,DaoSeng,1739383,0,tts,,1,3,5.37,1|1|-5.370|1|10522506,scaffold,false
 尾巴,有没有尾巴的猫。,有沒有尾巴的貓。,yǒu méi yǒu wěi ba de māo,There are cats without tails.,805688,cherylting,13591452,0,tts,,1,7,5.43,1|1|-5.433|0|805688,core,false
 尾巴,小狗摆著尾巴。,小狗擺著尾巴。,xiǎo gǒu bǎi zhù wěi ba,The dog was wagging his tail.,349767,nickyeow,48272,0,tts,,2,6,3.79,2|1|-3.790|0|349767,core,false
 头发,他的头发很长。,他的頭髮很長。,tā de tóu fà hěn zhǎng,He has long hair.,368143,nickyeow,705440,0,tts,,0,6,6.24,0|1|-6.236|0|368143,core,false
 头发,他有长头发。,他有長頭髮。,tā yǒu zhǎng tóu fà,He has long hair.,770360,Martha,705440,0,tts,,0,5,5.99,0|1|-5.987|0|770360,core,false
-头,我咬了我的舌头。,我咬了我的舌頭。,wǒ yǎo le wǒ de shé tou,I bit my tongue.,10368743,DaoSeng,2226329,0,tts,,0,7,6.24,0|0|-6.240|0|10368743,core,false
-头,这是什么石头？,这是什么石头？,zhè shì shén me shí tou,What kind of stone is this?,5613672,verdastelo9604,55856,0,tts,,0,6,6.16,0|1|-6.162|0|5613672,core,false
+头,我的头疼。,我的头疼。,wǒ de tóu téng,My head aches.,338784,Sprachprofi,280125,0,tts,,1,4,6.18,1|1|-6.180|1|338784,core,false
+头,我的头要炸了。,我的頭要炸了。,wǒ de tóu yào zhà le,My head is exploding.,6064597,verdastelo9604,1124833,0,tts,,1,6,6.08,1|1|-6.078|0|6064597,core,false
 耳朵,我们用耳朵听。,我们用耳朵听。,wǒ men yòng ěr duǒ tīng,We hear with our ears.,5640781,verdastelo9604,248818,0,tts,,0,6,5.65,0|1|-5.645|0|5640781,core,false
 耳朵,我的耳朵受伤了。,我的耳朵受伤了。,wǒ de ěr duǒ shòu shāng le,My ears hurt.,2338680,anndiana,1293141,0,tts,,1,7,6.22,1|1|-6.224|0|2338680,core,false
 眼睛,眼睛是心的语言。,眼睛是心的語言。,yǎn jīng shì xīn de yǔ yán,The eyes are the language of the heart.,11980896,corina,10766614,0,tts,,0,7,6.12,0|1|-6.120|0|11980896,core,false
@@ -142,57 +138,56 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 鼻子,他的鼻子很长。,他的鼻子很长。,tā de bí zi hěn zhǎng,He has a long nose.,677003,sysko,296383,0,tts,,0,6,6.14,0|1|-6.144|0|677003,core,false
 鼻子,用你的鼻子呼吸。,用你的鼻子呼吸。,yòng nǐ de bí zi hū xī,Breathe through your nose.,4845078,pig8322,4666280,0,tts,,0,7,5.84,0|1|-5.844|0|4845078,core,false
 嘴,我的嘴裂开了。,我的嘴裂开了。,wǒ de zuǐ liè kāi le,I have chapped lips.,334318,fucongcong,268877,0,tts,,1,6,6.00,1|0|-6.000|0|334318,core,false
-嘴,我说过了，闭嘴！,我说过了，闭嘴！,wǒ shuō guò le bì zuǐ,I said shut up!,2499996,fenfang557,1453550,0,tts,,1,6,6.11,1|1|-6.112|0|2499996,core,false
+嘴,闭上你的嘴。,闭上你的嘴。,bì shàng nǐ de zuǐ,Shut your mouth.,1691765,sadhen,240561,0,tts,,1,5,5.60,1|1|-5.598|0|1691765,core,false
 牙齿,乌龟没有牙齿。,烏龜沒有牙齒。,wū guī méi yǒu yá chǐ,Turtles don't have teeth.,5444617,Balamax,5308161,0,tts,,1,6,4.82,1|1|-4.817|0|5444617,core,false
+舌头,我咬了我的舌头。,我咬了我的舌頭。,wǒ yǎo le wǒ de shé tou,I bit my tongue.,10368743,DaoSeng,2226329,0,tts,,0,7,6.24,0|0|-6.240|0|10368743,core,false
 指甲,不要再咬指甲了。,不要再咬指甲了。,bú yào zài yǎo zhǐ jiǎ le,Stop biting your nails.,1423346,cienias,501792,0,tts,,0,7,5.39,0|1|-5.394|0|1423346,core,false
 指甲,我的指甲断了。,我的指甲断了。,wǒ de zhǐ jiǎ duàn le,I broke a nail.,1319931,shanghainese,1318534,0,tts,,1,6,6.05,1|1|-6.046|0|1319931,core,false
 脚,洗你的脚。,洗你的脚。,xǐ nǐ de jiǎo,Wash your feet.,487593,fucongcong,274488,0,tts,,0,4,5.99,0|1|-5.992|1|487593,core,false
 脚,洗您的脚。,洗您的脚。,xǐ nín de jiǎo,Wash your feet.,487590,fucongcong,274488,0,tts,,0,4,5.69,0|1|-5.692|1|487590,core,false
 腿,不要拉我的腿！,不要拉我的腿！,bú yào lā wǒ de tuǐ,Don't pull my leg!,332560,fucongcong,268459,0,tts,,0,6,6.08,0|0|-6.076|0|332560,core,false
-腿,他的腿很长。,他的腿很长。,tā de tuǐ hěn zhǎng,He has long legs.,453742,peipei,287067,0,tts,,0,5,6.25,0|1|-6.246|0|453742,core,false
+腿,他的腿受伤了。,他的腿受伤了。,tā de tuǐ shòu shāng le,He was injured in the leg.,1577198,GlossaMatik,1577214,0,tts,,1,6,6.26,1|1|-6.256|0|1577198,core,false
 膝盖,我的膝盖疼。,我的膝蓋疼。,wǒ de xī gài téng,My knee aches.,10368432,DaoSeng,6588377,0,tts,,1,5,5.77,1|1|-5.770|0|10368432,core,false
-手,我在找我的手机。,我在找我的手機。,wǒ zài zhǎo wǒ de shǒu jī,I'm looking for my cellphone.,10461343,DaoSeng,4058015,0,tts,,0,7,6.63,0|0|-6.630|0|10461343,core,false
-手,我没有手机了。,我没有手机了。,wǒ méi yǒu shǒu jī le,I don't have a cellphone anymore.,2113917,sysko,2113918,0,tts,,0,6,6.47,0|1|-6.473|0|2113917,core,false
+手,你的手真冷。,你的手真冷。,nǐ de shǒu zhēn lěng,Your hands are so cold.,3669422,trieuho,3669423,0,tts,,0,5,5.97,0|1|-5.974|0|3669422,core,false
+手,洗你们的手。,洗你們的手。,xǐ nǐ men de shǒu,Wash your hands.,10450777,DaoSeng,464330,0,tts,,0,5,5.87,0|1|-5.867|0|10450777,core,false
 翅膀,鸟有翅膀。,鸟有翅膀。,niǎo yǒu chì bǎng,Birds have wings.,352611,zhouj1955,1476885,0,tts,,0,4,5.17,0|1|-5.173|1|352611,core,false
 肚子,我打了他的肚子。,我打了他的肚子。,wǒ dǎ le tā de dǔ zi,I hit him in the belly.,846375,Martha,401967,0,tts,,0,7,6.41,0|1|-6.412|0|846375,core,false
-肚子,我肚子非常饿。,我肚子非常饿。,wǒ dǔ zi fēi cháng è,I'm so hungry!,1174610,Vortarulo,1213515,0,tts,,1,6,5.36,1|1|-5.357|0|1174610,core,false
+肚子,我肚子疼。,我肚子疼。,wǒ dǔ zi téng,My stomach hurts.,396056,GlossaMatik,28159,0,tts,,1,4,5.00,1|1|-5.005|1|396056,core,false
 脖子,我的脖子还疼。,我的脖子还疼。,wǒ de bó zi hái téng,My neck still hurts.,5631912,verdastelo9604,3436690,0,tts,,1,6,5.96,1|1|-5.958|0|5631912,core,false
 脖子,我脖子痛。,我脖子痛。,wǒ bó zi tòng,My neck hurts.,4490360,egg0073,2471465,0,tts,,1,4,5.24,1|1|-5.237|1|4490360,core,false
 背,请帮我洗背。,請幫我洗背。,qǐng bāng wǒ xǐ bèi,Please wash my back.,4493478,egg0073,282468,0,tts,,0,5,5.42,0|1|-5.418|0|4493478,core,false
-背,谁背叛我们？,誰背叛我們？,shuí bèi pàn wǒ men,Who betrayed us?,13524173,LeviHighway,2296177,0,tts,,1,5,5.53,1|0|-5.527|0|13524173,core,false
-心,您不担心吗？,您不擔心嗎？,nín bù dān xīn ma,Aren't you worried?,10298153,DaoSeng,6091213,0,tts,,0,5,5.99,0|0|-5.987|0|10298153,core,false
-心,我担心他的健康。,我担心他的健康。,wǒ dān xīn tā de jiàn kāng,I was worried about his health.,5691278,verdastelo9604,260589,0,tts,,0,7,6.37,0|1|-6.366|0|5691278,core,false
-肝,她哭得肝肠寸断。,她哭得肝腸寸斷。,tā kū dé gān cháng cùn duàn,She cried her heart out.,772138,Martha,310880,0,tts,,2,7,4.33,2|1|-4.330|0|772138,core,false
+背,我背不好。,我背不好。,wǒ bèi bù hǎo,I have back problems.,10533266,DaoSeng,1887359,0,tts,,1,4,5.50,1|0|-5.500|1|10533266,core,false
+心,这是我的真心话。,這是我的真心話。,zhè shì wǒ de zhēn xīn huà,I say this from my heart.,494468,nickyeow,33525,0,tts,,1,7,6.38,1|1|-6.378|0|494468,core,false
+心,你住在我心里。,你住在我心裡。,nǐ zhù zài wǒ xīn lǐ,You live in my heart.,4490242,egg0073,687942,0,tts,,1,6,6.22,1|1|-6.222|0|4490242,core,false
 喝,我什么都不想喝。,我什么都不想喝。,wǒ shén me dōu bù xiǎng hē,I don't want anything to drink.,332566,fucongcong,256125,0,tts,,0,7,6.00,0|0|-5.998|0|332566,core,false
 喝,有什么喝的吗？,有什么喝的吗？,yǒu shén me hē de ma,Do you have any drinks?,410500,GlossaMatik,410497,0,tts,,0,6,6.49,0|1|-6.490|0|410500,core,false
 吃,他们已经吃过了。,他們已經吃過了。,tā men yǐ jīng chī guò le,They've already eaten.,10715265,DaoSeng,3488501,0,tts,,0,7,6.27,0|0|-6.270|0|10715265,core,false
 吃,你想吃什么？,你想吃什么？,nǐ xiǎng chī shén me,What do you want to eat?,419672,GlossaMatik,372015,0,tts,,0,5,6.17,0|0|-6.170|0|419672,core,false
 咬,你的狗咬人吗？,你的狗咬人吗？,nǐ de gǒu yǎo rén ma,Does your dog bite?,340699,aaroned,340503,0,tts,,0,6,6.23,0|1|-6.230|0|340699,core,false
 咬,会叫的狗不咬人。,會叫的狗不咬人。,huì jiào de gǒu bù yǎo rén,Barking dogs never bite.,754618,Martha,2601523,0,tts,,0,7,6.14,0|1|-6.139|0|754618,core,false
-吸,你在呼吸吗？,你在呼吸嗎？,nǐ zài hū xī ma,Are you breathing?,10365079,DaoSeng,1102727,0,tts,,0,5,6.21,0|0|-6.210|0|10365079,core,false
-吸,您在呼吸吗？,您在呼吸嗎？,nín zài hū xī ma,Are you breathing?,10268921,DaoSeng,1102727,0,tts,,0,5,5.91,0|0|-5.910|0|10268921,core,false
-吐,我要吐了。,我要吐了。,wǒ yào tǔ le,I'm going to throw up.,13914750,jan_OkulaJu,2547197,0,tts,,0,4,6.24,0|1|-6.240|1|13914750,core,false
-吐,我昨晚吐了。,我昨晚吐了。,wǒ zuó wǎn tǔ le,Last night I puked.,10333111,DaoSeng,1593333,0,tts,,1,5,5.76,1|0|-5.760|0|10333111,core,false
+吸,吸我的鸡巴。,吸我的鸡巴。,xī wǒ de jī bā,Suck my dick.,2298595,sysko,462480,0,tts,,1,5,5.86,1|1|-5.855|0|2298595,core,false
+吸,海绵吸水。,海绵吸水。,hǎi mián xī shuǐ,A sponge absorbs water.,677985,Martha,51613,0,tts,,2,4,3.50,2|1|-3.505|1|677985,core,false
+吐,禁止吐痰。,禁止吐痰。,jìn zhǐ tǔ tán,Spitting is prohibited.,11239888,klzlueylx,2267745,0,tts,,2,4,3.62,2|1|-3.625|1|11239888,core,false
 吹,我不想吹牛。,我不想吹牛。,wǒ bù xiǎng chuī niú,I don't mean to brag.,13137879,LeviHighway,7915493,0,tts,,1,5,5.22,1|0|-5.217|0|13137879,core,false
-吹,你有带吹风机吗？,你有帶吹風機嗎？,nǐ yǒu dài chuī fēng jī ma,Did you bring a hair dryer?,2595828,egg0073,980596,0,tts,,1,7,5.62,1|1|-5.618|0|2595828,core,false
-呼吸,他在呼吸吗?,他在呼吸嗎?,tā zài hū xī ma,Is he breathing?,772142,Martha,239892,0,tts,,0,5,6.21,0|1|-6.205|0|772142,core,false
-呼吸,汤姆有呼吸问题。,湯姆有呼吸問題。,tāng mǔ yǒu hū xī wèn tí,Tom has breathing problems.,13109766,LeviHighway,12116889,0,tts,,1,7,5.36,1|0|-5.355|0|13109766,core,false
-笑,他总是在笑。,他总是在笑。,tā zǒng shì zài xiào,He's always smiling.,334059,fucongcong,1211565,0,tts,,0,5,6.06,0|0|-6.060|0|334059,core,false
+吹,风从东方吹来。,風從東方吹來。,fēng cóng dōng fāng chuī lái,The wind is blowing from the east.,895737,Martha,319709,0,tts,,1,6,5.44,1|1|-5.436|0|895737,core,false
+呼吸,你在呼吸吗？,你在呼吸嗎？,nǐ zài hū xī ma,Are you breathing?,10365079,DaoSeng,1102727,0,tts,,0,5,6.21,0|0|-6.210|0|10365079,core,false
+呼吸,您在呼吸吗？,您在呼吸嗎？,nín zài hū xī ma,Are you breathing?,10268921,DaoSeng,1102727,0,tts,,0,5,5.91,0|0|-5.910|0|10268921,core,false
 笑,别让我笑出来。,別讓我笑出來。,bié ràng wǒ xiào chū lái,Don't make me laugh.,10569124,DaoSeng,29948,0,tts,,0,6,5.89,0|0|-5.894|0|10569124,core,false
+笑,我们笑了。,我们笑了。,wǒ men xiào le,We laughed.,5092668,mirrorvan,1922452,0,tts,,0,4,6.29,0|1|-6.290|1|5092668,core,false
 看,您没看到我吗？,您沒看到我嗎？,nín méi kàn dào wǒ ma,Didn't you see me?,10305454,DaoSeng,8470967,0,tts,,0,6,6.14,0|0|-6.142|0|10305454,core,false
 看,我不想看到你。,我不想看到你。,wǒ bù xiǎng kàn dào nǐ,I don't want to see you.,10485553,DaoSeng,2011873,0,tts,,0,6,6.12,0|0|-6.115|0|10485553,core,false
 听,你在听我说吗？,你在听我说吗？,nǐ zài tīng wǒ shuō ma,Do you hear what I'm saying?,332820,fucongcong,2305057,0,tts,,0,6,6.60,0|0|-6.597|0|332820,core,false
-听,我没听过。,我沒聽過。,wǒ méi tīng guò,That's news to me.,13524029,LeviHighway,42323,0,tts,,0,4,6.20,0|0|-6.203|1|13524029,core,false
+听,我听不到你！,我聽不到你！,wǒ tīng bú dào nǐ,I can't hear you!,13319050,LeviHighway,12729203,0,tts,,0,5,6.16,0|0|-6.155|0|13319050,core,false
 知道,你真的想知道吗？,你真的想知道嗎？,nǐ zhēn de xiǎng zhī dào ma,Do you really want to know?,10526690,DaoSeng,1556174,0,tts,,0,7,6.21,0|0|-6.214|0|10526690,core,false
 知道,那有谁会知道呢？,那有誰會知道呢？,nà yǒu shuí huì zhī dào ne,Who would know that?,10640456,DaoSeng,2892882,0,tts,,0,7,6.15,0|0|-6.150|0|10640456,core,false
 想,我没想叫的。,我沒想叫的。,wǒ méi xiǎng jiào de,I didn't mean to yell.,13137889,LeviHighway,2275892,0,tts,,0,5,6.48,0|0|-6.484|0|13137889,core,false
-想,我们已经想好了。,我們已經想好了。,wǒ men yǐ jīng xiǎng hǎo le,We've already decided.,11697455,DaoSeng,4497147,0,tts,,0,7,6.40,0|0|-6.400|0|11697455,core,false
+想,他想做什么？,他想做什麼？,tā xiǎng zuò shén me,What does he mean to do?,13137896,LeviHighway,2080036,0,tts,,0,5,6.27,0|0|-6.272|0|13137896,core,false
 闻,我闻到了什么。,我聞到了什麼。,wǒ wén dào le shén me,I smell something here.,5845644,verdastelo9604,5747627,0,tts,,1,6,6.05,1|1|-6.053|0|5845644,core,false
 闻,我用鼻子闻气味。,我用鼻子聞氣味。,wǒ yòng bí zi wén qì wèi,I smell with my nose.,13826818,LeviHighway,258048,0,tts,,1,7,5.13,1|1|-5.130|0|13826818,core,false
 怕,有点怕很正常。,有點怕很正常。,yǒu diǎn pà hěn zhèng cháng,It's normal to be a little afraid.,10650288,DaoSeng,4017363,0,tts,,0,6,5.37,0|0|-5.372|0|10650288,core,false
 怕,他们怕我。,他们怕我。,tā men pà wǒ,They're afraid of me.,5550260,verdastelo9604,3444573,0,tts,,0,4,6.10,0|1|-6.100|1|5550260,core,false
 睡觉,我该去睡觉了。,我该去睡觉了。,wǒ gāi qù shuì jiào le,I have to go to sleep.,2,fucongcong,1277,0,tts,,0,6,6.19,0|0|-6.192|0|2,core,false
-睡觉,他已经去睡觉了。,他已經去睡覺了。,tā yǐ jīng qù shuì jiào le,He has already gone to bed.,13598177,LeviHighway,293104,0,tts,,0,7,6.16,0|0|-6.158|0|13598177,core,false
+睡觉,我在睡觉。,我在睡觉。,wǒ zài shuì jiào,I'm sleeping.,5580849,grindeldore,2203803,0,tts,,0,4,6.29,0|1|-6.287|1|5580849,core,false
 活,我爱我的生活。,我爱我的生活。,wǒ ài wǒ de shēng huó,I love my life.,465838,fucongcong,436789,0,tts,,0,6,6.67,0|1|-6.672|0|465838,core,false
 活,生活是难的。,生活是难的。,shēng huó shì nán de,Life is hard.,3701334,katshi94,630767,0,tts,,0,5,6.49,0|1|-6.490|0|3701334,core,false
 死,我不想要你死啊。,我不想要你死啊。,wǒ bù xiǎng yào nǐ sǐ a,I don't want you to die.,10667161,DaoSeng,2011876,0,tts,,0,7,6.19,0|0|-6.193|0|10667161,core,false
@@ -204,53 +199,49 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 打猎,他喜欢打猎。,他喜欢打猎。,tā xǐ huān dǎ liè,He likes hunting.,333859,fucongcong,386730,0,tts,,0,5,5.33,0|0|-5.330|0|333859,core,false
 打,我没想打你。,我沒想打你。,wǒ méi xiǎng dǎ nǐ,I didn't mean to hit you.,13138201,LeviHighway,2290413,0,tts,,0,5,6.27,0|0|-6.270|0|13138201,core,false
 打,别再打我了！,別再打我了！,bié zài dǎ wǒ le,Stop hitting me!,10299642,DaoSeng,1908468,0,tts,,0,5,6.19,0|0|-6.192|0|10299642,core,false
-切,到你切了!,到你切了!,dào nǐ qiè le,Your turn to split!,792893,fucongcong,791621,0,tts,,0,4,6.19,0|1|-6.190|1|792893,core,false
-切,我要你切腹。,我要你切腹。,wǒ yào nǐ qiè fù,I want you to commit seppuku.,792600,GlossaMatik,792601,0,tts,,1,5,5.67,1|1|-5.673|0|792600,core,false
-分开,我宁愿分开。,我寧願分開。,wǒ nìng yuàn fēn kāi,I would rather be apart.,750349,Martha,12643060,0,tts,,1,5,5.27,1|1|-5.267|0|750349,core,false
-刺,玫瑰有刺。,玫瑰有刺。,méi guī yǒu cì,Roses have thorns.,10322369,DaoSeng,2549026,0,tts,,1,4,5.17,1|0|-5.173|1|10322369,core,false
-刺,她有刺青吗？,她有刺青吗？,tā yǒu cì qīng ma,Does she have any tattoos?,9982239,BobbyLee,7989653,0,tts,,1,5,5.73,1|1|-5.728|0|9982239,core,false
+切,让我来切胡萝卜。,讓我來切胡蘿蔔。,ràng wǒ lái qiè hú luó bo,Let me cut the carrots.,6937169,xjjAstrus,422956,0,tts,,1,7,5.56,1|1|-5.562|0|6937169,core,false
+切,把土豆切一下。,把土豆切一下。,bǎ tǔ dòu qiè yí xià,Cut the potatoes.,431101,GlossaMatik,431100,0,tts,,1,6,5.04,1|1|-5.037|0|431101,core,false
+刺,汤姆企图刺我。,湯姆企圖刺我。,tāng mǔ qǐ tú cì wǒ,Tom tried to stab me.,5574476,verdastelo9604,5573992,0,tts,,2,6,4.97,2|1|-4.975|0|5574476,core,false
 抓,你的猫抓伤我了。,你的猫抓伤我了。,nǐ de māo zhuā shāng wǒ le,Your cat scratched me.,8696278,crescat,3822753,0,tts,,2,7,6.15,2|1|-6.147|0|8696278,core,false
-抓,这只猫不抓老鼠。,这只猫不抓老鼠。,zhè zhǐ māo bù zhuā lǎo shǔ,This cat doesn't chase mice.,8500215,black333,3011192,0,tts,,2,7,5.57,2|1|-5.567|0|8500215,core,false
 挖,他挖了一个洞。,他挖了一个洞。,tā wā le yí gè dòng,He dug a hole.,414486,fucongcong,295871,0,tts,,1,6,5.84,1|1|-5.844|0|414486,core,false
 游泳,我想游泳。,我想游泳。,wǒ xiǎng yóu yǒng,I wanted to swim.,13117592,LeviHighway,8071239,0,tts,,0,4,5.82,0|0|-5.823|1|13117592,core,false
 游泳,"你会游泳, 不是吗？","你會游泳, 不是嗎？",nǐ huì yóu yǒng bú shì ma,"You can swim, can't you?",793226,Martha,16299,0,tts,,0,7,6.06,0|1|-6.060|0|793226,core,false
-飞,这是他的飞机。,这是他的飞机。,zhè shì tā de fēi jī,This is his plane.,2117476,joulin,2166225,0,tts,,0,6,6.70,0|1|-6.700|0|2117476,core,false
-飞,飞机准备好了。,飞机准备好了。,fēi jī zhǔn bèi hǎo le,The plane is ready.,5900407,verdastelo9604,2685785,0,tts,,0,6,6.01,0|1|-6.013|0|5900407,core,false
-走,他会走的。,他會走的。,tā huì zǒu de,He'll leave.,13210561,LeviHighway,12835518,0,tts,,0,4,6.65,0|0|-6.652|1|13210561,core,false
-走,我走了啊。,我走了啊。,wǒ zǒu le a,I'm leaving.,3865800,DaoSeng,350133,0,tts,,0,4,6.42,0|0|-6.418|1|3865800,core,false
+飞,我很爱飞。,我很爱飞。,wǒ hěn ài fēi,I love flying.,5768184,mao,12624899,0,tts,,0,4,5.99,0|1|-5.987|1|5768184,core,false
+飞,此外，我能飞。,此外，我能飞。,cǐ wài wǒ néng fēi,"Moreover, I can fly.",10484110,BobbyLee,3210934,0,tts,,0,5,5.82,0|1|-5.817|0|10484110,core,false
+走,我和他一起走。,我和他一起走。,wǒ hé tā yì qǐ zǒu,He and I walked together.,908548,Martha,284468,0,tts,,0,6,6.36,0|1|-6.362|0|908548,core,false
+走,你能走吗？,你能走嗎？,nǐ néng zǒu ma,Can you walk?,3713825,egg0073,1453950,0,tts,,0,4,6.29,0|1|-6.295|1|3713825,core,false
 来,你真的应该来的。,你真的應該來的。,nǐ zhēn de yīng gāi lái de,You really should've come.,10626699,DaoSeng,10625922,0,tts,,0,7,6.53,0|0|-6.526|0|10626699,core,false
 来,我现在就来。,我現在就來。,wǒ xiàn zài jiù lái,I'll come right now.,10301648,DaoSeng,241649,0,tts,,0,5,6.53,0|0|-6.525|0|10301648,core,false
 躺,她躺在我身边。,她躺在我身边。,tā tǎng zài wǒ shēn biān,She lies here beside me.,10713940,AwabiJan,249648,0,tts,,1,6,5.98,1|1|-5.976|0|10713940,core,false
-躺,他在床上躺着。,他在床上躺着。,tā zài chuáng shàng tǎng zhe,He stayed in bed.,13361640,Xanthe,10512843,0,tts,,1,6,5.85,1|1|-5.848|0|13361640,core,false
+躺,我躺在床上。,我躺在床上。,wǒ tǎng zài chuáng shàng,I lay on my bed.,2336000,anndiana,258251,0,tts,,1,5,5.82,1|1|-5.822|0|2336000,core,false
 坐,请坐一下。,请坐一下。,qǐng zuò yí xià,Please sit down.,415599,GlossaMatik,415594,0,tts,,0,4,5.41,0|0|-5.413|1|415599,core,false
 坐,我能坐这里吗？,我能坐这里吗？,wǒ néng zuò zhè lǐ ma,Can I sit here?,4757682,ryanwoo,1537275,0,tts,,0,6,6.09,0|1|-6.090|0|4757682,core,false
-站,我找到了网站。,我找到了網站。,wǒ zhǎo dào le wǎng zhàn,I found the website.,13139001,LeviHighway,11549107,0,tts,,0,6,6.29,0|0|-6.295|0|13139001,core,false
 站,你能站起来吗？,你能站起來嗎？,nǐ néng zhàn qǐ lái ma,Can you stand up?,13158651,LeviHighway,1543665,0,tts,,0,6,6.17,0|0|-6.174|0|13158651,core,false
+站,别站起来。,別站起來。,bié zhàn qǐ lái,Don't stand up.,10329166,DaoSeng,325434,0,tts,,0,4,5.58,0|0|-5.577|1|10329166,core,false
 转,把火转小一点。,把火轉小一點。,bǎ huǒ zhuǎn xiǎo yì diǎn,Turn the flame down low.,836431,Martha,25907,0,tts,,0,6,5.48,0|1|-5.480|0|836431,core,false
-转,它会好转的。,它會好轉的。,tā huì hǎo zhuǎn de,It's gotten better.,825913,Martha,435784,0,tts,,1,5,6.10,1|1|-6.103|0|825913,core,false
-掉,我今天晚上死掉。,我今天晚上死掉。,wǒ jīn tiān wǎn shàng sǐ diào,I'm going to die tonight.,9431938,eltacodemex,3155231,0,tts,,0,7,5.65,0|1|-5.652|0|9431938,core,false
-掉,你会把它扔掉吗？,你會把它扔掉嗎？,nǐ huì bǎ tā rēng diào ma,Are you going to throw that away?,10715268,DaoSeng,4017101,0,tts,,1,7,5.92,1|0|-5.915|0|10715268,core,false
-给,这是只给你的。,這是只給你的。,zhè shì zhǐ gěi nǐ de,This is just for you.,6111795,verdastelo9604,3818148,0,tts,,0,6,6.74,0|1|-6.743|0|6111795,core,false
+转,您本应左转的。,您本应左转的。,nín běn yīng zuǒ zhuǎn de,You should've turned left.,10752794,GlossaMatik,3823083,0,tts,,1,6,5.51,1|1|-5.508|0|10752794,core,false
+掉,她的辫子掉了。,她的辮子掉了。,tā de biàn zi diào le,Her pigtail fell out.,13545603,LeviHighway,11535813,0,tts,,1,6,5.88,1|1|-5.880|0|13545603,core,false
+掉,苹果掉了。,蘋果掉了。,píng guǒ diào le,The apple fell.,13166883,LeviHighway,7931595,0,tts,,1,4,5.69,1|1|-5.690|1|13166883,core,false
 给,我给你带了一个。,我給你帶了一個。,wǒ gěi nǐ dài le yí gè,I've got one for you.,6624668,verdastelo9604,2769457,0,tts,,0,7,6.53,0|1|-6.532|0|6624668,core,false
+给,我有工作给你。,我有工作給你。,wǒ yǒu gōng zuò gěi nǐ,I have a job for you.,848838,Martha,237724,0,tts,,0,6,6.53,0|1|-6.530|0|848838,core,false
 拿,我没想要拿。,我沒想要拿。,wǒ méi xiǎng yào ná,I didn't mean to take it.,13138186,LeviHighway,2290420,0,tts,,0,5,5.92,0|0|-5.920|0|13138186,core,false
 拿,我拿了一个给他。,我拿了一个给他。,wǒ ná le yí gè gěi tā,I gave him one of those.,13892013,jan_OkulaJu,3916492,0,tts,,0,7,6.49,0|1|-6.488|0|13892013,core,false
-挤,她挤上了火车。,她擠上了火車。,tā jǐ shàng le huǒ chē,She elbowed her way onto the train.,894075,Martha,317496,0,tts,,2,6,5.32,2|1|-5.322|0|894075,core,false
+挤,别挤了。,別擠了。,bié jǐ le,Stop shoving.,12179898,DaoSeng,10869532,0,tts,,1,3,5.18,1|0|-5.180|1|12179898,scaffold,false
 洗,他正在洗他的车。,他正在洗他的车。,tā zhèng zài xǐ tā de chē,He's washing his car.,408504,fucongcong,7386831,0,tts,,0,7,6.08,0|1|-6.085|0|408504,core,false
-洗,洗你们的手。,洗你們的手。,xǐ nǐ men de shǒu,Wash your hands.,10450777,DaoSeng,464330,0,tts,,0,5,5.87,0|1|-5.867|0|10450777,core,false
-擦,我为老师擦黑板。,我为老师擦黑板。,wǒ wèi lǎo shī cā hēi bǎn,I erased the blackboard for the teacher.,3338935,sadhen,2325182,0,tts,,1,7,5.34,1|1|-5.344|0|3338935,core,false
-擦,她进屋前擦了鞋。,她进屋前擦了鞋。,tā jìn wū qián cā le xié,She scraped her shoes clean before she entered the house.,792898,fucongcong,24198,0,tts,,2,7,5.25,2|1|-5.245|0|792898,core,false
-拉,我把他拉黑了。,我把他拉黑了。,wǒ bǎ tā lā hēi le,I blocked him.,14054833,jan_OkulaJu,14054837,0,tts,,0,6,6.22,0|1|-6.222|0|14054833,core,false
-拉,你是阿拉伯人吗？,你是阿拉伯人嗎？,nǐ shì ā lā bó rén ma,Are you an Arab?,2183839,egg0073,1646252,0,tts,,1,7,6.05,1|1|-6.050|0|2183839,core,false
+洗,父亲让我洗汽车。,父亲让我洗汽车。,fù qīn ràng wǒ xǐ qì chē,My father had me wash the car.,1415761,sadhen,1415668,0,tts,,0,7,5.67,0|1|-5.672|0|1415761,core,false
+擦,这污点擦不掉。,這污點擦不掉。,zhè wū diǎn cā bú diào,This blot can't be wiped out.,1261451,tsayng,61046,0,tts,,2,6,4.15,2|1|-4.150|0|1261451,core,false
+拉,她把我拉到一边。,她把我拉到一边。,tā bǎ wǒ lā dào yì biān,She pulled me aside.,2242083,GlossaMatik,11294079,0,tts,,2,7,5.69,2|1|-5.686|0|2242083,core,false
+拉,她拉上了窗帘。,她拉上了窗簾。,tā lā shàng le chuāng lián,She drew up the curtain.,772137,Martha,310649,0,tts,,2,6,5.30,2|1|-5.305|0|772137,core,false
 推,我们推了车。,我們推了車。,wǒ men tuī le chē,We gave the car a push.,805107,Martha,321369,0,tts,,0,5,5.95,0|1|-5.952|0|805107,core,false
 推,有人推我到里面。,有人推我到裡面。,yǒu rén tuī wǒ dào lǐ miàn,Somebody pushed me in.,767058,Martha,276162,0,tts,,0,7,5.82,0|1|-5.824|0|767058,core,false
+扔,你会把它扔掉吗？,你會把它扔掉嗎？,nǐ huì bǎ tā rēng diào ma,Are you going to throw that away?,10715268,DaoSeng,4017101,0,tts,,1,7,5.92,1|0|-5.915|0|10715268,core,false
 扔,他把球扔了。,他把球扔了。,tā bǎ qiú rēng le,He threw the ball.,1411677,asosan,292712,0,tts,,1,5,5.84,1|1|-5.844|0|1411677,core,false
-扔,扔了这个烂香蕉。,扔了這個爛香蕉。,rēng le zhè ge làn xiāng jiāo,Throw this rotten banana.,5113327,xjjAstrus,7790204,0,tts,,1,7,5.29,1|1|-5.288|0|5113327,core,false
 缝,是用手缝的吗？,是用手縫的嗎？,shì yòng shǒu fèng de ma,Did you sew this by hand?,13108745,LeviHighway,54949,0,tts,,1,6,6.09,1|0|-6.092|0|13108745,core,false
 缝,你有没有缝衣针？,你有没有缝衣针？,nǐ yǒu méi yǒu féng yī zhēn,Do you have a sewing needle?,489228,GlossaMatik,489229,0,tts,,1,7,4.49,1|1|-4.487|0|489228,core,false
 数,我数到两百。,我数到两百。,wǒ shù dào liǎng bǎi,I counted to two hundred.,4267220,Mrew2Vier,4266737,0,tts,,1,5,5.51,1|1|-5.513|0|4267220,core,false
 数,数到三十。,数到三十。,shù dào sān shí,Count to thirty.,710390,fucongcong,707526,0,tts,,1,4,5.21,1|1|-5.210|1|710390,core,false
+说,你怎么说？,你怎麼說？,nǐ zěn me shuō,What do you say?,12346842,DaoSeng,1174872,0,tts,,0,4,6.44,0|0|-6.440|1|12346842,core,false
 说,他在信上说什么？,他在信上说什么？,tā zài xìn shàng shuō shén me,What does he say in his letter?,334634,fucongcong,286627,0,tts,,0,7,6.40,0|0|-6.397|0|334634,core,false
-说,你说有几个？,你說有幾個？,nǐ shuō yǒu jǐ gè,How many did you say there were?,11679658,DaoSeng,8903321,0,tts,,0,5,6.36,0|0|-6.360|0|11679658,core,false
 唱,她唱得比他好。,她唱得比他好。,tā chàng dé bǐ tā hǎo,She sang better than him.,813508,fucongcong,580432,0,tts,,0,6,5.94,0|1|-5.943|0|813508,core,false
 唱,跟我一起来唱吧。,跟我一起来唱吧。,gēn wǒ yì qǐ lái chàng ba,Come sing with me.,628538,U2FS,563197,0,tts,,0,7,5.90,0|1|-5.900|0|628538,core,false
 玩,我去玩了！,我去玩了！,wǒ qù wán le,I went to play!,1699103,fengli,7816792,0,tts,,0,4,6.44,0|1|-6.438|1|1699103,core,false
@@ -258,10 +249,9 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 浮,石头不会浮起来。,石头不会浮起来。,shí tou bú huì fú qǐ lái,Stones don't swim.,408854,fucongcong,518511,0,tts,,0,7,4.92,0|1|-4.920|0|408854,core,false
 浮,花瓣浮在水面上。,花瓣浮在水面上。,huā bàn fú zài shuǐ miàn shàng,The petals are floating on the water.,760833,Martha,23743,0,tts,,2,7,5.03,2|1|-5.034|0|760833,core,false
 流,不要让水一直流。,不要讓水一直流。,bú yào ràng shuǐ yì zhí liú,Don't leave the water running.,833170,Martha,270859,0,tts,,0,7,5.52,0|1|-5.522|0|833170,core,false
-流,我在流血。,我在流血。,wǒ zài liú xiě,I'm bleeding.,7768262,jiangche,2111754,0,tts,,1,4,6.06,1|1|-6.060|1|7768262,core,false
+流,河从桥下流过。,河從橋下流過。,hé cóng qiáo xià liú guò,The river flows under the bridge.,6109358,verdastelo9604,682256,0,tts,,2,6,4.40,2|1|-4.402|0|6109358,core,false
 冻,狗被冻死了。,狗被凍死了。,gǒu bèi dòng sǐ le,The dog was frozen to death.,10512904,DaoSeng,48228,0,tts,,1,5,5.54,1|0|-5.535|0|10512904,core,false
-冻,他喜欢的是果冻。,他喜歡的是果凍。,tā xǐ huān de shì guǒ dòng,What he likes is jelly.,805737,cherylting,387449,0,tts,,1,7,6.15,1|1|-6.148|0|805737,core,false
-肿,我有脑肿瘤。,我有脑肿瘤。,wǒ yǒu nǎo zhǒng liú,I have a brain tumor.,6089774,Sethlang,6033391,0,tts,,1,5,5.57,1|1|-5.567|0|6089774,core,false
+冻,他被冻死了。,他被冻死了。,tā bèi dòng sǐ le,He froze to death.,347134,zhouj1955,2764249,0,tts,,1,5,5.91,1|1|-5.912|0|347134,core,false
 太阳,我很喜欢太阳。,我很喜歡太陽。,wǒ hěn xǐ huān tài yáng,I love the sun.,805916,cherylting,567161,0,tts,,0,6,5.96,0|1|-5.960|0|805916,core,false
 太阳,太阳出来了。,太陽出來了。,tài yáng chū lái le,Sunshine appeared.,13153700,LeviHighway,11715519,0,tts,,0,5,5.90,0|1|-5.903|0|13153700,core,false
 月亮,月亮已经出来了。,月亮已經出來了。,yuè liàng yǐ jīng chū lái le,The moon is already out.,836157,Martha,387413,0,tts,,0,7,5.79,0|1|-5.785|0|836157,core,false
@@ -276,49 +266,46 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 河,那岛上有很多河。,那島上有很多河。,nà dǎo shàng yǒu hěn duō hé,The island abounds with rivers.,10268716,DaoSeng,44757,0,tts,,1,7,5.54,1|0|-5.540|0|10268716,core,false
 湖,这是湖的最深处。,这是湖的最深处。,zhè shì hú de zuì shēn chù,The lake is deepest at this point.,333071,fucongcong,59356,0,tts,,1,7,5.82,1|0|-5.820|0|333071,core,false
 湖,这湖里有许多鱼。,这湖里有许多鱼。,zhè hú lǐ yǒu xǔ duō yú,Fish abound in this lake.,2029376,ydcok,59360,0,tts,,1,7,5.40,1|1|-5.404|0|2029376,core,false
-海,我是上海人。,我是上海人。,wǒ shì shàng hǎi rén,I'm Shanghainese.,347342,sysko,347341,0,tts,,0,5,6.60,0|1|-6.598|0|347342,core,false
-海,你会说上海话吗？,你会说上海话吗？,nǐ huì shuō shàng hǎi huà ma,Can you speak Shanghainese?,374892,sysko,374894,0,tts,,0,7,6.24,0|1|-6.240|0|374892,core,false
+海,有海岛屿。,有海岛屿。,yǒu hǎi dǎo yǔ,There are islands in the sea.,3690076,Balamax,3663249,0,tts,,1,4,5.43,1|1|-5.427|1|3690076,core,false
+海,大海是蓝色的。,大海是蓝色的。,dà hǎi shì lán sè de,The sea is blue.,8821386,crescat,2396999,0,tts,,2,6,5.91,2|1|-5.912|0|8821386,core,false
 盐,没有再多的盐了。,沒有再多的鹽了。,méi yǒu zài duō de yán le,There's no more salt.,819477,Martha,467337,0,tts,,0,7,6.29,0|1|-6.292|0|819477,core,false
 盐,没有盐了。,没有盐了。,méi yǒu yán le,There's no more salt.,2032281,ydcok,467337,0,tts,,0,4,5.95,0|1|-5.953|1|2032281,core,false
+石头,这是什么石头？,这是什么石头？,zhè shì shén me shí tou,What kind of stone is this?,5613672,verdastelo9604,55856,0,tts,,0,6,6.16,0|1|-6.162|0|5613672,core,false
 石头,这个石头很重。,這個石頭很重。,zhè ge shí tou hěn zhòng,The stone is heavy.,4869680,zvzuibqx,3165955,0,tts,,0,6,5.54,0|1|-5.545|0|4869680,core,false
-石头,不要对狗丢石头。,不要对狗丢石头。,bú yào duì gǒu diū shí tou,Don't throw a stone at the dog.,435386,fucongcong,239144,0,tts,,1,7,5.35,1|1|-5.354|0|435386,core,false
 沙,他吃了些沙。,他吃了些沙。,tā chī le xiē shā,He ate some sand.,2694368,sadhen,1923380,0,tts,,0,5,5.82,0|1|-5.824|0|2694368,core,false
-沙,我想是在沙漠里。,我想是在沙漠里。,wǒ xiǎng shì zài shā mò lǐ,"In the desert, I think.",2200462,johannjunge,2206700,0,tts,,1,7,6.30,1|1|-6.298|0|2200462,core,false
+沙,我吃了沙子。,我吃了沙子。,wǒ chī le shā zi,I ate sand.,10559123,DaoSeng,2117539,0,tts,,1,5,5.86,1|1|-5.855|0|10559123,core,false
 灰尘,桌子被灰尘覆盖。,桌子被灰尘覆盖。,zhuō zi bèi huī chén fù gài,The table was covered with dust.,5613712,verdastelo9604,39592,0,tts,,2,7,4.72,2|1|-4.720|0|5613712,core,false
-土,你是土耳其人吗？,你是土耳其人吗？,nǐ shì tǔ ěr qí rén ma,Are you Turkish?,8860653,iiujik,8777419,0,tts,,1,7,5.96,1|1|-5.960|0|8860653,core,false
-土,我是土耳其人。,我是土耳其人。,wǒ shì tǔ ěr qí rén,I'm Turkish.,4461537,Vortarulo,1771869,0,tts,,1,6,5.85,1|1|-5.853|0|4461537,core,false
+土,这里的土壤肥沃。,這裡的土壤肥沃。,zhè lǐ de tǔ rǎng féi wò,The soil here is fertile.,778745,Martha,61621,0,tts,,2,7,5.34,2|1|-5.345|0|778745,core,false
 云,开始多云了。,开始多云了。,kāi shǐ duō yún le,It's getting cloudy.,1021015,joro,280741,0,tts,,1,5,5.71,1|1|-5.713|0|1021015,core,false
 云,月亮被云遮住了。,月亮被雲遮住了。,yuè liàng bèi yún zhē zhù le,The moon is behind the clouds.,359011,nickyeow,238821,0,tts,,1,7,5.28,1|1|-5.284|0|359011,core,false
 雾,波士顿现在有雾。,波士頓現在有霧。,bō shì dùn xiàn zài yǒu wù,It's foggy now in Boston.,13556503,LeviHighway,6268997,0,tts,,1,7,5.33,1|0|-5.325|0|13556503,core,false
 雾,外面有雾。,外面有霧。,wài miàn yǒu wù,It's foggy out.,13556507,LeviHighway,9926150,0,tts,,1,4,5.23,1|0|-5.230|1|13556507,core,false
-天,今天你吃的什么？,今天你吃的什么？,jīn tiān nǐ chī de shén me,What have you eaten today?,12617578,Enzo,1830497,0,tts,,0,7,6.42,0|1|-6.418|0|12617578,core,false
-天,今天我要去看他。,今天我要去看他。,jīn tiān wǒ yào qù kàn tā,I am going to see him today.,779072,Martha,242957,0,tts,,0,7,6.34,0|1|-6.343|0|779072,core,false
+天,为什么天是蓝的？,为什么天是蓝的？,wèi shén me tiān shì lán de,Why is the sky blue?,812329,fucongcong,2595655,0,tts,,1,7,6.18,1|1|-6.176|0|812329,core,false
+天,天变黑了。,天變黑了。,tiān biàn hēi le,The sky became dark.,13971955,LeviHighway,7120206,0,tts,,1,4,5.54,1|1|-5.540|1|13971955,core,false
 风,今天有风。,今天有风。,jīn tiān yǒu fēng,It's windy today.,510694,fucongcong,2713755,0,tts,,0,4,5.81,0|1|-5.807|1|510694,core,false
-风,不要听风就是雨。,不要听风就是雨。,bú yào tīng fēng jiù shì yǔ,"If you hear hoofbeats, don't look for zebras.",799242,fucongcong,409495,0,tts,,0,7,5.38,0|1|-5.376|0|799242,core,false
+风,明天会有风。,明天會有風。,míng tiān huì yǒu fēng,It'll be windy tomorrow.,13552182,LeviHighway,9457559,0,tts,,1,5,5.83,1|0|-5.833|0|13552182,core,false
 雪,你喜欢雪吗？,你喜欢雪吗？,nǐ xǐ huān xuě ma,Do you like snow?,510751,fucongcong,434606,0,tts,,0,5,5.83,0|1|-5.828|0|510751,core,false
 雪,我很喜欢雪。,我很喜歡雪。,wǒ hěn xǐ huān xuě,I like snow a lot.,6994073,verdastelo9604,758154,0,tts,,0,5,5.83,0|1|-5.825|0|6994073,core,false
-冰,我冰死了。,我冰死了。,wǒ bīng sǐ le,I'm freezing!,1184117,treskro3,1213444,0,tts,,0,4,5.99,0|1|-5.987|1|1184117,core,false
 冰,它冷得像冰一样。,它冷得像冰一樣。,tā lěng dé xiàng bīng yí yàng,It's as cold as ice.,836112,Martha,442090,0,tts,,0,7,5.40,0|1|-5.402|0|836112,core,false
+冰,我想去滑冰场。,我想去滑冰场。,wǒ xiǎng qù huá bīng chǎng,I want to go to the ice rink.,10269029,GlossaMatik,10275234,0,tts,,1,6,5.36,1|0|-5.355|0|10269029,core,false
 烟,快看那个烟。,快看那個煙。,kuài kàn nà ge yān,Look at that smoke.,809881,Martha,68563,0,tts,,0,5,5.52,0|1|-5.518|0|809881,core,false
 烟,我希望能够戒烟。,我希望能够戒烟。,wǒ xī wàng néng gòu jiè yān,I wish I could give up smoking.,333735,fucongcong,40612,0,tts,,1,7,5.46,1|0|-5.465|0|333735,core,false
 火,我们需要火。,我们需要火。,wǒ men xū yào huǒ,We need fire.,427910,GlossaMatik,427908,0,tts,,0,5,5.70,0|1|-5.703|0|427910,core,false
 火,动物怕火。,动物怕火。,dòng wù pà huǒ,Animals are afraid of fire.,512178,fucongcong,280244,0,tts,,0,4,4.92,0|1|-4.920|1|512178,core,false
-灰,他会让你吃灰的。,他会让你吃灰的。,tā huì ràng nǐ chī huī de,He will make you eat dirt.,503291,fucongcong,2169,0,tts,,0,7,6.25,0|1|-6.246|0|503291,core,false
-灰,我变灰了。,我变灰了。,wǒ biàn huī le,I turned grey.,9955767,GlossaMatik,11545930,0,tts,,0,4,5.89,0|1|-5.890|1|9955767,core,false
-烧,烧一点水。,烧一点水。,shāo yì diǎn shuǐ,Boil some water.,392263,fucongcong,64141,0,tts,,0,4,5.09,0|1|-5.090|1|392263,core,false
 烧,我的手烧伤了。,我的手烧伤了。,wǒ de shǒu shāo shāng le,My hand was burned.,5085551,Jubilee11,5085486,0,tts,,1,6,6.15,1|1|-6.146|0|5085551,core,false
-路,让我走自己的路。,让我走自己的路。,ràng wǒ zǒu zì jǐ de lù,Let me go my own way.,1490473,sadhen,249908,0,tts,,0,7,6.38,0|1|-6.382|0|1490473,core,false
-路,我给他指了路。,我給他指了路。,wǒ gěi tā zhǐ le lù,I showed him the way.,13919367,DaoSeng,1911912,0,tts,,0,6,6.29,0|1|-6.285|0|13919367,core,false
-山,你有登山鞋吗？,你有登山鞋嗎？,nǐ yǒu dēng shān xié ma,Do you have walking shoes?,10650622,DaoSeng,10646503,0,tts,,1,6,5.69,1|0|-5.688|0|10650622,core,false
+烧,我烧掉了一切。,我烧掉了一切。,wǒ shāo diào le yí qiè,I burned everything.,13071523,maina,9021762,0,tts,,1,6,5.81,1|1|-5.808|0|13071523,core,false
+路,请您看路。,請您看路。,qǐng nín kàn lù,Please watch the road.,13109149,LeviHighway,8777695,0,tts,,0,4,5.71,0|1|-5.715|1|13109149,core,false
+路,他们住在路对面。,他們住在路對面。,tā men zhù zài lù duì miàn,They live on the other side of the road.,6103122,verdastelo9604,307254,0,tts,,1,7,5.74,1|1|-5.742|0|6103122,core,false
 山,飞机飞过了山。,飛機飛過了山。,fēi jī fēi guò le shān,The plane flew over the mountain.,10535124,DaoSeng,318070,0,tts,,1,6,5.24,1|0|-5.240|0|10535124,core,false
+山,山是绿色的。,山是绿色的。,shān shì lǜ sè de,The mountain is green.,8875031,iiujik,963699,0,tts,,1,5,6.20,1|1|-6.195|0|8875031,core,false
 红,苹果是红的。,蘋果是紅的。,píng guǒ shì hóng de,Apples are red.,13175428,LeviHighway,430055,0,tts,,1,5,6.23,1|0|-6.228|0|13175428,core,false
 红,她的眼睛哭红了。,她的眼睛哭紅了。,tā de yǎn jīng kū hóng le,Her eyes were red from crying.,12799517,DaoSeng,313194,0,tts,,1,7,5.98,1|0|-5.983|0|12799517,core,false
-绿,山是绿色的。,山是绿色的。,shān shì lǜ sè de,The mountain is green.,8875031,iiujik,963699,0,tts,,1,5,6.20,1|1|-6.195|0|8875031,core,false
 绿,她有绿色的眼睛。,她有绿色的眼睛。,tā yǒu lǜ sè de yǎn jīng,She has green eyes.,3076586,tommyfang95,1463505,0,tts,,1,7,6.13,1|1|-6.126|0|3076586,core,false
+绿,变成了绿色。,变成了绿色。,biàn chéng le lǜ sè,It turned green.,10745350,megamanenm,10745341,0,tts,,1,5,5.74,1|1|-5.737|0|10745350,core,false
 黄,我们有黄苹果。,我們有黃蘋果。,wǒ men yǒu huáng píng guǒ,We have yellow apples.,13167231,LeviHighway,1193942,0,tts,,1,6,5.88,1|0|-5.880|0|13167231,core,false
 黄,我喜欢黄色。,我喜欢黄色。,wǒ xǐ huān huáng sè,I like yellow.,8853706,iiujik,4650860,0,tts,,1,5,5.73,1|1|-5.730|0|8853706,core,false
-白,我认为我明白了。,我认为我明白了。,wǒ rèn wéi wǒ míng bái le,I think I understood.,2076291,User5120,716142,0,tts,,0,7,6.44,0|1|-6.442|0|2076291,core,false
-白,她会明白的。,她會明白的。,tā huì míng bái de,She'll understand.,10260311,DaoSeng,2192522,0,tts,,0,5,6.44,0|1|-6.435|0|10260311,core,false
+白,我的马是白色的。,我的马是白色的。,wǒ de mǎ shì bái sè de,My horse is white.,2778259,iMaple,2778260,0,tts,,1,7,6.62,1|1|-6.623|0|2778259,core,false
+白,这只狗是白色的。,這隻狗是白色的。,zhè zhǐ gǒu shì bái sè de,This dog is white.,3706747,egg0073,441382,0,tts,,1,7,6.23,1|1|-6.225|0|3706747,core,false
 黑,天快黑了。,天快黑了。,tiān kuài hēi le,It's getting dark quickly.,3060526,trieuho,9628285,0,tts,,0,4,5.91,0|1|-5.912|1|3060526,core,false
 黑,我有只大黑狗。,我有隻大黑狗。,wǒ yǒu zhǐ dà hēi gǒu,I have a big black dog.,11679682,DaoSeng,259311,0,tts,,1,6,5.79,1|0|-5.792|0|11679682,core,false
 晚上,是晚上了。,是晚上了。,shì wǎn shàng le,It's night.,6047459,verdastelo9604,2187224,0,tts,,0,4,6.48,0|1|-6.483|1|6047459,core,false
@@ -331,54 +318,53 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 暖和,今天相当暖和。,今天相當暖和。,jīn tiān xiāng dāng nuǎn huo,It's fairly warm today.,825990,Martha,242917,0,tts,,0,6,4.79,0|1|-4.793|0|825990,core,false
 冷,没那么冷。,没那么冷。,méi nà me lěng,It wasn't that cold.,10537109,GlossaMatik,4494898,0,tts,,0,4,5.47,0|0|-5.473|1|10537109,core,false
 冷,这是冷的。,这是冷的。,zhè shì lěng de,This is cold.,4844766,sadhen,463300,0,tts,,0,4,6.57,0|1|-6.567|1|4844766,core,false
-满,你现在满意了吗？,你現在滿意了嗎？,nǐ xiàn zài mǎn yì le ma,Are you satisfied now?,5363963,egg0073,1495860,0,tts,,1,7,6.24,1|1|-6.242|0|5363963,core,false
-满,你并不满意，对吧？,你并不满意，对吧？,nǐ bìng bù mǎn yì duì ba,"You're not satisfied, are you?",2254032,KerenDeng,68913,0,tts,,1,7,6.18,1|1|-6.183|0|2254032,core,false
+满,汽车油箱是满的。,汽車油箱是滿的。,qì chē yóu xiāng shì mǎn de,The fuel tank in the car is full.,900000,kanaorange,681039,0,tts,,1,7,5.65,1|1|-5.650|0|900000,core,false
+满,我希望得满分。,我希望得满分。,wǒ xī wàng dé mǎn fēn,I intend to get full marks.,2906699,GlossaMatik,322644,0,tts,,1,6,5.61,1|1|-5.607|0|2906699,core,false
 新,这是新的。,这是新的。,zhè shì xīn de,This is new.,822110,U2FS,703077,0,tts,,0,4,6.93,0|1|-6.933|1|822110,core,false
 新,电脑是新的。,电脑是新的。,diàn nǎo shì xīn de,The computer is new.,1144001,Shishir,50353,0,tts,,0,5,6.54,0|1|-6.545|0|1144001,core,false
-老,他们都是好老师。,他们都是好老师。,tā men dōu shì hǎo lǎo shī,They are all good teachers.,333284,fucongcong,4728061,0,tts,,0,7,6.34,0|0|-6.338|0|333284,core,false
-老,她是位老师。,她是位老師。,tā shì wèi lǎo shī,She is a teacher.,13519633,LeviHighway,315459,0,tts,,0,5,6.04,0|0|-6.037|0|13519633,core,false
+老,我变老了，是吗？,我变老了，是吗？,wǒ biàn lǎo le shì ma,"I've gotten older, right?",8089854,GlossaMatik,8246472,0,tts,,0,6,6.43,0|1|-6.427|0|8089854,core,false
+老,我开始变老了！,我开始变老了！,wǒ kāi shǐ biàn lǎo le,I'm starting to get old!,1155613,sysko,1155608,0,tts,,0,6,6.18,0|1|-6.178|0|1155613,core,false
 旧,这些是很旧的书。,这些是很旧的书。,zhè xiē shì hěn jiù de shū,These are very old books.,2779412,GlossaMatik,55019,0,tts,,0,7,6.28,0|1|-6.278|0|2779412,core,false
 旧,这是台旧设备。,这是台旧设备。,zhè shì tái jiù shè bèi,This is an old device.,4757238,ryanwoo,4756241,0,tts,,0,6,5.90,0|1|-5.900|0|4757238,core,false
+好,他们都是好老师。,他们都是好老师。,tā men dōu shì hǎo lǎo shī,They are all good teachers.,333284,fucongcong,4728061,0,tts,,0,7,6.34,0|0|-6.338|0|333284,core,false
 好,你最好了。,你最好了。,nǐ zuì hǎo le,You're the best.,13511689,LeviHighway,1752568,0,tts,,0,4,6.34,0|0|-6.337|1|13511689,core,false
-好,你写好报告了吗？,你寫好報告了嗎？,nǐ xiě hǎo bào gào le ma,Have you got the report yet?,10654548,DaoSeng,10652750,0,tts,,0,7,6.28,0|0|-6.283|0|10654548,core,false
 坏,坏的人，是我。,坏的人，是我。,huài de rén shì wǒ,It is I that am bad.,792831,fucongcong,28650,0,tts,,0,5,6.72,0|1|-6.716|0|792831,core,false
-坏,我的电话坏了。,我的電話壞了。,wǒ de diàn huà huài le,My phone is broken.,713020,egg0073,4761626,0,tts,,0,6,6.45,0|1|-6.450|0|713020,core,false
+坏,有好就有坏。,有好就有坏。,yǒu hǎo jiù yǒu huài,"Where there's good, there's also bad.",2615069,fenfang557,2682253,0,tts,,0,5,6.29,0|1|-6.286|0|2615069,core,false
 烂,这些苹果烂了。,這些蘋果爛了。,zhè xiē píng guǒ làn le,These apples are rotten.,13167234,LeviHighway,1096341,0,tts,,1,6,5.66,1|0|-5.657|0|13167234,core,false
-烂,他把书撕烂了。,他把書撕爛了。,tā bǎ shū sī làn le,He tore the book apart.,759704,kaenif,303782,0,tts,,1,6,5.62,1|1|-5.624|0|759704,core,false
+烂,扔了这个烂香蕉。,扔了這個爛香蕉。,rēng le zhè ge làn xiāng jiāo,Throw this rotten banana.,5113327,xjjAstrus,7790204,0,tts,,1,7,5.29,1|1|-5.288|0|5113327,core,false
 脏,那个盘子是脏的。,那個盤子是髒的。,nà ge pán zi shì zàng de,The plate is dirty.,10456821,DaoSeng,2730922,0,tts,,1,7,5.68,1|0|-5.676|0|10456821,core,false
 脏,叉子是脏的。,叉子是髒的。,chā zi shì zàng de,The fork is dirty.,10526677,DaoSeng,2730924,0,tts,,1,5,5.48,1|0|-5.482|0|10526677,core,false
-直,不，一直是我在用。,不，一直是我在用。,bú yì zhí shì wǒ zài yòng,"No, I am always using it.",397340,sysko,7844521,0,tts,,0,7,6.62,0|1|-6.625|0|397340,core,false
-直,我一直在想你。,我一直在想你。,wǒ yì zhí zài xiǎng nǐ,I think of you all the time.,2257008,Eleanor,252805,0,tts,,0,6,6.50,0|1|-6.496|0|2257008,core,false
-圆,您有圆珠笔吗？,您有圓珠筆嗎？,nín yǒu yuán zhū bǐ ma,Do you have a ballpoint pen?,10459886,DaoSeng,2774769,0,tts,,1,6,5.11,1|0|-5.112|0|10459886,core,false
+直,他是个直男。,他是個直男。,tā shì gè zhí nán,He's straight.,6284440,xjjAstrus,8403786,0,tts,,0,5,6.02,0|1|-6.022|0|6284440,core,false
+直,他说话很直接。,他说话很直接。,tā shuō huà hěn zhí jiē,He's very straightforward.,2298338,Gustav249,2311496,0,tts,,0,6,5.89,0|1|-5.893|0|2298338,core,false
 圆,苹果是圆的。,蘋果是圓的。,píng guǒ shì yuán de,Apples are round.,13166879,LeviHighway,10109973,0,tts,,1,5,6.07,1|1|-6.070|0|13166879,core,false
+圆,球是圆的。,球是圆的。,qiú shì yuán de,Balls are round.,1397373,mtdot,33654,0,tts,,1,4,6.03,1|1|-6.027|1|1397373,core,false
 锋利,这把刀很锋利。,这把刀很锋利。,zhè bǎ dāo hěn fēng lì,This knife is very sharp.,710289,fucongcong,60764,0,tts,,1,6,5.43,1|1|-5.434|0|710289,core,false
 锋利,这刀不锋利。,這刀不鋒利。,zhè dāo bù fēng lì,The knife is not sharp.,793922,Martha,60758,0,tts,,1,5,5.37,1|1|-5.372|0|793922,core,false
 钝,我的刀变钝了。,我的刀變鈍了。,wǒ de dāo biàn dùn le,My knife has become dull.,13540022,LeviHighway,9315311,0,tts,,1,6,5.87,1|0|-5.867|0|13540022,core,false
 钝,铅笔头钝了。,铅笔头钝了。,qiān bǐ tóu dùn le,The point of the pencil has become dull.,424505,sysko,25771,0,tts,,1,5,4.37,1|1|-4.370|0|424505,core,false
-滑,我想和她去滑雪。,我想和她去滑雪。,wǒ xiǎng hé tā qù huá xuě,I'd like to go skiing with her.,334617,fucongcong,261089,0,tts,,1,7,6.03,1|0|-6.030|0|334617,core,false
-滑,你能滑雪吗？,你能滑雪嗎？,nǐ néng huá xuě ma,Can you ski?,13161169,LeviHighway,2748477,0,tts,,1,5,5.87,1|0|-5.867|0|13161169,core,false
+滑,地面仍然湿滑。,地面仍然濕滑。,dì miàn réng rán shī huá,The ground is still wet.,348902,nickyeow,277263,0,tts,,2,6,4.21,2|1|-4.210|0|348902,core,false
 湿,那是湿的。,那是湿的。,nà shì shī de,That's wet.,9970073,GlossaMatik,6532456,0,tts,,0,4,6.30,0|1|-6.297|1|9970073,core,false
 湿,天气又冷又湿。,天气又冷又湿。,tiān qì yòu lěng yòu shī,"The weather was not only cold, but also wet.",333431,fucongcong,278883,0,tts,,1,6,5.19,1|0|-5.188|0|333431,core,false
-干,我干了什么？,我幹了什麼？,wǒ gàn le shén me,What have I done?,10272105,DaoSeng,971169,0,tts,,0,5,6.48,0|0|-6.478|0|10272105,core,false
-干,我不干了。,我不干了。,wǒ bú gàn le,I quit.,9569182,MiracleQ,731636,0,tts,,0,4,6.59,0|1|-6.592|1|9569182,core,false
+干,我喉咙很干。,我喉咙很干。,wǒ hóu lóng hěn gàn,My throat feels dry.,333589,fucongcong,35759,0,tts,,1,5,5.68,1|0|-5.680|0|333589,core,false
+干,我的衬衫还没干。,我的襯衫還沒乾。,wǒ de chèn shān hái méi gàn,My shirt isn't dry yet.,757549,Martha,250335,0,tts,,1,7,6.11,1|1|-6.113|0|757549,core,false
 对,我做得对吗？,我做得對嗎？,wǒ zuò dé duì ma,Am I doing it right?,11921382,DaoSeng,2835774,0,tts,,0,5,6.45,0|0|-6.446|0|11921382,core,false
-对,这对他没有影响。,这对他没有影响。,zhè duì tā méi yǒu yǐng xiǎng,It has had no effect on him.,332838,fucongcong,42172,0,tts,,0,7,6.42,0|0|-6.422|0|332838,core,false
+对,我是对的。,我是對的。,wǒ shì duì de,I'm right.,816721,Martha,321343,0,tts,,0,4,7.13,0|1|-7.135|1|816721,core,false
 近,我住在这附近。,我住在這附近。,wǒ zhù zài zhè fù jìn,I live near here.,826271,Martha,413831,0,tts,,0,6,6.26,0|1|-6.260|0|826271,core,false
-近,他就住在附近。,他就住在附近。,tā jiù zhù zài fù jìn,He lives just around the corner.,846191,Martha,290460,0,tts,,0,6,6.19,0|1|-6.190|0|846191,core,false
+近,我和她近一样高。,我和她近一样高。,wǒ hé tā jìn yí yàng gāo,I am nearly as tall as she.,3699936,katshi94,261102,0,tts,,0,7,6.12,0|1|-6.123|0|3699936,core,false
 远,你的学校有多远？,你的学校有多远？,nǐ de xué xiào yǒu duō yuǎn,How far away is your school?,6005572,verdastelo9604,1885904,0,tts,,0,7,6.38,0|1|-6.378|0|6005572,core,false
 远,我们有多远了？,我们有多远了？,wǒ men yǒu duō yuǎn le,How far away are we?,7768295,jiangche,619764,0,tts,,0,6,6.37,0|1|-6.366|0|7768295,core,false
 右,他左右看了看。,他左右看了看。,tā zuǒ yòu kàn le kàn,He looked left and right.,8756388,crescat,4351264,0,tts,,1,6,6.25,1|1|-6.246|0|8756388,core,false
 右,不要从右边咬。,不要從右邊咬。,bú yào cóng yòu biān yǎo,Don't bite on the right side.,778764,Martha,27058,0,tts,,1,6,5.12,1|1|-5.120|0|778764,core,false
-左,您本应左转的。,您本应左转的。,nín běn yīng zuǒ zhuǎn de,You should've turned left.,10752794,GlossaMatik,3823083,0,tts,,1,6,5.51,1|1|-5.508|0|10752794,core,false
 左,我是左撇子。,我是左撇子。,wǒ shì zuǒ piě zi,I'm left-handed.,832799,Martha,321826,0,tts,,1,5,5.11,1|1|-5.107|0|832799,core,false
-在,我在努力。,我在努力。,wǒ zài nǔ lì,I'm working on doing that.,13117576,LeviHighway,7766248,0,tts,,0,4,6.50,0|0|-6.497|1|13117576,core,false
-在,我现在就走。,我現在就走。,wǒ xiàn zài jiù zǒu,I'm leaving now.,10369295,DaoSeng,242131,0,tts,,0,5,6.33,0|0|-6.327|0|10369295,core,false
+左,请向左转 。,請嚮左轉 。,qǐng xiàng zuǒ zhuǎn,Please turn to the left.,13152311,atitarev,6355637,0,tts,,1,4,3.98,1|1|-3.980|1|13152311,core,false
+在,他在看我们。,他在看我们。,tā zài kàn wǒ men,He's looking at us.,5663542,verdastelo9604,5373152,0,tts,,0,5,6.63,0|1|-6.633|0|5663542,core,false
+在,你在工作。,你在工作。,nǐ zài gōng zuò,You are at work.,5580886,grindeldore,7785092,0,tts,,0,4,6.62,0|1|-6.617|1|5580886,core,false
 里,这张里有你吗？,這張裡有你嗎？,zhè zhāng lǐ yǒu nǐ ma,Are you in this picture?,12321712,DaoSeng,3821506,0,tts,,0,6,6.33,0|0|-6.335|0|12321712,core,false
 里,进到里面去。,進到裡面去。,jìn dào lǐ miàn qù,Go inside.,13111618,LeviHighway,2428954,0,tts,,0,5,5.84,0|0|-5.843|0|13111618,core,false
-跟,你去哪我都跟。,你去哪我都跟。,nǐ qù nǎ wǒ dōu gēn,"Wherever you go, I'll follow.",13119386,LeviHighway,9052497,0,tts,,0,6,6.27,0|0|-6.265|0|13119386,core,false
-跟,我有话要跟你讲。,我有話要跟你講。,wǒ yǒu huà yào gēn nǐ jiǎng,I must talk to you.,12903253,DaoSeng,2387308,0,tts,,0,7,6.25,0|0|-6.247|0|12903253,core,false
-和,我和我自己来。,我和我自己来。,wǒ hé wǒ zì jǐ lái,I come with myself.,1020628,U2FS,1020617,0,tts,,0,6,6.68,0|1|-6.682|0|1020628,core,false
-和,我和他是朋友。,我和他是朋友。,wǒ hé tā shì péng yǒu,I'm friends with him.,1275327,egg0073,1283961,0,tts,,0,6,6.66,0|1|-6.656|0|1275327,core,false
+跟,我不跟你要好了。,我不跟你要好了。,wǒ bù gēn nǐ yào hǎo le,I'm going to stop trying to be friendly with you.,2637077,cienias,1970219,0,tts,,0,7,6.58,0|1|-6.576|0|2637077,core,false
+跟,我每天都跟他说。,我每天都跟他說。,wǒ měi tiān dōu gēn tā shuō,I speak with him every day.,5502139,egg0073,7807355,0,tts,,0,7,6.29,0|1|-6.290|0|5502139,core,false
+和,他和我是老师.,他和我是老师.,tā hé wǒ shì lǎo shī,He and I are teachers.,392146,Mouseneb,284475,0,tts,,0,6,6.59,0|1|-6.590|0|392146,core,false
+和,你和我是好朋友。,你和我是好朋友。,nǐ hé wǒ shì hǎo péng yǒu,You and I are good friends.,864425,Martha,17588,0,tts,,0,7,6.59,0|1|-6.590|0|864425,core,false
 如果,但如果他说不呢？,但如果他说不呢？,dàn rú guǒ tā shuō bù ne,But what if he says no?,10538610,GlossaMatik,5894451,0,tts,,0,7,6.34,0|1|-6.340|0|10538610,core,false
 如果,如果你能就来吧。,如果你能就來吧。,rú guǒ nǐ néng jiù lái ba,Come if you can.,825163,Martha,450074,0,tts,,0,7,6.33,0|1|-6.332|0|825163,core,false
 因为,那是因为我爱她.,那是因为我爱她.,nà shì yīn wèi wǒ ài tā,It's because I love her.,2021500,lynn2012,2021210,0,tts,,1,7,6.02,1|1|-6.016|0|2021500,core,false

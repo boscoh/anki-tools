@@ -198,7 +198,7 @@ The deck name has the entry count (for example, `Swadesh Mandarin 207`).
 ### Swadesh Mandarin Sentences
 
 Build a listening-comprehension deck for Mandarin. The deck pairs 207 Swadesh
-concepts with 387 Tatoeba sentences. Each card holds one sentence, the
+concepts with 371 Tatoeba sentences. Each card holds one sentence, the
 tone-marked pinyin, the English translation, the target word, and two MP3
 files.
 
@@ -207,7 +207,7 @@ uv run anki swadesh fetch                                   # cache the Tatoeba 
 uv run anki swadesh sentences mandarin --per-word 2 --max-cards 450
 uv run anki swadesh audio mandarin --native-audio none      # make the audio
 uv run anki swadesh pack mandarin                           # write the APKG
-uv run anki swadesh audit mandarin                          # gates G1 to G16
+uv run anki swadesh audit mandarin                          # gates G1 to G18
 ```
 
 The commands write these files:
@@ -225,10 +225,11 @@ The audio step uses gTTS because `edge-tts` is absent. `ffprobe` must be on
 the path. The audio step removes a file that fails the header or duration
 check.
 
-Measured result: 387 cards, 586 media files, and core coverage of 195 of 207
-concepts (0.942). The pack has 0 scaffold cards and 0 native recordings. Each
-sentence has 4 to 7 Han characters. These 12 words have no selected sentence:
-虱子, 棍子, 种子, 骨头, 脂肪, 羽毛, 舌头, 肠子, 乳房, 呕吐, 揉, and 绑.
+Measured result: 371 cards, 566 media files, and core coverage of 191 of 207
+concepts (0.923). The pack has 2 scaffold cards and 0 native recordings. Each
+sentence has 4 to 7 Han characters. These 16 words have no selected sentence:
+虱子, 棍子, 种子, 根, 骨头, 脂肪, 羽毛, 肠子, 乳房, 肝, 呕吐, 分开, 揉, 绑,
+肿, and 灰.
 
 On the back of a card, each Han character of the sentence is a link to the
 CC-Canto dictionary at `https://cantonese.org`. The script is
@@ -242,7 +243,7 @@ audio per recording. This pack uses synthesized audio only.
 ### Swadesh Greek Sentences
 
 Build a listening-comprehension deck for Greek. The deck pairs 207 Swadesh
-concepts with 306 Tatoeba sentences. Each card holds one sentence, the English
+concepts with 300 Tatoeba sentences. Each card holds one sentence, the English
 translation, the target word with a gender gloss, and two MP3 files.
 
 ```bash
@@ -250,7 +251,7 @@ uv run anki swadesh fetch --lang ell --lang eng              # cache the Tatoeba
 uv run anki swadesh sentences greek --per-word 2 --max-cards 340
 uv run anki swadesh audio greek --tts gtts                   # make the audio
 uv run anki swadesh pack greek                               # write the APKG
-uv run anki swadesh audit greek                              # gates G1 to G19
+uv run anki swadesh audit greek                              # gates G1 to G20
 ```
 
 The commands write these files:
@@ -281,14 +282,14 @@ Greek has no Tatoeba recordings. `ell_sentences_with_audio.tsv.bz2` returns HTTP
 The pack is TTS only. Greek `;` is the question mark, so the filter and the TTS
 input keep it unchanged.
 
-Measured result: 306 cards, 468 media files, and core coverage of 162 of 206
-card-capable concepts (0.786). The pack has 0 scaffold cards and 0 native
-recordings. These 44 words have no selected sentence: πλατύς, παχύς, ψείρα,
+Measured result: 300 cards, 460 media files, and core coverage of 160 of 206
+card-capable concepts (0.777). The pack has 2 scaffold cards and 0 native
+recordings. These 47 words have no selected sentence: πλατύς, παχύς, ψείρα,
 σκουλήκι, ραβδί, σπόρος, φλοιός του δέντρου, χόρτο, λίπος, κέρατο, πούπουλο,
-αυτί, νύχι, γόνατο, φτερό, κοιλιά, σπλάχνα, συκώτι, ρουφώ, ξερνώ, φυσάω,
-κυνηγώ, χτυπάω, μαχαιρώνω, ξύνω, σκάβω, πετάω, σφίγγω, τρίβω, σκουπίζω,
-τραβάω, δένω, μετρώ, πλέω, ρέω, παγώνω, πρήζομαι, σκόνη, στάχτη, σάπιος,
-στρογγυλός, αιχμηρός, στομωμένος, λείος.
+αυτί, νύχι, πόδι, γόνατο, φτερό, κοιλιά, σπλάχνα, λαιμός, συκώτι, ρουφώ,
+ξερνώ, φυσάω, κυνηγώ, χτυπάω, μαχαιρώνω, ξύνω, σκάβω, πετάω, ξαπλώνω, σφίγγω,
+τρίβω, σκουπίζω, τραβάω, δένω, μετρώ, πλέω, ρέω, παγώνω, πρήζομαι, σκόνη,
+στάχτη, σάπιος, στρογγυλός, αιχμηρός, στομωμένος, λείος.
 
 Index 81 (`πόδι`, leg) shares its form with index 80 (foot). The shared row has
 `variant=shared`, gets no card, and gate G19 rejects a card on a shared-only
@@ -309,7 +310,7 @@ uv run anki swadesh fetch --lang fra --lang eng              # cache the Tatoeba
 uv run anki swadesh sentences french --per-word 2 --max-cards 450
 uv run anki swadesh audio french --native-audio none         # make the audio
 uv run anki swadesh pack french                              # write the APKG
-uv run anki swadesh audit french                             # gates G1 to G20
+uv run anki swadesh audit french                             # gates G1 to G21
 ```
 
 The commands write these files:
@@ -339,7 +340,7 @@ and never writes them. Run `uv run python scripts/build_french_word_table.py`
 to regenerate them from `Module:Swadesh/data/fr`. The module code is `fr`; the
 `fra` page does not exist.
 
-Measured result on 2026-10-19: 412 cards, 618 media files, and core coverage
+Measured result on 2026-10-21: 412 cards, 618 media files, and core coverage
 of 206 of 207 concepts (0.995). The pack has 0 scaffold cards and 0 native
 recordings. The word `intestins` (guts, index 86) has no candidate sentence.
 
@@ -414,7 +415,7 @@ Licenses: Tatoeba sentence text CC BY 2.0 FR, `wordfreq` list Apache License
 ### Swadesh Cantonese Sentences
 
 Build a listening-comprehension deck for Cantonese. The deck pairs 207 Swadesh
-concepts with 333 Tatoeba sentences. Each card holds one sentence with the
+concepts with 279 Tatoeba sentences. Each card holds one sentence with the
 matched token in bold, the jyutping reading, the English translation, the
 target word with its reading, and two MP3 files.
 
@@ -423,7 +424,7 @@ uv run anki swadesh fetch --lang yue --lang eng              # cache the Tatoeba
 uv run anki swadesh sentences cantonese --per-word 2 --max-cards 450
 uv run anki swadesh audio cantonese --native-audio auto      # make the audio
 uv run anki swadesh pack cantonese                           # write the APKG
-uv run anki swadesh audit cantonese                          # gates G1 to G19
+uv run anki swadesh audit cantonese                          # gates G1 to G21
 ```
 
 The commands write these files:
@@ -458,10 +459,12 @@ Tatoeba row with OpenCC and keeps the raw row in `text_original`. A form
 matches only on a token boundary, so the card for 我 does not take a sentence
 that holds 我哋.
 
-Measured result on 2026-10-20: 333 cards, 178 of 207 forms (0.860), 208
-native recordings, and 125 synthesized files. These 29 forms have no selected
-sentence: 闊, 蝨, 棍, 種子, 葉, 樹皮, 脂肪, 羽毛, 腿, 膝頭, 翼, 腸, 胸, 肝,
-咬, 吐, 打獵, 分開, 𢯎, 搾, 掟, 綁, 浮, 結冰, 脹, 湖, 鹽, 鈍, 裡面.
+Measured result on 2026-10-21: 279 cards, 434 media files, 155 of 207 forms
+(0.749), 171 native recordings, and 108 synthesized files. These 51 forms have
+no selected sentence: 闊, 厚, 窄, 薄, 蝨, 棍, 種子, 葉, 根, 樹皮, 皮, 脂肪, 角,
+尾, 羽毛, 嘴, 腳, 腿, 膝頭, 翼, 腸, 頸, 胸, 肝, 咬, 吐, 吹, 打獵, 切, 分開,
+刺, 搾, 擦, 推, 綁, 數, 浮, 流, 結冰, 脹, 湖, 鹽, 沙, 灰, 燒, 爛, 圓, 利,
+鈍, 乾, 裡面. The form 𢯎 has a candidate but no card.
 
 Licenses: word data CC BY-SA 4.0, Tatoeba sentence text CC BY 2.0 FR, Cifu
 data cached only, and audio named by its source, engine, and voice.

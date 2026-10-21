@@ -31,6 +31,7 @@ from anki_tools.sentence_pack.audit import (
     sample,
 )
 from anki_tools.sentence_pack.audio import probe_duration
+from anki_tools.sentence_pack.english_sense import sense_mismatches
 from anki_tools.sentence_pack.languages.mandarin import (
     MANDARIN,
     check_word_table,
@@ -133,18 +134,17 @@ def _gate_g17(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
 
 
 def _gate_g18(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
-    """Gate G18: no card English holds a false-friend sense.
+    """Gate G18: no card English holds a different sense.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
     :returns: Pass flag and detail text.
     """
     rows = inputs.rows()
-    bad = [
-        f"{row.get('target', '')} in {row.get('sentence', '')}"
-        for row in rows
-        if sense_filter(row.get("target", ""), row.get("english", ""))
-    ]
+    gloss_by_form = {
+        profile.form_text(form): form.english for form in inputs.table()
+    }
+    bad = sense_mismatches(rows, gloss_by_form, sense_filter)
     if bad:
         return False, (
             f"{len(bad)} card(s) use the target in a different sense: "

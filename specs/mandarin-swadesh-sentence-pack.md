@@ -361,16 +361,23 @@ The list does not catch every case. A polyphone can change the sense
 (数 shù means number or math, not to count). A bare verb can carry a
 different sense. Those cases stay for a later review.
 
-An English sense check catches those cases. Each risky form has two English
-word lists: sense words and false-friend words. A candidate passes when the
-paired English holds a sense word, or holds no false-friend word. The
-`SENSE_CHECKS` table in `mandarin.py` holds the lists:
+The shared English sense test covers all 207 glosses. The table
+`vocab/english_senses.json` holds, for each gloss, the English words and phrases
+that show its sense. A candidate passes when the paired English holds one of
+them. `scripts/build_english_senses.py` writes the table from WordNet plus a
+reviewed list of extra words. This test catches a bare verb with the wrong
+sense, such as 大 with "everyone" English.
 
-| Form | Sense words                    | False-friend words
-| ---- | ------------------------------ | ---------------------------------------- |
-| 抓   | scratch, scratched, itch       | grab, grabbed, catch, caught, arrest     |
-| 数   | count, counts, counted         | math, mathematics, number, numbers       |
-| 挤   | squeeze, squeezes, squeezed    | crowded, cramped, packed                 |
+The form-level table adds a check for a compound with the wrong sense. Each
+risky form has two English word lists: sense words and false-friend words. A
+candidate passes when the paired English holds a sense word, or holds no
+false-friend word. The `SENSE_CHECKS` table in `mandarin.py` holds the lists:
+
+| Form | Sense words                 | False-friend words                   |
+| ---- | --------------------------- | ------------------------------------ |
+| 抓    | scratch, scratched, itch    | grab, grabbed, catch, caught, arrest |
+| 数    | count, counts, counted      | math, mathematics, number, numbers   |
+| 挤    | squeeze, squeezes, squeezed | crowded, cramped, packed             |
 
 Gate G18 checks the built deck against the stored English text.
 Reuse `char_similarity_zh` and `is_repeated_zh_sentence` from
@@ -702,26 +709,26 @@ Commit the CSV files and the manifest.
 `anki swadesh audit mandarin` runs these checks and exits with a non-zero
 code on a failure.
 
-| Gate | Check                                                                                      |
-| ---- | ------------------------------------------------------------------------------------------ |
-| G1   | Word table: 207 rows, 205 to 220 forms, no gap                                             |
-| G2   | No duplicate word form                                                                     |
-| G3   | Every card target exists in the reviewed CSV                                               |
-| G4   | Every card has a unique Tatoeba id after conversion                                        |
-| G5   | Target appears one time in each sentence                                                   |
-| G6   | No card pair with char-set Jaccard of 0.67 or more                                         |
-| G7   | Every card has a valid audio file with duration 0.4 to 15 seconds                          |
-| G8   | Audio file count equals the media count in the APKG                                        |
-| G9   | Pinyin syllable count equals Han character count                                           |
-| G10  | Core coverage of 80 percent or more, provisional for M1                                    |
-| G11  | Manifest counts match the word table and the sentence CSV (10.4)                           |
-| G12  | `ATTRIBUTION.md` exists and names every audio author in the pack                           |
-| G13  | The APKG opens with `AnkiPackage` and lists the expected notes                             |
-| G14  | Core cards pass F2 to F10. Scaffold cards pass F3, F4, F5, F7, F9, F10, and length 3 to 7  |
-| G15  | `vocab/swadesh_review.csv` exists and has no open row                                      |
-| G16  | Every card target has a valid `word_{hash}.mp3` file                                       |
-| G17  | No card uses its target inside a false-friend compound                                     |
-| G18  | No card English holds a false-friend sense for its target                                  |
+| Gate | Check                                                                                     |
+| ---- | ----------------------------------------------------------------------------------------- |
+| G1   | Word table: 207 rows, 205 to 220 forms, no gap                                            |
+| G2   | No duplicate word form                                                                    |
+| G3   | Every card target exists in the reviewed CSV                                              |
+| G4   | Every card has a unique Tatoeba id after conversion                                       |
+| G5   | Target appears one time in each sentence                                                  |
+| G6   | No card pair with char-set Jaccard of 0.67 or more                                        |
+| G7   | Every card has a valid audio file with duration 0.4 to 15 seconds                         |
+| G8   | Audio file count equals the media count in the APKG                                       |
+| G9   | Pinyin syllable count equals Han character count                                          |
+| G10  | Core coverage of 80 percent or more, provisional for M1                                   |
+| G11  | Manifest counts match the word table and the sentence CSV (10.4)                          |
+| G12  | `ATTRIBUTION.md` exists and names every audio author in the pack                          |
+| G13  | The APKG opens with `AnkiPackage` and lists the expected notes                            |
+| G14  | Core cards pass F2 to F10. Scaffold cards pass F3, F4, F5, F7, F9, F10, and length 3 to 7 |
+| G15  | `vocab/swadesh_review.csv` exists and has no open row                                     |
+| G16  | Every card target has a valid `word_{hash}.mp3` file                                      |
+| G17  | No card uses its target inside a false-friend compound                                    |
+| G18  | No card English holds a different sense than the card word                                |
 
 G10 is provisional. M1 measures the real coverage. This spec then keeps
 the measured value minus 5 points as the gate.
@@ -780,23 +787,24 @@ pass a manual review of sentence, pinyin, gloss, and audio.
 ## 17. Implementation result
 
 Milestone M5 is complete. These values come from the full pipeline run of
-2026-10-19. The run uses the 4 to 7 Han character window (section 7).
+2026-10-21. The run uses the 4 to 7 Han character window (section 7).
 
 | Measure         | Value                                                  |
 | --------------- | ------------------------------------------------------ |
-| Build date      | 2026-10-19                                             |
-| Cards           | 385 core, 0 scaffold                                   |
-| Media files     | 584 (385 sentence files and 199 word files)            |
-| Core coverage   | 195 of 207 concepts (0.942)                            |
-| Uncovered words | 虱子, 棍子, 种子, 骨头, 脂肪, 羽毛, 舌头, 肠子,       |
-|                 | 乳房, 呕吐, 揉, 绑                                     |
+| Build date      | 2026-10-21                                             |
+| Cards           | 369 core, 2 scaffold                                   |
+| Media files     | 566 (371 sentence files and 195 word files)            |
+| Core coverage   | 191 of 207 concepts (0.923)                            |
+| Uncovered words | 虱子, 棍子, 种子, 根, 骨头, 脂肪, 羽毛, 肠子, 乳房,                     |
+|                 | 肝, 呕吐, 分开, 揉, 绑, 肿, 灰                                  |
 | TTS engine      | gTTS, because `edge-tts` is absent; voice `gtts:zh-CN` |
 | Native audio    | 0 recordings                                           |
 | Gate result     | G1 to G18 pass; `anki swadesh audit mandarin` exits 0  |
 
-The Tatoeba pool gives no sentence for 11 concepts, and the card cap cuts
-one more. The selection keeps the core tier only, so the pack has no
-scaffold card.
+The Tatoeba pool gives no core candidate for 18 concepts. The fallback
+window gives 2 scaffold cards, and 16 concepts stay uncovered. The English
+sense test removes candidates before the fallback, so 大 with "everyone"
+English and 人 with "nobody" English do not become cards.
 
 `vocab/swadesh_review.csv` holds the Mandarin rows of the word review. The
 file has 29 reviewed rows (15 fixed and 14 kept) and no open row, so gate
