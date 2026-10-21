@@ -9,7 +9,7 @@ Modules:
     apkg.templates  - Card template partials
     ranking.rank    - Sentence ranking by frequency and complexity
     ranking.reorder - Deck reordering based on ranking
-    ranking.cull_fr - French cull pipeline
+    languages.french - French language profile and cull pipeline
     mandarin        - Mandarin audio, audit, deck, fetch, swadesh, pinyin
     cantonese       - Cantonese jyutping, frequency, and sentence selection
     sentence_pack   - Shared Swadesh sentence pack stages

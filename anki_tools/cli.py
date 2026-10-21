@@ -21,7 +21,7 @@ from typing import Literal
 import cyclopts
 from gtts import gTTS
 
-from anki_tools.ranking import cull_fr as french_cull
+from anki_tools.languages.french import cull as french_cull
 from anki_tools.cantonese.jyutping import fix_jyutping
 from anki_tools.mandarin.audio import (
     DEFAULT_VOICE as MANDARIN_DEFAULT_VOICE,

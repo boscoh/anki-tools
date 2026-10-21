@@ -15,7 +15,7 @@ from typing import Collection
 
 import pytest
 
-from anki_tools.ranking import cull_fr
+from anki_tools.languages.french import cull as cull_fr
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.sentence_pack.audit import sha256_value
 

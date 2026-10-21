@@ -11,7 +11,7 @@ from pathlib import Path
 from anki_tools.sentence_pack import audio, pack, pool, select
 from anki_tools.sentence_pack.audit import AuditInputs, gate_proper_sentences
 from anki_tools.sentence_pack.pool import check_sentence_shape
-from anki_tools.sentence_pack.languages import french
+from anki_tools.languages.french import profile as french
 
 MANDARIN_SHA256 = "862e07a6b5c7baa2766b9729734ddc72821496e89cdb76e3156f39245157b581"
 TAB = "\t"

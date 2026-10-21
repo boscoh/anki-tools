@@ -25,7 +25,9 @@ from anki_tools.sentence_pack.profile import (
     profile_names,
 )
 
-from . import cantonese, french, greek, mandarin
+from anki_tools.languages.french import profile as french
+
+from . import cantonese, greek, mandarin
 
 
 @dataclass(frozen=True)

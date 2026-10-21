@@ -30,7 +30,7 @@ from typing import Any, Callable, Collection, Iterable, Iterator, Sequence
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.sentence_pack.audit import sha256_value
 from anki_tools.sentence_pack.audio import probe_duration
-from anki_tools.sentence_pack.languages.french import EXTRA_CSS, TOKENIZER
+from anki_tools.languages.french.profile import EXTRA_CSS, TOKENIZER
 from anki_tools.sentence_pack.pack import load_css
 
 FREQUENCY_PATH = Path("data/french_frequency.tsv")

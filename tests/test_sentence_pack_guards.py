@@ -10,7 +10,7 @@ from anki_tools.sentence_pack.guards import (
     occurrences,
 )
 from anki_tools.sentence_pack.languages.cantonese import CANTONESE
-from anki_tools.sentence_pack.languages.french import FRENCH
+from anki_tools.languages.french.profile import FRENCH
 from anki_tools.sentence_pack.languages.greek import GREEK
 from anki_tools.sentence_pack.languages.mandarin import MANDARIN
 
