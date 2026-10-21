@@ -650,13 +650,43 @@ def _token_at(spans: Sequence[tuple[str, int, int]], position: int) -> str:
     return ""
 
 
+FALSE_FRIENDS: dict[str, tuple[str, ...]] = {
+    "切": ("趕得切", "一切"),
+    "聽": ("聽日",),
+    "數": ("着數", "數學", "彩數"),
+    "燒": ("發燒",),
+    "揸": ("揸車",),
+}
+
+
+def false_friend_spans(sentence: str, form: str) -> list[tuple[int, int]]:
+    """Give the spans where the form sits inside a different-sense compound.
+
+    :param sentence: Traditional Cantonese sentence.
+    :param form: Word-table form.
+    :returns: ``(start, end)`` offsets of each matching compound.
+    """
+    spans: list[tuple[int, int]] = []
+    for compound in FALSE_FRIENDS.get(form, ()):
+        position = sentence.find(compound)
+        while position != -1:
+            spans.append((position, position + len(compound)))
+            position = sentence.find(compound, position + 1)
+    return spans
+
+
+def _inside(position: int, spans: Sequence[tuple[int, int]]) -> bool:
+    return any(start <= position < end for start, end in spans)
+
+
 def form_offsets(sentence: str, form: str) -> list[int]:
     """Find the form occurrences that count as a target hit.
 
     Cantonese 我 and 我哋 are different Swadesh concepts. A form matches when
     it holds whole tokens. An occurrence inside a longer word counts only when
     that word is not itself a target form, so 食 hits inside 食飯 but 我 does
-    not hit inside 我哋.
+    not hit inside 我哋. An occurrence inside a false-friend compound never
+    counts, so 聽 does not hit inside 聽日.
 
     :param sentence: Traditional Cantonese sentence.
     :param form: Word-table form.
@@ -668,13 +698,15 @@ def form_offsets(sentence: str, form: str) -> list[int]:
     starts = {start for _, start, _ in spans}
     ends = {end for _, _, end in spans}
     targets = table_forms()
+    blocked = false_friend_spans(sentence, form)
     found: list[int] = []
     position = sentence.find(form)
     while position != -1:
-        if position in starts and position + len(form) in ends:
-            found.append(position)
-        elif _token_at(spans, position) not in targets:
-            found.append(position)
+        if not _inside(position, blocked):
+            if position in starts and position + len(form) in ends:
+                found.append(position)
+            elif _token_at(spans, position) not in targets:
+                found.append(position)
         position = sentence.find(form, position + 1)
     return found
 
@@ -1344,8 +1376,30 @@ def gate_native_license(
     return True, f"{native} native card(s) keep a license"
 
 
+def gate_no_false_friend(
+    inputs: Any, _profile: LanguageProfile
+) -> tuple[bool, str]:
+    """Cantonese gate G20: no card uses its target in a different sense.
+
+    :param inputs: Lazy file reader of the audit.
+    :param _profile: Language profile.
+    :returns: Pass flag and detail text.
+    """
+    rows = inputs.rows()
+    bad = [
+        f"{row.get('target', '')} in {row.get('sentence', '')}"
+        for row in rows
+        if false_friend_spans(row.get("sentence", ""), row.get("target", ""))
+    ]
+    if bad:
+        return False, (
+            f"{len(bad)} card(s) use the target in a different sense: {bad[0]}"
+        )
+    return True, f"{len(rows)} cards use each target in its Swadesh sense"
+
+
 def cantonese_gates() -> tuple[tuple[str, Any], ...]:
-    """Give the ordered gate list G1 to G19 of the Cantonese pack.
+    """Give the ordered gate list G1 to G20 of the Cantonese pack.
 
     :returns: Pairs of gate name and gate function.
     """
@@ -1386,6 +1440,7 @@ def cantonese_gates() -> tuple[tuple[str, Any], ...]:
         ("G17", gate_jyutping),
         ("G18", gate_native_license),
         ("G19", gate_target_in_table),
+        ("G20", gate_no_false_friend),
     )
 
 
@@ -1399,7 +1454,7 @@ def run_cantonese_audit(
     manifest_path: Path | None = None,
     attribution_path: Path = ATTRIBUTION_PATH,
 ) -> list[tuple[str, bool, str]]:
-    """Run the Cantonese quality gates G1 to G19.
+    """Run the Cantonese quality gates G1 to G20.
 
     :param apkg_path: APKG file of the pack.
     :param sentences_csv: Sentence CSV with one row per card.

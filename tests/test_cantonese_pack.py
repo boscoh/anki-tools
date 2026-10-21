@@ -144,6 +144,17 @@ def test_verb_hits_inside_a_non_target_word(fake_tokenizer: None) -> None:
     assert cantonese.form_offsets("我食飯。", "食飯") == [1]
 
 
+def test_false_friend_compound_does_not_hit(fake_tokenizer: None) -> None:
+    assert cantonese.form_offsets("聽日係我生日。", "聽") == []
+    assert cantonese.form_offsets("我聽音樂。", "聽") == [1]
+    assert cantonese.form_offsets("一切都好。", "切") == []
+    assert cantonese.form_offsets("我切菜。", "切") == [1]
+    assert cantonese.form_offsets("佢靠彩數成功。", "數") == []
+    assert cantonese.form_offsets("由左數起。", "數") == [2]
+    assert cantonese.form_offsets("我發燒。", "燒") == []
+    assert cantonese.form_offsets("我燒水。", "燒") == [1]
+
+
 def test_single_hits_skips_a_repeated_form(fake_tokenizer: None) -> None:
     forms = frozenset({"茶", "好"})
 

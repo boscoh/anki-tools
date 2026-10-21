@@ -36,7 +36,7 @@ In scope:
 - Audio for each sentence and for each target word.
 - A build command that writes one `.apkg` file.
 - A manifest with provenance and licenses.
-- Quality gates G1 to G19.
+- Quality gates G1 to G20.
 
 Out of scope:
 
@@ -228,6 +228,25 @@ reviewed form. Table 1 shows the rule.
 | 我食飯。  | 食   | 1    | inside 食飯, which is not a reviewed form |
 | 我食飯。  | 食飯 | 1    | whole token                  |
 
+An occurrence inside a false-friend compound never counts. The reviewed list
+in `anki_tools/sentence_pack/languages/cantonese.py` holds these compounds:
+
+| Form | Sense    | Blocked compounds                          |
+| ---- | -------- | ------------------------------------------ |
+| 切   | to cut   | 趕得切 (in time), 一切 (everything)         |
+| 聽   | to hear  | 聽日 (tomorrow)                             |
+| 數   | to count | 着數 (bargain), 數學 (mathematics), 彩數 (luck) |
+| 燒   | to burn  | 發燒 (fever)                                |
+| 揸   | to hold  | 揸車 (to drive)                             |
+
+Gate G20 checks the built deck. A card fails when its target sits inside one
+of these compounds.
+
+The list does not catch every case. A bare verb can carry a different sense
+(揸 alone means to drive). An aspect marker can split a compound (發緊燒 is
+fever). A polyphone can change the sense (數 sou3 means number or fate).
+Those cases stay for a later review.
+
 ## 7. Filters
 
 A sentence passes when it passes every rule. The rules are the shared F1 to
@@ -301,7 +320,7 @@ uv run anki swadesh fetch --lang yue --lang eng              # cache the Tatoeba
 uv run anki swadesh sentences cantonese --per-word 2 --max-cards 450
 uv run anki swadesh audio cantonese --native-audio auto      # make the audio
 uv run anki swadesh pack cantonese                           # write the APKG
-uv run anki swadesh audit cantonese                          # gates G1 to G19
+uv run anki swadesh audit cantonese                          # gates G1 to G20
 ```
 
 The commands write these files:
@@ -353,10 +372,11 @@ with a non-zero exit code.
 | G17  | Every card has a jyutping reading                                         |
 | G18  | Every native card keeps a license                                         |
 | G19  | Every card target is a reviewed form with a card                          |
+| G20  | No card uses its target inside a false-friend compound                     |
 
 ### 11.1 Tests
 
-`tests/test_cantonese_pack.py` holds 16 offline tests:
+`tests/test_cantonese_pack.py` holds 18 offline tests:
 
 | Area              | Test                                                       |
 | ----------------- | ---------------------------------------------------------- |
@@ -366,6 +386,7 @@ with a non-zero exit code.
 | Script            | simplified to Traditional conversion                       |
 | Jyutping          | the reading of a sentence                                  |
 | Whole-token match | 我 against 我哋 and 食 against 食飯                        |
+| False friends     | 聽 against 聽日 and 切 against 一切                        |
 | Unknown budget    | a known and an unknown sentence                            |
 | Filters           | F2, F3, F5, F6, F7, F8, and the off rules F9 and F10       |
 | Gloss and fields  | the gloss and the `Jyutping` field                         |
@@ -390,7 +411,7 @@ Measured on 2026-10-20 with the defaults:
 | Media files                | 511                   |
 | Audio duration             | 0.4 s to 15.0 s       |
 | Jyutping on every card     | yes                   |
-| Gates G1 to G19            | all pass              |
+| Gates G1 to G20            | all pass              |
 
 The 29 forms without a card: 闊, 蝨, 棍, 種子, 葉, 樹皮, 脂肪, 羽毛, 腿,
 膝頭, 翼, 腸, 胸, 肝, 咬, 吐, 打獵, 分開, 𢯎, 搾, 掟, 綁, 浮, 結冰, 脹, 湖,
@@ -433,7 +454,7 @@ Open questions:
 | C2        | `anki-gkd` | Language profile, tokenizer, jyutping, filters     | profile and hooks                          |
 | C3        | `anki-4ng` | Sentence pool and selection                       | `vocab/cantonese_sentences.csv`            |
 | C4        | `anki-yzf` | Audio and APKG pack                               | `apkg/swadesh_cantonese_sentences.apkg`    |
-| C5        | `anki-y2r` | Gates and tests                                   | `tests/test_cantonese_pack.py`; G1 to G19  |
+| C5        | `anki-y2r` | Gates and tests                                   | `tests/test_cantonese_pack.py`; G1 to G20  |
 | C6        | `anki-0wz` | README and `ATTRIBUTION.md`                       | release check                              |
 
 ## 15. Appendix: evidence
