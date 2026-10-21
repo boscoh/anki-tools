@@ -38,13 +38,14 @@ core word list. Each core word gets 2 to 3 example sentences. A sentence that
 brings many words outside the core costs more, so the deck adds few other
 words.
 
-### 1.1 The four changes
+### 1.1 The five changes
 
 | Change          | What it does                                                      | Section |
 | --------------- | ----------------------------------------------------------------- | ------- |
 | Core target set | Swadesh forms, then X spoken-frequency words                      | 3       |
 | Example quota   | Every target gets 1 to 3 examples; a function word gets 1         | 3.3     |
 | Outside cost    | Each new word outside the core costs; a rare word costs more      | 4.3     |
+| Sentence filter | Simple, complete, no name, no loan word, and the right sense      | 7.1, 7.2 |
 | Core order      | The card order follows the core list, so the deck is a curriculum | 6       |
 
 The mode uses the same filter, frequency list, tokenizer, similarity test, and
@@ -53,31 +54,32 @@ three selection passes.
 
 ### 1.2 Result at a glance
 
-The numbers come from a prototype of sections 3 and 4 on the French 6,000-card
-deck. The settings are the defaults of section 9.2.
+The numbers come from a prototype of sections 3, 4, and 7 on the French
+6,000-card deck. The settings are the recommended preset of section 5.5:
+`--core-words 50 --per-word 2 --max-cards 300 --tail-cards 120`.
 
 | Measure                        | 1,000-card cull | This spec |
 | ------------------------------ | --------------- | --------- |
 | Cards                          | 1,000           | 300       |
-| Core targets                   | 300             | 314       |
-| Targets with 1 example         | 297             | 314       |
-| Targets with 2 examples        | 287             | 300       |
-| Swadesh forms covered          | 206 / 207       | 164 / 203 |
-| Distinct content lemmas in all | 1,981           | 541       |
-| Words outside the core         | none measured   | 227       |
-| Words outside and rare         | none measured   | 19        |
+| Core targets                   | 300             | 205       |
+| Targets with 1 example         | 297             | 205       |
+| Targets with 2 examples        | 287             | 192       |
+| Swadesh forms covered          | 206 / 207       | 155 / 203 |
+| Distinct content lemmas in all | 1,981           | 740       |
+| Words outside the core, core cards | none measured | 215     |
+| Words from the tail            | none measured   | 320       |
 
-The core deck is one third of the cards. It gives 2 examples to a larger share
-of its targets, and it holds 541 content lemmas in total: 314 core targets and
-227 support words. The support words are the small set that the sentences need
-to stay natural.
+The core part is one third of the cards of the cull. It gives 2 examples to
+192 of its 205 targets, and it holds 215 support words. The tail adds 320 new
+lemmas, so the deck has 740 content lemmas in total.
 
 This deck is not the best choice for the most words per card. Section 5.4
 compares it with a breadth deck and with a core deck plus a breadth tail.
+Section 5.5 gives the measured presets with the filter of section 7.
 
-`--core` cannot cover a Swadesh form that the input deck does not hold. The
-French input holds 164 of the 203 distinct forms. Section 8 gives the reserve
-option for the other 39 forms.
+`--core` cannot cover a Swadesh form that the input deck does not hold. With
+the window of 7.1.1, the French input holds 155 of the 203 distinct forms.
+Section 8 gives the reserve option for the other 48 forms.
 
 ### 1.3 Key decisions
 
@@ -104,7 +106,10 @@ option for the other 39 forms.
    words near 20.
 5. Order the cards as a curriculum: the easiest core words come first, and
    each card adds few new words.
-6. Reuse the input model, fields, audio, and the `reorder_deck` code path.
+6. Keep every card simple and complete: inside the length window, with a
+   predicate, and without a name or an English loan word.
+7. Give a card credit for a core word only when the sense is the same.
+8. Reuse the input model, fields, audio, and the `reorder_deck` code path.
 
 ### 2.2 Measures
 
@@ -120,6 +125,13 @@ option for the other 39 forms.
 | `outside_per_card` | `outside / cards`                                                    |
 | `absent`           | Core words that no candidate sentence holds                          |
 | `hardest_rank`     | Rank of the least frequent content lemma of a card                   |
+| `units`            | Units in a card: words or Han characters, per language               |
+| `name_hits`        | Kept cards with a name from the name list                            |
+| `loan_hits`        | Kept cards with a word from the loan list                            |
+| `no_predicate`     | Kept cards with no verb or adjective token                           |
+| `unchecked`        | Targets with no sense row                                            |
+| `absent_sense`     | Targets whose every candidate fails the sense test                    |
+| `tail_words`       | Content lemmas that only the tail cards add                          |
 
 ### 2.3 In scope
 
@@ -147,10 +159,12 @@ option for the other 39 forms.
 The core list is one list. Tier S comes first. Tier F follows tier S in rank
 order. Each target has a 1-based `position` in this list.
 
-A shared Swadesh form gives one target. The reviewed word table can give two
-concepts the same form, for example index 1 and a later index. The target
-keeps the lowest index and the set of glosses. The list has one entry, not two.
-The prototype found 207 rows and 203 distinct forms.
+A shared Swadesh form gives one target when the two glosses share a sense
+word. The target keeps the lowest index and the gloss set. When the glosses
+do not share a sense word, the form gives two targets, and the sense guard of
+7.2 keeps their examples apart. This rule replaces a plain merge. The
+prototype found 207 rows and 203 distinct forms, and the duplicate forms are
+the subject of `anki-daz`.
 
 ### 3.2 Match rule
 
@@ -349,8 +363,11 @@ only with the kept cards that share a lemma.
 
 ### 5.1 Measured size
 
-The prototype measured these sets. Every row uses the defaults of section 9.2
-and quota 2, except the last three rows.
+Sections 5.1 to 5.4 use the wide window 3 to 12 words of the cull, to compare
+the objectives and the sizing. Section 5.5 uses the default window of 7.1.1.
+
+The prototype measured these sets. Every row uses quota 2, except the last
+three rows of 5.1.
 
 | Tier F words | Core targets | Cards | `covered1` | `covered2` | `outside` | `outside_rare` |
 | ------------ | ------------ | ----- | ---------- | ---------- | --------- | -------------- |
@@ -381,9 +398,9 @@ A kept card holds about 2 target hits. Thus the slot count is
 | 390         | 250          | 414          | 399        |
 | 520         | 400          | 564          | 548        |
 
-The default is `--core-words 150`. It gives 300 cards on the French input,
-which is the smallest set that covers the Swadesh forms of the deck with 2
-examples.
+The default is `--core-words 50`. With the wide window it gives 216 cards on
+the French input, and the tail fills the card budget. With the default window
+of 7.1.1 it gives 216 cards for 205 targets, as section 5.5 shows.
 
 The command checks the request before it starts:
 
@@ -433,8 +450,32 @@ measured these decks on the same pool and with the same filter.
   1,000-card deck adds 0.058 mass over the 300-card breadth deck. The knee
   is near 300 to 400 cards.
 
-The default is `--tail-cards 0`, because the mode targets a core list. A
-caller who wants the largest frequency mass per card sets a larger value.
+The rows above use the wide window 3 to 12 words, so they compare the
+objectives only. The default is `--tail-cards 0`, because the mode targets a
+core list. A caller who wants the largest frequency mass per card sets a
+larger value.
+
+### 5.5 Measured presets with the default filter
+
+These rows use the filter of section 7: the window 5 to 9 words, the
+predicate guard, the name guard, and the sense guard. The pool is 3,403
+cards. The tail fills to 300 cards.
+
+| Preset                     | Core words | Cards | Vocab | `spoken_mass` | `covered2` |
+| -------------------------- | ---------- | ----- | ----- | ------------- | ---------- |
+| Swadesh only, quota 2      | 0          | 179   | 394   | 0.307         | 142 / 155  |
+| Swadesh only, tail 300     | 0          | 300   | 833   | 0.459         | 142 / 155  |
+| Swadesh + 50, quota 2      | 50         | 216   | 420   | 0.340         | 192 / 205  |
+| Swadesh + 50, tail 300     | 50         | 300   | 740   | 0.436         | 192 / 205  |
+| Swadesh + 150, quota 2     | 150        | 303   | 531   | 0.377         | 292 / 305  |
+
+The recommended preset is the fourth row: `--core-words 50 --per-word 2
+--max-cards 300 --tail-cards 120`. The core part teaches 192 of its 205
+targets twice, and the tail adds the wide vocabulary of a breadth deck.
+
+The tighter window costs 9 Swadesh forms and about 0.02 `spoken_mass` against
+the wide window. It removes 1,869 cards of 4,958. The gain is a deck of
+simple sentences. Set `--max-units 12` to use the wide window.
 
 ## 6. Card order
 
@@ -466,8 +507,8 @@ is the curriculum key. `hardest_rank` stays in the CSV as a report value.
 | ----- | ---------- | ------------------------------ | ----------------------------------------- |
 | K0    | Extract    | input APKG                     | cards, English, audio                     |
 | K1    | Tokenize   | K0, the tokenizer of the language | lemma and tag per card                 |
-| K2    | Frequency  | the cached frequency list, the word table | core list, quota, `absent` list |
-| K3    | Filter     | K1                             | passed cards and reasons F1 to F9         |
+| K2    | Frequency  | the cached frequency list, the word table, the sense file | core list, quota, sense rows, `absent` list |
+| K3    | Filter     | K1                             | passed cards and reasons F1 to F9 and C1 to C4 |
 | K4    | Select     | K1, K2, K3                     | kept cards, uses, reasons                 |
 | K5    | Order      | K4                             | kept cards in core order                  |
 | K6    | Write      | K0, K5                         | `.apkg`, `.core.csv`, `.coverage.csv`, manifest |
@@ -487,11 +528,108 @@ K1, K3, and K6 are the existing functions:
 `anki fix fr --core` runs K0 to K6. A second run with the same input gives the
 same output. The audio cache is read only.
 
+### 7.1 K3 sentence filter
+
+The mode applies the cull filter F1 to F9 and four extra guards. A card must
+pass every rule. A card that fails a rule is not a candidate.
+
+| Key | Rule                                                       | Source        |
+| --- | ---------------------------------------------------------- | ------------- |
+| F1  | the English text has 2 to 12 words                          | cull F1       |
+| F2  | the unit count is inside the window of 7.1.1                | cull F2       |
+| F3  | no digit, bracket, URL, or ellipsis                         | cull F3       |
+| F4  | a final mark `.`, `?`, or `!` at the end                    | cull F4       |
+| F5  | exactly one final mark                                     | cull F5       |
+| F6  | no quotation mark and no dialogue dash                      | cull F6       |
+| F7  | at most one internal comma, colon, or semicolon             | cull F7       |
+| F8  | no proper name token                                       | cull F8       |
+| F9  | the sentence text is unique                                 | cull F9       |
+| C1  | a predicate: a `VERB`, `AUX`, or `ADJ` token                | pool F9       |
+| C2  | a main clause: no orphan conjunction                        | pool F10      |
+| C3  | no name from `vocab/<language>_names.*`, as a substring     | yue Y8        |
+| C4  | no word from `vocab/<language>_loanwords.txt`               | new           |
+
+C1 makes the sentence complete. A fragment such as `Très bon.` has no
+predicate, so it is not a core card. C2 rejects a clause that starts with a
+conjunction and has no main verb.
+
+C3 is the rule of the yue selector. A name can split into two tokens, so the
+test is a substring test on the sentence. F8 covers the languages whose
+tokenizer gives a `PROPN` tag. F3 covers a Latin name inside a Chinese
+sentence.
+
+C4 rejects an English loan word. The list is one word per line, for example
+`week-end`, `parking`, `sandwich`, `email`, `internet`, `job`, and `top` for
+French. A deck author adds a word when the deck shows it. The rule is a whole
+word match, not a substring match, so `stop` does not reject `stopover`.
+The list is optional. Gate K18 reports the count, so a missing list is
+visible and does not fail the run.
+
+#### 7.1.1 Length window
+
+The window is the preferred range of the Swadesh pack of the language. A
+short card is a fragment, and a long card is hard work in a core deck. The
+window also sets the length cost: `--lambda-len` applies to each unit above
+the simple limit.
+
+| Language  | Unit     | Window | Simple limit | Evidence                                        |
+| --------- | -------- | ------ | ------------ | ----------------------------------------------- |
+| French    | word     | 5 to 9 | 7            | the pack preferred range; the cull uses 3 to 12 |
+| Greek     | word     | 5 to 8 | 7            | the pack preferred range                        |
+| Cantonese | Han char | 4 to 7 | 6            | the pack uses 4 to 8; this spec uses 7          |
+| Mandarin  | Han char | 4 to 7 | 6            | the pack window                                 |
+
+The Cantonese window is 7 and not 8, for parity with Mandarin. The yue
+selector uses 3 to 12, because a Cantonese sentence is short. A caller can
+widen the window with `--max-units`.
+
+Measured effect on the French 6,000-card deck: the window 5 to 9 keeps 3,442
+of the 4,958 cards that pass F1 to F9. F2 rejects 1,869 cards. The predicate
+guard C1 rejects 39 more. The tighter window costs 9 Swadesh forms that have
+no candidate (164 present forms become 155).
+
+### 7.2 Sense guard
+
+A target is a word and a sense. A card gets credit for a target only when the
+English text holds that sense. The rule is the rule of the Swadesh pool.
+
+| Tier | Sense words                                             | False-friend words        |
+| ---- | ------------------------------------------------------- | ------------------------- |
+| S    | the Swadesh gloss, or the `SENSE_CHECKS` row of the form | the `SENSE_CHECKS` row    |
+| F    | the sense words of the target row                        | the false-friend words    |
+
+The tier F rows live in `vocab/<language>_core_senses.tsv`, with the columns
+`word`, `senses`, and `false_friends`. The two word columns are
+comma-separated. Reuse `make_sense_filter` of
+`sentence_pack/profile.py`, `holds_sense` of `sentence_pack/english_sense.py`,
+and `compound_spans` of `sentence_pack/guards.py`.
+
+```text
+hit(w, card) is True when
+    the form or lemma of w occurs in the card, and
+    the English holds a sense word of w, and
+    the English does not hold a false-friend word without a sense word
+```
+
+- A hit that fails the test does not count. The card stays when another
+  target counts, so one bad sense does not remove a good card.
+- The compound rule of the pack applies to a tier S form. For example, 闻
+  inside 新闻 is not a hit, and 聽 inside 聽日 is not a hit.
+- A target with no sense row is `unchecked`. Gate K17 fails when the count is
+  above `--max-unchecked-sense` (0 by default). The coverage CSV gives the
+  status `unchecked` for the target.
+- A target whose every candidate fails the sense test is `absent_sense`. It
+  stays in the coverage CSV, and it does not fail K2.
+
+The French pack has no `SENSE_CHECKS` rows, so the French core run needs a new
+sense file before K17 can pass. That file is the E2 task. A rough first pass
+is enough: the sentence pairs of the deck show the senses.
+
 ## 8. Swadesh reserve
 
 A core word with no source sentence in the input deck is `absent`. The French
-input deck holds 164 of the 203 distinct Swadesh forms. The 39 gaps are mostly
-rare nouns such as `pou`, `bâton`, and `graine`.
+input deck holds 155 of the 203 distinct Swadesh forms with the window of
+7.1.1. The 48 gaps are mostly rare nouns such as `pou`, `bâton`, and `graine`.
 
 The mode can add the Swadesh sentence pack of section 16 of the cull spec:
 
@@ -530,11 +668,11 @@ rank mode stays the default.
 | Option              | Default      | Meaning                                              |
 | ------------------- | ------------ | ---------------------------------------------------- |
 | `--core`            | off          | Run the core-word selection                          |
-| `--core-words`      | 150          | Tier F words after the Swadesh set                   |
+| `--core-words`      | 50           | Tier F words after the Swadesh set                   |
 | `--per-word`        | 2            | Examples per content target, 1 to 3                  |
 | `--third-examples`  | 0            | Targets that get a third example                     |
 | `--ubiquitous-share`| 0.25         | Share above which a target gets quota 1              |
-| `--max-cards`       | 400          | Card cap                                             |
+| `--max-cards`       | 300          | Card cap                                             |
 | `--completion-cards`| 120          | Card cap of the completion pass                      |
 | `--outside-budget`  | 0            | Cap on the outside set; 0 is no cap                  |
 | `--tail-cards`      | 0            | Cards after the core passes that only bring new words |
@@ -546,25 +684,32 @@ rank mode stays the default.
 | `--lambda-seed`     | 0.01         | Cost factor of the seed pass                         |
 | `--min-deck-count`  | 3            | Minimum deck count of a tier F target                |
 | `--spoken-weight`   | 0.5          | Weight of the Tatoeba term in the blend              |
-| `--min-words`       | 3            | Minimum word count of a card                         |
-| `--max-words`       | 12           | Maximum word count of a card                         |
+| `--min-words`       | per language | First unit count of the window of 7.1.1              |
+| `--max-words`       | per language | Last unit count of the window of 7.1.1               |
+| `--simple-units`    | per language | Unit count above which the length cost applies        |
+| `--names`           | per language | Name list of rule C3, or none                        |
+| `--loanwords`       | per language | Loan word list of rule C4, or none                   |
+| `--senses`          | per language | Sense file of section 7.2                            |
+| `--max-unchecked-sense` | 0        | Unchecked targets that gate K17 accepts              |
 | `--similarity`      | 0.67         | Lemma Jaccard limit                                  |
 | `--reserve-pack`    | none         | Swadesh pack to add, or none                         |
 | `--name`            | from the language | Output deck name                                |
 | `--output`          | from the input name | Output APKG                                  |
-| `--check`           | off          | Run gates K1 to K15 on the output                    |
+| `--check`           | off          | Run gates K1 to K20 on the output                    |
 
 ### 9.3 Output files
 
 | File                                  | Content                                                     |
 | ------------------------------------- | ----------------------------------------------------------- |
 | `apkg/french_core_300.apkg`           | The kept cards in core order, with the input model and audio |
-| `apkg/french_core_300.core.csv`       | One row per input card: `kept`, `pass`, `reason`, `targets`, `assigned`, `value`, `cost` |
+| `apkg/french_core_300.core.csv`       | One row per input card: `kept`, `pass`, `reason`, `targets`, `assigned`, `value`, `cost`, `units`, `sense` |
 | `apkg/french_core_300.coverage.csv`   | One row per target: `word`, `tier`, `position`, `quota`, `count`, `status` |
 | `apkg/french_core_300.manifest.json`  | Counts, options, frequency source, and hashes               |
 | `apkg/french_core_300.rank.csv`       | The ranking CSV that `reorder_deck` reads                    |
 
-`status` is `covered`, `partial` (below the quota), or `absent`.
+`status` is `covered`, `partial` (below the quota), `absent` (no candidate),
+`absent_sense` (every candidate fails the sense test), or `unchecked` (no
+sense row).
 
 ### 9.4 Code changes
 
@@ -572,8 +717,15 @@ rank mode stays the default.
   generic gain, cost, and pass code in `anki_tools/ranking/core.py`, so two
   languages share it.
 - Add the `--core` option and the option block to `anki fix fr` in `cli.py`.
+- Add the filter C1 to C4 as `core_filter_reason` after the cull reason. The
+  predicate and orphan tests are the tests of `sentence_pack/pool.py`.
+- Add the sense guard as `core_sense_hits`, over `make_sense_filter` and
+  `holds_sense`.
+- Add `vocab/<language>_core_senses.tsv` and
+  `vocab/<language>_loanwords.txt`. Add a name list for a language that has
+  none.
 - Extend `ranking/cover.py` with the `key` order `(-score, new, units, index)`.
-- Reuse `ANKI` write and `reorder_deck` without a change.
+- Reuse the APKG writer and `reorder_deck` without a change.
 - Reuse the gates file layout of `cull.py`.
 
 ## 10. Quality gates and tests
@@ -589,7 +741,7 @@ command with a non-zero exit code.
 | K2   | Every present target has at least 1 kept card (`covered1 == targets`) |
 | K3   | At least 0.95 of the targets reach 2 examples                         |
 | K4   | The outside set is at most 0.9 times the target count, and the rare outside words are at most 0.1 of the outside set |
-| K5   | Every kept card passes the filter rules F1 to F9                      |
+| K5   | Every kept card passes the filter rules F1 to F9 and C1 to C4         |
 | K6   | No kept pair reaches the lemma Jaccard limit                          |
 | K7   | Every kept card has its input audio, and the file is a valid MP3      |
 | K8   | The APKG note count equals the kept count and the manifest count      |
@@ -601,6 +753,10 @@ command with a non-zero exit code.
 | K14  | Every target with a kept card holds the form or lemma in that card    |
 | K15  | The templates and the CSS are the input values                        |
 | K16  | Every tail card brings at least one new content lemma                  |
+| K17  | Every target with a card has a sense row, or the unchecked count is within `--max-unchecked-sense` |
+| K18  | No kept card holds a name from the name list or a word from the loan list |
+| K19  | Every kept card has a predicate, and its unit count is inside the window |
+| K20  | The coverage CSV gives the status `absent`, `partial`, `covered`, or `unchecked`, and the manifest counts agree |
 
 ### 10.2 Tests
 
@@ -609,7 +765,8 @@ file. Do not download a file.
 
 | Area         | Test                                                              |
 | ------------ | ----------------------------------------------------------------- |
-| Core list    | One target per distinct Swadesh form; two shared forms merge      |
+| Core list    | One target per distinct Swadesh form when the glosses share a sense |
+| Core list    | Two glosses without a shared sense word give two targets          |
 | Core list    | A function word with a low content share is not a tier F target    |
 | Core list    | A tier F lemma equal to a Swadesh lemma is not added               |
 | Core list    | An absent target gets the status `absent` and does not fail K2     |
@@ -625,6 +782,15 @@ file. Do not download a file.
 | APKG         | The output holds the kept notes and only their media files         |
 | Tail pass    | A tail card brings a new lemma, and no tail card repeats a core card |
 | Tail pass    | `--tail-cards 0` keeps the core set and the core order             |
+| Filter C1    | A fragment with no verb or adjective is not a candidate            |
+| Filter C2    | A sentence that starts with a conjunction and has no main clause fails |
+| Filter C3    | A name from the list removes the card, also when it splits in two tokens |
+| Filter C4    | A loan word removes the card; a word that only contains it does not |
+| Window       | A card outside the language window fails, and `--max-units` widens it |
+| Sense        | A hit whose English holds no sense word does not count             |
+| Sense        | A false-friend English word removes the hit, and the card stays for another target |
+| Sense        | A target with no sense row gets the status `unchecked` and fails K17 |
+| Sense        | A compound span blocks a tier S hit (闻 inside 新闻)                  |
 
 ## 11. Risks and open questions
 
@@ -640,6 +806,10 @@ file. Do not download a file.
 | The input deck lacks a Swadesh form               | `absent` target                           | `--reserve-pack`; K2 excludes `absent`        |
 | The prototype matched lemmas, the code matches forms | A count can move by a few targets      | Re-measure at E2; the gates use the output    |
 | Lemmatizer artifacts (`taire`, `fait`, `éper`)    | A bad target                              | The word review file; the `absent` status     |
+| The window 5 to 9 removes 1,869 cards             | 9 Swadesh forms have no candidate         | `--max-units 12`; `--reserve-pack`            |
+| A sense file does not exist for most languages    | K17 fails, or many targets are `unchecked` | E2 builds the file for the top 50 words first |
+| A sense row is wrong                             | A good card loses its credit              | Review the CSV; the `absent_sense` status     |
+| The loan word list is incomplete                  | A loan word stays in a card               | Add a row when the review shows the word; K18 |
 
 ### 11.2 Open questions
 
@@ -652,15 +822,18 @@ file. Do not download a file.
 | 5   | Does the order interleave tier S and tier F, or follow the core list?   | E3        |
 | 6   | Is a second example of the same word in the same week useful, or should the order spread it? | E3 |
 | 7   | Should `--tail-cards` have a default above 0 for a deck of 300 cards? | E3 |
+| 8   | Is the window 5 to 9 for French right, or should it be 4 to 10? | E2 |
+| 9   | Does a curated loan word list cover the deck, or does it need a rule? | E2 |
+| 10  | Who writes the sense file, and how many words does it cover? | E2 |
 
 ## 12. Milestones
 
 | Milestone | Issue      | Task                                                     | Output                    |
 | --------- | ---------- | -------------------------------------------------------- | ------------------------- |
 | E1        | `anki-eo6` | This spec and the prototype analysis                      | `specs/core-word-small-deck.md` |
-| E2        | `anki-v12` | Core list, quota, `absent` list, size check                | `languages/<lang>/core.py` |
-| E3        | `anki-p62` | Value, cost, three passes, cover key                       | selection report          |
-| E4        | `anki-7z5` | Core order, writer, CSV files, manifest, gates K1 to K15   | `.apkg` and CSV files     |
+| E2        | `anki-v12` | Core list, quota, `absent` list, size check, filter C1 to C4, sense file, name and loan lists | `languages/<lang>/core.py` |
+| E3        | `anki-p62` | Value, cost, passes, cover key, sense-filtered hits        | selection report          |
+| E4        | `anki-7z5` | Core order, writer, CSV files, manifest, gates K1 to K20   | `.apkg` and CSV files     |
 | E5        | `anki-yop` | Tests, README, docs entry                                  | release check             |
 
 ## 13. Appendix: prototype evidence
