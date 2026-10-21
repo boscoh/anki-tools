@@ -1,4 +1,4 @@
-"""Mandarin caller of the shared quality gates (G1 to G17).
+"""Mandarin caller of the shared quality gates (G1 to G18).
 
 The shared module holds the gate runner and the language-neutral gates. This
 module adds the Mandarin word-table gate, the pinyin gate, and the native-audio
@@ -36,6 +36,7 @@ from anki_tools.sentence_pack.languages.mandarin import (
     check_word_table,
     load_word_table,
     false_friend_spans,
+    sense_filter,
 )
 from anki_tools.mandarin_deck import audio_author_map
 from anki_tools.rank import get_chinese_chars
@@ -131,6 +132,27 @@ def _gate_g17(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
     return True, f"{len(rows)} cards use each target in its Swadesh sense"
 
 
+def _gate_g18(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
+    """Gate G18: no card English holds a false-friend sense.
+
+    :param inputs: Lazy file reader of the audit.
+    :param profile: Language profile.
+    :returns: Pass flag and detail text.
+    """
+    rows = inputs.rows()
+    bad = [
+        f"{row.get('target', '')} in {row.get('sentence', '')}"
+        for row in rows
+        if sense_filter(row.get("target", ""), row.get("english", ""))
+    ]
+    if bad:
+        return False, (
+            f"{len(bad)} card(s) use the target in a different sense: "
+            f"{sample(bad)}"
+        )
+    return True, f"{len(rows)} cards use each target in its Swadesh sense"
+
+
 GATES: tuple[tuple[str, GateCheck], ...] = (
     ("G1", _gate_g1),
     ("G2", gate_unique_forms),
@@ -149,6 +171,7 @@ GATES: tuple[tuple[str, GateCheck], ...] = (
     ("G15", gate_review_file),
     ("G16", gate_word_audio),
     ("G17", _gate_g17),
+    ("G18", _gate_g18),
 )
 
 
@@ -161,7 +184,7 @@ def run_audit(
     manifest_path: Path = MANIFEST_PATH,
     attribution_path: Path = ATTRIBUTION_PATH,
 ) -> list[GateRow]:
-    """Run the quality gates G1 to G17.
+    """Run the quality gates G1 to G18.
     :param apkg_path: APKG file of the pack.
     :param sentences_csv: Sentence CSV with one row per card.
     :param word_csv: Reviewed Swadesh word CSV.

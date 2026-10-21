@@ -155,6 +155,15 @@ def test_false_friend_compound_does_not_hit(fake_tokenizer: None) -> None:
     assert cantonese.form_offsets("我燒水。", "燒") == [1]
 
 
+def test_sense_filter_rejects_false_friend_english() -> None:
+    assert cantonese.sense_filter("揸", "Could you drive more slowly?")
+    assert not cantonese.sense_filter("揸", "Hold the cup.")
+    assert cantonese.sense_filter("燒", "Does she have a temperature?")
+    assert not cantonese.sense_filter("燒", "My hand was burned.")
+    assert cantonese.sense_filter("數", "I like math least of all.")
+    assert not cantonese.sense_filter("數", "I counted to ten.")
+
+
 def test_single_hits_skips_a_repeated_form(fake_tokenizer: None) -> None:
     forms = frozenset({"茶", "好"})
 

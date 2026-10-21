@@ -103,6 +103,8 @@ class LanguageProfile:
         sentence, None to wrap the first target substring.
     :param char_links: True when the back template links each Han character
         to the CC-Canto dictionary.
+    :param sense_filter: Hook that rejects a form whose paired English holds a
+        false-friend sense, given the form and the English text.
     """
 
     name: str
@@ -176,6 +178,7 @@ class LanguageProfile:
     finalize_candidate: Callable[[Any, str], Any]
     highlight: Callable[[str, str], str] | None = None
     char_links: bool = False
+    sense_filter: Callable[[str, str], bool] | None = None
 
     def target_length(self, candidate: Any) -> int:
         """Give the unit length of a candidate.
@@ -213,6 +216,28 @@ def duplicate_limit(profile: LanguageProfile) -> float:
     :returns: Jaccard value of the duplicate guard.
     """
     return profile.similarity_limit
+
+
+def make_sense_filter(
+    checks: dict[str, tuple[frozenset[str], frozenset[str]]],
+) -> Callable[[str, str], bool]:
+    """Build a filter that rejects a false-friend English sense.
+
+    :param checks: Mapping from form to ``(sense words, false-friend words)``.
+    :returns: A function that returns True when the English holds a
+        false-friend word and no sense word.
+    """
+
+    def sense_filter(form: str, english: str) -> bool:
+        sense, false = checks.get(form, (frozenset(), frozenset()))
+        if not false:
+            return False
+        words = {word.strip(".,!?;:") for word in english.lower().split()}
+        if words & sense:
+            return False
+        return bool(words & false)
+
+    return sense_filter
 
 
 PROFILES: dict[str, LanguageProfile] = {}

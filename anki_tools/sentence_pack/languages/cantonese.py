@@ -43,7 +43,7 @@ from anki_tools.sentence_pack.pack import (
     tts_engine_name,
     write_attribution_section,
 )
-from anki_tools.sentence_pack.profile import LanguageProfile, register
+from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
 from anki_tools.sentence_pack.select import rank_order, review_status
 from anki_tools.yue_frequency import (
     build_yue_tokenizer,
@@ -659,6 +659,31 @@ FALSE_FRIENDS: dict[str, tuple[str, ...]] = {
 }
 
 
+SENSE_CHECKS: dict[str, tuple[frozenset[str], frozenset[str]]] = {
+    "揸": (
+        frozenset({
+            "hold", "holds", "held", "holding", "grip", "grips",
+            "grasp", "grasps", "clutch", "clutches",
+        }),
+        frozenset({
+            "drive", "drives", "drove", "driving", "driver", "fly",
+            "flies", "flew", "flying", "pilot", "plane", "planes",
+        }),
+    ),
+    "燒": (
+        frozenset({"burn", "burns", "burned", "burnt", "burning", "fire"}),
+        frozenset({"fever", "fevers", "temperature", "temperatures"}),
+    ),
+    "數": (
+        frozenset({"count", "counts", "counted", "counting"}),
+        frozenset({
+            "math", "maths", "mathematics", "arithmetic", "number",
+            "numbers",
+        }),
+    ),
+}
+
+
 def false_friend_spans(sentence: str, form: str) -> list[tuple[int, int]]:
     """Give the spans where the form sits inside a different-sense compound.
 
@@ -677,6 +702,9 @@ def false_friend_spans(sentence: str, form: str) -> list[tuple[int, int]]:
 
 def _inside(position: int, spans: Sequence[tuple[int, int]]) -> bool:
     return any(start <= position < end for start, end in spans)
+
+
+sense_filter = make_sense_filter(SENSE_CHECKS)
 
 
 def form_offsets(sentence: str, form: str) -> list[int]:
@@ -1137,6 +1165,7 @@ CANTONESE = register(
         extra_manifest=extra_manifest,
         attribution=write_attribution,
         highlight=highlight,
+        sense_filter=sense_filter,
         finalize_candidate=lambda card, _target: replace(
             card, jyutping=sentence_jyutping(card.sentence)
         ),
@@ -1398,8 +1427,30 @@ def gate_no_false_friend(
     return True, f"{len(rows)} cards use each target in its Swadesh sense"
 
 
+def gate_no_sense_mismatch(
+    inputs: Any, _profile: LanguageProfile
+) -> tuple[bool, str]:
+    """Cantonese gate G21: no card English holds a false-friend sense.
+
+    :param inputs: Lazy file reader of the audit.
+    :param _profile: Language profile.
+    :returns: Pass flag and detail text.
+    """
+    rows = inputs.rows()
+    bad = [
+        f"{row.get('target', '')} in {row.get('sentence', '')}"
+        for row in rows
+        if sense_filter(row.get("target", ""), row.get("english", ""))
+    ]
+    if bad:
+        return False, (
+            f"{len(bad)} card(s) use the target in a different sense: {bad[0]}"
+        )
+    return True, f"{len(rows)} cards use each target in its Swadesh sense"
+
+
 def cantonese_gates() -> tuple[tuple[str, Any], ...]:
-    """Give the ordered gate list G1 to G20 of the Cantonese pack.
+    """Give the ordered gate list G1 to G21 of the Cantonese pack.
 
     :returns: Pairs of gate name and gate function.
     """
@@ -1441,6 +1492,7 @@ def cantonese_gates() -> tuple[tuple[str, Any], ...]:
         ("G18", gate_native_license),
         ("G19", gate_target_in_table),
         ("G20", gate_no_false_friend),
+        ("G21", gate_no_sense_mismatch),
     )
 
 
@@ -1454,7 +1506,7 @@ def run_cantonese_audit(
     manifest_path: Path | None = None,
     attribution_path: Path = ATTRIBUTION_PATH,
 ) -> list[tuple[str, bool, str]]:
-    """Run the Cantonese quality gates G1 to G20.
+    """Run the Cantonese quality gates G1 to G21.
 
     :param apkg_path: APKG file of the pack.
     :param sentences_csv: Sentence CSV with one row per card.

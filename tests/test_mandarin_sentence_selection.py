@@ -29,6 +29,7 @@ from anki_tools.mandarin_swadesh import (
     write_sentence_csv,
     write_sentence_review_csv,
 )
+from anki_tools.sentence_pack.languages.mandarin import sense_filter
 
 POOL_SENTENCES = [
     (1, "我要喝水。", 100, "I want to drink water.", "alice", (5001, "CC BY 2.0 FR")),
@@ -220,6 +221,14 @@ class TestTokenChecks:
         assert count_form_occurrences("一切都好。", "切") == 0
         assert count_form_occurrences("他的数学很好。", "数") == 0
         assert sentence_hits("一切都好。", ["切", "好"]) == {"好": 1}
+
+    def test_sense_filter_rejects_false_friend_english(self) -> None:
+        assert sense_filter("抓", "He grabbed a handful of rice.")
+        assert not sense_filter("抓", "I scratched my arm.")
+        assert sense_filter("数", "What are those numbers?")
+        assert not sense_filter("数", "I counted to ten.")
+        assert sense_filter("挤", "This room is cramped.")
+        assert not sense_filter("挤", "Squeeze the lemon.")
 
 
 class TestRankingKey:

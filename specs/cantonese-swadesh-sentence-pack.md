@@ -36,7 +36,7 @@ In scope:
 - Audio for each sentence and for each target word.
 - A build command that writes one `.apkg` file.
 - A manifest with provenance and licenses.
-- Quality gates G1 to G20.
+- Quality gates G1 to G21.
 
 Out of scope:
 
@@ -247,6 +247,19 @@ The list does not catch every case. A bare verb can carry a different sense
 fever). A polyphone can change the sense (數 sou3 means number or fate).
 Those cases stay for a later review.
 
+An English sense check catches those cases. Each risky form has two English
+word lists: sense words and false-friend words. A candidate passes when the
+paired English holds a sense word, or holds no false-friend word. The
+`SENSE_CHECKS` table in `cantonese.py` holds the lists:
+
+| Form | Sense words             | False-friend words
+| ---- | ----------------------- | ---------------------------------- |
+| 揸   | hold, grip, grasp       | drive, drove, driving, driver      |
+| 數   | count, counts, counted  | math, mathematics, number, numbers |
+| 燒   | burn, burned, fire      | fever, temperature                 |
+
+Gate G21 checks the built deck against the stored English text.
+
 ## 7. Filters
 
 A sentence passes when it passes every rule. The rules are the shared F1 to
@@ -320,7 +333,7 @@ uv run anki swadesh fetch --lang yue --lang eng              # cache the Tatoeba
 uv run anki swadesh sentences cantonese --per-word 2 --max-cards 450
 uv run anki swadesh audio cantonese --native-audio auto      # make the audio
 uv run anki swadesh pack cantonese                           # write the APKG
-uv run anki swadesh audit cantonese                          # gates G1 to G20
+uv run anki swadesh audit cantonese                          # gates G1 to G21
 ```
 
 The commands write these files:
@@ -373,10 +386,11 @@ with a non-zero exit code.
 | G18  | Every native card keeps a license                                         |
 | G19  | Every card target is a reviewed form with a card                          |
 | G20  | No card uses its target inside a false-friend compound                     |
+| G21  | No card English holds a false-friend sense for its target                  |
 
 ### 11.1 Tests
 
-`tests/test_cantonese_pack.py` holds 18 offline tests:
+`tests/test_cantonese_pack.py` holds 19 offline tests:
 
 | Area              | Test                                                       |
 | ----------------- | ---------------------------------------------------------- |
@@ -387,6 +401,7 @@ with a non-zero exit code.
 | Jyutping          | the reading of a sentence                                  |
 | Whole-token match | 我 against 我哋 and 食 against 食飯                        |
 | False friends     | 聽 against 聽日 and 切 against 一切                        |
+| Sense filter      | drive and temperature English reject, hold and burn keep   |
 | Unknown budget    | a known and an unknown sentence                            |
 | Filters           | F2, F3, F5, F6, F7, F8, and the off rules F9 and F10       |
 | Gloss and fields  | the gloss and the `Jyutping` field                         |
@@ -401,29 +416,30 @@ Measured on 2026-10-20 with the defaults:
 
 | Measure                    | Value                 |
 | -------------------------- | --------------------- |
-| Cards                      | 330                   |
-| Core cards                 | 329                   |
+| Cards                      | 329                   |
+| Core cards                 | 328                   |
 | Scaffold cards             | 1                     |
-| Forms with a card          | 177 of 207 (85.5%)    |
-| Concepts with a card       | 177 of 207 (85.5%)    |
-| Cards with native audio    | 206                   |
-| Cards with a TTS file      | 124                   |
-| Media files                | 507                   |
+| Forms with a card          | 176 of 207 (85.0%)    |
+| Concepts with a card       | 176 of 207 (85.0%)    |
+| Cards with native audio    | 204                   |
+| Cards with a TTS file      | 125                   |
+| Media files                | 505                   |
 | Audio duration             | 0.4 s to 15.0 s       |
 | Jyutping on every card     | yes                   |
-| Gates G1 to G20            | all pass              |
+| Gates G1 to G21            | all pass              |
 
-The 30 forms without a card: 闊, 蝨, 棍, 種子, 葉, 樹皮, 脂肪, 羽毛, 腿,
+The 31 forms without a card: 闊, 蝨, 棍, 種子, 葉, 樹皮, 脂肪, 羽毛, 腿,
 膝頭, 翼, 腸, 胸, 肝, 咬, 吐, 打獵, 切, 分開, 𢯎, 搾, 掟, 綁, 浮, 結冰, 脹, 湖,
-鹽, 鈍, 裡面.
+鹽, 燒, 鈍, 裡面.
 
-The cap did not bind: `--per-word 2` stops at 330 cards, before `--max-cards
-450`. Two forms have a candidate but no card: 𢯎 and 掟. 切 has no candidate
-left, because its only candidates held the false-friend compounds 趕得切 and
-一切. Every other uncovered form has no candidate sentence that reaches it.
+The cap did not bind: `--per-word 2` stops at 329 cards, before `--max-cards
+450`. Three forms have a candidate but no card: 𢯎, 掟, and 燒. 燒 lost its
+candidates to the English sense check (fever and temperature are not the
+burn sense). 切 has no candidate left, because its only candidates held the
+false-friend compounds 趕得切 and 一切.
 
-Length of the cards: 13 cards have 3 Han characters, 21 have 4, 37 have 5, 57
-have 6, 48 have 7, 54 have 8, 42 have 9, 26 have 10, 15 have 11, and 17 have
+Length of the cards: 13 cards have 3 Han characters, 21 have 4, 38 have 5, 56
+have 6, 47 have 7, 53 have 8, 42 have 9, 26 have 10, 15 have 11, and 18 have
 12.
 
 ## 13. Risks and open questions
@@ -455,7 +471,7 @@ Open questions:
 | C2        | `anki-gkd` | Language profile, tokenizer, jyutping, filters     | profile and hooks                          |
 | C3        | `anki-4ng` | Sentence pool and selection                       | `vocab/cantonese_sentences.csv`            |
 | C4        | `anki-yzf` | Audio and APKG pack                               | `apkg/swadesh_cantonese_sentences.apkg`    |
-| C5        | `anki-y2r` | Gates and tests                                   | `tests/test_cantonese_pack.py`; G1 to G20  |
+| C5        | `anki-y2r` | Gates and tests                                   | `tests/test_cantonese_pack.py`; G1 to G21  |
 | C6        | `anki-0wz` | README and `ATTRIBUTION.md`                       | release check                              |
 
 ## 15. Appendix: evidence

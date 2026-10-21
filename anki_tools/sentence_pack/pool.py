@@ -318,6 +318,12 @@ def build_candidate_pool(
             counts[key] += 1
 
         hits = tuple(sorted(profile.hits(sentence, form_set)))
+        if profile.sense_filter is not None:
+            hits = tuple(
+                form
+                for form in hits
+                if not profile.sense_filter(form, english_text)
+            )
         if fail is None and hits:
             seen.add(dedupe)
             audio_id, audio_license = audio.get(sentence_id, (0, ""))

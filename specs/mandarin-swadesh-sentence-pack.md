@@ -348,9 +348,9 @@ A false-friend compound never counts as a target match. The reviewed list in
 | ---- | ---------- | --------------------------------------- |
 | 切   | to cut     | 一切 (everything)                       |
 | 闻   | to smell   | 新闻 (news), 传闻 (rumor)               |
-| 数   | to count | 数学 (math), 数大 (number), 数字 (numbers), 岁数 (age) |
+| 数   | to count | 数学 (math), 数大 (number), 数字 (numbers), 岁数 (age), 人数 (headcount) |
 | 烧   | to burn    | 发烧 (fever)                            |
-| 抓   | to scratch | 抓住 (to grab)                          |
+| 抓   | to scratch | 抓住 (to grab), 抓到 (to catch), 抓紧 (to grasp)          |
 | 挖   | to dig     | 挖苦 (to ridicule)                      |
 | 挤   | to squeeze | 挤满 (crowded)                          |
 
@@ -360,6 +360,19 @@ of these compounds.
 The list does not catch every case. A polyphone can change the sense
 (数 shù means number or math, not to count). A bare verb can carry a
 different sense. Those cases stay for a later review.
+
+An English sense check catches those cases. Each risky form has two English
+word lists: sense words and false-friend words. A candidate passes when the
+paired English holds a sense word, or holds no false-friend word. The
+`SENSE_CHECKS` table in `mandarin.py` holds the lists:
+
+| Form | Sense words                    | False-friend words
+| ---- | ------------------------------ | ---------------------------------------- |
+| 抓   | scratch, scratched, itch       | grab, grabbed, catch, caught, arrest     |
+| 数   | count, counts, counted         | math, mathematics, number, numbers       |
+| 挤   | squeeze, squeezes, squeezed    | crowded, cramped, packed                 |
+
+Gate G18 checks the built deck against the stored English text.
 Reuse `char_similarity_zh` and `is_repeated_zh_sentence` from
 `anki_tools/rank.py`.
 
@@ -390,7 +403,7 @@ Use greedy set cover:
 
 Defaults: `--per-word 2`, `--max-cards 450`, `--max-unknown 2`. The word
 list has 211 forms, so 2 cards per word gives about 420 cards. The 4 to 7
-character window and the Tatoeba pool give 386 cards. Keep the
+character window and the Tatoeba pool give 385 cards. Keep the
 deck below about 450 cards for daily review.
 
 Reject a card when the sentence has no English translation after pairing.
@@ -582,10 +595,10 @@ Write `apkg/swadesh_mandarin_sentences.manifest.json`:
   "source_dump_date": "2026-10-19",
   "counts": {
     "words": 211,
-    "cards": 386,
+    "cards": 385,
     "scaffold": 0,
     "native_audio": 0,
-    "tts_audio": 386
+    "tts_audio": 385
   },
   "coverage": {"core_with_card": 0.942},
   "voice": "gtts:zh-CN",
@@ -708,6 +721,7 @@ code on a failure.
 | G15  | `vocab/swadesh_review.csv` exists and has no open row                                      |
 | G16  | Every card target has a valid `word_{hash}.mp3` file                                       |
 | G17  | No card uses its target inside a false-friend compound                                     |
+| G18  | No card English holds a false-friend sense for its target                                  |
 
 G10 is provisional. M1 measures the real coverage. This spec then keeps
 the measured value minus 5 points as the gate.
@@ -771,14 +785,14 @@ Milestone M5 is complete. These values come from the full pipeline run of
 | Measure         | Value                                                  |
 | --------------- | ------------------------------------------------------ |
 | Build date      | 2026-10-19                                             |
-| Cards           | 387 core, 0 scaffold                                   |
-| Media files     | 586 (387 sentence files and 199 word files)            |
+| Cards           | 385 core, 0 scaffold                                   |
+| Media files     | 584 (385 sentence files and 199 word files)            |
 | Core coverage   | 195 of 207 concepts (0.942)                            |
 | Uncovered words | 虱子, 棍子, 种子, 骨头, 脂肪, 羽毛, 舌头, 肠子,       |
 |                 | 乳房, 呕吐, 揉, 绑                                     |
 | TTS engine      | gTTS, because `edge-tts` is absent; voice `gtts:zh-CN` |
 | Native audio    | 0 recordings                                           |
-| Gate result     | G1 to G16 pass; `anki swadesh audit mandarin` exits 0  |
+| Gate result     | G1 to G18 pass; `anki swadesh audit mandarin` exits 0  |
 
 The Tatoeba pool gives no sentence for 11 concepts, and the card cap cuts
 one more. The selection keeps the core tier only, so the pack has no

@@ -33,7 +33,7 @@ from anki_tools.sentence_pack.pack import (
     tts_engine_name,
     write_attribution_section,
 )
-from anki_tools.sentence_pack.profile import LanguageProfile, register
+from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
 from anki_tools.sentence_pack.select import rank_order, review_status
 
 DEFAULT_CSV_PATH = Path("vocab/english-mandarin.csv")
@@ -660,11 +660,31 @@ def count_form_tokens(sentence: str, form: str) -> int:
 FALSE_FRIENDS: dict[str, tuple[str, ...]] = {
     "切": ("一切",),
     "闻": ("新闻", "传闻"),
-    "数": ("数学", "数大", "数字", "岁数"),
+    "数": ("数学", "数大", "数字", "岁数", "人数"),
     "烧": ("发烧",),
-    "抓": ("抓住",),
+    "抓": ("抓住", "抓到", "抓紧"),
     "挖": ("挖苦",),
     "挤": ("挤满",),
+}
+
+
+SENSE_CHECKS: dict[str, tuple[frozenset[str], frozenset[str]]] = {
+    "抓": (
+        frozenset({"scratch", "scratches", "scratched", "scratching", "itch"}),
+        frozenset({
+            "grab", "grabs", "grabbed", "grabbing", "catch", "catches",
+            "caught", "catching", "seize", "seizes", "seized", "arrest",
+            "arrests", "arrested",
+        }),
+    ),
+    "数": (
+        frozenset({"count", "counts", "counted", "counting"}),
+        frozenset({"math", "maths", "mathematics", "arithmetic", "number", "numbers"}),
+    ),
+    "挤": (
+        frozenset({"squeeze", "squeezes", "squeezed", "squeezing"}),
+        frozenset({"crowded", "crowd", "crowds", "cramped", "packed"}),
+    ),
 }
 
 
@@ -687,6 +707,9 @@ def false_friend_spans(sentence: str, form: str) -> list[tuple[int, int]]:
 
 def _inside(position: int, spans: Sequence[tuple[int, int]]) -> bool:
     return any(start <= position < end for start, end in spans)
+
+
+sense_filter = make_sense_filter(SENSE_CHECKS)
 
 
 def form_occurrences(sentence: str, form: str) -> list[int]:
@@ -1082,6 +1105,7 @@ MANDARIN = register(
         excluded_words=_excluded_words,
         extra_manifest=_extra_manifest,
         attribution=write_attribution,
+        sense_filter=sense_filter,
         finalize_candidate=lambda card, target: replace(
             card, pinyin=sentence_pinyin(card.sentence)
         ),

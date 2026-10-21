@@ -209,8 +209,8 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 分开,我宁愿分开。,我寧願分開。,wǒ nìng yuàn fēn kāi,I would rather be apart.,750349,Martha,12643060,0,tts,,1,5,5.27,1|1|-5.267|0|750349,core,false
 刺,玫瑰有刺。,玫瑰有刺。,méi guī yǒu cì,Roses have thorns.,10322369,DaoSeng,2549026,0,tts,,1,4,5.17,1|0|-5.173|1|10322369,core,false
 刺,她有刺青吗？,她有刺青吗？,tā yǒu cì qīng ma,Does she have any tattoos?,9982239,BobbyLee,7989653,0,tts,,1,5,5.73,1|1|-5.728|0|9982239,core,false
-抓,他抓了一把米。,他抓了一把米。,tā zhuā le yì bǎ mǐ,He grabbed a handful of rice.,6314510,xjjAstrus,7808555,0,tts,,1,6,5.78,1|1|-5.780|0|6314510,core,false
-抓,凶手还没有抓到。,凶手还没有抓到。,xiōng shǒu hái méi yǒu zhuā dào,The murderer is still at large.,12686378,soueihin,47758,0,tts,,1,7,5.76,1|1|-5.758|0|12686378,core,false
+抓,你的猫抓伤我了。,你的猫抓伤我了。,nǐ de māo zhuā shāng wǒ le,Your cat scratched me.,8696278,crescat,3822753,0,tts,,2,7,6.15,2|1|-6.147|0|8696278,core,false
+抓,这只猫不抓老鼠。,这只猫不抓老鼠。,zhè zhǐ māo bù zhuā lǎo shǔ,This cat doesn't chase mice.,8500215,black333,3011192,0,tts,,2,7,5.57,2|1|-5.567|0|8500215,core,false
 挖,他挖了一个洞。,他挖了一个洞。,tā wā le yí gè dòng,He dug a hole.,414486,fucongcong,295871,0,tts,,1,6,5.84,1|1|-5.844|0|414486,core,false
 游泳,我想游泳。,我想游泳。,wǒ xiǎng yóu yǒng,I wanted to swim.,13117592,LeviHighway,8071239,0,tts,,0,4,5.82,0|0|-5.823|1|13117592,core,false
 游泳,"你会游泳, 不是吗？","你會游泳, 不是嗎？",nǐ huì yóu yǒng bú shì ma,"You can swim, can't you?",793226,Martha,16299,0,tts,,0,7,6.06,0|1|-6.060|0|793226,core,false
@@ -235,7 +235,6 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 拿,我没想要拿。,我沒想要拿。,wǒ méi xiǎng yào ná,I didn't mean to take it.,13138186,LeviHighway,2290420,0,tts,,0,5,5.92,0|0|-5.920|0|13138186,core,false
 拿,我拿了一个给他。,我拿了一个给他。,wǒ ná le yí gè gěi tā,I gave him one of those.,13892013,jan_OkulaJu,3916492,0,tts,,0,7,6.49,0|1|-6.488|0|13892013,core,false
 挤,她挤上了火车。,她擠上了火車。,tā jǐ shàng le huǒ chē,She elbowed her way onto the train.,894075,Martha,317496,0,tts,,2,6,5.32,2|1|-5.322|0|894075,core,false
-挤,这个房间很拥挤。,这个房间很拥挤。,zhè ge fáng jiān hěn yōng jǐ,This room is cramped.,9578359,jin1,57325,0,tts,,2,7,5.32,2|1|-5.322|0|9578359,core,false
 洗,他正在洗他的车。,他正在洗他的车。,tā zhèng zài xǐ tā de chē,He's washing his car.,408504,fucongcong,7386831,0,tts,,0,7,6.08,0|1|-6.085|0|408504,core,false
 洗,洗你们的手。,洗你們的手。,xǐ nǐ men de shǒu,Wash your hands.,10450777,DaoSeng,464330,0,tts,,0,5,5.87,0|1|-5.867|0|10450777,core,false
 擦,我为老师擦黑板。,我为老师擦黑板。,wǒ wèi lǎo shī cā hēi bǎn,I erased the blackboard for the teacher.,3338935,sadhen,2325182,0,tts,,1,7,5.34,1|1|-5.344|0|3338935,core,false
@@ -249,7 +248,7 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 缝,是用手缝的吗？,是用手縫的嗎？,shì yòng shǒu fèng de ma,Did you sew this by hand?,13108745,LeviHighway,54949,0,tts,,1,6,6.09,1|0|-6.092|0|13108745,core,false
 缝,你有没有缝衣针？,你有没有缝衣针？,nǐ yǒu méi yǒu féng yī zhēn,Do you have a sewing needle?,489228,GlossaMatik,489229,0,tts,,1,7,4.49,1|1|-4.487|0|489228,core,false
 数,我数到两百。,我数到两百。,wǒ shù dào liǎng bǎi,I counted to two hundred.,4267220,Mrew2Vier,4266737,0,tts,,1,5,5.51,1|1|-5.513|0|4267220,core,false
-数,人数不够啊！,人数不够啊！,rén shù bú gòu a,There aren't enough people!,347576,zhouj1955,6008636,0,tts,,1,5,5.35,1|1|-5.347|0|347576,core,false
+数,数到三十。,数到三十。,shù dào sān shí,Count to thirty.,710390,fucongcong,707526,0,tts,,1,4,5.21,1|1|-5.210|1|710390,core,false
 说,他在信上说什么？,他在信上说什么？,tā zài xìn shàng shuō shén me,What does he say in his letter?,334634,fucongcong,286627,0,tts,,0,7,6.40,0|0|-6.397|0|334634,core,false
 说,你说有几个？,你說有幾個？,nǐ shuō yǒu jǐ gè,How many did you say there were?,11679658,DaoSeng,8903321,0,tts,,0,5,6.36,0|0|-6.360|0|11679658,core,false
 唱,她唱得比他好。,她唱得比他好。,tā chàng dé bǐ tā hǎo,She sang better than him.,813508,fucongcong,580432,0,tts,,0,6,5.94,0|1|-5.943|0|813508,core,false
