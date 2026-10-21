@@ -53,7 +53,7 @@ cards, and 320 new words from the tail.
 
 `--core` cannot cover a Swadesh form that the input deck does not hold. The
 French input holds 155 of the 203 distinct forms with the default window.
-Section 3.2 explains the gap, and 5.4 the reserve option.
+Section 3.2 explains the gap, and 5.3 the reserve option.
 
 ### 1.2 Key decisions
 
@@ -208,31 +208,6 @@ hit(w, c) = the form or lemma of w occurs in c
 The French pack has no `SENSE_CHECKS` rows, so the French run needs the new
 file before K16 can pass. The file starts with the top 50 tier F targets.
 
-### 3.4 Relation to the cull filter
-
-The new guards can improve the cull. They cannot replace its filter. The cull
-selection at 1,000 cards, with the same targets and options:
-
-| Cull pool                 | Pool  | Content lemmas | `spoken_mass` |
-| ------------------------- | ----- | -------------- | ------------- |
-| wide window 3 to 12 words | 4,912 | 2,079          | 0.544         |
-| tight window 5 to 9 words | 3,403 | 1,856          | 0.523         |
-
-The tight window costs the cull 223 lemmas and 0.021 mass, and it puts the
-count below the 1,900 aim of the cull spec. The cull keeps 3 to 12 words.
-
-| Value          | `core` profile             | `cull` profile              |
-| -------------- | -------------------------- | --------------------------- |
-| Length window  | the window of 3.2          | 3 to 12 words               |
-| C1, C2         | on                         | on                          |
-| C3             | on for every language      | on when F8 has no tagger    |
-| C4             | on when a list exists      | off                         |
-| C5             | on                         | off                         |
-| Sense guard    | on, K16 fails              | on when a sense file exists |
-
-This needs a refactor of `cull.filter_cards` into
-`filter_reason(card, tokens, profile)`. The cull part is `anki-0h8`.
-
 ## 4. Selection
 
 ### 4.1 Value and cost
@@ -298,8 +273,8 @@ repeat:
 
 ### 5.1 Size
 
-5.1 and 5.3 use the wide window 3 to 12 words, to compare the objectives
-and the sizing. The presets of 5.2 use the default window of 3.2.
+The table uses the wide window 3 to 12 words, to show the sizing. The presets
+of 5.2 use the default window of 3.2.
 
 | Tier F words | Targets | Cards | `covered2` | `outside` |
 | ------------ | ------- | ----- | ---------- | --------- |
@@ -343,26 +318,12 @@ The core part teaches 192 of 205 targets twice, and the tail adds the wide
 vocabulary of a breadth deck. The tight window costs 9 Swadesh forms and about
 0.02 mass against the wide window.
 
-### 5.3 Bang for buck
+The core deck is not the widest deck for its card count. A breadth selection
+at 300 cards covers 1,201 lemmas at mass 0.497, against 740 at 0.436 here.
+The tail is how you buy that width. The core wins on mass per lemma, because
+its cards go to frequent words. Section 13.5 gives the table.
 
-`spoken_mass` is the share of Tatoeba French content tokens that the kept
-content lemmas cover. The buck is one card.
-
-| Deck                        | Cards | Content lemmas | `spoken_mass` | Mass per card |
-| --------------------------- | ----- | -------------- | ------------- | ------------- |
-| Core, quota 2, X=150        | 300   | 518            | 0.372         | 0.0012        |
-| Core X=0, then a tail       | 300   | 894            | 0.464         | 0.0015        |
-| Breadth only                | 300   | 1,201          | 0.497         | 0.0017        |
-| Breadth only                | 1,000 | 2,239          | 0.555         | 0.0006        |
-
-- A breadth deck wins on mass per card: 33% more mass and 2.3 times the
-  lemmas at 300 cards. It gives no second example.
-- The core deck wins on mass per lemma: 7.2e-4 against 4.1e-4.
-- The mass saturates. The tail from 300 to 400 cards adds 0.033 mass, and a
-  1,000-card deck adds 0.058 mass over a 300-card breadth deck. The knee is
-  near 300 to 400 cards.
-
-### 5.4 Swadesh reserve
+### 5.3 Swadesh reserve
 
 `--reserve-pack` adds the Swadesh sentence pack of section 16 of the cull
 spec. The default is off and stays off: the pack has about 198 cards, which
@@ -413,6 +374,10 @@ Code changes:
   generic gain, cost, and pass code in `anki_tools/ranking/core.py`.
 - Add the filter C1 to C5 as `core_filter_reason` after the cull reason. The
   predicate and orphan tests are the tests of `sentence_pack/pool.py`.
+- Share the filter with the cull through `filter_reason(card, tokens, profile)`:
+  the cull keeps 3 to 12 words, C1 and C2, C3 only where F8 has no tagger,
+  C4 and C5 off, and the sense guard only when a sense file exists. The cull
+  part is `anki-0h8`.
 - Add the sense guard as `core_sense_hits`, over `make_sense_filter` and
   `holds_sense`.
 - Add `vocab/<language>_core_senses.tsv` and
@@ -662,3 +627,22 @@ third example adds 33 cards and does not change `covered2`.
 
 Quota 3 costs about 1.8 cards per target, because a ubiquitous target keeps
 quota 1. A 300-card deck with 3 examples needs a core of about 160 targets.
+
+### 13.5 Bang for buck
+
+`spoken_mass` is the share of Tatoeba French content tokens that the kept
+content lemmas cover. The buck is one card. The rows use the wide window.
+
+| Deck                 | Cards | Content lemmas | `spoken_mass` | Mass per card |
+| -------------------- | ----- | -------------- | ------------- | ------------- |
+| Core, quota 2, X=150 | 300   | 518            | 0.372         | 0.0012        |
+| Core X=0, then a tail | 300  | 894            | 0.464         | 0.0015        |
+| Breadth only         | 300   | 1,201          | 0.497         | 0.0017        |
+| Breadth only         | 1,000 | 2,239          | 0.555         | 0.0006        |
+
+- A breadth deck wins on mass per card: 33% more mass and 2.3 times the
+  lemmas at 300 cards. It gives no second example.
+- The core deck wins on mass per lemma: 7.2e-4 against 4.1e-4.
+- The mass saturates. The tail from 300 to 400 cards adds 0.033 mass, and a
+  1,000-card deck adds 0.058 mass over a 300-card breadth deck. The knee is
+  near 300 to 400 cards.
