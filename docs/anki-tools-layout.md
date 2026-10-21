@@ -28,12 +28,13 @@ no language package.
 
 Shared ranking code only. No language data.
 
-| Path                            | Content                                            |
-| ------------------------------- | -------------------------------------------------- |
-| `anki_tools/ranking/rank.py`    | Sentence data, frequency tables, similarity engine |
-| `anki_tools/ranking/latin.py`   | Shared Latin-script text helpers and word metrics  |
-| `anki_tools/ranking/reorder.py` | Reorder a deck from a ranking CSV                  |
+| Path                            | Content                                               |
+| ------------------------------- | ----------------------------------------------------- |
+| `anki_tools/ranking/rank.py`    | Sentence data, frequency tables, shared score drivers |
+| `anki_tools/ranking/latin.py`   | Shared Latin-script text helpers and word metrics     |
+| `anki_tools/ranking/reorder.py` | Reorder a deck from a ranking CSV                     |
 
+`rank_word_based` and `rank_character_based` are the shared score drivers.
 `jaccard_similarity`, `compute_similarity_penalties`, and the word metrics of
 `latin.py` are the public shared helpers. A language package calls them.
 
@@ -42,18 +43,18 @@ Shared ranking code only. No language data.
 The shared Swadesh sentence pipeline. The stage order and the guard order are
 in `docs/swadesh-sentence-flow.md`.
 
-| Path                                     | Content                                |
-| ---------------------------------------- | -------------------------------------- |
-| `anki_tools/sentence_pack/profile.py`    | Profile dataclass and the profile registry |
-| `anki_tools/sentence_pack/tatoeba.py`    | S0 Tatoeba fetch cache                 |
-| `anki_tools/sentence_pack/pool.py`       | S2 candidate pool and guard tables     |
-| `anki_tools/sentence_pack/select.py`     | S3 greedy cover and duplicate guard    |
-| `anki_tools/sentence_pack/audio.py`      | S4 audio cache                         |
-| `anki_tools/sentence_pack/pack.py`       | S5 APKG build                          |
-| `anki_tools/sentence_pack/audit.py`      | Gate runner and language-neutral gates |
-| `anki_tools/sentence_pack/guards.py`     | Shared sentence-shape and span helpers |
-| `anki_tools/sentence_pack/tokens.py`     | Shared token and romanization helpers  |
-| `anki_tools/sentence_pack/english_sense.py` | English gloss sense check           |
+| Path                                        | Content                                    |
+| ------------------------------------------- | ------------------------------------------ |
+| `anki_tools/sentence_pack/profile.py`       | Profile dataclass and the profile registry |
+| `anki_tools/sentence_pack/tatoeba.py`       | S0 Tatoeba fetch cache                     |
+| `anki_tools/sentence_pack/pool.py`          | S2 candidate pool and guard tables         |
+| `anki_tools/sentence_pack/select.py`        | S3 greedy cover and duplicate guard        |
+| `anki_tools/sentence_pack/audio.py`         | S4 audio cache                             |
+| `anki_tools/sentence_pack/pack.py`          | S5 APKG build                              |
+| `anki_tools/sentence_pack/audit.py`         | Gate runner and language-neutral gates     |
+| `anki_tools/sentence_pack/guards.py`        | Shared sentence-shape and span helpers     |
+| `anki_tools/sentence_pack/tokens.py`        | Shared token and romanization helpers      |
+| `anki_tools/sentence_pack/english_sense.py` | English gloss sense check                  |
 
 ## 5. languages
 

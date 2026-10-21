@@ -12,18 +12,13 @@ from __future__ import annotations
 
 import re
 
-from anki_tools.ranking.latin import (
-    complexity_score_latin,
-    frequency_score_latin,
-    latin_word_similarity,
-)
 from anki_tools.ranking.rank import (
     STRUCTURAL_COMPLEXITY_BLEND,
+    WORD_WEIGHTS,
     FrequencyData,
     Sentence,
-    compute_similarity_penalties,
     load_wordfreq_data,
-    structural_score,
+    rank_word_based,
 )
 
 
@@ -94,61 +89,13 @@ def rank_sentences_es(
     :param structural_blend: Fraction of structural from complexity (rest from grammar).
     :returns: Same list sorted by final_score (best first).
     """
-    if weights is None:
-        weights = {
-            "structural": 0.35,
-            "frequency": 0.45,
-            "similarity_penalty": 0.2,
-        }
-
-    freq_data = load_frequency_data_es()
-
-    print("Calculating complexity scores...")
-    for sent in sentences:
-        sent.complexity_score = complexity_score_latin(sent.text)
-
-    print("Calculating frequency scores...")
-    for sent in sentences:
-        sent.frequency_score = frequency_score_latin(sent.text, freq_data)
-
-    print("Calculating grammar scores...")
-    for sent in sentences:
-        sent.grammar_score = grammar_score_es(sent.text)
-
-    for sent in sentences:
-        structural = structural_score(
-            sent.complexity_score, sent.grammar_score, structural_blend
-        )
-        sent.final_score = (
-            sent.frequency_score * weights["frequency"]
-            + (100 - structural) * weights["structural"]
-        )
-
-    sentences.sort(key=lambda s: s.final_score, reverse=True)
-
-    print("Calculating similarity penalties...")
-    penalties, similar_to_rank_indices, similar_to_texts = (
-        compute_similarity_penalties(sentences, latin_word_similarity)
+    return rank_word_based(
+        sentences,
+        WORD_WEIGHTS if weights is None else weights,
+        grammar=grammar_score_es,
+        freq_loader=load_frequency_data_es,
+        structural_blend=structural_blend,
     )
-    for sent, penalty, similar_to_rank, sim_text in zip(
-        sentences, penalties, similar_to_rank_indices, similar_to_texts
-    ):
-        sent.similarity_penalty = penalty
-        sent.similar_to_rank = similar_to_rank
-        sent.similar_to_text = sim_text
-
-    for sent in sentences:
-        structural = structural_score(
-            sent.complexity_score, sent.grammar_score, structural_blend
-        )
-        sent.final_score = (
-            sent.frequency_score * weights["frequency"]
-            + (100 - structural) * weights["structural"]
-            - sent.similarity_penalty * weights["similarity_penalty"]
-        )
-
-    sentences.sort(key=lambda s: s.final_score, reverse=True)
-    return sentences
 
 
 __all__ = [

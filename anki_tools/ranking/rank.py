@@ -22,6 +22,11 @@ from typing import Callable, Sequence
 from wordfreq import iter_wordlist
 
 from anki_tools.apkg.package import AnkiPackage
+from anki_tools.ranking.latin import (
+    complexity_score_latin,
+    frequency_score_latin,
+    latin_word_similarity,
+)
 
 # =============================================================================
 # Data Classes
@@ -390,6 +395,83 @@ def rank_character_based(
     return sentences
 
 
+#: Default weights of a word-based language: structural, frequency, similarity.
+WORD_WEIGHTS = {"structural": 0.35, "frequency": 0.45, "similarity_penalty": 0.2}
+
+
+def rank_word_based(
+    sentences: list[Sentence],
+    weights: dict[str, float],
+    *,
+    grammar: Callable[[str], float],
+    freq_loader: Callable[[], FrequencyData],
+    structural_blend: float = STRUCTURAL_COMPLEXITY_BLEND,
+) -> list[Sentence]:
+    """Rank the sentences of a word-based Latin-script language.
+
+    The structural term blends the complexity score and the grammar score, so
+    the two correlated measures count once. The caller gives the grammar score
+    and the frequency loader of its language. The Latin-script word metrics and
+    the similarity engine are shared.
+
+    :param sentences: Sentences to rank.
+    :param weights: Weights of structural, frequency, and similarity_penalty.
+    :param grammar: Grammar score of one sentence, 0 to 100.
+    :param freq_loader: Frequency data loader of the language.
+    :param structural_blend: Share of the complexity term in the structural
+        score.
+    :returns: The same list, sorted by final score, best first.
+    """
+    freq_data = freq_loader()
+
+    print("Calculating complexity scores...")
+    for sent in sentences:
+        sent.complexity_score = complexity_score_latin(sent.text)
+
+    print("Calculating frequency scores...")
+    for sent in sentences:
+        sent.frequency_score = frequency_score_latin(sent.text, freq_data)
+
+    print("Calculating grammar scores...")
+    for sent in sentences:
+        sent.grammar_score = grammar(sent.text)
+
+    for sent in sentences:
+        structural = structural_score(
+            sent.complexity_score, sent.grammar_score, structural_blend
+        )
+        sent.final_score = (
+            sent.frequency_score * weights["frequency"]
+            + (100 - structural) * weights["structural"]
+        )
+
+    sentences.sort(key=lambda s: s.final_score, reverse=True)
+
+    print("Calculating similarity penalties...")
+    penalties, similar_to_rank_indices, similar_to_texts = (
+        compute_similarity_penalties(sentences, latin_word_similarity)
+    )
+    for sent, penalty, similar_to_rank, sim_text in zip(
+        sentences, penalties, similar_to_rank_indices, similar_to_texts
+    ):
+        sent.similarity_penalty = penalty
+        sent.similar_to_rank = similar_to_rank
+        sent.similar_to_text = sim_text
+
+    for sent in sentences:
+        structural = structural_score(
+            sent.complexity_score, sent.grammar_score, structural_blend
+        )
+        sent.final_score = (
+            sent.frequency_score * weights["frequency"]
+            + (100 - structural) * weights["structural"]
+            - sent.similarity_penalty * weights["similarity_penalty"]
+        )
+
+    sentences.sort(key=lambda s: s.final_score, reverse=True)
+    return sentences
+
+
 def _open_for_write(output_path: str):
     try:
         return open(output_path, "w", newline="", encoding="utf-8")
@@ -504,7 +586,7 @@ def reduce_sentences_stratified(
     :param target_count: Target number of sentences (e.g., 3000).
     :param similarity_threshold: Jaccard threshold for deduplication (default 0.5).
     :param similarity_fn: Optional similarity function (defaults to the Latin
-        word similarity, the historical default of the French pipeline).
+        word similarity).
     :param min_chars: Skip deduplication for sentences with fewer characters than this (default 0 = disabled).
     :returns: Reduced list of sentences ordered by complexity bins, frequency within bins.
     """
@@ -516,8 +598,6 @@ def reduce_sentences_stratified(
 
     similarity: Callable[[str, str], float]
     if similarity_fn is None:
-        from anki_tools.ranking.latin import latin_word_similarity
-
         similarity = latin_word_similarity
     else:
         similarity = similarity_fn
