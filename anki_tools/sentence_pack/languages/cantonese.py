@@ -653,7 +653,7 @@ def _token_at(spans: Sequence[tuple[str, int, int]], position: int) -> str:
 FALSE_FRIENDS: dict[str, tuple[str, ...]] = {
     "切": ("趕得切", "一切"),
     "聽": ("聽日",),
-    "數": ("着數", "數學", "彩數"),
+    "數": ("着數", "數學", "彩數", "多數"),
     "燒": ("發燒",),
     "揸": ("揸車",),
 }

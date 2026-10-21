@@ -187,8 +187,8 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 知道,那有谁会知道呢？,那有誰會知道呢？,nà yǒu shuí huì zhī dào ne,Who would know that?,10640456,DaoSeng,2892882,0,tts,,0,7,6.15,0|0|-6.150|0|10640456,core,false
 想,我没想叫的。,我沒想叫的。,wǒ méi xiǎng jiào de,I didn't mean to yell.,13137889,LeviHighway,2275892,0,tts,,0,5,6.48,0|0|-6.484|0|13137889,core,false
 想,我们已经想好了。,我們已經想好了。,wǒ men yǐ jīng xiǎng hǎo le,We've already decided.,11697455,DaoSeng,4497147,0,tts,,0,7,6.40,0|0|-6.400|0|11697455,core,false
-闻,你看新闻吗？,你看新聞嗎？,nǐ kàn xīn wén ma,Do you watch the news?,11490952,janTuki,11475869,0,tts,,0,5,6.24,0|1|-6.242|0|11490952,core,false
-闻,我听传闻说的。,我听传闻说的。,wǒ tīng chuán wén shuō de,A little bird told me.,8725754,crescat,327991,0,tts,,1,6,6.23,1|1|-6.228|0|8725754,core,false
+闻,我闻到了什么。,我聞到了什麼。,wǒ wén dào le shén me,I smell something here.,5845644,verdastelo9604,5747627,0,tts,,1,6,6.05,1|1|-6.053|0|5845644,core,false
+闻,我用鼻子闻气味。,我用鼻子聞氣味。,wǒ yòng bí zi wén qì wèi,I smell with my nose.,13826818,LeviHighway,258048,0,tts,,1,7,5.13,1|1|-5.130|0|13826818,core,false
 怕,有点怕很正常。,有點怕很正常。,yǒu diǎn pà hěn zhèng cháng,It's normal to be a little afraid.,10650288,DaoSeng,4017363,0,tts,,0,6,5.37,0|0|-5.372|0|10650288,core,false
 怕,他们怕我。,他们怕我。,tā men pà wǒ,They're afraid of me.,5550260,verdastelo9604,3444573,0,tts,,0,4,6.10,0|1|-6.100|1|5550260,core,false
 睡觉,我该去睡觉了。,我该去睡觉了。,wǒ gāi qù shuì jiào le,I have to go to sleep.,2,fucongcong,1277,0,tts,,0,6,6.19,0|0|-6.192|0|2,core,false
@@ -204,15 +204,14 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 打猎,他喜欢打猎。,他喜欢打猎。,tā xǐ huān dǎ liè,He likes hunting.,333859,fucongcong,386730,0,tts,,0,5,5.33,0|0|-5.330|0|333859,core,false
 打,我没想打你。,我沒想打你。,wǒ méi xiǎng dǎ nǐ,I didn't mean to hit you.,13138201,LeviHighway,2290413,0,tts,,0,5,6.27,0|0|-6.270|0|13138201,core,false
 打,别再打我了！,別再打我了！,bié zài dǎ wǒ le,Stop hitting me!,10299642,DaoSeng,1908468,0,tts,,0,5,6.19,0|0|-6.192|0|10299642,core,false
-切,一切都好。,一切都好。,yí qiè dōu hǎo,All good.,13138903,LeviHighway,11841456,0,tts,,0,4,6.12,0|0|-6.123|1|13138903,core,false
-切,一切都会好的。,一切都会好的。,yí qiè dū huì hǎo de,Everything will be OK.,710795,Yashanti,710797,0,tts,,0,6,6.53,0|1|-6.528|0|710795,core,false
+切,到你切了!,到你切了!,dào nǐ qiè le,Your turn to split!,792893,fucongcong,791621,0,tts,,0,4,6.19,0|1|-6.190|1|792893,core,false
+切,我要你切腹。,我要你切腹。,wǒ yào nǐ qiè fù,I want you to commit seppuku.,792600,GlossaMatik,792601,0,tts,,1,5,5.67,1|1|-5.673|0|792600,core,false
 分开,我宁愿分开。,我寧願分開。,wǒ nìng yuàn fēn kāi,I would rather be apart.,750349,Martha,12643060,0,tts,,1,5,5.27,1|1|-5.267|0|750349,core,false
 刺,玫瑰有刺。,玫瑰有刺。,méi guī yǒu cì,Roses have thorns.,10322369,DaoSeng,2549026,0,tts,,1,4,5.17,1|0|-5.173|1|10322369,core,false
 刺,她有刺青吗？,她有刺青吗？,tā yǒu cì qīng ma,Does she have any tattoos?,9982239,BobbyLee,7989653,0,tts,,1,5,5.73,1|1|-5.728|0|9982239,core,false
-抓,她抓住他的手。,她抓住他的手。,tā zhuā zhù tā de shǒu,She grabbed him by the hand.,10260790,GlossaMatik,887165,0,tts,,1,6,6.09,1|1|-6.094|0|10260790,core,false
-抓,我抓住了机会。,我抓住了机会。,wǒ zhuā zhù le jī huì,I took advantage of an opportunity.,1946775,bigfatpanda,257370,0,tts,,1,6,6.01,1|1|-6.008|0|1946775,core,false
+抓,他抓了一把米。,他抓了一把米。,tā zhuā le yì bǎ mǐ,He grabbed a handful of rice.,6314510,xjjAstrus,7808555,0,tts,,1,6,5.78,1|1|-5.780|0|6314510,core,false
+抓,凶手还没有抓到。,凶手还没有抓到。,xiōng shǒu hái méi yǒu zhuā dào,The murderer is still at large.,12686378,soueihin,47758,0,tts,,1,7,5.76,1|1|-5.758|0|12686378,core,false
 挖,他挖了一个洞。,他挖了一个洞。,tā wā le yí gè dòng,He dug a hole.,414486,fucongcong,295871,0,tts,,1,6,5.84,1|1|-5.844|0|414486,core,false
-挖,汤姆真会挖苦人。,汤姆真会挖苦人。,tāng mǔ zhēn huì wā kǔ rén,Tom is quite sarcastic.,5663484,verdastelo9604,3409435,0,tts,,2,7,5.17,2|1|-5.174|0|5663484,core,false
 游泳,我想游泳。,我想游泳。,wǒ xiǎng yóu yǒng,I wanted to swim.,13117592,LeviHighway,8071239,0,tts,,0,4,5.82,0|0|-5.823|1|13117592,core,false
 游泳,"你会游泳, 不是吗？","你會游泳, 不是嗎？",nǐ huì yóu yǒng bú shì ma,"You can swim, can't you?",793226,Martha,16299,0,tts,,0,7,6.06,0|1|-6.060|0|793226,core,false
 飞,这是他的飞机。,这是他的飞机。,zhè shì tā de fēi jī,This is his plane.,2117476,joulin,2166225,0,tts,,0,6,6.70,0|1|-6.700|0|2117476,core,false
@@ -235,8 +234,8 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 给,我给你带了一个。,我給你帶了一個。,wǒ gěi nǐ dài le yí gè,I've got one for you.,6624668,verdastelo9604,2769457,0,tts,,0,7,6.53,0|1|-6.532|0|6624668,core,false
 拿,我没想要拿。,我沒想要拿。,wǒ méi xiǎng yào ná,I didn't mean to take it.,13138186,LeviHighway,2290420,0,tts,,0,5,5.92,0|0|-5.920|0|13138186,core,false
 拿,我拿了一个给他。,我拿了一个给他。,wǒ ná le yí gè gěi tā,I gave him one of those.,13892013,jan_OkulaJu,3916492,0,tts,,0,7,6.49,0|1|-6.488|0|13892013,core,false
-挤,街道上挤满了人。,街道上擠滿了人。,jiē dào shàng jǐ mǎn le rén,The street was crowded with people.,873214,Martha,278365,0,tts,,2,7,5.72,2|1|-5.720|0|873214,core,false
-挤,火车挤满了人。,火车挤满了人。,huǒ chē jǐ mǎn le rén,The train was crowded with people.,819751,fucongcong,236910,0,tts,,2,6,5.49,2|1|-5.492|0|819751,core,false
+挤,她挤上了火车。,她擠上了火車。,tā jǐ shàng le huǒ chē,She elbowed her way onto the train.,894075,Martha,317496,0,tts,,2,6,5.32,2|1|-5.322|0|894075,core,false
+挤,这个房间很拥挤。,这个房间很拥挤。,zhè ge fáng jiān hěn yōng jǐ,This room is cramped.,9578359,jin1,57325,0,tts,,2,7,5.32,2|1|-5.322|0|9578359,core,false
 洗,他正在洗他的车。,他正在洗他的车。,tā zhèng zài xǐ tā de chē,He's washing his car.,408504,fucongcong,7386831,0,tts,,0,7,6.08,0|1|-6.085|0|408504,core,false
 洗,洗你们的手。,洗你們的手。,xǐ nǐ men de shǒu,Wash your hands.,10450777,DaoSeng,464330,0,tts,,0,5,5.87,0|1|-5.867|0|10450777,core,false
 擦,我为老师擦黑板。,我为老师擦黑板。,wǒ wèi lǎo shī cā hēi bǎn,I erased the blackboard for the teacher.,3338935,sadhen,2325182,0,tts,,1,7,5.34,1|1|-5.344|0|3338935,core,false
@@ -249,8 +248,8 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 扔,扔了这个烂香蕉。,扔了這個爛香蕉。,rēng le zhè ge làn xiāng jiāo,Throw this rotten banana.,5113327,xjjAstrus,7790204,0,tts,,1,7,5.29,1|1|-5.288|0|5113327,core,false
 缝,是用手缝的吗？,是用手縫的嗎？,shì yòng shǒu fèng de ma,Did you sew this by hand?,13108745,LeviHighway,54949,0,tts,,1,6,6.09,1|0|-6.092|0|13108745,core,false
 缝,你有没有缝衣针？,你有没有缝衣针？,nǐ yǒu méi yǒu féng yī zhēn,Do you have a sewing needle?,489228,GlossaMatik,489229,0,tts,,1,7,4.49,1|1|-4.487|0|489228,core,false
-数,数大便是美。,數大便是美。,shù dà biàn shì měi,"The more, the better.",13569194,LeviHighway,274947,0,tts,,1,5,5.32,1|0|-5.322|0|13569194,core,false
-数,他的数学很好。,他的數學很好。,tā de shù xué hěn hǎo,He is very good at math.,3706726,egg0073,5574907,0,tts,,1,6,6.35,1|1|-6.354|0|3706726,core,false
+数,我数到两百。,我数到两百。,wǒ shù dào liǎng bǎi,I counted to two hundred.,4267220,Mrew2Vier,4266737,0,tts,,1,5,5.51,1|1|-5.513|0|4267220,core,false
+数,人数不够啊！,人数不够啊！,rén shù bú gòu a,There aren't enough people!,347576,zhouj1955,6008636,0,tts,,1,5,5.35,1|1|-5.347|0|347576,core,false
 说,他在信上说什么？,他在信上说什么？,tā zài xìn shàng shuō shén me,What does he say in his letter?,334634,fucongcong,286627,0,tts,,0,7,6.40,0|0|-6.397|0|334634,core,false
 说,你说有几个？,你說有幾個？,nǐ shuō yǒu jǐ gè,How many did you say there were?,11679658,DaoSeng,8903321,0,tts,,0,5,6.36,0|0|-6.360|0|11679658,core,false
 唱,她唱得比他好。,她唱得比他好。,tā chàng dé bǐ tā hǎo,She sang better than him.,813508,fucongcong,580432,0,tts,,0,6,5.94,0|1|-5.943|0|813508,core,false
@@ -308,7 +307,7 @@ target,sentence,text_original,pinyin,english,tatoeba_id,tatoeba_author,english_i
 灰,他会让你吃灰的。,他会让你吃灰的。,tā huì ràng nǐ chī huī de,He will make you eat dirt.,503291,fucongcong,2169,0,tts,,0,7,6.25,0|1|-6.246|0|503291,core,false
 灰,我变灰了。,我变灰了。,wǒ biàn huī le,I turned grey.,9955767,GlossaMatik,11545930,0,tts,,0,4,5.89,0|1|-5.890|1|9955767,core,false
 烧,烧一点水。,烧一点水。,shāo yì diǎn shuǐ,Boil some water.,392263,fucongcong,64141,0,tts,,0,4,5.09,0|1|-5.090|1|392263,core,false
-烧,我有点发烧。,我有點發燒。,wǒ yǒu diǎn fā shāo,I have a slight fever.,10515480,DaoSeng,39956,0,tts,,1,5,5.33,1|0|-5.327|0|10515480,core,false
+烧,我的手烧伤了。,我的手烧伤了。,wǒ de shǒu shāo shāng le,My hand was burned.,5085551,Jubilee11,5085486,0,tts,,1,6,6.15,1|1|-6.146|0|5085551,core,false
 路,让我走自己的路。,让我走自己的路。,ràng wǒ zǒu zì jǐ de lù,Let me go my own way.,1490473,sadhen,249908,0,tts,,0,7,6.38,0|1|-6.382|0|1490473,core,false
 路,我给他指了路。,我給他指了路。,wǒ gěi tā zhǐ le lù,I showed him the way.,13919367,DaoSeng,1911912,0,tts,,0,6,6.29,0|1|-6.285|0|13919367,core,false
 山,你有登山鞋吗？,你有登山鞋嗎？,nǐ yǒu dēng shān xié ma,Do you have walking shoes?,10650622,DaoSeng,10646503,0,tts,,1,6,5.69,1|0|-5.688|0|10650622,core,false

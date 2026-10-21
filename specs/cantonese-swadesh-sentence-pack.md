@@ -235,7 +235,7 @@ in `anki_tools/sentence_pack/languages/cantonese.py` holds these compounds:
 | ---- | -------- | ------------------------------------------ |
 | 切   | to cut   | 趕得切 (in time), 一切 (everything)         |
 | 聽   | to hear  | 聽日 (tomorrow)                             |
-| 數   | to count | 着數 (bargain), 數學 (mathematics), 彩數 (luck) |
+| 數   | to count | 着數 (bargain), 數學 (math), 彩數 (luck), 多數 (mostly) |
 | 燒   | to burn  | 發燒 (fever)                                |
 | 揸   | to hold  | 揸車 (to drive)                             |
 
@@ -401,28 +401,29 @@ Measured on 2026-10-20 with the defaults:
 
 | Measure                    | Value                 |
 | -------------------------- | --------------------- |
-| Cards                      | 333                   |
-| Core cards                 | 332                   |
+| Cards                      | 330                   |
+| Core cards                 | 329                   |
 | Scaffold cards             | 1                     |
-| Forms with a card          | 178 of 207 (86.0%)    |
-| Concepts with a card       | 178 of 207 (86.0%)    |
-| Cards with native audio    | 208                   |
-| Cards with a TTS file      | 125                   |
-| Media files                | 511                   |
+| Forms with a card          | 177 of 207 (85.5%)    |
+| Concepts with a card       | 177 of 207 (85.5%)    |
+| Cards with native audio    | 206                   |
+| Cards with a TTS file      | 124                   |
+| Media files                | 507                   |
 | Audio duration             | 0.4 s to 15.0 s       |
 | Jyutping on every card     | yes                   |
 | Gates G1 to G20            | all pass              |
 
-The 29 forms without a card: 闊, 蝨, 棍, 種子, 葉, 樹皮, 脂肪, 羽毛, 腿,
-膝頭, 翼, 腸, 胸, 肝, 咬, 吐, 打獵, 分開, 𢯎, 搾, 掟, 綁, 浮, 結冰, 脹, 湖,
+The 30 forms without a card: 闊, 蝨, 棍, 種子, 葉, 樹皮, 脂肪, 羽毛, 腿,
+膝頭, 翼, 腸, 胸, 肝, 咬, 吐, 打獵, 切, 分開, 𢯎, 搾, 掟, 綁, 浮, 結冰, 脹, 湖,
 鹽, 鈍, 裡面.
 
-The cap did not bind: `--per-word 2` stops at 333 cards, before `--max-cards
-450`. Two forms have a candidate but no card: 𢯎 and 掟. Every other uncovered
-form has no candidate sentence that reaches it.
+The cap did not bind: `--per-word 2` stops at 330 cards, before `--max-cards
+450`. Two forms have a candidate but no card: 𢯎 and 掟. 切 has no candidate
+left, because its only candidates held the false-friend compounds 趕得切 and
+一切. Every other uncovered form has no candidate sentence that reaches it.
 
-Length of the cards: 13 cards have 3 Han characters, 21 have 4, 38 have 5, 59
-have 6, 49 have 7, 53 have 8, 42 have 9, 26 have 10, 15 have 11, and 17 have
+Length of the cards: 13 cards have 3 Han characters, 21 have 4, 37 have 5, 57
+have 6, 48 have 7, 54 have 8, 42 have 9, 26 have 10, 15 have 11, and 17 have
 12.
 
 ## 13. Risks and open questions

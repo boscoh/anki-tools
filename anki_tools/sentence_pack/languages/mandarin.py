@@ -660,7 +660,7 @@ def count_form_tokens(sentence: str, form: str) -> int:
 FALSE_FRIENDS: dict[str, tuple[str, ...]] = {
     "切": ("一切",),
     "闻": ("新闻", "传闻"),
-    "数": ("数学", "数大"),
+    "数": ("数学", "数大", "数字", "岁数"),
     "烧": ("发烧",),
     "抓": ("抓住",),
     "挖": ("挖苦",),

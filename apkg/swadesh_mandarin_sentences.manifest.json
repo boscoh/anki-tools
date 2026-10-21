@@ -1,12 +1,12 @@
 {
-  "build_date": "2026-10-20",
+  "build_date": "2026-10-21",
   "source_dump_date": "2026-10-19",
   "counts": {
     "words": 211,
-    "cards": 387,
+    "cards": 386,
     "scaffold": 0,
     "native_audio": 0,
-    "tts_audio": 387
+    "tts_audio": 386
   },
   "coverage": {
     "core_with_card": 0.942
@@ -23,7 +23,7 @@
   },
   "files": {
     "source_csv": "sha256:8509d2e9b3312f903ece8d8bef027391ff41e3e2aaac4450e9747ae275d89350",
-    "sentences_csv": "sha256:762085840a138766b6e67c4029b0a803fd68b262ea3beda0b57645420f3f4fe2"
+    "sentences_csv": "sha256:cc045a2671a27a46d154ef665518f10553a12cb1e62fa2dd6d9ed38e2695c73a"
   },
   "licenses": [
     {

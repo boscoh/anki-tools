@@ -3,13 +3,13 @@
   "source_dump_date": "2026-10-19",
   "counts": {
     "words": 207,
-    "cards": 333,
+    "cards": 330,
     "scaffold": 1,
-    "native_audio": 208,
-    "tts_audio": 125
+    "native_audio": 206,
+    "tts_audio": 124
   },
   "coverage": {
-    "core_with_card": 0.8599
+    "core_with_card": 0.8551
   },
   "voice": "gtts:yue",
   "pack_license": "public",
@@ -23,7 +23,7 @@
   },
   "files": {
     "source_csv": "sha256:95ec2804373a0cf876099cd70b6d437d056aadccbf41cfa93a0110333cdb5006",
-    "sentences_csv": "sha256:da5b108312cf0bed42dc211fc37c817efd31e27da015b34e15701cec097f12c5"
+    "sentences_csv": "sha256:f940b55fae42b37d7239a4756dc2f382a4412a1366c18f723af07491b583c376"
   },
   "licenses": [
     {
@@ -57,6 +57,7 @@
     "咬",
     "吐",
     "打獵",
+    "切",
     "分開",
     "𢯎",
     "搾",

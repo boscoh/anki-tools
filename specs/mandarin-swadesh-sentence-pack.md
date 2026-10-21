@@ -348,7 +348,7 @@ A false-friend compound never counts as a target match. The reviewed list in
 | ---- | ---------- | --------------------------------------- |
 | 切   | to cut     | 一切 (everything)                       |
 | 闻   | to smell   | 新闻 (news), 传闻 (rumor)               |
-| 数   | to count   | 数学 (mathematics), 数大 (number sense) |
+| 数   | to count | 数学 (math), 数大 (number), 数字 (numbers), 岁数 (age) |
 | 烧   | to burn    | 发烧 (fever)                            |
 | 抓   | to scratch | 抓住 (to grab)                          |
 | 挖   | to dig     | 挖苦 (to ridicule)                      |
@@ -390,7 +390,7 @@ Use greedy set cover:
 
 Defaults: `--per-word 2`, `--max-cards 450`, `--max-unknown 2`. The word
 list has 211 forms, so 2 cards per word gives about 420 cards. The 4 to 7
-character window and the Tatoeba pool give 387 cards. Keep the
+character window and the Tatoeba pool give 386 cards. Keep the
 deck below about 450 cards for daily review.
 
 Reject a card when the sentence has no English translation after pairing.
@@ -582,10 +582,10 @@ Write `apkg/swadesh_mandarin_sentences.manifest.json`:
   "source_dump_date": "2026-10-19",
   "counts": {
     "words": 211,
-    "cards": 387,
+    "cards": 386,
     "scaffold": 0,
     "native_audio": 0,
-    "tts_audio": 387
+    "tts_audio": 386
   },
   "coverage": {"core_with_card": 0.942},
   "voice": "gtts:zh-CN",

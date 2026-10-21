@@ -17,6 +17,7 @@ target,swadesh_index,english,variant,status,zipf,candidate_count,scaffold_candid
 呕吐,97,to vomit,primary,uncovered,3.81,0,0,0,,,,,,,,,
 打猎,112,to hunt,primary,thin,3.58,1,0,1,他喜欢打猎。,他喜欢打猎。,tā xǐ huān dǎ liè,He likes hunting.,333859,0,5,0|0|-5.330|0|333859,core
 分开,115,to split,primary,thin,4.56,1,0,1,我宁愿分开。,我寧願分開。,wǒ nìng yuàn fēn kāi,I would rather be apart.,750349,1,5,1|1|-5.267|0|750349,core
+挖,118,to dig,primary,thin,4.38,1,0,1,他挖了一个洞。,他挖了一个洞。,tā wā le yí gè dòng,He dug a hole.,414486,1,6,1|1|-5.844|0|414486,core
 揉,131,to rub,primary,uncovered,3.97,0,0,0,,,,,,,,,
 绑,137,to tie,primary,uncovered,4.49,0,0,0,,,,,,,,,
 肿,146,to swell,primary,thin,3.78,1,0,1,我有脑肿瘤。,我有脑肿瘤。,wǒ yǒu nǎo zhǒng liú,I have a brain tumor.,6089774,1,5,1|1|-5.567|0|6089774,core

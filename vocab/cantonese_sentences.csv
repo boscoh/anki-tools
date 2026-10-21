@@ -158,7 +158,7 @@ target,sentence,text_original,jyutping,english,tatoeba_id,tatoeba_author,english
 睇,我以為自己睇錯。,我以為自己睇錯。,ngo5 ji5 wai4 zi6 gei2 tai2 co3,I can't believe my eyes.,7987787,nickyeow,6133,1025827,native,CC BY 4.0,0,7,5.39,0|0|-5.386|0|7987787,core,false
 睇,我完全睇唔明。,我完全睇唔明。,ngo5 jyun4 cyun4 tai2 m4 ming4,This is Greek to me.,5794880,nickyeow,5722481,1025697,native,CC BY 4.0,0,6,4.99,0|0|-4.994|0|5794880,core,false
 聽,你最好聽個醫生講。,你最好聽個醫生講。,nei5 zeoi3 hou2 teng1 go3 ji1 sang1 gong2,You'd better do as the doctor advised you.,422030,nickyeow,7810479,1025338,native,CC BY 4.0,0,8,5.72,0|0|-5.722|0|422030,core,false
-聽,聽日係我生日。,聽日係我生日。,ting1 jat6 hai6 ngo5 saang1 jat6,Tomorrow is my birthday.,1399805,nickyeow,71844,1007689,native,CC BY 4.0,0,6,5.35,0|0|-5.353|0|1399805,core,false
+聽,我咩都聽唔到喎。,我咩都聽唔到喎。,ngo5 me1 dou1 teng1 m4 dou2 wo3,I've heard nothing.,457590,nickyeow,404074,1025353,native,CC BY 4.0,0,7,4.69,0|0|-4.690|0|457590,core,false
 知道,我好想知道佢個名。,我好想知道佢個名。,ngo5 hou2 soeng2 zi1 dou3 keoi5 go3 meng2,I really want to know her name.,5375408,nickyeow,2269662,1036873,native,CC BY 4.0,0,8,5.74,0|0|-5.740|0|5375408,core,false
 知道,如果我早啲知道就好喇。,如果我早啲知道就好喇。,jyu4 gwo2 ngo5 zou2 di1 zi1 dou3 zau6 hou2 laa3,I wish I'd known that.,5761082,nickyeow,5749868,0,tts,,0,10,5.41,0|1|-5.406|1|5761082,core,false
 諗,我都係咁諗。,我都係咁諗。,ngo5 dou1 hai6 gam2 nam2,"I think so, too.",3868854,nickyeow,262339,996829,native,CC BY 4.0,0,5,4.92,0|0|-4.922|0|3868854,core,false
@@ -178,8 +178,6 @@ target,sentence,text_original,jyutping,english,tatoeba_id,tatoeba_author,english
 打交,打交解決唔到問題。,打交解決唔到問題。,daa2 gaau1 gaai2 kyut3 m4 dou2 man6 tai4,Fighting won't settle anything.,662795,nickyeow,239044,1025423,native,CC BY 4.0,0,8,4.63,0|0|-4.628|0|662795,core,false
 打,你應該打俾我吖嘛。,你應該打俾我吖嘛。,nei5 jing1 goi1 daa2 bei2 ngo5 aa1 maa3,You should've called me.,6103457,nickyeow,2718627,1036939,native,CC BY 4.0,0,8,5.14,0|0|-5.139|0|6103457,core,false
 打,今晚打俾我啦。,今晚打俾我啦。,gam1 maan5 daa2 bei2 ngo5 laa1,Give me a call tonight.,1385410,nickyeow,1387027,1007684,native,CC BY 4.0,0,6,5.11,0|0|-5.108|0|1385410,core,false
-切,佢趕得切上最後架巴士。,佢趕得切上最後架巴士。,keoi5 gon2 dak1 cit3 soeng6 zeoi3 hau6 gaa3 baa1 si2,He was in time for the last bus.,6329743,kaenif,296735,0,tts,,2,10,4.43,2|1|-4.433|1|6329743,core,false
-切,你趕唔趕得切㗎？,你趕唔趕得切㗎？,nei5 gon2 m4 gon2 dak1 cit3 gaa3,Will you make it in time?,5735064,nickyeow,5409462,0,tts,,2,6,4.39,2|1|-4.388|0|5735064,core,false
 刺,佢唔知有人密謀刺殺佢。,佢唔知有人密謀刺殺佢。,keoi5 m4 zi1 jau5 jan4 mat6 mau4 ci3 saat3 keoi5,He was ignorant of the plot to assassinate him.,6318072,kaenif,298887,0,tts,,2,10,4.28,2|1|-4.282|1|6318072,core,false
 掘,我哋喺地下掘咗個窿。,我哋喺地下掘咗個窿。,ngo5 dei6 hai2 dei6 haa2 gwat6 zo2 go3 lung1,We dug a hole in the ground.,423187,nickyeow,263150,1038696,native,CC BY 4.0,1,9,2.75,1|0|-2.750|1|423187,core,false
 游水,游水對我嚟講冇難度。,游水對我嚟講冇難度。,jau4 seoi2 deoi3 ngo5 lai4 gong2 mou5 naan4 dou6,Swimming is easy for me.,5942708,nickyeow,487827,1038836,native,CC BY 4.0,1,9,4.66,1|0|-4.664|1|5942708,core,false
@@ -202,8 +200,8 @@ target,sentence,text_original,jyutping,english,tatoeba_id,tatoeba_author,english
 跌,個細路喺張牀度跌咗落嚟。,個細路喺張床度跌咗落嚟。,go3 sai3 lou6 hai2 zoeng1 cong4 dou6 dit3 zo2 lok6 lai4,The boy fell off the bed.,403342,nickyeow,245655,0,tts,,1,11,4.14,1|1|-4.140|1|403342,core,false
 畀,我聽日買畀你。,我聽日買畀你。,ngo5 ting1 jat6 maai5 bei2 nei5,I'll buy it for you tomorrow.,10120920,LeeSooHa,10120906,0,tts,,0,6,5.63,0|1|-5.633|0|10120920,core,false
 畀,係畀你嘅。,係畀你嘅。,hai6 bei2 nei5 ge3,This is for you.,450979,minshirui,55752,0,tts,,0,4,4.45,0|1|-4.452|0|450979,core,false
-揸,小心啲揸車。,小心啲揸車。,siu2 sam1 di1 zaa1 ce1,Drive carefully.,5795803,nickyeow,265500,1000464,native,CC BY 4.0,0,5,3.89,0|0|-3.890|0|5795803,core,false
-揸,飲咗酒唔好揸車。,飲咗酒唔好揸車。,jam2 zo2 zau2 m4 hou2 zaa1 ce1,Don't drink and drive.,5355306,nickyeow,453605,1025611,native,CC BY 4.0,0,7,3.77,0|0|-3.773|0|5355306,core,false
+揸,你可唔可以揸慢少少呀？,你可唔可以揸慢少少呀？,nei5 ho2 m4 ho2 ji5 zaa1 maan6 siu2 siu2 aa3,Could you drive more slowly?,431587,nickyeow,30489,1042265,native,CC BY 4.0,1,10,4.91,1|0|-4.910|1|431587,core,false
+揸,你揸得太快喇。,你揸得太快喇。,nei5 zaa1 dak1 taai3 faai3 laa3,You're driving too fast.,616859,nickyeow,51828,1007655,native,CC BY 4.0,1,6,3.82,1|0|-3.817|0|616859,core,false
 擦,我個同事真係好識擦老細鞋㗎。,我個同事真係好識擦老細鞋㗎。,ngo5 go3 tung4 si6 zan1 hai6 hou2 sik1 caat3 lou5 sai3 haai4 gaa3,My coworker really knows how to suck up to the boss.,557287,nickyeow,554939,0,tts,,2,12,3.95,2|1|-3.947|1|557287,core,false
 擦,嗰個人好識擦老細鞋㗎。,嗰個人好識擦老細鞋㗎。,go2 go3 jan4 hou2 sik1 caat3 lou5 sai3 haai4 gaa3,That man knows how to get on the president's good side.,392323,nickyeow,67965,0,tts,,2,9,3.48,2|1|-3.480|1|392323,core,false
 洗,我幫你洗碗啦。,我幫你洗碗啦。,ngo5 bong1 nei5 sai2 wun2 laa1,Let me help you with the dishes.,692881,nickyeow,244969,1007659,native,CC BY 4.0,1,6,5.45,1|0|-5.450|0|692881,core,false
@@ -214,8 +212,8 @@ target,sentence,text_original,jyutping,english,tatoeba_id,tatoeba_author,english
 拉,蕾拉好擔心你。,蕾拉好擔心你。,leoi4 laai1 hou2 daam1 sam1 nei5,Layla is worried about you.,6109472,nickyeow,6099389,0,tts,,1,6,5.45,1|1|-5.450|0|6109472,core,false
 推,你有冇啲咩書推介呀？,你有冇啲咩書推介呀？,nei5 jau5 mou5 di1 me1 syu1 teoi1 gaai3 aa3,What books do you recommend?,6120127,nickyeow,6099128,1036952,native,CC BY 4.0,0,9,4.65,0|0|-4.652|1|6120127,core,false
 縫,呢個係咪你親手縫㗎？,呢個係咪你親手縫㗎？,ni1 go3 hai6 mai6 nei5 can1 sau2 fung4 gaa3,Did you sew this by hand?,787388,nickyeow,54949,1036666,native,CC BY 4.0,1,8,4.43,1|0|-4.430|0|787388,core,false
-數,冇可能咁着數嘅。,冇可能咁着數嘅。,mou5 ho2 nang4 gam3 zoek6 sou3 ge3,There has to be a catch.,6866769,nickyeow,6866770,1025793,native,CC BY 4.0,0,7,4.55,0|0|-4.547|0|6866769,core,false
-數,我最唔鍾意數學。,我最唔鍾意數學。,ngo5 zeoi3 m4 zung1 ji3 sou3 hok6,I like math least of all.,1889225,fercheung,258918,0,tts,,1,7,5.05,1|1|-5.054|0|1889225,core,false
+數,由左數起第五個人。,由左數起第五個人。,jau4 zo2 sou3 hei2 dai6 ng5 go3 jan4,Kiss the fifth man from the left.,678911,nickyeow,243544,0,tts,,2,8,5.09,2|1|-5.088|0|678911,core,false
+數,我幫緊家姐做數。,我幫緊家姐做數。,ngo5 bong1 gan2 gaa1 ze1 zou6 sou3,I am helping my sister to do her math exercises.,12133437,thesilhouette,1665995,0,tts,,2,7,4.40,2|1|-4.397|0|12133437,core,false
 講,講就容易，做就難。,講就容易，做就難。,gong2 zau6 jung4 ji6 zou6 zau6 naan4,Easier said than done.,3868196,nickyeow,239682,1036730,native,CC BY 4.0,0,7,5.85,0|0|-5.847|0|3868196,core,false
 講,你最好都係唔好同佢講。,你最好都係唔好同佢講。,nei5 zeoi3 hou2 dou1 hai6 m4 hou2 tung4 keoi5 gong2,You'd better not tell him.,1404411,nickyeow,284943,1042337,native,CC BY 4.0,0,10,5.08,0|0|-5.083|1|1404411,core,false
 唱,個演唱會點呀？,個演唱會點呀？,go3 jin2 coeng3 wui2 dim2 aa3,How was the concert?,6103436,nickyeow,895660,1025752,native,CC BY 4.0,1,6,4.87,1|0|-4.870|0|6103436,core,false
@@ -261,7 +259,6 @@ target,sentence,text_original,jyutping,english,tatoeba_id,tatoeba_author,english
 火,我前日喺火車度撞到佢。,我前日喺火車度撞到佢。,ngo5 cin4 jat6 hai2 fo2 ce1 dou6 zong6 dou3 keoi5,I met her by chance on the train the day before yesterday.,683241,nickyeow,27769,0,tts,,1,10,4.79,1|1|-4.786|1|683241,core,false
 灰,畀個煙灰缸我吖唔該。,畀個煙灰缸我吖唔該。,bei2 go3 jin1 fui1 gong1 ngo5 aa1 m4 goi1,Please give me an ashtray.,1579631,nickyeow,593547,1038775,native,CC BY 4.0,1,9,3.87,1|0|-3.870|1|1579631,core,false
 灰,我打爛咗你個煙灰缸。,我打爛咗你個煙灰缸。,ngo5 daa2 laan6 zo2 nei5 go3 jin1 fui1 gong1,I broke your ashtray.,385534,nickyeow,22143,1036626,native,CC BY 4.0,2,9,4.62,2|0|-4.625|1|385534,core,false
-燒,我好似發燒呀。,我好似發燒呀。,ngo5 hou2 ci5 faat3 siu1 aa3,I seem to have a fever.,7009344,nickyeow,38381,1025802,native,CC BY 4.0,1,6,4.88,1|0|-4.875|0|7009344,core,false
 燒,佢係咪仲發緊燒呀？,佢係咪仲發緊燒呀？,keoi5 hai6 mai6 zung6 faat3 gan2 siu1 aa3,Does she still have a temperature?,587384,nickyeow,531879,1025404,native,CC BY 4.0,1,8,3.32,1|0|-3.318|0|587384,core,false
 路,我一路期待緊㗎喇！,我一路期待緊㗎喇！,ngo5 jat1 lou6 kei4 doi6 gan2 gaa3 laa3,I was expecting it!,6005134,kaenif,2355,1036933,native,CC BY 4.0,0,7,4.88,0|0|-4.876|0|6005134,core,false
 路,佢企喺路邊。,佢企喺路邊。,keoi5 kei5 hai2 lou6 bin1,He was standing at the side of the road.,4778630,kaenif,302064,1000429,native,CC BY 4.0,0,5,4.00,0|0|-4.004|0|4778630,core,false
