@@ -1,0 +1,30 @@
+# English loan words that a French sentence should not hold.
+# One word per line. The match is a whole word, and case does not matter.
+week-end
+weekend
+parking
+sandwich
+email
+mail
+internet
+job
+top
+cool
+ok
+okay
+stop
+shopping
+camping
+football
+basketball
+tennis
+match
+ticket
+blog
+smartphone
+wifi
+web
+site
+forum
+chat
+coach

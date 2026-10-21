@@ -20,6 +20,7 @@ from typing import Literal
 import cyclopts
 from gtts import gTTS
 
+from anki_tools.languages.french import core as french_core
 from anki_tools.languages.french import cull as french_cull
 from anki_tools.languages.cantonese.jyutping import fix_jyutping
 from anki_tools.languages.mandarin.pinyin import fix_pinyin
@@ -750,6 +751,28 @@ def fr(
     text_field: str = "French",
     keep_filtered: bool = False,
     select: bool = False,
+    core: bool = False,
+    core_words: int = 50,
+    core_max_cards: int = 300,
+    per_word: int = 2,
+    third_examples: int = 0,
+    ubiquitous_share: float = 0.25,
+    completion_cards: int = 120,
+    tail_cards: int = 0,
+    outside_budget: int = 0,
+    support_top: int = 1000,
+    hard_top: int = 3000,
+    lambda_new: float = 0.1,
+    lambda_repeat: float = 0.03,
+    lambda_len: float = 0.02,
+    lambda_seed: float = 0.01,
+    core_min_words: int = 5,
+    core_max_words: int = 9,
+    simple_units: int = 7,
+    senses: Path = Path("vocab/french_core_senses.tsv"),
+    loanwords: Path = Path("vocab/french_loanwords.txt"),
+    max_unchecked_sense: int = 0,
+    bold_target: bool = True,
     max_cards: int = 1000,
     target_words: int = 300,
     max_uses: int = 4,
@@ -772,7 +795,9 @@ def fr(
     with its CSV files and manifest.
 
     ``--model-id``, ``--text-field``, and ``--keep-filtered`` apply to rank
-    mode only. The other options apply to select mode only.
+    mode only. The ``--core-*``, ``--per-word``, and ``--lambda-*`` options
+    apply to core mode only (see the spec), and the cull options to select
+    mode only.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
@@ -780,6 +805,30 @@ def fr(
     :param text_field: Rank mode: preferred sentence field (default: French).
     :param keep_filtered: Rank mode: keep filtered cards instead of removing.
     :param select: Run the card cull instead of the rank and reorder.
+    :param core: Run the core-word selection instead of the rank and reorder.
+    :param core_words: Core mode: tier F words after the Swadesh set.
+    :param core_max_cards: Core mode: card cap.
+    :param per_word: Core mode: examples per content target, 1 to 3.
+    :param third_examples: Core mode: targets that get a third example.
+    :param ubiquitous_share: Core mode: share above which a target gets
+        quota 1.
+    :param completion_cards: Core mode: card cap of the completion pass.
+    :param tail_cards: Core mode: cards after the core passes.
+    :param outside_budget: Core mode: cap on the outside set, 0 for no cap.
+    :param support_top: Core mode: outside rank that costs 1.0.
+    :param hard_top: Core mode: outside rank that costs 1.8.
+    :param lambda_new: Core mode: cost of one new outside word.
+    :param lambda_repeat: Core mode: cost of one repeated outside word.
+    :param lambda_len: Core mode: cost per unit above the simple limit.
+    :param lambda_seed: Core mode: cost factor of the seed pass.
+    :param core_min_words: Core mode: first unit count of the window.
+    :param core_max_words: Core mode: last unit count of the window.
+    :param simple_units: Core mode: free unit count of the length cost.
+    :param senses: Core mode: sense file of the tier F targets.
+    :param loanwords: Core mode: loan word list of rule C4.
+    :param max_unchecked_sense: Core mode: unchecked targets that K16
+        accepts.
+    :param bold_target: Core mode: bold the assigned target.
     :param max_cards: Select mode: card cap.
     :param target_words: Select mode: target count, 200 to 500.
     :param max_uses: Select mode: most cards that hold one non-exempt word.
@@ -800,10 +849,66 @@ def fr(
         print(f"Error: File not found: {apkg_path}")
         return
 
-    if not select and check:
-        print("Error: --check needs --select.")
+    if check and not (select or core):
+        print("Error: --check needs --select or --core.")
         return
 
+    if core and select:
+        print("Error: --core and --select cannot be used together.")
+        return
+
+
+    if core:
+        if model_id is not None:
+            print("Error: --model-id does not apply with --core.")
+            return
+        output_path = output or french_core.default_output(apkg_path)
+        if check:
+            code = french_core.check_core(output_path)
+            if code:
+                raise SystemExit(code)
+            return
+        deck_name = (
+            name
+            if name != "French 1000 Core Sentences"
+            else french_core.DEFAULT_NAME
+        )
+        print("=" * 50)
+        print("Processing French Anki Deck: core mode")
+        print("=" * 50)
+        french_core.run_core(
+            french_core.CoreRequest(
+                input_path=apkg_path,
+                output_path=output_path,
+                core_words=core_words,
+                options=french_core.CoreOptions(
+                    max_cards=core_max_cards,
+                    per_word=per_word,
+                    third_examples=third_examples,
+                    ubiquitous_share=ubiquitous_share,
+                    completion_cards=completion_cards,
+                    tail_cards=tail_cards,
+                    outside_budget=outside_budget,
+                    support_top=support_top,
+                    hard_top=hard_top,
+                    lambda_new=lambda_new,
+                    lambda_repeat=lambda_repeat,
+                    lambda_len=lambda_len,
+                    lambda_seed=lambda_seed,
+                    simple_units=simple_units,
+                    similarity=similarity,
+                ),
+                min_units=core_min_words,
+                max_units=core_max_words,
+                spoken_weight=spoken_weight,
+                sense_path=senses,
+                loan_path=loanwords,
+                name=deck_name,
+                bold_target=bold_target,
+                max_unchecked_sense=max_unchecked_sense,
+            )
+        )
+        return
     if select:
         if model_id is not None:
             print("Error: --model-id does not apply with --select.")

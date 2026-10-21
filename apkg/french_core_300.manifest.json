@@ -1,0 +1,63 @@
+{
+  "build_date": "2026-10-21T11:20:37+00:00",
+  "source": {
+    "input": "apkg/6000_French_Sentences_w_Audio.apkg",
+    "deck": "French Core Sentences",
+    "model": "French Sentences"
+  },
+  "params": {
+    "core_words": 50,
+    "per_word": 2,
+    "third_examples": 0,
+    "ubiquitous_share": 0.25,
+    "max_cards": 300,
+    "completion_cards": 120,
+    "tail_cards": 120,
+    "outside_budget": 0,
+    "support_top": 1000,
+    "hard_top": 3000,
+    "lambda_new": 0.1,
+    "lambda_repeat": 0.03,
+    "lambda_len": 0.02,
+    "lambda_seed": 0.01,
+    "similarity": 0.67,
+    "min_units": 5,
+    "max_units": 9,
+    "spoken_weight": 0.5,
+    "bold_target": true,
+    "name": "French Core Sentences",
+    "max_unchecked_sense": 0
+  },
+  "counts": {
+    "cards": 300,
+    "targets": 209,
+    "absent": 0,
+    "absent_sense": 5,
+    "unchecked": 0,
+    "covered1": 204,
+    "covered2": 183,
+    "full": 183,
+    "outside": 247,
+    "outside_rare": 18,
+    "tail_words": 346,
+    "sense_rows": 209,
+    "bolded": 182,
+    "unbolded": 118,
+    "name_hits": 0,
+    "loan_hits": 0,
+    "rows": 5928,
+    "rejected_c3": 25,
+    "rejected_c4": 32,
+    "sense_failures": 3296
+  },
+  "frequency": {
+    "path": "data/french_frequency.tsv",
+    "spoken_weight": 0.5
+  },
+  "files": {
+    "core_csv": "sha256:cb129dac4156564837cdfa11609e5ab02e5a0c0c306370199ce2090ccbc83e3e",
+    "coverage_csv": "sha256:f6d9603d92fd342c79e1fef76ef225645dca94cfffdfdcfc5262976f4ad9f82e",
+    "input_apkg": "sha256:230dd01bcf6223bcb8a5ea303eee01fd4a55e19ce418d0bf66a81193037024b5"
+  },
+  "kept_order": "sha256:63e0aef0b6f3ec832827acdd7a0275291e166b8be9757bb92c7b254242ec9c87"
+}
