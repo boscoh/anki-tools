@@ -74,34 +74,33 @@ BACK_TEMPLATE = (
     '<div class="source">{{Source}}</div>'
 )
 EXTRA_CSS = """
+.card {
+    font-size: 1.25em;
+    line-height: 1.3;
+}
 .front-audio {
-    text-align: center;
+    font-size: 0.9em;
 }
 .sentence {
-    font-size: 2.5rem;
-    text-align: center;
-    margin: 0.5rem 0;
+    font-size: 1.2em;
+    margin: 0.5em 0;
 }
 .english {
-    font-size: 1.1rem;
-    text-align: center;
+    font-size: 0.8em;
     color: #333;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.6em;
 }
 .target {
-    font-size: 1.6rem;
-    text-align: center;
-    margin-bottom: 0.5rem;
+    font-size: 1.2em;
+    margin-bottom: 0.4em;
 }
 .source {
-    font-size: 0.8rem;
-    text-align: center;
-    color: gray;
+    display: none;
 }
 .hint {
-    font-size: 0.9rem;
-    text-align: center;
+    font-size: 0.65em;
     color: gray;
+    margin-top: 0.6em;
 }
 """
 
