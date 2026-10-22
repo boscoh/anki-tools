@@ -70,7 +70,7 @@ BACK_TEMPLATE = (
     "<hr id=answer>\n"
     '<div class="sentence">{{Sentence}}</div>\n'
     '<div class="english">{{English}}</div>\n'
-    '<div class="target">{{Target}} {{Gloss}} {{WordAudio}}</div>\n'
+    '<div class="target">{{Target}} · {{Gloss}} {{WordAudio}}</div>\n'
     '<div class="source">{{Source}}</div>'
 )
 EXTRA_CSS = """

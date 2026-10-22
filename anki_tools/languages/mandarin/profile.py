@@ -153,7 +153,7 @@ BACK_TEMPLATE = (
     '<div class="sentence char-links">{{Sentence}}</div>\n'
     '<div class="pinyin">{{Pinyin}}</div>\n'
     '<div class="english">{{English}}</div>\n'
-    '<div class="target">{{Target}} {{Gloss}} {{WordAudio}}</div>\n'
+    '<div class="target">{{Target}} · {{Gloss}} {{WordAudio}}</div>\n'
     '<div class="source">{{Source}}</div>'
 )
 EXTRA_CSS = """
