@@ -182,12 +182,12 @@ EXTRA_CSS = """
     margin: 0.5em 0;
 }
 .jyutping {
-    font-size: 0.8em;
+    font-size: 0.9em;
     color: #444;
     margin-bottom: 0.4em;
 }
 .english {
-    font-size: 0.8em;
+    font-size: 0.9em;
     color: #333;
     margin-bottom: 0.6em;
 }

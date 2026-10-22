@@ -84,7 +84,7 @@ EXTRA_CSS = """
     margin: 0.5em 0;
 }
 .english {
-    font-size: 0.8em;
+    font-size: 0.9em;
     color: #333;
     margin-bottom: 0.6em;
 }
