@@ -213,6 +213,18 @@ class TestBuildTargets:
 
         assert [target.key for target in targets] == ["F:w1", "F:w2"]
 
+    def test_a_frequency_lemma_gets_its_first_sense_as_the_gloss(self) -> None:
+        frequency = [cull.TargetWord("faire", 1, 3, 1.0, 1.0)]
+        senses = {
+            "faire": core.SenseWords(
+                frozenset({"do", "make"}), frozenset(), "do"
+            )
+        }
+
+        targets, _dropped = core.build_core_targets([], frequency, senses, 1)
+
+        assert targets[0].gloss == "do"
+
 
 def _row(index: int, english: str, french: str, _lang: str):
     """Build a small word-table row for the target tests."""
@@ -313,7 +325,9 @@ class TestSense:
         loans = tmp_path / "loans.txt"
         loans.write_text("# a comment\nweek-end\n", encoding="utf-8")
 
-        assert core.read_senses(senses) == {"pas": (frozenset({"not"}), frozenset())}
+        assert core.read_senses(senses) == {
+            "pas": core.SenseWords(frozenset({"not"}), frozenset(), "not")
+        }
         assert core.read_loanwords(loans) == frozenset({"week-end"})
 
 
@@ -455,7 +469,7 @@ class TestCardDesign:
         cards = cull.load_input_deck(source)
         output = tmp_path / "core.apkg"
         cull.write_deck(source, cards, [0, 1, 2], output, "Core Deck")
-        targets = [_target("S1:chat", form="chat")]
+        targets = [_target("S1:chat", form="chat", gloss="cat")]
         candidates = [
             CoreCandidate(index=0, targets=("S1:chat",), outside=(), units=3),
             CoreCandidate(index=1, targets=("S1:chat",), outside=(), units=3),
@@ -484,7 +498,14 @@ class TestCardDesign:
                 for row in package.get_notes()
             }
 
-        assert names == ["French", "sound", "Back", "freq ranks", "Core"]
+        assert names == [
+            "French",
+            "sound",
+            "Back",
+            "freq ranks",
+            "Core",
+            "CoreGloss",
+        ]
         assert templates == [tuple(pair) for pair in core.CORE_TEMPLATES]
         with AnkiPackage(output) as package:
             ords = [row["ord"] for row in package.get_cards()]
@@ -493,6 +514,37 @@ class TestCardDesign:
         assert values["Le chat mange."][4] == "chat"
         assert values["Le lapin court."][4] == ""
         assert values["Le chat dort."][3] == "[ 1 2 ]"
+        assert values["Le chat dort."][5] == "cat"
+        assert values["Le chat mange."][5] == "cat"
+        assert values["Le lapin court."][5] == ""
+
+    def test_the_gloss_gate_passes_on_a_filled_deck(self, tmp_path: Path) -> None:
+        from anki_tools.languages.french import core_gates
+
+        source = _tiny_deck(tmp_path)
+        cards = cull.load_input_deck(source)
+        output = tmp_path / "core.apkg"
+        cull.write_deck(source, cards, [0, 1, 2], output, "Core Deck")
+        targets = [_target("S1:chat", form="chat", gloss="cat")]
+        candidates = [
+            CoreCandidate(index=0, targets=("S1:chat",), outside=(), units=3),
+            CoreCandidate(index=1, targets=("S1:chat",), outside=(), units=3),
+            CoreCandidate(index=2, targets=(), outside=(), units=3),
+        ]
+        result = CoreResult(
+            kept=[0, 1, 2],
+            uses=Counter(),
+            quotas={},
+            assigned={0: "S1:chat"},
+            order=[0, 1, 2],
+        )
+        core._write_core_model(
+            output, cards, result, [0, 1, 2], targets, candidates
+        )
+
+        passed, message = core_gates.gate_gloss(core_gates.CoreFiles(output))
+
+        assert passed, message
 
     def test_adding_the_field_twice_changes_nothing(self, tmp_path: Path) -> None:
         source = _tiny_deck(tmp_path)

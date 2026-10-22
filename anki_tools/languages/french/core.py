@@ -42,6 +42,7 @@ FRENCH_FIELD = cull.FRENCH_FIELD
 AUDIO_FIELD = cull.AUDIO_FIELD
 ENGLISH_FIELD = cull.ENGLISH_FIELD
 CORE_FIELD = "Core"
+CORE_GLOSS_FIELD = "CoreGloss"
 
 CORE_FRONT_TEMPLATE = '<div class="front-audio">{{sound}}</div>'
 CORE_BACK_TEMPLATE = (
@@ -49,7 +50,8 @@ CORE_BACK_TEMPLATE = (
     "<hr id=answer>"
     '<div class="sentence">{{French}}</div>'
     '<div class="english">{{Back}}</div>'
-    '{{#Core}}<div class="target">{{Core}}</div>{{/Core}}'
+    '{{#Core}}<div class="target">{{Core}}'
+    '{{#CoreGloss}} · {{CoreGloss}}{{/CoreGloss}}</div>{{/Core}}'
 )
 CORE_TEMPLATES = (
     (CORE_FRONT_TEMPLATE, CORE_BACK_TEMPLATE),
@@ -77,6 +79,7 @@ CORE_COLUMNS: tuple[str, ...] = (
 COVERAGE_COLUMNS: tuple[str, ...] = (
     "key",
     "word",
+    "gloss",
     "tier",
     "position",
     "quota",
@@ -178,9 +181,23 @@ class CoreRun:
     covered2: int = 0
 
 
+@dataclass(frozen=True)
+class SenseWords:
+    """English sense data of one tier F target.
+
+    :param senses: English sense words of the target.
+    :param false_friends: English false-friend words of the target.
+    :param first: First sense word of the file, used as the card gloss.
+    """
+
+    senses: frozenset[str]
+    false_friends: frozenset[str]
+    first: str
+
+
 def read_senses(
     path: Path = SENSE_PATH,
-) -> dict[str, tuple[frozenset[str], frozenset[str]]]:
+) -> dict[str, SenseWords]:
     """Read the sense file of the tier F targets.
 
     The file has the columns ``word``, ``senses``, and ``false_friends``. The
@@ -188,9 +205,9 @@ def read_senses(
     no rows, so every tier F target is unchecked.
 
     :param path: TSV file.
-    :returns: Lemma to its sense words and false-friend words.
+    :returns: Lemma to its sense words, false-friend words, and first sense.
     """
-    table: dict[str, tuple[frozenset[str], frozenset[str]]] = {}
+    table: dict[str, SenseWords] = {}
     source = Path(path)
     if not source.exists():
         return table
@@ -199,18 +216,28 @@ def read_senses(
             word = (row.get("word") or "").strip().casefold()
             if not word:
                 continue
-            table[word] = (
-                _word_set(row.get("senses") or ""),
-                _word_set(row.get("false_friends") or ""),
+            senses = _word_set(row.get("senses") or "")
+            table[word] = SenseWords(
+                senses=senses,
+                false_friends=_word_set(row.get("false_friends") or ""),
+                first=_first_word(row.get("senses") or ""),
             )
     return table
-
 
 def _word_set(text: str) -> frozenset[str]:
     """Split a comma-separated word list and casefold it."""
     return frozenset(
         part.strip().casefold() for part in text.split(",") if part.strip()
     )
+
+
+def _first_word(text: str) -> str:
+    """Give the first word of a comma-separated list, casefolded."""
+    for part in text.split(","):
+        word = part.strip().casefold()
+        if word:
+            return word
+    return ""
 
 
 def read_loanwords(path: Path = LOAN_PATH) -> frozenset[str]:
@@ -259,7 +286,7 @@ def glosses_share_sense(english_a: str, english_b: str) -> bool:
 def build_core_targets(
     table: Sequence[Any],
     frequency_targets: Sequence[cull.TargetWord],
-    senses: dict[str, tuple[frozenset[str], frozenset[str]]],
+    senses: dict[str, SenseWords],
     core_words: int,
 ) -> tuple[list[CoreTarget], list[CoreTarget]]:
     """Build the core list of tier S and tier F targets.
@@ -270,7 +297,7 @@ def build_core_targets(
 
     :param table: Reviewed French word table.
     :param frequency_targets: Tier F candidates in rank order.
-    :param senses: Sense rows of the tier F targets.
+    :param senses: Sense data of the tier F targets.
     :param core_words: Count of tier F targets to add.
     :returns: The core list in order, and the tier S rows that a merge dropped.
     """
@@ -309,16 +336,18 @@ def build_core_targets(
             break
         if word.lemma in lemmas:
             continue
-        sense, false = senses.get(word.lemma, (frozenset(), frozenset()))
+        sense = senses.get(
+            word.lemma, SenseWords(frozenset(), frozenset(), "")
+        )
         items.append(
             CoreTarget(
                 key=f"F:{word.lemma}",
                 tier="F",
                 position=0,
                 form=word.lemma,
-                gloss="",
-                senses=sense,
-                false_friends=false,
+                gloss=sense.first,
+                senses=sense.senses,
+                false_friends=sense.false_friends,
             )
         )
         added += 1
@@ -857,6 +886,7 @@ def coverage_rows_of(
             {
                 "key": target.key,
                 "word": target.word,
+                "gloss": target.gloss,
                 "tier": target.tier,
                 "position": target.position,
                 "quota": quota,
@@ -1035,10 +1065,11 @@ def _write_core_model(
 ) -> int:
     """Set the core card templates and fill the core word field.
 
-    The function adds the ``Core`` field to the model, writes the core word of
-    each card into it, and sets the core templates and the CSS. The core word is
-    the assigned target. A card with no assigned target gets the held target of
-    the lowest position. A card that holds no target gets no core word.
+    The function adds the ``Core`` and ``CoreGloss`` fields to the model,
+    writes the core word and its English gloss of each card into them, and sets
+    the core templates and the CSS. The core word is the assigned target. A card
+    with no assigned target gets the held target of the lowest position. A card
+    that holds no target gets no core word and no gloss.
 
     :param output_path: Output APKG file.
     :param cards: Input cards.
@@ -1054,7 +1085,8 @@ def _write_core_model(
     with AnkiPackage(output_path) as package:
         models = package.get_models(include_templates=True)
         model_id = cull._find_model_id(models)
-        field_index = package.add_model_field(model_id, CORE_FIELD)
+        word_index = package.add_model_field(model_id, CORE_FIELD)
+        gloss_index = package.add_model_field(model_id, CORE_GLOSS_FIELD)
         for index in ordered:
             target = result.assigned.get(index)
             if target is None and held.get(index):
@@ -1063,8 +1095,12 @@ def _write_core_model(
                 )
             if target is None:
                 continue
+            core = by_key[target]
             package.update_note_field(
-                cards[index].note_id, field_index, by_key[target].form
+                cards[index].note_id, word_index, core.form
+            )
+            package.update_note_field(
+                cards[index].note_id, gloss_index, core.gloss
             )
             filled += 1
         package.update_model_template(model_id=model_id, css=cull.card_css())

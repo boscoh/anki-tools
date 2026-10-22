@@ -1,5 +1,5 @@
 {
-  "build_date": "2026-10-21T11:47:39+00:00",
+  "build_date": "2026-10-22T22:10:55+00:00",
   "source": {
     "input": "apkg/6000_French_Sentences_w_Audio.apkg",
     "deck": "French Core Sentences",
@@ -56,7 +56,7 @@
   },
   "files": {
     "core_csv": "sha256:cb129dac4156564837cdfa11609e5ab02e5a0c0c306370199ce2090ccbc83e3e",
-    "coverage_csv": "sha256:f6d9603d92fd342c79e1fef76ef225645dca94cfffdfdcfc5262976f4ad9f82e",
+    "coverage_csv": "sha256:e93bfc7621d75c6b41e151ffb8f23434df1cf18d857bcb7bccde04e78de64e1d",
     "input_apkg": "sha256:230dd01bcf6223bcb8a5ea303eee01fd4a55e19ce418d0bf66a81193037024b5"
   },
   "kept_order": "sha256:63e0aef0b6f3ec832827acdd7a0275291e166b8be9757bb92c7b254242ec9c87"

@@ -437,7 +437,7 @@ the deck adds few other words.
 ```bash
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --core \
     --core-words 50 --per-word 2 --core-max-cards 300 --tail-cards 120
-# Run gates K1 to K18 on the built deck
+# Run gates K1 to K19 on the built deck
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --core \
     --output apkg/french_core_300.apkg --check
 ```
@@ -480,7 +480,7 @@ Measured result on 2026-10-21 with the command above: 300 cards for 209
 targets (159 Swadesh forms and 50 frequency lemmas). 183 targets have 2
 cards, 21 have one, and 5 are `absent_sense`. The core cards hold 247
 support words, of which 18 are rare, and the tail adds 346 new words. Gates
-K1 to K18 pass.
+K1 to K19 pass.
 
 Licenses: Tatoeba sentence text CC BY 2.0 FR, `wordfreq` list Apache License
 2.0, and input audio under the license of the source deck.

@@ -1,4 +1,4 @@
-"""Gates K1 to K18 of the French core deck.
+"""Gates K1 to K19 of the French core deck.
 
 The gates read the output APKG, the two CSV files, and the manifest. A gate
 never writes a file. See ``specs/core-word-small-deck.md`` section 10.
@@ -110,6 +110,17 @@ class CoreFiles:
                 }
 
         return self._load("notes", load)
+
+    def fields(self) -> list[str]:
+        """Read the field names of the French sentence model."""
+
+        def load() -> list[str]:
+            with AnkiPackage(self.apkg_path) as package:
+                models = package.get_models()
+                model = models[cull._find_model_id(models)]
+                return [entry["name"] for entry in model["flds"]]
+
+        return self._load("fields", load)
 
     def media(self) -> set[str]:
         """Read the media file names of the output deck."""
@@ -445,6 +456,34 @@ def gate_tail(files: CoreFiles) -> tuple[bool, str]:
     return not bad, f"{len(tail)} tail card(s), {len(bad)} without a new lemma"
 
 
+def gate_gloss(files: CoreFiles) -> tuple[bool, str]:
+    """K19: the core gloss pairs with the core word and holds one sense."""
+    names = files.fields()
+    missing = [
+        name
+        for name in (core.CORE_FIELD, core.CORE_GLOSS_FIELD)
+        if name not in names
+    ]
+    if missing:
+        return False, f"model has no {_sample(missing)} field"
+    word_index = names.index(core.CORE_FIELD)
+    gloss_index = names.index(core.CORE_GLOSS_FIELD)
+    bad: list[str] = []
+    filled = 0
+    for note_id, values in files.notes().items():
+        word = values[word_index].strip() if word_index < len(values) else ""
+        gloss = values[gloss_index].strip() if gloss_index < len(values) else ""
+        if not word:
+            if gloss:
+                bad.append(f"{note_id} has a gloss without a core word")
+            continue
+        filled += 1
+        if not gloss:
+            bad.append(f"{note_id} has no gloss")
+        elif "," in gloss:
+            bad.append(f"{note_id} holds a comma gloss")
+    return not bad, f"{filled} core word(s), {len(bad)} bad: {_sample(bad)}"
+
 GATES: tuple[tuple[str, Callable[[CoreFiles], tuple[bool, str]]], ...] = (
     ("K1", gate_card_count),
     ("K2", gate_covered1),
@@ -464,6 +503,7 @@ GATES: tuple[tuple[str, Callable[[CoreFiles], tuple[bool, str]]], ...] = (
     ("K16", gate_sense),
     ("K17", gate_names),
     ("K18", gate_tail),
+    ("K19", gate_gloss),
 )
 
 
@@ -484,7 +524,7 @@ def run_gates(files: CoreFiles) -> list[GateRow]:
 
 
 def check_core(output_path: Path) -> int:
-    """Run gates K1 to K18 on the files of a core output.
+    """Run gates K1 to K19 on the files of a core output.
 
     :param output_path: Output APKG file.
     :returns: The exit code of the gate table, 0 on a pass.

@@ -1,210 +1,210 @@
-key,word,tier,position,quota,count,status
-S1:je,je,S,1,2,2,covered
-S2:tu,tu,S,2,2,2,covered
-S3:il,il,S,3,2,2,covered
-S4:nous,nous,S,4,2,2,covered
-S5:vous,vous,S,5,2,2,covered
-S6:ils,ils,S,6,2,2,covered
-S7:ceci,ceci,S,7,2,2,covered
-S8:cela,cela,S,8,2,2,covered
-S9:ici,ici,S,9,2,2,covered
-S10:là,là,S,10,2,2,covered
-S11:qui,qui,S,11,2,2,covered
-S12:quoi,quoi,S,12,2,2,covered
-S13:où,où,S,13,2,2,covered
-S14:quand,quand,S,14,2,2,covered
-S15:comment,comment,S,15,2,2,covered
-S16:ne pas,ne pas,S,16,2,2,covered
-S17:tout,tout,S,17,2,2,covered
-S18:beaucoup,beaucoup,S,18,2,2,covered
-S19:quelques,quelques,S,19,2,2,covered
-S20:peu,peu,S,20,2,2,covered
-S21:autre,autre,S,21,2,2,covered
-S22:un,un,S,22,2,2,covered
-S23:deux,deux,S,23,2,2,covered
-S24:trois,trois,S,24,2,2,covered
-S25:quatre,quatre,S,25,2,2,covered
-S26:cinq,cinq,S,26,2,2,covered
-S27:grand,grand,S,27,2,2,covered
-S28:long,long,S,28,2,2,covered
-S29:large,large,S,29,2,1,partial
-S30:épais,épais,S,30,2,1,partial
-S32:petit,petit,S,32,2,2,covered
-S33:court,court,S,33,2,2,covered
-S35:mince,mince,S,35,2,1,partial
-S36:femme,femme,S,36,2,2,covered
-S37:homme,homme,S,37,2,2,covered
-S39:enfant,enfant,S,39,2,2,covered
-S40:épouse,épouse,S,40,2,2,covered
-S41:mari,mari,S,41,2,2,covered
-S42:mère,mère,S,42,2,2,covered
-S43:père,père,S,43,2,2,covered
-S44:animal,animal,S,44,2,2,covered
-S45:poisson,poisson,S,45,2,2,covered
-S46:oiseau,oiseau,S,46,2,2,covered
-S47:chien,chien,S,47,2,2,covered
-S49:serpent,serpent,S,49,2,2,covered
-S50:ver,ver,S,50,2,0,absent_sense
-S51:arbre,arbre,S,51,2,2,covered
-S52:forêt,forêt,S,52,2,2,covered
-S54:fruit,fruit,S,54,2,2,covered
-S56:feuille,feuille,S,56,2,2,covered
-S57:racine,racine,S,57,2,2,covered
-S59:fleur,fleur,S,59,2,2,covered
-S60:herbe,herbe,S,60,2,1,partial
-S61:corde,corde,S,61,2,2,covered
-S63:viande,viande,S,63,2,2,covered
-S64:sang,sang,S,64,2,2,covered
-S67:œuf,œuf,S,67,2,2,covered
-S69:queue,queue,S,69,2,1,partial
-S71:cheveux,cheveux,S,71,2,2,covered
-S72:tête,tête,S,72,2,1,partial
-S73:oreille,oreille,S,73,2,2,covered
-S74:œil,œil,S,74,2,2,covered
-S75:nez,nez,S,75,2,2,covered
-S76:bouche,bouche,S,76,2,2,covered
-S77:dent,dent,S,77,2,2,covered
-S78:langue,langue,S,78,2,1,partial
-S79:ongle,ongle,S,79,2,1,partial
-S80:pied,pied,S,80,2,2,covered
-S81:jambe,jambe,S,81,2,2,covered
-S83:main,main,S,83,2,2,covered
-S87:cou,cou,S,87,2,1,partial
-S88:dos,dos,S,88,2,2,covered
-S89:sein,sein,S,89,2,2,covered
-S90:cœur,cœur,S,90,2,2,covered
-S92:boire,boire,S,92,2,2,covered
-S93:manger,manger,S,93,2,2,covered
-S99:respirer,respirer,S,99,2,1,partial
-S100:rire,rire,S,100,2,2,covered
-S101:voir,voir,S,101,2,2,covered
-S102:entendre,entendre,S,102,2,2,covered
-S103:savoir,savoir,S,103,2,2,covered
-S104:penser,penser,S,104,2,2,covered
-S105:sentir,sentir,S,105,2,1,partial
-S106:craindre,craindre,S,106,2,2,covered
-S107:dormir,dormir,S,107,2,2,covered
-S108:vivre,vivre,S,108,2,2,covered
-S109:mourir,mourir,S,109,2,2,covered
-S110:tuer,tuer,S,110,2,2,covered
-S111:se battre,se battre,S,111,2,2,covered
-S113:frapper,frapper,S,113,2,1,partial
-S114:couper,couper,S,114,2,2,covered
-S119:nager,nager,S,119,2,2,covered
-S120:voler,voler,S,120,2,2,covered
-S121:marcher,marcher,S,121,2,2,covered
-S122:venir,venir,S,122,2,2,covered
-S123:s'étendre,s'étendre,S,123,2,1,partial
-S124:s'asseoir,s'asseoir,S,124,2,1,partial
-S125:se lever,se lever,S,125,2,1,partial
-S126:tourner,tourner,S,126,2,2,covered
-S127:tomber,tomber,S,127,2,2,covered
-S128:donner,donner,S,128,2,2,covered
-S129:tenir,tenir,S,129,2,2,covered
-S130:serrer,serrer,S,130,2,0,absent_sense
-S132:laver,laver,S,132,2,2,covered
-S134:tirer,tirer,S,134,2,2,covered
-S135:pousser,pousser,S,135,2,0,absent_sense
-S136:jeter,jeter,S,136,2,2,covered
-S139:compter,compter,S,139,2,2,covered
-S140:dire,dire,S,140,2,2,covered
-S141:chanter,chanter,S,141,2,2,covered
-S142:jouer,jouer,S,142,2,2,covered
-S144:couler,couler,S,144,2,0,absent_sense
-S147:soleil,soleil,S,147,2,2,covered
-S148:lune,lune,S,148,2,2,covered
-S149:étoile,étoile,S,149,2,2,covered
-S150:eau,eau,S,150,2,2,covered
-S151:pluie,pluie,S,151,2,2,covered
-S152:rivière,rivière,S,152,2,2,covered
-S153:lac,lac,S,153,2,2,covered
-S154:mer,mer,S,154,2,1,partial
-S159:terre,terre,S,159,2,2,covered
-S160:nuage,nuage,S,160,2,2,covered
-S161:brouillard,brouillard,S,161,2,2,covered
-S162:ciel,ciel,S,162,2,2,covered
-S163:vent,vent,S,163,2,2,covered
-S164:neige,neige,S,164,2,2,covered
-S165:glace,glace,S,165,2,2,covered
-S166:fumée,fumée,S,166,2,2,covered
-S167:feu,feu,S,167,2,2,covered
-S170:route,route,S,170,2,2,covered
-S171:montagne,montagne,S,171,2,2,covered
-S172:rouge,rouge,S,172,2,2,covered
-S173:vert,vert,S,173,2,1,partial
-S174:jaune,jaune,S,174,2,1,partial
-S175:blanc,blanc,S,175,2,2,covered
-S176:noir,noir,S,176,2,2,covered
-S177:nuit,nuit,S,177,2,2,covered
-S178:jour,jour,S,178,2,2,covered
-S179:année,année,S,179,2,2,covered
-S181:froid,froid,S,181,2,2,covered
-S182:plein,plein,S,182,2,1,partial
-S183:nouveau,nouveau,S,183,2,2,covered
-S184:vieux,vieux,S,184,2,2,covered
-S185:bon,bon,S,185,2,2,covered
-S186:mauvais,mauvais,S,186,2,2,covered
-S188:sale,sale,S,188,2,2,covered
-S189:droit,droit,S,189,2,0,absent_sense
-S196:juste,juste,S,196,2,2,covered
-S197:près,près,S,197,2,2,covered
-S198:loin,loin,S,198,2,1,partial
-S199:droite,droite,S,199,2,1,partial
-S200:gauche,gauche,S,200,2,2,covered
-S201:à,à,S,201,2,2,covered
-S202:dans,dans,S,202,2,2,covered
-S203:avec,avec,S,203,2,2,covered
-S204:et,et,S,204,2,2,covered
-S205:si,si,S,205,2,2,covered
-S206:parce que,parce que,S,206,2,2,covered
-S207:nom,nom,S,207,2,2,covered
-F:pas,pas,F,208,2,2,covered
-F:ne,ne,F,209,2,2,covered
-F:faire,faire,F,210,2,2,covered
-F:plus,plus,F,211,2,2,covered
-F:pouvoir,pouvoir,F,212,2,2,covered
-F:aller,aller,F,213,2,2,covered
-F:bien,bien,F,214,2,2,covered
-F:vouloir,vouloir,F,215,2,2,covered
-F:devoir,devoir,F,216,2,2,covered
-F:même,même,F,217,2,2,covered
-F:très,très,F,218,2,2,covered
-F:fait,fait,F,219,2,2,covered
-F:taire,taire,F,220,2,2,covered
-F:temps,temps,F,221,2,2,covered
-F:aimer,aimer,F,222,2,2,covered
-F:aussi,aussi,F,223,2,2,covered
-F:toi,toi,F,224,2,2,covered
-F:encore,encore,F,225,2,2,covered
-F:jamais,jamais,F,226,2,2,covered
-F:chose,chose,F,227,2,2,covered
-F:parler,parler,F,228,2,2,covered
-F:as,as,F,229,2,2,covered
-F:prendre,prendre,F,230,2,2,covered
-F:pourquoi,pourquoi,F,231,2,2,covered
-F:toujours,toujours,F,232,2,2,covered
-F:monde,monde,F,233,2,2,covered
-F:non,non,F,234,2,2,covered
-F:vie,vie,F,235,2,2,covered
-F:personne,personne,F,236,2,2,covered
-F:fois,fois,F,237,2,2,covered
-F:été,été,F,238,2,2,covered
-F:passer,passer,F,239,2,2,covered
-F:vraiment,vraiment,F,240,2,2,covered
-F:trouver,trouver,F,241,2,2,covered
-F:trop,trop,F,242,2,2,covered
-F:maison,maison,F,243,2,2,covered
-F:déjà,déjà,F,244,2,2,covered
-F:alors,alors,F,245,2,2,covered
-F:arriver,arriver,F,246,2,2,covered
-F:seul,seul,F,247,2,2,covered
-F:besoin,besoin,F,248,2,2,covered
-F:heure,heure,F,249,2,2,covered
-F:mettre,mettre,F,250,2,2,covered
-F:gens,gens,F,251,2,2,covered
-F:français,français,F,252,2,2,covered
-F:travail,travail,F,253,2,2,covered
-F:livre,livre,F,254,2,2,covered
-F:pays,pays,F,255,2,2,covered
-F:falloir,falloir,F,256,2,2,covered
-F:mal,mal,F,257,2,2,covered
+key,word,gloss,tier,position,quota,count,status
+S1:je,je,I,S,1,2,2,covered
+S2:tu,tu,you (singular),S,2,2,2,covered
+S3:il,il,he/she/it/they (singular),S,3,2,2,covered
+S4:nous,nous,we,S,4,2,2,covered
+S5:vous,vous,you (plural),S,5,2,2,covered
+S6:ils,ils,they (plural),S,6,2,2,covered
+S7:ceci,ceci,this,S,7,2,2,covered
+S8:cela,cela,that,S,8,2,2,covered
+S9:ici,ici,here,S,9,2,2,covered
+S10:là,là,there,S,10,2,2,covered
+S11:qui,qui,who,S,11,2,2,covered
+S12:quoi,quoi,what,S,12,2,2,covered
+S13:où,où,where,S,13,2,2,covered
+S14:quand,quand,when,S,14,2,2,covered
+S15:comment,comment,how,S,15,2,2,covered
+S16:ne pas,ne pas,not,S,16,2,2,covered
+S17:tout,tout,all,S,17,2,2,covered
+S18:beaucoup,beaucoup,many,S,18,2,2,covered
+S19:quelques,quelques,some,S,19,2,2,covered
+S20:peu,peu,few,S,20,2,2,covered
+S21:autre,autre,other,S,21,2,2,covered
+S22:un,un,one,S,22,2,2,covered
+S23:deux,deux,two,S,23,2,2,covered
+S24:trois,trois,three,S,24,2,2,covered
+S25:quatre,quatre,four,S,25,2,2,covered
+S26:cinq,cinq,five,S,26,2,2,covered
+S27:grand,grand,big,S,27,2,2,covered
+S28:long,long,long,S,28,2,2,covered
+S29:large,large,wide,S,29,2,1,partial
+S30:épais,épais,thick,S,30,2,1,partial
+S32:petit,petit,small,S,32,2,2,covered
+S33:court,court,short,S,33,2,2,covered
+S35:mince,mince,thin,S,35,2,1,partial
+S36:femme,femme,woman,S,36,2,2,covered
+S37:homme,homme,man,S,37,2,2,covered
+S39:enfant,enfant,child,S,39,2,2,covered
+S40:épouse,épouse,wife,S,40,2,2,covered
+S41:mari,mari,husband,S,41,2,2,covered
+S42:mère,mère,mother,S,42,2,2,covered
+S43:père,père,father,S,43,2,2,covered
+S44:animal,animal,animal,S,44,2,2,covered
+S45:poisson,poisson,fish,S,45,2,2,covered
+S46:oiseau,oiseau,bird,S,46,2,2,covered
+S47:chien,chien,dog,S,47,2,2,covered
+S49:serpent,serpent,snake,S,49,2,2,covered
+S50:ver,ver,worm,S,50,2,0,absent_sense
+S51:arbre,arbre,tree,S,51,2,2,covered
+S52:forêt,forêt,forest,S,52,2,2,covered
+S54:fruit,fruit,fruit,S,54,2,2,covered
+S56:feuille,feuille,leaf,S,56,2,2,covered
+S57:racine,racine,root,S,57,2,2,covered
+S59:fleur,fleur,flower,S,59,2,2,covered
+S60:herbe,herbe,grass,S,60,2,1,partial
+S61:corde,corde,rope,S,61,2,2,covered
+S63:viande,viande,meat,S,63,2,2,covered
+S64:sang,sang,blood,S,64,2,2,covered
+S67:œuf,œuf,egg,S,67,2,2,covered
+S69:queue,queue,tail,S,69,2,1,partial
+S71:cheveux,cheveux,hair,S,71,2,2,covered
+S72:tête,tête,head,S,72,2,1,partial
+S73:oreille,oreille,ear,S,73,2,2,covered
+S74:œil,œil,eye,S,74,2,2,covered
+S75:nez,nez,nose,S,75,2,2,covered
+S76:bouche,bouche,mouth,S,76,2,2,covered
+S77:dent,dent,tooth,S,77,2,2,covered
+S78:langue,langue,tongue,S,78,2,1,partial
+S79:ongle,ongle,fingernail,S,79,2,1,partial
+S80:pied,pied,foot,S,80,2,2,covered
+S81:jambe,jambe,leg,S,81,2,2,covered
+S83:main,main,hand,S,83,2,2,covered
+S87:cou,cou,neck,S,87,2,1,partial
+S88:dos,dos,back,S,88,2,2,covered
+S89:sein,sein,breast,S,89,2,2,covered
+S90:cœur,cœur,heart,S,90,2,2,covered
+S92:boire,boire,to drink,S,92,2,2,covered
+S93:manger,manger,to eat,S,93,2,2,covered
+S99:respirer,respirer,to breathe,S,99,2,1,partial
+S100:rire,rire,to laugh,S,100,2,2,covered
+S101:voir,voir,to see,S,101,2,2,covered
+S102:entendre,entendre,to hear,S,102,2,2,covered
+S103:savoir,savoir,to know,S,103,2,2,covered
+S104:penser,penser,to think,S,104,2,2,covered
+S105:sentir,sentir,to smell,S,105,2,1,partial
+S106:craindre,craindre,to fear,S,106,2,2,covered
+S107:dormir,dormir,to sleep,S,107,2,2,covered
+S108:vivre,vivre,to live,S,108,2,2,covered
+S109:mourir,mourir,to die,S,109,2,2,covered
+S110:tuer,tuer,to kill,S,110,2,2,covered
+S111:se battre,se battre,to fight,S,111,2,2,covered
+S113:frapper,frapper,to hit,S,113,2,1,partial
+S114:couper,couper,to cut,S,114,2,2,covered
+S119:nager,nager,to swim,S,119,2,2,covered
+S120:voler,voler,to fly,S,120,2,2,covered
+S121:marcher,marcher,to walk,S,121,2,2,covered
+S122:venir,venir,to come,S,122,2,2,covered
+S123:s'étendre,s'étendre,to lie down,S,123,2,1,partial
+S124:s'asseoir,s'asseoir,to sit,S,124,2,1,partial
+S125:se lever,se lever,to stand,S,125,2,1,partial
+S126:tourner,tourner,to turn (intransitive),S,126,2,2,covered
+S127:tomber,tomber,to fall,S,127,2,2,covered
+S128:donner,donner,to give,S,128,2,2,covered
+S129:tenir,tenir,to hold,S,129,2,2,covered
+S130:serrer,serrer,to squeeze,S,130,2,0,absent_sense
+S132:laver,laver,to wash,S,132,2,2,covered
+S134:tirer,tirer,to pull,S,134,2,2,covered
+S135:pousser,pousser,to push,S,135,2,0,absent_sense
+S136:jeter,jeter,to throw,S,136,2,2,covered
+S139:compter,compter,to count,S,139,2,2,covered
+S140:dire,dire,to say,S,140,2,2,covered
+S141:chanter,chanter,to sing,S,141,2,2,covered
+S142:jouer,jouer,to play,S,142,2,2,covered
+S144:couler,couler,to flow,S,144,2,0,absent_sense
+S147:soleil,soleil,sun,S,147,2,2,covered
+S148:lune,lune,moon,S,148,2,2,covered
+S149:étoile,étoile,star,S,149,2,2,covered
+S150:eau,eau,water,S,150,2,2,covered
+S151:pluie,pluie,rain,S,151,2,2,covered
+S152:rivière,rivière,river,S,152,2,2,covered
+S153:lac,lac,lake,S,153,2,2,covered
+S154:mer,mer,sea,S,154,2,1,partial
+S159:terre,terre,earth,S,159,2,2,covered
+S160:nuage,nuage,cloud,S,160,2,2,covered
+S161:brouillard,brouillard,fog,S,161,2,2,covered
+S162:ciel,ciel,sky,S,162,2,2,covered
+S163:vent,vent,wind,S,163,2,2,covered
+S164:neige,neige,snow,S,164,2,2,covered
+S165:glace,glace,ice,S,165,2,2,covered
+S166:fumée,fumée,smoke,S,166,2,2,covered
+S167:feu,feu,fire,S,167,2,2,covered
+S170:route,route,road,S,170,2,2,covered
+S171:montagne,montagne,mountain,S,171,2,2,covered
+S172:rouge,rouge,red,S,172,2,2,covered
+S173:vert,vert,green,S,173,2,1,partial
+S174:jaune,jaune,yellow,S,174,2,1,partial
+S175:blanc,blanc,white,S,175,2,2,covered
+S176:noir,noir,black,S,176,2,2,covered
+S177:nuit,nuit,night,S,177,2,2,covered
+S178:jour,jour,day,S,178,2,2,covered
+S179:année,année,year,S,179,2,2,covered
+S181:froid,froid,cold,S,181,2,2,covered
+S182:plein,plein,full,S,182,2,1,partial
+S183:nouveau,nouveau,new,S,183,2,2,covered
+S184:vieux,vieux,old,S,184,2,2,covered
+S185:bon,bon,good,S,185,2,2,covered
+S186:mauvais,mauvais,bad,S,186,2,2,covered
+S188:sale,sale,dirty,S,188,2,2,covered
+S189:droit,droit,straight,S,189,2,0,absent_sense
+S196:juste,juste,correct,S,196,2,2,covered
+S197:près,près,near,S,197,2,2,covered
+S198:loin,loin,far,S,198,2,1,partial
+S199:droite,droite,right,S,199,2,1,partial
+S200:gauche,gauche,left,S,200,2,2,covered
+S201:à,à,at,S,201,2,2,covered
+S202:dans,dans,in,S,202,2,2,covered
+S203:avec,avec,with,S,203,2,2,covered
+S204:et,et,and,S,204,2,2,covered
+S205:si,si,if,S,205,2,2,covered
+S206:parce que,parce que,because,S,206,2,2,covered
+S207:nom,nom,name,S,207,2,2,covered
+F:pas,pas,not,F,208,2,2,covered
+F:ne,ne,not,F,209,2,2,covered
+F:faire,faire,do,F,210,2,2,covered
+F:plus,plus,more,F,211,2,2,covered
+F:pouvoir,pouvoir,can,F,212,2,2,covered
+F:aller,aller,go,F,213,2,2,covered
+F:bien,bien,well,F,214,2,2,covered
+F:vouloir,vouloir,want,F,215,2,2,covered
+F:devoir,devoir,must,F,216,2,2,covered
+F:même,même,same,F,217,2,2,covered
+F:très,très,very,F,218,2,2,covered
+F:fait,fait,fact,F,219,2,2,covered
+F:taire,taire,quiet,F,220,2,2,covered
+F:temps,temps,time,F,221,2,2,covered
+F:aimer,aimer,love,F,222,2,2,covered
+F:aussi,aussi,also,F,223,2,2,covered
+F:toi,toi,you,F,224,2,2,covered
+F:encore,encore,again,F,225,2,2,covered
+F:jamais,jamais,never,F,226,2,2,covered
+F:chose,chose,thing,F,227,2,2,covered
+F:parler,parler,speak,F,228,2,2,covered
+F:as,as,have,F,229,2,2,covered
+F:prendre,prendre,take,F,230,2,2,covered
+F:pourquoi,pourquoi,why,F,231,2,2,covered
+F:toujours,toujours,always,F,232,2,2,covered
+F:monde,monde,world,F,233,2,2,covered
+F:non,non,no,F,234,2,2,covered
+F:vie,vie,life,F,235,2,2,covered
+F:personne,personne,nobody,F,236,2,2,covered
+F:fois,fois,time,F,237,2,2,covered
+F:été,été,summer,F,238,2,2,covered
+F:passer,passer,pass,F,239,2,2,covered
+F:vraiment,vraiment,really,F,240,2,2,covered
+F:trouver,trouver,find,F,241,2,2,covered
+F:trop,trop,too,F,242,2,2,covered
+F:maison,maison,house,F,243,2,2,covered
+F:déjà,déjà,already,F,244,2,2,covered
+F:alors,alors,then,F,245,2,2,covered
+F:arriver,arriver,arrive,F,246,2,2,covered
+F:seul,seul,alone,F,247,2,2,covered
+F:besoin,besoin,need,F,248,2,2,covered
+F:heure,heure,hour,F,249,2,2,covered
+F:mettre,mettre,put,F,250,2,2,covered
+F:gens,gens,people,F,251,2,2,covered
+F:français,français,french,F,252,2,2,covered
+F:travail,travail,work,F,253,2,2,covered
+F:livre,livre,book,F,254,2,2,covered
+F:pays,pays,country,F,255,2,2,covered
+F:falloir,falloir,must,F,256,2,2,covered
+F:mal,mal,bad,F,257,2,2,covered
