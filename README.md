@@ -639,9 +639,10 @@ uv run pytest tests/test_apkg_package.py -v
 uv run pytest tests/ --cov=anki_tools --cov-report=term-missing
 ```
 
-**Test coverage:** 447 tests. They cover the package API, the deck gates, the
+**Test coverage:** 450 tests. They cover the package API, the deck gates, the
 language pack rules, and the ranking. A test that needs a large input file or
-a cache skips when the file is absent.
+a cache skips when the file is absent. The tests build their own small APKG
+files, so the repository holds no deck binary.
 
 ## Alternative Methods
 

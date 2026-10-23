@@ -1,6 +1,5 @@
-# Anki package files (large binary files) - but allow test data in tests/
+# Anki package files (large binary files)
 *.apkg
-!tests/*.apkg
 
 # Local input data and cached dumps
 data/

@@ -1,11 +1,8 @@
-"""Contract tests for the APKG package API on a real deck.
+"""Contract tests for the APKG package API.
 
-The fixture is one Chinese deck of 576 notes and 538 media files. The
-module-scoped fixture opens the deck one time, so the tests share the unzip.
-Each test that changes the deck copies it first, so the tests stay independent.
-
-The deck references 4 audio files that it does not hold. That gap comes from
-the source deck, so the tests here check the mapping and not the tags.
+The deck comes from :mod:`tests.deck_fixture`, so the tests state the contract
+and do not depend on the quirks of one real deck. The module-scoped fixture
+builds the deck one time. Each test that changes the deck copies it first.
 """
 
 from __future__ import annotations
@@ -19,8 +16,8 @@ from typing import Iterator
 import pytest
 
 from anki_tools.apkg.package import AnkiPackage
+from tests.deck_fixture import MP3_STUB, build_contract_deck
 
-APKG_PATH = Path("tests/A_Course_in_Contemporary_Chinese_1.apkg")
 SOUND = re.compile(r"\[sound:([^\]]+)\]")
 AUDIO_SUFFIXES = (".mp3", ".wav", ".ogg")
 
@@ -41,6 +38,11 @@ def _audio_users(audio: dict[int, set[str]]) -> Counter[str]:
     return users
 
 
+def _note_cards(package: AnkiPackage) -> Counter[int]:
+    """Count the cards of each note."""
+    return Counter(int(row["nid"]) for row in package.get_cards())
+
+
 def _card_of(package: AnkiPackage, note_id: int) -> int:
     """Give the card id of one note."""
     return next(
@@ -49,25 +51,30 @@ def _card_of(package: AnkiPackage, note_id: int) -> int:
 
 
 @pytest.fixture(scope="module")
-def package() -> Iterator[AnkiPackage]:
-    with AnkiPackage(APKG_PATH) as open_package:
+def deck_path(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    return build_contract_deck(tmp_path_factory.mktemp("deck"))
+
+
+@pytest.fixture(scope="module")
+def package(deck_path: Path) -> Iterator[AnkiPackage]:
+    with AnkiPackage(deck_path) as open_package:
         yield open_package
 
 
 @pytest.fixture
-def editable(tmp_path: Path) -> Iterator[AnkiPackage]:
+def editable(deck_path: Path, tmp_path: Path) -> Iterator[AnkiPackage]:
     target = tmp_path / "deck.apkg"
-    shutil.copy(APKG_PATH, target)
+    shutil.copy(deck_path, target)
     with AnkiPackage(target) as open_package:
         yield open_package
 
 
-def test_every_media_file_is_referenced_by_a_note(package: AnkiPackage) -> None:
+def test_the_deck_references_every_media_file(package: AnkiPackage) -> None:
     """A media file with no note is dead weight in the package."""
     media = set(package.get_media_mapping().values())
     used = set().union(*_note_audio(package).values())
 
-    assert media - used == set()
+    assert media == used
 
 
 def test_the_extraction_writes_every_mapped_audio_file(
@@ -79,7 +86,7 @@ def test_the_extraction_writes_every_mapped_audio_file(
     assert set(extracted) == {name for name in media if name.endswith(AUDIO_SUFFIXES)}
     assert extracted
     for path in extracted.values():
-        assert Path(path).stat().st_size > 0
+        assert Path(path).stat().st_size == len(MP3_STUB)
 
 
 def test_delete_card_removes_the_note_and_its_exclusive_audio(
@@ -100,6 +107,7 @@ def test_delete_card_removes_the_note_and_its_exclusive_audio(
     assert result["note_deleted"] is True
     assert set(result["audio_files_deleted"]) == names
     assert all(not editable.is_audio_file_used(name) for name in names)
+    assert names.isdisjoint(set(editable.get_media_mapping().values()))
 
 
 def test_delete_card_keeps_a_shared_audio_file(editable: AnkiPackage) -> None:
@@ -117,6 +125,19 @@ def test_delete_card_keeps_a_shared_audio_file(editable: AnkiPackage) -> None:
     assert result["note_deleted"] is True
     assert set(result["audio_files_deleted"]).isdisjoint(shared)
     assert all(editable.is_audio_file_used(name) for name in shared)
+    assert shared <= set(editable.get_media_mapping().values())
+
+
+def test_delete_card_keeps_the_note_of_a_two_card_note(editable: AnkiPackage) -> None:
+    note_id = next(note_id for note_id, count in _note_cards(editable).items() if count > 1)
+    audio = _note_audio(editable)[note_id]
+
+    result = editable.delete_card(_card_of(editable, note_id))
+
+    assert result["card_deleted"] is True
+    assert result["note_deleted"] is False
+    assert result["audio_files_deleted"] == []
+    assert editable.is_audio_file_used(next(iter(audio)))
 
 
 def test_delete_cards_removes_the_unused_media(editable: AnkiPackage) -> None:
