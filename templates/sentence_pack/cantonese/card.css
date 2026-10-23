@@ -1,6 +1,4 @@
 /* Adds to templates/shared/card.css. */
-.jyutping {
-    font-size: 0.9em;
-    color: #444;
-    margin-bottom: 0.4em;
+.char-links {
+    font-family: "Noto Sans HK", "PingFang HK", "Microsoft JhengHei", sans-serif;
 }

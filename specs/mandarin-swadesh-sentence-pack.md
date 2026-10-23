@@ -563,7 +563,7 @@ Back template:
 {{Audio}}
 <hr id=answer>
 <div class="sentence char-links">{{Sentence}}</div>
-<div class="pinyin">{{Pinyin}}</div>
+<div class="romanization">{{Pinyin}}</div>
 <div class="english">{{English}}</div>
 <div class="target">{{Target}} {{Gloss}} {{WordAudio}}</div>
 <div class="source">{{Source}}</div>
@@ -574,8 +574,9 @@ The builder reads these files: `templates/sentence_pack/mandarin/front.html`,
 `templates/sentence_pack/mandarin/card.css`. Edit these files to change the
 deck. The pack `card.css` adds to the shared `templates/shared/card.css`.
 The shared sheet holds `.card`, `a`, `.front-audio`, `.sentence`,
-`.english`, `.target`, `.source`, and `.hint`. The Mandarin pack `card.css`
-holds `.pinyin`.
+`.english`, `.target`, `.source`, `.hint`, and `.romanization`. It also puts a
+Simplified Chinese font stack on `.char-links` and keeps the card color on
+each linked character. The Mandarin pack `card.css` holds only its own rules.
 
 The class `char-links` turns each Han character of the sentence into a link
 to the CC-Canto dictionary (`https://cantonese.org/search.php?q=`). The

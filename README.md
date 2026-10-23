@@ -77,12 +77,20 @@ Edit a file, then run the command again to change the deck.
 - Swadesh sentence packs: `templates/sentence_pack/<language>/` with
   `front.html`, `back.html`, and `card.css`.
 - `anki swadesh build <language>`: `templates/vocab/front.html`,
-  `templates/vocab/back.html`, and `templates/vocab/card.css`.
+  `templates/vocab/back.html`, `templates/vocab/card.css`, and an optional
+  `templates/vocab/<language>/card.css`.
 - `anki fix fr --select`: `templates/french_cull/front.html` and `back.html`.
 - `anki fix fr --core`: `templates/french_core/front.html` and `back.html`.
 
 A builder reads the shared sheet first, then the deck `card.css`, so a deck
 rule overrides a shared rule. A deck `card.css` holds only its own classes.
+
+The class `char-links` is a script hook: the shared script wraps each Han
+character in a link, and the shared sheet keeps the card color on that link.
+The shared sheet sets a Simplified Chinese font stack. The Cantonese deck
+overrides it with a Traditional stack, so each character uses a Hong Kong
+face.
+
 The back template of the vocab deck holds the `{{fields}}` placeholder for
 the field blocks. The command writes these blocks from the field list of the
 language.

@@ -6,6 +6,12 @@
 a {
     text-decoration: none;
 }
+.char-links {
+    font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+.char-links a {
+    color: inherit;
+}
 .front-audio {
     font-size: 0.9em;
 }
@@ -29,4 +35,9 @@ a {
     font-size: 0.65em;
     color: gray;
     margin-top: 0.6em;
+}
+.romanization {
+    font-size: 0.9em;
+    color: #444;
+    margin-bottom: 0.4em;
 }

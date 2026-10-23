@@ -366,7 +366,9 @@ links each Han character of the sentence to the CC-Canto dictionary
 (`https://cantonese.org/search.php?q=`), the same as the Mandarin sentence
 pack. The builder reads the front and back templates from
 `templates/sentence_pack/cantonese/front.html` and `back.html`, and the
-classes from `templates/sentence_pack/cantonese/card.css`.
+classes from `templates/sentence_pack/cantonese/card.css`. The pack `card.css`
+overrides the Simplified `.char-links` font stack of the shared sheet with a
+Traditional stack, so each character uses a Hong Kong face.
 
 ## 11. Quality gates
 

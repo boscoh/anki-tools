@@ -509,7 +509,7 @@ def _apply_style(
                 print(f"  Auto-mapping: {mapping}")
             afmt = _apply_field_mapping(afmt, mapping)
         script = load_char_links()
-        if script and ('id="chars"' in afmt or "char-links" in afmt):
+        if script and "char-links" in afmt:
             afmt = f"{afmt.rstrip()}\n{script}"
     elif verbose:
         print(f"No {back_path} found, skipping back template")
@@ -1432,7 +1432,8 @@ def _build_apkg(language: str, prune: bool = True) -> None:
     back_template = load_text(TEMPLATES_DIR / "vocab" / "back.html")
 
     css_path = TEMPLATES_DIR / "vocab" / "card.css"
-    css_content = load_css_layers(SHARED_CSS_PATH, css_path)
+    language_css_path = TEMPLATES_DIR / "vocab" / lang_lower / "card.css"
+    css_content = load_css_layers(SHARED_CSS_PATH, css_path, language_css_path)
 
     csv_fields = (
         [k for k in entries[0].keys() if k != "audio_filename"] if entries else []
@@ -1448,7 +1449,7 @@ def _build_apkg(language: str, prune: bool = True) -> None:
     for field in content_order:
         if field.lower() in cjk_fields:
             field_parts.append(
-                f"<div id='chars' style='font-size: 3rem'>{{{{{field}}}}}</div>"
+                f"<div class='char-links' style='font-size: 3rem'>{{{{{field}}}}}</div>"
             )
         elif field.lower() in script_15em_fields:
             field_parts.append(f"<div style='font-size: 1.5em'>{{{{{field}}}}}</div>")
