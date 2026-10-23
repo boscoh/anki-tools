@@ -244,6 +244,33 @@ def audio_author_map(tsv_path: Path) -> dict[int, str]:
     return authors
 
 
+def used_audio_authors(
+    audio_authors: dict[int, str], rows: Iterable[dict[str, str]]
+) -> dict[int, str]:
+    """Keep the authors of the native recordings that the pack uses.
+
+    :param audio_authors: Mapping from every audio id of the export to its
+        author.
+    :param rows: Sentence CSV rows of the pack.
+    :returns: The entries of the ids in a native row of the pack.
+    """
+    used: set[int] = set()
+    for row in rows:
+        if row.get("audio_source") != "native":
+            continue
+        try:
+            audio_id = int(str(row.get("audio_id", "")).strip())
+        except ValueError:
+            continue
+        if audio_id:
+            used.add(audio_id)
+    return {
+        audio_id: author
+        for audio_id, author in audio_authors.items()
+        if audio_id in used
+    }
+
+
 def tts_engine_name(voice: str) -> str:
     """Name the engine that produced the voice.
 
@@ -538,7 +565,7 @@ def build_pack(
     profile.attribution(
         packed_rows,
         index.voice,
-        audio_author_map_for(profile, audio_dir),
+        used_audio_authors(audio_author_map_for(profile, audio_dir), packed_rows),
         attribution_path,
     )
 
