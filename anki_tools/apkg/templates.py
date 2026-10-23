@@ -1,10 +1,33 @@
-"""Card template partials shared by the deck builders."""
+"""Card template and CSS files shared by the deck builders."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
-CHAR_LINKS_PATH = Path("templates/char_links.html")
+TEMPLATES_DIR = Path(__file__).parents[2] / "templates"
+CHAR_LINKS_PATH = TEMPLATES_DIR / "char_links.html"
+
+
+def load_text(path: Path) -> str:
+    """Read a template or CSS file.
+
+    :param path: File to read.
+    :raises FileNotFoundError: The file does not exist.
+    :returns: The text of the file, without the final newline.
+    """
+    return Path(path).read_text(encoding="utf-8").strip()
+
+
+def load_optional_text(path: Path) -> str:
+    """Read a template or CSS file, or give an empty string when it is absent.
+
+    :param path: File to read.
+    :returns: The text of the file, or an empty string.
+    """
+    path = Path(path)
+    if not path.exists():
+        return ""
+    return load_text(path)
 
 
 def load_char_links(path: Path = CHAR_LINKS_PATH) -> str:
@@ -13,7 +36,4 @@ def load_char_links(path: Path = CHAR_LINKS_PATH) -> str:
     :param path: HTML partial that holds the ``<script>`` block.
     :returns: The script text, or an empty string when the file is absent.
     """
-    path = Path(path)
-    if not path.exists():
-        return ""
-    return path.read_text(encoding="utf-8").strip()
+    return load_optional_text(path)

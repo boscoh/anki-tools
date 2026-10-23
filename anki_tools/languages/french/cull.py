@@ -27,6 +27,7 @@ from pathlib import Path
 from typing import Any, Callable, Collection, Iterable, Iterator, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
+from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
 from anki_tools.sentence_pack.audit import print_audit, sha256_value
 from anki_tools.sentence_pack.audio import probe_duration
 from anki_tools.languages.french.profile import EXTRA_CSS, TOKENIZER
@@ -53,32 +54,10 @@ SWADESH_TOTAL = 207
 SWADESH_EXCEPTIONS = ("intestins",)
 RESERVE_TAGS = " swadesh "
 CARD_CSS_PATH = Path(__file__).parents[3] / "templates" / "card.css"
-FRONT_HINT = "Tap to show the sentence"
-REVERSE_HINT = "Tap to show the French"
-FRONT_TEMPLATE = (
-    '<div class="front-audio">{{sound}}</div>'
-    f'<div class="hint">{FRONT_HINT}</div>'
-)
-BACK_TEMPLATE = (
-    "{{sound}}"
-    "<hr id=answer>"
-    '<div class="sentence">{{French}}</div>'
-    '<div class="english">{{Back}}</div>'
-)
-REVERSE_FRONT_TEMPLATE = (
-    '<div class="english">{{Back}}</div>'
-    f'<div class="hint">{REVERSE_HINT}</div>'
-)
-REVERSE_BACK_TEMPLATE = (
-    "{{Back}}"
-    "<hr id=answer>"
-    '<div class="sentence">{{French}}</div>'
-    '<div class="front-audio">{{sound}}</div>'
-)
-CARD_TEMPLATES = (
-    (FRONT_TEMPLATE, BACK_TEMPLATE),
-    (REVERSE_FRONT_TEMPLATE, REVERSE_BACK_TEMPLATE),
-)
+TEMPLATE_DIR = TEMPLATES_DIR / "french_cull"
+FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
+BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")
+CARD_TEMPLATES = ((FRONT_TEMPLATE, BACK_TEMPLATE),)
 
 CONTENT_POS = frozenset({"NOUN", "VERB", "ADJ", "ADV"})
 CONTENT_SHARE = 0.5
@@ -1284,10 +1263,10 @@ def card_css(css_path: Path = CARD_CSS_PATH) -> str:
 def apply_card_templates(
     package: AnkiPackage, model_id: str | None = None
 ) -> None:
-    """Set the Swadesh-style templates and CSS on the deck model.
+    """Set the Swadesh-style template and CSS on the deck model.
 
-    The model keeps a template that the note does not use, so the function
-    writes only the templates that the model has.
+    The deck holds one card per note, so the function writes the first
+    template and removes every template after it with its cards.
 
     :param package: Open package.
     :param model_id: Model id, or None to find the French sentence model.
@@ -1296,11 +1275,13 @@ def apply_card_templates(
     models = package.get_models(include_templates=True)
     model_id = model_id or _find_model_id(models)
     package.update_model_template(model_id=model_id, css=card_css())
-    count = len(models[model_id].get("tmpls", ()))
-    for index, (qfmt, afmt) in enumerate(CARD_TEMPLATES[:count]):
+    for index, (qfmt, afmt) in enumerate(CARD_TEMPLATES):
         package.update_model_template(
             model_id=model_id, qfmt=qfmt, afmt=afmt, template_index=index
         )
+    have = len(models[model_id].get("tmpls", ()))
+    for index in reversed(range(len(CARD_TEMPLATES), have)):
+        package.remove_model_template(model_id, index)
 
 
 def write_deck(
@@ -1883,24 +1864,26 @@ def gate_swadesh(inputs: GateInputs) -> tuple[bool, str]:
 
 
 def gate_card_templates(inputs: GateInputs) -> tuple[bool, str]:
-    """G15: the deck model holds the Swadesh-style templates and CSS."""
+    """G15: the deck model holds the Swadesh-style template and CSS."""
     output = inputs.output()
     templates = output["templates"].get(MODEL_NAME, [])
     if not templates:
         return False, f"the model {MODEL_NAME!r} has no card template"
-    expected = CARD_TEMPLATES[: len(templates)]
+    expected = list(CARD_TEMPLATES)
     problems = [
         f"card {index + 1} is {qfmt!r} / {afmt!r}"
         for index, (qfmt, afmt) in enumerate(templates)
-        if (qfmt, afmt) != expected[index]
+        if index >= len(expected) or (qfmt, afmt) != expected[index]
     ]
+    if len(templates) != len(expected):
+        problems.append(f"{len(templates)} templates, not {len(expected)}")
     css = output["css"].get(MODEL_NAME, "")
     for name in ("sentence", "english", "hint"):
         if f".{name}" not in css:
             problems.append(f"the CSS has no .{name} class")
     if problems:
         return False, f"{len(problems)} template problem(s): {_sample(problems)}"
-    return True, f"{len(templates)} card template(s) and the CSS classes match"
+    return True, f"{len(templates)} card template and the CSS classes match"
 
 
 GATES: tuple[tuple[str, GateCheck], ...] = (

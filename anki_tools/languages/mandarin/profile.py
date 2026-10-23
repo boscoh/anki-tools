@@ -27,6 +27,7 @@ from anki_tools.languages.mandarin.characters import (
     is_chinese_char,
     is_repeated_zh_sentence,
 )
+from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
 from anki_tools.sentence_pack.guards import compound_spans, inside_spans, occurrences
 from anki_tools.sentence_pack.pack import (
     ATTRIBUTION_PATH,
@@ -143,54 +144,11 @@ SORT_FIELD_INDEX = 4
 DECK_DESCRIPTION = "Word data CC BY-SA 4.0. Sentence text CC BY 2.0 FR. Audio: gTTS."
 SWADESH_URL = "https://en.wiktionary.org/wiki/Module:Swadesh/data/cmn"
 
-FRONT_TEMPLATE = (
-    '<div class="front-audio">{{Audio}}</div>\n'
-    '<div class="hint">Tap to show the sentence</div>'
-)
-BACK_TEMPLATE = (
-    "{{Audio}}\n"
-    "<hr id=answer>\n"
-    '<div class="sentence char-links">{{Sentence}}</div>\n'
-    '<div class="pinyin">{{Pinyin}}</div>\n'
-    '<div class="english">{{English}}</div>\n'
-    '<div class="target">{{Target}} · {{Gloss}} {{WordAudio}}</div>\n'
-    '<div class="source">{{Source}}</div>'
-)
-EXTRA_CSS = """
-.card {
-    font-size: 1.25em;
-    line-height: 1.3;
-}
-.front-audio {
-    font-size: 0.9em;
-}
-.sentence {
-    font-size: 1.2em;
-    margin: 0.5em 0;
-}
-.pinyin {
-    font-size: 0.9em;
-    color: #444;
-    margin-bottom: 0.4em;
-}
-.english {
-    font-size: 0.9em;
-    color: #333;
-    margin-bottom: 0.6em;
-}
-.target {
-    font-size: 1.2em;
-    margin-bottom: 0.4em;
-}
-.source {
-    display: none;
-}
-.hint {
-    font-size: 0.65em;
-    color: gray;
-    margin-top: 0.6em;
-}
-"""
+TEMPLATE_DIR = TEMPLATES_DIR / "sentence_pack" / "mandarin"
+
+FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
+BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")
+EXTRA_CSS = load_text(TEMPLATE_DIR / "card.css")
 
 _converter: opencc.OpenCC | None = None
 _t2s_converter: opencc.OpenCC | None = None

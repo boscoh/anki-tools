@@ -72,7 +72,12 @@ from anki_tools.ranking.rank import (
 
 from anki_tools.ranking.pipeline import rank_paths, run_ranked_deck
 from anki_tools.ranking.reorder import reorder_deck
-from anki_tools.apkg.templates import load_char_links
+from anki_tools.apkg.templates import (
+    TEMPLATES_DIR,
+    load_char_links,
+    load_optional_text,
+    load_text,
+)
 from anki_tools.languages.cantonese.frequency import (
     CIFU_ATTRIBUTION,
     YUE_FREQUENCY_ATTRIBUTION,
@@ -1410,11 +1415,11 @@ def _build_apkg(language: str, prune: bool = True) -> None:
         if removed:
             print(f"Removed {len(removed)} outdated audio files")
 
-    # Load CSS from templates/card.css if it exists
-    css_path = Path(__file__).parent.parent / "templates" / "card.css"
-    css_content = None
-    if css_path.exists():
-        css_content = css_path.read_text(encoding="utf-8")
+    front_template = load_text(TEMPLATES_DIR / "vocab" / "front.html")
+    back_template = load_text(TEMPLATES_DIR / "vocab" / "back.html")
+
+    css_path = TEMPLATES_DIR / "card.css"
+    css_content = load_optional_text(css_path)
 
     csv_fields = (
         [k for k in entries[0].keys() if k != "audio_filename"] if entries else []
@@ -1426,19 +1431,19 @@ def _build_apkg(language: str, prune: bool = True) -> None:
 
     cjk_fields = {"characters", "hanzi", "cantonese", "mandarin", "chinese"}
     script_15em_fields = {"arabic", "hindi"}
-    answer_parts = ["{{audio}}", "<hr id=answer>"]
+    field_parts: list[str] = []
     for field in content_order:
         if field.lower() in cjk_fields:
-            answer_parts.append(
+            field_parts.append(
                 f"<div id='chars' style='font-size: 3rem'>{{{{{field}}}}}</div>"
             )
         elif field.lower() in script_15em_fields:
-            answer_parts.append(f"<div style='font-size: 1.5em'>{{{{{field}}}}}</div>")
+            field_parts.append(f"<div style='font-size: 1.5em'>{{{{{field}}}}}</div>")
         else:
-            answer_parts.append(f"<div style='font-size: 2rem'>{{{{{field}}}}}</div>")
+            field_parts.append(f"<div style='font-size: 2rem'>{{{{{field}}}}}</div>")
     if char_click_script:
-        answer_parts.append(char_click_script)
-    answer_format = "\n".join(answer_parts)
+        field_parts.append(char_click_script)
+    answer_format = back_template.replace("{{fields}}", "\n".join(field_parts))
 
     cards = []
     media_files = []
@@ -1473,7 +1478,7 @@ def _build_apkg(language: str, prune: bool = True) -> None:
     print(f"  Cards: {len(cards)}")
     print(f"  Audio files: {len(media_files)}")
     if css_content:
-        print("  CSS: templates/card.css")
+        print(f"  CSS: {css_path}")
 
     tmp_path = output_path.with_name(output_path.name + ".tmp")
     AnkiPackage.create(
@@ -1483,7 +1488,7 @@ def _build_apkg(language: str, prune: bool = True) -> None:
         cards=cards,
         media_files=media_files,
         model_name=config["model_name"],
-        question_format="{{audio}}",
+        question_format=front_template,
         answer_format=answer_format,
         css=css_content,
         sort_field_index=0,

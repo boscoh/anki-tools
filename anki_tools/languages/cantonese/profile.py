@@ -30,6 +30,7 @@ import jieba
 import opencc
 from wordfreq import top_n_list, zipf_frequency
 
+from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
 from anki_tools.languages.cantonese.jyutping import get_jyutping
 from anki_tools.languages.mandarin.characters import (
     char_similarity_zh,
@@ -155,55 +156,11 @@ DECK_DESCRIPTION = (
     "Audio: native recordings and gTTS Cantonese."
 )
 SWADESH_URL = "https://en.wiktionary.org/wiki/Module:Swadesh/data/yue"
+TEMPLATE_DIR = TEMPLATES_DIR / "sentence_pack" / "cantonese"
 
-FRONT_TEMPLATE = (
-    '<div class="front-audio">{{Audio}}</div>\n'
-    '<div class="hint">Tap to show the sentence</div>'
-)
-BACK_TEMPLATE = (
-    "{{Audio}}\n"
-    "<hr id=answer>\n"
-    '<div class="sentence char-links">{{Sentence}}</div>\n'
-    '<div class="jyutping">{{Jyutping}}</div>\n'
-    '<div class="english">{{English}}</div>\n'
-    '<div class="target">{{Target}} · {{Gloss}} {{WordAudio}}</div>\n'
-    '<div class="source">{{Source}}</div>'
-)
-EXTRA_CSS = """
-.card {
-    font-size: 1.25em;
-    line-height: 1.3;
-}
-.front-audio {
-    font-size: 0.9em;
-}
-.sentence {
-    font-size: 1.2em;
-    margin: 0.5em 0;
-}
-.jyutping {
-    font-size: 0.9em;
-    color: #444;
-    margin-bottom: 0.4em;
-}
-.english {
-    font-size: 0.9em;
-    color: #333;
-    margin-bottom: 0.6em;
-}
-.target {
-    font-size: 1.2em;
-    margin-bottom: 0.4em;
-}
-.source {
-    display: none;
-}
-.hint {
-    font-size: 0.65em;
-    color: gray;
-    margin-top: 0.6em;
-}
-"""
+FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
+BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")
+EXTRA_CSS = load_text(TEMPLATE_DIR / "card.css")
 
 _s2t: opencc.OpenCC | None = None
 _t2s: opencc.OpenCC | None = None

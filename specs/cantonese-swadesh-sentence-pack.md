@@ -364,7 +364,9 @@ The back template has `class="sentence char-links"` on the `Sentence`
 field. The profile field `char_links` adds `templates/char_links.html`, which
 links each Han character of the sentence to the CC-Canto dictionary
 (`https://cantonese.org/search.php?q=`), the same as the Mandarin sentence
-pack.
+pack. The builder reads the front and back templates from
+`templates/sentence_pack/cantonese/front.html` and `back.html`, and the
+classes from `templates/sentence_pack/cantonese/card.css`.
 
 ## 11. Quality gates
 

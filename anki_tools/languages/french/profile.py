@@ -23,6 +23,7 @@ from typing import Any, Collection, Sequence
 
 from wordfreq import top_n_list, zipf_frequency
 
+from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
 from anki_tools.ranking.latin import latin_text_dedup_key, latin_word_similarity
 from anki_tools.sentence_pack.audit import AuditInputs, GateRow, sample
 from anki_tools.sentence_pack.pack import (
@@ -60,49 +61,11 @@ DECK_DESCRIPTION = (
 )
 SWADESH_URL = "https://en.wiktionary.org/wiki/Module:Swadesh/data/fr"
 TOKENIZER = "fr_core_news_sm"
+TEMPLATE_DIR = TEMPLATES_DIR / "sentence_pack" / "french"
 
-FRONT_TEMPLATE = (
-    '<div class="front-audio">{{Audio}}</div>\n'
-    '<div class="hint">Tap to show the sentence</div>'
-)
-BACK_TEMPLATE = (
-    "{{Audio}}\n"
-    "<hr id=answer>\n"
-    '<div class="sentence">{{Sentence}}</div>\n'
-    '<div class="english">{{English}}</div>\n'
-    '<div class="target">{{Target}} · {{Gloss}} {{WordAudio}}</div>\n'
-    '<div class="source">{{Source}}</div>'
-)
-EXTRA_CSS = """
-.card {
-    font-size: 1.25em;
-    line-height: 1.3;
-}
-.front-audio {
-    font-size: 0.9em;
-}
-.sentence {
-    font-size: 1.2em;
-    margin: 0.5em 0;
-}
-.english {
-    font-size: 0.9em;
-    color: #333;
-    margin-bottom: 0.6em;
-}
-.target {
-    font-size: 1.2em;
-    margin-bottom: 0.4em;
-}
-.source {
-    display: none;
-}
-.hint {
-    font-size: 0.65em;
-    color: gray;
-    margin-top: 0.6em;
-}
-"""
+FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
+BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")
+EXTRA_CSS = load_text(TEMPLATE_DIR / "card.css")
 
 SWADESH_ROWS = 207
 UNIQUE_FORMS = 207

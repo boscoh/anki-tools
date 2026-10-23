@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any, Iterable, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
+from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
 from anki_tools.languages.french import cull
 from anki_tools.languages.french.profile import FRENCH, load_word_table
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
@@ -44,15 +45,9 @@ ENGLISH_FIELD = cull.ENGLISH_FIELD
 CORE_FIELD = "Core"
 CORE_GLOSS_FIELD = "CoreGloss"
 
-CORE_FRONT_TEMPLATE = '<div class="front-audio">{{sound}}</div>'
-CORE_BACK_TEMPLATE = (
-    "{{sound}}"
-    "<hr id=answer>"
-    '<div class="sentence">{{French}}</div>'
-    '<div class="english">{{Back}}</div>'
-    '{{#Core}}<div class="target">{{Core}}'
-    '{{#CoreGloss}} · {{CoreGloss}}{{/CoreGloss}}</div>{{/Core}}'
-)
+TEMPLATE_DIR = TEMPLATES_DIR / "french_core"
+CORE_FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
+CORE_BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")
 CORE_TEMPLATES = (
     (CORE_FRONT_TEMPLATE, CORE_BACK_TEMPLATE),
 )

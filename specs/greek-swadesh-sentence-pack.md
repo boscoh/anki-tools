@@ -606,7 +606,9 @@ model, section 10.1 of that spec:
 Sort field index: 3 (`Target`).
 
 Templates: the same front and back templates as the French pack. The `.hint`
-line reads `Tap to show the sentence`.
+line reads `Tap to show the sentence`. The builder reads the templates from
+`templates/sentence_pack/greek/front.html` and `back.html`, and the classes
+from `templates/sentence_pack/greek/card.css`.
 
 ### 10.2 Tags
 

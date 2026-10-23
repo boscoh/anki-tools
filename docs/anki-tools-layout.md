@@ -22,7 +22,7 @@ no language package.
 | Path                           | Content                                 |
 | ------------------------------ | --------------------------------------- |
 | `anki_tools/apkg/package.py`   | Read, write, and edit APKG files        |
-| `anki_tools/apkg/templates.py` | Card template partials and the CSS path |
+| `anki_tools/apkg/templates.py` | Card template and CSS file loaders      |
 
 ## 3. ranking
 

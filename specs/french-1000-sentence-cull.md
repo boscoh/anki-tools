@@ -501,7 +501,7 @@ the command with a non-zero exit code.
 | G12  | The coverage CSV has one row per target word                            |
 | G13  | The manifest hashes match the cull CSV and the coverage CSV             |
 | G14  | The merged deck covers 206 of 207 Swadesh concepts, with `intestins` as the exception |
-| G15  | The deck model holds the Swadesh-style front and back templates and CSS |
+| G15  | The deck model holds exactly one Swadesh-style card template and the CSS |
 
 ### 11.2 Tests
 
@@ -704,19 +704,19 @@ reserve cards that the duplicate check drops are covered by frequency cards.
 ### 16.7 Card templates
 
 The output replaces the input templates with the Swadesh style, so the two
-decks look alike. The model keeps its two card directions.
+decks look alike. The model keeps one card per note: the comprehension card.
+The input deck gives two card directions, so the command removes the second
+template and its cards. The deck has 1,000 cards for 1,000 notes.
 
 Card 1 (comprehension):
 
 - Front: the audio and the hint `Tap to show the sentence`.
 - Back: the audio, the French sentence, and the `Back` field.
 
-Card 2 (production):
-
-- Front: the `Back` field and the hint `Tap to show the French`.
-- Back: the `Back` field, the French sentence, and the audio.
-
-The CSS is the base `templates/card.css` plus the French pack classes
-(`.front-audio`, `.sentence`, `.english`, `.hint`). The `Back` field of a
+The templates are in `templates/french_cull/front.html` and `back.html`. The
+CSS is the base `templates/card.css` plus the French pack classes
+(`.front-audio`, `.sentence`, `.english`, `.hint`) of
+`templates/sentence_pack/french/card.css`. The `Back` field of a
 reserve card already holds `English — target (gloss)`, so the target and the
-gloss appear with the English text. Gate G15 checks the templates and the CSS.
+gloss appear with the English text. Gate G15 checks that the model holds
+exactly this template and the CSS classes.

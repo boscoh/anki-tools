@@ -605,6 +605,11 @@ Back template:
 <div class="source">{{Source}}</div>
 ```
 
+The builder reads these files: `templates/sentence_pack/french/front.html`,
+`templates/sentence_pack/french/back.html`, and
+`templates/sentence_pack/french/card.css`. Edit these files to change the
+deck. The classes of `card.css` follow the shared `templates/card.css`.
+
 Use `templates/card.css` and add these classes: `.front-audio`, `.sentence`,
 `.english`, `.target`, `.source`, `.hint`. Sentence font 2.5rem, English
 1.1rem, source 0.8rem gray. The French pack has no pinyin line.

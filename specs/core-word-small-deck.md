@@ -411,8 +411,8 @@ looks like the 1,000-card deck and the Swadesh deck.
 
 | Part      | Value                                                                  |
 | --------- | ---------------------------------------------------------------------- |
-| Templates | `CORE_TEMPLATES`, one card, written by `_write_core_model`             |
-| CSS       | `card_css()`: `templates/card.css` plus the language `EXTRA_CSS`       |
+| Templates | `templates/french_core/`, one card, written by `_write_core_model`     |
+| CSS       | `card_css()`: shared `card.css` plus `sentence_pack/french/card.css`   |
 | Classes   | `.front-audio`, `.sentence`, `.english`, `.target`                     |
 | Fields    | the input fields, `Core`, and `CoreGloss`                              |
 | Audio     | the input MP3 file                                                     |

@@ -64,6 +64,24 @@ uv run anki inspect deck.apkg
 uv run anki style deck.apkg
 ```
 
+### Card Templates
+
+The deck builders read every card template and CSS file from `templates/`.
+Edit a file, then run the command again to change the deck.
+
+- Swadesh sentence packs: `templates/sentence_pack/<language>/` with
+  `front.html`, `back.html`, and `card.css`.
+- `anki swadesh build <language>`: `templates/vocab/front.html` and
+  `templates/vocab/back.html`, plus the CSS `templates/card.css`.
+- `anki fix zh`: `templates/front.html`, `templates/back.html`, and
+  `templates/card.css`.
+- `anki fix fr --select`: `templates/french_cull/front.html` and `back.html`.
+- `anki fix fr --core`: `templates/french_core/front.html` and `back.html`.
+
+Each pack CSS follows the shared `templates/card.css`. The back template of
+the vocab deck holds the `{{fields}}` placeholder for the field blocks. The
+command writes these blocks from the field list of the language.
+
 ### Python API
 
 ```python
@@ -424,6 +442,11 @@ cards, the cap; the reserve has a separate maximum of 34. The `spoken_mass` is
 The cull keeps the audio files and the note model of the input deck. It does
 not make new TTS files. The input file is
 `apkg/6000_French_Sentences_w_Audio.apkg`.
+
+The output deck holds one card for each note: the comprehension card with the
+audio on the front. The input deck has a second card direction, so the
+command removes that template and its cards. The deck has 1,000 cards for
+1,000 notes.
 
 Licenses: Tatoeba sentence text CC BY 2.0 FR, `wordfreq` list Apache License
 2.0, and input audio under the license of the source deck.
