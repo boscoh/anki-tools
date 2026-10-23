@@ -514,6 +514,70 @@ def test_write_deck_sets_the_swadesh_templates(tmp_path: Path) -> None:
     assert ".hint" in model["css"]
 
 
+def _add_second_template(path: Path) -> None:
+    """Add a copy of the first template and its cards to a deck."""
+    with AnkiPackage(path) as package:
+        cursor = package.conn.cursor()
+        models = json.loads(cursor.execute("SELECT models FROM col").fetchone()[0])
+        model_id = next(iter(models))
+        templates = models[model_id]["tmpls"]
+        extra = dict(templates[0])
+        extra.update({"name": "Card 2", "ord": len(templates)})
+        templates.append(extra)
+        cursor.execute("UPDATE col SET models = ? WHERE id = 1", (json.dumps(models),))
+        rows = cursor.execute(
+            "SELECT * FROM cards WHERE ord = 0 AND nid IN "
+            "(SELECT id FROM notes WHERE mid = ?)",
+            (int(model_id),),
+        ).fetchall()
+        columns = [row[1] for row in cursor.execute("PRAGMA table_info(cards)")]
+        next_card = int(cursor.execute("SELECT MAX(id) FROM cards").fetchone()[0]) + 1
+        for offset, row in enumerate(rows):
+            record = {name: row[name] for name in row.keys()}
+            record.update(id=next_card + offset, ord=1)
+            cursor.execute(
+                f"INSERT INTO cards ({','.join(columns)}) "
+                f"VALUES ({','.join('?' for _ in columns)})",
+                [record[column] for column in columns],
+            )
+        package.conn.commit()
+        package._modified = True
+        package.save()
+
+
+def test_write_deck_removes_the_second_card_template(tmp_path: Path) -> None:
+    source = _tiny_deck(tmp_path)
+    _add_second_template(source)
+    cards = cull_fr.load_input_deck(source)
+    output = tmp_path / "one-card.apkg"
+
+    cull_fr.write_deck(source, cards, [0, 1], output, DECK_NAME)
+
+    with AnkiPackage(output) as package:
+        models = package.get_models(include_templates=True)
+        rows = package.get_cards()
+    model = next(
+        item for item in models.values() if item.get("name") == cull_fr.MODEL_NAME
+    )
+
+    assert [template["name"] for template in model["tmpls"]] == ["Card 1"]
+    assert len(rows) == 2
+    assert {row["ord"] for row in rows} == {0}
+
+
+def test_gate_card_templates_fails_on_a_second_template(tmp_path: Path) -> None:
+    source = _tiny_deck(tmp_path)
+    cards = cull_fr.load_input_deck(source)
+    output = tmp_path / "two-templates.apkg"
+    cull_fr.write_deck(source, cards, [0], output, DECK_NAME)
+    _add_second_template(output)
+
+    rows = cull_fr.run_gates(cull_fr.gate_inputs(output))
+    message = dict((gate, passed) for gate, passed, _ in rows)["G15"]
+
+    assert message is False
+
+
 def test_gate_card_templates_fails_on_a_wrong_front(tmp_path: Path) -> None:
     source = _tiny_deck(tmp_path)
     cards = cull_fr.load_input_deck(source)

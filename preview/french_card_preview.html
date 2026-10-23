@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>French card preview — english line 0.8em vs 0.9em</title>
+<style>
+  /* base card.css */
+  .card {
+    font-size: 2.5em;
+    text-align: center;
+  }
+  a { text-decoration: none; }
+  .SentenceAnot { font-size: 1.5em; }
+
+  /* EXTRA_CSS (French profile), current values */
+  .card {
+    font-size: 1.25em;
+    line-height: 1.3;
+  }
+  .front-audio { font-size: 0.9em; }
+  .sentence {
+    font-size: 1.2em;
+    margin: 0.5em 0;
+  }
+  .english {
+    font-size: 0.9em;
+    color: #333;
+    margin-bottom: 0.6em;
+  }
+  .target {
+    font-size: 1.2em;
+    margin-bottom: 0.4em;
+  }
+  .source { display: none; }
+  .hint {
+    font-size: 0.65em;
+    color: gray;
+    margin-top: 0.6em;
+  }
+
+  /* page layout for the preview */
+  body { font-family: sans-serif; margin: 24px; }
+  h1 { font-size: 18px; }
+  h2 { font-size: 15px; color: #555; }
+  .panel {
+    display: inline-block;
+    vertical-align: top;
+    width: 320px;
+    margin: 8px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fafafa;
+  }
+  .panel .label {
+    font-size: 12px;
+    color: #666;
+    text-align: left;
+    margin-bottom: 8px;
+  }
+  .before .english { font-size: 0.8em; }
+</style>
+</head>
+<body>
+<h1>French card preview: english line 0.8em (before) vs 0.9em (after)</h1>
+
+<h2>Sentence deck back — French profile BACK_TEMPLATE</h2>
+<div class="panel before">
+  <div class="label">before (english 0.8em)</div>
+  <div class="card">
+    <hr class="answer">
+    <div class="sentence">Je pensais qu'ils ne voudraient pas venir.</div>
+    <div class="english">I thought they wouldn't want to come.</div>
+    <div class="target">penser · think</div>
+    <div class="source">source</div>
+  </div>
+</div>
+<div class="panel">
+  <div class="label">after (english 0.9em)</div>
+  <div class="card">
+    <hr class="answer">
+    <div class="sentence">Je pensais qu'ils ne voudraient pas venir.</div>
+    <div class="english">I thought they wouldn't want to come.</div>
+    <div class="target">penser · think</div>
+    <div class="source">source</div>
+  </div>
+</div>
+
+<h2>Core deck back — CORE_BACK_TEMPLATE</h2>
+<div class="panel before">
+  <div class="label">before (english 0.8em)</div>
+  <div class="card">
+    <hr class="answer">
+    <div class="sentence">Je ne t'en demanderai pas plus pour aujourd'hui.</div>
+    <div class="english">I won't ask you anything else today.</div>
+    <div class="target">ne · not</div>
+  </div>
+</div>
+<div class="panel">
+  <div class="label">after (english 0.9em)</div>
+  <div class="card">
+    <hr class="answer">
+    <div class="sentence">Je ne t'en demanderai pas plus pour aujourd'hui.</div>
+    <div class="english">I won't ask you anything else today.</div>
+    <div class="target">ne · not</div>
+  </div>
+</div>
+</body>
+</html>

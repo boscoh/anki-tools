@@ -1,0 +1,208 @@
+swadesh_index,english,spanish,gender,variant,form_kind,zipf,candidate_count,tier
+1,I,yo,,primary,single,6.29,0,core
+2,you (singular),tú,,primary,single,5.43,0,core
+3,he/she/it/they (singular),él,,primary,single,5.76,0,core
+4,we,nosotros,,primary,single,5.55,0,core
+5,you (plural),vosotros,,primary,single,4.57,0,core
+6,they (plural),ellos,,primary,single,5.80,0,core
+7,this,este,,primary,single,6.37,0,core
+8,that,ese,,primary,single,5.93,0,core
+9,here,aquí,,primary,single,5.75,0,core
+10,there,ahí,,primary,single,5.53,0,core
+11,who,quién,,primary,single,5.37,0,core
+12,what,qué,,primary,single,6.13,0,core
+13,where,dónde,,primary,single,5.16,0,core
+14,when,cuándo,,primary,single,4.73,0,core
+15,how,cómo,,primary,single,5.79,0,core
+16,not,no,,primary,single,7.16,0,core
+17,all,todo,,primary,single,6.35,0,core
+18,many,mucho,,primary,single,5.95,0,core
+19,some,alguno,,primary,single,4.84,0,core
+20,few,poco,,primary,single,5.82,0,core
+21,other,otro,,primary,single,5.87,0,core
+22,one,uno,,primary,single,5.96,0,core
+23,two,dos,,primary,single,6.12,0,core
+24,three,tres,,primary,single,5.72,0,core
+25,four,cuatro,,primary,single,5.40,0,core
+26,five,cinco,,primary,single,5.31,0,core
+27,big,grande,,primary,single,5.37,0,core
+28,long,largo,,primary,single,5.30,0,core
+29,wide,ancho,,primary,single,4.36,0,core
+30,thick,grueso,,primary,single,3.96,0,core
+31,heavy,pesado,,primary,single,4.22,0,core
+32,small,pequeño,,primary,single,5.09,0,core
+33,short,corto,,primary,single,4.74,0,core
+34,narrow,estrecho,,primary,single,4.05,0,core
+35,thin,delgado,,primary,single,4.13,0,core
+36,woman,mujer,f,primary,single,5.57,0,core
+37,man,hombre,m,primary,single,5.58,0,core
+38,human being,persona,f,primary,single,5.56,0,core
+39,child,niño,m,primary,single,5.10,0,core
+40,wife,esposa,f,primary,single,4.90,0,core
+41,husband,marido,m,primary,single,4.61,0,core
+42,mother,madre,f,primary,single,5.45,0,core
+43,father,padre,m,primary,single,5.36,0,core
+44,animal,animal,m,primary,single,4.67,0,core
+45,fish,pez,m,primary,single,4.19,0,core
+46,bird,pájaro,m,primary,single,3.95,0,core
+47,dog,perro,m,primary,single,4.90,0,core
+48,louse,piojo,m,primary,single,3.05,0,core
+49,snake,serpiente,f,primary,single,3.96,0,core
+50,worm,gusano,m,primary,single,3.56,0,core
+51,tree,árbol,m,primary,single,4.58,0,core
+52,forest,bosque,m,primary,single,4.57,0,core
+53,stick,palo,m,primary,single,4.38,0,core
+54,fruit,fruta,f,primary,single,4.20,0,core
+55,seed,semilla,f,primary,single,3.90,0,core
+56,leaf,hoja,f,primary,single,4.36,0,core
+57,root,raíz,f,primary,single,4.46,0,core
+58,tree bark,corteza,f,primary,single,3.76,0,core
+59,flower,flor,f,primary,single,4.47,0,core
+60,grass,hierba,f,primary,single,4.00,0,core
+61,rope,cuerda,f,primary,single,4.17,0,core
+62,skin,piel,f,primary,single,4.80,0,core
+63,meat,carne,f,primary,single,4.83,0,core
+64,blood,sangre,f,primary,single,5.01,0,core
+65,bone,hueso,m,primary,single,4.16,0,core
+66,fat (noun),grasa,f,primary,single,4.21,0,core
+67,egg,huevo,m,primary,single,4.50,0,core
+68,horn,cuerno,m,primary,single,3.66,0,core
+69,tail,cola,f,primary,single,4.61,0,core
+70,feather,pluma,f,primary,single,3.91,0,core
+71,hair,pelo,m,primary,single,4.82,0,core
+72,head,cabeza,f,primary,single,5.34,0,core
+73,ear,oreja,f,primary,single,3.99,0,core
+74,eye,ojo,m,primary,single,4.79,0,core
+75,nose,nariz,f,primary,single,4.30,0,core
+76,mouth,boca,f,primary,single,5.03,0,core
+77,tooth,diente,m,primary,single,3.83,0,core
+78,tongue,lengua,f,primary,single,4.92,0,core
+79,fingernail,uña,f,primary,single,3.51,0,core
+80,foot,pie,m,primary,single,4.94,0,core
+81,leg,pierna,f,primary,single,4.23,0,core
+82,knee,rodilla,f,primary,single,4.01,0,core
+83,hand,mano,f,primary,single,5.38,0,core
+84,wing,ala,f,primary,single,4.31,0,core
+85,belly,barriga,f,primary,single,3.61,0,core
+86,guts,tripas,f,primary,single,3.33,0,core
+87,neck,cuello,m,primary,single,4.62,0,core
+88,back,espalda,f,primary,single,4.64,0,core
+89,breast,pecho,m,primary,single,4.59,0,core
+90,heart,corazón,m,primary,single,5.20,0,core
+91,liver,hígado,m,primary,single,3.97,0,core
+92,to drink,beber,,primary,single,4.30,0,core
+93,to eat,comer,,primary,single,5.09,0,core
+94,to bite,morder,,primary,single,3.49,0,core
+95,to suck,chupar,,primary,single,3.65,0,core
+96,to spit,escupir,,primary,single,3.26,0,core
+97,to vomit,vomitar,,primary,single,3.62,0,core
+98,to blow,soplar,,primary,single,3.17,0,core
+99,to breathe,respirar,,primary,single,4.23,0,core
+100,to laugh,reír,,primary,single,4.12,0,core
+101,to see,ver,,primary,single,5.95,0,core
+102,to hear,oír,,primary,single,4.32,0,core
+103,to know,saber,,primary,single,5.49,0,core
+104,to think,pensar,,primary,single,5.27,0,core
+105,to smell,oler,,primary,single,3.54,0,core
+106,to fear,temer,,primary,single,3.94,0,core
+107,to sleep,dormir,,primary,single,4.86,0,core
+108,to live,vivir,,primary,single,5.26,0,core
+109,to die,morir,,primary,single,4.85,0,core
+110,to kill,matar,,primary,single,4.80,0,core
+111,to fight,pelear,,primary,single,4.26,0,core
+112,to hunt,cazar,,primary,single,3.74,0,core
+113,to hit,golpear,,primary,single,3.91,0,core
+114,to cut,cortar,,primary,single,4.37,0,core
+115,to split,dividir,,primary,single,3.94,0,core
+116,to stab,apuñalar,,primary,single,2.93,0,core
+117,to scratch,rascar,,primary,single,2.85,0,core
+118,to dig,cavar,,primary,single,3.14,0,core
+119,to swim,nadar,,primary,single,3.80,0,core
+120,to fly,volar,,primary,single,4.28,0,core
+121,to walk,caminar,,primary,single,4.55,0,core
+122,to come,venir,,primary,single,4.82,0,core
+123,to lie down,acostarse,,primary,single,3.54,0,core
+124,to sit,sentarse,,primary,single,4.03,0,core
+125,to stand,estar de pie,,primary,pair,4.88,0,core
+126,to turn (intransitive),girar,,primary,single,3.84,0,core
+127,to fall,caer,,primary,single,4.72,0,core
+128,to give,dar,,primary,single,5.48,0,core
+129,to hold,sostener,,primary,single,4.05,0,core
+130,to squeeze,apretar,,primary,single,3.61,0,core
+131,to rub,frotar,,primary,single,2.83,0,core
+132,to wash,lavar,,primary,single,4.05,0,core
+133,to wipe,limpiar,,primary,single,4.36,0,core
+134,to pull,tirar de,,primary,pair,4.37,0,core
+135,to push,empujar,,primary,single,3.60,0,core
+136,to throw,lanzar,,primary,single,4.25,0,core
+137,to tie,atar,,primary,single,3.33,0,core
+138,to sew,coser,,primary,single,3.46,0,core
+139,to count,contar,,primary,single,4.87,0,core
+140,to say,decir,,primary,single,5.78,0,core
+141,to sing,cantar,,primary,single,4.43,0,core
+142,to play,jugar,,primary,single,5.05,0,core
+143,to float,flotar,,primary,single,3.11,0,core
+144,to flow,fluir,,primary,single,3.31,0,core
+145,to freeze,congelar,,primary,single,3.34,0,core
+146,to swell,hincharse,,primary,single,2.33,0,core
+147,sun,sol,m,primary,single,5.09,0,core
+148,moon,luna,f,primary,single,4.79,0,core
+149,star,estrella,f,primary,single,4.66,0,core
+150,water,agua,f,primary,single,5.49,0,core
+151,rain,lluvia,f,primary,single,4.61,0,core
+152,river,río,m,primary,single,5.10,0,core
+153,lake,lago,m,primary,single,4.48,0,core
+154,sea,mar,m,primary,single,5.11,0,core
+155,salt,sal,f,primary,single,4.57,0,core
+156,stone,piedra,f,primary,single,4.76,0,core
+157,sand,arena,f,primary,single,4.55,0,core
+158,dust,polvo,m,primary,single,4.44,0,core
+159,earth,tierra,f,primary,single,5.36,0,core
+160,cloud,nube,f,primary,single,4.08,0,core
+161,fog,niebla,f,primary,single,3.91,0,core
+162,sky,cielo,m,primary,single,4.96,0,core
+163,wind,viento,m,primary,single,4.66,0,core
+164,snow,nieve,f,primary,single,4.39,0,core
+165,ice,hielo,m,primary,single,4.41,0,core
+166,smoke,humo,m,primary,single,4.40,0,core
+167,fire,fuego,m,primary,single,5.02,0,core
+168,ash,ceniza,f,primary,single,3.66,0,core
+169,to burn,quemar,,primary,single,4.13,0,core
+170,road,camino,m,primary,single,5.28,0,core
+171,mountain,montaña,f,primary,single,4.55,0,core
+172,red,rojo,,primary,single,4.84,0,core
+173,green,verde,,primary,single,4.87,0,core
+174,yellow,amarillo,,primary,single,4.33,0,core
+175,white,blanco,,primary,single,5.09,0,core
+176,black,negro,,primary,single,5.10,0,core
+177,night,noche,f,primary,single,5.55,0,core
+178,day,día,m,primary,single,5.96,0,core
+179,year,año,m,primary,single,5.88,0,core
+180,warm,cálido,,primary,single,3.82,0,core
+181,cold,frío,,primary,single,4.70,0,core
+182,full,lleno,,primary,single,4.82,0,core
+183,new,nuevo,,primary,single,5.77,0,core
+184,old,viejo,,primary,single,5.03,0,core
+185,good,bueno,,primary,single,5.70,0,core
+186,bad,malo,,primary,single,5.03,0,core
+187,rotten,podrido,,primary,single,3.61,0,core
+188,dirty,sucio,,primary,single,4.10,0,core
+189,straight,recto,,primary,single,3.81,0,core
+190,round,redondo,,primary,single,3.82,0,core
+191,sharp,afilado,,primary,single,3.10,0,core
+192,dull,romo,,primary,single,3.31,0,core
+193,smooth,liso,,primary,single,3.43,0,core
+194,wet,mojado,,primary,single,3.75,0,core
+195,dry,seco,,primary,single,4.28,0,core
+196,correct,correcto,,primary,single,4.71,0,core
+197,near,cerca,,primary,single,5.37,0,core
+198,far,lejos,,primary,single,5.07,0,core
+199,right,derecha,,primary,single,4.95,0,core
+200,left,izquierda,,primary,single,4.97,0,core
+201,at,a,,primary,single,7.36,0,core
+202,in,en,,primary,single,7.45,0,core
+203,with,con,,primary,single,6.97,0,core
+204,and,y,,primary,single,7.44,0,core
+205,if,si,,primary,single,6.59,0,core
+206,because,porque,,primary,single,6.14,0,core
+207,name,nombre,m,primary,single,5.61,0,core

@@ -1,0 +1,17 @@
+target,swadesh_index,english,variant,status,zipf,candidate_count,scaffold_candidates,rank,sentence,text_original,english_text,tatoeba_id,unknown_words,word_len,rank_key,tier
+piojo,48,louse,primary,thin,3.05,1,0,1,Me entran picores solo de pensar en los piojos.,Me entran picores solo de pensar en los piojos.,I get itchy just by thinking about lice.,10886140,1,9,1|1|-5.558|0|10886140,core
+corteza,58,tree bark,primary,uncovered,3.76,0,0,0,,,,,,,,
+barriga,85,belly,primary,scaffold_only,3.61,1,1,1,Tengo barriga cervecera.,Tengo barriga cervecera.,I have a beer belly.,8494596,1,3,1|1|-4.137|1|8494596,scaffold
+apuñalar,116,to stab,primary,low_zipf,2.93,15,0,1,Estuve a punto de ser apuñalado.,Estuve a punto de ser apuñalado.,I was about to be stabbed.,1325849,0,6,0|1|-5.782|0|1325849,core
+apuñalar,116,to stab,primary,low_zipf,2.93,15,0,2,¡Me apuñaló por la espalda!,¡Me apuñaló por la espalda!,He stabbed me in the back!,739385,0,5,0|1|-5.768|0|739385,core
+apuñalar,116,to stab,primary,low_zipf,2.93,15,0,3,Alguien apuñaló al hombre en la pierna.,Alguien apuñaló al hombre en la pierna.,Someone stabbed the man in the leg.,13651545,0,7,0|1|-5.741|0|13651545,core
+rascar,117,to scratch,primary,low_zipf,2.85,11,0,1,"Cuando piensa, se rasca la cabeza.","Cuando piensa, se rasca la cabeza.","When he thinks, he scratches his head.",1203661,0,6,0|1|-5.700|0|1203661,core
+rascar,117,to scratch,primary,low_zipf,2.85,11,0,2,Ella se rascó la cabeza.,Ella se rascó la cabeza.,She scratched her head.,3353690,0,5,0|1|-5.544|0|3353690,core
+rascar,117,to scratch,primary,low_zipf,2.85,11,0,3,Se rascó la cabeza.,Se rascó la cabeza.,She scratched her head.,5115501,0,4,0|1|-5.492|1|5115501,core
+frotar,131,to rub,primary,low_zipf,2.83,9,0,1,Ella se frotó los ojos.,Ella se frotó los ojos.,She rubbed her eyes.,3768362,0,5,0|0|-5.498|0|3768362,core
+frotar,131,to rub,primary,low_zipf,2.83,9,0,2,Él se frotó las manos.,Él se frotó las manos.,He rubbed his hands together.,1714494,0,5,0|0|-5.454|0|1714494,core
+frotar,131,to rub,primary,low_zipf,2.83,9,0,3,Ella se frotó sus ojos.,Ella se frotó sus ojos.,She rubbed her eyes.,1296689,0,5,0|1|-5.336|0|1296689,core
+hincharse,146,to swell,primary,low_zipf,2.33,3,0,1,Se le han hinchado los pies.,Se le han hinchado los pies.,His feet have swelled up.,8308821,1,6,1|0|-5.757|0|8308821,core
+hincharse,146,to swell,primary,low_zipf,2.33,3,0,2,El ojo se me ha hinchado.,El ojo se me ha hinchado.,My eye has swollen up.,750054,1,6,1|1|-5.917|0|750054,core
+hincharse,146,to swell,primary,low_zipf,2.33,3,0,3,Las encías se me han hinchado.,Las encías se me han hinchado.,My gums are swollen.,1195553,2,6,2|1|-5.473|0|1195553,core
+romo,192,dull,primary,thin,3.31,1,0,1,El cuchillo está romo.,El cuchillo está romo.,The knife is dull.,4997976,1,4,1|0|-5.270|1|4997976,core

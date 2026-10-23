@@ -33,7 +33,7 @@ class Token:
 
 @lru_cache(maxsize=4)
 def load_model(name: str) -> Any:
-    """Load a spaCy model once.
+    """Load a spaCy model once, without the parser and the entity tagger.
 
     :param name: spaCy model name, for example ``el_core_news_sm``.
     :raises RuntimeError: The model is not installed.
@@ -42,7 +42,7 @@ def load_model(name: str) -> Any:
     import spacy
 
     try:
-        return spacy.load(name)
+        return spacy.load(name, exclude=["parser", "ner"])
     except OSError as error:
         raise RuntimeError(
             f"spaCy model {name} is not installed. Install it from the spaCy "

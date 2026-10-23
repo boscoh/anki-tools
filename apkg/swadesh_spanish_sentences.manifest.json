@@ -1,0 +1,52 @@
+{
+  "build_date": "2026-10-22",
+  "source_dump_date": "2026-10-22",
+  "counts": {
+    "words": 207,
+    "cards": 408,
+    "scaffold": 1,
+    "native_audio": 0,
+    "tts_audio": 408
+  },
+  "coverage": {
+    "core_with_card": 0.9952
+  },
+  "voice": "gtts:es",
+  "pack_license": "public",
+  "audio_license_skipped": {
+    "empty": 0,
+    "CC BY-NC 4.0": 0
+  },
+  "native_audio_available": true,
+  "noun_rows": 84,
+  "noun_gender_missing": 0,
+  "files": {
+    "source_csv": "sha256:a2f45656f247b601e10542ca723a0e47741fcd377fa3c8282a1272a3074e3900",
+    "sentences_csv": "sha256:7530759895baa2c4844eeedbf074c69eefddb2f99476383b9eebea41956f77c6"
+  },
+  "licenses": [
+    {
+      "data": "Spanish Swadesh word data",
+      "license": "CC BY-SA 4.0"
+    },
+    {
+      "data": "Tatoeba sentences",
+      "license": "CC BY 2.0 FR"
+    },
+    {
+      "data": "Tatoeba audio",
+      "license": "per recording"
+    },
+    {
+      "data": "spaCy es_core_news_sm",
+      "license": "GPL-3.0"
+    },
+    {
+      "data": "gTTS",
+      "license": "MIT"
+    }
+  ],
+  "excluded_words": [
+    "corteza"
+  ]
+}

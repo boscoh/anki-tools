@@ -1,0 +1,101 @@
+index,english,current,module_terms,chosen,issue,fix,status
+36,woman,mujer,mujer,mujer,gender,f,fixed
+37,man,varón,varón,hombre,two_terms,hombre is the common word for man; varón is rare,fixed
+37,man,varón,varón,hombre,gender,m,fixed
+38,human being,hombre,hombre,persona,shared_form,hombre stays with index 37; persona is one token,fixed
+38,human being,hombre,hombre,persona,gender,f,fixed
+39,child,niño,niño,niño,gender,m,fixed
+40,wife,esposa,esposa|mujer,esposa,shared_form,mujer stays with index 36,kept
+40,wife,esposa,esposa|mujer,esposa,gender,f,fixed
+41,husband,esposo,esposo|marido,marido,two_terms,marido is more frequent than esposo,fixed
+41,husband,esposo,esposo|marido,marido,gender,m,fixed
+42,mother,madre,madre,madre,gender,f,fixed
+43,father,padre,padre,padre,gender,m,fixed
+44,animal,animal,animal,animal,gender,m,fixed
+45,fish,pez,pez|pescado,pez,gender,m,fixed
+46,bird,pájaro,pájaro,pájaro,gender,m,fixed
+47,dog,perro,perro,perro,gender,m,fixed
+48,louse,piojo,piojo,piojo,gender,m,fixed
+49,snake,serpiente,serpiente|víbora|culebra,serpiente,gender,f,fixed
+50,worm,gusano,gusano,gusano,gender,m,fixed
+51,tree,árbol,árbol,árbol,gender,m,fixed
+52,forest,bosque,bosque,bosque,gender,m,fixed
+53,stick,palo,palo,palo,gender,m,fixed
+54,fruit,fruta,fruta,fruta,gender,f,fixed
+55,seed,semilla,semilla,semilla,gender,f,fixed
+56,leaf,hoja,hoja,hoja,gender,f,fixed
+57,root,raíz,raíz,raíz,gender,f,fixed
+58,tree bark,corteza,corteza,corteza,gender,f,fixed
+59,flower,flor,flor,flor,gender,f,fixed
+60,grass,hierba,hierba|grama,hierba,gender,f,fixed
+61,rope,cuerda,cuerda,cuerda,gender,f,fixed
+62,skin,piel,piel,piel,gender,f,fixed
+63,meat,carne,carne,carne,gender,f,fixed
+64,blood,sangre,sangre,sangre,gender,f,fixed
+65,bone,hueso,hueso,hueso,gender,m,fixed
+66,fat (noun),grasa,grasa,grasa,gender,f,fixed
+67,egg,huevo,huevo,huevo,gender,m,fixed
+68,horn,cuerno,cuerno,cuerno,gender,m,fixed
+69,tail,cola,cola,cola,gender,f,fixed
+70,feather,pluma,pluma,pluma,gender,f,fixed
+71,hair,pelo,pelo|cabello,pelo,gender,m,fixed
+72,head,cabeza,cabeza,cabeza,gender,f,fixed
+73,ear,oreja,oreja,oreja,gender,f,fixed
+74,eye,ojo,ojo,ojo,gender,m,fixed
+75,nose,nariz,nariz,nariz,gender,f,fixed
+76,mouth,boca,boca,boca,gender,f,fixed
+77,tooth,diente,diente,diente,gender,m,fixed
+78,tongue,lengua,lengua,lengua,gender,f,fixed
+79,fingernail,uña,uña,uña,gender,f,fixed
+80,foot,pie,pie,pie,gender,m,fixed
+81,leg,pierna,pierna,pierna,gender,f,fixed
+82,knee,rodilla,rodilla,rodilla,gender,f,fixed
+83,hand,mano,mano,mano,gender,f,fixed
+84,wing,ala,ala,ala,gender,f,fixed
+85,belly,barriga,barriga|vientre,barriga,gender,f,fixed
+86,guts,tripas,tripas,tripas,gender,f,fixed
+87,neck,cuello,cuello,cuello,gender,m,fixed
+88,back,espalda,espalda,espalda,gender,f,fixed
+89,breast,pecho,pecho,pecho,gender,m,fixed
+90,heart,corazón,corazón,corazón,gender,m,fixed
+91,liver,hígado,hígado,hígado,gender,m,fixed
+115,to split,partir,partir,dividir,sense,partir mostly means leave; dividir means split,fixed
+117,to scratch,arañar,arañar|rascar,rascar,two_terms,rascar is more frequent than arañar,kept
+123,to lie down,echarse,echarse|yacer|[[estar]] [[en]] [[el]] [[suelo]],acostarse,sense,acostarse is the plain lie down action,fixed
+125,to stand,levantarse,levantarse|estar de pie,estar de pie,sense,estar de pie is the stand sense; levantarse is get up,kept
+129,to hold,tener,tener,sostener,sense,tener is have; sostener is the hold sense,fixed
+136,to throw,tirar,tirar|arrojar,lanzar,shared_form,tirar stays as the base of tirar de at index 134,fixed
+145,to freeze,congelarse,congelarse|helar,congelar,two_terms,congelar without the clitic; the matcher adds congelarse,fixed
+147,sun,sol,sol,sol,gender,m,fixed
+148,moon,luna,luna,luna,gender,f,fixed
+149,star,estrella,estrella,estrella,gender,f,fixed
+150,water,agua,agua,agua,gender,f,fixed
+151,rain,lluvia,lluvia,lluvia,gender,f,fixed
+152,river,río,río,río,gender,m,fixed
+153,lake,lago,lago,lago,gender,m,fixed
+154,sea,mar,mar,mar,gender,m,fixed
+155,salt,sal,sal,sal,gender,f,fixed
+156,stone,piedra,piedra,piedra,gender,f,fixed
+157,sand,arena,arena,arena,gender,f,fixed
+158,dust,polvo,polvo,polvo,gender,m,fixed
+159,earth,tierra,tierra,tierra,gender,f,fixed
+160,cloud,nube,nube,nube,gender,f,fixed
+161,fog,niebla,niebla,niebla,gender,f,fixed
+162,sky,cielo,cielo,cielo,gender,m,fixed
+163,wind,viento,viento,viento,gender,m,fixed
+164,snow,nieve,nieve,nieve,gender,f,fixed
+165,ice,hielo,hielo,hielo,gender,m,fixed
+166,smoke,humo,humo,humo,gender,m,fixed
+167,fire,fuego,fuego,fuego,gender,m,fixed
+168,ash,ceniza,ceniza,ceniza,gender,f,fixed
+170,road,camino,camino,camino,gender,m,fixed
+171,mountain,montaña,montaña,montaña,gender,f,fixed
+177,night,noche,noche,noche,gender,f,fixed
+178,day,día,día,día,gender,m,fixed
+179,year,año,año,año,gender,m,fixed
+180,warm,caliente,caliente|cálido,cálido,sense,cálido is warm; caliente is hot,kept
+191,sharp,agudo,agudo|afilado,afilado,two_terms,afilado is more frequent than agudo for a blade,kept
+192,dull,sin filo,sin filo|desafilado|embotado|romo,romo,two_terms,romo is the shortest word for dull; desafilado is rarer,kept
+192,dull,sin filo,sin filo|desafilado|embotado|romo,romo,zipf,"rare form, zipf 3.31; keep because it has candidates",kept
+201,at,en,en|a,a,shared_form,en stays with index 202,fixed
+207,name,nombre,nombre,nombre,gender,m,fixed

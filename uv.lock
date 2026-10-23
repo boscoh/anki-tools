@@ -156,6 +156,7 @@ source = { editable = "." }
 dependencies = [
     { name = "cyclopts" },
     { name = "el-core-news-sm" },
+    { name = "es-core-news-sm" },
     { name = "fr-core-news-sm" },
     { name = "genanki" },
     { name = "gtts" },
@@ -184,6 +185,7 @@ dev = [
 requires-dist = [
     { name = "cyclopts", specifier = ">=4.5.1" },
     { name = "el-core-news-sm", url = "https://github.com/explosion/spacy-models/releases/download/el_core_news_sm-3.8.0/el_core_news_sm-3.8.0-py3-none-any.whl" },
+    { name = "es-core-news-sm", url = "https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.8.0/es_core_news_sm-3.8.0-py3-none-any.whl" },
     { name = "fr-core-news-sm", url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.8.0/fr_core_news_sm-3.8.0-py3-none-any.whl" },
     { name = "genanki", specifier = ">=0.13.1" },
     { name = "gtts", specifier = ">=2.5.4" },
@@ -533,6 +535,14 @@ version = "3.8.0"
 source = { url = "https://github.com/explosion/spacy-models/releases/download/el_core_news_sm-3.8.0/el_core_news_sm-3.8.0-py3-none-any.whl" }
 wheels = [
     { url = "https://github.com/explosion/spacy-models/releases/download/el_core_news_sm-3.8.0/el_core_news_sm-3.8.0-py3-none-any.whl", hash = "sha256:18df59b7f099a20d6f7cc1f964a57408a4c1663b73b5110932c1ea24f66e3027" },
+]
+
+[[package]]
+name = "es-core-news-sm"
+version = "3.8.0"
+source = { url = "https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.8.0/es_core_news_sm-3.8.0-py3-none-any.whl" }
+wheels = [
+    { url = "https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.8.0/es_core_news_sm-3.8.0-py3-none-any.whl", hash = "sha256:e451a83d6df79b87e9eed0cb553f03e99e36a3bab18a7b79f0dcfd1fdf875e12" },
 ]
 
 [[package]]

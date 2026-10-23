@@ -294,6 +294,25 @@ def fact_failure(data: FactInput, *, skip: Collection[str] = ()) -> str | None:
     return None
 
 
+def exceeds_max_units(sentence: str, max_units: int) -> bool:
+    """Check without a model that a sentence is longer than the length window.
+
+    Each whitespace chunk with a letter or digit gives at least one word or
+    character unit. A count above the maximum guarantees a filter F2 failure.
+
+    :param sentence: Prepared sentence text.
+    :param max_units: Maximum unit count of the window.
+    :returns: True when the sentence has more than ``max_units`` units.
+    """
+    chunks = 0
+    for chunk in sentence.split():
+        if any(char.isalnum() for char in chunk):
+            chunks += 1
+            if chunks > max_units:
+                return True
+    return False
+
+
 def record_pass(counts: dict[str, int], failure: str | None) -> None:
     """Count one sentence as a pass of every guard before its first failure.
 
@@ -472,6 +491,9 @@ def build_candidate_pool(
             continue
         english_id, english_text = pair
         sentence = profile.prepare_text(raw).strip()
+        if exceeds_max_units(sentence, max_units):
+            record_pass(counts, "F2")
+            continue
         unit_len = profile.unit_count(sentence)
         shape = shape_failure(sentence, profile, min_units, max_units)
         relax_shape = (

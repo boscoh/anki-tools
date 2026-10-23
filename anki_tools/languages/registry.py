@@ -32,6 +32,7 @@ from anki_tools.languages.cantonese import profile as cantonese
 from anki_tools.languages.french import profile as french
 from anki_tools.languages.greek import profile as greek
 from anki_tools.languages.mandarin import profile as mandarin
+from anki_tools.languages.spanish import profile as spanish
 
 
 @dataclass(frozen=True)
@@ -64,7 +65,13 @@ LANGUAGES: dict[str, CliLanguage] = {
             module=french,
             audit=french.run_french_audit,
         ),
-        CliLanguage("spanish", build=True),
+        CliLanguage(
+            "spanish",
+            profile=spanish.SPANISH,
+            module=spanish,
+            audit=spanish.run_spanish_audit,
+            build=True,
+        ),
         CliLanguage(
             "greek",
             profile=greek.GREEK,
@@ -141,5 +148,6 @@ __all__ = [
     "profile_languages",
     "profile_names",
     "resolve",
+    "spanish",
     "swadesh_languages",
 ]

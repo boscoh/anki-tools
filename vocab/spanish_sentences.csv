@@ -1,0 +1,409 @@
+target,sentence,text_original,english,tatoeba_id,tatoeba_author,english_id,audio_id,audio_source,audio_license,unknown_words,word_len,zipf_mean,rank_key,tier,form_kind,audio_missing
+yo,Yo creo que no.,Yo creo que no.,I suppose not.,2405357,Shishir,6587898,0,tts,,0,4,6.69,0|0|-6.690|1|2405357,core,single,false
+yo,Eso no es lo que yo creo.,Eso no es lo que yo creo.,That's not what I believe.,7851885,arh,3419915,0,tts,,0,7,6.69,0|0|-6.689|0|7851885,core,single,false
+tú,No me gusta la gente como tú.,No me gusta la gente como tú.,I don't like people like you.,10095089,manufrutos,10094493,0,tts,,0,7,6.42,0|0|-6.423|0|10095089,core,single,false
+tú,No trabajo mucho más que tú.,No trabajo mucho más que tú.,I don't work much more than you.,6584324,arh,13024149,0,tts,,0,6,6.42,0|0|-6.417|0|6584324,core,single,false
+él,Él no es el mismo de antes.,Él no es el mismo de antes.,He is not the same as before.,1713664,marcelostockle,3105035,0,tts,,0,7,6.71,0|0|-6.707|0|1713664,core,single,false
+él,No era de él.,No era de él.,It wasn't his.,3170360,cueyayotl,2248917,0,tts,,0,4,6.70,0|0|-6.695|1|3170360,core,single,false
+nosotros,Él no es como nosotros.,Él no es como nosotros.,He's not like us.,2216786,marcelostockle,288266,0,tts,,0,5,6.44,0|0|-6.444|0|2216786,core,single,false
+nosotros,¿Qué hay de nosotros?,¿Qué hay de nosotros?,What about us?,1542390,marcelostockle,1542297,0,tts,,0,4,6.43,0|0|-6.430|1|1542390,core,single,false
+vosotros,Todo el mundo está de acuerdo con vosotros.,Todo el mundo está de acuerdo con vosotros.,Everybody agrees with you.,840830,Shishir,32111,0,tts,,0,8,6.36,0|0|-6.359|0|840830,core,single,false
+vosotros,Uno de vosotros dos va a tener que ir.,Uno de vosotros dos va a tener que ir.,One of you two is going to have to go there.,2160480,Shishir,1439112,0,tts,,0,9,6.30,0|0|-6.299|0|2160480,core,single,false
+ellos,¿Eso no es de ellos?,¿Eso no es de ellos?,Isn't that theirs?,1713339,marcelostockle,41939,0,tts,,0,5,6.79,0|0|-6.788|0|1713339,core,single,false
+ellos,Esto es de ellos.,Esto es de ellos.,This is theirs.,6168559,cueyayotl,2649115,0,tts,,0,4,6.67,0|0|-6.670|1|6168559,core,single,false
+este,Este es el final de mi historia.,Este es el final de mi historia.,This is the end of my story.,1619461,teskmon,56075,0,tts,,0,7,6.61,0|0|-6.607|0|1619461,core,single,false
+este,No soy de este mundo.,No soy de este mundo.,I'm not from this world.,2094555,Shishir,2094572,0,tts,,0,5,6.60,0|0|-6.602|0|2094555,core,single,false
+ese,Ese libro es de ellos.,Ese libro es de ellos.,That book is theirs.,1239079,marcelostockle,397331,0,tts,,0,5,6.38,0|0|-6.378|0|1239079,core,single,false
+ese,Ese no era el plan.,Ese no era el plan.,That wasn't the plan.,5030118,don_ramon,2547644,0,tts,,0,5,6.35,0|0|-6.354|0|5030118,core,single,false
+aquí,No es de por aquí.,No es de por aquí.,He's not from around here.,5093739,cueyayotl,3098780,0,tts,,0,5,6.96,0|0|-6.956|0|5093739,core,single,false
+aquí,Eso no es por lo que estoy aquí.,Eso no es por lo que estoy aquí.,That's not what I'm here for.,4784110,alegarvid,3591706,0,tts,,0,8,6.68,0|0|-6.678|0|4784110,core,single,false
+ahí,¿Qué es eso que está ahí?,¿Qué es eso que está ahí?,What is that over there?,2857701,Besatnias,773359,0,tts,,0,6,6.43,0|0|-6.428|0|2857701,core,single,false
+ahí,Es mayor que ese niño de ahí.,Es mayor que ese niño de ahí.,He is older than the boy who is over there.,2250839,Shishir,288707,0,tts,,0,7,6.36,0|0|-6.364|0|2250839,core,single,false
+quién,¿De qué y de quién es la culpa?,¿De qué y de quién es la culpa?,What or who is at fault?,1705619,marcelostockle,3763340,0,tts,,0,8,6.77,0|0|-6.770|0|1705619,core,single,false
+quién,¿De quién es eso?,¿De quién es eso?,Whose is that?,7276539,arh,9161733,0,tts,,0,4,6.59,0|0|-6.588|1|7276539,core,single,false
+qué,¿Qué es lo que tengo?,¿Qué es lo que tengo?,What do I have?,6600592,arh,24844,0,tts,,0,5,6.69,0|0|-6.694|0|6600592,core,single,false
+qué,¿Qué hay en el sobre?,¿Qué hay en el sobre?,What's in the envelope?,3029957,hayastan,2645645,0,tts,,0,5,6.69,0|0|-6.690|0|3029957,core,single,false
+dónde,¿Dónde está el resto de la clase?,¿Dónde está el resto de la clase?,Where's the rest of our class?,1987566,Shishir,1985650,0,tts,,0,7,6.38,0|0|-6.383|0|1987566,core,single,false
+dónde,¿Dónde están los de él?,¿Dónde están los de él?,Where are his?,6627374,Schuager,6627373,0,tts,,0,5,6.36,0|0|-6.362|0|6627374,core,single,false
+cuándo,"Si no es ahora, ¿cuándo?","Si no es ahora, ¿cuándo?","If not now, when?",4844535,cueyayotl,4844536,0,tts,,0,5,6.31,0|0|-6.310|0|4844535,core,single,false
+cuándo,¿Cuándo se fueron a casa?,¿Cuándo se fueron a casa?,When did they go home?,1327751,marcelostockle,65972,0,tts,,0,5,6.11,0|0|-6.106|0|1327751,core,single,false
+cómo,¿Cómo de bueno es?,¿Cómo de bueno es?,How good is he?,2351629,Shishir,1894230,0,tts,,0,4,6.58,0|0|-6.580|1|2351629,core,single,false
+cómo,¿Cómo de importante es la música en tu vida?,¿Cómo de importante es la música en tu vida?,How important is music in your life?,6877658,arh,6877445,0,tts,,0,9,6.50,0|0|-6.502|0|6877658,core,single,false
+no,No es de los nuestros.,No es de los nuestros.,He's not one of us.,656219,Shishir,655925,0,tts,,0,5,6.92,0|0|-6.922|0|656219,core,single,false
+no,No es el caso.,No es el caso.,That's not the case.,1292112,Shishir,42351,0,tts,,0,4,6.83,0|0|-6.835|1|1292112,core,single,false
+todo,Todo no es lo que parece.,Todo no es lo que parece.,Everything is not what it seems.,7849649,arh,9668301,0,tts,,0,6,6.77,0|0|-6.772|0|7849649,core,single,false
+todo,El dinero no lo es todo.,El dinero no lo es todo.,Money isn't everything.,536541,Shishir,1740882,0,tts,,0,6,6.72,0|0|-6.723|0|536541,core,single,false
+mucho,"No es mucho, ¿no?","No es mucho, ¿no?","That isn't much, is it?",5566668,swyter,3594065,0,tts,,0,4,6.82,0|0|-6.822|1|5566668,core,single,false
+mucho,"No es mucho, pero es mejor que nada.","No es mucho, pero es mejor que nada.","It's not much, but it's better than nothing.",9755597,Shishir,9778663,0,tts,,0,8,6.65,0|0|-6.651|0|9755597,core,single,false
+alguno,Para algunas personas lo es.,Para algunas personas lo es.,"For some people, it is.",7144977,arh,9855460,0,tts,,0,5,6.42,0|0|-6.424|0|7144977,core,single,false
+alguno,"Por alguna razón, me siento más vivo por la noche.","Por alguna razón, me siento más vivo por la noche.",For some reason I feel more alive at night.,2538,Shishir,1332,0,tts,,0,10,6.18,0|0|-6.177|1|2538,core,single,false
+poco,No es tan poco.,No es tan poco.,It's not so little.,6149746,Omnivoro,2891620,0,tts,,0,4,6.49,0|0|-6.487|1|6149746,core,single,false
+poco,Es de poco valor.,Es de poco valor.,It is of little value.,1713383,marcelostockle,42646,0,tts,,0,4,6.45,0|0|-6.445|1|1713383,core,single,false
+otro,Ustedes se tienen la una a la otra.,Ustedes se tienen la una a la otra.,You've got each other.,3562687,ficion,3330981,0,tts,,0,8,6.66,0|0|-6.655|0|3562687,core,single,false
+otro,Esta casa es mejor que la otra.,Esta casa es mejor que la otra.,This is a better house than the other one.,2268925,Shishir,2268924,0,tts,,0,7,6.58,0|0|-6.577|0|2268925,core,single,false
+uno,Es la una y media.,Es la una y media.,It's half past one.,8803545,carlosalberto,3550808,0,tts,,0,5,6.83,0|0|-6.832|0|8803545,core,single,false
+uno,Madre no hay más que una.,Madre no hay más que una.,Mother is no more than one.,868664,ILDEFONSO,1174790,0,tts,,0,6,6.66,0|0|-6.657|0|868664,core,single,false
+dos,Son las dos de la mañana.,Son las dos de la mañana.,It's two in the morning.,2131425,Shishir,12656116,0,tts,,0,6,6.70,0|0|-6.703|0|2131425,core,single,false
+dos,¿Cuál es el mejor de los dos?,¿Cuál es el mejor de los dos?,Which one is the better of the two?,8815822,carlosalberto,8815808,0,tts,,0,7,6.65,0|0|-6.647|0|8815822,core,single,false
+tres,"Por favor, está en casa a las tres.","Por favor, está en casa a las tres.",Please be home by three o'clock.,6682008,arh,6681650,0,tts,,0,8,6.50,0|0|-6.504|0|6682008,core,single,false
+tres,Hace tres días que no como.,Hace tres días que no como.,I haven't eaten for three days.,3222563,Shishir,3154830,0,tts,,0,6,6.48,0|0|-6.478|0|3222563,core,single,false
+cuatro,Dos y dos son cuatro.,Dos y dos son cuatro.,Two plus two makes four.,843288,Shishir,394885,0,tts,,0,5,6.27,0|0|-6.268|0|843288,core,single,false
+cuatro,Él tiene cuatro hijos a los que mantener.,Él tiene cuatro hijos a los que mantener.,He has four children to provide for.,1344740,Shishir,304528,0,tts,,0,8,6.21,0|0|-6.214|0|1344740,core,single,false
+cinco,Tenemos que empezar antes de las cinco.,Tenemos que empezar antes de las cinco.,We must begin before five.,740772,Shishir,72503,0,tts,,0,7,6.29,0|0|-6.289|0|740772,core,single,false
+cinco,No tenía más de cinco dólares.,No tenía más de cinco dólares.,I had no more than five dollars.,1120234,Shishir,254956,0,tts,,0,6,6.25,0|0|-6.247|0|1120234,core,single,false
+grande,La casa en que vivo no es muy grande.,La casa en que vivo no es muy grande.,The house I'm living in isn't very large.,2167098,Shishir,1053958,0,tts,,0,9,6.58,0|0|-6.577|0|2167098,core,single,false
+grande,Es el más grande del mundo.,Es el más grande del mundo.,It's the largest in the world.,1686522,Shishir,1671763,0,tts,,0,6,6.56,0|0|-6.562|0|1686522,core,single,false
+largo,El viaje es más largo de lo que pensaba.,El viaje es más largo de lo que pensaba.,The trip is longer than I expected.,959845,hundo,748406,0,tts,,0,9,6.48,0|0|-6.480|0|959845,core,single,false
+largo,Hay un largo camino de aquí a la escuela.,Hay un largo camino de aquí a la escuela.,It's a long way from here to school.,2152254,Shishir,62092,0,tts,,0,9,6.40,0|0|-6.402|0|2152254,core,single,false
+ancho,¿Qué tan ancho es este río?,¿Qué tan ancho es este río?,How wide is this river?,1448256,marcelostockle,58144,0,tts,,0,6,5.82,0|0|-5.822|0|1448256,core,single,false
+ancho,¡La vida no es larga sino ancha!,¡La vida no es larga sino ancha!,"Life is not long, it is wide!",619076,darinmex,2181,0,tts,,0,7,6.02,0|1|-6.019|0|619076,core,single,false
+grueso,El libro es grueso.,El libro es grueso.,The book is thick.,10558229,Seael,10060003,0,tts,,0,4,5.94,0|1|-5.940|1|10558229,core,single,false
+grueso,Este libro es muy grueso.,Este libro es muy grueso.,This book is very thick.,839813,Espi,682176,0,tts,,0,5,5.78,0|1|-5.778|0|839813,core,single,false
+pesado,Es más pesado de lo que parece.,Es más pesado de lo que parece.,It's heavier than it looks.,10240967,Shishir,9447058,0,tts,,0,7,6.54,0|0|-6.540|0|10240967,core,single,false
+pesado,El oro es mucho más pesado que el agua.,El oro es mucho más pesado que el agua.,Gold is far heavier than water.,339125,tatoerique,18583,0,tts,,0,9,6.31,0|0|-6.311|0|339125,core,single,false
+pequeño,La Tierra es más pequeña que el Sol.,La Tierra es más pequeña que el Sol.,The Earth is smaller than the Sun.,743776,chinopinyin,5139350,0,tts,,0,8,6.46,0|0|-6.457|0|743776,core,single,false
+pequeño,¿No es un poco pequeño?,¿No es un poco pequeño?,Isn't it a bit small?,673006,Shishir,619708,0,tts,,0,5,6.43,0|0|-6.432|0|673006,core,single,false
+corto,La vida es corta.,La vida es corta.,Life's short.,959885,hayastan,958757,0,tts,,0,4,6.29,0|0|-6.292|1|959885,core,single,false
+corto,Estoy corto de dinero.,Estoy corto de dinero.,I'm very short of money.,967686,leoruilova,37860,0,tts,,0,4,5.98,0|0|-5.978|1|967686,core,single,false
+estrecho,Pasamos por un camino estrecho.,Pasamos por un camino estrecho.,We went along a narrow road.,2270046,Shishir,2270045,0,tts,,0,5,5.55,0|0|-5.552|0|2270046,core,single,false
+estrecho,El camino es muy estrecho para los autos.,El camino es muy estrecho para los autos.,The road is too narrow for cars.,1353047,marcelostockle,44680,0,tts,,0,8,6.08,0|1|-6.085|0|1353047,core,single,false
+delgado,Creo que hoy en día las modelos son demasiado delgadas.,Creo que hoy en día las modelos son demasiado delgadas.,I think fashion models today are too thin.,1855150,marcelostockle,682179,0,tts,,0,10,5.89,0|0|-5.892|1|1855150,core,single,false
+delgado,Él es alto y delgado.,Él es alto y delgado.,He is tall and lean.,1410567,darinmex,302408,0,tts,,0,5,5.93,0|1|-5.928|0|1410567,core,single,false
+mujer,Veo a un hombre y a una mujer.,Veo a un hombre y a una mujer.,I see a man and a woman.,627064,Leono,2839853,0,tts,,0,8,6.58,0|0|-6.583|0|627064,core,single,false
+mujer,Eso es trabajo de mujeres.,Eso es trabajo de mujeres.,That's a woman's job.,5057089,don_ramon,1956300,0,tts,,0,5,6.46,0|0|-6.458|0|5057089,core,single,false
+hombre,Soy el hombre de la casa.,Soy el hombre de la casa.,I'm the man of the house.,2114432,Shishir,2077738,0,tts,,0,6,6.66,0|0|-6.658|0|2114432,core,single,false
+hombre,Es un hombre de acción.,Es un hombre de acción.,He is a man of action.,1282044,Shishir,296362,0,tts,,0,5,6.52,0|0|-6.522|0|1282044,core,single,false
+persona,Es la última persona que quiero ver.,Es la última persona que quiero ver.,He is the last man I want to see.,958344,hundo,297264,0,tts,,0,7,6.37,0|0|-6.374|0|958344,core,single,false
+persona,Yo era la persona más feliz del mundo.,Yo era la persona más feliz del mundo.,I was the happiest man on earth.,888703,ryuzaki,253676,0,tts,,0,8,6.26,0|0|-6.264|0|888703,core,single,false
+niño,El cinco de mayo es el día del niño.,El cinco de mayo es el día del niño.,May fifth is Children's Day.,1596439,nancy,1454486,0,tts,,0,9,6.48,0|0|-6.482|0|1596439,core,single,false
+niño,Los niños están en la escuela.,Los niños están en la escuela.,The kids are at school.,3305838,marcelostockle,3303811,0,tts,,0,6,6.46,0|0|-6.457|0|3305838,core,single,false
+esposa,"Él quiere a su hija, pero su esposa no.","Él quiere a su hija, pero su esposa no.","He loves his daughter, but his wife doesn't.",1968893,Shishir,304031,0,tts,,0,9,6.21,0|0|-6.213|0|1968893,core,single,false
+esposa,No tenía ni idea de que María era tu esposa.,No tenía ni idea de que María era tu esposa.,I had no idea Mary was your wife.,9701952,arh,9701946,0,tts,,0,10,6.17,0|0|-6.169|1|9701952,core,single,false
+marido,A ella no le gusta su marido.,A ella no le gusta su marido.,She didn't like her husband.,855150,Daga007,388375,0,tts,,0,7,6.22,0|0|-6.220|0|855150,core,single,false
+marido,¿Está su marido en casa?,¿Está su marido en casa?,Is your husband at home?,1205952,cueyayotl,1192252,0,tts,,0,5,6.17,0|0|-6.166|0|1205952,core,single,false
+madre,Mañana es el día de la madre.,Mañana es el día de la madre.,Tomorrow is Mother's Day.,570960,Leono,323315,0,tts,,0,7,6.68,0|0|-6.676|0|570960,core,single,false
+madre,Su cara se parece a la de su madre.,Su cara se parece a la de su madre.,Her face resembles her mother's.,1245016,Shishir,313081,0,tts,,0,9,6.64,0|0|-6.640|0|1245016,core,single,false
+padre,Esto es de mi padre.,Esto es de mi padre.,This is my father's.,445906,Shishir,413066,0,tts,,0,5,6.53,0|0|-6.534|0|445906,core,single,false
+padre,Creo que se parece a su padre.,Creo que se parece a su padre.,I think he takes after his father.,2403342,Shishir,303334,0,tts,,0,7,6.51,0|0|-6.509|0|2403342,core,single,false
+animal,El hombre es el único animal que habla.,El hombre es el único animal que habla.,Man is the only animal that talks.,758534,Shishir,270323,0,tts,,0,8,6.29,0|0|-6.286|0|758534,core,single,false
+animal,No dé de comer a los animales.,No dé de comer a los animales.,Don't feed the animals.,580978,Shishir,280214,0,tts,,0,7,6.28,0|0|-6.281|0|580978,core,single,false
+pez,No es un pez.,No es un pez.,It's not a fish.,1513877,marcelostockle,1513673,0,tts,,0,4,6.36,0|0|-6.360|1|1513877,core,single,false
+pez,Los peces viven en el agua.,Los peces viven en el agua.,Fish live in the water.,449935,Shishir,19346,0,tts,,0,6,6.09,0|0|-6.092|0|449935,core,single,false
+pájaro,El pájaro se fue muy lejos.,El pájaro se fue muy lejos.,The bird went far away.,520678,Shishir,45016,0,tts,,0,6,5.99,0|0|-5.993|0|520678,core,single,false
+pájaro,Él vio el pájaro en el árbol.,Él vio el pájaro en el árbol.,He saw the bird in the tree.,979459,hundo,979446,0,tts,,0,7,5.92,0|0|-5.923|0|979459,core,single,false
+perro,Tengo que dar de comer a mi perro.,Tengo que dar de comer a mi perro.,I need to feed my dog.,4419912,pchamorro,2387593,0,tts,,0,8,6.31,0|0|-6.312|0|4419912,core,single,false
+perro,No tengo miedo a los perros para nada.,No tengo miedo a los perros para nada.,I'm not afraid of dogs at all.,9191592,ignacio,9250874,0,tts,,0,8,6.31,0|0|-6.306|0|9191592,core,single,false
+piojo,Me entran picores solo de pensar en los piojos.,Me entran picores solo de pensar en los piojos.,I get itchy just by thinking about lice.,10886140,Seael,10921675,0,tts,,1,9,5.56,1|1|-5.558|0|10886140,core,single,false
+serpiente,A ella no le dan miedo las serpientes.,A ella no le dan miedo las serpientes.,She isn't afraid of snakes.,521911,Shishir,314824,0,tts,,0,8,5.96,0|0|-5.964|0|521911,core,single,false
+serpiente,La serpiente me mordió en la pierna.,La serpiente me mordió en la pierna.,The snake bit me in the leg.,521904,Shishir,258416,0,tts,,0,7,5.81,0|0|-5.814|0|521904,core,single,false
+gusano,Esto es un gusano.,Esto es un gusano.,This is a worm.,7160278,Adelpa,8374109,0,tts,,0,4,5.92,0|1|-5.925|1|7160278,core,single,false
+gusano,Se retuerce como un gusano.,Se retuerce como un gusano.,It wriggles like a worm.,10078983,manufrutos,10070160,0,tts,,1,5,5.42,1|1|-5.416|0|10078983,core,single,false
+árbol,Este árbol es más viejo que yo.,Este árbol es más viejo que yo.,This tree is older than I am.,6564562,arh,6555173,0,tts,,0,7,6.21,0|0|-6.206|0|6564562,core,single,false
+árbol,Mira a lo alto de ese árbol.,Mira a lo alto de ese árbol.,Look at the top of that tree.,1616000,teskmon,67803,0,tts,,0,7,6.15,0|0|-6.150|0|1616000,core,single,false
+bosque,Mira lo que he encontrado en el bosque.,Mira lo que he encontrado en el bosque.,Look what I found in the woods.,6739344,arh,6738451,0,tts,,0,8,6.19,0|0|-6.192|0|6739344,core,single,false
+bosque,Vive solo en el bosque.,Vive solo en el bosque.,He lives by himself in the woods.,2476379,Shishir,288206,0,tts,,0,5,6.10,0|0|-6.098|0|2476379,core,single,false
+palo,Te voy a moler a palos.,Te voy a moler a palos.,I'm gonna beat the shit out of you.,4553982,swyter,4541263,0,tts,,1,6,5.68,1|0|-5.685|0|4553982,core,single,false
+palo,El perro estaba olfateando un palo.,El perro estaba olfateando un palo.,The dog was sniffing a stick.,330147,tatoerique,239229,0,tts,,1,6,5.27,1|0|-5.270|0|330147,core,single,false
+fruta,Ella es la primera para la fruta.,Ella es la primera para la fruta.,She is the first to get the fruit.,5711653,arh,13603013,0,tts,,0,7,6.38,0|0|-6.383|0|5711653,core,single,false
+fruta,¿Qué fruta es la que más te gusta?,¿Qué fruta es la que más te gusta?,What fruit do you like the best?,743768,chinopinyin,37537,0,tts,,0,8,6.38,0|0|-6.383|0|743768,core,single,false
+semilla,Las frutas tienen semillas en su interior.,Las frutas tienen semillas en su interior.,Fruits have seeds in them.,2098349,Shishir,23945,0,tts,,0,7,5.78,0|0|-5.783|0|2098349,core,single,false
+semilla,Las semillas de estos árboles son amarillas.,Las semillas de estos árboles son amarillas.,The seeds of these trees are yellow.,5268413,Omnivoro,5267501,0,tts,,0,7,5.63,0|1|-5.627|0|5268413,core,single,false
+hoja,Las hojas empiezan a caer en octubre.,Las hojas empiezan a caer en octubre.,Leaves begin to fall in October.,991081,Shishir,323614,0,tts,,0,7,5.80,0|0|-5.799|0|991081,core,single,false
+hoja,Las hojas están cambiando de color.,Las hojas están cambiando de color.,The leaves are changing color.,7558017,arh,6351102,0,tts,,0,6,5.77,0|0|-5.765|0|7558017,core,single,false
+raíz,El dinero es la raíz de todos los males.,El dinero es la raíz de todos los males.,Money is the root of all evil.,615616,Leono,18505,0,tts,,0,9,6.33,0|0|-6.334|0|615616,core,single,false
+raíz,La falta de dinero es la raíz de todo mal.,La falta de dinero es la raíz de todo mal.,The lack of money is the root of all evil.,864507,cris,864505,0,tts,,0,10,6.51,0|1|-6.510|1|864507,core,single,false
+flor,Esta chica es la flor de la escuela.,Esta chica es la flor de la escuela.,This girl is the flower of the school.,1595100,teskmon,897315,0,tts,,0,8,6.38,0|0|-6.376|0|1595100,core,single,false
+flor,Ella tiene flores en la mano.,Ella tiene flores en la mano.,She has flowers in her hand.,1247681,hayastan,314870,0,tts,,0,6,6.19,0|0|-6.187|0|1247681,core,single,false
+hierba,Hay hierba verde en el campo.,Hay hierba verde en el campo.,There is green grass on the field.,854015,japegon,851940,0,tts,,0,6,5.86,0|0|-5.863|0|854015,core,single,false
+hierba,Algunos niños están jugando en la hierba.,Algunos niños están jugando en la hierba.,Some children are playing on the grass.,1807932,Shishir,245694,0,tts,,0,7,5.80,0|0|-5.804|0|1807932,core,single,false
+cuerda,"La cuerda es fuerte, ¿no?","La cuerda es fuerte, ¿no?","This rope is strong, isn't it?",1604532,teskmon,60324,0,tts,,0,5,6.23,0|0|-6.230|0|1604532,core,single,false
+cuerda,Esta cuerda no es lo bastante fuerte.,Esta cuerda no es lo bastante fuerte.,This rope isn't strong enough.,6843399,arh,6842947,0,tts,,0,7,6.01,0|0|-6.011|0|6843399,core,single,false
+piel,Su piel es lisa.,Su piel es lisa.,Her skin is smooth.,1728790,marcelostockle,309622,0,tts,,0,4,5.68,0|0|-5.680|1|1728790,core,single,false
+piel,Tengo la piel seca.,Tengo la piel seca.,I have dry skin.,9706746,Shishir,282662,0,tts,,0,4,5.61,0|0|-5.605|1|9706746,core,single,false
+carne,Él da un poco de carne al perro.,Él da un poco de carne al perro.,He gives some meat to the dog.,1173650,Shishir,825701,0,tts,,0,8,6.06,0|0|-6.064|0|1173650,core,single,false
+carne,Esta carne es buena.,Esta carne es buena.,This meat is good.,2125254,Shishir,3303549,0,tts,,0,4,5.95,0|0|-5.945|1|2125254,core,single,false
+sangre,¿Cuál es tu tipo de sangre?,¿Cuál es tu tipo de sangre?,What is your blood type?,2881263,cueyayotl,372352,0,tts,,0,6,6.12,0|0|-6.118|0|2881263,core,single,false
+sangre,"No he entendido, ¿dónde está la sangre?","No he entendido, ¿dónde está la sangre?",I didn't understand; where's the blood?,7411066,arh,12198178,0,tts,,0,7,5.91,0|0|-5.914|0|7411066,core,single,false
+hueso,Ella es piel y hueso.,Ella es piel y hueso.,She is all skin and bone.,1304465,hayastan,310687,0,tts,,0,5,5.83,0|1|-5.834|0|1304465,core,single,false
+hueso,Le dio un hueso al perro.,Le dio un hueso al perro.,He gave the dog a bone.,623547,darinmex,295969,0,tts,,0,6,5.75,0|1|-5.752|0|623547,core,single,false
+grasa,¿Dónde está la grasa?,¿Dónde está la grasa?,Where is the fat located?,2202440,lazarus1907,37456,0,tts,,0,4,5.79,0|1|-5.787|1|2202440,core,single,false
+grasa,La carne es muy tierna y baja en grasa.,La carne es muy tierna y baja en grasa.,The meat is very tender and low in fat.,10733899,megamanenm,10733890,0,tts,,1,9,5.94,1|1|-5.941|0|10733899,core,single,false
+huevo,"Por favor, ¿dónde están los huevos?","Por favor, ¿dónde están los huevos?","Where are the eggs, please?",2756,Shishir,1565,0,tts,,0,6,5.90,0|0|-5.902|0|2756,core,single,false
+huevo,¿Cómo quiere los huevos?,¿Cómo quiere los huevos?,How would you like your eggs?,2392762,Shishir,325221,0,tts,,0,4,5.79,0|0|-5.793|1|2392762,core,single,false
+cuerno,Las vacas tienen cuernos.,Las vacas tienen cuernos.,Cows have horns.,10246871,Seael,1739383,0,tts,,1,4,5.14,1|1|-5.140|1|10246871,core,single,false
+cuerno,Los búfalos tienen grandes cuernos.,Los búfalos tienen grandes cuernos.,Buffaloes have big horns.,2220783,nancy,270893,0,tts,,1,5,4.99,1|1|-4.994|0|2220783,core,single,false
+cola,Mi perro tiene la cola larga.,Mi perro tiene la cola larga.,My dog has a long tail.,966564,hundo,250765,0,tts,,0,6,5.75,0|0|-5.753|0|966564,core,single,false
+cola,Ese perro tiene una corta cola.,Ese perro tiene una corta cola.,That dog has a short tail.,1584076,marcelostockle,68422,0,tts,,0,6,5.53,0|1|-5.530|0|1584076,core,single,false
+pluma,Tienes una pluma en el pelo.,Tienes una pluma en el pelo.,You have a feather in your hair.,1624803,marcelostockle,1624828,0,tts,,0,6,6.01,0|1|-6.010|0|1624803,core,single,false
+pluma,Ella tiene una gran pluma.,Ella tiene una gran pluma.,She has a huge feather.,5888320,albrusgher,3113554,0,tts,,0,5,5.72,0|1|-5.720|0|5888320,core,single,false
+pelo,No me gusta su pelo.,No me gusta su pelo.,I don't like your hair.,6795718,arh,8924352,0,tts,,0,5,6.19,0|0|-6.188|0|6795718,core,single,false
+pelo,El año pasado no tenía el pelo largo.,El año pasado no tenía el pelo largo.,My hair wasn't long last year.,10128871,Shishir,10596648,0,tts,,0,8,6.14,0|0|-6.140|0|10128871,core,single,false
+cabeza,No se me pasó por la cabeza.,No se me pasó por la cabeza.,It hadn't crossed my mind.,2720127,Shishir,610041,0,tts,,0,7,6.58,0|0|-6.579|0|2720127,core,single,false
+cabeza,¿Es que se os ha ido la cabeza?,¿Es que se os ha ido la cabeza?,Have you lost your mind?,9702652,Shishir,707277,0,tts,,0,8,6.37,0|0|-6.366|0|9702652,core,single,false
+oreja,Tus orejas son muy pequeñas.,Tus orejas son muy pequeñas.,Your ears are really small.,6797802,arh,8232173,0,tts,,0,5,5.35,0|0|-5.352|0|6797802,core,single,false
+oreja,No tengo oreja para la música.,No tengo oreja para la música.,I don't have an ear for music.,1920235,marcelostockle,472164,0,tts,,0,6,6.13,0|1|-6.130|0|1920235,core,single,false
+ojo,Te entra más por los ojos que por la boca.,Te entra más por los ojos que por la boca.,The eye is bigger than the belly.,576949,Shishir,323760,0,tts,,0,10,6.46,0|0|-6.456|1|576949,core,single,false
+ojo,El ojo tiene la capacidad natural de ver.,El ojo tiene la capacidad natural de ver.,The eye has the natural ability to see.,9678836,Eremon,2380098,0,tts,,0,8,6.22,0|0|-6.221|0|9678836,core,single,false
+nariz,Su nariz es más grande de lo normal.,Su nariz es más grande de lo normal.,Her nose is abnormally large.,9749536,Eremon,4506324,0,tts,,0,8,6.22,0|0|-6.223|0|9749536,core,single,false
+nariz,No puedo respirar por la nariz.,No puedo respirar por la nariz.,I can't breathe through my nose.,602182,Leono,318196,0,tts,,0,6,5.98,0|0|-5.978|0|602182,core,single,false
+boca,No es de buena educación hablar con la boca llena.,No es de buena educación hablar con la boca llena.,It's not polite to speak with your mouth full.,1615961,teskmon,240537,0,tts,,0,10,6.26,0|0|-6.261|1|1615961,core,single,false
+boca,No es bueno hablar con la boca llena.,No es bueno hablar con la boca llena.,It is not good to talk with your mouth full.,858705,Kokoo,268674,0,tts,,0,8,6.20,0|0|-6.201|0|858705,core,single,false
+diente,Mis dientes son de color blanco.,Mis dientes son de color blanco.,My teeth are white.,6797837,arh,8387280,0,tts,,0,6,5.74,0|0|-5.738|0|6797837,core,single,false
+diente,Los niños tienen menos dientes.,Los niños tienen menos dientes.,Children have fewer teeth.,6797811,arh,9644111,0,tts,,0,5,5.73,0|0|-5.732|0|6797811,core,single,false
+lengua,A ver su lengua.,A ver su lengua.,Let me see your tongue.,1654697,marcelostockle,272646,0,tts,,0,4,6.25,0|0|-6.253|1|1654697,core,single,false
+lengua,Se mordió la lengua y no dijo nada.,Se mordió la lengua y no dijo nada.,He held his tongue and didn't say a word.,2730615,Shishir,296272,0,tts,,0,8,6.13,0|0|-6.131|0|2730615,core,single,false
+uña,Nunca me corto las uñas por la noche.,Nunca me corto las uñas por la noche.,I never cut my nails at night.,1009909,Shishir,261987,0,tts,,0,8,6.06,0|0|-6.062|0|1009909,core,single,false
+uña,María cambia el color de sus uñas casi cada día.,María cambia el color de sus uñas casi cada día.,Mary changes her nail color almost every day.,1873307,Shishir,1030083,0,tts,,0,10,5.79,0|0|-5.789|1|1873307,core,single,false
+pie,En mi trabajo paso el día de pie.,En mi trabajo paso el día de pie.,"At my job, I spend the day on foot.",6690732,arh,10274032,0,tts,,0,8,6.40,0|0|-6.404|0|6690732,core,single,false
+pie,No he puesto un pie fuera de la casa hoy.,No he puesto un pie fuera de la casa hoy.,I haven't set foot outside the house today.,6685274,UsuarioX,4754808,0,tts,,0,10,6.27,0|0|-6.271|1|6685274,core,single,false
+pierna,¿Te ha pasado algo en la pierna?,¿Te ha pasado algo en la pierna?,Did something happen with your leg?,9392556,ignacio,9392600,0,tts,,0,7,6.23,0|0|-6.229|0|9392556,core,single,false
+pierna,¿Qué le pasó a tu pierna?,¿Qué le pasó a tu pierna?,What happened to your leg?,4317992,pchamorro,3129498,0,tts,,0,6,5.92,0|0|-5.922|0|4317992,core,single,false
+rodilla,Se cayó de rodillas.,Se cayó de rodillas.,He collapsed to his knees.,816057,BraveSentry,289534,0,tts,,0,4,5.87,0|1|-5.865|1|816057,core,single,false
+rodilla,El agua me llegaba hasta las rodillas.,El agua me llegaba hasta las rodillas.,The water came up to my knees.,994543,hayastan,270805,0,tts,,0,7,5.84,0|1|-5.841|0|994543,core,single,false
+mano,El problema se le fue de las manos.,El problema se le fue de las manos.,The problem got out of hand.,6566843,arh,9026072,0,tts,,0,8,6.58,0|0|-6.582|0|6566843,core,single,false
+mano,"No, es de segunda mano.","No, es de segunda mano.","No, it's second-hand.",345490,tatoerique,13201836,0,tts,,0,5,6.53,0|0|-6.526|0|345490,core,single,false
+ala,Un pájaro tiene alas.,Un pájaro tiene alas.,A bird has wings.,1803678,marcelostockle,278183,0,tts,,0,4,5.38,0|0|-5.378|1|1803678,core,single,false
+ala,Los pájaros tienen alas.,Los pájaros tienen alas.,Birds have wings.,1476906,marcelostockle,1476885,0,tts,,0,4,5.32,0|0|-5.317|1|1476906,core,single,false
+barriga,Tengo barriga cervecera.,Tengo barriga cervecera.,I have a beer belly.,8494596,Balamax,5858417,0,tts,,1,3,4.14,1|1|-4.137|1|8494596,scaffold,single,false
+tripas,Tu tripa parece un huevo.,Tu tripa parece un huevo.,Your gut looks like an egg.,979111,Shishir,2649971,0,tts,,1,5,5.33,1|0|-5.332|0|979111,core,single,false
+tripas,La tripa es una mala consejera.,La tripa es una mala consejera.,Your gut isn't the best adviser.,9667822,Shishir,9770507,0,tts,,2,6,5.54,2|0|-5.542|0|9667822,core,single,false
+cuello,Tengo un dolor en mi cuello.,Tengo un dolor en mi cuello.,I have a pain in my neck.,1881170,radu107,1879931,0,tts,,0,6,6.08,0|0|-6.075|0|1881170,core,single,false
+cuello,Estoy hasta el cuello de trabajo.,Estoy hasta el cuello de trabajo.,I am up to my neck in work.,1407796,arashi_29,257505,0,tts,,0,6,6.28,0|1|-6.278|0|1407796,core,single,false
+espalda,No está bien hablar a espaldas de otra persona.,No está bien hablar a espaldas de otra persona.,It's not right to talk about people behind their backs.,10545698,arh,10545703,0,tts,,0,9,6.18,0|0|-6.183|0|10545698,core,single,false
+espalda,No siento la espalda.,No siento la espalda.,I can't feel my back.,6637158,arh,10241830,0,tts,,0,4,6.15,0|0|-6.155|1|6637158,core,single,false
+pecho,Ella tiene pechos grandes.,Ella tiene pechos grandes.,She has large breasts.,967521,hundo,784435,0,tts,,0,4,5.32,0|0|-5.315|1|967521,core,single,false
+pecho,El corazón se encuentra en el pecho.,El corazón se encuentra en el pecho.,The heart is located in the chest.,1650817,marcelostockle,1652457,0,tts,,0,7,6.34,0|1|-6.343|0|1650817,core,single,false
+corazón,Sé que está en mi corazón.,Sé que está en mi corazón.,I know it in my heart.,2412434,marcelostockle,2376019,0,tts,,0,6,6.39,0|0|-6.385|0|2412434,core,single,false
+corazón,Es malo para el corazón.,Es malo para el corazón.,It's bad for the heart.,2010738,Shishir,1944875,0,tts,,0,5,6.32,0|0|-6.324|0|2010738,core,single,false
+hígado,¿Es bueno para vos comer hígado?,¿Es bueno para vos comer hígado?,Is eating liver good for you?,2728156,emanuel81,953993,0,tts,,0,6,5.66,0|1|-5.657|0|2728156,core,single,false
+hígado,"Donde estaba mi hígado, ahora hay un minibar.","Donde estaba mi hígado, ahora hay un minibar.",Now there's a minibar where my liver was.,3449218,carlosalberto,10014276,0,tts,,1,8,5.48,1|1|-5.484|0|3449218,core,single,false
+beber,El perro bebió un poco de agua y se fue.,El perro bebió un poco de agua y se fue.,The dog drank some water and went away.,1182839,Shishir,48238,0,tts,,0,10,6.24,0|0|-6.238|1|1182839,core,single,false
+beber,Tiene que dejar de beber.,Tiene que dejar de beber.,You must quit drinking.,1174292,Shishir,1174758,0,tts,,0,5,6.22,0|0|-6.220|0|1174292,core,single,false
+comer,Me la voy a comer.,Me la voy a comer.,I'm going to eat it.,5130045,don_ramon,2548250,0,tts,,0,5,6.49,0|0|-6.486|0|5130045,core,single,false
+comer,Es casi la hora de comer.,Es casi la hora de comer.,It's almost time to eat.,6704608,arh,6704094,0,tts,,0,6,6.41,0|0|-6.413|0|6704608,core,single,false
+morder,Has tenido suerte de que no te haya mordido.,Has tenido suerte de que no te haya mordido.,You're lucky because he didn't bite you.,2751,Shishir,1560,0,tts,,0,9,5.89,0|0|-5.887|0|2751,core,single,false
+morder,El perro me mordió la mano.,El perro me mordió la mano.,The dog bit my hand.,623890,Shishir,971766,0,tts,,0,6,5.87,0|0|-5.872|0|623890,core,single,false
+chupar,Él pidió que se la chuparan.,Él pidió que se la chuparan.,He requested a blow job.,1562935,erjabi,791590,0,tts,,1,6,5.68,1|1|-5.678|0|1562935,core,single,false
+chupar,Tom te está chupando la sangre.,Tom te está chupando la sangre.,Tom is sucking your blood.,6152150,Shishir,10093926,0,tts,,1,6,5.50,1|1|-5.495|0|6152150,core,single,false
+escupir,Un caballero no escupiría en la calle.,Un caballero no escupiría en la calle.,A gentleman would not spit on the street.,529575,darinmex,269706,0,tts,,1,7,5.76,1|1|-5.757|0|529575,core,single,false
+escupir,Él escupió en el piso.,Él escupió en el piso.,He spat on the ground.,4359648,pchamorro,4358557,0,tts,,1,5,5.64,1|1|-5.642|0|4359648,core,single,false
+vomitar,¿Cuándo fue la última vez que vomitó?,¿Cuándo fue la última vez que vomitó?,When was the last time you vomited?,9939270,Shishir,9849652,0,tts,,0,7,5.68,0|0|-5.677|0|9939270,core,single,false
+vomitar,Creo que voy a vomitar.,Creo que voy a vomitar.,I think I'm going to puke.,2442853,wallebot,4907368,0,tts,,0,5,6.00,0|1|-6.002|0|2442853,core,single,false
+soplar,El viento sopla del este.,El viento sopla del este.,The wind is blowing from the east.,1337925,Shishir,319709,0,tts,,0,5,5.77,0|0|-5.770|0|1337925,core,single,false
+soplar,Siempre podía decir en qué dirección soplaba el viento.,Siempre podía decir en qué dirección soplaba el viento.,He could always tell which direction the wind was blowing.,995845,Shishir,988566,0,tts,,0,9,5.59,0|0|-5.591|0|995845,core,single,false
+respirar,Aquí no se puede respirar.,Aquí no se puede respirar.,You can't breathe here.,697474,Shishir,698945,0,tts,,0,5,6.06,0|0|-6.062|0|697474,core,single,false
+respirar,No puedo respirar bien.,No puedo respirar bien.,I can't breathe well.,7942479,arh,8165626,0,tts,,0,4,5.77,0|0|-5.770|1|7942479,core,single,false
+reír,No me gusta la manera en la que ella ríe.,No me gusta la manera en la que ella ríe.,I don't like the way she laughs.,883925,ildefonk,261284,0,tts,,0,10,6.46,0|0|-6.459|1|883925,core,single,false
+reír,No me voy a reír.,No me voy a reír.,I won't laugh.,4999506,don_ramon,2247630,0,tts,,0,5,6.21,0|0|-6.212|0|4999506,core,single,false
+ver,La vemos de vez en cuando.,La vemos de vez en cuando.,We see her on occasion.,4815541,cueyayotl,7786382,0,tts,,0,6,6.67,0|0|-6.665|0|4815541,core,single,false
+ver,La vi en la iglesia.,La vi en la iglesia.,I met her at the church.,1691462,marcelostockle,256928,0,tts,,0,5,6.58,0|0|-6.578|0|1691462,core,single,false
+oír,Eso no es lo que quería oír.,Eso no es lo que quería oír.,That isn't what I wanted to hear.,10009992,manufrutos,10009771,0,tts,,0,7,6.30,0|0|-6.303|0|10009992,core,single,false
+oír,Que no te vuelva a oír decir eso.,Que no te vuelva a oír decir eso.,Don't ever let me hear you say that again.,5854156,arh,3121920,0,tts,,0,8,6.17,0|0|-6.169|0|5854156,core,single,false
+saber,No sé lo que es.,No sé lo que es.,I don't know what it is.,2152182,Shishir,43145,0,tts,,0,5,6.82,0|0|-6.816|0|2152182,core,single,false
+saber,¿No sabes lo que es?,¿No sabes lo que es?,Don't you know what it is?,7288948,UsuarioX,3511793,0,tts,,0,5,6.77,0|0|-6.768|0|7288948,core,single,false
+pensar,Hay más de lo que pensaba.,Hay más de lo que pensaba.,There's more than I thought.,8322183,arh,9663014,0,tts,,0,6,6.61,0|0|-6.612|0|8322183,core,single,false
+pensar,Eso no es en lo que estaba pensando.,Eso no es en lo que estaba pensando.,That's not quite what I was thinking.,1898694,marcelostockle,1897808,0,tts,,0,8,6.60,0|0|-6.604|0|1898694,core,single,false
+oler,El dinero no huele.,El dinero no huele.,Money doesn't smell.,576380,Leono,11470702,0,tts,,0,4,6.04,0|0|-6.043|1|576380,core,single,false
+oler,No me gusta cómo huele esta fruta.,No me gusta cómo huele esta fruta.,I don't like the way this fruit smells.,1205091,Shishir,1192404,0,tts,,0,7,5.68,0|0|-5.683|0|1205091,core,single,false
+temer,No le temo a la muerte.,No le temo a la muerte.,I don't fear death.,1419360,marcelostockle,1111459,0,tts,,0,6,6.34,0|0|-6.337|0|1419360,core,single,false
+temer,Me temo que ya no te quiero.,Me temo que ya no te quiero.,I'm afraid I don't love you any longer.,10065373,manufrutos,10064799,0,tts,,0,7,6.30,0|0|-6.304|0|10065373,core,single,false
+dormir,Todo lo que quiero hacer ahora es dormir.,Todo lo que quiero hacer ahora es dormir.,All I want to do now is sleep.,4708388,DarkHollow,4707901,0,tts,,0,8,6.32,0|0|-6.319|0|4708388,core,single,false
+dormir,Hay gente que se pasa la vida durmiendo.,Hay gente que se pasa la vida durmiendo.,Some people spend their lives sleeping.,11472734,arh,11316779,0,tts,,0,8,6.24,0|0|-6.235|0|11472734,core,single,false
+vivir,Esta es la casa en la que vivía.,Esta es la casa en la que vivía.,Here is the house where he lived.,534302,Shishir,504716,0,tts,,0,8,6.70,0|0|-6.696|0|534302,core,single,false
+vivir,Se vive mejor en el campo que en la ciudad.,Se vive mejor en el campo que en la ciudad.,People live better in the countryside than in cities.,8339383,arh,8393075,0,tts,,0,10,6.63,0|0|-6.634|1|8339383,core,single,false
+morir,La buena noticia es que no te vas a morir.,La buena noticia es que no te vas a morir.,The good news is that you're not going to die.,1781702,Shishir,954349,0,tts,,0,10,6.39,0|0|-6.392|1|1781702,core,single,false
+morir,Está a punto de morir.,Está a punto de morir.,He is about to die.,1832131,Shishir,1829476,0,tts,,0,5,6.35,0|0|-6.348|0|1832131,core,single,false
+matar,No nos puedes matar a los dos.,No nos puedes matar a los dos.,You can't kill us both.,3338539,Shishir,3331099,0,tts,,0,7,6.31,0|0|-6.314|0|3338539,core,single,false
+matar,Lo que no nos mata nos hace más fuertes.,Lo que no nos mata nos hace más fuertes.,What doesn't kill us makes us stronger.,1264564,Shishir,1669986,0,tts,,0,9,6.19,0|0|-6.193|0|1264564,core,single,false
+pelear,No sé por qué se están peleando.,No sé por qué se están peleando.,I don't know why they are fighting.,1702095,teskmon,400205,0,tts,,0,7,6.10,0|0|-6.104|0|1702095,core,single,false
+pelear,Dos hombres se estaban peleando en la calle.,Dos hombres se estaban peleando en la calle.,Two men were fighting on the street.,541346,Shishir,280908,0,tts,,0,8,6.01,0|0|-6.011|0|541346,core,single,false
+cazar,Él fue a cazar en el bosque.,Él fue a cazar en el bosque.,He went hunting in the woods.,862235,jorgearestrepo,299957,0,tts,,0,7,6.08,0|0|-6.079|0|862235,core,single,false
+cazar,Este es un buen lugar para cazar.,Este es un buen lugar para cazar.,This is a good place for hunting.,1218479,alexmarcelo,1344650,0,tts,,0,7,6.06,0|1|-6.063|0|1218479,core,single,false
+golpear,El hombre me golpeó en la cabeza.,El hombre me golpeó en la cabeza.,The man hit me on the head.,1638193,teskmon,45305,0,tts,,0,7,6.28,0|0|-6.280|0|1638193,core,single,false
+golpear,Él me golpeó en la cabeza.,Él me golpeó en la cabeza.,He hit me on the head.,699774,Shishir,303763,0,tts,,0,6,6.11,0|0|-6.115|0|699774,core,single,false
+cortar,Me he cortado el pelo.,Me he cortado el pelo.,I got my hair cut.,800667,Shishir,257883,0,tts,,0,5,5.73,0|0|-5.730|0|800667,core,single,false
+cortar,Me corté el pelo antes del viaje.,Me corté el pelo antes del viaje.,I cut my hair before travelling.,778681,chinopinyin,10529553,0,tts,,0,7,5.72,0|0|-5.720|0|778681,core,single,false
+dividir,Aquí el camino se divide en dos.,Aquí el camino se divide en dos.,The road divides here into two.,746421,U2FS,280405,0,tts,,0,7,6.17,0|0|-6.166|0|746421,core,single,false
+dividir,El dinero fue dividido entre tres.,El dinero fue dividido entre tres.,The money was divided among the three.,1068597,wallebot,48642,0,tts,,0,6,5.83,0|0|-5.828|0|1068597,core,single,false
+apuñalar,Estuve a punto de ser apuñalado.,Estuve a punto de ser apuñalado.,I was about to be stabbed.,1325849,marcelostockle,1325848,0,tts,,0,6,5.78,0|1|-5.782|0|1325849,core,single,false
+apuñalar,¡Me apuñaló por la espalda!,¡Me apuñaló por la espalda!,He stabbed me in the back!,739385,Shishir,30217,0,tts,,0,5,5.77,0|1|-5.768|0|739385,core,single,false
+rascar,"Cuando piensa, se rasca la cabeza.","Cuando piensa, se rasca la cabeza.","When he thinks, he scratches his head.",1203661,alexmarcelo,1205639,0,tts,,0,6,5.70,0|1|-5.700|0|1203661,core,single,false
+rascar,Ella se rascó la cabeza.,Ella se rascó la cabeza.,She scratched her head.,3353690,marcelostockle,1996927,0,tts,,0,5,5.54,0|1|-5.544|0|3353690,core,single,false
+cavar,Tengo problemas para cavar por las piedras.,Tengo problemas para cavar por las piedras.,I'm having trouble digging because of the stones.,12200630,carlosalberto,12200624,0,tts,,0,7,5.70,0|1|-5.699|0|12200630,core,single,false
+cavar,"Si te encuentras en un agujero, para de cavar.","Si te encuentras en un agujero, para de cavar.","If you find yourself in a hole, stop digging.",599620,Shishir,425410,0,tts,,1,9,5.98,1|0|-5.978|0|599620,core,single,false
+nadar,Voy a nadar una vez a la semana.,Voy a nadar una vez a la semana.,I go swimming once a week.,966298,Shishir,429104,0,tts,,0,8,6.28,0|0|-6.284|0|966298,core,single,false
+nadar,Vi a la chica que nadaba en el río.,Vi a la chica que nadaba en el río.,I saw the girl swimming in the river.,1068433,Shishir,254490,0,tts,,0,9,6.12,0|0|-6.123|0|1068433,core,single,false
+volar,Quiero volar por encima de las nubes.,Quiero volar por encima de las nubes.,I want to fly above the clouds.,491500,Shishir,256154,0,tts,,0,7,5.89,0|0|-5.886|0|491500,core,single,false
+volar,Los pájaros se fueron volando hacia el sur.,Los pájaros se fueron volando hacia el sur.,The birds flew to the south.,879072,inmachan,278211,0,tts,,0,8,5.77,0|0|-5.766|0|879072,core,single,false
+caminar,No puede caminar más.,No puede caminar más.,He can't walk any more.,5036541,don_ramon,289990,0,tts,,0,4,6.11,0|0|-6.112|1|5036541,core,single,false
+caminar,"Me gusta caminar, especialmente a la mañana.","Me gusta caminar, especialmente a la mañana.","I like walking, especially in the morning.",1138986,nancy,257886,0,tts,,0,7,6.03,0|0|-6.031|0|1138986,core,single,false
+venir,Todo lo que sé es que él viene de China.,Todo lo que sé es que él viene de China.,All I know is that he came from China.,841971,Shishir,251425,0,tts,,0,10,6.46,0|0|-6.465|1|841971,core,single,false
+venir,"Por lo que yo sé, él no va a venir.","Por lo que yo sé, él no va a venir.","To the best of my knowledge, he will not come.",1968795,Shishir,251466,0,tts,,0,10,6.42,0|0|-6.422|1|1968795,core,single,false
+acostarse,Creo que me voy a acostar ahora mismo.,Creo que me voy a acostar ahora mismo.,I think I'm going to lie down right now.,13692801,Seael,13900934,0,tts,,1,8,6.04,1|1|-6.036|0|13692801,core,single,false
+acostarse,Me acosté no tanto para dormir como para pensar.,Me acosté no tanto para dormir como para pensar.,I lay down not so much to sleep as to think.,720059,darinmex,322737,0,tts,,1,9,5.94,1|1|-5.942|0|720059,core,single,false
+sentarse,¿Le gustaría sentarse en otro lugar?,¿Le gustaría sentarse en otro lugar?,Do you want to sit somewhere else?,3562082,ficion,3223105,0,tts,,0,6,5.75,0|0|-5.750|0|3562082,core,single,false
+sentarse,No puede sentarse conmigo.,No puede sentarse conmigo.,You can't sit with me.,4968032,Shishir,4967237,0,tts,,0,4,5.58,0|0|-5.580|1|4968032,core,single,false
+estar de pie,No puedo estar de pie.,No puedo estar de pie.,I can't stand.,4589153,Francisco_M,1954908,0,tts,,0,5,6.25,0|0|-6.246|0|4589153,core,single,false
+estar de pie,Él estaba de pie.,Él estaba de pie.,He was standing.,2508368,marcelostockle,499548,0,tts,,0,4,6.06,0|0|-6.062|1|2508368,core,single,false
+girar,El camino gira a la izquierda allí.,El camino gira a la izquierda allí.,The road turns left there.,866185,jorgearestrepo,44684,0,tts,,0,7,6.05,0|0|-6.049|0|866185,core,single,false
+girar,¿Qué hace girar a la Tierra?,¿Qué hace girar a la Tierra?,What makes Earth turn?,1965497,marcelostockle,12820564,0,tts,,0,6,6.05,0|1|-6.047|0|1965497,core,single,false
+caer,No me voy a caer.,No me voy a caer.,I'm not going to fall.,7308202,arh,8160931,0,tts,,0,5,6.33,0|0|-6.332|0|7308202,core,single,false
+caer,El niño se cayó.,El niño se cayó.,The child fell.,7308215,arh,8108650,0,tts,,0,4,6.03,0|0|-6.032|1|7308215,core,single,false
+dar,Se la di a ella.,Se la di a ella.,I gave it to her.,7842072,arh,3874524,0,tts,,0,5,6.54,0|0|-6.542|0|7842072,core,single,false
+dar,En un momento te la doy.,En un momento te la doy.,I'll give it to you in a minute.,7154366,arh,9524983,0,tts,,0,6,6.51,0|0|-6.508|0|7154366,core,single,false
+sostener,El hombre sostuvo que él no había tomado el dinero.,El hombre sostuvo que él no había tomado el dinero.,The man claimed he didn't take the money.,1313024,marcelostockle,680517,0,tts,,0,10,6.09,0|1|-6.090|1|1313024,core,single,false
+sostener,¿Quién es esa mujer que sostiene las flores?,¿Quién es esa mujer que sostiene las flores?,Who is that woman holding the flowers?,1363601,marcelostockle,289634,0,tts,,0,8,5.93,0|1|-5.931|0|1363601,core,single,false
+apretar,Ella apretó mi mano.,Ella apretó mi mano.,She squeezed my hand.,2585375,marcelostockle,11346484,0,tts,,0,4,5.16,0|1|-5.160|1|2585375,core,single,false
+apretar,Todo lo que tienes que hacer es apretar el botón.,Todo lo que tienes que hacer es apretar el botón.,All you have to do is press the button.,1066928,alexmarcelo,69766,0,tts,,1,10,6.21,1|1|-6.211|1|1066928,core,single,false
+frotar,Ella se frotó los ojos.,Ella se frotó los ojos.,She rubbed her eyes.,3768362,cueyayotl,317196,0,tts,,0,5,5.50,0|0|-5.498|0|3768362,core,single,false
+frotar,Él se frotó las manos.,Él se frotó las manos.,He rubbed his hands together.,1714494,teskmon,304709,0,tts,,0,5,5.45,0|0|-5.454|0|1714494,core,single,false
+lavar,¡Una mano lava a la otra!,¡Una mano lava a la otra!,One hand washes the other.,1237381,Shishir,453127,0,tts,,0,6,6.16,0|0|-6.163|0|1237381,core,single,false
+lavar,Me voy a lavar la cara.,Me voy a lavar la cara.,I’m going to wash my face.,10016347,Shishir,10016671,0,tts,,0,6,6.11,0|0|-6.110|0|10016347,core,single,false
+limpiar,Se limpió las manos con un pañuelo.,Se limpió las manos con un pañuelo.,He wiped his hands on a handkerchief.,877064,ildefonk,292452,0,tts,,1,7,5.73,1|0|-5.733|0|877064,core,single,false
+limpiar,Él limpió las lágrimas de ella.,Él limpió las lágrimas de ella.,He wiped her tears away.,11056188,DJ_Saidez,2346032,0,tts,,1,6,5.61,1|1|-5.610|0|11056188,core,single,false
+tirar de,Él tiró de la cuerda.,Él tiró de la cuerda.,He pulled the rope.,1502178,marcelostockle,293363,0,tts,,0,5,5.84,0|1|-5.838|0|1502178,core,single,false
+tirar de,Ella tiró de la puerta para abrirla.,Ella tiró de la puerta para abrirla.,She pulled the door open.,4468909,mervert1,311668,0,tts,,1,7,5.73,1|1|-5.726|0|4468909,core,pair,false
+empujar,Él me empujó al pasar.,Él me empujó al pasar.,He pushed past me.,6859579,albrusgher,298096,0,tts,,0,5,5.59,0|1|-5.590|0|6859579,core,single,false
+empujar,Ella le empujó por la ventana.,Ella le empujó por la ventana.,She pushed him out the window.,1100767,Shishir,887348,0,tts,,1,6,5.78,1|0|-5.783|0|1100767,core,single,false
+lanzar,El niño le lanzó una piedra al perro.,El niño le lanzó una piedra al perro.,The child threw a stone at the dog.,399575,catakaoe,245952,0,tts,,0,8,5.83,0|0|-5.834|0|399575,core,single,false
+lanzar,¿Quién le lanzó una piedra a mi perro?,¿Quién le lanzó una piedra a mi perro?,Who threw a stone at my dog?,1420650,jolugaju,276332,0,tts,,0,8,5.82,0|1|-5.817|0|1420650,core,single,false
+atar,Le ataron las manos con una cuerda.,Le ataron las manos con una cuerda.,They tied his hands with a rope.,6566802,arh,9814517,0,tts,,0,7,5.64,0|0|-5.637|0|6566802,core,single,false
+atar,Ella le ató a la silla.,Ella le ató a la silla.,She tied him to the chair.,1330633,Shishir,887441,0,tts,,1,6,5.71,1|0|-5.715|0|1330633,core,single,false
+coser,Ella puede coser muy bien.,Ella puede coser muy bien.,She can sew very well.,5906014,albrusgher,313794,0,tts,,0,5,5.53,0|0|-5.528|0|5906014,core,single,false
+coser,Ella sabe coser muy bien.,Ella sabe coser muy bien.,She can sew very well.,1656985,marcelostockle,313794,0,tts,,0,5,5.38,0|0|-5.380|0|1656985,core,single,false
+contar,Podemos contar con la ayuda de ella.,Podemos contar con la ayuda de ella.,We can depend on her to help us.,1638195,teskmon,387563,0,tts,,0,7,6.26,0|0|-6.259|0|1638195,core,single,false
+contar,No puedes contar con su ayuda.,No puedes contar con su ayuda.,You can't count on their help.,704319,Shishir,68064,0,tts,,0,6,6.09,0|0|-6.092|0|704319,core,single,false
+decir,Te tengo que decir que no.,Te tengo que decir que no.,I must say no to you.,709619,Shishir,252743,0,tts,,0,6,6.73,0|0|-6.735|0|709619,core,single,false
+decir,He dicho que no me gusta y es que no.,He dicho que no me gusta y es que no.,"I said I don't like it, and that's final.",855723,Kokoo,1289913,0,tts,,0,10,6.72,0|0|-6.718|1|855723,core,single,false
+cantar,No tiene para qué cantar.,No tiene para qué cantar.,You don't have to sing.,2471905,marcelostockle,2283655,0,tts,,0,5,6.16,0|0|-6.158|0|2471905,core,single,false
+cantar,¿Qué pasa con mi forma de cantar?,¿Qué pasa con mi forma de cantar?,What's wrong with the way I sing?,8416869,arh,5849309,0,tts,,0,7,6.15,0|0|-6.146|0|8416869,core,single,false
+jugar,No juego a las cartas.,No juego a las cartas.,I don't play cards.,2154800,hayastan,2050556,0,tts,,0,5,6.31,0|0|-6.308|0|2154800,core,single,false
+jugar,No tiene tiempo para jugar a las cartas.,No tiene tiempo para jugar a las cartas.,He doesn't have the time to play cards.,963059,hundo,292205,0,tts,,0,8,6.28,0|0|-6.281|0|963059,core,single,false
+flotar,¿Por qué el hielo flota?,¿Por qué el hielo flota?,Why does ice float?,5275073,Omnivoro,5275040,0,tts,,0,5,5.85,0|0|-5.846|0|5275073,core,single,false
+flotar,Él fue el primer hombre en flotar en el espacio.,Él fue el primer hombre en flotar en el espacio.,He was the first man to float in space.,3109019,marcelostockle,293861,0,tts,,0,10,6.12,0|1|-6.123|1|3109019,core,single,false
+fluir,El río fluye a través de la ciudad.,El río fluye a través de la ciudad.,The river flows through the town.,775304,ekvintroj,45754,0,tts,,0,8,6.25,0|1|-6.254|0|775304,core,single,false
+fluir,Los ríos dejaron de fluir.,Los ríos dejaron de fluir.,The rivers stopped flowing.,11012055,carlosalberto,11012053,0,tts,,0,5,5.47,0|1|-5.470|0|11012055,core,single,false
+congelar,Cuando el agua se congela se vuelve hielo.,Cuando el agua se congela se vuelve hielo.,When water freezes it becomes ice.,1361285,marcelostockle,681016,0,tts,,0,8,5.73,0|1|-5.728|0|1361285,core,single,false
+congelar,No estoy congelando tu comida.,No estoy congelando tu comida.,I'm not freezing your food.,13678731,mervert1,2847774,0,tts,,0,5,5.41,0|1|-5.406|0|13678731,core,single,false
+hincharse,Se le han hinchado los pies.,Se le han hinchado los pies.,His feet have swelled up.,8308821,arh,9483509,0,tts,,1,6,5.76,1|0|-5.757|0|8308821,core,single,false
+hincharse,El ojo se me ha hinchado.,El ojo se me ha hinchado.,My eye has swollen up.,750054,darinmex,642489,0,tts,,1,6,5.92,1|1|-5.917|0|750054,core,single,false
+sol,El sol no se pone por el este.,El sol no se pone por el este.,The sun doesn't set in the East.,7038058,arh,10006697,0,tts,,0,8,6.58,0|0|-6.580|0|7038058,core,single,false
+sol,El Sol está muy lejos de la Tierra.,El Sol está muy lejos de la Tierra.,The Sun is very far from the Earth.,360400,tatoerique,1263634,0,tts,,0,8,6.35,0|0|-6.346|0|360400,core,single,false
+luna,No hay gente en la luna.,No hay gente en la luna.,There are no people on the moon.,8630163,cueyayotl,7924218,0,tts,,0,6,6.52,0|0|-6.515|0|8630163,core,single,false
+luna,La luna no es una estrella.,La luna no es una estrella.,The moon isn't a star.,9998950,Shishir,9014451,0,tts,,0,6,6.36,0|0|-6.357|0|9998950,core,single,false
+estrella,Por la noche se pueden ver las estrellas.,Por la noche se pueden ver las estrellas.,Stars can be seen at night.,708454,Shishir,271531,0,tts,,0,8,6.31,0|0|-6.312|0|708454,core,single,false
+estrella,Hay miles de millones de estrellas en el cielo.,Hay miles de millones de estrellas en el cielo.,There are billions of stars in the sky.,761487,Shishir,18320,0,tts,,0,9,6.31,0|0|-6.310|0|761487,core,single,false
+agua,El agua es importante para las personas.,El agua es importante para las personas.,Water is important for people.,721973,EugeneGS,541286,0,tts,,0,7,6.46,0|0|-6.456|0|721973,core,single,false
+agua,Quiero un poco más de agua.,Quiero un poco más de agua.,I'd like some more water.,2194789,Shishir,270772,0,tts,,0,6,6.43,0|0|-6.435|0|2194789,core,single,false
+lluvia,Llegó a tiempo a pesar de la lluvia.,Llegó a tiempo a pesar de la lluvia.,He arrived on time in spite of the rain.,741911,ventana,293865,0,tts,,0,8,6.37,0|0|-6.372|0|741911,core,single,false
+lluvia,Me gusta la lluvia cuando estoy en casa.,Me gusta la lluvia cuando estoy en casa.,I like the rain when I am in my house.,5322702,Shishir,5324863,0,tts,,0,8,6.22,0|0|-6.219|0|5322702,core,single,false
+río,¿La escuela está de este lado del río?,¿La escuela está de este lado del río?,Is the school on this side of the river?,2150780,hayastan,21513,0,tts,,0,8,6.36,0|0|-6.357|0|2150780,core,single,false
+río,¿Cuál es el nombre de ese río?,¿Cuál es el nombre de ese río?,What is the name of that river?,881541,Shishir,67083,0,tts,,0,7,6.27,0|0|-6.274|0|881541,core,single,false
+lago,Hay un lago en frente de mi casa.,Hay un lago en frente de mi casa.,There is a lake in front of my house.,1130946,Shishir,250508,0,tts,,0,8,6.33,0|0|-6.331|0|1130946,core,single,false
+lago,Hay un lago al este del pueblo.,Hay un lago al este del pueblo.,There is a lake on the east of the village.,556549,Shishir,274572,0,tts,,0,7,6.20,0|0|-6.201|0|556549,core,single,false
+mar,¿No están en el mar durante la noche?,¿No están en el mar durante la noche?,Aren’t they on the sea during the night?,853967,japegon,851991,0,tts,,0,8,6.50,0|0|-6.498|0|853967,core,single,false
+mar,A su derecha pueden ver el mar.,A su derecha pueden ver el mar.,"If you look to your right, you'll see the sea.",2303208,Shishir,10501711,0,tts,,0,7,6.18,0|0|-6.183|0|2303208,core,single,false
+sal,A veces le pongo un poco de sal.,A veces le pongo un poco de sal.,I sometimes put a little salt in it.,1601056,teskmon,255192,0,tts,,0,8,6.16,0|0|-6.155|0|1601056,core,single,false
+sal,"Pasa la sal, por favor.","Pasa la sal, por favor.","Pass the salt, please.",1753994,Shishir,745314,0,tts,,0,5,6.03,0|0|-6.026|0|1753994,core,single,false
+piedra,Las calles de la ciudad son todas de piedra.,Las calles de la ciudad son todas de piedra.,The city streets are all paved with stones.,2935341,hayastan,9795545,0,tts,,0,9,6.40,0|0|-6.396|0|2935341,core,single,false
+piedra,El niño tira una piedra.,El niño tira una piedra.,The boy throws a stone.,589028,Shishir,2805562,0,tts,,0,5,5.72,0|0|-5.720|0|589028,core,single,false
+arena,Tengo arena en el ojo.,Tengo arena en el ojo.,I got some sand in my eye.,865338,Rafp,323745,0,tts,,0,5,6.03,0|0|-6.030|0|865338,core,single,false
+arena,Yo odio la arena.,Yo odio la arena.,I hate sand.,3365769,gianich73,1923379,0,tts,,0,4,5.84,0|0|-5.842|1|3365769,core,single,false
+polvo,La casa está llena de polvo.,La casa está llena de polvo.,The house is full of dust.,7558513,arh,11716507,0,tts,,0,6,6.09,0|0|-6.087|0|7558513,core,single,false
+polvo,Tengo polvo en los ojos.,Tengo polvo en los ojos.,I've got some dust in my eyes.,3216188,marcelostockle,3010136,0,tts,,0,5,6.05,0|1|-6.050|0|3216188,core,single,false
+tierra,Yo era el hombre más feliz de la Tierra.,Yo era el hombre más feliz de la Tierra.,I was the happiest man on earth.,1276866,Shishir,253676,0,tts,,0,9,6.43,0|0|-6.428|0|1276866,core,single,false
+tierra,Un día me gustaría ver la Tierra desde el espacio.,Un día me gustaría ver la Tierra desde el espacio.,I'd like to see the earth from space one day.,2707614,caiser,2707464,0,tts,,0,10,6.22,0|0|-6.224|1|2707614,core,single,false
+nube,No había una nube en el cielo.,No había una nube en el cielo.,There wasn't a cloud in the sky.,1604986,teskmon,18309,0,tts,,0,7,6.27,0|0|-6.266|0|1604986,core,single,false
+nube,No hay nubes en el cielo.,No hay nubes en el cielo.,There is no cloud in the sky.,959908,hundo,1170679,0,tts,,0,6,6.24,0|0|-6.240|0|959908,core,single,false
+niebla,Nos perdimos en la niebla.,Nos perdimos en la niebla.,We got lost in the fog.,2230019,hayastan,249403,0,tts,,0,5,5.77,0|0|-5.772|0|2230019,core,single,false
+niebla,Sólo podíamos ver la niebla.,Sólo podíamos ver la niebla.,We could see nothing but fog.,473498,Shishir,322861,0,tts,,0,5,5.42,0|0|-5.418|0|473498,core,single,false
+cielo,No se veía ni una sola estrella en el cielo.,No se veía ni una sola estrella en el cielo.,Not a single star could be seen in the sky.,728866,Shishir,453420,0,tts,,0,10,6.13,0|0|-6.128|1|728866,core,single,false
+cielo,No se podía ver ninguna estrella en el cielo.,No se podía ver ninguna estrella en el cielo.,Not a single star could be seen in the sky.,1004764,Shishir,453420,0,tts,,0,9,6.12,0|0|-6.118|0|1004764,core,single,false
+viento,Hay un poco de viento.,Hay un poco de viento.,There's a little wind.,6610537,UsuarioX,2764490,0,tts,,0,5,6.32,0|0|-6.318|0|6610537,core,single,false
+viento,¿A que hoy hace viento?,¿A que hoy hace viento?,"It's windy today, isn't it?",2715075,Shishir,2713291,0,tts,,0,5,6.26,0|0|-6.262|0|2715075,core,single,false
+nieve,A todo el mundo le gusta la nieve.,A todo el mundo le gusta la nieve.,Everyone likes snow.,9703934,arh,9735049,0,tts,,0,8,6.36,0|0|-6.360|0|9703934,core,single,false
+nieve,"Para que nieve, tiene que hacer frío.","Para que nieve, tiene que hacer frío.",It has to get cold for it to snow.,6592076,arh,9524901,0,tts,,0,7,6.18,0|0|-6.181|0|6592076,core,single,false
+hielo,Es tan frío como el hielo.,Es tan frío como el hielo.,It's as cold as ice.,948559,hayastan,442090,0,tts,,0,6,6.04,0|0|-6.043|0|948559,core,single,false
+hielo,El hielo es muy frío.,El hielo es muy frío.,Ice is very cold.,10502257,DJ_Saidez,5248271,0,tts,,0,5,5.96,0|0|-5.958|0|10502257,core,single,false
+humo,No hay humo sin fuego.,No hay humo sin fuego.,There is no smoke without fire.,1599015,naikodemus,23884,0,tts,,0,5,5.81,0|0|-5.810|0|1599015,core,single,false
+humo,No puedo ver por el humo.,No puedo ver por el humo.,I can't see because of the smoke.,11383402,carlosalberto,11383392,0,tts,,0,6,6.26,0|1|-6.263|0|11383402,core,single,false
+fuego,El hombre es el único animal que usa el fuego.,El hombre es el único animal que usa el fuego.,Man is the only fire-using animal.,357304,tatoerique,471887,0,tts,,0,10,6.24,0|0|-6.244|1|357304,core,single,false
+fuego,A los animales les da miedo el fuego.,A los animales les da miedo el fuego.,Animals are afraid of fire.,532618,Shishir,280244,0,tts,,0,8,6.08,0|0|-6.077|0|532618,core,single,false
+ceniza,Sus cenizas están enterradas aquí.,Sus cenizas están enterradas aquí.,His ashes are buried here.,1127241,Shishir,285531,0,tts,,1,5,5.01,1|0|-5.008|0|1127241,core,single,false
+ceniza,El incendio redujo a cenizas todo el pueblo.,El incendio redujo a cenizas todo el pueblo.,The fire reduced the whole village to ashes.,356125,tatoerique,60081,0,tts,,2,8,5.78,2|1|-5.782|0|356125,core,single,false
+quemar,Algo se está quemando.,Algo se está quemando.,Something's burning.,2152509,hayastan,2111532,0,tts,,0,4,5.74,0|0|-5.740|1|2152509,core,single,false
+quemar,Las casas se están quemando.,Las casas se están quemando.,The houses are burning.,1701727,marcelostockle,1700577,0,tts,,0,5,5.71,0|0|-5.712|0|1701727,core,single,false
+camino,El camino es largo.,El camino es largo.,The road is long.,1355621,marcelostockle,370546,0,tts,,0,4,6.26,0|0|-6.263|1|1355621,core,single,false
+camino,Este camino no es muy seguro.,Este camino no es muy seguro.,This road isn't very safe.,1287202,Shishir,886276,0,tts,,0,6,6.24,0|0|-6.238|0|1287202,core,single,false
+montaña,No ha vuelto de la montaña.,No ha vuelto de la montaña.,He isn't back from the mountain.,1057684,Shishir,292852,0,tts,,0,6,6.34,0|0|-6.340|0|1057684,core,single,false
+montaña,Estaba en la montaña.,Estaba en la montaña.,I was on the mountain.,2163011,Shishir,757390,0,tts,,0,4,6.33,0|0|-6.325|1|2163011,core,single,false
+rojo,"Una es roja, y la otra es blanca.","Una es roja, y la otra es blanca.",One is red and the other is white.,1683861,marcelostockle,27206,0,tts,,0,8,6.41,0|0|-6.411|0|1683861,core,single,false
+rojo,Uno es rojo y el otro es blanco.,Uno es rojo y el otro es blanco.,One is red and the other is white.,940089,Shishir,27206,0,tts,,0,8,6.34,0|0|-6.336|0|940089,core,single,false
+verde,Los verdes están en contra de todo.,Los verdes están en contra de todo.,The Greens are against everything.,1237292,Shishir,2057003,0,tts,,0,7,6.41,0|0|-6.407|0|1237292,core,single,false
+verde,Él está todavía un poco verde en el trabajo.,Él está todavía un poco verde en el trabajo.,He is still green at the job.,963061,hundo,290820,0,tts,,0,9,6.20,0|0|-6.202|0|963061,core,single,false
+amarillo,La puerta de la oficina es amarilla.,La puerta de la oficina es amarilla.,The door of the office is yellow.,1664837,hayastan,397029,0,tts,,0,7,6.30,0|0|-6.303|0|1664837,core,single,false
+amarillo,¿Por qué tienes los ojos amarillos?,¿Por qué tienes los ojos amarillos?,Why do you have yellow eyes?,6795843,arh,13793935,0,tts,,0,6,5.79,0|0|-5.795|0|6795843,core,single,false
+blanco,La imagen está en blanco y negro.,La imagen está en blanco y negro.,The picture is in black and white.,1784882,Shishir,1640955,0,tts,,0,7,6.29,0|0|-6.294|0|1784882,core,single,false
+blanco,¿Por qué es blanca la nieve?,¿Por qué es blanca la nieve?,Why is snow white?,994772,hundo,749959,0,tts,,0,6,6.16,0|0|-6.155|0|994772,core,single,false
+negro,La flor no es negra.,La flor no es negra.,The flower isn't black.,2199624,Shishir,7492878,0,tts,,0,5,6.18,0|0|-6.184|0|2199624,core,single,false
+negro,El negro te queda bien.,El negro te queda bien.,Black suits you.,1143550,Shishir,3140021,0,tts,,0,5,6.09,0|0|-6.092|0|1143550,core,single,false
+noche,No trabajo por la noche.,No trabajo por la noche.,I don't work at night.,7586084,arh,6532187,0,tts,,0,5,6.62,0|0|-6.624|0|7586084,core,single,false
+noche,Son tan diferentes como el día y la noche.,Son tan diferentes como el día y la noche.,They are as different as day and night.,776393,Shishir,238795,0,tts,,0,9,6.47,0|0|-6.466|0|776393,core,single,false
+día,El domingo es el último día de la semana.,El domingo es el último día de la semana.,Sunday is the last day of the week.,853848,opor,281873,0,tts,,0,9,6.57,0|0|-6.567|0|853848,core,single,false
+día,No tengo todo el día.,No tengo todo el día.,I haven't got all day.,2067037,Shishir,1934897,0,tts,,0,5,6.57,0|0|-6.566|0|2067037,core,single,false
+año,Es el final del año.,Es el final del año.,It's the end of the year.,5714202,arh,5697129,0,tts,,0,5,6.57,0|0|-6.572|0|5714202,core,single,false
+año,Es fin de año.,Es fin de año.,It's the end of the year.,5714200,arh,5697129,0,tts,,0,4,6.56,0|0|-6.565|1|5714200,core,single,false
+cálido,"Ahora que el tiempo es cálido, puedo salir fuera.","Ahora que el tiempo es cálido, puedo salir fuera.","Now that the weather is warmer, I can go outdoors.",656076,MondCivitano,31199,0,tts,,0,9,6.04,0|0|-6.040|0|656076,core,single,false
+cálido,"Era un día cálido, así que fuimos a nadar.","Era un día cálido, así que fuimos a nadar.","It was a warm day, so we went swimming.",2185128,Shishir,682358,0,tts,,0,9,5.80,0|0|-5.800|0|2185128,core,single,false
+frío,No me importa si hace un poco de frío.,No me importa si hace un poco de frío.,I don't care if it's a bit cold.,1322447,Shishir,1075746,0,tts,,0,9,6.34,0|0|-6.342|0|1322447,core,single,false
+frío,Aquí el tiempo es frío todo el año.,Aquí el tiempo es frío todo el año.,The weather is cold all year here.,853672,japegon,852896,0,tts,,0,8,6.32,0|0|-6.321|0|853672,core,single,false
+lleno,El mundo está lleno de problemas.,El mundo está lleno de problemas.,The world is full of problems.,5026065,don_ramon,4695566,0,tts,,0,6,6.27,0|0|-6.270|0|5026065,core,single,false
+lleno,El campo está lleno de gente.,El campo está lleno de gente.,The field is full of people.,8331654,arh,13213026,0,tts,,0,6,6.23,0|0|-6.230|0|8331654,core,single,false
+nuevo,Es nuevo en la ciudad.,Es nuevo en la ciudad.,He's new in town.,2294375,Shishir,1699197,0,tts,,0,5,6.70,0|0|-6.700|0|2294375,core,single,false
+nuevo,¿Qué hay de nuevo?,¿Qué hay de nuevo?,What's new?,795930,Shishir,25029,0,tts,,0,4,6.48,0|0|-6.485|1|795930,core,single,false
+viejo,Él es mucho más viejo de lo que parece.,Él es mucho más viejo de lo que parece.,He is much older than he looks.,1237567,hayastan,296008,0,tts,,0,9,6.48,0|0|-6.478|0|1237567,core,single,false
+viejo,Uno es nuevo y el otro es viejo.,Uno es nuevo y el otro es viejo.,"One is new, the other is old.",775700,chinopinyin,1490285,0,tts,,0,8,6.45,0|0|-6.445|0|775700,core,single,false
+bueno,Esto no es bueno.,Esto no es bueno.,This is no good.,4329300,pchamorro,3363714,0,tts,,0,4,6.48,0|0|-6.482|1|4329300,core,single,false
+bueno,No es algo bueno.,No es algo bueno.,That's not a good thing.,5022421,don_ramon,5021786,0,tts,,0,4,6.47,0|0|-6.468|1|5022421,core,single,false
+malo,"El tiempo es malo, ¿no?","El tiempo es malo, ¿no?","The weather's bad, isn't it?",5854047,arh,1167498,0,tts,,0,5,6.53,0|0|-6.526|0|5854047,core,single,false
+malo,No somos los malos de la película.,No somos los malos de la película.,We're not the bad guys.,5021511,don_ramon,5020114,0,tts,,0,7,6.41,0|0|-6.410|0|5021511,core,single,false
+podrido,El sistema está podrido.,El sistema está podrido.,The system is rotten.,1686566,Shishir,1669872,0,tts,,0,4,5.71,0|0|-5.710|1|1686566,core,single,false
+podrido,Algo me huele a podrido.,Algo me huele a podrido.,I smell something rotten.,1267832,arashi_29,25034,0,tts,,0,5,5.55,0|0|-5.550|0|1267832,core,single,false
+sucio,"Quieres que yo te haga el trabajo sucio, ¿verdad?","Quieres que yo te haga el trabajo sucio, ¿verdad?","You want me to do your dirty work for you, don't you?",2050326,Shishir,2034600,0,tts,,0,9,5.98,0|0|-5.979|0|2050326,core,single,false
+sucio,El agua está sucia.,El agua está sucia.,The water is dirty.,12766521,Shishir,10064018,0,tts,,0,4,5.80,0|0|-5.803|1|12766521,core,single,false
+recto,Sigue recto esta calle.,Sigue recto esta calle.,Go straight along this street.,5935444,albrusgher,57614,0,tts,,0,4,5.21,0|0|-5.205|1|5935444,core,single,false
+recto,El árbol está recto.,El árbol está recto.,The tree is straight.,2002633,bichodebola,2002550,0,tts,,0,4,5.51,0|1|-5.515|1|2002633,core,single,false
+redondo,Él tiene la cara redonda.,Él tiene la cara redonda.,He has a round face.,1250894,Shishir,530046,0,tts,,0,5,5.73,0|0|-5.726|0|1250894,core,single,false
+redondo,Mi cabeza es redonda.,Mi cabeza es redonda.,My head is round.,6797758,arh,9706129,0,tts,,0,4,5.67,0|0|-5.670|1|6797758,core,single,false
+afilado,La hoja estaba muy afilada.,La hoja estaba muy afilada.,The blade was very sharp.,2267968,cueyayotl,2267967,0,tts,,0,5,5.37,0|1|-5.374|0|2267968,core,single,false
+afilado,Tiene una lengua afilada.,Tiene una lengua afilada.,He has a sharp tongue.,4762580,DarkHollow,71995,0,tts,,0,4,5.25,0|1|-5.255|1|4762580,core,single,false
+romo,El cuchillo está romo.,El cuchillo está romo.,The knife is dull.,4997976,cueyayotl,1487659,0,tts,,1,4,5.27,1|0|-5.270|1|4997976,core,single,false
+liso,Esta tela es bastante lisa y sedosa.,Esta tela es bastante lisa y sedosa.,This cloth is really smooth and silky.,1170647,darinmex,491839,0,tts,,2,7,5.24,2|1|-5.243|0|1170647,core,single,false
+mojado,La calle está aún mojada.,La calle está aún mojada.,The street is still wet.,7282922,arh,9457333,0,tts,,0,5,5.60,0|0|-5.598|0|7282922,core,single,false
+mojado,Estoy frío y mojado.,Estoy frío y mojado.,I'm cold and wet.,2099806,marcelostockle,256712,0,tts,,0,4,5.45,0|0|-5.445|1|2099806,core,single,false
+seco,El río está seco.,El río está seco.,The river is dry.,7128727,arh,11038749,0,tts,,0,4,5.76,0|0|-5.763|1|7128727,core,single,false
+seco,Todavía no está seco.,Todavía no está seco.,It's not dry yet.,7778557,arh,6584732,0,tts,,0,4,5.76,0|0|-5.758|1|7778557,core,single,false
+correcto,Todo lo que dice es correcto.,Todo lo que dice es correcto.,Everything he says is correct.,2186801,Shishir,1802101,0,tts,,0,6,6.37,0|0|-6.370|0|2186801,core,single,false
+correcto,Sé lo que es correcto.,Sé lo que es correcto.,I know what's right.,2232649,Shishir,1887514,0,tts,,0,5,6.33,0|0|-6.326|0|2232649,core,single,false
+cerca,¿Qué ciudad es la que está más cerca de Barcelona?,¿Qué ciudad es la que está más cerca de Barcelona?,Which city is the one closest to Barcelona?,5321384,Shishir,5324891,0,tts,,0,10,6.49,0|0|-6.492|1|5321384,core,single,false
+cerca,Mi casa está cerca de la escuela.,Mi casa está cerca de la escuela.,My house is near the school.,1436776,Ankio,1937619,0,tts,,0,7,6.35,0|0|-6.346|0|1436776,core,single,false
+lejos,No está lejos de aquí.,No está lejos de aquí.,It's not far from here.,527181,Shishir,528718,0,tts,,0,5,6.40,0|0|-6.402|0|527181,core,single,false
+lejos,¿Es muy lejos de aquí?,¿Es muy lejos de aquí?,Is it very far from here?,2267344,cueyayotl,2267343,0,tts,,0,5,6.37,0|0|-6.372|0|2267344,core,single,false
+derecha,"Tú vas a la izquierda, yo voy a la derecha.","Tú vas a la izquierda, yo voy a la derecha.","You go to the left, I go to the right.",8948529,carlosalberto,8948388,0,tts,,0,10,6.26,0|0|-6.261|1|8948529,core,single,false
+derecha,"Sí, es aquí a la derecha.","Sí, es aquí a la derecha.","Yes, it's here to the right.",1427805,marcelostockle,403091,0,tts,,0,6,6.40,0|1|-6.398|0|1427805,core,single,false
+izquierda,Está a la izquierda.,Está a la izquierda.,It's on the left.,2781395,nancy,2780776,0,tts,,0,4,6.53,0|0|-6.527|1|2781395,core,single,false
+izquierda,Es allí a la izquierda.,Es allí a la izquierda.,It's there to the left.,1339939,Shishir,403079,0,tts,,0,5,6.43,0|0|-6.434|0|1339939,core,single,false
+a,Quiero estar a la cabeza de la compañía.,Quiero estar a la cabeza de la compañía.,I want to be at the top of the company.,2526667,teskmon,256574,0,tts,,0,8,6.53,0|0|-6.531|0|2526667,core,single,false
+a,Está a su lado.,Está a su lado.,He's at her side.,743378,chinopinyin,712993,0,tts,,0,4,6.47,0|0|-6.473|1|743378,core,single,false
+en,Es el único en el mundo.,Es el único en el mundo.,It's the only one in the world.,2668237,Shishir,2662181,0,tts,,0,6,6.77,0|0|-6.770|0|2668237,core,single,false
+en,Te quiero más que a nada en el mundo.,Te quiero más que a nada en el mundo.,I love you more than anything in the world.,2716288,Shishir,2712645,0,tts,,0,9,6.74,0|0|-6.737|0|2716288,core,single,false
+con,No estoy de acuerdo con eso.,No estoy de acuerdo con eso.,I disagree with that.,3052971,marcelostockle,2093305,0,tts,,0,6,6.60,0|0|-6.598|0|3052971,core,single,false
+con,No está de acuerdo con su familia.,No está de acuerdo con su familia.,He disagrees with his relatives.,1919433,Shishir,300072,0,tts,,0,7,6.58,0|0|-6.583|0|1919433,core,single,false
+y,Todo vale en el amor y en la guerra.,Todo vale en el amor y en la guerra.,All's fair in love and war.,347329,tatoerique,326268,0,tts,,0,9,6.64,0|0|-6.638|0|347329,core,single,false
+y,No fue la primera vez y no será la última.,No fue la primera vez y no será la última.,It wasn't the first time and it won't be the last.,1876012,hayastan,1875998,0,tts,,0,10,6.56,0|0|-6.559|1|1876012,core,single,false
+si,No sé si la historia es verdad o no.,No sé si la historia es verdad o no.,I don't know whether the story is true or not.,1275963,Shishir,43310,0,tts,,0,9,6.54,0|0|-6.538|0|1275963,core,single,false
+si,No tiene que hablar de ello si no quiere.,No tiene que hablar de ello si no quiere.,You don't have to talk about it if you don't want to.,2138095,Shishir,2034598,0,tts,,0,9,6.52,0|0|-6.522|0|2138095,core,single,false
+porque,Lo hago porque no tengo nada mejor que hacer.,Lo hago porque no tengo nada mejor que hacer.,I'm only doing this because I have nothing better to do.,6803784,arh,6803650,0,tts,,0,9,6.30,0|0|-6.302|0|6803784,core,single,false
+porque,Lo hice porque no tenía nada mejor que hacer.,Lo hice porque no tenía nada mejor que hacer.,I only did that because I had nothing better to do.,6803783,arh,6803651,0,tts,,0,9,6.25,0|0|-6.247|0|6803783,core,single,false
+nombre,Su nombre no estaba en la lista.,Su nombre no estaba en la lista.,Her name wasn't on the list.,1702624,marcelostockle,29695,0,tts,,0,7,6.51,0|0|-6.513|0|1702624,core,single,false
+nombre,Tu nombre es el primero en la lista.,Tu nombre es el primero en la lista.,Your name is first on the list.,1113406,AgentGreen,453147,0,tts,,0,8,6.50,0|0|-6.501|0|1113406,core,single,false
