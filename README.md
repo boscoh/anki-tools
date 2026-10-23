@@ -633,13 +633,15 @@ from anki_tools import (
 uv run pytest tests/ -v
 
 # Run specific test file
-uv run pytest tests/test_card_deletion.py -v
+uv run pytest tests/test_apkg_package.py -v
 
 # Run with coverage
 uv run pytest tests/ --cov=anki_tools --cov-report=term-missing
 ```
 
-**Test coverage:** 54 tests covering media mapping, audio extraction, card linking, deletion, and sentence ranking.
+**Test coverage:** 447 tests. They cover the package API, the deck gates, the
+language pack rules, and the ranking. A test that needs a large input file or
+a cache skips when the file is absent.
 
 ## Alternative Methods
 
