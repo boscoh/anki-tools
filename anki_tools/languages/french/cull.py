@@ -27,7 +27,11 @@ from pathlib import Path
 from typing import Any, Callable, Collection, Iterable, Iterator, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
+from anki_tools.apkg.templates import (
+    DEFAULT_TEMPLATE_DIR,
+    TEMPLATES_DIR,
+    load_text,
+)
 from anki_tools.sentence_pack.audit import print_audit, sha256_value
 from anki_tools.sentence_pack.audio import probe_duration
 from anki_tools.languages.french.profile import EXTRA_CSS, TOKENIZER
@@ -53,7 +57,7 @@ SWADESH_AUDIO_FIELD = "Audio"
 SWADESH_TOTAL = 207
 SWADESH_EXCEPTIONS = ("intestins",)
 RESERVE_TAGS = " swadesh "
-CARD_CSS_PATH = Path(__file__).parents[3] / "templates" / "card.css"
+CARD_CSS_PATH = DEFAULT_TEMPLATE_DIR / "card.css"
 TEMPLATE_DIR = TEMPLATES_DIR / "french_cull"
 FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
 BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")

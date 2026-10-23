@@ -73,6 +73,7 @@ from anki_tools.ranking.rank import (
 from anki_tools.ranking.pipeline import rank_paths, run_ranked_deck
 from anki_tools.ranking.reorder import reorder_deck
 from anki_tools.apkg.templates import (
+    DEFAULT_TEMPLATE_DIR,
     TEMPLATES_DIR,
     load_char_links,
     load_optional_text,
@@ -449,12 +450,17 @@ def _apply_field_mapping(template: str, mapping: dict[str, str]) -> str:
     return result
 
 
+CARD_CSS_PATH = DEFAULT_TEMPLATE_DIR / "card.css"
+FRONT_TEMPLATE_PATH = DEFAULT_TEMPLATE_DIR / "front.html"
+BACK_TEMPLATE_PATH = DEFAULT_TEMPLATE_DIR / "back.html"
+
+
 def _apply_style(
     target_apkg: Path,
     *,
-    css_path: Path = Path("templates/card.css"),
-    front_path: Path = Path("templates/front.html"),
-    back_path: Path = Path("templates/back.html"),
+    css_path: Path = CARD_CSS_PATH,
+    front_path: Path = FRONT_TEMPLATE_PATH,
+    back_path: Path = BACK_TEMPLATE_PATH,
     verbose: bool = True,
 ) -> tuple[int, list[str]]:
     """Load CSS/templates, map fields to deck, update target package. Returns (models_updated, applied_names)."""
@@ -549,14 +555,15 @@ def apply(
 ):
     """Apply CSS and card templates to a deck.
 
-    Looks for templates/card.css, templates/front.html, templates/back.html by default.
+    Looks for `card.css`, `front.html`, and `back.html` in the repository
+    `templates/` directory by default.
     Auto-maps mismatched field names to closest deck fields.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: input_styled.apkg).
-    :param css: CSS file (default: templates/card.css).
-    :param front: Front template file (default: templates/front.html).
-    :param back: Back template file (default: templates/back.html).
+    :param css: CSS file (default: `card.css` in `templates/`).
+    :param front: Front template file (default: `front.html` in `templates/`).
+    :param back: Back template file (default: `back.html` in `templates/`).
     """
     apkg_path = Path(apkg_path)
     if output is None:
@@ -571,13 +578,16 @@ def apply(
 
     _n, applied = _apply_style(
         output,
-        css_path=css or Path("templates/card.css"),
-        front_path=front or Path("templates/front.html"),
-        back_path=back or Path("templates/back.html"),
+        css_path=css or CARD_CSS_PATH,
+        front_path=front or FRONT_TEMPLATE_PATH,
+        back_path=back or BACK_TEMPLATE_PATH,
         verbose=True,
     )
     if not applied:
-        print("\nNothing to apply. Create templates/card.css, templates/front.html, or templates/back.html first.")
+        print(
+            f"\nNothing to apply. Check {CARD_CSS_PATH}, "
+            f"{FRONT_TEMPLATE_PATH}, and {BACK_TEMPLATE_PATH} first."
+        )
         return
     print(f"\nSaved: {output}")
 
@@ -724,9 +734,9 @@ def zh(
         print("\nApplying card styles...")
         styles_applied, applied = _apply_style(
             Path(paths.output_path),
-            css_path=Path("templates/card.css"),
-            front_path=Path("templates/front.html"),
-            back_path=Path("templates/back.html"),
+            css_path=CARD_CSS_PATH,
+            front_path=FRONT_TEMPLATE_PATH,
+            back_path=BACK_TEMPLATE_PATH,
             verbose=False,
         )
         if applied:
@@ -1418,7 +1428,7 @@ def _build_apkg(language: str, prune: bool = True) -> None:
     front_template = load_text(TEMPLATES_DIR / "vocab" / "front.html")
     back_template = load_text(TEMPLATES_DIR / "vocab" / "back.html")
 
-    css_path = TEMPLATES_DIR / "card.css"
+    css_path = CARD_CSS_PATH
     css_content = load_optional_text(css_path)
 
     csv_fields = (

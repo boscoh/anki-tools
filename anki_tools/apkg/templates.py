@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 TEMPLATES_DIR = Path(__file__).parents[2] / "templates"
+DEFAULT_TEMPLATE_DIR = TEMPLATES_DIR / "default"
 CHAR_LINKS_PATH = TEMPLATES_DIR / "char_links.html"
 
 

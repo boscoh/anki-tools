@@ -69,18 +69,18 @@ uv run anki style deck.apkg
 The deck builders read every card template and CSS file from `templates/`.
 Edit a file, then run the command again to change the deck.
 
+- Default deck style: `templates/default/` with `card.css`, `front.html`, and
+  `back.html`. The `anki style` command and `anki fix zh` read it.
 - Swadesh sentence packs: `templates/sentence_pack/<language>/` with
   `front.html`, `back.html`, and `card.css`.
 - `anki swadesh build <language>`: `templates/vocab/front.html` and
-  `templates/vocab/back.html`, plus the CSS `templates/card.css`.
-- `anki fix zh`: `templates/front.html`, `templates/back.html`, and
-  `templates/card.css`.
+  `templates/vocab/back.html`, plus the CSS `templates/default/card.css`.
 - `anki fix fr --select`: `templates/french_cull/front.html` and `back.html`.
 - `anki fix fr --core`: `templates/french_core/front.html` and `back.html`.
 
-Each pack CSS follows the shared `templates/card.css`. The back template of
-the vocab deck holds the `{{fields}}` placeholder for the field blocks. The
-command writes these blocks from the field list of the language.
+Each pack CSS follows the shared `templates/default/card.css`. The back
+template of the vocab deck holds the `{{fields}}` placeholder for the field
+blocks. The command writes these blocks from the field list of the language.
 
 ### Python API
 

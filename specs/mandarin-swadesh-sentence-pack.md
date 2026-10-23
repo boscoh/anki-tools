@@ -572,8 +572,9 @@ Back template:
 The builder reads these files: `templates/sentence_pack/mandarin/front.html`,
 `templates/sentence_pack/mandarin/back.html`, and
 `templates/sentence_pack/mandarin/card.css`. Edit these files to change the
-deck. The classes of `card.css` follow the shared `templates/card.css`.
-Use `templates/card.css` and add these classes: `.front-audio`,
+deck. The classes of `card.css` follow the shared
+`templates/default/card.css`.
+Use `templates/default/card.css` and add these classes: `.front-audio`,
 `.sentence`, `.pinyin`, `.english`, `.target`, `.source`, `.hint`.
 Sentence font 2.5rem, pinyin 1.2rem, English 1.1rem, source 0.8rem gray.
 

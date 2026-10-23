@@ -1,11 +1,22 @@
 """Tests that the deck builders read their card templates from files."""
 
-from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
+from anki_tools.apkg.templates import DEFAULT_TEMPLATE_DIR, TEMPLATES_DIR, load_text
 from anki_tools.languages import PROFILES
 from anki_tools.languages.french import core as french_core
 from anki_tools.languages.french import cull as french_cull
+from anki_tools.sentence_pack import pack as sentence_pack
 
 PACK_PROFILES = tuple(PROFILES[name] for name in sorted(PROFILES))
+
+
+def test_the_default_style_files_exist() -> None:
+    for filename in ("card.css", "front.html", "back.html"):
+        assert (DEFAULT_TEMPLATE_DIR / filename).is_file(), filename
+
+
+def test_the_default_paths_point_at_the_default_dir() -> None:
+    assert sentence_pack.CSS_PATH == DEFAULT_TEMPLATE_DIR / "card.css"
+    assert french_cull.CARD_CSS_PATH == DEFAULT_TEMPLATE_DIR / "card.css"
 
 
 def test_each_pack_has_the_three_template_files() -> None:

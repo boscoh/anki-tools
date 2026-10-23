@@ -29,9 +29,9 @@ from anki_tools.sentence_pack.profile import (
     WordRow,
     excluded_forms,
 )
-from anki_tools.apkg.templates import load_char_links
+from anki_tools.apkg.templates import DEFAULT_TEMPLATE_DIR, load_char_links
 
-CSS_PATH = Path("templates/card.css")
+CSS_PATH = DEFAULT_TEMPLATE_DIR / "card.css"
 CHECKSUMS_PATH = Path("data/tatoeba/checksums.json")
 ATTRIBUTION_PATH = Path("ATTRIBUTION.md")
 
