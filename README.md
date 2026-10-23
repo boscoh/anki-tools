@@ -69,18 +69,23 @@ uv run anki style deck.apkg
 The deck builders read every card template and CSS file from `templates/`.
 Edit a file, then run the command again to change the deck.
 
+- Shared layer: `templates/shared/card.css` holds the rules that every deck
+  gets, and `templates/shared/char_links.html` holds the Han character link
+  script.
 - Default deck style: `templates/default/` with `card.css`, `front.html`, and
   `back.html`. The `anki style` command and `anki fix zh` read it.
 - Swadesh sentence packs: `templates/sentence_pack/<language>/` with
   `front.html`, `back.html`, and `card.css`.
-- `anki swadesh build <language>`: `templates/vocab/front.html` and
-  `templates/vocab/back.html`, plus the CSS `templates/default/card.css`.
+- `anki swadesh build <language>`: `templates/vocab/front.html`,
+  `templates/vocab/back.html`, and `templates/vocab/card.css`.
 - `anki fix fr --select`: `templates/french_cull/front.html` and `back.html`.
 - `anki fix fr --core`: `templates/french_core/front.html` and `back.html`.
 
-Each pack CSS follows the shared `templates/default/card.css`. The back
-template of the vocab deck holds the `{{fields}}` placeholder for the field
-blocks. The command writes these blocks from the field list of the language.
+A builder reads the shared sheet first, then the deck `card.css`, so a deck
+rule overrides a shared rule. A deck `card.css` holds only its own classes.
+The back template of the vocab deck holds the `{{fields}}` placeholder for
+the field blocks. The command writes these blocks from the field list of the
+language.
 
 ### Python API
 
@@ -263,7 +268,7 @@ sentence has 4 to 7 Han characters. These 16 words have no selected sentence:
 
 On the back of a card, each Han character of the sentence is a link to the
 CC-Canto dictionary at `https://cantonese.org`. The script is
-`templates/char_links.html`.
+`templates/shared/char_links.html`.
 
 Licenses: word data CC BY-SA 4.0, Tatoeba sentence text CC BY 2.0 FR, and
 audio per recording. This pack uses synthesized audio only.

@@ -74,9 +74,10 @@ from anki_tools.ranking.pipeline import rank_paths, run_ranked_deck
 from anki_tools.ranking.reorder import reorder_deck
 from anki_tools.apkg.templates import (
     DEFAULT_TEMPLATE_DIR,
+    SHARED_CSS_PATH,
     TEMPLATES_DIR,
     load_char_links,
-    load_optional_text,
+    load_css_layers,
     load_text,
 )
 from anki_tools.languages.cantonese.frequency import (
@@ -474,13 +475,11 @@ def _apply_style(
             for _mid, model in models.items():
                 print(f"  {', '.join(f['name'] for f in model['flds'])}")
 
-    css_content = None
-    if css_path.exists():
-        css_content = css_path.read_text(encoding="utf-8")
-        if verbose:
-            print(f"\nLoaded: {css_path}")
+    css_content = load_css_layers(SHARED_CSS_PATH, css_path)
+    if css_content and verbose:
+        print(f"\nLoaded: {SHARED_CSS_PATH} and {css_path}")
     elif verbose:
-        print(f"\nNo {css_path} found, skipping CSS")
+        print(f"\nNo CSS found in {SHARED_CSS_PATH} or {css_path}, skipping CSS")
 
     qfmt = None
     if front_path.exists():
@@ -555,15 +554,19 @@ def apply(
 ):
     """Apply CSS and card templates to a deck.
 
-    Looks for `card.css`, `front.html`, and `back.html` in the repository
-    `templates/` directory by default.
+    The CSS starts with the shared sheet `templates/shared/card.css` and then
+    the deck `card.css`, so a deck rule overrides a shared rule. The templates
+    and the deck `card.css` default to the repository `templates/default/`
+    directory.
     Auto-maps mismatched field names to closest deck fields.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: input_styled.apkg).
-    :param css: CSS file (default: `card.css` in `templates/`).
-    :param front: Front template file (default: `front.html` in `templates/`).
-    :param back: Back template file (default: `back.html` in `templates/`).
+    :param css: Deck CSS file (default: `card.css` in `templates/default/`).
+    :param front: Front template file (default: `front.html` in
+        `templates/default/`).
+    :param back: Back template file (default: `back.html` in
+        `templates/default/`).
     """
     apkg_path = Path(apkg_path)
     if output is None:
@@ -1428,8 +1431,8 @@ def _build_apkg(language: str, prune: bool = True) -> None:
     front_template = load_text(TEMPLATES_DIR / "vocab" / "front.html")
     back_template = load_text(TEMPLATES_DIR / "vocab" / "back.html")
 
-    css_path = CARD_CSS_PATH
-    css_content = load_optional_text(css_path)
+    css_path = TEMPLATES_DIR / "vocab" / "card.css"
+    css_content = load_css_layers(SHARED_CSS_PATH, css_path)
 
     csv_fields = (
         [k for k in entries[0].keys() if k != "audio_filename"] if entries else []

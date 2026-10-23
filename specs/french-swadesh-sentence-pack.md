@@ -608,11 +608,10 @@ Back template:
 The builder reads these files: `templates/sentence_pack/french/front.html`,
 `templates/sentence_pack/french/back.html`, and
 `templates/sentence_pack/french/card.css`. Edit these files to change the
-deck. The classes of `card.css` follow the shared
-`templates/default/card.css`.
-Use `templates/default/card.css` and add these classes: `.front-audio`, `.sentence`,
-`.english`, `.target`, `.source`, `.hint`. Sentence font 2.5rem, English
-1.1rem, source 0.8rem gray. The French pack has no pinyin line.
+deck. The pack `card.css` adds to the shared `templates/shared/card.css`.
+The shared sheet holds `.card`, `a`, `.front-audio`, `.sentence`,
+`.english`, `.target`, `.source`, and `.hint`. The French pack has no pinyin
+line.
 
 The bold target must cover the matched token only. For an elided form, bold the
 word after the apostrophe: `un verre d'<b>eau</b>`.

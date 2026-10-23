@@ -28,7 +28,7 @@ from typing import Any, Callable, Collection, Iterable, Iterator, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.templates import (
-    DEFAULT_TEMPLATE_DIR,
+    SHARED_CSS_PATH,
     TEMPLATES_DIR,
     load_text,
 )
@@ -57,7 +57,7 @@ SWADESH_AUDIO_FIELD = "Audio"
 SWADESH_TOTAL = 207
 SWADESH_EXCEPTIONS = ("intestins",)
 RESERVE_TAGS = " swadesh "
-CARD_CSS_PATH = DEFAULT_TEMPLATE_DIR / "card.css"
+CARD_CSS_PATH = SHARED_CSS_PATH
 TEMPLATE_DIR = TEMPLATES_DIR / "french_cull"
 FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
 BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")

@@ -714,7 +714,7 @@ Card 1 (comprehension):
 - Back: the audio, the French sentence, and the `Back` field.
 
 The templates are in `templates/french_cull/front.html` and `back.html`. The
-CSS is the base `templates/default/card.css` plus the French pack classes
+CSS is the base `templates/shared/card.css` plus the French pack classes
 (`.front-audio`, `.sentence`, `.english`, `.hint`) of
 `templates/sentence_pack/french/card.css`. The `Back` field of a
 reserve card already holds `English — target (gloss)`, so the target and the

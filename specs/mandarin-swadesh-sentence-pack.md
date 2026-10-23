@@ -572,15 +572,14 @@ Back template:
 The builder reads these files: `templates/sentence_pack/mandarin/front.html`,
 `templates/sentence_pack/mandarin/back.html`, and
 `templates/sentence_pack/mandarin/card.css`. Edit these files to change the
-deck. The classes of `card.css` follow the shared
-`templates/default/card.css`.
-Use `templates/default/card.css` and add these classes: `.front-audio`,
-`.sentence`, `.pinyin`, `.english`, `.target`, `.source`, `.hint`.
-Sentence font 2.5rem, pinyin 1.2rem, English 1.1rem, source 0.8rem gray.
+deck. The pack `card.css` adds to the shared `templates/shared/card.css`.
+The shared sheet holds `.card`, `a`, `.front-audio`, `.sentence`,
+`.english`, `.target`, `.source`, and `.hint`. The Mandarin pack `card.css`
+holds `.pinyin`.
 
 The class `char-links` turns each Han character of the sentence into a link
 to the CC-Canto dictionary (`https://cantonese.org/search.php?q=`). The
-script is `templates/char_links.html`. It walks the text nodes, so the
+script is `templates/shared/char_links.html`. It walks the text nodes, so the
 `<b>` mark on the target word stays. The profile field `char_links` adds
 the script to the back template.
 
