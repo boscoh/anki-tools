@@ -655,10 +655,11 @@ def vocab_card(language: str, title: str) -> PreviewCard:
         "{{fields}}", "\n".join(field_parts)
     )
     front_template = load_text(TEMPLATES_DIR / "vocab" / "front.html")
+    language_css = TEMPLATES_DIR / "vocab" / language / "card.css"
     css = load_css_layers(
         SHARED_CSS_PATH,
         TEMPLATES_DIR / "vocab" / "card.css",
-        TEMPLATES_DIR / "vocab" / language / "card.css",
+        language_css,
     )
     fields = {
         "audio": f"[sound:{audio_name(row[language])}]",
@@ -677,9 +678,7 @@ def vocab_card(language: str, title: str) -> PreviewCard:
         fields,
         css,
         source="templates/vocab/{front,back,card}"
-        + (
-            f" + templates/vocab/{language}/card.css" if language == "cantonese" else ""
-        ),
+        + (f" + templates/vocab/{language}/card.css" if language_css.exists() else ""),
         field_list=", ".join(["audio", *content_order]),
         note=note,
     )
@@ -758,7 +757,7 @@ def build_sections() -> tuple[PreviewSection, ...]:
             description=(
                 "The vocabulary builder writes one block for the target form, the "
                 "transliteration, and the English gloss. Cantonese adds a Hong Kong "
-                "font stack."
+                "font stack. Arabic adds a right-to-left rule."
             ),
             cards=vocab_cards,
         ),

@@ -143,3 +143,14 @@ def test_the_arabic_deck_aligns_the_text_to_the_right() -> None:
 
     assert "direction: rtl" in arabic
     assert "text-align: right" in arabic
+
+
+def test_the_default_card_uses_the_shared_card_classes() -> None:
+    front = load_text(DEFAULT_TEMPLATE_DIR / "front.html")
+    back = load_text(DEFAULT_TEMPLATE_DIR / "back.html")
+
+    assert 'class="hint"' in front
+    assert "<hr id=answer>" in back
+    assert 'class="sentence char-links"' in back
+    assert 'class="romanization"' in back
+    assert 'class="english"' in back
