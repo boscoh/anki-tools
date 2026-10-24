@@ -1,0 +1,131 @@
+key,word,gloss,tier,position,quota,count,status
+S1:我,我,I,S,1,1,1,covered
+S2:你,你,you (singular),S,2,2,2,covered
+S3:佢,佢,he/she/it/they (singular),S,3,2,2,covered
+S4:我哋,我哋,we,S,4,2,2,covered
+S5:你哋,你哋,you (plural),S,5,2,2,covered
+S6:佢哋,佢哋,they (plural),S,6,2,2,covered
+S7:呢個,呢個,this,S,7,2,2,covered
+S8:嗰,嗰,that,S,8,2,2,covered
+S9:呢度,呢度,here,S,9,2,2,covered
+S10:嗰度,嗰度,there,S,10,2,1,partial
+S11:邊個,邊個,who,S,11,2,2,covered
+S12:乜嘢,乜嘢,what,S,12,2,2,covered
+S13:邊度,邊度,where,S,13,2,2,covered
+S14:幾時,幾時,when,S,14,2,2,covered
+S15:點樣,點樣,how,S,15,2,1,partial
+S16:唔,唔,not,S,16,2,2,covered
+S18:多,多,many,S,18,2,2,covered
+S19:啲,啲,some,S,19,2,2,covered
+S20:少,少,few,S,20,2,2,covered
+S22:一,一,one,S,22,2,1,partial
+S23:兩,兩,two,S,23,2,2,covered
+S24:三,三,three,S,24,2,2,covered
+S25:四,四,four,S,25,2,0,absent_sense
+S27:大,大,big,S,27,2,2,covered
+S28:長,長,long,S,28,2,1,partial
+S31:重,重,heavy,S,31,2,1,partial
+S32:細,細,small,S,32,2,1,partial
+S36:女人,女人,woman,S,36,2,2,covered
+S37:男人,男人,man,S,37,2,2,covered
+S38:人,人,human being,S,38,2,0,absent_sense
+S39:細路,細路,child,S,39,2,1,partial
+S40:老婆,老婆,wife,S,40,2,1,partial
+S43:阿爸,阿爸,father,S,43,2,2,covered
+S45:魚,魚,fish,S,45,2,1,partial
+S46:雀,雀,bird,S,46,2,2,covered
+S47:狗,狗,dog,S,47,2,2,covered
+S49:蛇,蛇,snake,S,49,2,1,partial
+S50:蟲,蟲,worm,S,50,2,1,partial
+S54:生果,生果,fruit,S,54,2,1,partial
+S60:草,草,grass,S,60,2,1,partial
+S62:皮,皮,skin,S,62,2,0,absent_sense
+S63:肉,肉,meat,S,63,2,2,covered
+S67:蛋,蛋,egg,S,67,2,1,partial
+S71:頭髮,頭髮,hair,S,71,2,1,partial
+S72:頭,頭,head,S,72,2,1,partial
+S74:眼,眼,eye,S,74,2,1,partial
+S75:鼻,鼻,nose,S,75,2,1,partial
+S77:牙,牙,tooth,S,77,2,1,partial
+S80:腳,腳,foot,S,80,2,0,absent_sense
+S83:手,手,hand,S,83,2,2,covered
+S85:肚,肚,belly,S,85,2,1,partial
+S87:頸,頸,neck,S,87,2,0,absent_sense
+S90:心,心,heart,S,90,2,0,absent_sense
+S92:飲,飲,to drink,S,92,2,2,covered
+S93:食,食,to eat,S,93,2,2,covered
+S95:吸,吸,to suck,S,95,2,0,absent_sense
+S97:嘔,嘔,to vomit,S,97,2,1,partial
+S98:吹,吹,to blow,S,98,2,0,absent_sense
+S100:笑,笑,to laugh,S,100,2,2,covered
+S101:睇,睇,to see,S,101,2,2,covered
+S102:聽,聽,to hear,S,102,2,2,covered
+S103:知道,知道,to know,S,103,2,1,partial
+S104:諗,諗,to think,S,104,2,2,covered
+S106:驚,驚,to fear,S,106,2,2,covered
+S107:瞓覺,瞓覺,to sleep,S,107,2,2,covered
+S108:生存,生存,to live,S,108,2,1,partial
+S109:死,死,to die,S,109,2,2,covered
+S110:殺,殺,to kill,S,110,2,2,covered
+S113:打,打,to hit,S,113,2,2,covered
+S119:游水,游水,to swim,S,119,2,1,partial
+S120:飛,飛,to fly,S,120,2,2,covered
+S121:行,行,to walk,S,121,2,2,covered
+S122:嚟,嚟,to come,S,122,2,2,covered
+S123:瞓,瞓,to lie down,S,123,2,0,absent_sense
+S124:坐,坐,to sit,S,124,2,2,covered
+S125:企,企,to stand,S,125,2,2,covered
+S127:跌,跌,to fall,S,127,2,0,absent_sense
+S128:畀,畀,to give,S,128,2,0,absent_sense
+S129:揸,揸,to hold,S,129,2,1,partial
+S132:洗,洗,to wash,S,132,2,1,partial
+S134:拉,拉,to pull,S,134,2,0,absent_sense
+S136:掟,掟,to throw,S,136,2,1,partial
+S140:講,講,to say,S,140,2,2,covered
+S141:唱,唱,to sing,S,141,2,2,covered
+S142:玩,玩,to play,S,142,2,0,absent_sense
+S147:太陽,太陽,sun,S,147,2,2,covered
+S149:星,星,star,S,149,2,0,absent_sense
+S150:水,水,water,S,150,2,2,covered
+S151:雨,雨,rain,S,151,2,2,covered
+S156:石,石,stone,S,156,2,2,covered
+S157:沙,沙,sand,S,157,2,0,absent_sense
+S162:天,天,sky,S,162,2,1,partial
+S163:風,風,wind,S,163,2,0,absent_sense
+S164:雪,雪,snow,S,164,2,2,covered
+S165:冰,冰,ice,S,165,2,1,partial
+S166:煙,煙,smoke,S,166,2,2,covered
+S167:火,火,fire,S,167,2,1,partial
+S168:灰,灰,ash,S,168,2,0,absent_sense
+S169:燒,燒,to burn,S,169,2,1,partial
+S170:路,路,road,S,170,2,1,partial
+S171:山,山,mountain,S,171,2,0,absent_sense
+S172:紅,紅,red,S,172,2,2,covered
+S174:黃,黃,yellow,S,174,2,1,partial
+S175:白,白,white,S,175,2,1,partial
+S176:黑,黑,black,S,176,2,2,covered
+S178:日,日,day,S,178,2,0,absent_sense
+S179:年,年,year,S,179,2,1,partial
+S180:暖,暖,warm,S,180,2,1,partial
+S181:凍,凍,cold,S,181,2,2,covered
+S183:新,新,new,S,183,2,2,covered
+S184:老,老,old,S,184,2,1,partial
+S185:好,好,good,S,185,2,2,covered
+S187:爛,爛,rotten,S,187,2,0,absent_sense
+S189:直,直,straight,S,189,2,0,absent_sense
+S191:利,利,sharp,S,191,2,0,absent_sense
+S193:滑,滑,smooth,S,193,2,0,absent_sense
+S194:濕,濕,wet,S,194,2,1,partial
+S195:乾,乾,dry,S,195,2,0,absent_sense
+S196:啱,啱,correct,S,196,2,2,covered
+S197:近,近,near,S,197,2,2,covered
+S198:遠,遠,far,S,198,2,0,absent_sense
+S201:喺,喺,at,S,201,2,1,partial
+S203:同,同,with,S,203,2,2,covered
+S205:如果,如果,if,S,205,2,1,partial
+S207:名,名,name,S,207,2,2,covered
+S17:都,都,all,S,208,2,2,covered
+S42:老母,老母,mother,S,209,2,1,partial
+S76:口,口,mouth,S,210,2,0,absent_sense
+S89:心口,心口,breast,S,211,2,1,partial
+S114:剪,剪,to cut,S,212,2,0,absent_sense

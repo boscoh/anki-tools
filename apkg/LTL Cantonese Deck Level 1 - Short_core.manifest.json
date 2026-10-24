@@ -1,0 +1,66 @@
+{
+  "build_date": "2026-10-24T12:24:15+00:00",
+  "source": {
+    "input": "apkg/LTL Cantonese Deck Level 1 - Short.apkg",
+    "deck": "Cantonese Core Sentences",
+    "model": "LTL Note Type - Cantonese"
+  },
+  "params": {
+    "core_words": 0,
+    "per_word": 2,
+    "third_examples": 0,
+    "ubiquitous_share": 0.25,
+    "max_cards": 300,
+    "completion_cards": 120,
+    "tail_cards": 0,
+    "outside_budget": 165,
+    "support_top": 1000,
+    "hard_top": 50000,
+    "lambda_new": 0.1,
+    "lambda_repeat": 0.03,
+    "lambda_len": 0.02,
+    "lambda_seed": 0.01,
+    "simple_units": 7,
+    "similarity": 0.65,
+    "min_units": 2,
+    "max_units": 7,
+    "spoken_weight": 0.7,
+    "bold_target": true,
+    "name": "Cantonese Core Sentences",
+    "max_unchecked_sense": 0,
+    "max_unranked": 0
+  },
+  "counts": {
+    "cards": 126,
+    "targets": 130,
+    "absent": 0,
+    "absent_sense": 27,
+    "unchecked": 0,
+    "unranked": 0,
+    "covered1": 103,
+    "covered2": 60,
+    "full": 61,
+    "outside": 165,
+    "outside_rare": 10,
+    "tail_words": 0,
+    "sense_rows": 130,
+    "bolded": 95,
+    "unbolded": 31,
+    "name_hits": 0,
+    "loan_hits": 0,
+    "rows": 999,
+    "rejected_c3": 0,
+    "rejected_c4": 0,
+    "sense_failures": 752
+  },
+  "frequency": {
+    "path": "data/cantonese_frequency.tsv",
+    "spoken_weight": 0.7
+  },
+  "files": {
+    "core_csv": "sha256:2bc28ce6452ddb7b10e647dd4fc8bd9e916dc6a43a7386df6f6ff956367fb4e1",
+    "coverage_csv": "sha256:728f5aee04186e8c4850fcc6ac6ca5f7f1b63c771d3bb19087beb9ec3a7000d5",
+    "input_apkg": "sha256:7f4c1d34f8b4423252eabbe475520923bfd0da7659be7bd078cf8d125bf2be00"
+  },
+  "kept_order": "sha256:b8b8603d08f98933f8a16afcf65160d0b6708384052ca937e580a3ac79d05a8b"
+}

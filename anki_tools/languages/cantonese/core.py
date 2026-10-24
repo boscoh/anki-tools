@@ -57,7 +57,9 @@ LOAN_PATH = Path("vocab/cantonese_loanwords.txt")
 NAMES_PATH = Path("vocab/cantonese_names.tsv")
 
 DEFAULT_NAME = "Cantonese Core Sentences"
-DEFAULT_CORE_WORDS = 50
+# The tier F sense rows are not authored yet (anki-eiy). Raise this to 50 with
+# the rows in vocab/cantonese_core_senses.tsv.
+DEFAULT_CORE_WORDS = 0
 # The input deck is small, so the selection deduplicates below the Jaccard limit
 # of gate K6 and caps the outside vocabulary of the kept cards.
 DEFAULT_OPTIONS = CoreOptions(
