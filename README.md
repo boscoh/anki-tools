@@ -84,6 +84,7 @@ Edit a file, then run the command again to change the deck.
   `templates/vocab/<language>/card.css`.
 - `anki fix fr --select`: `templates/french_cull/front.html` and `back.html`.
 - `anki fix fr --core`: `templates/french_core/front.html` and `back.html`.
+- `anki fix yue --core`: `templates/cantonese_core/front.html` and `back.html`.
 
 A builder reads the shared sheet first, then the deck `card.css`, so a deck
 rule overrides a shared rule. A deck `card.css` holds only its own classes.
@@ -189,7 +190,8 @@ uv run anki fix fr deck.apkg --core    # Core mode: a small core-word deck
 ```bash
 uv run anki freq yue          # Write data/cantonese_frequency.tsv
 uv run anki freq yue --check  # Run gates G1, G3, and G4
-uv run anki fix yue deck.apkg # Convert, fix jyutping, select, rank, reorder
+uv run anki fix yue deck.apkg        # Convert, fix jyutping, select, rank, reorder
+uv run anki fix yue deck.apkg --core # Core mode: a small core-word deck
 ```
 - Converts simplified to traditional Chinese
 - Generates accurate jyutping romanization
@@ -219,6 +221,9 @@ uv run anki fix yue deck.apkg # Convert, fix jyutping, select, rank, reorder
 - Outputs `_reordered.apkg`, `.rank.csv` (adds `hardest_rank` and `kept`),
   `.select.csv` (one row per input sentence with the reason), and
   `.coverage.csv` (one row per target word)
+- Core mode builds a small deck from the Swadesh word table. It writes
+  `_core.apkg` with its CSV files and manifest. See "Cantonese Core-Word
+  Deck" below.
 
 **Spanish (es):**
 ```bash
@@ -545,6 +550,30 @@ K1 to K19 pass.
 
 Licenses: Tatoeba sentence text CC BY 2.0 FR, `wordfreq` list Apache License
 2.0, and input audio under the license of the source deck.
+
+### Cantonese Core-Word Deck
+
+Build a core deck from the LTL Cantonese deck. The LTL deck is small, so two
+examples per target are a best effort: 70 of the 212 word-table rows have two
+or more usable cards. The selection takes the second card where the pool holds
+one, and keeps one card where it does not.
+
+```bash
+uv run anki fix yue "apkg/LTL Cantonese Deck Level 1 - Short.apkg" --core
+# Run gates K1 to K20 on the built deck
+uv run anki fix yue "apkg/LTL Cantonese Deck Level 1 - Short.apkg" --core \
+    --output "apkg/LTL Cantonese Deck Level 1 - Short_core.apkg" --check
+```
+
+Gate K3 reports the two-card share and does not gate, because the share
+measures the input deck. The 50 tier F targets need the sense rows of
+`vocab/cantonese_core_senses.tsv`, so `--words` defaults to 0.
+
+Measured result on 2026-10-24: 126 cards for 130 targets. 60 targets have two
+cards, 43 have one, and 27 are `absent_sense`. All 20 gates pass.
+
+Licenses: Cifu frequency data (GPL-3.0) cached only, and input audio under the
+license of the source deck.
 
 ### Swadesh Cantonese Sentences
 

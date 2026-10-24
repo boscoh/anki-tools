@@ -53,6 +53,9 @@ The source is LTL Flexi Classes. The deck has 999 cards. The audio files
 start with `azure-`, so the audio is Azure TTS. The note type has the fields
 `Front`, `Back`, `Audio`, `Jyutping`, and `Eng Audio`.
 
+The deck is small, so a core deck from it holds one card for many targets.
+`--core` takes the second card where the pool holds one.
+
 ## 4. Spanish
 
 Local file: `apkg/Spanish 9000 sentences with native audio.apkg`
@@ -96,6 +99,7 @@ uv run anki fix fr                     # uses the 6000-sentence deck
 uv run anki fix fr --select            # same input, 1000-card cull
 uv run anki fix fr --core              # same input, core deck
 uv run anki fix yue                    # uses the LTL deck
+uv run anki fix yue --core             # same input, core deck
 uv run anki fix es apkg/input.apkg
 ```
 
