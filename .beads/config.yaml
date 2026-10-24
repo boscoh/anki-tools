@@ -8,19 +8,10 @@
 # Example: issue-prefix: "myproject" creates issues like "myproject-1", "myproject-2", etc.
 # issue-prefix: ""
 
-# Use no-db mode: load from JSONL, no SQLite, write back after each command
-# When true, bd will use .beads/issues.jsonl as the source of truth
-# instead of SQLite database
-# no-db: false
-
-# Disable daemon for RPC communication (forces direct database access)
-# no-daemon: false
-
-# Disable auto-flush of database to JSONL after mutations
-# no-auto-flush: false
-
-# Disable auto-import from JSONL when it's newer than database
-# no-auto-import: false
+# Beads is Dolt-native in this repository: the local Dolt database under
+# .beads/embeddeddolt/ is the source of truth. `.beads/issues.jsonl` is a
+# passive local artifact, never a sync protocol. Cross-machine sync uses Dolt
+# refs on the git remote (see sync.remote and dolt below).
 
 # Enable JSON output by default
 # json: false
@@ -30,19 +21,6 @@
 
 # Path to database (overridden by BEADS_DB or --db)
 # db: ""
-
-# Auto-start daemon if not running (can also use BEADS_AUTO_START_DAEMON)
-# auto-start-daemon: true
-
-# Debounce interval for auto-flush (can also use BEADS_FLUSH_DEBOUNCE)
-# flush-debounce: "5s"
-
-# Git branch for beads commits (bd sync will commit to this branch)
-# IMPORTANT: Set this for team projects so all clones use the same sync branch.
-# This setting persists across clones (unlike database config which is gitignored).
-# Can also use BEADS_SYNC_BRANCH env var for local override.
-# If not set, bd sync will require you to run 'bd config set sync.branch <branch>'.
-# sync-branch: "beads-sync"
 
 # Multi-repo configuration (experimental - bd-307)
 # Allows hydrating from multiple repositories and routing writes to the correct JSONL
@@ -61,5 +39,14 @@
 # - github.org
 # - github.repo
 
-sync:
-    remote: "git+ssh://git@github.com/boscoh/anki-tools.git"
+# Dolt sync target. `bd sync` pulls, checks conflicts, then pushes
+# refs/dolt/data on this git remote.
+sync.remote: 'git+ssh://git@github.com/boscoh/anki-tools.git'
+
+# Auto-push is off: pushes happen on the explicit `bd sync` at handoff.
+dolt:
+  auto-push: false
+
+# JSONL export is off; Dolt is the source of truth.
+export:
+  auto: false

@@ -4,7 +4,7 @@ Follow these instructions precisely for all sessions.
 
 ## Project Tools
 
-**Markdonw**: Don't use emojis; Always format tables properly with aligned columns
+**Markdown**: Do not use emojis; always format tables properly with aligned columns
 
 ## Python
 - Use `uv` for package management and running scripts.
@@ -22,35 +22,44 @@ When writing code:
 Do not edit files with a Python script, `sed`, `awk`, `perl`, or a heredoc. Use `replace` and `insert`, which check anchors and support undo. Use `write` for a new file or a complete rewrite only.
 
 
-## Beads Workflow (MANDATORY)
+## Issue Tracking (Beads)
 
-This project uses [Beads](https://github.com/steveyegge/beads) for issue tracking. **Use `bd` commands instead of markdown TODOs.**
+Work is tracked in **Beads** (`bd`, Dolt-backed). `bd prime` is the single
+source of truth for the workflow; run it after compaction or in a new session.
+The `beads` skill lives at `.agents/skills/beads/SKILL.md`. Never keep a second
+task list in markdown.
 
-### Session Start
-1. Run `bd ready` to list unblocked issues
-2. Select highest-priority matching issue
-3. Claim it: `bd update <id> --status=in_progress`
+```bash
+bd ready                        # unblocked work
+bd create "title" -t task -p 2  # new issue; add --json for structured output
+bd update <id> --claim          # claim atomically
+bd update <id> --append-notes="Progress..."
+bd close <id> --reason "..."    # complete
+bd sync                         # pull, conflict check, push (at handoff)
+```
 
-### During Work
-- Create issues: `bd create --title="..." --type=task --priority=2`
-- Update progress: `bd update <id> --note="Progress..."`
-- Add dependencies: `bd dep add <child> <blocks>`
-- Types: task, bug, feature, epic, question, docs
-- Priorities: P0 (critical) → P4 (backlog)
+- Issues live in a local Dolt database (`.beads/embeddeddolt/`). Dolt refs on
+  the git remote (`refs/dolt/data`) are the sync protocol. `.beads/issues.jsonl`
+  is a passive local artifact, never a source of truth. Fresh clones run
+  `bd bootstrap`.
+- `bd sync` is a manual handoff step. Auto-push is off (`dolt.auto-push:
+  false`), so run `bd sync` before you hand off. Never run `bd dolt push` by
+  hand.
+- Never use `bd edit`; it opens an interactive `$EDITOR`. Update a field with a
+  flag, for example `bd update <id> --description ...`.
+- Link discovered work with `--deps discovered-from:<id>`.
+- Git hooks are shared and committable: `git config core.hooksPath
+  .beads-hooks` (installed with `bd hooks install --shared`). Do not use
+  `.git/hooks`.
 
 ### After Each Task (MANDATORY)
+
 1. Close the issue: `bd close <id> --reason="..."`
 2. Stage and commit: `git add -A && git commit -m "Close <id>: description"`
-3. If there is a relevant spec/migration md file, update that too
-4. Only then move to the next task
+3. If a relevant spec or migration markdown file exists, update it too
+4. Only then start the next task
 
-This ensures atomic commits per task and clean git history.
-
-### Session End
-1. Close completed issues: `bd close <id>`
-2. Create follow-up issues if needed
-3. Run `bd export -o .beads/issues.jsonl` and commit the export (see anki-t6l: `bd sync` fails on the dolt remote)
-4. Leave git clean
+This keeps one atomic commit per task and a clean git history.
 
 
 ## Landing the Plane (Session Completion)
@@ -65,7 +74,7 @@ This ensures atomic commits per task and clean git history.
 4. **PUSH TO REMOTE** - This is MANDATORY:
    ```bash
    git pull --rebase
-   bd export -o .beads/issues.jsonl   # bd sync fails: the dolt remote has no branches
+   bd sync            # pull, conflict check, push the Dolt refs
    git push
    git status  # MUST show "up to date with origin"
    ```
