@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import re
 import shutil
+import sqlite3
+import zipfile
 from collections import Counter
 from pathlib import Path
 from typing import Iterator
@@ -50,6 +52,15 @@ def _card_of(package: AnkiPackage, note_id: int) -> int:
     )
 
 
+def _field_names(package: AnkiPackage) -> list[str]:
+    """Give the field names of the note types, in ordinal order."""
+    models = package.get_models()
+    return [
+        field["name"]
+        for model in models.values()
+        for field in model["flds"]
+    ]
+
 @pytest.fixture(scope="module")
 def deck_path(tmp_path_factory: pytest.TempPathFactory) -> Path:
     return build_contract_deck(tmp_path_factory.mktemp("deck"))
@@ -67,6 +78,93 @@ def editable(deck_path: Path, tmp_path: Path) -> Iterator[AnkiPackage]:
     shutil.copy(deck_path, target)
     with AnkiPackage(target) as open_package:
         yield open_package
+
+
+ANKI21B_NOTE_TYPE = "1700000000001"
+ANKI21B_FIELDS = ("Sentence", "English", "Audio")
+ANKI21B_SCHEMA = """
+CREATE TABLE col (id integer primary key, crt integer, decks text);
+CREATE TABLE notetypes (id integer primary key, name text, config blob);
+CREATE TABLE fields (ntid integer, ord integer, name text, config blob);
+CREATE TABLE templates (
+    ntid integer, ord integer, name text, config blob
+);
+CREATE TABLE notes (
+    id integer primary key, mid integer, flds text, tags text,
+    mod integer, usn integer
+);
+CREATE TABLE cards (id integer primary key, nid integer, did integer, ord integer);
+CREATE TABLE decks (id integer primary key, name text);
+CREATE TABLE revlog (id integer primary key);
+CREATE TABLE graves (usn integer, oid integer, type integer);
+"""
+
+
+def _anki21b_database(path: Path) -> None:
+    """Fill a SQLite file with the tables of the anki21b schema."""
+    connection = sqlite3.connect(path)
+    connection.executescript(ANKI21B_SCHEMA)
+    connection.execute("INSERT INTO col VALUES (1, 0, '{}')")
+    connection.execute(
+        "INSERT INTO notetypes VALUES (?, 'Shared sentences', '')",
+        (int(ANKI21B_NOTE_TYPE),),
+    )
+    connection.executemany(
+        "INSERT INTO fields VALUES (?, ?, ?, '')",
+        [
+            (int(ANKI21B_NOTE_TYPE), ord_, name)
+            for ord_, name in enumerate(ANKI21B_FIELDS)
+        ],
+    )
+    connection.execute(
+        "INSERT INTO templates VALUES (?, 0, 'Card 1', '')",
+        (int(ANKI21B_NOTE_TYPE),),
+    )
+    for index, sentence in enumerate(("Hola.", "Adios.")):
+        connection.execute(
+            "INSERT INTO notes VALUES (?, ?, ?, '', 0, 0)",
+            (
+                index + 1,
+                int(ANKI21B_NOTE_TYPE),
+                "\x1f".join([sentence, "English.", f"a{index}.mp3"]),
+            ),
+        )
+        connection.execute(
+            "INSERT INTO cards VALUES (?, ?, 1, 0)", (10 + index, index + 1)
+        )
+    connection.execute("INSERT INTO decks VALUES (1, 'Source')")
+    connection.commit()
+    connection.close()
+
+
+def build_anki21b_deck(path: Path) -> Path:
+    """Write a minimal APKG file in the anki21b database format.
+
+    :param path: Path of the new APKG file.
+    :raises ImportError: The ``zstandard`` package is absent.
+    :returns: The same path, after the write.
+    """
+    zstandard = pytest.importorskip("zstandard")
+    database = path.with_name("collection.db")
+    _anki21b_database(database)
+    compressed = path.with_name("collection.anki21b")
+    with database.open("rb") as source, compressed.open("wb") as target:
+        zstandard.ZstdCompressor().copy_stream(source, target)
+    database.unlink()
+    with zipfile.ZipFile(path, "w") as archive:
+        archive.write(compressed, "collection.anki21b")
+    compressed.unlink()
+    return path
+
+
+@pytest.fixture
+def anki21b(tmp_path: Path) -> Iterator[AnkiPackage]:
+    deck = build_anki21b_deck(tmp_path / "deck.apkg")
+    with AnkiPackage(deck) as open_package:
+        yield open_package
+        temp_dir = open_package.temp_dir
+    if temp_dir:
+        shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 def test_the_deck_references_every_media_file(package: AnkiPackage) -> None:
@@ -158,3 +256,40 @@ def test_delete_cards_removes_the_unused_media(editable: AnkiPackage) -> None:
     assert result["notes_deleted"] == 2
     assert len(editable.get_cards()) == cards_before - 2
     assert result["audio_files_deleted"]
+
+
+def test_anki21b_add_model_field_gives_the_ord_of_a_field(
+    anki21b: AnkiPackage,
+) -> None:
+    """A known field name keeps its ordinal and changes no note."""
+    assert anki21b.db_format == "anki21b"
+
+    ord_ = anki21b.add_model_field(ANKI21B_NOTE_TYPE, "English")
+
+    assert ord_ == 1
+    assert _field_names(anki21b) == list(ANKI21B_FIELDS)
+    assert {len(row["flds"].split("\x1f")) for row in anki21b.get_notes()} == {3}
+
+
+def test_anki21b_add_model_field_appends_an_empty_value(
+    anki21b: AnkiPackage,
+) -> None:
+    """A new field gets the next ordinal and an empty value on each note."""
+    ord_ = anki21b.add_model_field(ANKI21B_NOTE_TYPE, "Core")
+
+    assert ord_ == 3
+    assert _field_names(anki21b) == [*ANKI21B_FIELDS, "Core"]
+    assert all(row["flds"].endswith("\x1f") for row in anki21b.get_notes())
+    assert {len(row["flds"].split("\x1f")) for row in anki21b.get_notes()} == {4}
+
+
+def test_anki21b_add_model_field_twice_changes_nothing(
+    anki21b: AnkiPackage,
+) -> None:
+    """The second call gives the same ordinal and adds no separator."""
+    first = anki21b.add_model_field(ANKI21B_NOTE_TYPE, "Core")
+    second = anki21b.add_model_field(ANKI21B_NOTE_TYPE, "Core")
+
+    assert first == second == 3
+    assert _field_names(anki21b) == [*ANKI21B_FIELDS, "Core"]
+    assert {len(row["flds"].split("\x1f")) for row in anki21b.get_notes()} == {4}
