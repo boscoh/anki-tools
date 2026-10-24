@@ -438,11 +438,6 @@ cull: it writes `<input>_culled.apkg`.
 
 ```bash
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
-    --max-cards 1000 \
-    --target-words 300 \
-    --max-uses 4 \
-    --exempt-top 100 \
-    --spoken-weight 0.5 \
     --output apkg/french_1000_sentences.apkg
 
 # Run gates G1 to G15 on the written output
@@ -450,9 +445,9 @@ uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
     --output apkg/french_1000_sentences.apkg --check
 ```
 
-The defaults are the values above. The other select mode options are
-`--min-words 3`, `--max-words 12`, `--similarity 0.67`, `--order coverage`
-(`coverage` or `input`), and `--name "French 1000 Core Sentences"`.
+The defaults build the measured 1000-card deck. The tuning values, such as
+the spoken weight and the similarity limit, are fields of `CullRequest`, and
+`specs/french-1000-sentence-cull.md` records them.
 
 The command writes these files:
 
@@ -469,8 +464,8 @@ one card, and `absent` for no card.
 The cull adds a Swadesh reserve from
 `apkg/swadesh_french_sentences.apkg`: one card per Swadesh concept, with its
 audio. The frequency pass fills the rest of the 1,000 cards. Use
-`--reserve-pack` to select another pack, or `--no-reserve` for the frequency
-cull alone.
+`--no-reserve` for the frequency cull alone. The reserve pack path is a
+`CullRequest` field.
 
 Measured result on 2026-10-21: 1,000 cards, 194 reserve cards, 806 frequency
 cards, 2,002 distinct content lemmas, 299 of 300 frequency targets covered,
@@ -508,13 +503,14 @@ The defaults are the measured preset: 50 tier F words, 300 cards, 2 examples
 per word, and a tail of 120 cards.
 
 The core list starts with the reviewed Swadesh forms of the language. It then
-adds `--core-words` content lemmas in blended frequency order. A target that
-more than `--ubiquitous-share` (0.25) of the candidates hold gets one example,
-because a second example adds no skill.
+adds `--words` content lemmas in blended frequency order. A target that
+more than 0.25 of the candidates hold gets one example, because a second
+example adds no skill.
 
 A card must pass the cull filter F1 to F9 and the guards C1 to C5: a
 predicate, a main clause, no name, no loan word, and an audio file. The
-window is 5 to 9 words. `--core-min-words` and `--core-max-words` move it.
+window is 5 to 9 words, set by the `min_units` and `max_units` fields of
+`CoreRequest`.
 
 The selection is a greedy cover. Each card has a value from the target
 examples that it adds, minus a cost for the words outside the core. A new
@@ -538,8 +534,8 @@ the sense test, and `unchecked` when the target has no sense row.
 
 Each note has one card. The front shows only the play button. The back shows
 the play button, the French sentence, the English translation, and the core
-word. The model gains a `Core` field for the core word. `--bold-target` is on
-by default, and the assigned target is bold in the sentence.
+word. The model gains a `Core` field for the core word. The assigned target
+is bold in the sentence.
 
 Measured result on 2026-10-21 with the command above: 300 cards for 209
 targets (159 Swadesh forms and 50 frequency lemmas). 183 targets have 2

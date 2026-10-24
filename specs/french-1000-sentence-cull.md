@@ -425,30 +425,24 @@ parameter change, not a gate failure.
 
 ```bash
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
-    --max-cards 1000 \
-    --target-words 300 \
-    --max-uses 4 \
-    --exempt-top 100 \
-    --spoken-weight 0.5 \
     --output apkg/french_1000_sentences.apkg
 ```
 
 ### 10.2 Options
 
-| Option            | Default                    | Meaning                                      |
-| ----------------- | -------------------------- | -------------------------------------------- |
-| `--max-cards`     | 1000                       | Card cap                                     |
-| `--target-words`  | 300                        | Target count, 200 to 500                     |
-| `--max-uses`      | 4                          | Most cards for one non-exempt word           |
-| `--exempt-top`    | 100                        | Content lemmas exempt from the cap           |
-| `--spoken-weight` | 0.5                        | `w` in the blend                             |
-| `--min-words`     | 3                          | Minimum word count of a card                 |
-| `--max-words`     | 12                         | Maximum word count of a card                 |
-| `--similarity`    | 0.67                       | Lemma Jaccard limit                          |
-| `--order`         | coverage                   | `coverage` or `input`                        |
-| `--name`          | French 1000 Core Sentences | Output deck name                             |
-| `--output`        | from the input name        | Output APKG                                  |
-| `--select`        | off                        | Run the cull instead of the rank and reorder |
+| Flag         | Default             | Meaning                                      |
+| ------------ | ------------------- | -------------------------------------------- |
+| `--cards`    | 1000                | Card cap                                     |
+| `--targets`  | 300                 | Target count, 200 to 500                     |
+| `--max-uses` | 4                   | Most cards for one non-exempt word           |
+| `--reserve`  | on                  | Add the Swadesh reserve cards                |
+| `--output`   | from the input name | Output APKG                                  |
+| `--check`    | off                 | Run gates G1 to G15 on the output            |
+| `--select`   | off                 | Run the cull instead of the rank and reorder |
+
+`--exempt-top`, the spoken weight, the word window, the similarity limit,
+the order, the name, and the reserve pack path are fields of `CullRequest`
+with these defaults in `cull.py`.
 
 ### 10.3 Output files
 

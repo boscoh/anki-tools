@@ -37,8 +37,8 @@ costs more, so the deck adds few other words.
 
 ### 1.1 Result at a glance
 
-Built on the French 6,000-card deck with the preset of 5.2:
-`--core-words 50 --per-word 2 --core-max-cards 300 --tail-cards 120`.
+Built on the French 6,000-card deck with the preset of 5.2, which is the CLI
+default.
 The numbers come from the built deck, not from the prototype.
 
 | Measure                        | 1,000-card cull | This spec |
@@ -317,8 +317,7 @@ except that the prototype matched tier S by lemma. The tail fills to 300.
 The recommended preset is the fourth row:
 
 ```bash
-uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --core \
-    --core-words 50 --per-word 2 --core-max-cards 300 --tail-cards 120
+uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --core
 ```
 
 These values are the CLI defaults: `--core` alone builds this deck.
@@ -443,7 +442,7 @@ so the core deck and the Swadesh deck read the same way.
 | `Core`       | the core word of the card, as described above; empty for a card with no target |
 | `CoreGloss`  | the English gloss of the core word; empty for a card with no core word         |
 
-- `--bold-target` is on by default. `--no-bold-target` writes plain text.
+- `bold_target` is on by default. A false value writes plain text.
 - The CSV holds the plain sentence; the markup stays in the APKG.
   `_plain_sentence` removes it on a later extract.
 - The `Core` field changes the note model. Anki can ask for a full sync when you
@@ -453,35 +452,22 @@ so the core deck and the Swadesh deck read the same way.
 
 ### 9.1 Options
 
-| Option                  | Default                        | Meaning                                 |
-| ----------------------- | ------------------------------ | --------------------------------------- |
-| `--core`                | off                            | Run the core selection                  |
-| `--core-words`          | 50                             | Tier F words after the Swadesh set      |
-| `--per-word`            | 2                              | Examples per content target, 1 to 3     |
-| `--third-examples`      | 0                              | Targets that get a third example        |
-| `--ubiquitous-share`    | 0.25                           | Share above which a target gets quota 1 |
-| `--core-max-cards`      | 300                            | Card cap                                |
-| `--completion-cards`    | 120                            | Card cap of the completion pass         |
-| `--tail-cards`          | 0                              | Cards after the core passes             |
-| `--outside-budget`      | 0                              | Cap on the outside set; 0 is no cap     |
-| `--support-top`         | 1000                           | Outside rank that costs 1.0             |
-| `--hard-top`            | 3000                           | Outside rank that costs 1.8, else 3.0   |
-| `--lambda-new`          | 0.1                            | Cost of one new outside word            |
-| `--lambda-repeat`       | 0.03                           | Cost of one repeated outside word       |
-| `--lambda-len`          | 0.02                           | Cost per unit above `--simple-units`    |
-| `--lambda-seed`         | 0.01                           | Cost factor of the seed pass            |
-| `--simple-units`        | 7                              | Free unit count of the length cost      |
-| `--core-min-words`      | 5                              | First unit count of the window          |
-| `--core-max-words`      | 9                              | Last unit count of the window           |
-| `--loanwords`           | `vocab/french_loanwords.txt`   | Loan word list of rule C4               |
-| `--senses`              | `vocab/french_core_senses.tsv` | Sense file of section 3.3               |
-| `--max-unchecked-sense` | 0                              | Unchecked targets that K16 accepts      |
-| `--similarity`          | 0.67                           | Lemma Jaccard limit                     |
-| `--spoken-weight`       | 0.5                            | Weight of the Tatoeba term in the blend |
-| `--bold-target`         | on                             | Bold the assigned target                |
-| `--name`                | `French Core Sentences`        | Output deck name                        |
-| `--output`              | from the input name            | Output APKG                             |
-| `--check`               | off                            | Run gates K1 to K19 on the output       |
+| Flag          | Default             | Meaning                                 |
+| ------------- | ------------------- | --------------------------------------- |
+| `--core`      | off                 | Run the core selection                  |
+| `--cards`     | 300                 | Card cap                                |
+| `--words`     | 50                  | Tier F words after the Swadesh set      |
+| `--examples`  | 2                   | Examples per content target, 1 to 3     |
+| `--tail`      | 120                 | Cards after the core passes             |
+| `--output`    | from the input name | Output APKG                             |
+| `--check`     | off                 | Run gates K1 to K19 on the output       |
+
+The other values are fields of `CoreOptions` or `CoreRequest`: the third
+examples, the ubiquitous share, the completion cap, the outside budget, the
+rank curve, the four lambdas, the free unit count, the word window, the
+sense and loan word paths, the unchecked limit, the similarity limit, the
+spoken weight, and the bold flag. The defaults are in `core.py` and
+`ranking/core.py`.
 
 `--core` and `--select` cannot be used together. Rank mode stays the default.
 
@@ -699,7 +685,7 @@ to E5 are closed. Section 14.5 lists what remains.
 
 | Gate | Value                                                                             |
 | ---- | --------------------------------------------------------------------------------- |
-| K1   | 300 cards, equal to `--core-max-cards`; the CSV, the APKG, and the manifest agree |
+| K1   | 300 cards, equal to the card cap of the request; the CSV, the APKG, and the manifest agree |
 | K2   | 204 of 204 coverable targets hold a card; 5 targets are `absent_sense`            |
 | K3   | 0.897, above the limit of 0.85                                                    |
 | K4   | 247 outside words for 209 targets, 1.18 times; 18 are rare                        |
@@ -721,8 +707,7 @@ to E5 are closed. Section 14.5 lists what remains.
 
 ### 14.3 Built deck
 
-`uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --core
---core-words 50 --core-max-cards 300 --tail-cards 120` gives:
+`uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --core` gives:
 
 | Measure                         | Value                                                             |
 | ------------------------------- | ----------------------------------------------------------------- |

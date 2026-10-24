@@ -42,6 +42,10 @@ FREQUENCY_PATH = Path("data/french_frequency.tsv")
 NAMES_PATH = Path("vocab/french_names.txt")
 TATOEBA_PATH = Path("data/tatoeba/fra_sentences.tsv")
 
+DEFAULT_MAX_CARDS = 1000
+DEFAULT_TARGET_WORDS = 300
+DEFAULT_MAX_USES = 4
+
 MODEL_NAME = "French Sentences"
 FRENCH_FIELD = "French"
 AUDIO_FIELD = "sound"
@@ -1931,9 +1935,9 @@ class CullRequest:
 
     input_path: Path
     output_path: Path
-    max_cards: int = 1000
-    target_words: int = 300
-    max_uses: int = 4
+    max_cards: int = DEFAULT_MAX_CARDS
+    target_words: int = DEFAULT_TARGET_WORDS
+    max_uses: int = DEFAULT_MAX_USES
     exempt_top: int = 100
     spoken_weight: float = 0.5
     min_words: int = 3

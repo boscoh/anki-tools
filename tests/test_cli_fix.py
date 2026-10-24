@@ -66,7 +66,7 @@ class TestSelectMode:
             cli.french_cull, "run_cull", lambda request: requests.append(request)
         )
 
-        cli.fr(deck_file, select=True, reserve=False, max_cards=500)
+        cli.fr(deck_file, select=True, reserve=False, cards=500)
 
         assert requests[0].no_reserve is True
         assert requests[0].max_cards == 500

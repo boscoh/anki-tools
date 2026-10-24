@@ -47,8 +47,8 @@ from anki_tools.sentence_pack.english_sense import english_tokens, load_senses
 
 SENSE_PATH = Path("vocab/french_core_senses.tsv")
 DEFAULT_NAME = "French Core Sentences"
-
-SIMPLE_UNITS = 7
+DEFAULT_CORE_WORDS = 50
+DEFAULT_OPTIONS = CoreOptions(tail_cards=120)
 
 MODEL_NAME = cull.MODEL_NAME
 FRENCH_FIELD = cull.FRENCH_FIELD
@@ -138,7 +138,7 @@ class CoreRequest:
 
     input_path: Path
     output_path: Path
-    core_words: int = 50
+    core_words: int = DEFAULT_CORE_WORDS
     options: CoreOptions = field(default_factory=CoreOptions)
     min_units: int = MIN_UNITS
     max_units: int = MAX_UNITS
