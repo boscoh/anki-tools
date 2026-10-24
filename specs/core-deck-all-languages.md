@@ -211,6 +211,50 @@ Every language also needs a deck with a usable English field. The French deck
 has one. The Spanish deck at `apkg/Spanish 9000 sentences with native audio.apkg`
 has one. Check the other decks before a build.
 
+### 8.1 Frequency source
+
+| Language | Primary                | Fallback                    | License                   |
+| -------- | ---------------------- | --------------------------- | ------------------------- |
+| fr       | wordfreq + Tatoeba     | Lexique 4.00                | Apache-2.0 + CC BY-SA 4.0 |
+| es       | FrequencyWords es_full | Leipzig spa_web             | CC BY-SA 4.0 / CC BY 4.0  |
+| zh       | wordfreq zh            | FrequencyWords zh_cn, zh_tw | Apache-2.0 + CC BY-SA 4.0 |
+| yue      | Cifu + HKCanCor        | HKCanCor alone              | GPL-3.0 / CC BY 4.0       |
+
+Rules:
+
+- No single source covers all four languages. wordfreq, FrequencyWords, and
+  Leipzig have no `yue` list.
+- Do not use SUBTLEX-ESP. Its license is Creative Commons
+  Attribution-NonCommercial-NoDerivatives 3.0: no derivatives and no
+  commercial use.
+- Do not use the SUBTLEX-CH files. The page states no license.
+- Cifu is GPL-3.0. HKCanCor (CC BY 4.0) is the clean fallback for Cantonese.
+- CC BY-SA 4.0 is share-alike. The attribution file and the manifest must name
+  the source and the license of the derived TSV.
+
+### 8.2 Frequency cache
+
+One TSV per language in `data/`, for example `data/spanish_frequency.tsv`:
+
+| Column  | Meaning                                            |
+| ------- | -------------------------------------------------- |
+| word    | Surface form, as it appears in the deck            |
+| lemma   | Lemma of the form, from the source or a lemmatizer |
+| count   | Token count                                        |
+| pm      | Count per million tokens                           |
+| rank    | 1-based rank of the lemma                          |
+| pos     | Part of speech, empty when the source has none     |
+| source  | Short source name                                  |
+| license | SPDX identifier                                    |
+
+- Record the file sha256 and the source version in the manifest, next to
+  `LICENSES`.
+- `build_targets` looks up lemmas in the rank table. A form-only source needs
+  a lemma column. Without it, unmatched lemmas fall to `UNRANKED_RANK = 100000`.
+- Normalize case and accents. For Chinese, pin the script and convert with
+  OpenCC.
+- Keep the top 50,000 rows, as `data/french_frequency.tsv` does.
+
 ## 9. Interface
 
 Keep the reduced surface of `anki fix fr`:
@@ -240,7 +284,7 @@ Input: `apkg/Spanish 9000 sentences with native audio.apkg`.
 | ---- | ---------------------------------------------------------------- | --------------------------------------------- |
 | S1   | scan and tokenize the deck; compare lemma counts with the ranker | counts agree with `fix es`                    |
 | S2   | Swadesh-only core list, 0 tier F rows, 1 to 2 examples           | K1 to K19 pass with 0 unchecked               |
-| S3   | author 50 tier F rows                                            | every tier F target is `checked`              |
+| S3   | build the frequency cache (8.2), then author 50 tier F rows      | every tier F target is `checked`              |
 | S4   | build the 300-card deck                                          | K1 to K19 pass; coverage CSV agrees           |
 | S5   | compare with the current `fix es --max-sentences` output         | report coverage, outside words, sense rejects |
 
@@ -252,7 +296,8 @@ Open items:
 - the English field name of the Spanish deck;
 - the audio field and the media check;
 - the `es_core_news_sm` model install;
-- the tier F word list for Spanish (blended frequency, content share, names).
+- the tier F word list for Spanish (FrequencyWords `es_full`, content share,
+  names).
 
 ## 12. Risks
 
