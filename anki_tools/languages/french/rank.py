@@ -12,6 +12,8 @@ See SPEC_RANK_SENTENCES.md for the specification.
 from __future__ import annotations
 
 import re
+from functools import lru_cache
+from typing import Any
 
 from anki_tools.ranking.rank import (
     STRUCTURAL_COMPLEXITY_BLEND,
@@ -33,19 +35,34 @@ def load_frequency_data_fr() -> FrequencyData:
 
 
 
-def _grammar_score_fr_spacy(sentence: str) -> float | None:
-    """Give the spaCy grammar score of a French sentence.
+@lru_cache(maxsize=1)
+def _load_grammar_nlp() -> Any | None:
+    """Load the French spaCy pipeline one time for the grammar score.
 
-    :param sentence: French sentence.
-    :returns: Score from 0 to 100, or None when spaCy or the model is absent.
+    The entity model is not part of the score, so it is left out. A missing
+    spaCy package or model gives ``None``, and the caller uses the marker
+    fallback.
+
+    :returns: The loaded pipeline, or None when spaCy or the model is absent.
     """
     try:
         import spacy
     except ImportError:
         return None
     try:
-        nlp = spacy.load("fr_core_news_sm")
+        return spacy.load("fr_core_news_sm", exclude=["ner"])
     except OSError:
+        return None
+
+
+def _grammar_score_fr_spacy(sentence: str) -> float | None:
+    """Give the spaCy grammar score of a French sentence.
+
+    :param sentence: French sentence.
+    :returns: Score from 0 to 100, or None when spaCy or the model is absent.
+    """
+    nlp = _load_grammar_nlp()
+    if nlp is None:
         return None
     cleaned = re.sub(r"<[^>]+>", "", sentence)
     if not cleaned.strip():
