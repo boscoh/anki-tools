@@ -375,15 +375,22 @@ class AnkiPackage:
         cursor = self.conn.cursor()
 
         if self._db_format == "anki21b":
-            cursor.execute("SELECT id, name FROM notetypes")
+            if include_templates:
+                cursor.execute("SELECT id, name, config FROM notetypes")
+            else:
+                cursor.execute("SELECT id, name FROM notetypes")
             models = {}
             for row in cursor.fetchall():
                 model_id = str(row["id"])
+                css = ""
+                if include_templates:
+                    parsed = self._parse_notetype_config(row["config"] or b"")
+                    css = parsed["css"]
                 models[model_id] = {
                     "name": row["name"],
                     "flds": [],
                     "tmpls": [],
-                    "css": "",
+                    "css": css,
                 }
 
             cursor.execute("SELECT ntid, name, ord FROM fields ORDER BY ntid, ord")

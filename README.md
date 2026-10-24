@@ -107,6 +107,21 @@ and CSS files. Run it again after a template edit.
 `uv run anki preview --open-browser` writes the file and opens it. Use
 `--output <path>` to write another file.
 
+Use `--apkg <path>` to preview the real cards of a package. The command
+reads the note fields, the card templates, and the model CSS of that file.
+It also extracts the media files that the cards use, so the audio controls
+play and the images show.
+
+```bash
+uv run anki preview --apkg deck.apkg --output preview/deck.html
+```
+
+The package preview shows 50 cards by default. Use `--limit 0` to show every
+card, `--deck <text>` to select a deck, and `--search <text>` to select a
+field value. Use `--no-media` to keep the audio placeholders. The media
+files go to a directory named after the HTML file, for example
+`preview/deck_media/`. Use `--media-dir <path>` to select another directory.
+
 ### Python API
 
 ```python

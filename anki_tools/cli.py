@@ -6,6 +6,7 @@ Commands:
     swadesh - Build Swadesh vocabulary APKG files with audio
     fix - Fix and optimize decks (zh, fr, yue)
     style - Apply CSS and card templates to any deck
+    preview - Build an HTML preview of the templates or of a package
 """
 
 import csv
@@ -45,6 +46,7 @@ from anki_tools.languages.mandarin.stages import (
 )
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.preview import write_preview
+from anki_tools.preview_apkg import write_apkg_preview
 from anki_tools.sentence_pack import audio as pack_audio
 from anki_tools.sentence_pack import pack as sentence_pack
 from anki_tools.sentence_pack import pool as sentence_pool
@@ -1920,15 +1922,47 @@ def list_languages():
 def preview(
     output: Path = Path("preview/cards.html"),
     *,
+    apkg: Path | None = None,
+    limit: int = 50,
+    deck: str | None = None,
+    search: str | None = None,
+    media: bool = True,
+    media_dir: Path | None = None,
     open_browser: bool = False,
 ):
-    """Build the browser preview of every card template.
+    """Build a browser preview of the card templates or of a package.
+
+    Without ``--apkg`` the command reads the repository templates. With
+    ``--apkg`` the command reads the note fields, the card templates, and the
+    media files of that package.
 
     :param output: HTML file to write (default: ``preview/cards.html``).
+    :param apkg: Package to preview. Defaults to the repository templates.
+    :param limit: Maximum card count of the package preview. Zero shows all.
+    :param deck: Only show package cards of a deck with this text.
+    :param search: Only show package cards with a field that holds this text.
+    :param media: Extract media and link it in the page.
+    :param media_dir: Directory for the extracted media files.
     :param open_browser: Open the written file in the default browser.
     """
-    cards, sections = write_preview(output)
-    print(f"wrote {output} with {cards} cards in {sections} sections")
+    if apkg is None:
+        cards, sections = write_preview(output)
+        print(f"wrote {output} with {cards} cards in {sections} sections")
+    else:
+        result = write_apkg_preview(
+            apkg,
+            output,
+            limit=limit,
+            deck=deck,
+            search=search,
+            extract_media=media,
+            media_dir=media_dir,
+        )
+        print(
+            f"wrote {result.output_path} with {result.cards} of "
+            f"{result.total} cards in {result.sections} sections and "
+            f"{result.media} media files"
+        )
     if open_browser:
         webbrowser.open(Path(output).resolve().as_uri())
 

@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from anki_tools.preview import build_sections, write_preview
+from anki_tools.preview import build_sections, render_template, write_preview
 
 
 def test_write_preview_writes_every_section(tmp_path: Path) -> None:
@@ -30,3 +30,18 @@ def test_vocabulary_cards_hold_only_card_content() -> None:
 
     assert by_title["French vocabulary"].fields == "audio, french, english"
     assert by_title["Greek vocabulary"].fields == "audio, greek, english"
+
+
+def test_render_template_hides_and_shows_sections() -> None:
+    template = "{{#Tag}}yes{{/Tag}}{{^Tag}}no{{/Tag}}"
+
+    assert render_template(template, {"Tag": "x"}) == "yes"
+    assert render_template(template, {"Tag": ""}) == "no"
+
+
+def test_render_template_handles_filters_and_triple_braces() -> None:
+    template = "{{text:Front}} {{{Back}}} {{! note}}"
+
+    result = render_template(template, {"Front": "a", "Back": "b"})
+
+    assert result == "a b "
