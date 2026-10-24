@@ -62,7 +62,9 @@ class CoreTarget:
     :param tier: ``S`` for a Swadesh form, ``F`` for a frequency lemma.
     :param position: 1-based position in the core list.
     :param form: Surface form of a tier S target, or the lemma of tier F.
-    :param gloss: English Swadesh gloss of a tier S target, empty for tier F.
+    :param gloss: English gloss of the target: the Swadesh gloss of a tier S
+        target, the first sense word of a tier F target, or empty when the
+        target is unchecked.
     :param senses: English sense words, empty when the target is unchecked.
     :param false_friends: English false-friend words of the target.
     """

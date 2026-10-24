@@ -561,6 +561,48 @@ def han_tokens(sentence: str) -> list[str]:
     ]
 
 
+JIEBA_POS: dict[str, tuple[str, ...]] = {
+    "NOUN": ("n", "r"),
+    "VERB": ("v",),
+    "ADJ": ("a",),
+    "ADV": ("d",),
+}
+
+
+def shared_pos(flag: str) -> str:
+    """Map a jieba flag to a tag of the shared content rules.
+
+    The map reads the flag prefix, so ``nr``, ``nz``, and ``vn`` keep a
+    content tag. A pronoun keeps the ``NOUN`` tag, because it stands for a
+    noun, and the shared similarity test and the tier F word list both read
+    that tag. A flag with no prefix of :data:`JIEBA_POS` gives the empty
+    string, which is not a content tag.
+
+    :param flag: jieba part-of-speech flag, for example ``n`` or ``vn``.
+    :returns: ``NOUN``, ``VERB``, ``ADJ``, ``ADV``, or the empty string.
+    """
+    for pos, prefixes in JIEBA_POS.items():
+        if flag.startswith(prefixes):
+            return pos
+    return ""
+
+
+def tokens_with_pos(sentence: str) -> list[tuple[str, str]]:
+    """Tokenize a sentence into Han tokens with a shared part of speech.
+
+    A token whose jieba flag has no shared tag gets the empty string, so the
+    shared rules never see it as a content word.
+
+    :param sentence: Simplified Chinese sentence.
+    :returns: One ``(token, part of speech)`` pair per Han token, in order.
+    """
+    return [
+        (word, shared_pos(flag))
+        for word, flag in _tokens(sentence)
+        if word and all(is_chinese_char(char) for char in word)
+    ]
+
+
 def count_form_tokens(sentence: str, form: str) -> int:
     """Count the tokens of a sentence that equal one form.
 
@@ -579,6 +621,7 @@ FALSE_FRIENDS: dict[str, tuple[str, ...]] = {
     "抓": ("抓住", "抓到", "抓紧"),
     "挖": ("挖苦",),
     "挤": ("挤满",),
+    "来": ("出来", "起来"),
 }
 
 
@@ -646,6 +689,28 @@ def count_form_occurrences(sentence: str, form: str) -> int:
     :returns: Occurrence count outside a different-sense compound.
     """
     return len(form_occurrences(sentence, form))
+
+def highlight(sentence: str, form: str) -> str:
+    """Wrap the matched spans of a card target in a bold tag.
+
+    The span rule is the hit rule of the core deck: the form as a character
+    span, minus the compounds where it takes another sense.
+
+    :param sentence: Simplified Chinese sentence.
+    :param form: Word-table form.
+    :returns: Sentence with the matched spans in ``<b>`` tags.
+    """
+    spans = [
+        (index, index + 1)
+        for index, char in enumerate(sentence)
+        if is_chinese_char(char)
+    ]
+    offsets = form_occurrences(sentence, form)
+    for position in reversed(offsets):
+        start = spans[position][0]
+        end = spans[position + len(form) - 1][1]
+        sentence = f"{sentence[:start]}<b>{sentence[start:end]}</b>{sentence[end:]}"
+    return sentence
 
 
 def sentence_hits(sentence: str, forms: Iterable[str]) -> dict[str, int]:
@@ -964,6 +1029,7 @@ MANDARIN = register(
         comma_marks="，,",
         orphan_conjunctions=ORPHAN_CONJUNCTIONS,
         wordfreq_lang="zh",
+        highlight=highlight,
         tokenizer="",
         native_audio=False,
         prefer_native_audio=False,
@@ -1076,4 +1142,5 @@ __all__ = [
     "Candidate",
     "WordForm",
     "rank_order",
+    "highlight",
 ]

@@ -1,0 +1,20 @@
+# Mandarin loan words that the deck uses. One word per line.
+# Rule C4 rejects a card whose sentence holds one of these words.
+# 咖啡 coffee
+咖啡
+# 坦克 tank
+坦克
+# 巧克力 chocolate
+巧克力
+# 三明治 sandwich
+三明治
+# 威士忌 whiskey
+威士忌
+# 啤酒 beer, 啤 from English beer
+啤酒
+# 酒吧 bar, 吧 from English bar
+酒吧
+# 塔 tower, from Sanskrit stupa
+塔
+# 苹果 apple, from Sanskrit bimba
+苹果

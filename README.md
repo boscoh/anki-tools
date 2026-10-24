@@ -85,6 +85,7 @@ Edit a file, then run the command again to change the deck.
 - `anki fix fr --select`: `templates/french_cull/front.html` and `back.html`.
 - `anki fix fr --core`: `templates/french_core/front.html` and `back.html`.
 - `anki fix yue --core`: `templates/cantonese_core/front.html` and `back.html`.
+- `anki fix zh --core`: `templates/mandarin_core/front.html` and `back.html`.
 
 A builder reads the shared sheet first, then the deck `card.css`, so a deck
 rule overrides a shared rule. A deck `card.css` holds only its own classes.
@@ -155,20 +156,17 @@ The `fix` command optimizes decks by analyzing sentences by complexity, frequenc
 
 **Chinese (zh):**
 ```bash
-uv run anki fix zh deck.apkg                        # Rank, reorder, fix pinyin, apply styling
-uv run anki fix zh deck.apkg --max-sentences 2600   # Also deduplicate and reduce
+uv run anki fix zh deck.apkg        # Rank, reorder, fix pinyin, apply styling
+uv run anki fix zh deck.apkg --core # Core mode: a small core-word deck
 ```
 - Character-based complexity and similarity
 - Uses wordfreq for frequency data with HSK vocabulary bonus
 - Strips repeated-pattern sentences before ranking (e.g. '走吧走吧', '好了，好了')
 - Fixes pinyin formatting and applies card styling
 - Outputs `_reordered.apkg` and `.rank.csv`
-- With `--max-sentences`: stratified reduction across 4 complexity bins (35/35/20/10%)
-  with same-unique-char-length deduplication (threshold 0.67).
-  - Threshold 0.67 is intentional: for 3-unique-char sentences Jaccard jumps from 0.5
-    directly to 1.0 with nothing in between, so 0.67 catches only true anagrams
-    ('你要我'/'我要你') and avoids false positives like '我在这'/'你在这'.
-  - Dedup runs within each complexity bin; cross-bin near-duplicates are not removed.
+- Core mode builds a small deck from the Swadesh word table. It writes
+  `_core.apkg` with its CSV files and manifest. See "Mandarin Core-Word
+  Deck" below.
 
 **French (fr):**
 ```bash
@@ -574,6 +572,34 @@ cards, 43 have one, and 27 are `absent_sense`. All 20 gates pass.
 
 Licenses: Cifu frequency data (GPL-3.0) cached only, and input audio under the
 license of the source deck.
+
+### Mandarin Core-Word Deck
+
+Build a core deck from the Neri Part 2 deck. The tier S form is the reviewed
+word-table form. A form hits a card when it occurs as a character span and the
+paired English holds the Swadesh sense, so 水 hits inside 喝水 and 来 does not
+hit inside 出来.
+
+```bash
+uv run anki freq zh                      # Write data/mandarin_frequency.tsv
+uv run anki freq zh --check              # Run gates Z1 to Z3
+uv run anki fix zh "apkg/Neri's Chinese Sents Part 2.apkg" --core
+# Run gates K1 to K20 on the built deck
+uv run anki fix zh "apkg/Neri's Chinese Sents Part 2.apkg" --core --check
+```
+
+The defaults are 50 tier F words, 300 cards, and 2 examples per word. The
+sense rows are `vocab/mandarin_core_senses.tsv`, and rule C4 reads
+`vocab/mandarin_loanwords.txt`. The deck keeps the input model, adds the `Core`
+and `CoreGloss` fields, and bolds the assigned target.
+
+Measured result on 2026-10-24: 147 cards for 140 targets (90 Swadesh forms and
+50 tier F words). 96 of 117 coverable targets hold two cards, 106 cards hold
+the bold target, and all 20 gates pass. The input deck is small, so 23 targets
+stay `absent_sense`.
+
+Licenses: wordfreq list Apache License 2.0, and input audio under the license
+of the source deck.
 
 ### Swadesh Cantonese Sentences
 

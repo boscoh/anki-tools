@@ -27,6 +27,8 @@ from anki_tools.languages.cantonese import core as cantonese_core
 from anki_tools.languages.french import core as french_core
 from anki_tools.languages.french import cull as french_cull
 from anki_tools.languages.spanish import core as spanish_core
+from anki_tools.languages.mandarin import core as mandarin_core
+from anki_tools.languages.mandarin import frequency as mandarin_frequency
 from anki_tools.languages.cantonese.jyutping import fix_jyutping
 from anki_tools.languages.mandarin.pinyin import fix_pinyin
 from anki_tools.languages.mandarin.stages import (
@@ -65,7 +67,6 @@ from anki_tools.languages import (
 )
 from anki_tools.languages.cantonese.rank import rank_sentences_yue
 from anki_tools.languages.french.rank import rank_sentences_fr
-from anki_tools.languages.mandarin.characters import char_similarity_zh_same_len
 from anki_tools.languages.mandarin.rank import rank_sentences_zh
 from anki_tools.languages.spanish.rank import rank_sentences_es
 from anki_tools.ranking.latin import latin_word_similarity
@@ -643,6 +644,45 @@ def freq_yue(
     if failed:
         raise SystemExit(1)
 
+@freq_app.command(name="zh")
+def freq_zh(
+    *,
+    output: Path = mandarin_frequency.FREQUENCY_PATH,
+    rows: int = mandarin_frequency.MAX_ROWS,
+    fallback: bool = False,
+    refresh: bool = False,
+    check: bool = False,
+):
+    """Build the Mandarin word frequency list from the wordfreq zh list.
+
+    Writes the most frequent forms with their rank, source, and license. The
+    wordfreq list needs no download. ``--fallback`` reads the FrequencyWords
+    ``zh_cn`` and ``zh_tw`` lists instead, and converts ``zh_tw`` to Simplified.
+
+    :param output: Output TSV file, sorted by rank.
+    :param rows: Number of most frequent forms to keep.
+    :param fallback: Read the FrequencyWords files instead of wordfreq.
+    :param refresh: Download the fallback files again.
+    :param check: Run gates Z1 to Z3 and exit with code 1 on a failure.
+    """
+    if fallback:
+        paths = mandarin_frequency.download_zh_sources(force=refresh)
+        data = mandarin_frequency.build_frequency_zh_fallback(paths, rows=rows)
+    else:
+        data = mandarin_frequency.build_frequency_zh(rows=rows)
+    mandarin_frequency.write_frequency_tsv(data, output)
+    print(f"Wrote {len(data)} words to {output}")
+    print(f"  {mandarin_frequency.SOURCE_NAME} {mandarin_frequency.LICENSE}")
+    if not check:
+        return
+    failed = False
+    for gate, ok, message in mandarin_frequency.check_frequency(data):
+        print(f"{gate} {'PASS' if ok else 'FAIL'}: {message}")
+        failed = failed or not ok
+    if failed:
+        raise SystemExit(1)
+
+
 
 # =============================================================================
 # Fix commands - optimize decks by language
@@ -662,16 +702,17 @@ def zh(
     no_pinyin_fix: bool = False,
     no_style: bool = False,
     verbose: bool = False,
-    max_sentences: int | None = None,
-    similarity_threshold: float = 0.67,
-    min_chars: int = 0,
+    core: bool = False,
+    cards: int | None = None,
+    words: int = mandarin_core.DEFAULT_CORE_WORDS,
+    examples: int = mandarin_core.DEFAULT_OPTIONS.per_word,
+    tail: int = mandarin_core.DEFAULT_OPTIONS.tail_cards,
+    check: bool = False,
 ):
     """Fix Chinese deck: rank, reorder, fix pinyin, and apply styling.
 
     Ranks sentences by frequency and complexity, reorders the deck,
     fixes pinyin formatting, and applies card styling.
-    Optionally reduce to max_sentences using stratified complexity sampling
-    with character-based similarity deduplication.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: input_reordered.apkg).
@@ -680,14 +721,50 @@ def zh(
     :param no_pinyin_fix: If True, skip pinyin correction.
     :param no_style: If True, skip card styling (CSS/templates).
     :param verbose: If True, show detailed output.
-    :param max_sentences: Optional max sentence count (e.g., 3000).
-    :param similarity_threshold: Jaccard threshold for deduplication (default 0.67).
-        Uses unique-char-set-size matching so only same-unique-length sentences are
-        compared. For 3-unique-char sentences Jaccard jumps from 0.5 directly to 1.0
-        (no values between), so 0.67 catches only true anagrams like '你要我'/'我要你'.
-        0.5 would also remove valid pairs that share 2 of 4 unique chars ('我在这'/'你在这').
-    :param min_chars: Skip dedup for sentences with fewer raw chars than this (default 0 = off).
+    :param core: Build the core deck instead of ranking and reordering.
+    :param cards: Core mode: card cap.
+    :param words: Core mode: tier F words after the Swadesh set.
+    :param examples: Core mode: examples per content target.
+    :param tail: Core mode: cards after the core passes.
+    :param check: Core mode: run the gates on the output only.
     """
+    if check and not core:
+        print("Error: --check needs --core.")
+        return
+
+    if core:
+        if model_id is not None:
+            print("Error: --model-id does not apply with --core.")
+            return
+        output_path = output or mandarin_core.default_output(apkg_path)
+        if check:
+            code = mandarin_core.check_core(output_path)
+            if code:
+                raise SystemExit(code)
+            return
+        if not apkg_path.exists():
+            print(f"Error: File not found: {apkg_path}")
+            return
+        print("=" * 50)
+        print("Processing Chinese Anki Deck: core mode")
+        print("=" * 50)
+        options = replace(
+            mandarin_core.DEFAULT_OPTIONS,
+            per_word=examples,
+            tail_cards=tail,
+        )
+        if cards is not None:
+            options = replace(options, max_cards=cards)
+        mandarin_core.run_core(
+            mandarin_core.CoreRequest(
+                input_path=apkg_path,
+                output_path=output_path,
+                core_words=words,
+                options=options,
+            )
+        )
+        return
+
     paths = rank_paths(apkg_path, output)
 
     print("=" * 50)
@@ -696,23 +773,10 @@ def zh(
     print(f"Input:   {paths.input_path}")
     print(f"Output:  {paths.output_path}")
     print(f"Ranking: {paths.ranking_path}")
-    if max_sentences:
-        print(f"Target:  {max_sentences} sentences (stratified reduction)")
     print()
 
     print("Step 1: Ranking sentences...")
 
-    def reduce_ranked(ranked: list[Sentence]) -> list[Sentence]:
-        if not max_sentences or len(ranked) <= max_sentences:
-            return ranked
-        print(f"\nStep 2: Reducing to {max_sentences} sentences...")
-        return reduce_sentences_stratified(
-            ranked,
-            target_count=max_sentences,
-            similarity_threshold=similarity_threshold,
-            similarity_fn=char_similarity_zh_same_len,
-            min_chars=min_chars,
-        )
 
     deck = run_ranked_deck(
         paths,
@@ -720,8 +784,6 @@ def zh(
         model_id=model_id,
         romanization_candidates=("Pinyin",),
         keep_filtered=keep_filtered,
-        reduce=reduce_ranked,
-        remove_unranked=bool(max_sentences),
     )
     if not deck.sentences:
         print("No sentences found!")

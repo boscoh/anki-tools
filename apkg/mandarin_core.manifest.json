@@ -1,0 +1,66 @@
+{
+  "build_date": "2026-10-24T13:13:44+00:00",
+  "source": {
+    "input": "apkg/Neri's Chinese Sents Part 2.apkg",
+    "deck": "Mandarin Core Sentences",
+    "model": "0 2024 Sentences Deck"
+  },
+  "params": {
+    "core_words": 50,
+    "per_word": 2,
+    "third_examples": 0,
+    "ubiquitous_share": 0.25,
+    "max_cards": 300,
+    "completion_cards": 120,
+    "tail_cards": 0,
+    "outside_budget": 200,
+    "support_top": 1000,
+    "hard_top": 50000,
+    "lambda_new": 0.1,
+    "lambda_repeat": 0.03,
+    "lambda_len": 0.02,
+    "lambda_seed": 0.01,
+    "simple_units": 7,
+    "similarity": 0.65,
+    "min_units": 2,
+    "max_units": 8,
+    "spoken_weight": 0.5,
+    "bold_target": true,
+    "name": "Mandarin Core Sentences",
+    "max_unchecked_sense": 0,
+    "max_unranked": 0
+  },
+  "counts": {
+    "cards": 147,
+    "targets": 140,
+    "absent": 0,
+    "absent_sense": 23,
+    "unchecked": 0,
+    "unranked": 0,
+    "covered1": 117,
+    "covered2": 96,
+    "full": 98,
+    "outside": 40,
+    "outside_rare": 1,
+    "tail_words": 0,
+    "sense_rows": 140,
+    "bolded": 106,
+    "unbolded": 41,
+    "name_hits": 0,
+    "loan_hits": 0,
+    "rows": 5009,
+    "rejected_c3": 0,
+    "rejected_c4": 0,
+    "sense_failures": 1424
+  },
+  "frequency": {
+    "path": "data/mandarin_frequency.tsv",
+    "spoken_weight": 0.5
+  },
+  "files": {
+    "core_csv": "sha256:9f554bbb257c4f7a2e6883f3fbf6f4ccceedb44dcab642d6488e11b44c88fef6",
+    "coverage_csv": "sha256:96c267af42703f960b6711e9840fb35bd68deddb02d6c09f42ac9d3d30736ce1",
+    "input_apkg": "sha256:e7c99d9f7e176d108652f810388575438b514d9aedec806d9d09a88e71b1b3f1"
+  },
+  "kept_order": "sha256:821141fb7546d71edeb600da73071159a4479bc1ef45e5e8cfc76d24dd3fdfe9"
+}

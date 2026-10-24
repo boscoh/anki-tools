@@ -88,7 +88,7 @@ The flow starts with one pass over the deck:
 | -------- | ----------------------- | ----------------------- | --------- |
 | fr       | spaCy `fr_core_news_sm` | Tatoeba + `wordfreq`    | yes       |
 | es       | spaCy `es_core_news_sm` | `wordfreq`              | yes       |
-| zh       | jieba                   | `wordfreq` + characters | yes       |
+| zh       | jieba                   | `wordfreq zh`           | yes       |
 | yue      | Cifu + jieba            | spoken + written Cifu   | yes       |
 
 The frequency candidate builder is shared: `anki_tools/ranking/corelist.py`
@@ -217,12 +217,12 @@ the word core and retires its stratified preset.
 
 ## 8. Data requirements
 
-| Language | Word table                    | Sense table                     | Tier F rows | State      |
-| -------- | ----------------------------- | ------------------------------- | ----------- | ---------- |
-| fr       | `vocab/english-french.csv`    | `vocab/french_core_senses.tsv`  | 51          | ready      |
-| es       | `vocab/spanish_words.csv`     | `vocab/spanish_core_senses.tsv` | 50          | ready      |
-| zh       | `vocab/english-mandarin.csv`  | none                            | 0           | needs rows |
-| yue      | `vocab/english-cantonese.csv` | none                            | 0           | ready      |
+| Language | Word table                    | Sense table                      | Tier F rows | State |
+| -------- | ----------------------------- | -------------------------------- | ----------- | ----- |
+| fr       | `vocab/english-french.csv`    | `vocab/french_core_senses.tsv`   | 51          | ready |
+| es       | `vocab/spanish_words.csv`     | `vocab/spanish_core_senses.tsv`  | 50          | ready |
+| zh       | `vocab/english-mandarin.csv`  | `vocab/mandarin_core_senses.tsv` | 50          | ready |
+| yue      | `vocab/english-cantonese.csv` | none                             | 0           | ready |
 
 Every language also needs a deck with a usable English field. The French deck
 has one. The Spanish deck at `apkg/Spanish 9000 sentences with native audio.apkg`
@@ -386,14 +386,95 @@ time, and its card reads `"Don't speak nonsense!"`. A second input with paired
 English, the Tatoeba pool of `anki-5z4`, improves that share but is no longer a
 prerequisite.
 
+### 11.4 Mandarin pilot
+
+Input: `apkg/Neri's Chinese Sents Part 2.apkg`, 5009 cards on the model
+`0 2024 Sentences Deck`.
+
+The adapter is `anki_tools/languages/mandarin/core.py`. The tier S form unit is
+the reviewed word-table form, which is one jieba word. The hit rule reads the
+form as a character span in the Han text, and the English gloss of the row
+decides the card. The character span keeps the forms that jieba merges into a
+longer token, for example `水` inside `喝水`. `FALSE_FRIENDS` blocks the spans
+where the form takes another sense, so `来` does not hit inside `出来` and
+`起来`. That hit rule answers the word-boundary risk of section 12.
+
+The run sets 50 tier F words, two examples per word, no tail cards, and a
+similarity limit of 0.65. The sense rows live in
+`vocab/mandarin_core_senses.tsv`, and `vocab/mandarin_loanwords.txt` lists the
+nine loan words for rule C4.
+
+```text
+uv run anki fix zh "apkg/Neri's Chinese Sents Part 2.apkg" --core --output apkg/mandarin_core.apkg
+uv run anki fix zh "apkg/Neri's Chinese Sents Part 2.apkg" --core --check --output apkg/mandarin_core.apkg
+```
+
+| Measure        | Value                      |
+| -------------- | -------------------------- |
+| Input cards    | 5009                       |
+| Passed scan    | 2812                       |
+| Rejected C1    | 1096                       |
+| Rejected F1    | 752                        |
+| Rejected F2    | 348                        |
+| Cards          | 147                        |
+| Targets        | 140 (90 tier S, 50 tier F) |
+| Covered once   | 117                        |
+| Covered twice  | 96 of 117 (0.821)          |
+| Full sense     | 98                         |
+| Partial sense  | 19                         |
+| Absent sense   | 23                         |
+| Outside lemmas | 40, rare 1                 |
+| Unchecked      | 0                          |
+| Sense failures | 1424                       |
+
+The build passes all 20 gates with 147 cards and 140 targets. Gate K3 reports
+the two-card share 0.821 and does not gate. The 23 `absent_sense` targets and
+the 1424 sense failures share one cause: the English field of the deck does
+not hold the gloss of the form. The kept files are `apkg/mandarin_core.apkg`
+with its `.core.csv`, `.coverage.csv`, `.manifest.json`, and `.rank.csv`.
+
+Two repairs followed the first build. The templates now read the audio field
+`[a]` of the model, because `{{Audio}}` named no field, and the Mandarin
+profile sets the `highlight` hook, so the assigned target is bold. The sense
+rows of `一样` and `计划` now start with `same` and `plan`, because the deck
+gave those words in that sense.
+
+```text
+Gate  Result  Detail
+----  ------  --------------------------------------------------------------------------------------------------------------
+K1    PASS    manifest 147, CSV 147, APKG 147
+K2    PASS    covered 117 of 117
+K3    PASS    two cards for 96 of 117 (0.821)
+K4    PASS    outside 40 of 140 targets, rare 1
+K5    PASS    147 card(s) pass the rules
+K6    PASS    no pair reaches the limit
+K7    PASS    0 card(s) without audio:
+K8    PASS    notes 147, CSV 147, media 147 of 147
+K9    PASS    decks ['Mandarin Core Sentences'], models ['0 2024 Sentences Deck']
+K10   PASS    147 rows, order matches
+K11   PASS    140 rows, issues
+K12   PASS    hashes match
+K13   PASS    0 bad hit(s):
+K14   PASS    1 model(s) match, CSS match
+K15   PASS    106 bold card(s), issues
+K16   PASS    0 unchecked, limit 0
+K17   PASS    name hits 0, loan hits 0
+K18   PASS    0 tail card(s), 0 without a new lemma
+K19   PASS    147 core word(s), 0 bad:
+K20   PASS    0 unranked, limit 0
+
+all 20 gates passed
+```
+
 ## 12. Risks
 
 - Data authoring is the long pole. The Spanish pilot needs 50 rows, and a full
   deck needs more.
 - The English translation limits the sense guard. A weak English field rejects
   good cards or passes bad ones.
-- Mandarin needs a word boundary and a segmentation check before a word-level
-  sense test is meaningful.
+- Resolved for Mandarin (section 11.4): the character-span hit rule gives the
+  word-level sense test a boundary. Another script needs the same check before
+  the sense test is meaningful.
 - Adding the guard to the existing cull changes its deck. Measure before the
   change, and record a new manifest.
 - The false-friend column is empty in French. Spanish sets one row: `solo`

@@ -91,6 +91,11 @@ The `zh_Chinese_Commonly_Used_Sentences_w_Word_Explanations` deck is not an
 upstream deck. It is a prepared copy of Neri's Part 1. The `_processed.apkg`
 file is a later local output.
 
+`fix zh --core` reads Neri's Part 2. The model is `0 2024 Sentences Deck` with
+5009 cards that hold a sentence, an English translation, and an audio file in
+the `[a]` field. The core deck needs one model, so the two `TEXT CARD` notes
+are not scanned.
+
 ## 6. Command examples
 
 ```bash
@@ -100,6 +105,7 @@ uv run anki fix fr --select            # same input, 1000-card cull
 uv run anki fix fr --core              # same input, core deck
 uv run anki fix yue                    # uses the LTL deck
 uv run anki fix yue --core             # same input, core deck
+uv run anki fix zh "apkg/Neri's Chinese Sents Part 2.apkg" --core  # core deck
 uv run anki fix es apkg/input.apkg
 ```
 
