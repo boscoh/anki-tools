@@ -308,14 +308,14 @@ def spoken_mass(freq: YueFrequency, candidates: list[Candidate]) -> float:
 
     :param freq: The ranked frequency list.
     :param candidates: Kept candidates.
-    :returns: A value from 0 to 100.
+    :returns: A value from 0 to 1.
     """
     total = sum(row.spoken_count for row in freq.rows)
     if not total:
         return 0.0
     words = {word for candidate in candidates for word in candidate.words}
     covered = sum(row.spoken_count for row in freq.rows if row.word in words)
-    return 100 * covered / total
+    return covered / total
 
 
 def select_yue_sentences(
@@ -462,7 +462,7 @@ def print_selection_summary(report: SelectionReport, options: SelectionOptions) 
     for top in (500, 1000, 1500):
         count = s[f"top{top}"]
         print(f"  Top {top} words present:  {count} ({100 * count / top:.1f}%)")
-    print(f"  Spoken mass:         {s['spoken_mass']:.1f}%")
+    print(f"  Spoken mass:         {100 * s['spoken_mass']:.1f}%")
     limit = options.max_uses or "off"
     print(
         f"  Most uses of one word outside the top {EXEMPT_TOP}: "

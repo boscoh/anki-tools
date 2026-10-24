@@ -480,7 +480,7 @@ class TestSpokenMass:
             FreqRow("食", "", 25, 1.0, 1.0, 1.0, rank=2, source="cifu"),
         ])
         candidates = [Candidate(make_sentence("我。", 0), ["我"], 1)]
-        assert spoken_mass(freq, candidates) == pytest.approx(75.0)
+        assert spoken_mass(freq, candidates) == pytest.approx(0.75)
 
 
 class TestWrittenRegression:
