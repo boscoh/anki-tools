@@ -1,6 +1,7 @@
 """Fix jyutping in Cantonese Anki decks: convert to traditional and regenerate."""
 
 import re
+from functools import lru_cache
 from pathlib import Path
 
 import opencc
@@ -13,6 +14,19 @@ try:
 except ImportError:
     HAS_TOJYUTPING = False
 
+@lru_cache(maxsize=1)
+def _traditional_converter() -> opencc.OpenCC | None:
+    """Load the simplified-to-traditional converter one time.
+
+    The converter takes about 15 ms to build, and its caller runs once per
+    note, so a build per call costs seconds on a deck.
+
+    :returns: The converter, or None when OpenCC cannot load it.
+    """
+    try:
+        return opencc.OpenCC("s2t")
+    except Exception:
+        return None
 
 def simplified_to_traditional(text: str) -> str:
     """Convert simplified Chinese to traditional Chinese.
@@ -20,8 +34,10 @@ def simplified_to_traditional(text: str) -> str:
     :param text: Text with simplified Chinese characters.
     :returns: Text with traditional Chinese characters.
     """
+    converter = _traditional_converter()
+    if converter is None:
+        return text
     try:
-        converter = opencc.OpenCC('s2t')
         return converter.convert(text)
     except Exception:
         return text
