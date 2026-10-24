@@ -17,8 +17,6 @@
   "outputTranscript": true,
   "worktreeIsolation": true,
   "maxSubagentDepth": 2,
-  "reportUsage": true,
-  "showCost": true,
   "showModel": false,
   "viewerMarkdown": "assistant"
 }
