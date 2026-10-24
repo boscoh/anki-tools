@@ -109,8 +109,13 @@ not hold gets `UNRANKED_RANK`. Build the full ranked candidate list, drop the
 forms that the Swadesh table already holds, then cut to `--words`. Do not cut
 before the exclusion.
 
-Apply the same rules as the French core: the content share, the minimum deck
-count, the name list, and the loan word list.
+Apply the same rules as the French core: the content share, the name list, and
+the loan word list. The minimum deck count is one more than the example quota,
+so the selector keeps one spare candidate.
+
+The manifest counts the tier F targets whose rank is `UNRANKED_RANK`. Gate K20
+caps that count, like K16 caps `unchecked`. An unranked word sorts below every
+ranked word; its tie-break is the deck count, then the form.
 
 Invariant: for French, the new builder must produce the current 209 targets
 (159 tier S and 50 tier F) with the same positions, keys, glosses, and sense
@@ -274,11 +279,12 @@ sense file from the profile. No new per-language flags.
 
 ## 10. Gates and acceptance
 
-Reuse gates K1 to K19 with the language file paths. A language is accepted when:
+Reuse gates K1 to K20 with the language file paths. A language is accepted when:
 
 - every K gate passes;
 - `checked` equals the targets with a sense row plus every tier S target;
 - `unchecked` is within the limit;
+- `unranked` is within the limit;
 - every `CoreGloss` equals the target's first sense;
 - the manifest records the kept order and the hashes.
 

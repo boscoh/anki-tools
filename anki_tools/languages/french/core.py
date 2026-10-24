@@ -134,6 +134,7 @@ class CoreRequest:
     :param name: Output deck name.
     :param bold_target: Bold the assigned target in the sentence.
     :param max_unchecked_sense: Unchecked targets that gate K16 accepts.
+    :param max_unranked: Unranked tier F targets that gate K20 accepts.
     """
 
     input_path: Path
@@ -148,6 +149,7 @@ class CoreRequest:
     name: str = DEFAULT_NAME
     bold_target: bool = True
     max_unchecked_sense: int = 0
+    max_unranked: int = 0
 
 
 @dataclass
@@ -503,6 +505,7 @@ def run_core(request: CoreRequest) -> CoreRun:
         ranks,
         names,
         target_words=None,
+        min_deck_count=request.options.per_word + 1,
     )
     targets, merged = build_core_targets(
         table, frequency_targets, senses, request.core_words
@@ -814,6 +817,9 @@ def manifest_counts(
         "absent": statuses["absent"],
         "absent_sense": statuses["absent_sense"],
         "unchecked": statuses["unchecked"],
+        "unranked": sum(
+            1 for row in coverage if row["tier"] == "F" and ranks.get(row["word"]) is None
+        ),
         "covered1": sum(1 for row in coverage if int(row["count"]) >= 1),
         "covered2": sum(1 for row in coverage if int(row["count"]) >= 2),
         "full": sum(
@@ -1061,6 +1067,7 @@ def write_manifest(
             "bold_target": request.bold_target,
             "name": request.name,
             "max_unchecked_sense": request.max_unchecked_sense,
+            "max_unranked": request.max_unranked,
         },
         "counts": counts,
         "frequency": {

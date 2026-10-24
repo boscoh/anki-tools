@@ -354,6 +354,12 @@ def gate_sense(files: CoreFiles) -> tuple[bool, str]:
     limit = int(files.manifest()["params"].get("max_unchecked_sense", 0))
     return unchecked <= limit, f"{unchecked} unchecked, limit {limit}"
 
+def gate_unranked(files: CoreFiles) -> tuple[bool, str]:
+    """K20: the unranked tier F targets stay inside the limit."""
+    count = int(files.manifest()["counts"].get("unranked", 0))
+    limit = int(files.manifest()["params"].get("max_unranked", 0))
+    return count <= limit, f"{count} unranked, limit {limit}"
+
 
 def gate_names(files: CoreFiles) -> tuple[bool, str]:
     """K17: no kept card holds a name or a loan word."""
@@ -421,6 +427,7 @@ GATES: tuple[Gate, ...] = (
     CoreGate("K17", gate_names),
     CoreGate("K18", gate_tail),
     CoreGate("K19", gate_gloss),
+    CoreGate("K20", gate_unranked),
 )
 
 
