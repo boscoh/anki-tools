@@ -95,6 +95,12 @@ The back template of the vocab deck holds the `{{fields}}` placeholder for
 the field blocks. The command writes these blocks from the field list of the
 language.
 
+### Card Previews
+
+`uv run python scripts/build_card_preview.py` writes `preview/cards.html`.
+Open the file in a browser to see every card type with sample data. The script
+reads the real template and CSS files. Run it again after a template edit.
+
 ### Python API
 
 ```python
