@@ -126,7 +126,7 @@ def test_the_vocab_templates_hold_the_field_placeholder() -> None:
     assert "{{fields}}" in load_text(directory / "back.html")
 
 
-def test_every_deck_aligns_the_card_text_to_the_left() -> None:
+def test_the_cards_align_the_text_to_the_reading_side() -> None:
     shared = load_text(SHARED_CSS_PATH)
     assert "text-align: left" in shared
     centred = [
@@ -136,3 +136,10 @@ def test_every_deck_aligns_the_card_text_to_the_left() -> None:
     ]
 
     assert centred == []
+
+
+def test_the_arabic_deck_aligns_the_text_to_the_right() -> None:
+    arabic = load_text(TEMPLATES_DIR / "vocab" / "arabic" / "card.css")
+
+    assert "direction: rtl" in arabic
+    assert "text-align: right" in arabic

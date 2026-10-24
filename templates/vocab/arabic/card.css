@@ -1,0 +1,5 @@
+/* Arabic reads right to left, so the card aligns right. */
+.card {
+    direction: rtl;
+    text-align: right;
+}
