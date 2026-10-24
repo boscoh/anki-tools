@@ -17,11 +17,26 @@ from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterable, Sequence
+from typing import Any, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
 from anki_tools.languages.french import cull
+from anki_tools.languages.french.core_gates import check_core  # noqa: F401
+from anki_tools.languages.french.core_types import (
+    CORE_BACK_TEMPLATE,  # noqa: F401
+    CORE_FIELD,
+    CORE_FRONT_TEMPLATE,  # noqa: F401
+    CORE_GLOSS_FIELD,
+    CORE_TEMPLATES,
+    CONTENT_POS,
+    LOAN_PATH,
+    MAX_UNITS,
+    MIN_UNITS,
+    TARGET_SEPARATOR,
+    filter_core_cards,
+    read_loanwords,
+    side_paths,
+)
 from anki_tools.languages.french.profile import FRENCH, load_word_table
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
 from anki_tools.ranking.core import select as select_core
@@ -31,28 +46,15 @@ from anki_tools.sentence_pack.audit import sha256_value
 from anki_tools.sentence_pack.english_sense import english_tokens, load_senses
 
 SENSE_PATH = Path("vocab/french_core_senses.tsv")
-LOAN_PATH = Path("vocab/french_loanwords.txt")
 DEFAULT_NAME = "French Core Sentences"
 
-MIN_UNITS = 5
-MAX_UNITS = 9
 SIMPLE_UNITS = 7
 
 MODEL_NAME = cull.MODEL_NAME
 FRENCH_FIELD = cull.FRENCH_FIELD
 AUDIO_FIELD = cull.AUDIO_FIELD
 ENGLISH_FIELD = cull.ENGLISH_FIELD
-CORE_FIELD = "Core"
-CORE_GLOSS_FIELD = "CoreGloss"
 
-TEMPLATE_DIR = TEMPLATES_DIR / "french_core"
-CORE_FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
-CORE_BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")
-CORE_TEMPLATES = (
-    (CORE_FRONT_TEMPLATE, CORE_BACK_TEMPLATE),
-)
-
-CONTENT_POS = cull.CONTENT_POS
 CORE_COLUMNS: tuple[str, ...] = (
     "note_id",
     "index",
@@ -81,8 +83,6 @@ COVERAGE_COLUMNS: tuple[str, ...] = (
     "count",
     "status",
 )
-STATUSES = ("covered", "partial", "absent", "absent_sense", "unchecked")
-TARGET_SEPARATOR = "|"
 FILTER_KEYS = (*cull.FILTER_RULES, "C1", "C2", "C3", "C4", "C5")
 
 
@@ -233,23 +233,6 @@ def _first_word(text: str) -> str:
         if word:
             return word
     return ""
-
-
-def read_loanwords(path: Path = LOAN_PATH) -> frozenset[str]:
-    """Read the loan word list of rule C4.
-
-    :param path: Text file, one word per line. A ``#`` line is a comment.
-    :returns: Casefolded words, empty when the file is missing.
-    """
-    source = Path(path)
-    if not source.exists():
-        return frozenset()
-    words = set()
-    for line in source.read_text(encoding="utf-8").splitlines():
-        text = line.strip()
-        if text and not text.startswith("#"):
-            words.add(text.casefold())
-    return frozenset(words)
 
 
 def glosses_share_sense(english_a: str, english_b: str) -> bool:
@@ -446,86 +429,6 @@ def holds_tier_s_sense(target: CoreTarget, english: str) -> bool:
     return holds_sense(target.gloss, english)
 
 
-def _has_predicate(tokens: Sequence[tuple[str, str]]) -> bool:
-    """Give rule C1: the sentence has a verb, auxiliary, or adjective."""
-    return any(pos in {"VERB", "AUX", "ADJ"} for _lemma, pos in tokens)
-
-
-def _holds_name(sentence: str, names: Iterable[str]) -> bool:
-    """Give rule C3: a whole word of the name list occurs in the sentence.
-
-    French uses a word boundary. A substring test would reject a common word
-    that holds a short name, for example ``tomber`` with the name ``tom``.
-    Chinese and Cantonese use the substring test of the yue selector instead.
-    """
-    words = {word.casefold() for word in cull._WORD_PATTERN.findall(sentence)}
-    return any(name.casefold() in words for name in names)
-
-
-def _holds_loanword(sentence: str, loanwords: Iterable[str]) -> bool:
-    """Give rule C4: a loan word occurs in the sentence.
-
-    The rule splits the loan word on non-letters, so ``week-end`` also
-    matches the two words ``week`` and ``end`` in the sentence.
-    """
-    words = {word.casefold() for word in cull._WORD_PATTERN.findall(sentence)}
-    for loan in loanwords:
-        parts = [
-            part.casefold()
-            for part in cull._WORD_PATTERN.findall(loan)
-        ]
-        if parts and all(part in words for part in parts):
-            return True
-    return False
-
-
-def filter_core_cards(
-    cards: Sequence[cull.InputCard],
-    tokens: Sequence[Sequence[tuple[str, str]]],
-    media: set[str],
-    names: Iterable[str],
-    loanwords: Iterable[str],
-    *,
-    min_units: int = MIN_UNITS,
-    max_units: int = MAX_UNITS,
-) -> tuple[list[int], list[str]]:
-    """Apply rules F1 to F9 and C1 to C5 to the cards.
-
-    :param cards: Input cards.
-    :param tokens: Lemma and part of speech per card.
-    :param media: File names of the input media map.
-    :param names: Name list of rule C3.
-    :param loanwords: Loan word list of rule C4.
-    :param min_units: First unit count of the window.
-    :param max_units: Last unit count of the window.
-    :raises ValueError: The card list and the token list differ in size.
-    :returns: The input indices that pass, and the reason per input index. A
-        passed card has the empty string as its reason.
-    """
-    if len(cards) != len(tokens):
-        raise ValueError("The card list and the token list differ in size.")
-    passed, cull_reasons = cull.filter_cards(
-        cards, tokens, min_words=min_units, max_words=max_units
-    )
-    reasons = list(cull_reasons)
-    kept: list[int] = []
-    for index in passed:
-        card = cards[index]
-        if not _has_predicate(tokens[index]):
-            reasons[index] = "C1"
-        elif FRENCH.has_orphan(card.sentence):
-            reasons[index] = "C2"
-        elif _holds_name(card.sentence, names):
-            reasons[index] = "C3"
-        elif _holds_loanword(card.sentence, loanwords):
-            reasons[index] = "C4"
-        elif not card.audio or card.audio not in media:
-            reasons[index] = "C5"
-        else:
-            kept.append(index)
-    return kept, reasons
-
-
 def default_output(apkg_path: Path) -> Path:
     """Build the default output path of a core run.
 
@@ -534,36 +437,6 @@ def default_output(apkg_path: Path) -> Path:
     """
     path = Path(apkg_path)
     return path.parent / f"{path.stem}_core.apkg"
-
-
-def check_core(output_path: Path) -> int:
-    """Run gates K1 to K18 on the files of a core output.
-
-    The gate code lives in ``core_gates.py``, which imports this module. The
-    import is local, so the two modules do not load each other at start.
-
-    :param output_path: Output APKG file.
-    :returns: The exit code of the gate table, 0 on a pass.
-    """
-    from anki_tools.languages.french.core_gates import check_core as run
-
-    return run(Path(output_path))
-
-
-def side_paths(output_path: Path) -> tuple[Path, Path, Path, Path]:
-    """Build the four side file paths of a core run.
-
-    :param output_path: Output APKG file.
-    :returns: The core CSV, the coverage CSV, the manifest, and the rank CSV.
-    """
-    path = Path(output_path)
-    stem = path.with_suffix("") if path.suffix else path
-    return (
-        Path(f"{stem}.core.csv"),
-        Path(f"{stem}.coverage.csv"),
-        Path(f"{stem}.manifest.json"),
-        Path(f"{stem}.rank.csv"),
-    )
 
 
 def size_check(quotas: dict[str, int], max_cards: int) -> None:
