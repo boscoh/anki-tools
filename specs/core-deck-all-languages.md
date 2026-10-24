@@ -68,7 +68,7 @@ so the sentence and the gloss cannot disagree.
 Rules:
 
 - A tier S gloss comes from the reviewed word table, for example
-  `vocab/english-spanish.csv`.
+  `vocab/spanish_words.csv`.
 - A tier F gloss is the first word of its sense row. Tier F has no reviewed
   gloss of its own, so the sense row supplies both the test and the back text.
 - A target without a sense row is `unchecked`. It selects cards with no sense
@@ -202,8 +202,9 @@ The cover keeps a card only when its gain is positive. Each language supplies:
 
 The core preset uses the five passes of `anki_tools/ranking/core.py`: seed,
 depth, completion, tail, top-up, with the outside-word cost. The breadth preset
-uses the cull cap and the Swadesh reserve. A stratified preset for Mandarin and
-Spanish remains a separate policy and is not part of this spec.
+uses the cull cap and the Swadesh reserve. A stratified preset stays the
+Spanish mode and is not part of this spec. The M6 decision moves Mandarin to
+the word core and retires its stratified preset.
 
 ## 7. Order and card
 
@@ -219,7 +220,7 @@ Spanish remains a separate policy and is not part of this spec.
 | Language | Word table                    | Sense table                    | Tier F rows | State      |
 | -------- | ----------------------------- | ------------------------------ | ----------- | ---------- |
 | fr       | `vocab/english-french.csv`    | `vocab/french_core_senses.tsv` | 51          | ready      |
-| es       | `vocab/english-spanish.csv`   | none                           | 0           | needs rows |
+| es       | `vocab/spanish_words.csv`     | none                           | 0           | needs rows |
 | zh       | `vocab/english-mandarin.csv`  | none                           | 0           | needs rows |
 | yue      | `vocab/english-cantonese.csv` | none                           | 0           | needs rows |
 
@@ -310,11 +311,14 @@ Step S5 decides whether the core guarantee beats the current complexity spread.
 
 Open items:
 
-- the English field name of the Spanish deck;
-- the audio field and the media check;
-- the `es_core_news_sm` model install;
-- the tier F word list for Spanish (FrequencyWords `es_full`, content share,
-  names).
+- Resolved: the sentence field is `SpanishSentence`, the English field is
+  `EnglishSentence`, and the audio field is `Audio`, on the model
+  `Spanish sentences cloze+` (anki21b, zstd media).
+- Resolved: `es_core_news_sm` is installed.
+- Resolved: the word table is `vocab/spanish_words.csv`; the older
+  `vocab/english-spanish.csv` has slashed variant rows that cannot match tokens.
+- Open: the tier F word list for Spanish (FrequencyWords `es_full`, content
+  share, names).
 
 ## 12. Risks
 
@@ -340,5 +344,5 @@ Open items:
 | M3        | French core list unchanged on the new record               |
 | M4        | Spanish Swadesh-only deck, gates pass                      |
 | M5        | Spanish tier F sense rows and the 300-card deck            |
-| M6        | decision on Mandarin: word core or keep complexity spread  |
+| M6        | Mandarin decision recorded: word core; complexity spread retired |
 | M7        | Cantonese core deck on the same contract                   |
