@@ -167,6 +167,10 @@ either several rows or a wider sense list. The French `plus` row lists
 `more,most,else,longer,further`, so `no longer` passes, although it is a
 different sense. A false friend could reject it.
 
+Tier F senses are single English words. The TSV has no phrase column, so a
+multiword sense needs a wider word list or a false friend. Tier S supports
+phrases through `vocab/english_senses.json`.
+
 Counts: French has 51 rows for 50 tier F words plus `ne`. A 300-card core deck
 in another language needs roughly 50 to 150 rows. A Swadesh-only deck needs
 none, because tier S uses the gloss table.
