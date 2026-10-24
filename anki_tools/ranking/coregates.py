@@ -523,7 +523,7 @@ def gate_tail(files: CoreFiles) -> tuple[bool, str]:
 
 
 def gate_gloss(files: CoreFiles) -> tuple[bool, str]:
-    """K19: the core gloss pairs with the core word and holds one sense."""
+    """K19: the core gloss is the target gloss of the core word."""
     profile = files.profile
     names = files.fields()
     missing = [
@@ -535,6 +535,7 @@ def gate_gloss(files: CoreFiles) -> tuple[bool, str]:
         return False, f"model has no {_sample(missing)} field"
     word_index = names.index(profile.core_field)
     gloss_index = names.index(profile.core_gloss_field)
+    allowed = _target_glosses(files)
     bad: list[str] = []
     filled = 0
     for note_id, values in files.notes().items():
@@ -549,7 +550,32 @@ def gate_gloss(files: CoreFiles) -> tuple[bool, str]:
             bad.append(f"{note_id} has no gloss")
         elif "," in gloss:
             bad.append(f"{note_id} holds a comma gloss")
+        elif word in allowed and gloss not in allowed[word]:
+            bad.append(
+                f"{note_id} gloss {gloss!r} is not the target gloss of {word}"
+            )
     return not bad, f"{filled} core word(s), {len(bad)} bad: {_sample(bad)}"
+
+
+def _target_glosses(files: CoreFiles) -> dict[str, set[str]]:
+    """Read the target glosses of the coverage CSV, keyed by word.
+
+    A form can hold more than one target, so the map holds a set per word. A
+    missing coverage file is not this gate's failure: K1 and K11 report it.
+
+    :param files: Lazy reader of the output files.
+    :returns: Word to the set of its target glosses.
+    """
+    try:
+        rows = files.coverage()
+    except (OSError, ValueError):
+        return {}
+    allowed: dict[str, set[str]] = {}
+    for row in rows:
+        word = (row.get("word") or "").strip()
+        if word:
+            allowed.setdefault(word, set()).add((row.get("gloss") or "").strip())
+    return allowed
 
 
 GATES: tuple[Gate, ...] = (

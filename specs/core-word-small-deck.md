@@ -513,7 +513,7 @@ non-zero.
 | K16  | every target with a card has a sense row, or the unchecked count is within `--max-unchecked-sense` |
 | K17  | no kept card holds a name or a loan word, and the manifest gives both counts |
 | K18  | every tail card brings at least one new content lemma                 |
-| K19  | every note with a `Core` value holds a one-word `CoreGloss` value, and no other note holds a gloss |
+| K19  | every note with a `Core` value holds the target gloss of that word, and no other note holds a gloss |
 
 ### 10.2 Tests
 
@@ -703,7 +703,7 @@ to E5 are closed. Section 14.5 lists what remains.
 | K16  | 0 unchecked targets                                                               |
 | K17  | 0 names and 0 loan words in the kept cards                                        |
 | K18  | every tail card brings a new content lemma                                        |
-| K19  | every note with a `Core` value holds a one-word `CoreGloss` value                 |
+| K19  | every note with a `Core` value holds the target gloss of that word                |
 
 ### 14.3 Built deck
 

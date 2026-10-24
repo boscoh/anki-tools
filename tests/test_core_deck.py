@@ -537,6 +537,42 @@ class TestCardDesign:
 
         assert passed, message
 
+    def test_the_gloss_gate_fails_on_a_wrong_gloss(self, tmp_path: Path) -> None:
+        from anki_tools.languages.french import core_gates
+        from anki_tools.ranking.coreflow import side_paths
+
+        source = _tiny_deck(tmp_path)
+        cards = cull.load_input_deck(source)
+        output = tmp_path / "core.apkg"
+        cull.write_deck(source, cards, [0, 1, 2], output, "Core Deck")
+        targets = [_target("S1:chat", form="chat", gloss="cat")]
+        candidates = [
+            CoreCandidate(index=0, targets=("S1:chat",), outside=(), units=3),
+            CoreCandidate(index=1, targets=("S1:chat",), outside=(), units=3),
+            CoreCandidate(index=2, targets=(), outside=(), units=3),
+        ]
+        result = CoreResult(
+            kept=[0, 1, 2],
+            uses=Counter(),
+            quotas={},
+            assigned={0: "S1:chat"},
+            order=[0, 1, 2],
+        )
+        core._write_core_model(
+            output, cards, result, [0, 1, 2], targets, candidates
+        )
+        _core, coverage, _manifest, _rank = side_paths(output)
+        coverage.write_text(
+            "key,word,gloss,tier,position,quota,count,status\n"
+            "S1:chat,chat,dog,S,1,2,2,covered\n",
+            encoding="utf-8",
+        )
+
+        passed, message = core_gates.gate_gloss(core_gates.CoreFiles(output))
+
+        assert not passed
+        assert "is not the target gloss" in message
+
     def test_adding_the_field_twice_changes_nothing(self, tmp_path: Path) -> None:
         source = _tiny_deck(tmp_path)
         with AnkiPackage(source) as package:
