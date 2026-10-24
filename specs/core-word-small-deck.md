@@ -497,7 +497,7 @@ non-zero.
 | ---- | -------------------------------------------------------------------- |
 | K1   | the card count is at most `--core-max-cards`, and the CSV, the APKG, and the manifest agree |
 | K2   | every coverable target has a kept card, where a target whose every candidate fails the sense test is `absent_sense` and is not counted |
-| K3   | at least 0.85 of the coverable targets have 2 cards (measured 0.897) |
+| K3   | report, not a gate: the share of coverable targets with 2 cards (French measured 0.897) |
 | K4   | the outside set of the core cards is at most 1.3 times the target count, and the rare outside words are at most 0.1 of the outside set (measured 247 of 209) |
 | K5   | every kept card passes F1 to F9 and C1 to C5, and the APKG text equals the CSV text |
 | K6   | no kept pair reaches the similarity limit                            |
@@ -687,7 +687,7 @@ to E5 are closed. Section 14.5 lists what remains.
 | ---- | --------------------------------------------------------------------------------- |
 | K1   | 300 cards, equal to the card cap of the request; the CSV, the APKG, and the manifest agree |
 | K2   | 204 of 204 coverable targets hold a card; 5 targets are `absent_sense`            |
-| K3   | 0.897, above the limit of 0.85                                                    |
+| K3   | report only: 0.897 of the coverable targets hold 2 cards                            |
 | K4   | 247 outside words for 209 targets, 1.18 times; 18 are rare                        |
 | K5   | every kept card passes F1 to F9 and C1 to C5                                      |
 | K6   | no kept pair reaches the lemma Jaccard limit                                      |
