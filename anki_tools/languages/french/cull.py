@@ -1433,7 +1433,6 @@ def _write_legacy_decks(package: AnkiPackage, decks: dict[str, dict]) -> None:
     conn.commit()
 
 
-
 GateRow = tuple[str, bool, str]
 GateCheck = Callable[["GateInputs"], tuple[bool, str]]
 

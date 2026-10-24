@@ -427,7 +427,6 @@ def select_yue_sentences(
     return SelectionReport(ordered, select_rows, coverage_rows, summary)
 
 
-
 def write_select_csv(report: SelectionReport, path: Path) -> None:
     """Write one row per input sentence: sentence, kept, reason, targets, gain.
 
