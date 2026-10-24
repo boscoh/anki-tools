@@ -607,7 +607,7 @@ def content_field_order(csv_fields: list[str], audio_field_name: str) -> list[st
 
     :param csv_fields: All CSV column names.
     :param audio_field_name: Column of the target-language form.
-    :returns: Target form, transliteration, English, then the other columns.
+    :returns: Target form, transliteration, and English gloss.
     """
     target = next(
         (field for field in csv_fields if field.lower() == audio_field_name.lower()),
@@ -619,9 +619,6 @@ def content_field_order(csv_fields: list[str], audio_field_name: str) -> list[st
         found = next((field for field in rest if field.lower() == name), None)
         if found:
             result.append(found)
-    for field in rest:
-        if field not in result:
-            result.append(field)
     return result
 
 
@@ -667,6 +664,12 @@ def vocab_card(language: str, title: str) -> PreviewCard:
         "audio": f"[sound:{audio_name(row[language])}]",
     }
     fields.update({field: row.get(field, "") for field in content_order})
+    note = (
+        "The card holds only the target form, the transliteration, and the "
+        "English gloss."
+    )
+    if language in {"mandarin", "cantonese"}:
+        note += " The shared script links each Han character."
     return make_card(
         title,
         front_template,
@@ -678,7 +681,7 @@ def vocab_card(language: str, title: str) -> PreviewCard:
             f" + templates/vocab/{language}/card.css" if language == "cantonese" else ""
         ),
         field_list=", ".join(["audio", *content_order]),
-        note="Each CSV column becomes one field block. The shared script links each Han character.",
+        note=note,
     )
 
 
@@ -753,10 +756,9 @@ def build_sections() -> tuple[PreviewSection, ...]:
             anchor="vocab",
             title="Swadesh vocabulary decks",
             description=(
-                "The vocabulary builder reads the CSV header and makes one field "
-                "block for each column. Cantonese adds a Hong Kong font stack. "
-                "The French and Greek word tables hold review columns, so those "
-                "cards show more blocks."
+                "The vocabulary builder writes one block for the target form, the "
+                "transliteration, and the English gloss. Cantonese adds a Hong Kong "
+                "font stack."
             ),
             cards=vocab_cards,
         ),

@@ -1368,11 +1368,15 @@ def _generate_audio_files(entries: list[dict], config: dict) -> None:
 
 
 def _content_field_order(csv_fields: list[str], audio_field_name: str) -> list[str]:
-    """Order fields: target language, transliteration (if any), english, then rest.
+    """Order the content fields: target language, transliteration, english.
+
+    Review columns of a sentence-pack word table are not card content. The
+    function keeps only the target form, the transliteration, and the English
+    gloss.
 
     :param csv_fields: All CSV column names.
     :param audio_field_name: Name of the audio/target language field.
-    :returns: Ordered list of field names for card content.
+    :returns: Ordered content field names.
     """
     target = next(
         (f for f in csv_fields if f.lower() == audio_field_name.lower()),
@@ -1384,9 +1388,6 @@ def _content_field_order(csv_fields: list[str], audio_field_name: str) -> list[s
         found = next((f for f in rest if f.lower() == name), None)
         if found:
             result.append(found)
-    for f in rest:
-        if f not in result:
-            result.append(f)
     return result
 
 

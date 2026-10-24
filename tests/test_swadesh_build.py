@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from anki_tools.cli import _prune_outdated_audio
+from anki_tools.cli import _content_field_order, _prune_outdated_audio
 
 
 def test_prune_removes_files_not_in_keep(tmp_path: Path) -> None:
@@ -28,3 +28,29 @@ def test_prune_keeps_every_listed_file(tmp_path: Path) -> None:
 
 def test_prune_absent_dir_returns_empty(tmp_path: Path) -> None:
     assert _prune_outdated_audio(tmp_path / "absent", set()) == []
+
+
+def test_content_field_order_keeps_only_card_content() -> None:
+    fields = [
+        "swadesh_index",
+        "english",
+        "french",
+        "gender",
+        "variant",
+        "form_kind",
+        "zipf",
+        "candidate_count",
+        "tier",
+    ]
+
+    assert _content_field_order(fields, "french") == ["french", "english"]
+
+
+def test_content_field_order_keeps_the_transliteration() -> None:
+    fields = ["english", "mandarin", "transliteration"]
+
+    assert _content_field_order(fields, "mandarin") == [
+        "mandarin",
+        "transliteration",
+        "english",
+    ]
