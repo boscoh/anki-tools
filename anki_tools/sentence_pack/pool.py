@@ -468,6 +468,13 @@ def build_candidate_pool(
     paths = pool_paths(profile, Path(data_dir))
     links = read_links(paths["links"])
     sentences = read_sentences(paths["sentences"])
+    prepared = {
+        sentence_id: profile.prepare_text(sentences[sentence_id]).strip()
+        for sentence_id in links
+        if sentence_id in sentences
+    }
+    if profile.warm_tokens is not None:
+        profile.warm_tokens(prepared.values())
     wanted_english = {
         english_id for english_ids in links.values() for english_id in english_ids
     }
@@ -490,7 +497,7 @@ def build_candidate_pool(
         if pair is None:
             continue
         english_id, english_text = pair
-        sentence = profile.prepare_text(raw).strip()
+        sentence = prepared[sentence_id]
         if exceeds_max_units(sentence, max_units):
             record_pass(counts, "F2")
             continue

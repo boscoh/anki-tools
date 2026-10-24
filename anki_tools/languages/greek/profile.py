@@ -13,7 +13,7 @@ import unicodedata
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Collection, Sequence
+from typing import Any, Collection, Iterable, Sequence
 
 from wordfreq import zipf_frequency
 
@@ -26,7 +26,7 @@ from anki_tools.sentence_pack.pack import (
     write_attribution_section,
 )
 from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
-from anki_tools.sentence_pack.tokens import Token, has_finite_verb, tokenize
+from anki_tools.sentence_pack.tokens import Token, TokenCache, has_finite_verb, tokenize
 from anki_tools.sentence_pack.word_table import (
     check_form_labels,
     check_missing_indices,
@@ -329,14 +329,24 @@ def script_problem(text: str) -> str | None:
     return None
 
 
-@lru_cache(maxsize=200_000)
+_TOKEN_CACHE = TokenCache(TOKENIZER)
+
+
 def greek_tokens(sentence: str) -> tuple[Token, ...]:
     """Tokenize a Greek sentence once.
 
     :param sentence: Greek sentence.
     :returns: Tokens of the sentence.
     """
-    return tuple(tokenize(TOKENIZER, sentence))
+    return _TOKEN_CACHE.get(sentence)
+
+
+def warm_tokens(sentences: Iterable[str]) -> None:
+    """Tokenize a run of Greek sentences in one pipeline pass.
+
+    :param sentences: Sentence texts of the pool.
+    """
+    _TOKEN_CACHE.warm(sentences)
 
 
 def token_words(sentence: str) -> list[str]:
@@ -926,6 +936,7 @@ GREEK = register(
         orphan_conjunctions=ORPHAN_CONJUNCTIONS,
         wordfreq_lang="el",
         tokenizer=TOKENIZER,
+        warm_tokens=warm_tokens,
         native_audio=False,
         prefer_native_audio=False,
         voice="gtts:el",

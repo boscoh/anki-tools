@@ -8,7 +8,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import Any
+from typing import Any, Iterable
+
+PIPE_BATCH = 256
 
 
 @dataclass(frozen=True)
@@ -57,18 +59,87 @@ def tokenize(name: str, text: str) -> list[Token]:
     :param text: Sentence text.
     :returns: One token per word and punctuation mark, in sentence order.
     """
-    doc = load_model(name)(text)
+    return [_convert(token) for token in load_model(name)(text)]
+
+
+def tokenize_many(name: str, texts: Iterable[str]) -> list[list[Token]]:
+    """Tokenize sentences in one pipeline pass.
+
+    The pass pays the pipeline overhead once. A call per sentence costs 1 to
+    3 ms each on top of the parse.
+
+    :param name: spaCy model name.
+    :param texts: Sentence texts.
+    :returns: One token list per text, in the given order.
+    """
+    nlp = load_model(name)
     return [
-        Token(
-            text=token.text,
-            lemma=token.lemma_,
-            pos=token.pos_,
-            morph=str(token.morph),
-            punctuation=token.is_punct,
-            idx=token.idx,
-        )
-        for token in doc
+        [_convert(token) for token in doc]
+        for doc in nlp.pipe(texts, batch_size=PIPE_BATCH)
     ]
+
+
+def _convert(token: Any) -> Token:
+    """Convert a spaCy token to the shared record.
+
+    :param token: spaCy token.
+    :returns: The token record.
+    """
+    return Token(
+        text=token.text,
+        lemma=token.lemma_,
+        pos=token.pos_,
+        morph=str(token.morph),
+        punctuation=token.is_punct,
+        idx=token.idx,
+    )
+
+
+class TokenCache:
+    """Per-sentence token cache that a batch pass can fill.
+
+    The guards read one sentence at a time, so the cache keeps the per-sentence
+    result. :meth:`warm` fills it from a whole pool with one pipeline pass.
+
+    :param name: spaCy model name.
+    :param limit: Maximum count of cached sentences.
+    """
+
+    def __init__(self, name: str, limit: int = 200_000) -> None:
+        self.name = name
+        self.limit = limit
+        self._tokens: dict[str, tuple[Token, ...]] = {}
+
+    def get(self, sentence: str) -> tuple[Token, ...]:
+        """Give the tokens of one sentence, and cache them.
+
+        :param sentence: Sentence text.
+        :returns: Tokens of the sentence.
+        """
+        tokens = self._tokens.get(sentence)
+        if tokens is None:
+            tokens = tuple(tokenize(self.name, sentence))
+            self._remember(sentence, tokens)
+        return tokens
+
+    def warm(self, sentences: Iterable[str]) -> None:
+        """Tokenize the sentences that the cache does not hold, in one pass.
+
+        :param sentences: Sentence texts of the pool.
+        """
+        unique = dict.fromkeys(sentences)
+        missing = [text for text in unique if text not in self._tokens]
+        for sentence, tokens in zip(missing, tokenize_many(self.name, missing)):
+            self._remember(sentence, tuple(tokens))
+
+    def _remember(self, sentence: str, tokens: tuple[Token, ...]) -> None:
+        """Cache one result while the cache holds room.
+
+        :param sentence: Sentence text.
+        :param tokens: Tokens of the sentence.
+        """
+        if len(self._tokens) < self.limit:
+            self._tokens[sentence] = tokens
 
 
 def words(name: str, text: str) -> list[str]:

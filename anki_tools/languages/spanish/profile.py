@@ -14,7 +14,7 @@ import unicodedata
 from dataclasses import dataclass, replace
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Collection, Sequence
+from typing import Any, Collection, Iterable, Sequence
 
 from wordfreq import top_n_list, zipf_frequency
 
@@ -50,7 +50,7 @@ from anki_tools.sentence_pack.pack import (
     write_attribution_section,
 )
 from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
-from anki_tools.sentence_pack.tokens import Token, has_finite_verb, tokenize
+from anki_tools.sentence_pack.tokens import Token, TokenCache, has_finite_verb, tokenize
 
 WORD_CSV_PATH = Path("vocab/spanish_words.csv")
 SWADESH_PATH = Path("vocab/swadesh.txt")
@@ -261,14 +261,24 @@ def surface_key(text: str) -> str:
     return prepare_text(text).casefold()
 
 
-@lru_cache(maxsize=50_000)
+_TOKEN_CACHE = TokenCache(TOKENIZER)
+
+
 def spanish_tokens(sentence: str) -> tuple[Token, ...]:
     """Tokenize a Spanish sentence once.
 
     :param sentence: Prepared Spanish sentence.
     :returns: Tokens of the sentence.
     """
-    return tuple(tokenize(TOKENIZER, sentence))
+    return _TOKEN_CACHE.get(sentence)
+
+
+def warm_tokens(sentences: Iterable[str]) -> None:
+    """Tokenize a run of Spanish sentences in one pipeline pass.
+
+    :param sentences: Sentence texts of the pool.
+    """
+    _TOKEN_CACHE.warm(sentences)
 
 
 def word_tokens(sentence: str) -> tuple[Token, ...]:
@@ -1074,6 +1084,7 @@ SPANISH = register(
         orphan_conjunctions=ORPHAN_CONJUNCTIONS,
         wordfreq_lang="es",
         tokenizer=TOKENIZER,
+        warm_tokens=warm_tokens,
         native_audio=True,
         prefer_native_audio=True,
         voice="gtts:es",

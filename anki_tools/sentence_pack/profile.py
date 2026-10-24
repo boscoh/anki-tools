@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Collection, Protocol, Sequence
+from typing import Any, Callable, Collection, Iterable, Protocol, Sequence
 
 
 class WordRow(Protocol):
@@ -107,6 +107,8 @@ class LanguageProfile:
         false-friend sense, given the form and the English text.
     :param false_friend_spans: Hook that gives the spans where a form sits in a
         different-sense compound, given the sentence and the form.
+    :param warm_tokens: Hook that tokenizes a whole sentence pool in one pass, so
+        the per-sentence cache is warm before the guards run.
     """
 
     name: str
@@ -182,6 +184,7 @@ class LanguageProfile:
     char_links: bool = False
     sense_filter: Callable[[str, str], bool] | None = None
     false_friend_spans: Callable[[str, str], Sequence[tuple[int, int]]] | None = None
+    warm_tokens: Callable[[Iterable[str]], None] | None = None
 
     def target_length(self, candidate: Any) -> int:
         """Give the unit length of a candidate.
