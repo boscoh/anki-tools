@@ -11,10 +11,7 @@ pronoun forms match by surface only. A reflexive infinitive such as
 from __future__ import annotations
 
 import csv
-import json
 import unicodedata
-import urllib.parse
-import urllib.request
 from dataclasses import dataclass, replace
 from functools import lru_cache
 from pathlib import Path
@@ -23,13 +20,23 @@ from typing import Any, Collection, Sequence
 from wordfreq import top_n_list, zipf_frequency
 
 from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
-from anki_tools.languages.french.profile import (
+from anki_tools.languages.french.profile import NOUN_INDICES
+from anki_tools.sentence_pack.word_table import (
+    check_form_labels,
+    check_missing_indices,
+    check_review_file,
+    check_row_count,
+    form_positions as shared_form_positions,
+    read_csv_rows,
+    read_swadesh_labels as shared_read_swadesh_labels,
+    read_word_review as shared_read_word_review,
+    write_csv,
+)
+from anki_tools.sentence_pack.wiktionary import (
     LINK_PATTERN,
     NOTE_PATTERN,
-    NOUN_INDICES,
     parse_module_terms,
-    read_csv_rows,
-    read_swadesh_labels,
+    read_module_terms,
 )
 from anki_tools.ranking.latin import latin_text_dedup_key, latin_word_similarity
 from anki_tools.sentence_pack.audit import AuditInputs, GateRow, sample
@@ -67,6 +74,7 @@ DECK_DESCRIPTION = (
     "Audio: synthesized speech (gTTS), voice gtts:es."
 )
 SWADESH_URL = "https://en.wiktionary.org/wiki/Module:Swadesh/data/es"
+SWADESH_PAGE = "Module:Swadesh/data/es"
 TOKENIZER = "es_core_news_sm"
 TEMPLATE_DIR = TEMPLATES_DIR / "sentence_pack" / "spanish"
 
@@ -673,10 +681,12 @@ def form_positions(table: Sequence[WordForm]) -> dict[str, tuple[int, int]]:
     :param table: Reviewed word table.
     :returns: Mapping from form to ``(swadesh_index, variant_rank)``.
     """
-    return {
-        form.spanish: (form.swadesh_index, 0 if form.variant == "primary" else 1)
-        for form in table
-    }
+    return shared_form_positions(table, key=lambda form: form.spanish)
+
+
+def read_swadesh_labels(swadesh_path: Path = SWADESH_PATH) -> list[str]:
+    """Read the Swadesh English labels in index order."""
+    return shared_read_swadesh_labels(swadesh_path)
 
 
 def load_word_table(
@@ -728,60 +738,10 @@ def verb_forms() -> frozenset[str]:
     )
 
 
-def module_terms_url() -> str:
-    """Build the API URL of the Spanish Swadesh module.
-
-    :returns: The MediaWiki API URL.
-    """
-    query = urllib.parse.urlencode(
-        {
-            "action": "parse",
-            "page": "Module:Swadesh/data/es",
-            "prop": "wikitext",
-            "format": "json",
-            "formatversion": "2",
-        }
-    )
-    return f"https://en.wiktionary.org/w/api.php?{query}"
-
-
-def fetch_module_terms(
-    cache_path: Path = MODULE_CACHE_PATH, *, refresh: bool = False
-) -> Path:
-    """Download the Spanish Swadesh module wikitext into the cache.
-
-    :param cache_path: Cache file of the wikitext.
-    :param refresh: Ignore an existing cache file.
-    :raises RuntimeError: The download or the JSON parse fails.
-    :returns: The cache path.
-    """
-    cache_path = Path(cache_path)
-    if cache_path.exists() and not refresh:
-        return cache_path
-    request = urllib.request.Request(
-        module_terms_url(), headers={"User-Agent": "anki-tools"}
-    )
-    try:
-        with urllib.request.urlopen(request, timeout=60) as response:
-            data = json.load(response)
-        text = data["parse"]["wikitext"]
-    except (OSError, ValueError, KeyError) as error:
-        raise RuntimeError(f"cannot read {module_terms_url()}: {error}") from error
-    cache_path.parent.mkdir(parents=True, exist_ok=True)
-    cache_path.write_text(text, encoding="utf-8")
-    return cache_path
-
-
 @lru_cache(maxsize=1)
 def module_terms(cache_path: Path = MODULE_CACHE_PATH) -> dict[int, tuple[str, ...]]:
-    """Read the cached module terms, with a download on the first run.
-
-    :param cache_path: Cache file of the wikitext.
-    :returns: Mapping from index to its raw terms.
-    """
-    path = cache_path if Path(cache_path).exists() else fetch_module_terms(cache_path)
-    return parse_module_terms(Path(path).read_text(encoding="utf-8"))
-
+    """Read the cached module terms, with a download on the first run."""
+    return read_module_terms(SWADESH_PAGE, cache_path, parse_module_terms)
 
 def clean_term(term: str) -> str:
     """Clean one module term.
@@ -795,15 +755,8 @@ def clean_term(term: str) -> str:
 
 
 def read_word_review(review_path: Path = WORD_REVIEW_PATH) -> list[dict[str, str]]:
-    """Read the Spanish word review CSV.
-
-    :param review_path: Review CSV file.
-    :returns: One mapping per row, empty without a file.
-    """
-    if not Path(review_path).exists():
-        return []
-    return read_csv_rows(review_path)
-
+    """Read the Spanish word review CSV."""
+    return shared_read_word_review(review_path)
 
 def _module_forms(index: int) -> set[str]:
     return {clean_term(term) for term in module_terms().get(index, ())}
@@ -823,42 +776,24 @@ def check_word_table(
     """
     failures: list[str] = []
     labels = read_swadesh_labels(swadesh_path)
-    indices = sorted({form.swadesh_index for form in table})
-    if len(indices) != SWADESH_ROWS:
-        failures.append(f"row count: expected {SWADESH_ROWS}, found {len(indices)}")
-    missing = sorted(set(range(1, SWADESH_ROWS + 1)) - set(indices))
-    if missing:
-        failures.append(f"swadesh index: missing {missing}")
+    failures.extend(check_row_count(table, swadesh_rows=SWADESH_ROWS))
+    failures.extend(check_missing_indices(table, swadesh_rows=SWADESH_ROWS))
     forms = [form.spanish for form in table]
     if len(set(forms)) != UNIQUE_FORMS:
         failures.append(
             f"unique forms: expected {UNIQUE_FORMS}, found {len(set(forms))}"
         )
+    failures.extend(check_review_file(review_path))
     review = read_word_review(review_path)
-    if not Path(review_path).exists():
-        failures.append(f"review file missing: {review_path}")
-    open_rows = [
-        row.get("index", "")
-        for row in review
-        if row.get("status", "").lower() == OPEN_STATUS
-    ]
-    if open_rows:
-        failures.append(f"review file has {len(open_rows)} open row(s): {open_rows}")
     reviewed = {
         row.get("index", "")
         for row in review
         if row.get("chosen", "") and row.get("issue", "") != "gender"
     }
+    failures.extend(check_form_labels(table, labels))
     for form in table:
         if not 1 <= form.swadesh_index <= len(labels):
-            failures.append(f"index out of range: {form.swadesh_index}")
             continue
-        label = labels[form.swadesh_index - 1]
-        if form.english != label:
-            failures.append(
-                f"label {form.swadesh_index}: expected {label!r}, "
-                f"found {form.english!r}"
-            )
         problem = form_problem(form.spanish)
         if problem:
             failures.append(f"form {form.spanish}: {problem}")
@@ -997,14 +932,7 @@ def write_sentence_csv(cards: list[Candidate], path: Path = SENTENCES_PATH) -> P
     :param path: Output CSV file.
     :returns: The written path.
     """
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=SENTENCE_FIELDS)
-        writer.writeheader()
-        for card in cards:
-            writer.writerow(sentence_row(card))
-    return path
+    return write_csv(path, SENTENCE_FIELDS, [sentence_row(card) for card in cards])
 
 
 def write_sentence_review_csv(

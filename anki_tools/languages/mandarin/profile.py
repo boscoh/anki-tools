@@ -38,6 +38,17 @@ from anki_tools.sentence_pack.pack import (
 from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
 from anki_tools.sentence_pack.select import rank_order, review_status
 
+from anki_tools.sentence_pack.word_table import (
+    check_english_labels,
+    check_form_count,
+    check_review_file,
+    check_row_count,
+    duplicate_forms,
+    form_positions as shared_form_positions,
+    read_csv_rows,
+    read_swadesh_labels,
+    write_csv,
+)
 DEFAULT_CSV_PATH = Path("vocab/english-mandarin.csv")
 DEFAULT_SWADESH_PATH = Path("vocab/swadesh.txt")
 DEFAULT_OVERRIDES_PATH = Path("vocab/mandarin_pinyin_overrides.csv")
@@ -251,29 +262,6 @@ def _normalize(text: str) -> str:
     return " ".join(text.split())
 
 
-def read_csv_rows(csv_path: Path) -> list[dict[str, str]]:
-    """Read a CSV file into a list of stripped row mappings.
-
-    :param csv_path: CSV file to read.
-    :returns: One mapping per data row, with stripped values.
-    """
-    with Path(csv_path).open(encoding="utf-8", newline="") as handle:
-        return [
-            {key: (value or "").strip() for key, value in row.items()}
-            for row in csv.DictReader(handle)
-        ]
-
-
-def read_swadesh_labels(swadesh_path: Path = DEFAULT_SWADESH_PATH) -> list[str]:
-    """Read the Swadesh English labels in index order.
-
-    :param swadesh_path: File with one English label per line.
-    :returns: Label list, index 1 at position 0.
-    """
-    text = Path(swadesh_path).read_text(encoding="utf-8")
-    return [line.strip() for line in text.splitlines()]
-
-
 def read_pinyin_overrides(
     overrides_path: Path = DEFAULT_OVERRIDES_PATH,
 ) -> dict[str, str]:
@@ -399,14 +387,10 @@ def load_word_table(
 
 
 def _check_size(table: list[WordForm]) -> list[str]:
-    failures: list[str] = []
-    indices = sorted({form.swadesh_index for form in table})
-    if len(indices) != SWADESH_ROWS:
-        failures.append(f"row count: expected {SWADESH_ROWS}, found {len(indices)}")
-    if not MIN_FORMS <= len(table) <= MAX_FORMS:
-        failures.append(
-            f"form count: expected {MIN_FORMS} to {MAX_FORMS}, found {len(table)}"
-        )
+    failures = check_row_count(table, swadesh_rows=SWADESH_ROWS)
+    failures.extend(
+        check_form_count(table, min_forms=MIN_FORMS, max_forms=MAX_FORMS)
+    )
     return failures
 
 
@@ -421,15 +405,10 @@ def _check_indices(table: list[WordForm]) -> list[str]:
 
 
 def _check_unique(table: list[WordForm]) -> list[str]:
-    seen: set[str] = set()
-    duplicates: set[str] = set()
-    for form in table:
-        if form.mandarin in seen:
-            duplicates.add(form.mandarin)
-        seen.add(form.mandarin)
+    duplicates = duplicate_forms(table, key=lambda form: form.mandarin)
     if not duplicates:
         return []
-    return [f"duplicate form: {sorted(duplicates)}"]
+    return [f"duplicate form: {duplicates}"]
 
 
 def _check_labels(table: list[WordForm], swadesh_path: Path) -> list[str]:
@@ -437,15 +416,7 @@ def _check_labels(table: list[WordForm], swadesh_path: Path) -> list[str]:
     failures: list[str] = []
     if len(labels) != SWADESH_ROWS:
         failures.append(f"swadesh labels: expected {SWADESH_ROWS}, found {len(labels)}")
-    for form in table:
-        if not 1 <= form.swadesh_index <= len(labels):
-            continue
-        label = labels[form.swadesh_index - 1]
-        if form.english != label:
-            failures.append(
-                f"label {form.swadesh_index}: expected {label!r}, "
-                f"found {form.english!r}"
-            )
+    failures.extend(check_english_labels(table, labels))
     return failures
 
 
@@ -474,19 +445,6 @@ def _check_pinyin(
     return failures
 
 
-def _check_review_file(review_path: Path) -> list[str]:
-    if not Path(review_path).exists():
-        return [f"review file missing: {review_path}"]
-    open_rows = [
-        row
-        for row in read_csv_rows(review_path)
-        if row.get("status", "").lower() == OPEN_STATUS
-    ]
-    if not open_rows:
-        return []
-    indices = [row.get("index", "") for row in open_rows]
-    return [f"review file has {len(open_rows)} open row(s): {indices}"]
-
 
 def check_word_table(
     table: list[WordForm],
@@ -509,7 +467,7 @@ def check_word_table(
     failures.extend(_check_unique(table))
     failures.extend(_check_labels(table, swadesh_path))
     failures.extend(_check_pinyin(table, csv_path, overrides_path))
-    failures.extend(_check_review_file(review_path))
+    failures.extend(check_review_file(review_path))
     return failures
 
 
@@ -808,13 +766,7 @@ def sentence_pinyin(sentence: str) -> str:
 
 
 def _form_positions(word_table: Sequence[WordForm]) -> dict[str, tuple[int, int]]:
-    return {
-        form.mandarin: (
-            form.swadesh_index,
-            0 if form.variant == "primary" else 1,
-        )
-        for form in word_table
-    }
+    return shared_form_positions(word_table, key=lambda form: form.mandarin)
 
 
 def make_candidate(
@@ -1099,14 +1051,7 @@ def write_sentence_csv(cards: list[Candidate], path: Path = SENTENCES_PATH) -> P
     :param path: Output CSV file.
     :returns: The written path.
     """
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=SENTENCE_FIELDS)
-        writer.writeheader()
-        for card in cards:
-            writer.writerow(sentence_row(card))
-    return path
+    return write_csv(path, SENTENCE_FIELDS, [sentence_row(card) for card in cards])
 
 
 def write_sentence_review_csv(
