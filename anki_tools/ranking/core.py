@@ -17,6 +17,8 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Callable, Iterable, Sequence
 
+from anki_tools.ranking.duplicates import at_limit
+
 #: The value of example 1, 2, and 3 of one target.
 DEMAND = (1.0, 0.35, 0.12)
 
@@ -245,9 +247,7 @@ def _is_duplicate(
     buckets = {index for word in candidate.lemmas for index in shared.get(word, ())}
     lemmas = candidate.lemmas
     for index in buckets:
-        other = kept_sets[index]
-        union = len(lemmas | other)
-        if union and len(lemmas & other) / union >= limit:
+        if at_limit(lemmas, kept_sets[index], limit):
             return True
     return False
 

@@ -37,6 +37,7 @@ from anki_tools.sentence_pack.audio import probe_duration
 from anki_tools.languages.french.profile import EXTRA_CSS, TOKENIZER
 from anki_tools.sentence_pack.pack import load_css
 from anki_tools.ranking.cover import greedy_cover
+from anki_tools.ranking.duplicates import at_limit
 
 FREQUENCY_PATH = Path("data/french_frequency.tsv")
 NAMES_PATH = Path("vocab/french_names.txt")
@@ -887,11 +888,8 @@ def _is_similar(
         kept_indices = shared.get(lemma)
         if kept_indices:
             others.update(kept_indices)
-    size = len(lemma_set)
     for other in others:
-        other_set = sets[other]
-        common = len(lemma_set & other_set)
-        if common and common / (size + len(other_set) - common) >= similarity:
+        if at_limit(lemma_set, sets[other], similarity):
             return True
     return False
 
