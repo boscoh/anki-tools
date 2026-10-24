@@ -498,12 +498,14 @@ examples. A sentence that brings many words outside the core costs more, so
 the deck adds few other words.
 
 ```bash
-uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --core \
-    --core-words 50 --per-word 2 --core-max-cards 300 --tail-cards 120
+uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --core
 # Run gates K1 to K19 on the built deck
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --core \
     --output apkg/french_core_300.apkg --check
 ```
+
+The defaults are the measured preset: 50 tier F words, 300 cards, 2 examples
+per word, and a tail of 120 cards.
 
 The core list starts with the reviewed Swadesh forms of the language. It then
 adds `--core-words` content lemmas in blended frequency order. A target that

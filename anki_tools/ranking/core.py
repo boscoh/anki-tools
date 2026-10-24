@@ -63,7 +63,7 @@ class CoreOptions:
     lambda_repeat: float = 0.03
     lambda_len: float = 0.02
     lambda_seed: float = 0.01
-    simple_units: int = 8
+    simple_units: int = 7
     similarity: float = SIMILARITY_LIMIT
 
     def __post_init__(self) -> None:

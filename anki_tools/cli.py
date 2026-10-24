@@ -781,7 +781,7 @@ def fr(
     third_examples: int = 0,
     ubiquitous_share: float = 0.25,
     completion_cards: int = 120,
-    tail_cards: int = 0,
+    tail_cards: int = 120,
     outside_budget: int = 0,
     support_top: int = 1000,
     hard_top: int = 3000,
@@ -836,7 +836,8 @@ def fr(
     :param ubiquitous_share: Core mode: share above which a target gets
         quota 1.
     :param completion_cards: Core mode: card cap of the completion pass.
-    :param tail_cards: Core mode: cards after the core passes.
+    :param tail_cards: Core mode: cards after the core passes. The default
+        matches the measured 300-card preset.
     :param outside_budget: Core mode: cap on the outside set, 0 for no cap.
     :param support_top: Core mode: outside rank that costs 1.0.
     :param hard_top: Core mode: outside rank that costs 1.8.

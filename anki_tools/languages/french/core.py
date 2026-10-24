@@ -1053,6 +1053,7 @@ def write_manifest(
             "lambda_repeat": request.options.lambda_repeat,
             "lambda_len": request.options.lambda_len,
             "lambda_seed": request.options.lambda_seed,
+            "simple_units": request.options.simple_units,
             "similarity": request.options.similarity,
             "min_units": request.min_units,
             "max_units": request.max_units,

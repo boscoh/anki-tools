@@ -321,6 +321,8 @@ uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --core \
     --core-words 50 --per-word 2 --core-max-cards 300 --tail-cards 120
 ```
 
+These values are the CLI defaults: `--core` alone builds this deck.
+
 The built deck gives 300 cards for 209 targets: 183 targets with 2 cards, 21
 with one, and 5 `absent_sense`. The tail adds 346 new words. The prototype
 row above reads 192 of 205 because it uses the lemma match and no C3 or C4.
