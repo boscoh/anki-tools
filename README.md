@@ -32,6 +32,9 @@ See `docs/anki-tools-layout.md` for the package layout.
 See `docs/anki-command-decks.md` for the source deck and the target deck of
 each command.
 
+See `docs/anki-input-sources.md` for the local input file and the upstream
+source of each `anki fix` command.
+
 ## Quick Start
 
 ### CLI Commands

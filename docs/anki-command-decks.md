@@ -2,6 +2,9 @@
 
 This page gives the source deck and the target deck of each `anki` command.
 
+See `docs/anki-input-sources.md` for the local input file and the upstream
+source of each `anki fix` command.
+
 ## 1. Terms
 
 - **Source deck**: the deck of the input APKG file that the command reads.
@@ -30,9 +33,8 @@ The target name in the tables is the default name.
 
 Notes:
 
-- `anki fix fr` has two default inputs. `--select` and `--core` use
-  `apkg/6000_French_Sentences_w_Audio.apkg` when the argument is absent. Rank
-  mode has no default input.
+- `anki fix fr` uses `apkg/6000_French_Sentences_w_Audio.apkg` when the
+  argument is absent. The default applies to rank, `--select`, and `--core`.
 - `anki fix yue` uses `apkg/LTL Cantonese Deck Level 1 - Short.apkg` when the
   argument is absent.
 - `anki fix fr --select` sets the target name with `--name`. The default is
