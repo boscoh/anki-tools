@@ -99,6 +99,4 @@ uv run anki fix yue                    # uses the LTL deck
 uv run anki fix es apkg/input.apkg
 ```
 
-`docs/anki-command-decks.md` gives the source deck and the target deck of
-every command. `uv run anki fix <lang> --help` shows the default input of
-`fr` and `yue`.
+`uv run anki fix <lang> --help` shows the default input of `fr` and `yue`.
