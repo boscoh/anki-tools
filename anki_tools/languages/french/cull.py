@@ -477,7 +477,7 @@ def build_targets(
     tokens: Sequence[Sequence[tuple[str, str]]],
     ranks: dict[str, int],
     names: Collection[str],
-    target_words: int = 300,
+    target_words: int | None = 300,
 ) -> tuple[list[TargetWord], int]:
     """Build the target word list.
 
@@ -485,7 +485,7 @@ def build_targets(
     :param tokens: Lemma and part of speech per card.
     :param ranks: Lemma to blended frequency rank.
     :param names: Name stoplist.
-    :param target_words: Number of targets to keep.
+    :param target_words: Number of targets to keep, or None for every candidate.
     :raises ValueError: The card list and the token list have different sizes.
     :returns: The targets in rank order, and the count of content lemmas before
         the target cut.
@@ -522,6 +522,8 @@ def build_targets(
         )
 
     candidates.sort(key=lambda target: (target.rank, target.lemma))
+    if target_words is None:
+        return candidates, len(candidates)
     return candidates[:target_words], len(candidates)
 
 

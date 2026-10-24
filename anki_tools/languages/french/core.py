@@ -502,7 +502,7 @@ def run_core(request: CoreRequest) -> CoreRun:
         tokens,
         ranks,
         names,
-        target_words=request.core_words + len(table),
+        target_words=None,
     )
     targets, merged = build_core_targets(
         table, frequency_targets, senses, request.core_words

@@ -103,8 +103,14 @@ Build the target list in one order:
 1. The reviewed Swadesh forms, in table order.
 2. The tier F words, in blended frequency order, up to `--words`.
 
+The tier F candidate set is the lemma set of the scan. The external frequency
+list only sorts that set; it adds no members. A scan lemma that the list does
+not hold gets `UNRANKED_RANK`. Build the full ranked candidate list, drop the
+forms that the Swadesh table already holds, then cut to `--words`. Do not cut
+before the exclusion.
+
 Apply the same rules as the French core: the content share, the minimum deck
-count, the name list, and the loan word list. Cut to the requested count.
+count, the name list, and the loan word list.
 
 Invariant: for French, the new builder must produce the current 209 targets
 (159 tier S and 50 tier F) with the same positions, keys, glosses, and sense
