@@ -1,28 +1,43 @@
-"""Shared types and gate contract of the French core deck.
+"""French core deck adapter: profile, constants, and bound wrappers.
 
-The module holds the constants, the filter rules, and the gate contract that
-:mod:`cull`, :mod:`core`, and :mod:`core_gates` share. Every gate of the core
-audit is a :class:`CoreGate` value that implements the :class:`Gate` protocol,
-and the gates run against one :class:`CoreFiles` reader.
+The module holds the French-specific values of the shared core flow and the
+:class:`anki_tools.ranking.scan.CoreProfile` that ties them together. The
+generic logic lives in ``anki_tools.ranking.coreflow`` and
+``anki_tools.ranking.coregates``.
 """
 
 from __future__ import annotations
 
-import csv
-import json
-from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Iterable, NamedTuple, Protocol, Sequence
+from typing import Any, Collection, Sequence
 
-from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
 from anki_tools.languages.french import cull
-from anki_tools.languages.french.profile import FRENCH
+from anki_tools.languages.french.profile import FRENCH, load_word_table
+from anki_tools.ranking import coreflow
+from anki_tools.ranking.core import CoreOptions
+from anki_tools.ranking.corelist import (
+    CONTENT_POS,  # noqa: F401
+    CoreTarget,  # noqa: F401
+    SenseWords,  # noqa: F401
+    build_core_targets,  # noqa: F401
+    build_targets,  # noqa: F401
+)
+from anki_tools.ranking.scan import CoreProfile
 
+SENSE_PATH = Path("vocab/french_core_senses.tsv")
 LOAN_PATH = Path("vocab/french_loanwords.txt")
+DEFAULT_NAME = "French Core Sentences"
+DEFAULT_CORE_WORDS = 50
+DEFAULT_OPTIONS = CoreOptions(tail_cards=120)
 
 MIN_UNITS = 5
 MAX_UNITS = 9
+
+MODEL_NAME = cull.MODEL_NAME
+FRENCH_FIELD = cull.FRENCH_FIELD
+AUDIO_FIELD = cull.AUDIO_FIELD
+ENGLISH_FIELD = cull.ENGLISH_FIELD
 
 CORE_FIELD = "Core"
 CORE_GLOSS_FIELD = "CoreGloss"
@@ -34,261 +49,115 @@ CORE_TEMPLATES = (
     (CORE_FRONT_TEMPLATE, CORE_BACK_TEMPLATE),
 )
 
-CONTENT_POS = cull.CONTENT_POS
-STATUSES = ("covered", "partial", "absent", "absent_sense", "unchecked")
-TARGET_SEPARATOR = "|"
+# Re-export the generic flow surface.
+CoreRequest = coreflow.CoreRequest
+CoreRun = coreflow.CoreRun
+sense_match = coreflow.sense_match
+holds_tier_s_sense = coreflow.holds_tier_s_sense
+core_hits = coreflow.core_hits
+default_output = coreflow.default_output
+size_check = coreflow.size_check
+outside_lemmas = coreflow.outside_lemmas
+side_paths = coreflow.side_paths
+write_rank_csv = coreflow.write_rank_csv
+kept_order_hash = coreflow.kept_order_hash
+card_rows = coreflow.card_rows
+coverage_rows_of = coreflow.coverage_rows_of
+manifest_counts = coreflow.manifest_counts
+write_core_csv = coreflow.write_core_csv
+write_coverage_csv = coreflow.write_coverage_csv
+write_manifest = coreflow.write_manifest
+CORE_COLUMNS = coreflow.CORE_COLUMNS
+COVERAGE_COLUMNS = coreflow.COVERAGE_COLUMNS
+FILTER_KEYS = coreflow.FILTER_KEYS
+TARGET_SEPARATOR = coreflow.TARGET_SEPARATOR
+STATUSES = coreflow.STATUSES
 
 
-class GateResult(NamedTuple):
-    """Result of one gate.
-
-    :param name: Gate label, for example ``K1``.
-    :param passed: True when the gate accepts the files.
-    :param message: Detail line of the gate table.
-    """
-
-    name: str
-    passed: bool
-    message: str
+def word_table() -> list[tuple[int, str, str]]:
+    """Give the reviewed French Swadesh rows as ``(index, form, gloss)``."""
+    return [
+        (row.swadesh_index, row.french, row.english) for row in load_word_table()
+    ]
 
 
-class Gate(Protocol):
-    """Contract of one core gate.
-
-    :ivar name: Gate label, for example ``K1``.
-    :ivar check: Run the gate on the output files and give the result.
-    """
-
-    name: str
-
-    def check(self, files: CoreFiles) -> GateResult:
-        """Run the gate on the output files and give the result."""
-        ...
-
-
-@dataclass
-class CoreGate:
-    """One gate value built from a ``(passed, message)`` check function.
-
-    :param name: Gate label, for example ``K1``.
-    :param check: Check that gives ``(passed, message)`` for the files.
-    """
-
-    name: str
-    _check: Callable[[CoreFiles], tuple[bool, str]]
-
-    def check(self, files: CoreFiles) -> GateResult:
-        """Run the check and wrap the result with the gate name."""
-        passed, message = self._check(files)
-        return GateResult(self.name, passed, message)
-
-
-def _read_csv(path: Path) -> list[dict[str, str]]:
-    """Read a CSV file into row mappings."""
-    with Path(path).open(encoding="utf-8", newline="") as handle:
-        return list(csv.DictReader(handle))
-
-
-def _read_json(path: Path) -> dict[str, Any]:
-    """Read a JSON object file."""
-    try:
-        text = Path(path).read_text(encoding="utf-8")
-        return json.loads(text)
-    except (OSError, json.JSONDecodeError) as error:
-        raise ValueError(f"cannot read {path}") from error
-
-
-@dataclass
-class CoreFiles:
-    """Lazy reader for the four files of a core run.
-
-    :param apkg_path: Output APKG file.
-    """
-
-    apkg_path: Path
-    _cache: dict[str, Any] = field(default_factory=dict)
-
-    def __post_init__(self) -> None:
-        """Set the paths and start an empty cache."""
-        self.apkg_path = Path(self.apkg_path)
-        self.core_csv, self.coverage_csv, self.manifest_path, self.rank_csv = (
-            side_paths(self.apkg_path)
-        )
-
-    def _load(self, name: str, loader: Callable[[], Any]) -> Any:
-        """Load one value once and cache the value or the error."""
-        if name not in self._cache:
-            try:
-                self._cache[name] = (True, loader())
-            except Exception as error:  # noqa: BLE001 - cached for every gate
-                self._cache[name] = (False, error)
-        ok, value = self._cache[name]
-        if not ok:
-            raise value
-        return value
-
-    def rows(self) -> list[dict[str, str]]:
-        """Read the card CSV rows."""
-        return self._load("rows", lambda: _read_csv(self.core_csv))
-
-    def coverage(self) -> list[dict[str, str]]:
-        """Read the coverage CSV rows."""
-        return self._load("coverage", lambda: _read_csv(self.coverage_csv))
-
-    def manifest(self) -> dict[str, Any]:
-        """Read the manifest JSON."""
-        return self._load("manifest", lambda: _read_json(self.manifest_path))
-
-    def rank_rows(self) -> list[dict[str, str]]:
-        """Read the rank CSV rows."""
-        return self._load("rank", lambda: _read_csv(self.rank_csv))
-
-    def output(self) -> dict[str, Any]:
-        """Read the output APKG and probe its audio."""
-        return self._load("output", lambda: cull._read_output(self.apkg_path))
-
-    def tokens(self) -> list[list[tuple[str, str]]]:
-        """Tokenize the sentences of the output deck."""
-        return self._load(
-            "tokens", lambda: cull.tokenize_deck(self.output()["cards"])
-        )
-
-    def notes(self) -> dict[int, list[str]]:
-        """Read the note fields of the output deck, keyed by note id."""
-
-        def load() -> dict[int, list[str]]:
-            with AnkiPackage(self.apkg_path) as package:
-                return {
-                    int(row["id"]): str(row["flds"]).split("\x1f")
-                    for row in package.get_notes()
-                }
-
-        return self._load("notes", load)
-
-    def fields(self) -> list[str]:
-        """Read the field names of the French sentence model."""
-
-        def load() -> list[str]:
-            with AnkiPackage(self.apkg_path) as package:
-                models = package.get_models()
-                model = models[cull._find_model_id(models)]
-                return [entry["name"] for entry in model["flds"]]
-
-        return self._load("fields", load)
-
-    def media(self) -> set[str]:
-        """Read the media file names of the output deck."""
-        return self._load("media", lambda: set(self.output()["media"]))
+def read_senses(path: Path = SENSE_PATH) -> dict[str, SenseWords]:
+    """Read the French tier F sense file."""
+    return coreflow.read_senses(path)
 
 
 def read_loanwords(path: Path = LOAN_PATH) -> frozenset[str]:
-    """Read the loan word list of rule C4.
-
-    :param path: Text file, one word per line. A ``#`` line is a comment.
-    :returns: Casefolded words, empty when the file is missing.
-    """
-    source = Path(path)
-    if not source.exists():
-        return frozenset()
-    words = set()
-    for line in source.read_text(encoding="utf-8").splitlines():
-        text = line.strip()
-        if text and not text.startswith("#"):
-            words.add(text.casefold())
-    return frozenset(words)
-
-
-def _has_predicate(tokens: Sequence[tuple[str, str]]) -> bool:
-    """Give rule C1: the sentence has a verb, auxiliary, or adjective."""
-    return any(pos in {"VERB", "AUX", "ADJ"} for _lemma, pos in tokens)
-
-
-def _holds_name(sentence: str, names: Iterable[str]) -> bool:
-    """Give rule C3: a whole word of the name list occurs in the sentence.
-
-    French uses a word boundary. A substring test would reject a common word
-    that holds a short name, for example ``tomber`` with the name ``tom``.
-    Chinese and Cantonese use the substring test of the yue selector instead.
-    """
-    words = {word.casefold() for word in cull._WORD_PATTERN.findall(sentence)}
-    return any(name.casefold() in words for name in names)
-
-
-def _holds_loanword(sentence: str, loanwords: Iterable[str]) -> bool:
-    """Give rule C4: a loan word occurs in the sentence.
-
-    The rule splits the loan word on non-letters, so ``week-end`` also
-    matches the two words ``week`` and ``end`` in the sentence.
-    """
-    words = {word.casefold() for word in cull._WORD_PATTERN.findall(sentence)}
-    for loan in loanwords:
-        parts = [
-            part.casefold()
-            for part in cull._WORD_PATTERN.findall(loan)
-        ]
-        if parts and all(part in words for part in parts):
-            return True
-    return False
+    """Read the French loan word list."""
+    return coreflow.read_loanwords(path)
 
 
 def filter_core_cards(
-    cards: Sequence[cull.InputCard],
+    cards: Sequence[Any],
     tokens: Sequence[Sequence[tuple[str, str]]],
     media: set[str],
-    names: Iterable[str],
-    loanwords: Iterable[str],
+    names: Collection[str],
+    loanwords: Collection[str],
     *,
     min_units: int = MIN_UNITS,
     max_units: int = MAX_UNITS,
 ) -> tuple[list[int], list[str]]:
-    """Apply rules F1 to F9 and C1 to C5 to the cards.
-
-    :param cards: Input cards.
-    :param tokens: Lemma and part of speech per card.
-    :param media: File names of the input media map.
-    :param names: Name list of rule C3.
-    :param loanwords: Loan word list of rule C4.
-    :param min_units: First unit count of the window.
-    :param max_units: Last unit count of the window.
-    :raises ValueError: The card list and the token list differ in size.
-    :returns: The input indices that pass, and the reason per input index. A
-        passed card has the empty string as its reason.
-    """
-    if len(cards) != len(tokens):
-        raise ValueError("The card list and the token list differ in size.")
-    passed, cull_reasons = cull.filter_cards(
-        cards, tokens, min_words=min_units, max_words=max_units
+    """Apply rules F1 to F9 and C1 to C5 to the French cards."""
+    return coreflow.filter_core_cards(
+        cards,
+        tokens,
+        media,
+        names,
+        loanwords,
+        FRENCH_CORE_PROFILE.has_orphan,
+        min_units=min_units,
+        max_units=max_units,
     )
-    reasons = list(cull_reasons)
-    kept: list[int] = []
-    for index in passed:
-        card = cards[index]
-        if not _has_predicate(tokens[index]):
-            reasons[index] = "C1"
-        elif FRENCH.has_orphan(card.sentence):
-            reasons[index] = "C2"
-        elif _holds_name(card.sentence, names):
-            reasons[index] = "C3"
-        elif _holds_loanword(card.sentence, loanwords):
-            reasons[index] = "C4"
-        elif not card.audio or card.audio not in media:
-            reasons[index] = "C5"
-        else:
-            kept.append(index)
-    return kept, reasons
 
 
-def side_paths(output_path: Path) -> tuple[Path, Path, Path, Path]:
-    """Build the four side file paths of a core run.
-
-    :param output_path: Output APKG file.
-    :returns: The core CSV, the coverage CSV, the manifest, and the rank CSV.
-    """
-    path = Path(output_path)
-    stem = path.with_suffix("") if path.suffix else path
-    return (
-        Path(f"{stem}.core.csv"),
-        Path(f"{stem}.coverage.csv"),
-        Path(f"{stem}.manifest.json"),
-        Path(f"{stem}.rank.csv"),
+def _write_core_model(
+    output_path: Path,
+    cards: Sequence[Any],
+    result: coreflow.CoreResult,
+    ordered: Sequence[int],
+    targets: Sequence[CoreTarget],
+    candidates: Sequence[coreflow.CoreCandidate],
+) -> int:
+    """Set the French core card templates and fill the core word field."""
+    return coreflow._write_core_model(
+        output_path, cards, result, ordered, targets, candidates, FRENCH_CORE_PROFILE
     )
+
+
+def run_core(request: CoreRequest) -> CoreRun:
+    """Run the French core mode and write the output files."""
+    return coreflow.run_core(request, FRENCH_CORE_PROFILE)
+
+
+FRENCH_CORE_PROFILE = CoreProfile(
+    load_input_deck=cull.load_input_deck,
+    tokenize_deck=cull.tokenize_deck,
+    load_frequency=cull.load_frequency,
+    frequency_ranks=cull.frequency_ranks,
+    read_names=cull.read_names,
+    word_table=word_table,
+    sense_path=SENSE_PATH,
+    loan_path=LOAN_PATH,
+    has_orphan=FRENCH.has_orphan,
+    hits=FRENCH.hits,
+    sense_filter=FRENCH.sense_filter,
+    highlight=FRENCH.highlight,
+    lemma_key=str.casefold,
+    model_name=MODEL_NAME,
+    sentence_field=FRENCH_FIELD,
+    english_field=ENGLISH_FIELD,
+    audio_field=AUDIO_FIELD,
+    core_field=CORE_FIELD,
+    core_gloss_field=CORE_GLOSS_FIELD,
+    templates=CORE_TEMPLATES,
+    card_css=cull.card_css,
+    min_units=MIN_UNITS,
+    max_units=MAX_UNITS,
+    default_options=DEFAULT_OPTIONS,
+    deck_name=DEFAULT_NAME,
+    frequency_source=str(cull.FREQUENCY_PATH),
+)

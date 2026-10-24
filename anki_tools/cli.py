@@ -24,6 +24,7 @@ import cyclopts
 from gtts import gTTS
 
 from anki_tools.languages.french import core as french_core
+from anki_tools.languages.spanish import core as spanish_core
 from anki_tools.languages.french import cull as french_cull
 from anki_tools.languages.cantonese.jyutping import fix_jyutping
 from anki_tools.languages.mandarin.pinyin import fix_pinyin
@@ -1079,9 +1080,11 @@ def yue(
         print(f"  Coverage CSV:        {coverage_csv}")
 
 
+DEFAULT_SPANISH_APKG = Path("apkg/Spanish 9000 sentences with native audio.apkg")
+
 @fix_app.command
 def es(
-    apkg_path: Path,
+    apkg_path: Path = DEFAULT_SPANISH_APKG,
     *,
     output: Path | None = None,
     model_id: int | None = None,
@@ -1089,22 +1092,65 @@ def es(
     keep_filtered: bool = False,
     max_sentences: int | None = None,
     similarity_threshold: float = 0.5,
+    core: bool = False,
+    cards: int | None = None,
+    words: int = spanish_core.DEFAULT_CORE_WORDS,
+    examples: int = spanish_core.DEFAULT_OPTIONS.per_word,
+    tail: int = spanish_core.DEFAULT_OPTIONS.tail_cards,
+    check: bool = False,
 ):
-    """Fix Spanish deck: rank, deduplicate, and reorder by complexity and frequency.
+    """Fix Spanish deck: rank and reorder it, or build a Swadesh-only core deck.
 
-    Optionally reduce to max_sentences using stratified complexity sampling.
+    Rank mode is the default. ``--core`` builds the Swadesh-only core deck and
+    writes ``<input>_core.apkg`` with its CSV files and manifest.
 
     :param apkg_path: Input .apkg file.
-    :param output: Output .apkg file (default: input_reordered.apkg).
-    :param model_id: Filter by specific model ID.
-    :param text_field: Preferred sentence field (default: Spanish).
-    :param keep_filtered: If True, keep filtered cards instead of removing.
-    :param max_sentences: Optional max sentence count (e.g., 3000).
+    :param output: Output .apkg file (default: from the input name).
+    :param model_id: Rank mode: filter by specific model ID.
+    :param text_field: Rank mode: preferred sentence field (default: Spanish).
+    :param keep_filtered: Rank mode: keep filtered cards instead of removing.
+    :param max_sentences: Rank mode: optional max sentence count (e.g., 3000).
     :param similarity_threshold: Jaccard threshold for deduplication (default 0.5).
+    :param core: Build the Swadesh-only core deck instead of ranking.
+    :param cards: Core mode: card cap.
+    :param words: Core mode: tier F words after the Swadesh set (default 0).
+    :param examples: Core mode: examples per content target.
+    :param tail: Core mode: cards after the core passes.
+    :param check: Run the gates on the output and do not run the mode again.
     """
     apkg_path = Path(apkg_path)
     if not apkg_path.exists():
         print(f"Error: File not found: {apkg_path}")
+        return
+
+    if core:
+        if model_id is not None:
+            print("Error: --model-id does not apply with --core.")
+            return
+        output_path = output or spanish_core.default_output(apkg_path)
+        if check:
+            code = spanish_core.check_core(output_path)
+            if code:
+                raise SystemExit(code)
+            return
+        print("=" * 50)
+        print("Processing Spanish Anki Deck: core mode")
+        print("=" * 50)
+        options = replace(
+            spanish_core.DEFAULT_OPTIONS,
+            per_word=examples,
+            tail_cards=tail,
+        )
+        if cards is not None:
+            options = replace(options, max_cards=cards)
+        spanish_core.run_core(
+            spanish_core.CoreRequest(
+                input_path=apkg_path,
+                output_path=output_path,
+                core_words=words,
+                options=options,
+            )
+        )
         return
 
     paths = rank_paths(apkg_path, output)

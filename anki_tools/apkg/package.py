@@ -115,6 +115,10 @@ class AnkiPackage:
 
         self.conn = sqlite3.connect(db_path)
         self.conn.row_factory = sqlite3.Row
+        self.conn.create_collation(
+            "unicase",
+            lambda a, b: (a.casefold() > b.casefold()) - (a.casefold() < b.casefold()),
+        )
 
         return self
 
@@ -523,23 +527,56 @@ class AnkiPackage:
         self._modified = True
 
     def add_model_field(self, model_id: str, name: str) -> int:
-        """
-        Add a field to the end of a note type and give every note an empty value.
+        """Add a field to the end of a note type and give every note an empty value.
 
-        The method reads the legacy ``anki2`` format only. A model that already
-        has the field is left as it is.
+        The method reads the ``anki2`` and ``anki21b`` formats. A model that
+        already has the field is left as it is.
 
         :param model_id: Model ID to change.
         :param name: Name of the new field.
-        :raises NotImplementedError: The package is not in the ``anki2`` format.
+        :raises NotImplementedError: The package is in the ``anki21`` format.
         :raises ValueError: If model not found.
         :returns: Zero-based index of the field.
         """
+        cursor = self.conn.cursor()
+        mod_time = int(time.time())
+
+        if self._db_format == "anki21b":
+            existing = cursor.execute(
+                "SELECT ord FROM fields WHERE ntid = ? AND name = ?",
+                (int(model_id), name),
+            ).fetchone()
+            if existing is not None:
+                return existing["ord"]
+            max_ord = cursor.execute(
+                "SELECT COALESCE(MAX(ord), -1) FROM fields WHERE ntid = ?",
+                (int(model_id),),
+            ).fetchone()[0]
+            new_ord = max_ord + 1
+            sample = cursor.execute(
+                "SELECT config FROM fields WHERE ntid = ? ORDER BY ord LIMIT 1",
+                (int(model_id),),
+            ).fetchone()
+            config = sample["config"] if sample is not None else b""
+            cursor.execute(
+                "INSERT INTO fields (ntid, ord, name, config) VALUES (?, ?, ?, ?)",
+                (int(model_id), new_ord, name, config),
+            )
+            cursor.execute("SELECT id, flds FROM notes WHERE mid = ?", (int(model_id),))
+            for row in cursor.fetchall():
+                cursor.execute(
+                    "UPDATE notes SET flds = ?, mod = ?, usn = -1 WHERE id = ?",
+                    (row["flds"] + "\x1f", int(time.time() * 1000), row["id"]),
+                )
+            self.conn.commit()
+            self._modified = True
+            return new_ord
+
         if self._db_format != "anki2":
             raise NotImplementedError(
                 f"add_model_field needs the anki2 format, not {self._db_format}"
             )
-        cursor = self.conn.cursor()
+
         cursor.execute("SELECT models FROM col")
         models = json.loads(cursor.fetchone()[0])
         if model_id not in models:
@@ -559,7 +596,6 @@ class AnkiPackage:
             "UPDATE col SET models = ? WHERE id = 1", (json.dumps(models),)
         )
         cursor.execute("SELECT id, flds FROM notes WHERE mid = ?", (int(model_id),))
-        mod_time = int(time.time())
         for row in cursor.fetchall():
             cursor.execute(
                 "UPDATE notes SET flds = ?, mod = ?, usn = -1 WHERE id = ?",

@@ -1,0 +1,66 @@
+{
+  "build_date": "2026-10-24T06:37:39+00:00",
+  "source": {
+    "input": "apkg/Spanish 9000 sentences with native audio.apkg",
+    "deck": "Spanish Core Sentences",
+    "model": "Spanish sentences cloze+"
+  },
+  "params": {
+    "core_words": 0,
+    "per_word": 2,
+    "third_examples": 0,
+    "ubiquitous_share": 0.25,
+    "max_cards": 300,
+    "completion_cards": 120,
+    "tail_cards": 0,
+    "outside_budget": 0,
+    "support_top": 1000,
+    "hard_top": 50000,
+    "lambda_new": 0.1,
+    "lambda_repeat": 0.03,
+    "lambda_len": 0.02,
+    "lambda_seed": 0.01,
+    "simple_units": 7,
+    "similarity": 0.67,
+    "min_units": 4,
+    "max_units": 10,
+    "spoken_weight": 0.5,
+    "bold_target": true,
+    "name": "Spanish Core Sentences",
+    "max_unchecked_sense": 0,
+    "max_unranked": 0
+  },
+  "counts": {
+    "cards": 228,
+    "targets": 176,
+    "absent": 0,
+    "absent_sense": 6,
+    "unchecked": 0,
+    "unranked": 0,
+    "covered1": 170,
+    "covered2": 149,
+    "full": 149,
+    "outside": 200,
+    "outside_rare": 16,
+    "tail_words": 0,
+    "sense_rows": 176,
+    "bolded": 165,
+    "unbolded": 63,
+    "name_hits": 0,
+    "loan_hits": 0,
+    "rows": 9263,
+    "rejected_c3": 0,
+    "rejected_c4": 0,
+    "sense_failures": 2043
+  },
+  "frequency": {
+    "path": "data/spanish_frequency.tsv",
+    "spoken_weight": 0.5
+  },
+  "files": {
+    "core_csv": "sha256:541cf39f7deabfbc43f68e590e4a9882286a71117d1db4da40d1c80c67b0b99b",
+    "coverage_csv": "sha256:7b1fee1a7fc70162e4b94da6f977cf2ea85c53350d3d21ccc48591e5a5b97b35",
+    "input_apkg": "sha256:f67605459feb506bcbbb95830a356ff349c21c28e136c8efc3d82d253ec244e9"
+  },
+  "kept_order": "sha256:d2d858ebf8eec2ad6fc4ec5587be98ebb1d8dd7057242ec9f96d850717ea4101"
+}

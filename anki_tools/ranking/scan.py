@@ -1,24 +1,25 @@
 """Shared scan: extract, tokenize, count, and blend the frequency ranks.
 
 The scan is the first stage of the core flow of spec section 3. A language
-package supplies the five adapters of a :class:`CoreProfile`, and :func:`scan`
-runs them in order. The result feeds the shared target-list builders of
-``anki_tools/ranking/corelist.py``.
+package supplies the adapters of a :class:`CoreProfile`, and :func:`scan`
+runs the five scan adapters in order. The rest of the profile feeds the shared
+target-list builders of ``anki_tools/ranking/corelist.py`` and the shared core
+flow of ``anki_tools/ranking/coreflow.py``.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Collection, Mapping, Sequence
 
 
 @dataclass(frozen=True)
 class CoreProfile:
-    """Language hooks of the shared scan.
+    """Language hooks of the shared core flow.
 
-    Each field is one adapter that the language package supplies. The scan calls
-    them in the order below.
+    The first five fields are the scan adapters, called by :func:`scan` in the
+    order below. The remaining fields feed the rest of the core flow.
 
     :param load_input_deck: Read the cards of the input deck from an APKG file.
     :param tokenize_deck: Tokenize every card into ``(lemma, part of speech)``
@@ -26,6 +27,31 @@ class CoreProfile:
     :param load_frequency: Read the frequency rows of the language.
     :param frequency_ranks: Rank the lemmas by the blended frequency.
     :param read_names: Read the name stoplist.
+    :param word_table: Read the reviewed Swadesh rows as ``(index, form,
+        english gloss)`` triples in table order.
+    :param sense_path: TSV file of the tier F sense rows.
+    :param loan_path: Text file of the loan word list.
+    :param has_orphan: Tell whether a sentence starts with an orphan
+        conjunction.
+    :param hits: Count the tier S forms that a sentence holds exactly once.
+    :param sense_filter: Reject a form whose paired English holds a
+        false-friend sense, or None when the language has no such filter.
+    :param highlight: Wrap the matched target tokens of a sentence in a bold
+        tag, or None when the deck does not bold.
+    :param lemma_key: Normalize a lemma before the tier F sense guard.
+    :param model_name: Name of the input note model.
+    :param sentence_field: Name of the sentence field of the model.
+    :param english_field: Name of the English field of the model.
+    :param audio_field: Name of the audio field of the model.
+    :param core_field: Name of the core word field.
+    :param core_gloss_field: Name of the core gloss field.
+    :param templates: Card templates of the core deck.
+    :param card_css: CSS of the core deck.
+    :param min_units: Minimum word count of a card.
+    :param max_units: Maximum word count of a card.
+    :param default_options: Selection settings of the core cover.
+    :param deck_name: Name of the output deck.
+    :param frequency_source: Label of the frequency source for the manifest.
     """
 
     load_input_deck: Callable[[Path], Any]
@@ -33,6 +59,28 @@ class CoreProfile:
     load_frequency: Callable[[], Any]
     frequency_ranks: Callable[[Any, float], dict[str, int]]
     read_names: Callable[[], set[str]]
+
+    word_table: Callable[[], Sequence[tuple[int, str, str]]]
+    sense_path: Path
+    loan_path: Path
+    has_orphan: Callable[[str], bool]
+    hits: Callable[[str, Collection[str]], Mapping[str, int]]
+    sense_filter: Callable[[str, str], bool] | None
+    highlight: Callable[[str, str], str] | None
+    lemma_key: Callable[[str], str]
+    model_name: str
+    sentence_field: str
+    english_field: str
+    audio_field: str
+    core_field: str
+    core_gloss_field: str
+    templates: tuple[tuple[str, str], ...]
+    card_css: Callable[[], str]
+    min_units: int
+    max_units: int
+    default_options: Any
+    deck_name: str
+    frequency_source: str
 
 
 @dataclass(frozen=True)
@@ -53,7 +101,7 @@ class ScanResult:
 
 
 def scan(profile: CoreProfile, apkg_path: Path, spoken_weight: float) -> ScanResult:
-    """Run the five adapters of the profile in order.
+    """Run the five scan adapters of the profile in order.
 
     :param profile: Language hooks of the scan.
     :param apkg_path: Input APKG file.
