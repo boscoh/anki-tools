@@ -21,7 +21,7 @@ from anki_tools.languages.spanish.profile import WORD_CSV_PATH
 from anki_tools.ranking import cardfilter, coreflow
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
 from anki_tools.ranking.corelist import CoreTarget, SenseWords
-from anki_tools.ranking.scan import CoreProfile
+from anki_tools.ranking.scan import CoreProfile, scan
 
 SPANISH_TOKENIZER = "es_core_news_sm"
 WORD_PATTERN = re.compile(r"[^\W\d_]+")
@@ -486,3 +486,46 @@ class TestSpanishTokenizer:
         )
         assert ("hablar", "VERB") in tokens[0]
         assert ("libro", "NOUN") in tokens[1]
+
+
+def _scan_profile(**overrides: object) -> CoreProfile:
+    """Give an offline scan profile with the given hooks."""
+    values: dict[str, object] = {
+        "load_input_deck": lambda path: [_card()],
+        "tokenize_deck": lambda cards: [
+            [("quier", "VERB"), ("buen", "ADJ"), ("casa", "NOUN")]
+        ],
+        "load_frequency": lambda: [],
+        "frequency_ranks": lambda rows, weight: {},
+        "read_names": lambda: set(),
+    }
+    values.update(overrides)
+    return replace(spanish_core.SPANISH_CORE_PROFILE, **values)
+
+
+class TestScanLemmaOverrides:
+    def test_a_lemma_override_rewrites_the_tokens(self, tmp_path: Path) -> None:
+        profile = _scan_profile(
+            lemma_overrides={"quier": "querer", "buen": "bueno"}
+        )
+
+        result = scan(profile, tmp_path / "deck.apkg", 0.5)
+
+        assert result.tokens == [
+            [("querer", "VERB"), ("bueno", "ADJ"), ("casa", "NOUN")]
+        ]
+
+    def test_no_override_map_keeps_the_tokens(self, tmp_path: Path) -> None:
+        profile = _scan_profile(lemma_overrides={})
+
+        result = scan(profile, tmp_path / "deck.apkg", 0.5)
+
+        assert result.tokens == [
+            [("quier", "VERB"), ("buen", "ADJ"), ("casa", "NOUN")]
+        ]
+
+    def test_the_spanish_profile_repairs_the_two_artefacts(self) -> None:
+        assert spanish_core.SPANISH_CORE_PROFILE.lemma_overrides == {
+            "quier": "querer",
+            "buen": "bueno",
+        }

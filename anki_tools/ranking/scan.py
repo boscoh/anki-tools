@@ -9,7 +9,7 @@ flow of ``anki_tools/ranking/coreflow.py``.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Collection, Mapping, Sequence
 
@@ -52,6 +52,8 @@ class CoreProfile:
     :param default_options: Selection settings of the core cover.
     :param deck_name: Name of the output deck.
     :param frequency_source: Label of the frequency source for the manifest.
+    :param lemma_overrides: Lemma repair map of the lemmatizer artefacts,
+        applied by :func:`scan` to the tokens of every card.
     """
 
     load_input_deck: Callable[[Path], Any]
@@ -81,6 +83,7 @@ class CoreProfile:
     default_options: Any
     deck_name: str
     frequency_source: str
+    lemma_overrides: Mapping[str, str] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -103,6 +106,10 @@ class ScanResult:
 def scan(profile: CoreProfile, apkg_path: Path, spoken_weight: float) -> ScanResult:
     """Run the five scan adapters of the profile in order.
 
+    The lemma overrides of the profile repair the tokens after
+    ``tokenize_deck``, so the target list and the sense guard see the
+    repaired lemma.
+
     :param profile: Language hooks of the scan.
     :param apkg_path: Input APKG file.
     :param spoken_weight: Weight of the spoken term in the frequency blend.
@@ -110,6 +117,12 @@ def scan(profile: CoreProfile, apkg_path: Path, spoken_weight: float) -> ScanRes
     """
     cards = profile.load_input_deck(apkg_path)
     tokens = profile.tokenize_deck(cards)
+    overrides = profile.lemma_overrides
+    if overrides:
+        tokens = [
+            [(overrides.get(lemma, lemma), pos) for lemma, pos in card]
+            for card in tokens
+        ]
     frequency = profile.load_frequency()
     ranks = profile.frequency_ranks(frequency, spoken_weight)
     names = profile.read_names()

@@ -332,10 +332,16 @@ no core target.
   `vocab/english-spanish.csv` has slashed variant rows that cannot match tokens.
 - Resolved: the tier F word list is the first 50 lemmas of `build_targets`
   after the Swadesh exclusion.
-- Open: the lemmatizer gives two artefacts among the 50 tier F targets. It
-  gives `quier` for `quieres`, where `querer` is already a target, and it
-  gives `buen` for the `buen` and `buena` forms, where the dictionary lemma is
-  `bueno`. The card back shows the artefact. A lemma override is needed.
+- Resolved: the lemmatizer gave two artefacts among the 50 tier F targets. It
+  gave `quier` for `quieres`, where `querer` is already a target, and it gave
+  `buen` for the `buen` and `buena` forms, where the dictionary lemma is
+  `bueno`. `CoreProfile.lemma_overrides` repairs the tokens after
+  `tokenize_deck`, and the Spanish profile maps `quier` to `querer` and `buen`
+  to `bueno`. `F:quier` merges into `F:querer`. `bueno` is Swadesh row 185, so
+  the tier S target `S185:bueno` covers the `buen` and `buena` cards and the
+  duplicate tier F row is gone. The tier F row `buen` is removed, and the rows
+  `salir` and `gente` enter the 50. The deck holds 265 cards, 226 targets, 0
+  unchecked, and 0 unranked.
 - Open: `mirar` is a tier F target, so two kept cards can hold one content
   lemma each. The Spanish profile sets `similarity=0.5` to keep gate K6. The
   shared dedup compares target keys, and K6 compares content lemmas.

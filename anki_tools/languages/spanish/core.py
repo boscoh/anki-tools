@@ -47,6 +47,9 @@ LOAN_PATH = Path("vocab/spanish_loanwords.txt")
 
 DEFAULT_NAME = "Spanish Core Sentences"
 DEFAULT_CORE_WORDS = 50
+# The spaCy model gives two artefact lemmas: ``quier`` for ``quieres``, and
+# ``buen`` for ``buen`` and ``buena``.
+LEMMA_OVERRIDES = {"quier": "querer", "buen": "bueno"}
 # A tier F card can hold one content lemma, so the selection deduplicates on a
 # lower Jaccard limit than the gate K6 limit of 0.67.
 DEFAULT_OPTIONS = CoreOptions(tail_cards=0, hard_top=50_000, similarity=0.5)
@@ -235,4 +238,5 @@ SPANISH_CORE_PROFILE = CoreProfile(
     default_options=DEFAULT_OPTIONS,
     deck_name=DEFAULT_NAME,
     frequency_source=str(FREQUENCY_PATH),
+    lemma_overrides=LEMMA_OVERRIDES,
 )
