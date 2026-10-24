@@ -514,6 +514,11 @@ Audio: gTTS, voice gtts:es.
 
 Spanish word data: <https://en.wiktionary.org/wiki/Module:Swadesh/data/es>, CC BY-SA 4.0.
 Tagger and lemmatizer: spaCy es_core_news_sm, GNU GPL 3.0. The build uses the model only. The pack does not contain it.
+Spanish frequency list: FrequencyWords `es_full`, CC BY-SA 4.0.
+Source: <https://github.com/hermitdave/FrequencyWords>, `content/2018/es/es_full.txt`.
+Version: 525f9b560de45753a5ea01069454e72e9aa541c6.
+Source sha256: b4794c425f3500c21a0ff9367175e36795a978c928a36670e9ad6ae206fb7728.
+The derived `data/spanish_frequency.tsv` is CC BY-SA 4.0.
 
 ## Greek pack
 
