@@ -1099,10 +1099,11 @@ def es(
     tail: int = spanish_core.DEFAULT_OPTIONS.tail_cards,
     check: bool = False,
 ):
-    """Fix Spanish deck: rank and reorder it, or build a Swadesh-only core deck.
+    """Fix Spanish deck: rank and reorder it, or build a core deck.
 
-    Rank mode is the default. ``--core`` builds the Swadesh-only core deck and
-    writes ``<input>_core.apkg`` with its CSV files and manifest.
+    Rank mode is the default. ``--core`` builds the core deck of the Swadesh
+    rows and the tier F words, and writes ``<input>_core.apkg`` with its CSV
+    files and manifest.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
@@ -1111,9 +1112,9 @@ def es(
     :param keep_filtered: Rank mode: keep filtered cards instead of removing.
     :param max_sentences: Rank mode: optional max sentence count (e.g., 3000).
     :param similarity_threshold: Jaccard threshold for deduplication (default 0.5).
-    :param core: Build the Swadesh-only core deck instead of ranking.
+    :param core: Build the core deck instead of ranking.
     :param cards: Core mode: card cap.
-    :param words: Core mode: tier F words after the Swadesh set (default 0).
+    :param words: Core mode: tier F words after the Swadesh set (default 50).
     :param examples: Core mode: examples per content target.
     :param tail: Core mode: cards after the core passes.
     :param check: Run the gates on the output and do not run the mode again.

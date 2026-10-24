@@ -1,45 +1,45 @@
 rank,note_id,sentence,kept
 1,1548089875917,Yo no pensé que tú me creerías.,1
-2,1548089871304,No todos son como tú.,1
-3,1548089871827,Él mató a ese hombre.,1
-4,1548089871794,Quédate aquí con nosotros.,1
-5,1548089879001,"Si no estuviera enfermo, me uniría a vosotros.",1
+2,1548089871542,¿Lo hiciste tú solo?,1
+3,1548089871925,¿Cómo ha llegado él hasta aquí?,1
+4,1548089871904,Uno de nosotros tendrá que ir.,1
+5,1548089877694,A vosotros ya os perdonamos.,1
 6,1548089872310,¿Sabe usted quiénes son ellos?,1
-7,1548089876069,¿Qué tan ancho es este río?,1
+7,1548089873080,¿Cómo se llama este pez en inglés?,1
 8,1548089871948,¿Qué es ese edificio grande y nuevo?,1
 9,1548089872026,No estoy aquí para pelear.,1
 10,1548089871502,Yo voy ahí cada año.,1
-11,1548089872503,¿Quién es aquella mujer?,1
-12,1548089874951,¿De qué te ríes?,1
-13,1548089871772,¿Dónde están las otras chicas?,1
-14,1548089877866,¿Cuándo podemos volvernos a ver?,1
+11,1548089871331,¿Quién es ese hombre?,1
+12,1548089871362,¿Qué hace tu padre?,1
+13,1548089873154,Le pregunté dónde vivía.,1
+14,1548089871610,¿Cuándo se fueron a casa?,1
 15,1548089872510,¿Cómo quieres los huevos?,1
 16,1548089871978,No puedo comer carne.,1
 17,1548089877011,Todas las hojas del árbol se volvieron amarillas.,1
-18,1548089873204,Muchos niños los usan.,1
-19,1548089873195,¿Puedo ver alguna identificación?,1
+18,1548089872072,Hablamos de muchas cosas.,1
+19,1548089876396,Quiero algunos huevos frescos.,1
 20,1548089876332,Él bebió un poco.,1
-21,1548089873551,Esperaré otros cinco minutos.,1
+21,1548089874547,Creo que nos quedaremos otro día más.,1
 22,1548089876561,No se perdía una.,1
 23,1548089875888,"Tenemos dos perros, tres gatos y seis pollos.",1
 24,1548089876122,El dinero fue dividido entre tres.,1
 25,1548089874041,Él me prometió que vendría a las cuatro.,1
 26,1548089873476,Esperemos cinco minutos más.,1
 27,1548089871777,Él tiene una boca grande.,1
-28,1548089872340,Fue una reunión muy larga.,1
-29,1548089878854,Él tiene hombros anchos.,1
+28,1548089874762,Necesito una larga siesta.,1
+29,1548089876069,¿Qué tan ancho es este río?,1
 30,1548089876710,Siento las piernas pesadas.,1
-31,1548089873094,Tengo las manos pequeñas.,1
-32,1548089875353,Estamos cortos de dinero.,1
+31,1548089878845,Mis pies son pequeños comparados con los tuyos.,1
+32,1548089876764,A ella le gustan las faldas cortas.,1
 33,1548089877356,Esta carretera es muy estrecha.,1
 34,1548089875451,Este delgado libro es mío.,1
 35,1548089878930,Nunca golpearía a una mujer.,1
 36,1548089872357,El hombre es el único animal que usa el fuego.,1
 37,1548089871941,Ese perro parece completamente una persona.,1
-38,1548089874130,Ese niño tiró una piedra al perro.,1
+38,1548089876568,Deja que los niños jueguen.,1
 39,1548089872312,Mi esposa está intentando dormir.,1
 40,1548089871870,¿Está su marido en casa?,1
-41,1548089879681,Mi madre está ocupada plantando flores en el jardín.,1
+41,1548089871411,¿Ahora está tu madre en casa?,1
 42,1548089873410,Me parezco a mi padre.,1
 43,1548089872141,Le gustan los animales.,1
 44,1548089873319,Los peces viven en el mar.,1
@@ -51,67 +51,67 @@ rank,note_id,sentence,kept
 50,1548089874439,¿Quieren un jugo de fruta?,1
 51,1548089874211,Las hojas están cambiando de color.,1
 52,1548089877002,El dinero es la raíz de todos los males.,1
-53,1548089872814,En el jardín hay muchas flores.,1
+53,1548089872589,No toque las flores.,1
 54,1548089874191,Las vacas están comiendo hierba.,1
 55,1548089876037,Él soltó la cuerda.,1
 56,1548089872842,Esa carne es de pollo.,1
 57,1548089876234,No puedes ser un donante de sangre.,1
 58,1548089873617,¿Alguna vez te has roto un hueso?,1
-59,1548089876396,Quiero algunos huevos frescos.,1
-60,1548089878272,¿Puedo coger tu secador de pelo?,1
-61,1548089877120,Le dolía la cabeza.,1
-62,1548089880487,Me perforé las orejas.,1
-63,1548089877375,Sus ojos estaban rojos por haber llorado.,1
-64,1548089875732,Te sangra la nariz.,1
-65,1548089875240,Mantendré la boca cerrada.,1
-66,1548089876851,¿Las tortugas tienen dientes?,1
-67,1548089872469,A ver su lengua.,1
-68,1548089876625,Deja de comerte las uñas.,1
-69,1548089874684,Tus pies están sucios.,1
-70,1548089872327,Me duele la pierna.,1
-71,1548089874120,Al caer se hizo daño en la rodilla.,1
-72,1548089879596,¿Lo cosiste a mano?,1
-73,1548089874004,El pájaro tenía un ala rota.,1
-74,1548089872164,Él lleva una bolsa a la espalda.,1
-75,1548089876557,¡No me rompas el corazón!,1
-76,1548089873572,¿Por qué estás bebiendo agua?,1
+59,1548089879768,Quiero teñirme el pelo de rojo.,1
+60,1548089871744,¿Has perdido la cabeza?,1
+61,1548089875974,¿Las hormigas tienen orejas?,1
+62,1548089872985,Lo vi con mis propios ojos.,1
+63,1548089875732,Te sangra la nariz.,1
+64,1548089873190,No es de buena educación hablar con la boca llena.,1
+65,1548089876851,¿Las tortugas tienen dientes?,1
+66,1548089872469,A ver su lengua.,1
+67,1548089876625,Deja de comerte las uñas.,1
+68,1548089874684,Tus pies están sucios.,1
+69,1548089872327,Me duele la pierna.,1
+70,1548089874120,Al caer se hizo daño en la rodilla.,1
+71,1548089878237,¿Te lavas las manos antes de las comidas?,1
+72,1548089874004,El pájaro tenía un ala rota.,1
+73,1548089872164,Él lleva una bolsa a la espalda.,1
+74,1548089874775,Tengo el as de corazones.,1
+75,1548089873572,¿Por qué estás bebiendo agua?,1
+76,1548089874859,Comemos tres veces al día.,1
 77,1548089878873,Me mordí el labio.,1
 78,1548089873855,Tengo ganas de vomitar.,1
 79,1548089875454,El viento sopla del este.,1
 80,1548089873768,No sé si reír o llorar.,1
-81,1548089873177,¿Alguna vez lo has visto nadar?,1
+81,1548089871422,No es tan bueno como se ve.,1
 82,1548089877926,Me alivia oír eso.,1
-83,1548089871402,Yo sé tu nombre.,1
-84,1548089873266,Yo pensaba que él vendría.,1
+83,1548089873567,Quiero que todos sepan lo que pasó.,1
+84,1548089873147,Pocas personas piensan así.,1
 85,1548089874265,Puedo oler el océano.,1
 86,1548089873962,No hay nada que temer.,1
 87,1548089872879,Duerme como un bebé.,1
-88,1548089876409,Él vivió hasta los ochenta.,1
+88,1548089874673,"Donde vivo, tenemos nieve en enero.",1
 89,1548089880263,Las plantas tienen que haberse muerto porque nadie las regó.,1
-90,1548089873004,¡Mi papá me matará!,1
-91,1548089873587,No sé por qué se están peleando.,1
+90,1548089872738,Este trabajo me está matando.,1
+91,1548089874019,Ellos empezaron a pelear.,1
 92,1548089877409,Está prohibido cazar en los parques nacionales.,1
-93,1548089874323,Se nos ha golpeado.,1
+93,1548089876081,¿Con qué te golpearon?,1
 94,1548089875363,Me corté el dedo con un cuchillo.,1
 95,1548089879212,El terreno se dividió en ocho parcelas.,1
 96,1548089879308,Ellos cavaron una tumba.,1
-97,1548089875333,¿Puedes cruzar el río nadando?,1
+97,1548089873177,¿Alguna vez lo has visto nadar?,1
 98,1548089875602,Nunca he volado en avión.,1
 99,1548089875870,Ella habló mientras caminaba.,1
 100,1548089873750,Le dije que viniera.,1
 101,1548089880066,Me senté sobre el bordillo.,1
 102,1548089879863,Ella giró el picaporte despacio.,1
-103,1548089874805,Se cayeron muchos árboles.,1
-104,1548089871952,Te doy mi palabra.,1
+103,1548089872366,Yo lo dejo caer.,1
+104,1548089871683,Él dio la vida por el país.,1
 105,1548089878874,Se lavaron en el río.,1
 106,1548089876200,Ella le empujó por la ventana.,1
 107,1548089873742,"Por favor, lanza la bola.",1
 108,1548089877582,Ella le ató a la silla.,1
 109,1548089876301,Ella sabe coser muy bien.,1
-110,1548089871468,Todo el mundo cuenta contigo.,1
-111,1548089871521,Ahora es el momento de decir buenas noches.,1
+110,1548089874112,Espera a que cuente hasta diez.,1
+111,1548089871969,Él decía la verdad.,1
 112,1548089877562,Nosotros cantamos para ella.,1
-113,1548089874531,¡No juegues con esa llave!,1
+113,1548089873155,Él siempre juega bien.,1
 114,1548089872882,¿Por qué el hielo flota?,1
 115,1548089877051,El estanque se congeló.,1
 116,1548089878890,Las nubes cubrieron el sol.,1
@@ -119,111 +119,149 @@ rank,note_id,sentence,kept
 118,1548089872576,El cielo está lleno de estrellas.,1
 119,1548089871513,Aquí hay un poco de agua.,1
 120,1548089877214,La lluvia arrastró la tierra.,1
-121,1548089872577,El lago está lejos de aquí.,1
-122,1548089872035,El mar estaba en calma.,1
-123,1548089875542,¿Puede pasarme la sal?,1
-124,1548089872530,Este puente está hecho de piedra.,1
-125,1548089873036,Hicimos un castillo de arena.,1
-126,1548089873884,El suelo estaba cubierto de polvo.,1
-127,1548089874912,Él posee esta tierra.,1
-128,1548089875209,No había una nube en el cielo.,1
-129,1548089879112,Hubo varios accidentes motivados por la niebla.,1
-130,1548089872350,Hoy no hace nada de viento.,1
-131,1548089878982,El sol derritió la nieve.,1
-132,1548089878331,El hielo se ha derretido.,1
-133,1548089874676,Un humo negro salió de la chimenea.,1
-134,1548089879783,El fuego se extinguió.,1
-135,1548089877194,He quemado la tostada.,1
-136,1548089875780,Las montañas son preciosas.,1
-137,1548089872081,Tengo un coche rojo nuevo.,1
-138,1548089872286,El verde te queda.,1
-139,1548089880178,El teñidor viste de blanco.,1
-140,1548089872575,Tengo los ojos negros.,1
-141,1548089871362,¿Qué hace tu padre?,1
-142,1548089871444,¿Cómo estás estos días?,1
-143,1548089871616,¿Sabe usted dónde vivo?,1
-144,1548089871744,¿Has perdido la cabeza?,1
-145,1548089871890,Me gustan los dos.,1
-146,1548089872190,¿El coche parecía viejo?,1
-147,1548089872307,No fuimos tan lejos.,1
-148,1548089877579,Ella cantó muy bien.,1
-149,1548089871689,Esa casa es muy pequeña.,1
-150,1548089871719,Todos los hombres deben morir.,1
-151,1548089874296,Nos perdimos en la niebla.,1
-152,1548089874877,La casa se está quemando.,1
-153,1548089876568,Deja que los niños jueguen.,1
-154,1548089879165,¿Cuándo se plantaron estos árboles?,1
-155,1548089871411,¿Ahora está tu madre en casa?,1
-156,1548089871546,Sé que está en mi corazón.,1
-157,1548089871904,Uno de nosotros tendrá que ir.,1
-158,1548089872299,Está tan frío como el hielo.,1
-159,1548089873082,Tengo una casa en las montañas.,1
-160,1548089873941,Él le teme a los perros.,1
-161,1548089875950,Él tiene cerca de sesenta años.,1
-162,1548089871422,No es tan bueno como se ve.,1
-163,1548089871967,Te daré un regalo.,1
-164,1548089873147,Pocas personas piensan así.,1
-165,1548089874384,Tráeme una toalla seca.,1
-166,1548089875926,Me pica la nariz.,1
-167,1548089875974,¿Las hormigas tienen orejas?,1
-168,1548089876498,Yo no entraría ahí.,1
-169,1548089876533,Marchamos bajo la lluvia.,1
-170,1548089876807,Caminamos otras cien yardas.,1
-171,1548089880100,Él cavó un agujero.,1
-172,1548089872207,Hoy he visto una estrella.,1
-173,1548089872252,Mi esposa está muy molesta.,1
-174,1548089874474,Mi marido es un vago.,1
-175,1548089874530,"Por favor, pásame la sal.",1
-176,1548089876458,Esta habitación es muy cálida.,1
-177,1548089877694,A vosotros ya os perdonamos.,1
-178,1548089878131,No te muerdas las uñas.,1
-179,1548089878410,Las bayas se pueden congelar.,1
-180,1548089880534,Tengo que cepillarme los dientes.,1
-181,1548089872187,¿Qué tan largo es ese puente?,1
-182,1548089874112,Espera a que cuente hasta diez.,1
-183,1548089875952,Los hombres van en manga corta.,1
-184,1548089877738,Me tengo que secar el pelo.,1
-185,1548089871606,Es la última persona que quiero ver.,1
-186,1548089875140,Él lava el coche todas las semanas.,1
-187,1548089876086,El cartero fue mordido por ese perro.,1
-188,1548089876046,Nos sentamos en un banco en el parque.,1
-189,1548089878845,Mis pies son pequeños comparados con los tuyos.,1
-190,1548089874014,A él no le dan ningún miedo las serpientes.,1
-191,1548089877138,Miles de peces muertos fueron encontrados flotando en el lago.,1
-192,1548089875546,La nieve desaparecerá pronto.,1
-193,1548089872024,Todavía puedo oír tu voz.,1
-194,1548089875651,Ambas formas de escribir son correctas.,1
-195,1548089875781,Él se lastimó su mano izquierda.,1
-196,1548089877307,Su lengua materna es el francés.,1
-197,1548089878177,"A menudo, los perros entierran huesos.",1
-198,1548089871737,¿No crees que es una cosa mala?,1
-199,1548089874136,El vidrio se hace a partir de arena.,1
-200,1548089880266,El viento de proa soplaba contra la vela.,1
-201,1548089873386,El oro es mucho más pesado que el agua.,1
-202,1548089878545,Gira el pomo y abre la puerta.,1
-203,1548089877558,Hay una necesidad urgente de donaciones de sangre.,1
-204,1548089874686,Era muy de noche cuando regresamos.,1
-205,1548089871745,La llamo todos los días.,1
-206,1548089874515,Hay cuatro estaciones al año.,1
-207,1548089876140,Es agradable y cálido.,1
-208,1548089874888,Estoy frío y mojado.,1
-209,1548089872948,Ese libro está lleno de errores.,1
-210,1548089871398,¿Qué hay de nuevo?,1
-211,1548089878691,Es un viejo estereotipo.,1
-212,1548089871301,Yo puedo ser bueno.,1
-213,1548089874881,Es una mala inversión.,1
-214,1548089876077,La mitad de estas manzanas está podrida.,1
-215,1548089873848,Tu habitación está sucia.,1
-216,1548089877533,El cuchillo no está afilado.,1
-217,1548089876249,La toalla está mojada.,1
-218,1548089876259,¿Mis calcetines ya están secos?,1
-219,1548089872555,Es del tamaño correcto.,1
-220,1548089873118,Hubo un incendio cerca.,1
-221,1548089871673,¿Qué tan lejos está de aquí?,1
-222,1548089872532,Siga a la izquierda.,1
-223,1548089872161,Te llamaré a las siete.,1
-224,1548089875529,Hay muchos peces en el estanque.,1
-225,1548089874333,El verde no pega con el rojo.,1
-226,1548089879458,Nos situamos detrás del coche y empujamos.,1
-227,1548089871314,Estoy aquí porque quiero.,1
-228,1548089874598,Oí cómo llamaban mi nombre.,1
+121,1548089875333,¿Puedes cruzar el río nadando?,1
+122,1548089872577,El lago está lejos de aquí.,1
+123,1548089872035,El mar estaba en calma.,1
+124,1548089874530,"Por favor, pásame la sal.",1
+125,1548089872530,Este puente está hecho de piedra.,1
+126,1548089873036,Hicimos un castillo de arena.,1
+127,1548089873884,El suelo estaba cubierto de polvo.,1
+128,1548089874912,Él posee esta tierra.,1
+129,1548089875209,No había una nube en el cielo.,1
+130,1548089879112,Hubo varios accidentes motivados por la niebla.,1
+131,1548089872350,Hoy no hace nada de viento.,1
+132,1548089878982,El sol derritió la nieve.,1
+133,1548089878331,El hielo se ha derretido.,1
+134,1548089874676,Un humo negro salió de la chimenea.,1
+135,1548089879783,El fuego se extinguió.,1
+136,1548089874877,La casa se está quemando.,1
+137,1548089873082,Tengo una casa en las montañas.,1
+138,1548089872081,Tengo un coche rojo nuevo.,1
+139,1548089872286,El verde te queda.,1
+140,1548089880178,El teñidor viste de blanco.,1
+141,1548089872575,Tengo los ojos negros.,1
+142,1548089874686,Era muy de noche cuando regresamos.,1
+143,1548089873390,Ahora tengo treinta años.,1
+144,1548089876140,Es agradable y cálido.,1
+145,1548089874888,Estoy frío y mojado.,1
+146,1548089872948,Ese libro está lleno de errores.,1
+147,1548089872190,¿El coche parecía viejo?,1
+148,1548089871301,Yo puedo ser bueno.,1
+149,1548089871737,¿No crees que es una cosa mala?,1
+150,1548089876077,La mitad de estas manzanas está podrida.,1
+151,1548089873848,Tu habitación está sucia.,1
+152,1548089877533,El cuchillo no está afilado.,1
+153,1548089876249,La toalla está mojada.,1
+154,1548089876259,¿Mis calcetines ya están secos?,1
+155,1548089872555,Es del tamaño correcto.,1
+156,1548089875950,Él tiene cerca de sesenta años.,1
+157,1548089872307,No fuimos tan lejos.,1
+158,1548089872532,Siga a la izquierda.,1
+159,1548089872161,Te llamaré a las siete.,1
+160,1548089871451,Todo está en tu cabeza.,1
+161,1548089871389,Yo no estoy de acuerdo con él.,1
+162,1548089879458,Nos situamos detrás del coche y empujamos.,1
+163,1548089871325,No sé si tengo tiempo.,1
+164,1548089871314,Estoy aquí porque quiero.,1
+165,1548089872890,¿Cuál es tu nombre favorito para chico?,1
+166,1548089871581,Parece que ella tiene muchos amigos.,1
+167,1548089871632,Tuve que ir ahí solo.,1
+168,1548089871624,Tenía algunas cosas que hacer.,1
+169,1548089877579,Ella cantó muy bien.,1
+170,1548089871295,No quiero nada más.,1
+171,1548089871426,Debe de haber más.,1
+172,1548089871338,La vida es así.,1
+173,1548089871349,Yo también lo creo.,1
+174,1548089871419,Sólo le he visto una vez.,1
+175,1548089871592,¿Qué pasó en realidad?,1
+176,1548089871926,No estaría tan seguro.,1
+177,1548089873629,Gracias por preocuparte de mí.,1
+178,1548089871519,Es sólo un niño.,1
+179,1548089871378,Espera aquí un poco.,1
+180,1548089871350,Siento lo de antes.,1
+181,1548089871402,Yo sé tu nombre.,1
+182,1548089872503,¿Quién es aquella mujer?,1
+183,1548089873094,Tengo las manos pequeñas.,1
+184,1548089874196,La noche estaba fresca.,1
+185,1548089874951,¿De qué te ríes?,1
+186,1548089875353,Estamos cortos de dinero.,1
+187,1548089879596,¿Lo cosiste a mano?,1
+188,1548089871719,Todos los hombres deben morir.,1
+189,1548089871827,Él mató a ese hombre.,1
+190,1548089874296,Nos perdimos en la niebla.,1
+191,1548089871546,Sé que está en mi corazón.,1
+192,1548089871673,¿Qué tan lejos está de aquí?,1
+193,1548089872187,¿Qué tan largo es ese puente?,1
+194,1548089872299,Está tan frío como el hielo.,1
+195,1548089873941,Él le teme a los perros.,1
+196,1548089874429,Pienso que sería mejor que me quedara aquí.,1
+197,1548089873118,Hubo un incendio cerca.,1
+198,1548089873907,¿De qué quieres hablarme?,1
+199,1548089874373,¡Qué flores tan bonitas!,1
+200,1548089874384,Tráeme una toalla seca.,1
+201,1548089874507,Él usaba zapatos viejos.,1
+202,1548089874561,¿Cuándo voy a cobrar?,1
+203,1548089874881,Es una mala inversión.,1
+204,1548089875780,Las montañas son preciosas.,1
+205,1548089875926,Me pica la nariz.,1
+206,1548089876533,Marchamos bajo la lluvia.,1
+207,1548089876602,Mira a la pizarra.,1
+208,1548089876807,Caminamos otras cien yardas.,1
+209,1548089876859,Yo necesito primeros auxilios.,1
+210,1548089877194,He quemado la tostada.,1
+211,1548089878854,Él tiene hombros anchos.,1
+212,1548089880100,Él cavó un agujero.,1
+213,1548089880487,Me perforé las orejas.,1
+214,1548089871468,Todo el mundo cuenta contigo.,1
+215,1548089871741,Ella es su madre real.,1
+216,1548089872207,Hoy he visto una estrella.,1
+217,1548089872252,Mi esposa está muy molesta.,1
+218,1548089872608,Nosotros éramos más jóvenes entonces.,1
+219,1548089874474,Mi marido es un vago.,1
+220,1548089874515,Hay cuatro estaciones al año.,1
+221,1548089876458,Esta habitación es muy cálida.,1
+222,1548089878131,No te muerdas las uñas.,1
+223,1548089878410,Las bayas se pueden congelar.,1
+224,1548089877738,Me tengo que secar el pelo.,1
+225,1548089871606,Es la última persona que quiero ver.,1
+226,1548089874130,Ese niño tiró una piedra al perro.,1
+227,1548089876086,El cartero fue mordido por ese perro.,1
+228,1548089876046,Nos sentamos en un banco en el parque.,1
+229,1548089877037,Tardó cinco minutos en llegar a la estación.,1
+230,1548089873386,El oro es mucho más pesado que el agua.,1
+231,1548089874014,A él no le dan ningún miedo las serpientes.,1
+232,1548089877138,Miles de peces muertos fueron encontrados flotando en el lago.,1
+233,1548089871979,Gracias por este regalo maravilloso.,1
+234,1548089872024,Todavía puedo oír tu voz.,1
+235,1548089873722,Esta sopa tiene demasiada sal.,1
+236,1548089873960,Tengo algo dormida la mano izquierda.,1
+237,1548089877307,Su lengua materna es el francés.,1
+238,1548089878177,"A menudo, los perros entierran huesos.",1
+239,1548089874136,El vidrio se hace a partir de arena.,1
+240,1548089879001,"Si no estuviera enfermo, me uniría a vosotros.",1
+241,1548089880266,El viento de proa soplaba contra la vela.,1
+242,1548089878545,Gira el pomo y abre la puerta.,1
+243,1548089877558,Hay una necesidad urgente de donaciones de sangre.,1
+244,1548089871382,Eso es otra cosa.,1
+245,1548089874322,¿Habrás terminado para entonces?,1
+246,1548089879469,Pintamos la casa de verde.,1
+247,1548089871407,Debe de ser verdad.,1
+248,1548089871511,Esto toma su tiempo.,1
+249,1548089871748,Seguro que mañana hará buen tiempo.,1
+250,1548089873627,Creí que nunca volvería.,1
+251,1548089871377,Eres mi mejor amigo.,1
+252,1548089876603,Les voy a dar todo lo que necesiten.,1
+253,1548089872859,No siempre puedes obtener lo que quieres.,1
+254,1548089873046,¿Por qué me miras?,1
+255,1548089871395,Tengo una vida muy buena.,1
+256,1548089871497,¿Dónde están los chicos?,1
+257,1548089871583,Hoy también lo haré lo mejor que pueda.,1
+258,1548089871890,Me gustan los dos.,1
+259,1548089871781,El daño está hecho.,1
+260,1548089872317,¿Esta es su primera visita?,1
+261,1548089871558,¿En cuánto tiempo vamos a llegar?,1
+262,1548089872919,¿Qué te ha llevado tanto tiempo?,1
+263,1548089871679,Estoy seguro de que tengo el número correcto.,1
+264,1548089871363,¿Qué es tu trabajo?,1
+265,1548089872356,Ellos estarán de acuerdo en eso.,1
+266,1548089871568,Me gustaría tomar algo.,1

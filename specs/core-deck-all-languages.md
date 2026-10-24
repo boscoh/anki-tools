@@ -217,12 +217,12 @@ the word core and retires its stratified preset.
 
 ## 8. Data requirements
 
-| Language | Word table                    | Sense table                    | Tier F rows | State      |
-| -------- | ----------------------------- | ------------------------------ | ----------- | ---------- |
-| fr       | `vocab/english-french.csv`    | `vocab/french_core_senses.tsv` | 51          | ready      |
-| es       | `vocab/spanish_words.csv`     | none                           | 0           | needs rows |
-| zh       | `vocab/english-mandarin.csv`  | none                           | 0           | needs rows |
-| yue      | `vocab/english-cantonese.csv` | none                           | 0           | needs rows |
+| Language | Word table                    | Sense table                     | Tier F rows | State      |
+| -------- | ----------------------------- | ------------------------------- | ----------- | ---------- |
+| fr       | `vocab/english-french.csv`    | `vocab/french_core_senses.tsv`  | 51          | ready      |
+| es       | `vocab/spanish_words.csv`     | `vocab/spanish_core_senses.tsv` | 50          | ready      |
+| zh       | `vocab/english-mandarin.csv`  | none                            | 0           | needs rows |
+| yue      | `vocab/english-cantonese.csv` | none                            | 0           | needs rows |
 
 Every language also needs a deck with a usable English field. The French deck
 has one. The Spanish deck at `apkg/Spanish 9000 sentences with native audio.apkg`
@@ -309,7 +309,20 @@ Input: `apkg/Spanish 9000 sentences with native audio.apkg`.
 Step S2 proves the flow without any new data. Step S3 proves the sense contract.
 Step S5 decides whether the core guarantee beats the current complexity spread.
 
-Open items:
+### 11.1 S5 comparison
+
+A 300-card complexity spread against the 266-card word core:
+
+| Deck              | Cards | Targets 2+ | Tier F 2+ | Outside | Sense rejects |
+| ----------------- | ----- | ---------- | --------- | ------- | ------------- |
+| word core         | 266   | 198 of 226 | 50 of 50  | 180     | 128           |
+| complexity spread | 300   | 67 of 226  | 33 of 50  | 100     | 135           |
+
+The word core covers 2.9 times the targets at the quota, so it beats the
+complexity spread. The spread holds fewer outside words and 49 cards that teach
+no core target.
+
+### 11.2 Open items
 
 - Resolved: the sentence field is `SpanishSentence`, the English field is
   `EnglishSentence`, and the audio field is `Audio`, on the model
@@ -317,8 +330,15 @@ Open items:
 - Resolved: `es_core_news_sm` is installed.
 - Resolved: the word table is `vocab/spanish_words.csv`; the older
   `vocab/english-spanish.csv` has slashed variant rows that cannot match tokens.
-- Open: the tier F word list for Spanish (FrequencyWords `es_full`, content
-  share, names).
+- Resolved: the tier F word list is the first 50 lemmas of `build_targets`
+  after the Swadesh exclusion.
+- Open: the lemmatizer gives two artefacts among the 50 tier F targets. It
+  gives `quier` for `quieres`, where `querer` is already a target, and it
+  gives `buen` for the `buen` and `buena` forms, where the dictionary lemma is
+  `bueno`. The card back shows the artefact. A lemma override is needed.
+- Open: `mirar` is a tier F target, so two kept cards can hold one content
+  lemma each. The Spanish profile sets `similarity=0.5` to keep gate K6. The
+  shared dedup compares target keys, and K6 compares content lemmas.
 
 ## 12. Risks
 
@@ -330,8 +350,9 @@ Open items:
   sense test is meaningful.
 - Adding the guard to the existing cull changes its deck. Measure before the
   change, and record a new manifest.
-- The false-friend column is empty in French. The mechanism needs a test with
-  real data.
+- The false-friend column is empty in French. Spanish sets one row: `solo`
+  rejects `only` and `just`, so the target keeps the `alone` sense. The
+  mechanism has no test beyond that row.
 - A shared flow must not become a dispatcher. The policy stays a per-language
   preset, not a branch inside the scan.
 
@@ -344,5 +365,5 @@ Open items:
 | M3        | French core list unchanged on the new record               |
 | M4        | Spanish Swadesh-only deck, gates pass                      |
 | M5        | Spanish tier F sense rows and the 300-card deck            |
-| M6        | Mandarin decision recorded: word core; complexity spread retired |
+| M6        | Mandarin: word core; complexity spread retired             |
 | M7        | Cantonese core deck on the same contract                   |

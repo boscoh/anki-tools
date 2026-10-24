@@ -1,10 +1,11 @@
-"""Spanish Swadesh-only core deck: profile and bound wrappers.
+"""Spanish core deck: profile and bound wrappers.
 
-The module builds a Swadesh-only core deck for the Spanish sentence deck
-``apkg/Spanish 9000 sentences with native audio.apkg``. It has no tier F rows
-and no sense file, so every target is a checked tier S target. The generic
-logic lives in ``anki_tools.ranking.coreflow`` and
-``anki_tools.ranking.coregates``.
+The module builds the core deck of the Spanish sentence deck
+``apkg/Spanish 9000 sentences with native audio.apkg``. The Swadesh rows of
+``vocab/spanish_words.csv`` give the tier S targets, and the tier F targets
+come from ``DEFAULT_CORE_WORDS`` words of the frequency list. Their sense rows
+live in ``vocab/spanish_core_senses.tsv``. The generic logic lives in
+``anki_tools.ranking.coreflow`` and ``anki_tools.ranking.coregates``.
 """
 
 from __future__ import annotations
@@ -45,8 +46,10 @@ SENSE_PATH = Path("vocab/spanish_core_senses.tsv")
 LOAN_PATH = Path("vocab/spanish_loanwords.txt")
 
 DEFAULT_NAME = "Spanish Core Sentences"
-DEFAULT_CORE_WORDS = 0
-DEFAULT_OPTIONS = CoreOptions(tail_cards=0, hard_top=50_000)
+DEFAULT_CORE_WORDS = 50
+# A tier F card can hold one content lemma, so the selection deduplicates on a
+# lower Jaccard limit than the gate K6 limit of 0.67.
+DEFAULT_OPTIONS = CoreOptions(tail_cards=0, hard_top=50_000, similarity=0.5)
 
 MIN_UNITS = 4
 MAX_UNITS = 10
