@@ -23,37 +23,37 @@ bd list
 bd show <issue-id>
 
 # Update issue status
-bd update <issue-id> --status in_progress
+bd update <issue-id> --claim
 bd update <issue-id> --status done
 
-# Sync with git remote
-bd sync
+# Sync with Dolt remote
+bd dolt push
 ```
 
 ### Working with Issues
 
 Issues in Beads are:
-- **Git-native**: Stored in `.beads/issues.jsonl` and synced like code
+- **Git-native**: Stored in Dolt database with version control and branching
 - **AI-friendly**: CLI-first design works perfectly with AI coding agents
 - **Branch-aware**: Issues can follow your branch workflow
-- **Always in sync**: Auto-syncs with your commits
+- **Sync-ready**: Uses Dolt remotes for backup and team sharing
 
 ## Why Beads?
 
-✨ **AI-Native Design**
+### AI-Native Design
 - Built specifically for AI-assisted development workflows
 - CLI-first interface works seamlessly with AI coding agents
 - No context switching to web UIs
 
-🚀 **Developer Focused**
+### Developer Focused
 - Issues live in your repo, right next to your code
 - Works offline, syncs when you push
 - Fast, lightweight, and stays out of your way
 
-🔧 **Git Integration**
-- Automatic sync with git commits
+### Git Integration
+- Dolt-native sync via bd dolt push / bd dolt pull
 - Branch-aware issue tracking
-- Intelligent JSONL merge resolution
+- Dolt-native three-way merge resolution
 
 ## Get Started with Beads
 
@@ -73,9 +73,8 @@ bd create "Try out Beads"
 ## Learn More
 
 - **Documentation**: [github.com/steveyegge/beads/docs](https://github.com/steveyegge/beads/tree/main/docs)
-- **Quick Start Guide**: Run `bd quickstart`
 - **Examples**: [github.com/steveyegge/beads/examples](https://github.com/steveyegge/beads/tree/main/examples)
 
 ---
 
-*Beads: Issue tracking that moves at the speed of thought* ⚡
+*Beads: Issue tracking that moves at the speed of thought*
