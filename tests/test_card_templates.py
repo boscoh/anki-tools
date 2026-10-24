@@ -124,3 +124,15 @@ def test_the_vocab_templates_hold_the_field_placeholder() -> None:
     directory = TEMPLATES_DIR / "vocab"
     assert "{{audio}}" in load_text(directory / "front.html")
     assert "{{fields}}" in load_text(directory / "back.html")
+
+
+def test_every_deck_aligns_the_card_text_to_the_left() -> None:
+    shared = load_text(SHARED_CSS_PATH)
+    assert "text-align: left" in shared
+    centred = [
+        path.relative_to(TEMPLATES_DIR)
+        for path in TEMPLATES_DIR.rglob("*.css")
+        if "text-align: center" in load_text(path)
+    ]
+
+    assert centred == []
