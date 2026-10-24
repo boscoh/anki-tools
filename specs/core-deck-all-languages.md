@@ -222,7 +222,7 @@ the word core and retires its stratified preset.
 | fr       | `vocab/english-french.csv`    | `vocab/french_core_senses.tsv`  | 51          | ready      |
 | es       | `vocab/spanish_words.csv`     | `vocab/spanish_core_senses.tsv` | 50          | ready      |
 | zh       | `vocab/english-mandarin.csv`  | none                            | 0           | needs rows |
-| yue      | `vocab/english-cantonese.csv` | none                            | 0           | needs rows |
+| yue      | `vocab/english-cantonese.csv` | none                            | 0           | too small  |
 
 Every language also needs a deck with a usable English field. The French deck
 has one. The Spanish deck at `apkg/Spanish 9000 sentences with native audio.apkg`
@@ -346,6 +346,37 @@ no core target.
   lemma each. The Spanish profile sets `similarity=0.5` to keep gate K6. The
   shared dedup compares target keys, and K6 compares content lemmas.
 
+### 11.3 Cantonese pilot (parked)
+
+Input: `apkg/LTL Cantonese Deck Level 1 - Short.apkg`, 999 notes.
+
+The adapter is written and its tests pass. The input deck is too small for
+gate K3. A Swadesh form needs two kept cards, and the deck holds two or more
+usable cards for 70 of its 212 word-table rows:
+
+| Usable cards | Forms |
+| ------------ | ----- |
+| 3 or more    | 48    |
+| 2            | 22    |
+| 1            | 38    |
+| 0            | 104   |
+
+The two runs:
+
+| Run           | Cards | Targets | K3                 | Other failures     |
+| ------------- | ----- | ------- | ------------------ | ------------------ |
+| `--words 0`   | 126   | 130     | 60 of 103 (0.583)  | none               |
+| `--words 50`  | 174   | 180     | 103 of 153 (0.673) | K16 (50), K19 (43) |
+
+Gate K3 needs 0.85. The best case is `(70 + 50) / 153 = 0.78`, so no sense
+row and no tuning reaches the limit. The 27 `absent_sense` targets and the
+752 sense failures give the same cause: the English field does not hold the
+gloss of the form. Example: `四` occurs one time, and its card reads
+`"Don't speak nonsense!"`.
+
+Decision: park M7. The Cantonese core deck waits for a second input with
+paired English, the Tatoeba pool of `anki-5z4`. Do not lower K3 for Cantonese.
+
 ## 12. Risks
 
 - Data authoring is the long pole. The Spanish pilot needs 50 rows, and a full
@@ -361,6 +392,8 @@ no core target.
   mechanism has no test beyond that row.
 - A shared flow must not become a dispatcher. The policy stays a per-language
   preset, not a branch inside the scan.
+- A small input deck fails K3 on structure, not on policy. Measure the usable
+  cards of the word table before a language starts.
 
 ## 13. Milestones
 
@@ -372,4 +405,4 @@ no core target.
 | M4        | Spanish Swadesh-only deck, gates pass                      |
 | M5        | Spanish tier F sense rows and the 300-card deck            |
 | M6        | Mandarin: word core; complexity spread retired             |
-| M7        | Cantonese core deck on the same contract                   |
+| M7        | Cantonese: parked; the LTL deck cannot meet K3             |
