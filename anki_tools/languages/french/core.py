@@ -41,9 +41,10 @@ from anki_tools.languages.french.profile import FRENCH, load_word_table
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
 from anki_tools.ranking.core import select as select_core
 from anki_tools.ranking.core import target_quotas
+from anki_tools.ranking.corelist import CoreTarget, SenseWords, build_core_targets, build_targets
 from anki_tools.ranking.reorder import reorder_deck
 from anki_tools.sentence_pack.audit import sha256_value
-from anki_tools.sentence_pack.english_sense import english_tokens, load_senses
+from anki_tools.sentence_pack.english_sense import english_tokens
 
 SENSE_PATH = Path("vocab/french_core_senses.tsv")
 DEFAULT_NAME = "French Core Sentences"
@@ -84,38 +85,6 @@ COVERAGE_COLUMNS: tuple[str, ...] = (
     "status",
 )
 FILTER_KEYS = (*cull.FILTER_RULES, "C1", "C2", "C3", "C4", "C5")
-
-
-@dataclass(frozen=True)
-class CoreTarget:
-    """One word and one sense that the deck teaches.
-
-    :param key: Unique key of the target, for example ``S1:je``.
-    :param tier: ``S`` for a Swadesh form, ``F`` for a frequency lemma.
-    :param position: 1-based position in the core list.
-    :param form: Surface form of a tier S target, or the lemma of tier F.
-    :param gloss: English Swadesh gloss of a tier S target, empty for tier F.
-    :param senses: English sense words, empty when the target is unchecked.
-    :param false_friends: English false-friend words of the target.
-    """
-
-    key: str
-    tier: str
-    position: int
-    form: str
-    gloss: str
-    senses: frozenset[str] = frozenset()
-    false_friends: frozenset[str] = frozenset()
-
-    @property
-    def word(self) -> str:
-        """Give the display word of the target."""
-        return self.form
-
-    @property
-    def checked(self) -> bool:
-        """Tell whether the target has a sense test."""
-        return self.tier == "S" or bool(self.senses)
 
 
 @dataclass(frozen=True)
@@ -178,20 +147,6 @@ class CoreRun:
     covered2: int = 0
 
 
-@dataclass(frozen=True)
-class SenseWords:
-    """English sense data of one tier F target.
-
-    :param senses: English sense words of the target.
-    :param false_friends: English false-friend words of the target.
-    :param first: First sense word of the file, used as the card gloss.
-    """
-
-    senses: frozenset[str]
-    false_friends: frozenset[str]
-    first: str
-
-
 def read_senses(
     path: Path = SENSE_PATH,
 ) -> dict[str, SenseWords]:
@@ -235,115 +190,6 @@ def _first_word(text: str) -> str:
         if word:
             return word
     return ""
-
-
-def glosses_share_sense(english_a: str, english_b: str) -> bool:
-    """Tell whether two Swadesh glosses show one sense.
-
-    A shared word of the two sense sets is the test. A gloss with no sense row
-    uses the words of its own text.
-
-    :param english_a: First Swadesh gloss.
-    :param english_b: Second Swadesh gloss.
-    :returns: True when the two glosses share a word.
-    """
-    table = load_senses()
-    first = table.get(english_a.casefold())
-    second = table.get(english_b.casefold())
-    words_a = (
-        first.words | {word for phrase in first.phrases for word in phrase}
-        if first
-        else frozenset(english_tokens(english_a))
-    )
-    words_b = (
-        second.words | {word for phrase in second.phrases for word in phrase}
-        if second
-        else frozenset(english_tokens(english_b))
-    )
-    return bool(words_a & words_b)
-
-
-def build_core_targets(
-    table: Sequence[Any],
-    frequency_targets: Sequence[cull.TargetWord],
-    senses: dict[str, SenseWords],
-    core_words: int,
-) -> tuple[list[CoreTarget], list[CoreTarget]]:
-    """Build the core list of tier S and tier F targets.
-
-    Two Swadesh rows with the same form give one target when the glosses share
-    a sense. Otherwise they give two targets, and the sense guard separates
-    them.
-
-    :param table: Reviewed French word table.
-    :param frequency_targets: Tier F candidates in rank order.
-    :param senses: Sense data of the tier F targets.
-    :param core_words: Count of tier F targets to add.
-    :returns: The core list in order, and the tier S rows that a merge dropped.
-    """
-    merged: list[CoreTarget] = []
-    dropped: list[CoreTarget] = []
-    by_form: dict[str, list[CoreTarget]] = {}
-    for row in table:
-        form = row.french
-        target = CoreTarget(
-            key=f"S{row.swadesh_index}:{form}",
-            tier="S",
-            position=0,
-            form=form,
-            gloss=row.english,
-        )
-        kept = by_form.get(form)
-        if kept:
-            same = [
-                existing
-                for existing in kept
-                if glosses_share_sense(existing.gloss, target.gloss)
-            ]
-            if same:
-                dropped.append(target)
-                continue
-            kept.append(target)
-        else:
-            by_form[form] = [target]
-        merged.append(target)
-
-    lemmas = {target.form.casefold() for target in merged}
-    items: list[CoreTarget] = list(merged)
-    added = 0
-    for word in frequency_targets:
-        if added >= core_words:
-            break
-        if word.lemma in lemmas:
-            continue
-        sense = senses.get(
-            word.lemma, SenseWords(frozenset(), frozenset(), "")
-        )
-        items.append(
-            CoreTarget(
-                key=f"F:{word.lemma}",
-                tier="F",
-                position=0,
-                form=word.lemma,
-                gloss=sense.first,
-                senses=sense.senses,
-                false_friends=sense.false_friends,
-            )
-        )
-        added += 1
-    positioned = [
-        CoreTarget(
-            key=target.key,
-            tier=target.tier,
-            position=index,
-            form=target.form,
-            gloss=target.gloss,
-            senses=target.senses,
-            false_friends=target.false_friends,
-        )
-        for index, target in enumerate(items, start=1)
-    ]
-    return positioned, dropped
 
 
 def sense_match(
@@ -499,7 +345,7 @@ def run_core(request: CoreRequest) -> CoreRun:
     media = _media_names(apkg_path)
 
     table = load_word_table()
-    frequency_targets, _content = cull.build_targets(
+    frequency_targets, _content = build_targets(
         cards,
         tokens,
         ranks,
@@ -508,7 +354,10 @@ def run_core(request: CoreRequest) -> CoreRun:
         min_deck_count=request.options.per_word + 1,
     )
     targets, merged = build_core_targets(
-        table, frequency_targets, senses, request.core_words
+        [(row.swadesh_index, row.french, row.english) for row in table],
+        frequency_targets,
+        senses,
+        request.core_words,
     )
     passed, reasons = filter_core_cards(
         cards,

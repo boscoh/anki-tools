@@ -185,21 +185,21 @@ class TestSelection:
 
 class TestBuildTargets:
     def test_two_glosses_with_one_sense_merge(self) -> None:
-        table = [_row(1, "I", "je", "en"), _row(2, "me", "je", "en")]
+        table = [(1, "je", "I"), (2, "je", "me")]
         targets, dropped = core.build_core_targets(table, [], {}, 0)
 
         assert len(targets) == 1
         assert len(dropped) == 1
 
     def test_two_senses_keep_two_targets(self) -> None:
-        table = [_row(1, "fly", "voler", "en"), _row(2, "steal", "voler", "en")]
+        table = [(1, "voler", "fly"), (2, "voler", "steal")]
         targets, dropped = core.build_core_targets(table, [], {}, 0)
 
         assert [target.key for target in targets] == ["S1:voler", "S2:voler"]
         assert not dropped
 
     def test_a_frequency_lemma_that_is_a_swadesh_form_is_not_added(self) -> None:
-        table = [_row(1, "water", "eau", "en")]
+        table = [(1, "eau", "water")]
         frequency = [cull.TargetWord("eau", 1, 3, 1.0, 1.0), cull.TargetWord("pain", 2, 3, 1.0, 1.0)]
 
         targets, _dropped = core.build_core_targets(table, frequency, {}, 5)
@@ -224,15 +224,6 @@ class TestBuildTargets:
         targets, _dropped = core.build_core_targets([], frequency, senses, 1)
 
         assert targets[0].gloss == "do"
-
-
-def _row(index: int, english: str, french: str, _lang: str):
-    """Build a small word-table row for the target tests."""
-    return type(
-        "Row",
-        (),
-        {"swadesh_index": index, "english": english, "french": french},
-    )()
 
 
 class TestFilter:

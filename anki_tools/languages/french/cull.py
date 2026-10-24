@@ -36,6 +36,7 @@ from anki_tools.sentence_pack.audit import print_audit, sha256_value
 from anki_tools.sentence_pack.audio import probe_duration
 from anki_tools.languages.french.profile import EXTRA_CSS, TOKENIZER
 from anki_tools.sentence_pack.pack import load_css
+from anki_tools.ranking.corelist import CONTENT_POS, UNRANKED_RANK, TargetWord, build_targets
 from anki_tools.ranking.cover import greedy_cover
 from anki_tools.ranking.coverage import write_rows
 from anki_tools.ranking.duplicates import at_limit
@@ -69,12 +70,7 @@ FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
 BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")
 CARD_TEMPLATES = ((FRONT_TEMPLATE, BACK_TEMPLATE),)
 
-CONTENT_POS = frozenset({"NOUN", "VERB", "ADJ", "ADV"})
-CONTENT_SHARE = 0.5
-MIN_DECK_COUNT = 3
-MIN_LEMMA_LENGTH = 2
 SMALL_COUNT = 5
-UNRANKED_RANK = 100_000
 UNRANKED_ORDER = 1_000_000
 TATOEBA_BATCH = 1000
 
@@ -177,24 +173,6 @@ class FrequencyRow:
     tatoeba_pm: float
     written_pm: float
     zipf: float
-
-
-@dataclass(frozen=True)
-class TargetWord:
-    """One target word of the cull.
-
-    :param lemma: Lemma text.
-    :param rank: Rank in the blended frequency list.
-    :param deck_count: Occurrence count in the input deck.
-    :param content_share: Share of the occurrences with a content part of speech.
-    :param weight: Selection weight, ``1 / log2(rank + 1)``.
-    """
-
-    lemma: str
-    rank: int
-    deck_count: int
-    content_share: float
-    weight: float
 
 
 @dataclass(frozen=True)
@@ -470,63 +448,6 @@ def read_names(path: Path = NAMES_PATH) -> set[str]:
             if name and not name.startswith("#"):
                 names.add(name)
     return names
-
-
-def build_targets(
-    cards: Sequence[InputCard],
-    tokens: Sequence[Sequence[tuple[str, str]]],
-    ranks: dict[str, int],
-    names: Collection[str],
-    target_words: int | None = 300,
-    min_deck_count: int = MIN_DECK_COUNT,
-) -> tuple[list[TargetWord], int]:
-    """Build the target word list.
-
-    :param cards: Input cards.
-    :param tokens: Lemma and part of speech per card.
-    :param ranks: Lemma to blended frequency rank.
-    :param names: Name stoplist.
-    :param target_words: Number of targets to keep, or None for every candidate.
-    :param min_deck_count: Minimum content-token count of a candidate.
-    :raises ValueError: The card list and the token list have different sizes.
-    :returns: The targets in rank order, and the count of content lemmas before
-        the target cut.
-    """
-    if len(cards) != len(tokens):
-        raise ValueError("The card list and the token list differ in size.")
-
-    totals: Counter[str] = Counter()
-    content: Counter[str] = Counter()
-    for card_tokens in tokens:
-        for lemma, pos in card_tokens:
-            totals[lemma] += 1
-            if pos in CONTENT_POS:
-                content[lemma] += 1
-
-    candidates: list[TargetWord] = []
-    for lemma, count in totals.items():
-        if content[lemma] < min_deck_count:
-            continue
-        share = content[lemma] / count
-        if share < CONTENT_SHARE:
-            continue
-        if len(lemma) < MIN_LEMMA_LENGTH or lemma in names:
-            continue
-        rank = ranks.get(lemma, UNRANKED_RANK)
-        candidates.append(
-            TargetWord(
-                lemma=lemma,
-                rank=rank,
-                deck_count=content[lemma],
-                content_share=share,
-                weight=1 / math.log2(rank + 1),
-            )
-        )
-
-    candidates.sort(key=lambda target: (target.rank, -target.deck_count, target.lemma))
-    if target_words is None:
-        return candidates, len(candidates)
-    return candidates[:target_words], len(candidates)
 
 
 def filter_cards(

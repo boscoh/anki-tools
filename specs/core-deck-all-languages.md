@@ -91,7 +91,8 @@ The flow starts with one pass over the deck:
 | zh       | jieba                   | `wordfreq` + characters | yes       |
 | yue      | Cifu + jieba            | spoken + written Cifu   | yes       |
 
-The scan is already shared in part: the French cull and core reuse
+The frequency candidate builder is shared: `anki_tools/ranking/corelist.py`
+holds `build_targets`. The scan helpers still live in the French package:
 `load_input_deck`, `tokenize_deck`, `load_frequency`, and `frequency_ranks`.
 The Cantonese selection scans inside its own module. The Spanish and Mandarin
 rank modes do not scan at all today.
@@ -116,6 +117,10 @@ so the selector keeps one spare candidate.
 The manifest counts the tier F targets whose rank is `UNRANKED_RANK`. Gate K20
 caps that count, like K16 caps `unchecked`. An unranked word sorts below every
 ranked word; its tie-break is the deck count, then the form.
+
+`build_core_targets` and the target record types live in the same shared
+module. A language package supplies the word-table triples and the tier F
+sense rows.
 
 Invariant: for French, the new builder must produce the current 209 targets
 (159 tier S and 50 tier F) with the same positions, keys, glosses, and sense
