@@ -43,6 +43,7 @@ from anki_tools.ranking.core import select as select_core
 from anki_tools.ranking.core import target_quotas
 from anki_tools.ranking.corelist import CoreTarget, SenseWords, build_core_targets, build_targets
 from anki_tools.ranking.reorder import reorder_deck
+from anki_tools.ranking.scan import CoreProfile, scan
 from anki_tools.sentence_pack.audit import sha256_value
 from anki_tools.sentence_pack.english_sense import english_tokens
 
@@ -56,6 +57,14 @@ FRENCH_FIELD = cull.FRENCH_FIELD
 AUDIO_FIELD = cull.AUDIO_FIELD
 ENGLISH_FIELD = cull.ENGLISH_FIELD
 
+
+FRENCH_CORE_PROFILE = CoreProfile(
+    load_input_deck=cull.load_input_deck,
+    tokenize_deck=cull.tokenize_deck,
+    load_frequency=cull.load_frequency,
+    frequency_ranks=cull.frequency_ranks,
+    read_names=cull.read_names,
+)
 CORE_COLUMNS: tuple[str, ...] = (
     "note_id",
     "index",
@@ -335,11 +344,11 @@ def run_core(request: CoreRequest) -> CoreRun:
     """
     apkg_path = Path(request.input_path)
     output_path = Path(request.output_path)
-    cards = cull.load_input_deck(apkg_path)
-    tokens = cull.tokenize_deck(cards)
-    frequency = cull.load_frequency()
-    ranks = cull.frequency_ranks(frequency, spoken_weight=request.spoken_weight)
-    names = cull.read_names()
+    scanned = scan(FRENCH_CORE_PROFILE, apkg_path, request.spoken_weight)
+    cards = scanned.cards
+    tokens = scanned.tokens
+    ranks = scanned.ranks
+    names = scanned.names
     loanwords = read_loanwords(request.loan_path)
     senses = read_senses(request.sense_path)
     media = _media_names(apkg_path)
