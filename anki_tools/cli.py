@@ -23,9 +23,10 @@ from typing import Literal
 import cyclopts
 from gtts import gTTS
 
+from anki_tools.languages.cantonese import core as cantonese_core
 from anki_tools.languages.french import core as french_core
-from anki_tools.languages.spanish import core as spanish_core
 from anki_tools.languages.french import cull as french_cull
+from anki_tools.languages.spanish import core as spanish_core
 from anki_tools.languages.cantonese.jyutping import fix_jyutping
 from anki_tools.languages.mandarin.pinyin import fix_pinyin
 from anki_tools.languages.mandarin.stages import (
@@ -940,6 +941,12 @@ def yue(
     freq: Literal["blend", "spoken", "written"] = "blend",
     spoken_weight: float = 0.7,
     freq_report: bool = False,
+    core: bool = False,
+    cards: int | None = None,
+    words: int = cantonese_core.DEFAULT_CORE_WORDS,
+    examples: int = cantonese_core.DEFAULT_OPTIONS.per_word,
+    tail: int = cantonese_core.DEFAULT_OPTIONS.tail_cards,
+    check: bool = False,
 ):
     """Fix Cantonese deck: convert to traditional, fix jyutping, select, rank, and reorder.
 
@@ -968,10 +975,51 @@ def yue(
     :param freq: Frequency term: blend, spoken, or written.
     :param spoken_weight: Weight of the spoken term in the blend (0 to 1).
     :param freq_report: Write the sentences that the frequency change moves.
+    :param core: Build the core deck instead of ranking and selecting.
+    :param cards: Core mode: card cap.
+    :param words: Core mode: tier F words after the Swadesh set.
+    :param examples: Core mode: examples per content target.
+    :param tail: Core mode: cards after the core passes.
+    :param check: Core mode: run the gates on the output only.
     """
     apkg_path = Path(apkg_path)
     if not apkg_path.exists():
         print(f"Error: File not found: {apkg_path}")
+        return
+
+    if check and not core:
+        print("Error: --check needs --core.")
+        return
+
+    if core:
+        if model_id is not None:
+            print("Error: --model-id does not apply with --core.")
+            return
+        output_path = output or cantonese_core.default_output(apkg_path)
+        if check:
+            code = cantonese_core.check_core(output_path)
+            if code:
+                raise SystemExit(code)
+            return
+        print("=" * 50)
+        print("Processing Cantonese Anki Deck: core mode")
+        print("=" * 50)
+        options = replace(
+            cantonese_core.DEFAULT_OPTIONS,
+            per_word=examples,
+            tail_cards=tail,
+        )
+        if cards is not None:
+            options = replace(options, max_cards=cards)
+        cantonese_core.run_core(
+            cantonese_core.CoreRequest(
+                input_path=apkg_path,
+                output_path=output_path,
+                core_words=words,
+                options=options,
+                spoken_weight=spoken_weight,
+            )
+        )
         return
 
     if output is None:
