@@ -364,6 +364,9 @@ def test_cull_csv_columns_and_reasons(tmp_path: Path) -> None:
 
     cull_fr.write_cull_csv(cards, ["F7", "", ""], selection, [1], path)
     header, rows = _read_csv(path)
+    raw = path.read_bytes()
+    assert raw.split(b"\n")[0] == ",".join(cull_fr.CULL_COLUMNS).encode()
+    assert b"\r" not in raw
 
     assert header == list(cull_fr.CULL_COLUMNS)
     assert len(rows) == 3
@@ -517,7 +520,9 @@ def test_write_deck_sets_the_swadesh_templates(tmp_path: Path) -> None:
 def _add_second_template(path: Path) -> None:
     """Add a copy of the first template and its cards to a deck."""
     with AnkiPackage(path) as package:
-        cursor = package.conn.cursor()
+        conn = package.conn
+        assert conn is not None
+        cursor = conn.cursor()
         models = json.loads(cursor.execute("SELECT models FROM col").fetchone()[0])
         model_id = next(iter(models))
         templates = models[model_id]["tmpls"]
@@ -540,7 +545,7 @@ def _add_second_template(path: Path) -> None:
                 f"VALUES ({','.join('?' for _ in columns)})",
                 [record[column] for column in columns],
             )
-        package.conn.commit()
+        conn.commit()
         package._modified = True
         package.save()
 

@@ -37,6 +37,7 @@ from anki_tools.sentence_pack.audio import probe_duration
 from anki_tools.languages.french.profile import EXTRA_CSS, TOKENIZER
 from anki_tools.sentence_pack.pack import load_css
 from anki_tools.ranking.cover import greedy_cover
+from anki_tools.ranking.coverage import write_rows
 from anki_tools.ranking.duplicates import at_limit
 
 FREQUENCY_PATH = Path("data/french_frequency.tsv")
@@ -1007,7 +1008,7 @@ def write_cull_csv(
             continue
         reason = reasons[index] or selection.reasons.get(index, "")
         rows.append(_cull_row(card, False, reason, selection, index))
-    _write_rows(path, CULL_COLUMNS, rows)
+    write_rows(path, CULL_COLUMNS, rows)
 
 
 def _reserve_row(card: ReserveCard) -> dict[str, Any]:
@@ -1078,7 +1079,7 @@ def write_coverage_csv(
                 "status": coverage_status(count),
             }
         )
-    _write_rows(path, COVERAGE_COLUMNS, rows)
+    write_rows(path, COVERAGE_COLUMNS, rows)
 
 
 def coverage_status(count: int) -> str:
@@ -1431,17 +1432,6 @@ def _write_legacy_decks(package: AnkiPackage, decks: dict[str, dict]) -> None:
     conn.execute("UPDATE col SET decks = ? WHERE id = 1", (json.dumps(decks),))
     conn.commit()
 
-
-def _write_rows(
-    path: Path, columns: Sequence[str], rows: Sequence[dict[str, Any]]
-) -> None:
-    """Write CSV rows with a fixed column order."""
-    target = Path(path)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    with target.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(columns), lineterminator="\n")
-        writer.writeheader()
-        writer.writerows(rows)
 
 
 GateRow = tuple[str, bool, str]

@@ -9,7 +9,6 @@ See ``specs/yue-sentence-selection.md`` sections 7 and 8.
 
 from __future__ import annotations
 
-import csv
 import math
 from collections import Counter
 from dataclasses import dataclass, field
@@ -23,6 +22,7 @@ from anki_tools.languages.mandarin.characters import (
     get_chinese_chars,
 )
 from anki_tools.ranking.cover import greedy_cover
+from anki_tools.ranking.coverage import write_rows
 from anki_tools.ranking.rank import Sentence
 from anki_tools.languages.cantonese.frequency import (
     VOCAB_DIR,
@@ -427,16 +427,6 @@ def select_yue_sentences(
     return SelectionReport(ordered, select_rows, coverage_rows, summary)
 
 
-def _write_rows(path: Path, columns: tuple[str, ...], rows: list[dict[str, Any]]) -> None:
-    try:
-        handle = open(path, "w", encoding="utf-8", newline="")
-    except OSError as exc:
-        raise RuntimeError(f"Cannot write {path}.") from exc
-    with handle:
-        writer = csv.DictWriter(handle, fieldnames=columns, lineterminator="\n")
-        writer.writeheader()
-        writer.writerows(rows)
-
 
 def write_select_csv(report: SelectionReport, path: Path) -> None:
     """Write one row per input sentence: sentence, kept, reason, targets, gain.
@@ -444,7 +434,7 @@ def write_select_csv(report: SelectionReport, path: Path) -> None:
     :param report: Selection report.
     :param path: Output file.
     """
-    _write_rows(path, SELECT_COLUMNS, report.select_rows)
+    write_rows(path, SELECT_COLUMNS, report.select_rows)
 
 
 def write_coverage_csv(report: SelectionReport, path: Path) -> None:
@@ -453,7 +443,7 @@ def write_coverage_csv(report: SelectionReport, path: Path) -> None:
     :param report: Selection report.
     :param path: Output file.
     """
-    _write_rows(path, COVERAGE_COLUMNS, report.coverage_rows)
+    write_rows(path, COVERAGE_COLUMNS, report.coverage_rows)
 
 
 def print_selection_summary(report: SelectionReport, options: SelectionOptions) -> None:
