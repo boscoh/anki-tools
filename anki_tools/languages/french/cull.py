@@ -856,9 +856,10 @@ def hardest_rank(card_tokens: Sequence[tuple[str, str]], ranks: dict[str, int]) 
 
     :param card_tokens: Lemma and part of speech of the card sentence.
     :param ranks: Lemma to blended frequency rank.
-    :returns: The lowest rank, or :data:`UNRANKED_ORDER` without a content lemma.
+    :returns: The rank of the least frequent content lemma, or
+        :data:`UNRANKED_ORDER` without a content lemma.
     """
-    return min(
+    return max(
         (
             ranks.get(lemma, UNRANKED_ORDER)
             for lemma, pos in card_tokens

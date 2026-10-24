@@ -1,5 +1,5 @@
 {
-  "build_date": "2026-10-24T00:10:31+00:00",
+  "build_date": "2026-10-24T23:10:25+00:00",
   "source": {
     "input": "apkg/6000_French_Sentences_w_Audio.apkg",
     "deck": "French 1000 Core Sentences",
@@ -35,7 +35,7 @@
     "spoken_weight": 0.5
   },
   "files": {
-    "cull_csv": "sha256:20d9ac6760d332df376d38c96bd3156565351ed9989bd19e76e8b13d10dd8b8f",
+    "cull_csv": "sha256:dced1e7aab89ed73a1232fd0ec4d82f93123c1b444a44247d6307b05bf5a9082",
     "coverage_csv": "sha256:2cbabf895b0b9a35cbc34ecfbc94c3aa5e2e5e7c46d07cf771ae97b0ac817b55",
     "input_apkg": "sha256:230dd01bcf6223bcb8a5ea303eee01fd4a55e19ce418d0bf66a81193037024b5"
   },
@@ -44,7 +44,7 @@
     "wordfreq": "wordfreq list: Apache License 2.0",
     "audio": "Input audio: license of the source deck"
   },
-  "kept_order": "sha256:b0193a3faf3ed40a9144c1524d9aead4ac6e955ae802a4fead1ae22b87c88214",
+  "kept_order": "sha256:621716d14b9c5450e247ead1a3c45d9c3e761f26d8e44a149a16dce142770dfa",
   "reserve_pack": "apkg/swadesh_french_sentences.apkg",
   "swadesh_exceptions": [
     "intestins"

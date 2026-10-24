@@ -322,8 +322,8 @@ class TestOrder:
         hardest = [
             cull_fr.hardest_rank(ORDER_TOKENS[index], ORDER_RANKS) for index in ordered
         ]
-        assert ordered == [1, 0, 2]
-        assert hardest == sorted(hardest)
+        assert ordered == [0, 1, 2]
+        assert hardest == [40, 900, cull_fr.UNRANKED_ORDER]
 
     def test_input_keeps_the_given_order(self) -> None:
         ordered = cull_fr.order_cards(
