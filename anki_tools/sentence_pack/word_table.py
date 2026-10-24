@@ -22,6 +22,7 @@ class TableForm(Protocol):
     swadesh_index: int
     english: str
     variant: str
+    zipf: float
 
 
 def read_csv_rows(csv_path: Path) -> list[dict[str, str]]:
@@ -207,6 +208,41 @@ def form_positions(
         for form in table
     }
 
+
+def summarize_word_table(
+    table: Sequence[TableForm],
+    *,
+    form_key: Callable[[Any], str],
+    zipf_min: float,
+    extra: Callable[[Any], dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Summarize the common counts of a reviewed word table.
+
+    :param table: Reviewed word table.
+    :param form_key: Function that gives the unique form string of one form.
+    :param zipf_min: Zipf value below which a form is rare.
+    :param extra: Function that adds language-specific counts, given the table.
+    :returns: Common counts, plus the counts of ``extra`` when given.
+    """
+    forms = [form_key(form) for form in table]
+    low = sorted(
+        (
+            (form_key(form), round(form.zipf, 2))
+            for form in table
+            if form.zipf < zipf_min
+        ),
+        key=lambda item: item[1],
+    )
+    report: dict[str, Any] = {
+        "words": len({form.swadesh_index for form in table}),
+        "forms": len(table),
+        "unique_forms": len(set(forms)),
+        "zipf_below_3": len(low),
+        "low_zipf_forms": low,
+    }
+    if extra is not None:
+        report.update(extra(table))
+    return report
 
 def write_csv(
     path: Path, fieldnames: Sequence[str], rows: Sequence[dict[str, Any]]

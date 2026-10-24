@@ -7,7 +7,6 @@ module contains a test on the language name.
 
 from __future__ import annotations
 
-import csv
 import re
 from collections import Counter
 from dataclasses import dataclass, replace
@@ -36,7 +35,7 @@ from anki_tools.sentence_pack.pack import (
     write_attribution_section,
 )
 from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
-from anki_tools.sentence_pack.select import rank_order, review_status
+from anki_tools.sentence_pack.select import rank_order
 
 from anki_tools.sentence_pack.word_table import (
     check_english_labels,
@@ -47,7 +46,12 @@ from anki_tools.sentence_pack.word_table import (
     form_positions as shared_form_positions,
     read_csv_rows,
     read_swadesh_labels,
-    write_csv,
+    summarize_word_table,
+)
+from anki_tools.sentence_pack.cards import (
+    build_sentence_row,
+    write_review_rows,
+    write_sentence_rows,
 )
 DEFAULT_CSV_PATH = Path("vocab/english-mandarin.csv")
 DEFAULT_SWADESH_PATH = Path("vocab/swadesh.txt")
@@ -478,24 +482,19 @@ def word_table_report(table: list[WordForm]) -> dict[str, Any]:
     :returns: Counts of words and forms, the low Zipf forms, and the forms
         with no candidate sentence. ``uncovered`` stays empty until S2.
     """
-    forms = [form.mandarin for form in table]
-    low = sorted(
-        (
-            (form.mandarin, round(form.zipf, 2))
-            for form in table
-            if form.zipf < MIN_ZIPF
-        ),
-        key=lambda item: item[1],
+    return summarize_word_table(
+        table,
+        form_key=lambda form: form.mandarin,
+        zipf_min=MIN_ZIPF,
+        extra=_report_extras,
     )
+
+
+def _report_extras(table: list[WordForm]) -> dict[str, Any]:
     return {
-        "words": len({form.swadesh_index for form in table}),
-        "forms": len(table),
-        "unique_forms": len(set(forms)),
         "primary_forms": sum(1 for form in table if form.variant == "primary"),
         "alternate_forms": sum(1 for form in table if form.variant == "alternate"),
         "core_forms": sum(1 for form in table if form.tier == "core"),
-        "zipf_below_3": len(low),
-        "low_zipf_forms": low,
         "uncovered": [],
     }
 
@@ -1011,37 +1010,17 @@ MANDARIN = register(
 )
 
 
-def _review_row_status(
-    form: WordForm, pool_count: int, core_count: int, per_word: int
-) -> str | None:
-    return review_status(form, pool_count, core_count, per_word, MIN_ZIPF)
-
-
 def sentence_row(card: Candidate) -> dict[str, Any]:
     """Build one sentence CSV row of a card.
 
     :param card: Selected card.
     :returns: Mapping from CSV column to value.
     """
-    return {
-        "target": card.target,
-        "sentence": card.sentence,
-        "text_original": card.text_original,
-        "pinyin": card.pinyin,
-        "english": card.english,
-        "tatoeba_id": card.tatoeba_id,
-        "tatoeba_author": card.tatoeba_author,
-        "english_id": card.english_id,
-        "audio_id": card.audio_id,
-        "audio_source": card.audio_source,
-        "audio_license": card.audio_license,
-        "unknown_words": card.unknown_words,
-        "han_len": card.han_len,
-        "zipf_mean": f"{card.zipf_mean:.2f}",
-        "rank_key": card.rank_key,
-        "tier": card.tier,
-        "audio_missing": "true" if card.audio_missing else "false",
-    }
+    return build_sentence_row(
+        card,
+        unit_field="han_len",
+        extra_fields=(("pinyin", lambda card: card.pinyin),),
+    )
 
 
 def write_sentence_csv(cards: list[Candidate], path: Path = SENTENCES_PATH) -> Path:
@@ -1051,7 +1030,7 @@ def write_sentence_csv(cards: list[Candidate], path: Path = SENTENCES_PATH) -> P
     :param path: Output CSV file.
     :returns: The written path.
     """
-    return write_csv(path, SENTENCE_FIELDS, [sentence_row(card) for card in cards])
+    return write_sentence_rows(cards, path, SENTENCE_FIELDS, sentence_row)
 
 
 def write_sentence_review_csv(
@@ -1075,54 +1054,20 @@ def write_sentence_review_csv(
     :param top_n: Candidate rows per word.
     :returns: The written path.
     """
-    from anki_tools.sentence_pack.select import review_candidates
-
-    pool_counts, core_counts, by_form = review_candidates(pool, MANDARIN)
-
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=SENTENCE_REVIEW_FIELDS)
-        writer.writeheader()
-        for form in word_table:
-            status = _review_row_status(
-                form, pool_counts[form.mandarin], core_counts[form.mandarin], per_word
-            )
-            if status is None:
-                continue
-            base = {
-                "target": form.mandarin,
-                "swadesh_index": form.swadesh_index,
-                "english": form.english,
-                "variant": form.variant,
-                "status": status,
-                "zipf": f"{form.zipf:.2f}",
-                "candidate_count": pool_counts[form.mandarin],
-                "scaffold_candidates": pool_counts[form.mandarin]
-                - core_counts[form.mandarin],
-            }
-            candidates = by_form.get(form.mandarin, [])[:top_n]
-            if not candidates:
-                writer.writerow({**base, "rank": 0})
-                continue
-            for rank, candidate in enumerate(candidates, start=1):
-                writer.writerow(
-                    {
-                        **base,
-                        "rank": rank,
-                        "sentence": candidate.sentence,
-                        "text_original": candidate.text_original,
-                        "pinyin": candidate.pinyin
-                        or sentence_pinyin(candidate.sentence),
-                        "english_text": candidate.english,
-                        "tatoeba_id": candidate.tatoeba_id,
-                        "unknown_words": candidate.unknown_words,
-                        "han_len": candidate.han_len,
-                        "rank_key": candidate.rank_key,
-                        "tier": candidate.tier,
-                    }
-                )
-    return path
+    return write_review_rows(
+        MANDARIN,
+        pool,
+        word_table,
+        path,
+        SENTENCE_REVIEW_FIELDS,
+        form_key=lambda form: form.mandarin,
+        unit_field="han_len",
+        zipf_min=MIN_ZIPF,
+        per_word=per_word,
+        top_n=top_n,
+        transliteration_field="pinyin",
+        transliteration=sentence_pinyin,
+    )
 
 
 __all__ = [

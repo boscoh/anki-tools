@@ -10,7 +10,6 @@ pronoun forms match by surface only. A reflexive infinitive such as
 
 from __future__ import annotations
 
-import csv
 import unicodedata
 from dataclasses import dataclass, replace
 from functools import lru_cache
@@ -30,7 +29,12 @@ from anki_tools.sentence_pack.word_table import (
     read_csv_rows,
     read_swadesh_labels as shared_read_swadesh_labels,
     read_word_review as shared_read_word_review,
-    write_csv,
+    summarize_word_table,
+)
+from anki_tools.sentence_pack.cards import (
+    build_sentence_row,
+    write_review_rows,
+    write_sentence_rows,
 )
 from anki_tools.sentence_pack.wiktionary import (
     LINK_PATTERN,
@@ -840,23 +844,19 @@ def word_table_report(table: list[WordForm]) -> dict[str, Any]:
     :param table: Word table from :func:`load_word_table`.
     :returns: Counts, the low Zipf forms, and the noun gender coverage.
     """
-    low = sorted(
-        (
-            (form.spanish, round(form.zipf, 2))
-            for form in table
-            if form.zipf < MIN_ZIPF
-        ),
-        key=lambda item: item[1],
+    return summarize_word_table(
+        table,
+        form_key=lambda form: form.spanish,
+        zipf_min=MIN_ZIPF,
+        extra=_report_extras,
     )
+
+
+def _report_extras(table: list[WordForm]) -> dict[str, Any]:
     nouns = [form for form in table if form.swadesh_index in NOUN_INDICES]
     return {
-        "words": len({form.swadesh_index for form in table}),
-        "forms": len(table),
-        "unique_forms": len({form.spanish for form in table}),
         "nouns": len(nouns),
         "nouns_with_gender": sum(1 for form in nouns if form.gender),
-        "zipf_below_3": len(low),
-        "low_zipf_forms": low,
     }
 
 
@@ -904,25 +904,11 @@ def sentence_row(card: Candidate) -> dict[str, Any]:
     :param card: Selected card.
     :returns: Mapping from CSV column to value.
     """
-    return {
-        "target": card.target,
-        "sentence": card.sentence,
-        "text_original": card.text_original,
-        "english": card.english,
-        "tatoeba_id": card.tatoeba_id,
-        "tatoeba_author": card.tatoeba_author,
-        "english_id": card.english_id,
-        "audio_id": card.audio_id,
-        "audio_source": card.audio_source,
-        "audio_license": card.audio_license,
-        "unknown_words": card.unknown_words,
-        "word_len": card.word_len,
-        "zipf_mean": f"{card.zipf_mean:.2f}",
-        "rank_key": card.rank_key,
-        "tier": card.tier,
-        "form_kind": card.form_kind,
-        "audio_missing": "true" if card.audio_missing else "false",
-    }
+    return build_sentence_row(
+        card,
+        unit_field="word_len",
+        extra_fields=(("form_kind", lambda card: card.form_kind),),
+    )
 
 
 def write_sentence_csv(cards: list[Candidate], path: Path = SENTENCES_PATH) -> Path:
@@ -932,7 +918,7 @@ def write_sentence_csv(cards: list[Candidate], path: Path = SENTENCES_PATH) -> P
     :param path: Output CSV file.
     :returns: The written path.
     """
-    return write_csv(path, SENTENCE_FIELDS, [sentence_row(card) for card in cards])
+    return write_sentence_rows(cards, path, SENTENCE_FIELDS, sentence_row)
 
 
 def write_sentence_review_csv(
@@ -951,55 +937,18 @@ def write_sentence_review_csv(
     :param top_n: Candidate rows per word.
     :returns: The written path.
     """
-    from anki_tools.sentence_pack.select import review_candidates, review_status
-
-    pool_counts, core_counts, by_form = review_candidates(pool, SPANISH)
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=SENTENCE_REVIEW_FIELDS)
-        writer.writeheader()
-        for form in word_table:
-            status = review_status(
-                form,
-                pool_counts[form.spanish],
-                core_counts[form.spanish],
-                per_word,
-                MIN_ZIPF,
-            )
-            if status is None:
-                continue
-            base = {
-                "target": form.spanish,
-                "swadesh_index": form.swadesh_index,
-                "english": form.english,
-                "variant": form.variant,
-                "status": status,
-                "zipf": f"{form.zipf:.2f}",
-                "candidate_count": pool_counts[form.spanish],
-                "scaffold_candidates": pool_counts[form.spanish]
-                - core_counts[form.spanish],
-            }
-            candidates = by_form.get(form.spanish, [])[:top_n]
-            if not candidates:
-                writer.writerow({**base, "rank": 0})
-                continue
-            for rank, candidate in enumerate(candidates, start=1):
-                writer.writerow(
-                    {
-                        **base,
-                        "rank": rank,
-                        "sentence": candidate.sentence,
-                        "text_original": candidate.text_original,
-                        "english_text": candidate.english,
-                        "tatoeba_id": candidate.tatoeba_id,
-                        "unknown_words": candidate.unknown_words,
-                        "word_len": candidate.word_len,
-                        "rank_key": candidate.rank_key,
-                        "tier": candidate.tier,
-                    }
-                )
-    return path
+    return write_review_rows(
+        SPANISH,
+        pool,
+        word_table,
+        path,
+        SENTENCE_REVIEW_FIELDS,
+        form_key=lambda form: form.spanish,
+        unit_field="word_len",
+        zipf_min=MIN_ZIPF,
+        per_word=per_word,
+        top_n=top_n,
+    )
 
 
 def known_words(word_table: Sequence[WordForm]) -> set[str]:
