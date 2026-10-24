@@ -46,6 +46,7 @@ class CliLanguage:
     :param audit: Gate runner of the language, None when it has none.
     :param build: True when the ``build`` command serves the language from an
         ``english-<lang>.csv`` file and an audio directory.
+    :param tts: gTTS language code of the ``build`` command, None when it has none.
     """
 
     name: str
@@ -53,12 +54,13 @@ class CliLanguage:
     module: ModuleType | None = None
     audit: Callable[[], Sequence[Any]] | None = None
     build: bool = False
+    tts: str | None = None
 
 
 LANGUAGES: dict[str, CliLanguage] = {
     language.name: language
     for language in (
-        CliLanguage("mandarin", profile=mandarin.MANDARIN, build=True),
+        CliLanguage("mandarin", profile=mandarin.MANDARIN, build=True, tts="zh-cn"),
         CliLanguage(
             "french",
             profile=french.FRENCH,
@@ -71,6 +73,7 @@ LANGUAGES: dict[str, CliLanguage] = {
             module=spanish,
             audit=spanish.run_spanish_audit,
             build=True,
+            tts="es",
         ),
         CliLanguage(
             "greek",
@@ -78,17 +81,19 @@ LANGUAGES: dict[str, CliLanguage] = {
             module=greek,
             audit=greek.run_greek_audit,
             build=True,
+            tts="el",
         ),
-        CliLanguage("german", build=True),
+        CliLanguage("german", build=True, tts="de"),
         CliLanguage(
             "cantonese",
             profile=cantonese.CANTONESE,
             module=cantonese,
             audit=cantonese.run_cantonese_audit,
             build=True,
+            tts="yue",
         ),
-        CliLanguage("arabic", build=True),
-        CliLanguage("hindi", build=True),
+        CliLanguage("arabic", build=True, tts="ar"),
+        CliLanguage("hindi", build=True, tts="hi"),
     )
 }
 

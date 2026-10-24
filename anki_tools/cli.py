@@ -16,6 +16,7 @@ import re
 import shutil
 import time
 import webbrowser
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
@@ -1316,17 +1317,8 @@ def _generate_audio_files(entries: list[dict], config: dict) -> None:
     if not language:
         return
 
-    GTTS_LANG = {
-        "arabic": "ar",
-        "cantonese": "yue",
-        "german": "de",
-        "greek": "el",
-        "hindi": "hi",
-        "mandarin": "zh-cn",
-        "spanish": "es",
-    }
-
-    lang = GTTS_LANG.get(language.lower())
+    entry = LANGUAGES.get(language.lower())
+    lang = entry.tts if entry is not None else None
     if not lang:
         print(f"Unknown language for gTTS: {language}")
         return
@@ -1395,49 +1387,30 @@ def _content_field_order(csv_fields: list[str], audio_field_name: str) -> list[s
     return result
 
 
-def _build_apkg(language: str, prune: bool = True) -> None:
-    """Build APKG file with vocabulary and audio for the given language.
+@dataclass(frozen=True)
+class _BuildLayout:
+    """Note fields, templates, and field order of one vocabulary deck."""
 
-    :param language: Language name (e.g. mandarin, spanish).
-    :param prune: Delete audio files that the current list does not use.
+    fields: list[str]
+    content_order: list[str]
+    front_template: str
+    answer_format: str
+    css_content: str
+    css_path: Path
+
+
+def _build_layout(config: dict, entries: list[dict]) -> _BuildLayout:
+    """Compute the note fields, templates, and field order from the config.
+
+    :param config: Config dict with the audio field name and language.
+    :param entries: List of entry dicts from _parse_vocab_entries.
+    :returns: The layout of the deck.
     """
-    lang_lower = language.lower()
-    lang_title = language.title()
-    print(f"Building {lang_title} vocabulary APKG...")
-
-    config = {
-        "language": language,
-        "vocab_file": f"vocab/english-{lang_lower}.csv",
-        "audio_dir": f"audio/audio_{lang_lower}",
-        "deck_name": f"Swadesh {lang_title}",
-        "model_name": f"Swadesh {lang_title}",
-        "output_file": f"swadesh_{lang_lower}.apkg",
-        "audio_field_name": lang_lower,
-    }
-
-    entries = _parse_vocab_entries(config)
-    config["deck_name"] = f"{config['deck_name']} {len(entries)}"
-
-    _generate_audio_files(entries, config)
-
-    audio_dir = Path(config["audio_dir"])
-    if not audio_dir.is_absolute():
-        audio_dir = Path(__file__).parent.parent / config["audio_dir"]
-    if not audio_dir.exists():
-        print(f"Error: Audio directory not found: {audio_dir}")
-        return
-
-    keep = {entry["audio_filename"] for entry in entries}
-    if prune:
-        removed = _prune_outdated_audio(audio_dir, keep)
-        if removed:
-            print(f"Removed {len(removed)} outdated audio files")
-
     front_template = load_text(TEMPLATES_DIR / "vocab" / "front.html")
     back_template = load_text(TEMPLATES_DIR / "vocab" / "back.html")
 
     css_path = TEMPLATES_DIR / "vocab" / "card.css"
-    language_css_path = TEMPLATES_DIR / "vocab" / lang_lower / "card.css"
+    language_css_path = TEMPLATES_DIR / "vocab" / config["language"].lower() / "card.css"
     css_content = load_css_layers(SHARED_CSS_PATH, css_path, language_css_path)
 
     csv_fields = (
@@ -1464,6 +1437,39 @@ def _build_apkg(language: str, prune: bool = True) -> None:
         field_parts.append(char_click_script)
     answer_format = back_template.replace("{{fields}}", "\n".join(field_parts))
 
+    return _BuildLayout(
+        fields=fields,
+        content_order=content_order,
+        front_template=front_template,
+        answer_format=answer_format,
+        css_content=css_content,
+        css_path=css_path,
+    )
+
+
+def _pack_apkg(
+    config: dict, entries: list[dict], layout: _BuildLayout, prune: bool
+) -> None:
+    """Write the APKG file and prune the outdated audio files.
+
+    :param config: Config dict with the deck and audio settings.
+    :param entries: List of entry dicts from _parse_vocab_entries.
+    :param layout: Deck layout from _build_layout.
+    :param prune: Delete audio files that the current list does not use.
+    """
+    audio_dir = Path(config["audio_dir"])
+    if not audio_dir.is_absolute():
+        audio_dir = Path(__file__).parent.parent / config["audio_dir"]
+    if not audio_dir.exists():
+        print(f"Error: Audio directory not found: {audio_dir}")
+        return
+
+    keep = {entry["audio_filename"] for entry in entries}
+    if prune:
+        removed = _prune_outdated_audio(audio_dir, keep)
+        if removed:
+            print(f"Removed {len(removed)} outdated audio files")
+
     cards = []
     media_files = []
     missing: list[str] = []
@@ -1477,7 +1483,7 @@ def _build_apkg(language: str, prune: bool = True) -> None:
             continue
 
         card = {"audio": f"[sound:{entry['audio_filename']}]"}
-        for field in content_order:
+        for field in layout.content_order:
             card[field] = entry.get(field, "")
         cards.append(card)
 
@@ -1496,25 +1502,53 @@ def _build_apkg(language: str, prune: bool = True) -> None:
     print(f"  Deck: {config['deck_name']}")
     print(f"  Cards: {len(cards)}")
     print(f"  Audio files: {len(media_files)}")
-    if css_content:
-        print(f"  CSS: {css_path}")
+    if layout.css_content:
+        print(f"  CSS: {layout.css_path}")
 
     tmp_path = output_path.with_name(output_path.name + ".tmp")
     AnkiPackage.create(
         tmp_path,
         config["deck_name"],
-        fields=fields,
+        fields=layout.fields,
         cards=cards,
         media_files=media_files,
         model_name=config["model_name"],
-        question_format=front_template,
-        answer_format=answer_format,
-        css=css_content,
+        question_format=layout.front_template,
+        answer_format=layout.answer_format,
+        css=layout.css_content,
         sort_field_index=0,
     )
     tmp_path.replace(output_path)
 
     print(f"\nSuccessfully created: {output_path}")
+
+
+def _build_apkg(language: str, prune: bool = True) -> None:
+    """Build APKG file with vocabulary and audio for the given language.
+
+    :param language: Language name (e.g. mandarin, spanish).
+    :param prune: Delete audio files that the current list does not use.
+    """
+    lang_lower = language.lower()
+    lang_title = language.title()
+    print(f"Building {lang_title} vocabulary APKG...")
+
+    config = {
+        "language": language,
+        "vocab_file": f"vocab/english-{lang_lower}.csv",
+        "audio_dir": f"audio/audio_{lang_lower}",
+        "deck_name": f"Swadesh {lang_title}",
+        "model_name": f"Swadesh {lang_title}",
+        "output_file": f"swadesh_{lang_lower}.apkg",
+        "audio_field_name": lang_lower,
+    }
+
+    entries = _parse_vocab_entries(config)
+    config["deck_name"] = f"{config['deck_name']} {len(entries)}"
+
+    _generate_audio_files(entries, config)
+    layout = _build_layout(config, entries)
+    _pack_apkg(config, entries, layout, prune)
 
 
 SWADESH_LANGUAGES = swadesh_languages()
