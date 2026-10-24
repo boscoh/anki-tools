@@ -48,19 +48,19 @@ Notes:
 
 ## 3. Card count of the target deck
 
-| Command                       | Cards in the target deck                                             |
-| ----------------------------- | -------------------------------------------------------------------- |
-| `anki fix zh`                 | the rated sentences; the filter drops a name and an invalid sentence |
-| `anki fix zh --max-sentences` | `--max-sentences` cards; the reduce step also drops a duplicate      |
-| `anki fix fr`                 | the rated sentences; the filter drops a name and an invalid sentence |
-| `anki fix fr --select`        | `--max-cards` cards, default 1000                                    |
-| `anki fix fr --core`          | `--core-max-cards` cards, plus `--tail-cards`                        |
-| `anki fix yue`                | the kept sentences of the selection                                  |
-| `anki fix yue --no-select`    | the rated sentences; the filter drops a name and an invalid sentence |
-| `anki fix es`                 | the rated sentences; `--max-sentences` drops a duplicate too         |
-| `anki style apply`            | every card of the source deck                                        |
-| `anki swadesh build`          | one card for each row of the word CSV                                |
-| `anki swadesh pack`           | one card for each selected row of the sentence CSV                   |
+| Command                       | Cards in the target deck                                                           |
+| ----------------------------- | ---------------------------------------------------------------------------------- |
+| `anki fix zh`                 | the source cards, less a duplicate above the similarity threshold                  |
+| `anki fix zh --max-sentences` | `--max-sentences` cards, rated and deduplicated                                    |
+| `anki fix fr`                 | the source cards, less a duplicate above the similarity threshold                  |
+| `anki fix fr --select`        | `--max-cards` cards, default 1000                                                  |
+| `anki fix fr --core`          | `--core-max-cards` cards, plus `--tail-cards`                                      |
+| `anki fix yue`                | the kept sentences of the selection                                                |
+| `anki fix yue --no-select`    | the source cards, less a duplicate above the similarity threshold                  |
+| `anki fix es`                 | the source cards, less a duplicate; `--max-sentences` also drops the unrated cells |
+| `anki style apply`            | every card of the source deck                                                      |
+| `anki swadesh build`          | one card for each row of the word CSV                                              |
+| `anki swadesh pack`           | one card for each selected row of the sentence CSV                                 |
 
 ## 4. Deck names of the sentence packs
 
@@ -98,8 +98,8 @@ writes no deck. Run `anki swadesh pack <language>` first.
 
 ## 6. The write steps of a target deck
 
-A fix command writes the target deck in place. It copies the source deck to
-the target file, then edits the target file. The source file does not change.
+A fix command reads the source deck and saves the target deck. The source
+file does not change.
 
 `anki fix fr --select` and `anki fix fr --core` also write side files beside
 the target deck: the card CSV, the coverage CSV, the manifest JSON, and for
