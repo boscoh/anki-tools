@@ -14,6 +14,7 @@ import os
 import re
 import shutil
 import time
+import webbrowser
 from pathlib import Path
 from typing import Literal
 
@@ -43,6 +44,7 @@ from anki_tools.languages.mandarin.stages import (
     write_sentence_review_csv,
 )
 from anki_tools.apkg.package import AnkiPackage
+from anki_tools.preview import write_preview
 from anki_tools.sentence_pack import audio as pack_audio
 from anki_tools.sentence_pack import pack as sentence_pack
 from anki_tools.sentence_pack import pool as sentence_pool
@@ -1907,6 +1909,28 @@ def _language_pack(module, profile, pack_license: str) -> None:
 def list_languages():
     """List supported Swadesh languages."""
     print("Supported languages:", ", ".join(SWADESH_LANGUAGES))
+
+
+# =============================================================================
+# Preview - build the browser preview of the card templates
+# =============================================================================
+
+
+@app.command
+def preview(
+    output: Path = Path("preview/cards.html"),
+    *,
+    open_browser: bool = False,
+):
+    """Build the browser preview of every card template.
+
+    :param output: HTML file to write (default: ``preview/cards.html``).
+    :param open_browser: Open the written file in the default browser.
+    """
+    cards, sections = write_preview(output)
+    print(f"wrote {output} with {cards} cards in {sections} sections")
+    if open_browser:
+        webbrowser.open(Path(output).resolve().as_uri())
 
 
 def main() -> None:

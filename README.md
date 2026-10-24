@@ -97,9 +97,12 @@ language.
 
 ### Card Previews
 
-`uv run python scripts/build_card_preview.py` writes `preview/cards.html`.
-Open the file in a browser to see every card type with sample data. The script
-reads the real template and CSS files. Run it again after a template edit.
+`uv run anki preview` writes `preview/cards.html`. Open the file in a browser
+to see every card type with sample data. The command reads the real template
+and CSS files. Run it again after a template edit.
+
+`uv run anki preview --open-browser` writes the file and opens it. Use
+`--output <path>` to write another file.
 
 ### Python API
 

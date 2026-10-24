@@ -10,6 +10,7 @@ lives in one directory only.
 | `anki_tools/__init__.py` | Public exports of the package                    |
 | `anki_tools/cli.py`      | Cyclopts command tree and the `anki` entry point |
 | `anki_tools/cache.py`    | Download a file into the cache                   |
+| `anki_tools/preview.py`  | Build the browser preview of the card templates  |
 
 `cli.py` also holds the deck field-name aliases that each `fix` command
 passes to `extract_sentences`. A field name of one language stays in the
