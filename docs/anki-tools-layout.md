@@ -90,8 +90,7 @@ One package per language. The package holds all the code of that language.
 | `anki_tools/languages/french/profile.py`            | French profile and form matching                   |
 | `anki_tools/languages/french/rank.py`               | French sentence ranking                            |
 | `anki_tools/languages/french/cull.py`               | French cull profile, values, and bindings          |
-| `anki_tools/languages/french/core.py`               | French core-word deck pipeline                     |
-| `anki_tools/languages/french/core_gates.py`         | Gates K1 to K19 of the core deck                   |
+| `anki_tools/languages/french/core.py`               | French core deck: profile, wrappers, and gates     |
 | `anki_tools/languages/greek/profile.py`             | Greek profile and form matching                    |
 | `anki_tools/languages/greek/rank.py`                | Greek sentence ranking                             |
 | `anki_tools/languages/spanish/rank.py`              | Spanish sentence ranking                           |

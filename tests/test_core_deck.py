@@ -14,7 +14,17 @@ import pytest
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.languages.french import core, cull
-from anki_tools.ranking.coreflow import find_model_id
+from anki_tools.ranking.coreflow import (
+    coverage_rows_of,
+    find_model_id,
+    kept_order_hash,
+    outside_lemmas,
+    sense_match,
+    side_paths,
+    size_check,
+    write_rank_csv,
+)
+from anki_tools.ranking.corelist import build_core_targets
 from anki_tools.ranking.core import (
     CoreCandidate,
     CoreOptions,
@@ -188,14 +198,14 @@ class TestSelection:
 class TestBuildTargets:
     def test_two_glosses_with_one_sense_merge(self) -> None:
         table = [(1, "je", "I"), (2, "je", "me")]
-        targets, dropped = core.build_core_targets(table, [], {}, 0)
+        targets, dropped = build_core_targets(table, [], {}, 0)
 
         assert len(targets) == 1
         assert len(dropped) == 1
 
     def test_two_senses_keep_two_targets(self) -> None:
         table = [(1, "voler", "fly"), (2, "voler", "steal")]
-        targets, dropped = core.build_core_targets(table, [], {}, 0)
+        targets, dropped = build_core_targets(table, [], {}, 0)
 
         assert [target.key for target in targets] == ["S1:voler", "S2:voler"]
         assert not dropped
@@ -204,14 +214,14 @@ class TestBuildTargets:
         table = [(1, "eau", "water")]
         frequency = [cull.TargetWord("eau", 1, 3, 1.0, 1.0), cull.TargetWord("pain", 2, 3, 1.0, 1.0)]
 
-        targets, _dropped = core.build_core_targets(table, frequency, {}, 5)
+        targets, _dropped = build_core_targets(table, frequency, {}, 5)
 
         assert [target.key for target in targets] == ["S1:eau", "F:pain"]
 
     def test_the_core_words_cut_the_frequency_list(self) -> None:
         frequency = [cull.TargetWord(f"w{index}", index, 3, 1.0, 1.0) for index in range(1, 6)]
 
-        targets, _dropped = core.build_core_targets([], frequency, {}, 2)
+        targets, _dropped = build_core_targets([], frequency, {}, 2)
 
         assert [target.key for target in targets] == ["F:w1", "F:w2"]
 
@@ -223,7 +233,7 @@ class TestBuildTargets:
             )
         }
 
-        targets, _dropped = core.build_core_targets([], frequency, senses, 1)
+        targets, _dropped = build_core_targets([], frequency, senses, 1)
 
         assert targets[0].gloss == "do"
 
@@ -297,18 +307,18 @@ class TestFilter:
 
 class TestSense:
     def test_a_hit_needs_a_sense_word(self) -> None:
-        assert not core.sense_match(
+        assert not sense_match(
             "I saw it.", frozenset({"time"}), frozenset()
         )
-        assert core.sense_match("What time is it?", frozenset({"time"}), frozenset())
+        assert sense_match("What time is it?", frozenset({"time"}), frozenset())
 
     def test_a_false_friend_blocks_the_hit(self) -> None:
-        assert not core.sense_match(
+        assert not sense_match(
             "I have time.", frozenset({"time"}), frozenset({"have"})
         )
 
     def test_an_unchecked_target_accepts_every_hit(self) -> None:
-        assert core.sense_match("anything", frozenset(), frozenset())
+        assert sense_match("anything", frozenset(), frozenset())
 
     def test_the_sense_file_and_the_loan_list_load(self, tmp_path: Path) -> None:
         senses = tmp_path / "senses.tsv"
@@ -328,7 +338,7 @@ class TestOutside:
     def test_a_core_form_is_not_an_outside_word(self) -> None:
         tokens = [[("chat", "NOUN"), ("manger", "VERB"), ("vite", "ADV")]]
 
-        outside = core.outside_lemmas(0, tokens, frozenset({"chat", "vite"}))
+        outside = outside_lemmas(0, tokens, frozenset({"chat", "vite"}))
 
         assert outside == ("manger",)
 
@@ -347,7 +357,7 @@ class TestCoverage:
             quotas={"S1:a": 2, "S2:b": 2, "S3:c": 2, "S4:d": 2},
         )
 
-        rows = core.coverage_rows_of(
+        rows = coverage_rows_of(
             targets,
             result,
             {"S1:a": True, "S2:b": True, "S3:c": False, "S4:d": True},
@@ -368,7 +378,7 @@ class TestCoverage:
             kept=[], uses=Counter({"F:x": 1}), quotas={"F:x": 2}
         )
 
-        rows = core.coverage_rows_of(
+        rows = coverage_rows_of(
             targets, result, {"F:x": True}, {"F:x": 2}
         )
 
@@ -378,10 +388,10 @@ class TestCoverage:
 class TestSizeCheck:
     def test_a_small_budget_stops_the_run(self) -> None:
         with pytest.raises(ValueError, match="cannot fit"):
-            core.size_check({f"t{index}": 2 for index in range(100)}, 50)
+            size_check({f"t{index}": 2 for index in range(100)}, 50)
 
     def test_a_large_budget_passes(self) -> None:
-        core.size_check({f"t{index}": 2 for index in range(100)}, 300)
+        size_check({f"t{index}": 2 for index in range(100)}, 300)
 
 
 class TestFiles:
@@ -389,15 +399,15 @@ class TestFiles:
         cards = [_card("A.", index=0), _card("B.", index=1)]
         path = tmp_path / "x.rank.csv"
 
-        core.write_rank_csv(cards, [1, 0], path)
+        write_rank_csv(cards, [1, 0], path)
         rows = list(csv.DictReader(path.open(encoding="utf-8")))
 
         assert [row["sentence"] for row in rows] == ["B.", "A."]
         assert [row["rank"] for row in rows] == ["1", "2"]
-        assert core.kept_order_hash(cards, [1, 0]) == core.kept_order_hash(cards, [1, 0])
+        assert kept_order_hash(cards, [1, 0]) == kept_order_hash(cards, [1, 0])
 
     def test_the_side_paths_hold_the_four_files(self, tmp_path: Path) -> None:
-        paths = core.side_paths(tmp_path / "deck.apkg")
+        paths = side_paths(tmp_path / "deck.apkg")
 
         assert [path.name for path in paths] == [
             "deck.core.csv",
@@ -512,7 +522,6 @@ class TestCardDesign:
         assert values["Le lapin court."][5] == ""
 
     def test_the_gloss_gate_passes_on_a_filled_deck(self, tmp_path: Path) -> None:
-        from anki_tools.languages.french import core_gates
 
         source = _tiny_deck(tmp_path)
         cards = cull.load_input_deck(source)
@@ -535,12 +544,11 @@ class TestCardDesign:
             output, cards, result, [0, 1, 2], targets, candidates
         )
 
-        passed, message = gate_gloss(core_gates.CoreFiles(output))
+        passed, message = gate_gloss(core.CoreFiles(output))
 
         assert passed, message
 
     def test_the_gloss_gate_fails_on_a_wrong_gloss(self, tmp_path: Path) -> None:
-        from anki_tools.languages.french import core_gates
         from anki_tools.ranking.coreflow import side_paths
 
         source = _tiny_deck(tmp_path)
@@ -570,7 +578,7 @@ class TestCardDesign:
             encoding="utf-8",
         )
 
-        passed, message = gate_gloss(core_gates.CoreFiles(output))
+        passed, message = gate_gloss(core.CoreFiles(output))
 
         assert not passed
         assert "is not the target gloss" in message
