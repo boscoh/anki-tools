@@ -41,6 +41,43 @@ LICENSE = "CC BY-SA 4.0"
 TOKENIZER = "es_core_news_sm"
 MAX_ROWS = 50_000
 
+# ``hacerlo`` gives the lemma ``hacer él``. The cull keys on the verb.
+CLITIC_LEMMAS = frozenset(
+    {
+        "yo",
+        "tú",
+        "él",
+        "ella",
+        "nosotros",
+        "nosotras",
+        "vosotros",
+        "vosotras",
+        "ellos",
+        "ellas",
+        "se",
+        "me",
+        "te",
+        "nos",
+        "os",
+        "le",
+        "les",
+        "lo",
+        "la",
+        "los",
+        "las",
+    }
+)
+
+
+def base_lemma(lemma: str) -> str:
+    """Drop the clitic pronoun that the Spanish model appends to a verb lemma.
+
+    :param lemma: Lemma from the Spanish spaCy model.
+    :returns: The lemma without its clitic pronoun.
+    """
+    head, _, tail = lemma.partition(" ")
+    return head if tail in CLITIC_LEMMAS else lemma
+
 _COLUMNS = (
     "word",
     "lemma",
@@ -307,30 +344,34 @@ def write_frequency_tsv(
 def cull_frequency_rows(
     rows: Sequence[SpanishFrequencyRow],
 ) -> list[cullflow.FrequencyRow]:
-    """Map the Spanish rows to the shared cull rows, one row per lemma.
+    """Map the Spanish rows to the shared cull rows, one row per base lemma.
+
+    The cache holds one row per surface form, and the cull reads one row per
+    lemma. The rows of one base lemma merge, because the tokenizer drops the
+    clitic pronoun that the model appends to a verb lemma. The spoken terms add,
+    because the rows share the content-token denominator. The written terms take
+    their largest value, because a clitic form is absent from ``wordfreq``.
 
     :param rows: Spanish frequency rows in rank order.
-    :returns: One cull row per lemma, in the given order.
+    :returns: One cull row per base lemma, in the given order.
     """
-    seen: set[str] = set()
-    out: list[cullflow.FrequencyRow] = []
+    groups: dict[str, list[SpanishFrequencyRow]] = {}
     for row in rows:
-        if row.lemma in seen:
-            continue
-        seen.add(row.lemma)
-        out.append(
-            cullflow.FrequencyRow(
-                word=row.lemma,
-                tatoeba_count=row.tatoeba_count,
-                tatoeba_pm=row.tatoeba_pm,
-                written_pm=row.written_pm,
-                zipf=row.zipf,
-            )
+        groups.setdefault(base_lemma(row.lemma), []).append(row)
+    return [
+        cullflow.FrequencyRow(
+            word=lemma,
+            tatoeba_count=sum(row.tatoeba_count for row in group),
+            tatoeba_pm=sum(row.tatoeba_pm for row in group),
+            written_pm=max(row.written_pm for row in group),
+            zipf=max(row.zipf for row in group),
         )
-    return out
+        for lemma, group in groups.items()
+    ]
 
 
 __all__ = [
+    "CLITIC_LEMMAS",
     "ES_FULL_SHA256",
     "ES_FULL_URL",
     "ES_SOURCE_PATH",
@@ -342,6 +383,7 @@ __all__ = [
     "TOKENIZER",
     "TATOEBA_PATH",
     "SpanishFrequencyRow",
+    "base_lemma",
     "build_frequency_es",
     "cull_frequency_rows",
     "frequency_ranks_es",
