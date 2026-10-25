@@ -30,6 +30,36 @@ from anki_tools.ranking.corelist import CONTENT_POS
 from anki_tools.ranking.scan import CoreProfile
 from anki_tools.sentence_pack.audit import print_audit, sha256_value
 
+__all__ = [
+    "CoreFiles",
+    "CoreGate",
+    "GATES",
+    "Gate",
+    "GateResult",
+    "check_core",
+    "gate_audio",
+    "gate_bold",
+    "gate_card_count",
+    "gate_counts",
+    "gate_coverage",
+    "gate_covered1",
+    "gate_covered2",
+    "gate_filter",
+    "gate_gloss",
+    "gate_hashes",
+    "gate_hit",
+    "gate_identity",
+    "gate_names",
+    "gate_order",
+    "gate_outside",
+    "gate_sense",
+    "gate_similarity",
+    "gate_tail",
+    "gate_templates",
+    "gate_unranked",
+    "run_gates",
+]
+
 SAMPLE = 3
 
 

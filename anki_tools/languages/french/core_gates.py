@@ -11,32 +11,7 @@ from pathlib import Path
 
 from anki_tools.languages.french.core_types import FRENCH_CORE_PROFILE
 from anki_tools.ranking import coregates as _shared
-from anki_tools.ranking.coregates import (
-    CoreGate,  # noqa: F401
-    Gate,  # noqa: F401
-    GateResult,  # noqa: F401
-    GATES,  # noqa: F401
-    gate_audio,  # noqa: F401
-    gate_bold,  # noqa: F401
-    gate_card_count,  # noqa: F401
-    gate_counts,  # noqa: F401
-    gate_coverage,  # noqa: F401
-    gate_covered1,  # noqa: F401
-    gate_covered2,  # noqa: F401
-    gate_filter,  # noqa: F401
-    gate_gloss,  # noqa: F401
-    gate_hashes,  # noqa: F401
-    gate_hit,  # noqa: F401
-    gate_identity,  # noqa: F401
-    gate_names,  # noqa: F401
-    gate_order,  # noqa: F401
-    gate_outside,  # noqa: F401
-    gate_sense,  # noqa: F401
-    gate_similarity,  # noqa: F401
-    gate_tail,  # noqa: F401
-    gate_templates,  # noqa: F401
-    gate_unranked,  # noqa: F401
-)
+from anki_tools.ranking.coregates import GateResult
 from anki_tools.sentence_pack.audit import print_audit
 
 

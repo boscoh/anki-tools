@@ -24,6 +24,7 @@ from anki_tools.ranking.core import (
     select,
     target_quotas,
 )
+from anki_tools.ranking.coregates import gate_gloss
 
 
 def _card(
@@ -534,7 +535,7 @@ class TestCardDesign:
             output, cards, result, [0, 1, 2], targets, candidates
         )
 
-        passed, message = core_gates.gate_gloss(core_gates.CoreFiles(output))
+        passed, message = gate_gloss(core_gates.CoreFiles(output))
 
         assert passed, message
 
@@ -569,7 +570,7 @@ class TestCardDesign:
             encoding="utf-8",
         )
 
-        passed, message = core_gates.gate_gloss(core_gates.CoreFiles(output))
+        passed, message = gate_gloss(core_gates.CoreFiles(output))
 
         assert not passed
         assert "is not the target gloss" in message
