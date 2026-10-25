@@ -1597,7 +1597,12 @@ def fetch(
         codes.append(entry.profile.tatoeba_lang)
     codes.extend(lang or [])
     if not codes:
-        codes.append(LANGUAGES["mandarin"].profile.tatoeba_lang)
+        # ponytail: the fallback profile is a registry invariant, not a runtime
+        # branch; fail loudly if a future edit drops it.
+        mandarin = LANGUAGES["mandarin"].profile
+        if mandarin is None:
+            raise RuntimeError("The Mandarin profile is not registered.")
+        codes.append(mandarin.tatoeba_lang)
     files: dict[str, str] = {}
     for code in codes:
         files.update(
