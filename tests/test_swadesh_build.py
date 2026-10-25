@@ -74,3 +74,11 @@ def test_vocab_deck_and_model_names(monkeypatch: pytest.MonkeyPatch) -> None:
 
     assert captured["deck_name"] == "Swadesh French Vocabulary"
     assert captured["model_name"] == "Swadesh French Vocabulary"
+
+
+def test_core_command_reports_a_language_without_a_core_module(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    cli.core("greek", tmp_path / "absent.apkg")
+
+    assert "Unsupported language: greek" in capsys.readouterr().out

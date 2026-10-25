@@ -50,3 +50,12 @@ def test_unknown_name_folds_to_lowercase() -> None:
 
 def test_every_alias_points_at_a_registry_name() -> None:
     assert set(ALIASES.values()) <= set(LANGUAGES)
+
+
+def test_only_four_languages_have_a_core_module() -> None:
+    assert {name for name, entry in LANGUAGES.items() if entry.core} == {
+        "mandarin",
+        "french",
+        "spanish",
+        "cantonese",
+    }

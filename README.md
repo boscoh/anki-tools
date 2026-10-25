@@ -290,6 +290,11 @@ uv run anki swadesh pack mandarin                           # write the APKG
 uv run anki swadesh audit mandarin                          # gates G1 to G18
 ```
 
+The core deck of mandarin, french, spanish, and cantonese also has a Swadesh
+entry point: `uv run anki swadesh core <language> <input.apkg>`. It reads the
+same input as `anki fix <lang> --core` and takes the same `--output`,
+`--cards`, `--words`, `--examples`, `--tail`, and `--check` flags.
+
 See `docs/swadesh-sentence-flow.md` for the stage order and the guard order.
 
 The commands write these files:

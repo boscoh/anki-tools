@@ -27,11 +27,15 @@ from anki_tools.sentence_pack.profile import (
     profile_names,
 )
 
+from anki_tools.languages.cantonese import core as cantonese_core
 from anki_tools.languages.cantonese import profile as cantonese
+from anki_tools.languages.french import core as french_core
 from anki_tools.languages.french import profile as french
 from anki_tools.languages.greek import profile as greek
+from anki_tools.languages.mandarin import core as mandarin_core
 from anki_tools.languages.mandarin import profile as mandarin
 from anki_tools.languages.mandarin import stages as mandarin_stages
+from anki_tools.languages.spanish import core as spanish_core
 from anki_tools.languages.spanish import profile as spanish
 
 
@@ -43,6 +47,8 @@ class CliLanguage:
     :param profile: Sentence-pack profile, None for a vocabulary-only language.
     :param module: Sentence-pack module that the shared pipeline drives, None
         when the language has no pipeline module.
+    :param core: Core-deck module that the ``core`` command drives, None when
+        the language has no core module.
     :param audit: Gate runner of the language, None when it has none.
     :param build: True when the ``build`` command serves the language from an
         ``english-<lang>.csv`` file and an audio directory.
@@ -52,6 +58,7 @@ class CliLanguage:
     name: str
     profile: LanguageProfile | None = None
     module: ModuleType | None = None
+    core: ModuleType | None = None
     audit: Callable[[], Sequence[Any]] | None = None
     build: bool = False
     tts: str | None = None
@@ -64,6 +71,7 @@ LANGUAGES: dict[str, CliLanguage] = {
             "mandarin",
             profile=mandarin.MANDARIN,
             module=mandarin,
+            core=mandarin_core,
             audit=mandarin_stages.run_audit,
             build=True,
             tts="zh-cn",
@@ -72,12 +80,14 @@ LANGUAGES: dict[str, CliLanguage] = {
             "french",
             profile=french.FRENCH,
             module=french,
+            core=french_core,
             audit=french.run_french_audit,
         ),
         CliLanguage(
             "spanish",
             profile=spanish.SPANISH,
             module=spanish,
+            core=spanish_core,
             audit=spanish.run_spanish_audit,
             build=True,
             tts="es",
@@ -95,6 +105,7 @@ LANGUAGES: dict[str, CliLanguage] = {
             "cantonese",
             profile=cantonese.CANTONESE,
             module=cantonese,
+            core=cantonese_core,
             audit=cantonese.run_cantonese_audit,
             build=True,
             tts="yue",

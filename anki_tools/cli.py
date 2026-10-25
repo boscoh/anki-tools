@@ -1795,6 +1795,59 @@ def audit(language: str) -> None:
         raise SystemExit(code)
 
 
+@swadesh_app.command
+def core(
+    language: str,
+    apkg_path: Path,
+    *,
+    output: Path | None = None,
+    model_id: int | None = None,
+    cards: int | None = None,
+    words: int | None = None,
+    examples: int | None = None,
+    tail: int | None = None,
+    check: bool = False,
+) -> None:
+    """Build the core deck of a language through the registry.
+
+    :param language: Language name: mandarin, french, spanish, or cantonese.
+    :param apkg_path: Input .apkg file.
+    :param output: Output .apkg file (default: from the input name).
+    :param model_id: Rank mode filter, rejected in core mode.
+    :param cards: Core mode: card cap. The module default applies when empty.
+    :param words: Core mode: tier F words after the Swadesh set. The module
+        default applies when empty.
+    :param examples: Core mode: examples per content target. The module
+        default applies when empty.
+    :param tail: Core mode: cards after the core passes. The module default
+        applies when empty.
+    :param check: Run the gates on the output only.
+    """
+    lang = resolve(language)
+    entry = LANGUAGES.get(lang)
+    if entry is None or entry.core is None:
+        print(
+            f"Unsupported language: {language}. "
+            f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
+        )
+        return
+    module = entry.core
+    _run_core_command(
+        module,
+        label=language.title(),
+        apkg_path=apkg_path,
+        output=output,
+        model_id=model_id,
+        cards=cards,
+        words=words if words is not None else module.DEFAULT_CORE_WORDS,
+        examples=(
+            examples if examples is not None else module.DEFAULT_OPTIONS.per_word
+        ),
+        tail=tail if tail is not None else module.DEFAULT_OPTIONS.tail_cards,
+        check=check,
+    )
+
+
 def _language_sentences(
     module,
     profile,
