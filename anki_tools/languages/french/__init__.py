@@ -11,7 +11,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import cull, rank  # noqa: F401
+from . import cull, rank
+
+__all__ = ["cull", "rank"]
 
 
 def __getattr__(name: str) -> Any:

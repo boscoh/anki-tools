@@ -17,11 +17,9 @@ from anki_tools.languages.french.profile import FRENCH, load_word_table
 from anki_tools.ranking import coreflow
 from anki_tools.ranking.core import CoreOptions
 from anki_tools.ranking.corelist import (
-    CONTENT_POS,  # noqa: F401
-    CoreTarget,  # noqa: F401
-    SenseWords,  # noqa: F401
-    build_core_targets,  # noqa: F401
-    build_targets,  # noqa: F401
+    CoreTarget,
+    SenseWords,
+    build_core_targets,
 )
 from anki_tools.ranking.scan import CoreProfile
 
@@ -72,7 +70,56 @@ COVERAGE_COLUMNS = coreflow.COVERAGE_COLUMNS
 FILTER_KEYS = coreflow.FILTER_KEYS
 TARGET_SEPARATOR = coreflow.TARGET_SEPARATOR
 STATUSES = coreflow.STATUSES
-
+__all__ = [
+    "AUDIO_FIELD",
+    "CORE_BACK_TEMPLATE",
+    "CORE_COLUMNS",
+    "CORE_FIELD",
+    "CORE_FRONT_TEMPLATE",
+    "CORE_GLOSS_FIELD",
+    "CORE_TEMPLATES",
+    "COVERAGE_COLUMNS",
+    "CoreRequest",
+    "CoreRun",
+    "CoreTarget",
+    "DEFAULT_CORE_WORDS",
+    "DEFAULT_NAME",
+    "DEFAULT_OPTIONS",
+    "ENGLISH_FIELD",
+    "FILTER_KEYS",
+    "FRENCH_CORE_PROFILE",
+    "FRENCH_FIELD",
+    "LOAN_PATH",
+    "MAX_UNITS",
+    "MIN_UNITS",
+    "MODEL_NAME",
+    "SENSE_PATH",
+    "STATUSES",
+    "SenseWords",
+    "TARGET_SEPARATOR",
+    "TEMPLATE_DIR",
+    "build_core_targets",
+    "card_rows",
+    "core_hits",
+    "coverage_rows_of",
+    "default_output",
+    "filter_core_cards",
+    "holds_tier_s_sense",
+    "kept_order_hash",
+    "manifest_counts",
+    "outside_lemmas",
+    "read_loanwords",
+    "read_senses",
+    "run_core",
+    "sense_match",
+    "side_paths",
+    "size_check",
+    "word_table",
+    "write_core_csv",
+    "write_coverage_csv",
+    "write_manifest",
+    "write_rank_csv",
+]
 
 def word_table() -> list[tuple[int, str, str]]:
     """Give the reviewed French Swadesh rows as ``(index, form, gloss)``."""
