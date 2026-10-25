@@ -77,40 +77,26 @@ def reorder_deck(
     print(f"Marked {len(remove_ranks)} high-similarity cards for removal")
 
     with AnkiPackage(input_apkg) as pkg:
-        conn = pkg.conn
-        assert conn is not None
-        cursor = conn.cursor()
-
-        # Build note_ranks mapping, preferring note_id mapping if available
+        notes = pkg.get_notes()
         note_ranks = {}
 
-        # First, use direct note_id mapping if available
         if note_id_ranking:
-            cursor.execute("SELECT id FROM notes")
-            for row in cursor.fetchall():
+            for row in notes:
                 nid = row["id"]
                 if nid in note_id_ranking:
                     note_ranks[nid] = note_id_ranking[nid]
             print(f"Matched {len(note_ranks)} notes by note_id")
 
-        # Fall back to sentence matching for any unmatched notes
         if not note_ranks:
-            cursor.execute("SELECT id, flds FROM notes")
-            note_sentences = {}
-            for row in cursor.fetchall():
-                fields = row["flds"].split("\x1f")
-                sentence = fields[0] if fields else ""
-                note_sentences[row["id"]] = sentence
-
-            for nid, sentence in note_sentences.items():
+            for row in notes:
+                sentence = row["flds"].split("\x1f")[0]
                 if sentence in sentence_ranking:
-                    note_ranks[nid] = sentence_ranking[sentence]
+                    note_ranks[row["id"]] = sentence_ranking[sentence]
             print(f"Matched {len(note_ranks)} notes by sentence text")
 
         print(f"Total matched: {len(note_ranks)} notes to rankings")
 
-        cursor.execute("SELECT id, nid, due FROM cards WHERE type = 0")
-        cards = cursor.fetchall()
+        cards = pkg.get_new_cards()
 
         cards_to_remove = []
 
@@ -140,8 +126,7 @@ def reorder_deck(
                 pkg.delete_card(card_id, cleanup_audio=False)
 
         remaining_cards = []
-        cursor.execute("SELECT id, nid FROM cards WHERE type = 0")
-        for card in cursor.fetchall():
+        for card in pkg.get_new_cards():
             nid = card["nid"]
             if nid in note_ranks:
                 rank = note_ranks[nid]
@@ -151,11 +136,11 @@ def reorder_deck(
         remaining_cards.sort(key=lambda x: x[0])
 
         print(f"Updating order for {len(remaining_cards)} cards...")
-        for new_due, (rank, card_id) in enumerate(remaining_cards, start=1):
-            cursor.execute("UPDATE cards SET due = ? WHERE id = ?", (new_due, card_id))
-
-        conn.commit()
-        pkg._modified = True
+        dues = {
+            card_id: new_due
+            for new_due, (_rank, card_id) in enumerate(remaining_cards, start=1)
+        }
+        pkg.set_card_due(dues)
 
         pkg.save(output_apkg)
 

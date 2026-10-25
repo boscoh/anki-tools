@@ -293,7 +293,8 @@ def _extract_media(
     :param media_dir: Destination directory.
     :returns: Number of copied files.
     """
-    if not collector.needed or package.temp_dir is None:
+    media_root = package.media_dir()
+    if not collector.needed or media_root is None:
         return 0
     mapping = {
         filename: file_id for file_id, filename in package.get_media_mapping().items()
@@ -302,7 +303,7 @@ def _extract_media(
     root = media_dir.resolve()
     copied = 0
     for name in sorted(collector.needed):
-        source = Path(package.temp_dir) / mapping[name]
+        source = Path(media_root) / mapping[name]
         if not source.is_file():
             continue
         target = (media_dir / name).resolve()

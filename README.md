@@ -685,20 +685,14 @@ Import: `from anki_tools import AnkiPackage`
 **Audio Methods:**
 - `get_media_mapping()` - Get media ID to filename mapping
 - `extract_audio_files()` - Extract audio files to directory
-- `get_audio_for_card()` - Get audio files for specific card
 - `get_audio_statistics()` - Get audio usage statistics
 - `add_media_file()` - Add audio file to package
 
 **Editing Methods:**
 - `update_note_field()` - Update note field content
 - `move_card()` - Move card to different deck
-- `add_audio_to_card()` - Add audio reference to card
-- `create_deck()` - Create new deck
-- `copy_cards_to_deck()` - Copy cards to deck
-- `create_deck_from_cards()` - Create deck and copy cards
 - `delete_card()` - Delete single card with optional audio cleanup
 - `delete_cards()` - Delete multiple cards with optional audio cleanup
-- `delete_note()` - Delete note and all its cards
 - `save()` - Save changes to new APKG file
 
 ### Utility Functions
