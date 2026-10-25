@@ -29,7 +29,6 @@ from anki_tools.languages.french import core as french_core
 from anki_tools.languages.french import cull as french_cull
 from anki_tools.languages.spanish import core as spanish_core
 from anki_tools.languages.mandarin import core as mandarin_core
-from anki_tools.languages.mandarin import frequency as mandarin_frequency
 from anki_tools.languages.cantonese.jyutping import fix_jyutping
 from anki_tools.languages.mandarin.pinyin import fix_pinyin
 from anki_tools.apkg.package import AnkiPackage
@@ -73,14 +72,8 @@ from anki_tools.apkg.templates import (
     load_text,
 )
 from anki_tools.languages.cantonese.frequency import (
-    CIFU_ATTRIBUTION,
-    YUE_FREQUENCY_ATTRIBUTION,
-    FREQUENCY_PATH,
-    check_frequency,
-    load_yue_frequency,
     rank_change_rows,
     write_freq_change_csv,
-    write_frequency_tsv,
 )
 
 app = cyclopts.App(help="CLI tools for Anki package (.apkg) files")
@@ -573,94 +566,6 @@ def apply(
         )
         return
     print(f"\nSaved: {output}")
-
-
-# =============================================================================
-# Freq commands - build word frequency lists
-# =============================================================================
-
-freq_app = cyclopts.App(name="freq", help="Build word frequency lists")
-app.command(freq_app)
-
-
-@freq_app.command(name="yue")
-def freq_yue(
-    *,
-    output: Path = FREQUENCY_PATH,
-    spoken_weight: float = 0.7,
-    refresh: bool = False,
-    check: bool = False,
-):
-    """Build the Cantonese word frequency list from spoken and written counts.
-
-    Blends the Cifu spoken counts with the Cifu and Apple Daily written counts,
-    folds variant characters, and applies the override file. Downloads the two
-    source files into ~/.cache/anki-tools when they are absent.
-
-    :param output: Output TSV file, sorted by rank.
-    :param spoken_weight: Weight of the spoken term in the blend (0 to 1).
-    :param refresh: Download the source files again.
-    :param check: Run gates G1, G3, and G4 and exit with code 1 on a failure.
-    """
-    data = load_yue_frequency(spoken_weight=spoken_weight, refresh=refresh)
-    write_frequency_tsv(data, output)
-    print(f"Wrote {len(data.rows)} words to {output}")
-    print(f"  {CIFU_ATTRIBUTION}")
-    print(f"  {YUE_FREQUENCY_ATTRIBUTION}")
-    if not check:
-        return
-    failed = False
-    for gate, ok, message in check_frequency(data):
-        print(f"{gate} {'PASS' if ok else 'FAIL'}: {message}")
-        failed = failed or not ok
-    if failed:
-        raise SystemExit(1)
-
-@freq_app.command(name="zh")
-def freq_zh(
-    *,
-    output: Path = mandarin_frequency.FREQUENCY_PATH,
-    rows: int = mandarin_frequency.MAX_ROWS,
-    fallback: bool = False,
-    refresh: bool = False,
-    check: bool = False,
-):
-    """Build the Mandarin word frequency list from the wordfreq zh list.
-
-    Writes the most frequent forms with their rank, source, and license. The
-    wordfreq list needs no download. ``--fallback`` reads the FrequencyWords
-    ``zh_cn`` and ``zh_tw`` lists instead, and converts ``zh_tw`` to Simplified.
-
-    :param output: Output TSV file, sorted by rank.
-    :param rows: Number of most frequent forms to keep.
-    :param fallback: Read the FrequencyWords files instead of wordfreq.
-    :param refresh: Download the fallback files again.
-    :param check: Run gates Z1 to Z3 and exit with code 1 on a failure.
-    """
-    if fallback:
-        paths = mandarin_frequency.download_zh_sources(force=refresh)
-        data = mandarin_frequency.build_frequency_zh_fallback(paths, rows=rows)
-    else:
-        data = mandarin_frequency.build_frequency_zh(rows=rows)
-    mandarin_frequency.write_frequency_tsv(data, output)
-    print(f"Wrote {len(data)} words to {output}")
-    print(f"  {mandarin_frequency.SOURCE_NAME} {mandarin_frequency.LICENSE}")
-    if not check:
-        return
-    failed = False
-    for gate, ok, message in mandarin_frequency.check_frequency(data):
-        print(f"{gate} {'PASS' if ok else 'FAIL'}: {message}")
-        failed = failed or not ok
-    if failed:
-        raise SystemExit(1)
-
-
-
-for _freq_command, _canonical_name in (
-    (freq_yue, "cantonese"),
-    (freq_zh, "mandarin"),
-):
-    freq_app.command(_freq_command, name=_canonical_name)
 
 
 # =============================================================================

@@ -508,7 +508,7 @@ def tokenizer() -> jieba.Tokenizer:
     except (OSError, RuntimeError) as error:
         raise RuntimeError(
             "the Cantonese tokenizer needs the Cifu lexicon. Run "
-            "`uv run anki freq yue` to download it."
+            "`uv run anki fix yue` to download it."
         ) from error
 
 
@@ -769,7 +769,7 @@ def known_words(word_table: Sequence[WordForm]) -> set[str]:
     """Build the known word set of filter F11.
 
     The set holds the Swadesh forms and the most frequent Cantonese words. The
-    frequency list of ``anki freq yue`` applies when it exists. Otherwise the
+    frequency list TSV applies when it exists. Otherwise the
     set uses the top ``wordfreq`` Chinese words in Traditional characters.
 
     :param word_table: Word table from :func:`load_word_table`.

@@ -203,13 +203,13 @@ Zipf words, and the target match.
 | ---------- | ----------------------------------------------------------------- |
 | Library    | `jieba` with a `jieba.Tokenizer` instance                         |
 | Dictionary | Every Cifu word with a Han character and a weight above 0         |
-| Weight     | `spoken_count * 40 + written_count * 2` (from `anki freq yue`)    |
+| Weight     | `spoken_count * 40 + written_count * 2` (from the Cifu blend)    |
 | Extras     | The reviewed forms and the frequency override words               |
 | Cache      | `~/.cache/anki-tools/cifu-jieba-dict.txt`                         |
 
 The build builds the tokenizer once and does not change the global jieba
-dictionary. The Cifu lexicon is cached and never committed. A build without
-Cifu stops with a message that names `uv run anki freq yue`.
+dictionary. The Cifu lexicon is cached and never committed. The first build
+downloads it into the cache.
 
 ### 6.1 Whole-token match
 
@@ -457,7 +457,7 @@ have 7, 36 have 8, 51 have 9, 43 have 10, 24 have 11, 15 have 12, 11 have 13,
 
 | Risk                                                        | Effect                           | Mitigation                                                              |
 | ----------------------------------------------------------- | -------------------------------- | ----------------------------------------------------------------------- |
-| `wordfreq` has no `yue` list                                | A rare Cantonese form looks rare | The value only orders candidates; `anki freq yue` gives the spoken rank |
+| `wordfreq` has no `yue` list                                | A rare Cantonese form looks rare | The value only orders candidates; the Cifu blend gives the spoken rank |
 | No Cantonese tagger                                         | F9 and F10 are off               | The length, script, and mark rules still apply                          |
 | The reviewed CSV differs from the module terms              | A form may be unusual            | The 32 rows are in the review file with a decision                      |
 | A form is a common particle (呢)                             | Wrong cards for `this`           | The review keeps 呢個 for `this`                                          |
@@ -471,7 +471,7 @@ Open questions:
    one term. A variant row would cover more concepts but raise the card count.
 2. Is the whole-token rule too strict for a verb such as 食? Measure the
    candidates that the rule removes on a larger corpus.
-3. Should the pack use the `anki freq yue` rank in the ranking key instead of
+3. Should the pack use the Cifu blend rank in the ranking key instead of
    the Chinese Zipf value?
 
 ## 14. Milestones

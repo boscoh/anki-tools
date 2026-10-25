@@ -322,11 +322,12 @@ def load_yue_frequency(
     :param freq: ``blend``, ``spoken``, or ``written``.
     :param spoken_weight: Value of ``w``.
     :param refresh: Download both source files again.
+    :raises RuntimeError: The blend fails a gate of the spec.
     :returns: The ranked list.
     """
     cifu = read_cifu(download_cifu(force=refresh))
     apple = _read_word_count_tsv(download_yue_frequency(force=refresh))
-    return build_yue_frequency(
+    data = build_yue_frequency(
         cifu,
         apple,
         variants=read_variants(),
@@ -334,6 +335,20 @@ def load_yue_frequency(
         freq=freq,
         spoken_weight=spoken_weight,
     )
+    if freq == "blend":
+        # ponytail: the gates describe the blend; the written-only list
+        # lacks the colloquial forms that G3 and G4 name.
+        failures = [
+            f"{gate}: {message}"
+            for gate, passed, message in check_frequency(data)
+            if not passed
+        ]
+        if failures:
+            raise RuntimeError(
+                "The Cantonese frequency list fails its gates: "
+                + "; ".join(failures)
+            )
+    return data
 
 
 def to_frequency_data(data: YueFrequency, max_words: int) -> FrequencyData:

@@ -16,6 +16,7 @@ from anki_tools.languages.cantonese.frequency import (
     build_yue_tokenizer,
     check_frequency,
     han_tokens,
+    load_yue_frequency,
     rank_change_rows,
     read_cifu,
     read_overrides,
@@ -161,6 +162,20 @@ class TestOutputAndGates:
     def test_small_list_fails_gate_g1(self) -> None:
         results = {gate: ok for gate, ok, _ in check_frequency(build_yue_frequency(CIFU, APPLE))}
         assert results["G1"] is False
+
+    def test_a_failing_gate_stops_the_blend(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        module = "anki_tools.languages.cantonese.frequency"
+        monkeypatch.setattr(
+            f"{module}.download_cifu", lambda path=None, *, force=False: Path("cifu")
+        )
+        monkeypatch.setattr(f"{module}.read_cifu", lambda path: {})
+        monkeypatch.setattr(
+            f"{module}.download_yue_frequency", lambda path=None, *, force=False: Path("apple")
+        )
+        monkeypatch.setattr(f"{module}._read_word_count_tsv", lambda path: {})
+        monkeypatch.setattr(f"{module}.check_frequency", lambda data: [("G1", False, "too few")])
+        with pytest.raises(RuntimeError, match="G1: too few"):
+            load_yue_frequency()
 
 
 class TestTokenizer:

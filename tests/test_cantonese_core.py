@@ -1,8 +1,8 @@
 """Tests for the Cantonese core adapter.
 
 The tests read the committed LTL deck. The tokenizer tests need the Cifu
-cache, which ``anki freq yue`` fills; without the cache they skip, so a fresh
-clone stays green.
+cache, which the first ``anki fix yue`` fills; without the cache they skip, so
+a fresh clone stays green.
 """
 
 from __future__ import annotations

@@ -145,7 +145,7 @@ def tokenize_deck(cards: Sequence[InputCard]) -> list[list[tuple[str, str]]]:
 def load_frequency() -> YueFrequency:
     """Give the Cantonese frequency list.
 
-    The list of ``anki freq yue`` is read when it exists, because it is faster
+    The frequency list TSV is read when it exists, because it is faster
     than the blend. Otherwise the blend is built from the Cifu and Apple Daily
     sources.
 

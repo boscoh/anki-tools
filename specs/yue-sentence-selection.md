@@ -35,7 +35,7 @@ keep fewer cards, with the widest vocabulary, weighted to spoken Cantonese.
 
 | Change                | What it does                                                                                  | Section |
 | --------------------- | --------------------------------------------------------------------------------------------- | ------- |
-| Spoken frequency list | Blends Cifu spoken counts with written counts; `anki freq yue`                                | 5       |
+| Spoken frequency list | Blends Cifu spoken counts with written counts; built on demand                                | 5       |
 | Sentence filter       | Removes fragments, mixed script, repeats, names, and hard sentences                                  | 7       |
 | Diversity selection   | Greedy cover of the most frequent words; a limit on uses of one word; easy-to-hard card order | 8       |
 
@@ -106,7 +106,7 @@ tokenizer, the rank list, and the test, so the absolute values are high. Use
 - A spoken frequency list, built from public corpora and cached locally.
 - A Cantonese-aware word tokenizer.
 - New options for `anki fix yue`, and a report of what the filter removed.
-- The command `anki freq yue`, which writes the frequency list.
+- The blend of the frequency list, which runs at the first `anki fix yue`.
 - The Tatoeba Cantonese export as a second input (M6). Section 3.4 gives the
   numbers.
 
@@ -273,14 +273,13 @@ include its effect. The LTL cells in 3.2, 14.5, and 14.6 predate it.
 | Stage | Name           | Input              | Output                                        |
 | ----- | -------------- | ------------------ | --------------------------------------------- |
 | Y0    | Fetch          | network            | cached Cifu and Apple Daily files             |
-| Y1    | Frequency list | Y0, override files | `data/cantonese_frequency.tsv`                |
+| Y1    | Frequency list | Y0, override files | a frequency list in memory                     |
 | Y2    | Tokenize       | Y1, deck sentences | tokens per sentence                           |
 | Y3    | Filter         | Y2                 | passed and rejected sentences, reasons        |
 | Y4    | Select         | Y3, Y1             | kept sentences in learning order              |
 | Y5    | Write          | Y4, original deck  | `_reordered.apkg`, `.rank.csv`, `.select.csv` |
 
-- `anki freq yue` runs Y0 and Y1.
-- `anki fix yue` runs Y2 to Y5.
+- `anki fix yue` runs Y0 to Y5. It builds the frequency list when no TSV exists.
 - Each stage gives the same output for the same input.
 
 ## 5. Frequency list
@@ -486,14 +485,10 @@ falls by 0.0 and 0.3 points (3.1). With a card cap, the loss is 0.1 point or les
 
 ## 9. Interface
 
-### 9.1 New command
+### 9.1 Frequency list
 
-```bash
-anki freq yue                        # Y0, Y1: write data/cantonese_frequency.tsv
-anki freq yue --spoken-weight 0.8
-anki freq yue --refresh              # download the sources again
-anki freq yue --check                # run gates G1, G3, G4
-```
+There is no frequency command. The first `anki fix yue` builds the frequency
+list and runs gates G1, G3, and G4 on the blend.
 
 ### 9.2 Options of `anki fix yue`
 
@@ -600,12 +595,12 @@ Rules:
 
 ### 11.1 Gates
 
-`anki freq yue --check` and the unit tests run these checks. A failure stops
-the run with a non-zero exit code. Lower a value only with a new measurement.
+The build of the frequency list and the unit tests run these checks. A failure
+stops the run with a `RuntimeError`. Lower a value only with a new measurement.
 
 | Gate | Check                                                                                                                           | From |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------- | ---- |
-| G1   | `data/cantonese_frequency.tsv` has at least 40,000 rows, and its ranks are 1 to N with no gap                                  | M1   |
+| G1   | the frequency list has at least 40,000 rows, and its ranks are 1 to N with no gap                                              | M1   |
 | G2   | On the LTL deck, at least 92 percent of Han tokens have a spoken count (measured 92.3)                                          | M2   |
 | G3   | 係, 嘅, 唔, 我, 你 are in the first 20 ranks                                                                                    | M1   |
 | G4   | 你好, 早晨, 唔該 are in the first 3000 ranks (overrides apply)                                                                  | M1   |
@@ -679,7 +674,7 @@ tests. Patch the download function, as the existing yue tests do.
 | Milestone | Issue      | Task                                                                    | Output                                  |
 | --------- | ---------- | ----------------------------------------------------------------------- | --------------------------------------- |
 | M0        | `anki-4uh` | Fetch Cifu to the cache; check the license; add `CIFU_PATH`             | cached file, license note               |
-| M1        | `anki-vfx` | Reader, blend, variant map, overrides, `anki freq yue`                  | `data/cantonese_frequency.tsv`; G1, G3, G4 |
+| M1        | `anki-vfx` | Reader, blend, variant map, overrides, build on demand                  | frequency list; G1, G3, G4              |
 | M2        | `anki-d1o` | Tokenizer, `--freq` option, change report for `anki-afn`                | report of changed sentences; G2         |
 | M3        | `anki-8ox` | Rules Y1 to Y8, `.select.csv`                                           | G5, G7                                  |
 | M4        | `anki-7y5` | Greedy cover, similarity, word-use cap, learning order, `.coverage.csv` | G6, G9, G10, G11, G12; options complete |

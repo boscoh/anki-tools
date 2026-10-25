@@ -51,9 +51,6 @@ uv run anki fix zh input.apkg
 # Fix French deck (rank and reorder, or select with --select)
 uv run anki fix fr input.apkg
 
-# Build the Cantonese frequency list (blended spoken and written counts)
-uv run anki freq yue
-
 # Fix Cantonese deck (convert to traditional, fix jyutping, select, rank, reorder)
 uv run anki fix yue input.apkg
 
@@ -186,8 +183,6 @@ uv run anki fix fr deck.apkg --core    # Core mode: a small core-word deck
 
 **Cantonese (yue):**
 ```bash
-uv run anki freq yue          # Write data/cantonese_frequency.tsv
-uv run anki freq yue --check  # Run gates G1, G3, and G4
 uv run anki fix yue deck.apkg        # Convert, fix jyutping, select, rank, reorder
 uv run anki fix yue deck.apkg --core # Core mode: a small core-word deck
 ```
@@ -197,8 +192,10 @@ uv run anki fix yue deck.apkg --core # Core mode: a small core-word deck
   Cifu `SpokenAdult` count; the written term is the mean of the Cifu and Apple
   Daily counts. The default spoken weight is 0.7.
   - `--freq written` uses the Apple Daily list alone. This is the old ranking.
-  - The first run downloads both files to `~/.cache/anki-tools`. Set
-    `CIFU_PATH` or `YUE_FREQUENCY_PATH` to use other files.
+  - The list is built on demand at the first `anki fix yue` or
+    `anki swadesh core cantonese`. The first run downloads both files to
+    `~/.cache/anki-tools`. Set `CIFU_PATH` or `YUE_FREQUENCY_PATH` to use
+    other files.
   - A variant map in `vocab/cantonese_variants.tsv` and the overrides in
     `vocab/cantonese_frequency_overrides.tsv` fix common spoken forms and
     greetings.
@@ -595,12 +592,12 @@ paired English holds the Swadesh sense, so 水 hits inside 喝水 and 来 does n
 hit inside 出来.
 
 ```bash
-uv run anki freq zh                      # Write data/mandarin_frequency.tsv
-uv run anki freq zh --check              # Run gates Z1 to Z3
 uv run anki fix zh "apkg/Neri's Chinese Sents Part 2.apkg" --core
 # Run gates K1 to K20 on the built deck
 uv run anki fix zh "apkg/Neri's Chinese Sents Part 2.apkg" --core --check
 ```
+
+The first run builds `data/mandarin_frequency.tsv` and runs gates Z1 to Z3.
 
 The defaults are 50 tier F words, 300 cards, and 2 examples per word. The
 sense rows are `vocab/mandarin_core_senses.tsv`, and rule C4 reads
@@ -645,8 +642,8 @@ The commands write these files:
 
 Cantonese needs three external things:
 
-1. The Cifu lexicon for the tokenizer. `uv run anki freq yue` downloads it to
-   the cache. The build does not commit it.
+1. The Cifu lexicon for the tokenizer. The first `anki swadesh sentences
+   cantonese` downloads it to the cache. The build does not commit it.
 2. `ffprobe` on the path. The audio step removes a file that fails the header or
    the duration check.
 3. `gtts` for the voice `gtts:yue`. The optional `edge-tts` package adds the

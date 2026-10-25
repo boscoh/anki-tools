@@ -1,7 +1,7 @@
 """Gate checks for the committed LTL Cantonese deck selection.
 
 These tests read the CSV files that ``anki fix yue`` writes for the LTL deck.
-They need the Cifu cache; ``anki freq yue`` fills it. Without the cache the
+They need the Cifu cache; the first ``anki fix yue`` fills it. Without the cache
 tests skip, so a fresh clone stays green and the suite never downloads.
 """
 
