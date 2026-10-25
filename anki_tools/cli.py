@@ -1691,7 +1691,7 @@ def sentences(
 ) -> None:
     """Build the sentence candidates and write the card CSV files (S1 to S3).
 
-    :param language: Language name: mandarin, french, greek, or cantonese.
+    :param language: Language name, for example mandarin.
     :param per_word: Card limit per word form.
     :param max_cards: Hard card cap.
     :param max_unknown: Unknown token budget per sentence.
@@ -1731,7 +1731,7 @@ def sentence_audio(
 ) -> None:
     """Generate and validate the audio files of a sentence pack (stage S4).
 
-    :param language: Language name: mandarin, french, greek, or cantonese.
+    :param language: Language name, for example mandarin.
     :param native_audio: Tatoeba tier: none, auto, or only.
     :param voice: TTS voice name. The profile default applies when empty.
     :param slow_audio: Generate the slow variant.
@@ -1765,7 +1765,7 @@ def pack(
 ) -> None:
     """Build one Swadesh sentence pack (stage S5).
 
-    :param language: Language name: mandarin, french, greek, or cantonese.
+    :param language: Language name, for example mandarin.
     :param pack_license: public or private.
     """
     lang = resolve(language)
@@ -1783,7 +1783,7 @@ def pack(
 def audit(language: str) -> None:
     """Run the quality gates of a Swadesh sentence pack.
 
-    :param language: Language name: mandarin, french, greek, or cantonese.
+    :param language: Language name, for example mandarin.
     """
     lang = resolve(language)
     entry = LANGUAGES.get(lang)
@@ -1813,7 +1813,7 @@ def core(
 ) -> None:
     """Build the core deck of a language through the registry.
 
-    :param language: Language name: mandarin, french, spanish, or cantonese.
+    :param language: Language name, for example mandarin.
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
     :param model_id: Rank mode filter, rejected in core mode.
