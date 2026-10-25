@@ -45,11 +45,11 @@ class TestSelectMode:
     ) -> None:
         requests = []
 
-        def fake_run_cull(request):
+        def fake_run_cull(request, _profile):
             requests.append(request)
             return SimpleNamespace(cards=1)
 
-        monkeypatch.setattr(cli.french_cull, "run_cull", fake_run_cull)
+        monkeypatch.setattr(cli.cullflow, "run_cull", fake_run_cull)
 
         cli.fr(deck_file, select=True)
 
@@ -64,7 +64,9 @@ class TestSelectMode:
     ) -> None:
         requests = []
         monkeypatch.setattr(
-            cli.french_cull, "run_cull", lambda request: requests.append(request)
+            cli.cullflow,
+            "run_cull",
+            lambda request, _profile: requests.append(request),
         )
         output = deck_file.parent / "small.apkg"
 
@@ -77,7 +79,9 @@ class TestSelectMode:
     ) -> None:
         requests = []
         monkeypatch.setattr(
-            cli.french_cull, "run_cull", lambda request: requests.append(request)
+            cli.cullflow,
+            "run_cull",
+            lambda request, _profile: requests.append(request),
         )
 
         cli.fr(deck_file, select=True, reserve=False, cards=500)
@@ -88,10 +92,10 @@ class TestSelectMode:
     def test_model_id_with_select_prints_an_error(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
     ) -> None:
-        def fail(_request):
+        def fail(_request, _profile):
             raise AssertionError("run_cull must not run")
 
-        monkeypatch.setattr(cli.french_cull, "run_cull", fail)
+        monkeypatch.setattr(cli.cullflow, "run_cull", fail)
 
         cli.fr(deck_file, select=True, model_id=7)
 
@@ -102,7 +106,9 @@ class TestSelectMode:
     ) -> None:
         checked = []
         monkeypatch.setattr(
-            cli.french_cull, "check_cull", lambda path: checked.append(path) or 0
+            cli.cullgates,
+            "check_cull",
+            lambda path, _profile: checked.append(path) or 0,
         )
 
         cli.fr(deck_file, select=True, check=True)
@@ -112,7 +118,7 @@ class TestSelectMode:
     def test_check_with_select_exits_on_a_gate_failure(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        monkeypatch.setattr(cli.french_cull, "check_cull", lambda _path: 1)
+        monkeypatch.setattr(cli.cullgates, "check_cull", lambda _path, _profile: 1)
 
         with pytest.raises(SystemExit):
             cli.fr(deck_file, select=True, check=True)
@@ -404,9 +410,11 @@ class TestCantoneseCoreMode:
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         requests = []
-        monkeypatch.setattr(
-            cli.cantonese_core, "run_core", lambda request: requests.append(request)
-        )
+
+        def fake(request, _profile) -> None:
+            requests.append(request)
+
+        monkeypatch.setattr(cli.coreflow, "run_core", fake)
 
         cli.yue(deck_file, core=True, cards=42)
 
@@ -416,35 +424,29 @@ class TestCantoneseCoreMode:
 
 
 class TestCoreSpokenWeight:
-    def test_the_module_weight_applies_when_the_caller_gives_none(
-        self, deck_file: Path, tmp_path: Path
+    def test_the_profile_weight_applies_when_the_caller_gives_none(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         requests: list = []
 
-        def fake_module(weight: float | None) -> SimpleNamespace:
-            module = SimpleNamespace(
-                DEFAULT_CORE_WORDS=0,
-                DEFAULT_OPTIONS=cli.cantonese_core.DEFAULT_OPTIONS,
-                CoreRequest=cli.cantonese_core.CoreRequest,
-                default_output=lambda _path: tmp_path / "out.apkg",
-                run_core=requests.append,
-            )
-            if weight is not None:
-                module.SPOKEN_WEIGHT = weight
-            return module
+        def fake(request, _profile) -> None:
+            requests.append(request)
+
+        monkeypatch.setattr(cli.coreflow, "run_core", fake)
+        options = cli.cantonese_core.DEFAULT_OPTIONS
 
         for weight, expected in ((0.7, 0.7), (None, 0.5)):
-            module = fake_module(weight)
+            profile = SimpleNamespace(default_options=options, spoken_weight=weight)
             cli._run_core_command(
-                module,
+                profile,
                 "Test",
                 deck_file,
                 None,
                 None,
                 None,
-                module.DEFAULT_CORE_WORDS,
-                module.DEFAULT_OPTIONS.per_word,
-                module.DEFAULT_OPTIONS.tail_cards,
+                0,
+                options.per_word,
+                options.tail_cards,
                 False,
             )
             assert requests[-1].spoken_weight == expected
@@ -467,7 +469,9 @@ class TestSpanishMode:
     ) -> None:
         checked = []
         monkeypatch.setattr(
-            cli.spanish_core, "check_core", lambda path: checked.append(path) or 0
+            cli.coregates,
+            "check_core",
+            lambda path, _profile: checked.append(path) or 0,
         )
 
         cli.es(deck_file, core=True, check=True)
@@ -477,7 +481,7 @@ class TestSpanishMode:
     def test_check_with_core_exits_on_a_gate_failure(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        monkeypatch.setattr(cli.spanish_core, "check_core", lambda _path: 1)
+        monkeypatch.setattr(cli.coregates, "check_core", lambda _path, _profile: 1)
 
         with pytest.raises(SystemExit):
             cli.es(deck_file, core=True, check=True)
@@ -572,7 +576,7 @@ class TestMandarinCoreMode:
     ) -> None:
         requests = []
         monkeypatch.setattr(
-            cli.mandarin_core, "run_core", lambda request: requests.append(request)
+            cli.coreflow, "run_core", lambda request, _profile: requests.append(request)
         )
 
         cli.zh(deck_file, core=True, cards=42)
@@ -599,7 +603,9 @@ class TestMandarinCoreMode:
     ) -> None:
         checked = []
         monkeypatch.setattr(
-            cli.mandarin_core, "check_core", lambda path: checked.append(path) or 0
+            cli.coregates,
+            "check_core",
+            lambda path, _profile: checked.append(path) or 0,
         )
 
         cli.zh(deck_file, core=True, check=True)
@@ -609,7 +615,7 @@ class TestMandarinCoreMode:
     def test_check_with_core_exits_on_a_gate_failure(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        monkeypatch.setattr(cli.mandarin_core, "check_core", lambda _path: 1)
+        monkeypatch.setattr(cli.coregates, "check_core", lambda _path, _profile: 1)
 
         with pytest.raises(SystemExit):
             cli.zh(deck_file, core=True, check=True)
@@ -700,7 +706,7 @@ class TestSpanishCoreMode:
     ) -> None:
         requests = []
         monkeypatch.setattr(
-            cli.spanish_core, "run_core", lambda request: requests.append(request)
+            cli.coreflow, "run_core", lambda request, _profile: requests.append(request)
         )
         output = deck_file.parent / "core.apkg"
 

@@ -11,6 +11,7 @@ import json
 import math
 from collections import Counter
 from dataclasses import replace
+from functools import partial
 from pathlib import Path
 from typing import Collection
 
@@ -77,11 +78,11 @@ class TestFrequency:
             _freq_row("ecrit", pm=1.0, written=100.0),
         ]
 
-        assert cull_fr.frequency_ranks(rows, spoken_weight=0.0) == {
+        assert cullflow.frequency_ranks(rows, spoken_weight=0.0) == {
             "ecrit": 1,
             "parle": 2,
         }
-        assert cull_fr.frequency_ranks(rows, spoken_weight=1.0) == {
+        assert cullflow.frequency_ranks(rows, spoken_weight=1.0) == {
             "parle": 1,
             "ecrit": 2,
         }
@@ -106,8 +107,8 @@ class TestFrequency:
 
         monkeypatch.setattr(cull_fr.cullflow, "build_frequency_cache", fake_build)
 
-        rows = cull_fr.load_frequency(frequency_path, tatoeba_path)
-        again = cull_fr.load_frequency(frequency_path, tatoeba_path)
+        rows = cull_fr.load_or_build_frequency(frequency_path, tatoeba_path)
+        again = cull_fr.load_or_build_frequency(frequency_path, tatoeba_path)
 
         assert [row.word for row in rows] == ["chat"]
         assert again == rows
@@ -120,7 +121,7 @@ class TestNames:
         path = tmp_path / "names.txt"
         path.write_text("# a comment\n\nParis\n  zoe \n", encoding="utf-8")
 
-        assert cull_fr.read_names(path) == {"paris", "zoe"}
+        assert cullflow.read_names(path) == {"paris", "zoe"}
 
 
 @pytest.mark.parametrize(
@@ -150,13 +151,20 @@ def test_one_card_per_filter_rule(
 ) -> None:
     card = _card(sentence, english=english)
 
-    assert cull_fr._filter_reason(card, tokens, MIN_WORDS, MAX_WORDS) == rule
+    assert cullflow.filter_reason(
+        card, tokens, MIN_WORDS, MAX_WORDS, cull_fr.FRENCH_CULL_PROFILE
+    ) == rule
 
 
 def test_a_clean_card_passes_every_rule() -> None:
     card = _card("Le chat mange vite.")
 
-    assert cull_fr._filter_reason(card, BASE_TOKENS, MIN_WORDS, MAX_WORDS) == ""
+    assert (
+        cullflow.filter_reason(
+            card, BASE_TOKENS, MIN_WORDS, MAX_WORDS, cull_fr.FRENCH_CULL_PROFILE
+        )
+        == ""
+    )
 
 
 def test_filter_cards_rejects_a_duplicate_text() -> None:
@@ -167,7 +175,15 @@ def test_filter_cards_rejects_a_duplicate_text() -> None:
     ]
     tokens = [BASE_TOKENS, BASE_TOKENS, BASE_TOKENS]
 
-    passed, reasons = cull_fr.filter_cards(cards, tokens, MIN_WORDS, MAX_WORDS)
+    passed, reasons = cullflow.filter_cards(
+        cards,
+        tokens,
+        MIN_WORDS,
+        MAX_WORDS,
+        card_rule=partial(
+            cullflow.filter_reason, profile=cull_fr.FRENCH_CULL_PROFILE
+        ),
+    )
 
     assert passed == [0, 1]
     assert reasons == ["", "", "F9"]
@@ -249,7 +265,7 @@ def test_write_deck_keeps_the_notes_and_their_media(tmp_path: Path) -> None:
     cards = cull_fr.load_input_deck(source)
     output = tmp_path / "output.apkg"
 
-    counts = cull_fr.write_deck(source, cards, [0, 2], output, DECK_NAME)
+    counts = cull_fr.write_cull_deck(source, cards, [0, 2], output, DECK_NAME)
 
     with AnkiPackage(output) as package:
         notes = package.get_notes()
@@ -273,7 +289,7 @@ def test_write_deck_sets_the_swadesh_templates(tmp_path: Path) -> None:
     cards = cull_fr.load_input_deck(source)
     output = tmp_path / "templated.apkg"
 
-    cull_fr.write_deck(source, cards, [0], output, DECK_NAME)
+    cull_fr.write_cull_deck(source, cards, [0], output, DECK_NAME)
 
     with AnkiPackage(output) as package:
         models = package.get_models(include_templates=True)
@@ -327,7 +343,7 @@ def test_write_deck_removes_the_second_card_template(tmp_path: Path) -> None:
     cards = cull_fr.load_input_deck(source)
     output = tmp_path / "one-card.apkg"
 
-    cull_fr.write_deck(source, cards, [0, 1], output, DECK_NAME)
+    cull_fr.write_cull_deck(source, cards, [0, 1], output, DECK_NAME)
 
     with AnkiPackage(output) as package:
         models = package.get_models(include_templates=True)
@@ -345,7 +361,7 @@ def test_gate_card_templates_fails_on_a_second_template(tmp_path: Path) -> None:
     source = _tiny_deck(tmp_path)
     cards = cull_fr.load_input_deck(source)
     output = tmp_path / "two-templates.apkg"
-    cull_fr.write_deck(source, cards, [0], output, DECK_NAME)
+    cull_fr.write_cull_deck(source, cards, [0], output, DECK_NAME)
     _add_second_template(output)
 
     rows = cullgates.run_gates(
@@ -360,7 +376,7 @@ def test_gate_card_templates_fails_on_a_wrong_front(tmp_path: Path) -> None:
     source = _tiny_deck(tmp_path)
     cards = cull_fr.load_input_deck(source)
     output = tmp_path / "wrong.apkg"
-    cull_fr.write_deck(source, cards, [0], output, DECK_NAME)
+    cull_fr.write_cull_deck(source, cards, [0], output, DECK_NAME)
 
     with AnkiPackage(output) as package:
         package.update_model_template(
@@ -424,7 +440,7 @@ def test_run_gates_passes_on_a_tiny_output(
     cards = cull_fr.load_input_deck(source)
     output = tmp_path / "gated.apkg"
     ordered = [0, 1, 2]
-    cull_fr.write_deck(source, cards, ordered, output, DECK_NAME)
+    cull_fr.write_cull_deck(source, cards, ordered, output, DECK_NAME)
 
     targets = [_target("chat", 1), _target("boire", 2), _target("lait", 3)]
     selection = cullflow.SelectionResult(
@@ -513,7 +529,7 @@ def _tiny_swadesh_deck(tmp_path: Path) -> Path:
 
 
 def test_load_reserve_reads_the_plain_and_bold_sentence(tmp_path: Path) -> None:
-    reserve = cull_fr.load_reserve(_tiny_swadesh_deck(tmp_path))
+    reserve = cull_fr.read_reserve(_tiny_swadesh_deck(tmp_path))
 
     assert len(reserve) == 1
     assert reserve[0].sentence == "Je suis ici."
@@ -526,10 +542,10 @@ def test_write_deck_inserts_the_reserve_card(tmp_path: Path) -> None:
     source = _tiny_deck(tmp_path)
     cards = cull_fr.load_input_deck(source)
     swadesh = _tiny_swadesh_deck(tmp_path)
-    reserve = cull_fr.load_reserve(swadesh)
+    reserve = cull_fr.read_reserve(swadesh)
     output = tmp_path / "merged.apkg"
 
-    counts = cull_fr.write_deck(
+    counts = cull_fr.write_cull_deck(
         source,
         cards,
         [0, 1],
@@ -556,10 +572,10 @@ def test_write_deck_inserts_the_reserve_card(tmp_path: Path) -> None:
 
 def test_swadesh_coverage_counts_a_word_from_another_card() -> None:
     sentence = "Un nuage flottait dans le ciel."
-    tokens = cull_fr.tokenize_texts([sentence])
+    tokens = cullflow.tokenize_texts([sentence], model=cull_fr.TOKENIZER)
 
-    covered, total = cull_fr.swadesh_coverage(
-        ["nuage", "intestins"], [sentence], tokens
+    covered, total = cullflow.swadesh_coverage(
+        ["nuage", "intestins"], [sentence], tokens, cull_fr.FRENCH_CULL_PROFILE
     )
 
     assert covered == 1

@@ -1,4 +1,4 @@
-"""Mandarin core deck: profile and bound wrappers.
+"""Mandarin core deck: profile and values.
 
 The module builds the core deck of the Mandarin sentence deck
 ``apkg/Neri's Chinese Sents Part 2.apkg``. The Swadesh rows of
@@ -104,11 +104,6 @@ CORE_TEMPLATES = (
     (CORE_FRONT_TEMPLATE, CORE_BACK_TEMPLATE),
 )
 
-CoreRequest = coreflow.CoreRequest
-CoreRun = coreflow.CoreRun
-default_output = coreflow.default_output
-InputCard = coreflow.InputCard
-
 _BOLD_PATTERN = re.compile(r"</?b>")
 _FINAL_MARKS = {"。": ".", "？": "?", "！": "!"}
 _ASCII_FINAL_MARKS = frozenset(".?!")
@@ -151,7 +146,7 @@ def _ensure_dictionary() -> None:
         _dictionary_ready = True
 
 
-def load_input_deck(path: Path) -> list[InputCard]:
+def load_input_deck(path: Path) -> list[coreflow.InputCard]:
     """Read the cards of the Mandarin sentence model from an APKG file.
 
     The package also holds two ``TEXT CARD`` notes of another model, so only the
@@ -171,7 +166,7 @@ def load_input_deck(path: Path) -> list[InputCard]:
     )
 
 
-def tokenize_deck(cards: Sequence[InputCard]) -> list[list[tuple[str, str]]]:
+def tokenize_deck(cards: Sequence[coreflow.InputCard]) -> list[list[tuple[str, str]]]:
     """Tokenize the sentence of every card with jieba.
 
     :param cards: Input cards.
@@ -274,25 +269,6 @@ def finalize_output(output_path: Path, core_csv: Path) -> int:
         package.save(output_path)
     return written
 
-
-def run_core(request: CoreRequest) -> CoreRun:
-    """Run the Mandarin core mode and write the output files."""
-    run = coreflow.run_core(request, MANDARIN_CORE_PROFILE)
-    finalize_output(run.output_path, run.core_csv)
-    return run
-
-
-def check_core(output_path: Path) -> int:
-    """Run gates K1 to K20 on the files of a Mandarin core output.
-
-    :param output_path: Output APKG file.
-    :returns: The exit code of the gate table, 0 on a pass.
-    """
-    from anki_tools.ranking import coregates
-
-    return coregates.check_core(Path(output_path), MANDARIN_CORE_PROFILE)
-
-
 MANDARIN_CORE_PROFILE = CoreProfile(
     load_input_deck=load_input_deck,
     tokenize_deck=tokenize_deck,
@@ -322,4 +298,5 @@ MANDARIN_CORE_PROFILE = CoreProfile(
     frequency_source=str(FREQUENCY_PATH),
     outside_set_ratio=1.3,
     outside_rare_ratio=0.1,
+    finalize=lambda run: finalize_output(run.output_path, run.core_csv),
 )

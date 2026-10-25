@@ -52,19 +52,19 @@ from anki_tools.languages.cantonese.rank import rank_sentences_yue
 from anki_tools.languages.french.rank import rank_sentences_fr
 from anki_tools.languages.mandarin.rank import rank_sentences_zh
 from anki_tools.languages.spanish.rank import rank_sentences_es
+from anki_tools.ranking import coreflow, coregates, cullflow, cullgates
 from anki_tools.ranking.latin import latin_word_similarity
 from anki_tools.ranking.rank import (
     Sentence,
     reduce_sentences_stratified,
 )
-
-
 from anki_tools.ranking.pipeline import (
     RankPaths,
     RankedDeck,
     rank_paths,
     run_ranked_deck,
 )
+from anki_tools.ranking.scan import CoreProfile
 from anki_tools.apkg.templates import (
     DEFAULT_TEMPLATE_DIR,
     SHARED_CSS_PATH,
@@ -579,7 +579,7 @@ app.command(fix_app)
 
 
 def _run_core_command(
-    module: Any,
+    profile: CoreProfile,
     label: str,
     apkg_path: Path,
     output: Path | None,
@@ -593,7 +593,7 @@ def _run_core_command(
 ) -> None:
     """Build the core deck for one language.
 
-    :param module: Language core module that holds the core entry points.
+    :param profile: Language hooks of the shared core flow.
     :param label: Language name that the banner shows.
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
@@ -604,14 +604,14 @@ def _run_core_command(
     :param tail: Core mode: cards after the core passes.
     :param check: Run the gates on the output only.
     :param spoken_weight: Optional weight of the spoken frequency term. The
-        module's ``SPOKEN_WEIGHT`` applies when it is None.
+        profile weight applies when it is None.
     """
     if model_id is not None:
         print("Error: --model-id does not apply with --core.")
         return
-    output_path = output or module.default_output(apkg_path)
+    output_path = output or coreflow.default_output(apkg_path)
     if check:
-        code = module.check_core(output_path)
+        code = coregates.check_core(output_path, profile)
         if code:
             raise SystemExit(code)
         return
@@ -622,24 +622,22 @@ def _run_core_command(
     print(f"Processing {label} Anki Deck: core mode")
     print("=" * 50)
     options = replace(
-        module.DEFAULT_OPTIONS,
+        profile.default_options,
         per_word=examples,
         tail_cards=tail,
     )
     if cards is not None:
         options = replace(options, max_cards=cards)
-    request = module.CoreRequest(
+    request = coreflow.CoreRequest(
         input_path=apkg_path,
         output_path=output_path,
         core_words=words,
         options=options,
     )
-    weight = spoken_weight
-    if weight is None:
-        weight = getattr(module, "SPOKEN_WEIGHT", None)
+    weight = spoken_weight if spoken_weight is not None else profile.spoken_weight
     if weight is not None:
         request = replace(request, spoken_weight=weight)
-    module.run_core(request)
+    coreflow.run_core(request, profile)
 
 
 def _check_guard(check: bool, modes: Sequence[tuple[str, bool]]) -> bool:
@@ -701,7 +699,7 @@ def zh(
 
     if core:
         _run_core_command(
-            mandarin_core,
+            mandarin_core.MANDARIN_CORE_PROFILE,
             LANGUAGES["mandarin"].label,
             apkg_path,
             output,
@@ -766,8 +764,8 @@ def fr(
     select: bool = False,
     core: bool = False,
     cards: int | None = None,
-    targets: int = french_cull.DEFAULT_TARGET_WORDS,
-    max_uses: int = french_cull.DEFAULT_MAX_USES,
+    targets: int = cullflow.DEFAULT_TARGET_WORDS,
+    max_uses: int = cullflow.DEFAULT_MAX_USES,
     reserve: bool = True,
     words: int = french_core.DEFAULT_CORE_WORDS,
     examples: int = french_core.DEFAULT_OPTIONS.per_word,
@@ -817,7 +815,7 @@ def fr(
 
     if core:
         _run_core_command(
-            french_core,
+            french_core.FRENCH_CORE_PROFILE,
             LANGUAGES["french"].label,
             apkg_path,
             output,
@@ -833,13 +831,15 @@ def fr(
         if model_id is not None:
             print("Error: --model-id does not apply with --select.")
             return
-        output_path = output or french_cull.default_output(apkg_path)
+        output_path = output or cullflow.default_output(apkg_path)
         if check:
-            code = french_cull.check_cull(output_path)
+            code = cullgates.check_cull(
+                output_path, french_cull.FRENCH_CULL_PROFILE
+            )
             if code:
                 raise SystemExit(code)
             return
-        request = french_cull.CullRequest(
+        request = cullflow.CullRequest(
             input_path=apkg_path,
             output_path=output_path,
             target_words=targets,
@@ -848,7 +848,7 @@ def fr(
         )
         if cards is not None:
             request = replace(request, max_cards=cards)
-        french_cull.run_cull(request)
+        cullflow.run_cull(request, french_cull.FRENCH_CULL_PROFILE)
         return
 
     paths = rank_paths(apkg_path, output)
@@ -1009,7 +1009,7 @@ def yue(
 
     if core:
         _run_core_command(
-            cantonese_core,
+            cantonese_core.CANTONESE_CORE_PROFILE,
             LANGUAGES["cantonese"].label,
             apkg_path,
             output,
@@ -1161,7 +1161,7 @@ def es(
 
     if core:
         _run_core_command(
-            spanish_core,
+            spanish_core.SPANISH_CORE_PROFILE,
             LANGUAGES["spanish"].label,
             apkg_path,
             output,

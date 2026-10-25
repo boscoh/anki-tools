@@ -54,7 +54,7 @@ def _row(
 @needs_cache
 def test_the_spoken_weight_changes_the_blend_of_a_spanish_row() -> None:
     """A Spanish row holds a spoken term, so the weight changes the score."""
-    row = next(row for row in cull_es.load_frequency() if row.tatoeba_count >= 5)
+    row = next(row for row in cull_es.read_cull_frequency() if row.tatoeba_count >= 5)
 
     assert cullflow.blend_pm(row, spoken_weight=0.0) == pytest.approx(row.written_pm)
     assert cullflow.blend_pm(row, spoken_weight=1.0) == pytest.approx(row.tatoeba_pm)
@@ -64,7 +64,7 @@ def test_the_spoken_weight_changes_the_blend_of_a_spanish_row() -> None:
 @needs_cache
 def test_the_cull_rows_hold_one_row_per_lemma() -> None:
     """The surface rows of the cache collapse to one cull row per lemma."""
-    rows = cull_es.load_frequency()
+    rows = cull_es.read_cull_frequency()
     words = [row.word for row in rows]
 
     assert len(rows) == len(set(words))

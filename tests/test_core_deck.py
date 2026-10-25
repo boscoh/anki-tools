@@ -9,6 +9,7 @@ from __future__ import annotations
 import csv
 from collections import Counter
 from pathlib import Path
+from typing import Sequence
 
 import pytest
 
@@ -36,6 +37,7 @@ from anki_tools.ranking.core import (
     select,
     target_quotas,
 )
+from anki_tools.ranking import coregates
 from anki_tools.ranking.coregates import gate_gloss
 
 
@@ -51,6 +53,26 @@ def _card(
         english=english,
         audio=audio,
         index=index,
+    )
+
+
+def _filter(
+    cards: Sequence[InputCard],
+    tokens: Sequence[Sequence[tuple[str, str]]],
+    names: Sequence[str] = (),
+    loanwords: Sequence[str] = (),
+) -> tuple[list[int], list[str]]:
+    """Apply the shared rules with the French profile and a test window."""
+    profile = core.FRENCH_CORE_PROFILE
+    return coreflow.filter_core_cards(
+        cards,
+        tokens,
+        {"a.mp3"},
+        names,
+        loanwords,
+        profile.has_orphan,
+        min_units=1,
+        max_units=9,
     )
 
 
@@ -248,9 +270,7 @@ class TestFilter:
         cards = [_card("Très bon.", english="Very good.")]
         tokens = [[("très", "ADV"), ("bon", "ADJ")]]
 
-        passed, reasons = core.filter_core_cards(
-            cards, tokens, {"a.mp3"}, [], [], min_units=1, max_units=9
-        )
+        passed, reasons = _filter(cards, tokens)
 
         assert reasons[0] == ""
         assert passed == [0]
@@ -259,9 +279,7 @@ class TestFilter:
         cards = [_card("Trois chats.")]
         tokens = [[("trois", "NUM"), ("chat", "NOUN")]]
 
-        passed, reasons = core.filter_core_cards(
-            cards, tokens, {"a.mp3"}, [], [], min_units=1, max_units=9
-        )
+        passed, reasons = _filter(cards, tokens)
 
         assert passed == []
         assert reasons[0] == "C1"
@@ -270,9 +288,7 @@ class TestFilter:
         cards = [_card("Tomber est facile.")]
         tokens = [[("tomber", "VERB"), ("être", "AUX"), ("facile", "ADJ")]]
 
-        passed, _reasons = core.filter_core_cards(
-            cards, tokens, {"a.mp3"}, ["tom"], [], min_units=1, max_units=9
-        )
+        passed, _reasons = _filter(cards, tokens, ["tom"])
 
         assert passed == [0]
 
@@ -280,9 +296,7 @@ class TestFilter:
         cards = [_card("Tom mange une pomme.")]
         tokens = [[("tom", "PROPN"), ("manger", "VERB"), ("un", "DET"), ("pomme", "NOUN")]]
 
-        passed, reasons = core.filter_core_cards(
-            cards, tokens, {"a.mp3"}, ["tom"], [], min_units=1, max_units=9
-        )
+        passed, reasons = _filter(cards, tokens, ["tom"])
 
         assert passed == []
         assert reasons[0] in {"C3", "F8"}
@@ -291,9 +305,7 @@ class TestFilter:
         cards = [_card("Le week-end est court.")]
         tokens = [[("le", "DET"), ("week", "NOUN"), ("est", "AUX"), ("court", "ADJ")]]
 
-        passed, reasons = core.filter_core_cards(
-            cards, tokens, {"a.mp3"}, [], ["week-end"], min_units=1, max_units=9
-        )
+        passed, reasons = _filter(cards, tokens, [], ["week-end"])
 
         assert passed == []
         assert reasons[0] == "C4"
@@ -302,9 +314,7 @@ class TestFilter:
         cards = [_card("Le chat mange.", audio="missing.mp3")]
         tokens = [[("le", "DET"), ("chat", "NOUN"), ("manger", "VERB")]]
 
-        passed, reasons = core.filter_core_cards(
-            cards, tokens, {"a.mp3"}, [], [], min_units=1, max_units=9
-        )
+        passed, reasons = _filter(cards, tokens)
 
         assert passed == []
         assert reasons[0] == "C5"
@@ -333,10 +343,10 @@ class TestSense:
         loans = tmp_path / "loans.txt"
         loans.write_text("# a comment\nweek-end\n", encoding="utf-8")
 
-        assert core.read_senses(senses) == {
+        assert coreflow.read_senses(senses) == {
             "pas": corelist.SenseWords(frozenset({"not"}), frozenset(), "not")
         }
-        assert core.read_loanwords(loans) == frozenset({"week-end"})
+        assert coreflow.read_loanwords(loans) == frozenset({"week-end"})
 
 
 class TestOutside:
@@ -476,7 +486,7 @@ class TestCardDesign:
         source = _tiny_deck(tmp_path)
         cards = cull.load_input_deck(source)
         output = tmp_path / "core.apkg"
-        cull.write_deck(source, cards, [0, 1, 2], output, "Core Deck")
+        cull.write_cull_deck(source, cards, [0, 1, 2], output, "Core Deck")
         targets = [_target("S1:chat", form="chat", gloss="cat")]
         candidates = [
             CoreCandidate(index=0, targets=("S1:chat",), outside=(), units=3),
@@ -491,8 +501,14 @@ class TestCardDesign:
             order=[0, 1, 2],
         )
 
-        filled = core._write_core_model(
-            output, cards, result, [0, 1, 2], targets, candidates
+        filled = coreflow._write_core_model(
+            output,
+            cards,
+            result,
+            [0, 1, 2],
+            targets,
+            candidates,
+            core.FRENCH_CORE_PROFILE,
         )
 
         assert filled == 2
@@ -531,7 +547,7 @@ class TestCardDesign:
         source = _tiny_deck(tmp_path)
         cards = cull.load_input_deck(source)
         output = tmp_path / "core.apkg"
-        cull.write_deck(source, cards, [0, 1, 2], output, "Core Deck")
+        cull.write_cull_deck(source, cards, [0, 1, 2], output, "Core Deck")
         targets = [_target("S1:chat", form="chat", gloss="cat")]
         candidates = [
             CoreCandidate(index=0, targets=("S1:chat",), outside=(), units=3),
@@ -545,11 +561,18 @@ class TestCardDesign:
             assigned={0: "S1:chat"},
             order=[0, 1, 2],
         )
-        core._write_core_model(
-            output, cards, result, [0, 1, 2], targets, candidates
+        coreflow._write_core_model(
+            output,
+            cards,
+            result,
+            [0, 1, 2],
+            targets,
+            candidates,
+            core.FRENCH_CORE_PROFILE,
         )
 
-        passed, message = gate_gloss(core.CoreFiles(output))
+        files = coregates.CoreFiles(output, core.FRENCH_CORE_PROFILE)
+        passed, message = gate_gloss(files)
 
         assert passed, message
 
@@ -559,7 +582,7 @@ class TestCardDesign:
         source = _tiny_deck(tmp_path)
         cards = cull.load_input_deck(source)
         output = tmp_path / "core.apkg"
-        cull.write_deck(source, cards, [0, 1, 2], output, "Core Deck")
+        cull.write_cull_deck(source, cards, [0, 1, 2], output, "Core Deck")
         targets = [_target("S1:chat", form="chat", gloss="cat")]
         candidates = [
             CoreCandidate(index=0, targets=("S1:chat",), outside=(), units=3),
@@ -573,8 +596,14 @@ class TestCardDesign:
             assigned={0: "S1:chat"},
             order=[0, 1, 2],
         )
-        core._write_core_model(
-            output, cards, result, [0, 1, 2], targets, candidates
+        coreflow._write_core_model(
+            output,
+            cards,
+            result,
+            [0, 1, 2],
+            targets,
+            candidates,
+            core.FRENCH_CORE_PROFILE,
         )
         _core, coverage, _manifest, _rank = side_paths(output)
         coverage.write_text(
@@ -583,7 +612,8 @@ class TestCardDesign:
             encoding="utf-8",
         )
 
-        passed, message = gate_gloss(core.CoreFiles(output))
+        files = coregates.CoreFiles(output, core.FRENCH_CORE_PROFILE)
+        passed, message = gate_gloss(files)
 
         assert not passed
         assert "is not the target gloss" in message

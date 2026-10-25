@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from functools import partial
 from pathlib import Path
-from typing import Iterable, Sequence
+from typing import Sequence
 
 from anki_tools.apkg.templates import SHARED_CSS_PATH, TEMPLATES_DIR, load_text
 from anki_tools.languages.french.profile import (
@@ -22,7 +22,7 @@ from anki_tools.languages.french.profile import (
     QUOTE_MARKS,
     TOKENIZER,
 )
-from anki_tools.ranking import coreflow, corelist, cullflow, cullgates
+from anki_tools.ranking import coreflow, corelist, cullflow
 from anki_tools.ranking.coreflow import InputCard
 from anki_tools.sentence_pack.pack import load_css
 from anki_tools.sentence_pack.tokens import load_model
@@ -30,10 +30,6 @@ from anki_tools.sentence_pack.tokens import load_model
 FREQUENCY_PATH = Path("data/french_frequency.tsv")
 NAMES_PATH = Path("vocab/french_names.txt")
 TATOEBA_PATH = Path("data/tatoeba/fra_sentences.tsv")
-
-DEFAULT_TARGET_WORDS = cullflow.DEFAULT_TARGET_WORDS
-DEFAULT_MAX_USES = cullflow.DEFAULT_MAX_USES
-
 MODEL_NAME = "French Sentences"
 FRENCH_FIELD = "French"
 AUDIO_FIELD = "sound"
@@ -76,34 +72,16 @@ def load_input_deck(path: Path) -> list[InputCard]:
     )
 
 
-def tokenize_texts(texts: Iterable[str]) -> list[list[tuple[str, str]]]:
-    """Tokenize French texts with the shared spaCy pipeline.
-
-    :param texts: Sentence texts.
-    :returns: One list of lowercased ``(lemma, part of speech)`` pairs per text.
-    """
-    return cullflow.tokenize_texts(texts, model=TOKENIZER)
-
-
 def tokenize_deck(cards: Sequence[InputCard]) -> list[list[tuple[str, str]]]:
     """Tokenize the sentence of every card.
 
     :param cards: Input cards.
     :returns: One list of ``(lemma, part of speech)`` pairs per card.
     """
-    return tokenize_texts(card.sentence for card in cards)
+    return cullflow.tokenize_texts((card.sentence for card in cards), model=TOKENIZER)
 
 
-def read_names(path: Path = NAMES_PATH) -> set[str]:
-    """Read the French name stoplist.
-
-    :param path: Text file with one name per line.
-    :returns: Lowercased names. Blank lines and ``#`` comments are skipped.
-    """
-    return cullflow.read_names(path)
-
-
-def load_frequency(
+def load_or_build_frequency(
     frequency_path: Path = FREQUENCY_PATH, tatoeba_path: Path = TATOEBA_PATH
 ) -> list[cullflow.FrequencyRow]:
     """Give the cached French frequency rows, and build the cache when it is absent.
@@ -159,9 +137,9 @@ def _reserve_fields(card: cullflow.ReserveCard) -> list[str]:
     return [card.html, f"[sound:{card.audio}]", back, ""]
 
 
-load_reserve = partial(cullflow.load_reserve, model_name=SWADESH_MODEL_NAME)
+read_reserve = partial(cullflow.load_reserve, model_name=SWADESH_MODEL_NAME)
 
-write_deck = partial(
+write_cull_deck = partial(
     coreflow.write_deck,
     model_name=MODEL_NAME,
     templates=CARD_TEMPLATES,
@@ -170,10 +148,10 @@ write_deck = partial(
 )
 
 FRENCH_CULL_PROFILE = cullflow.CullProfile(
-    tokenize_texts=tokenize_texts,
-    load_frequency=load_frequency,
+    tokenize_texts=partial(cullflow.tokenize_texts, model=TOKENIZER),
+    load_frequency=load_or_build_frequency,
     frequency_ranks=cullflow.frequency_ranks,
-    read_names=read_names,
+    read_names=partial(cullflow.read_names, NAMES_PATH),
     concept_forms=_concept_forms,
     content_pos=corelist.CONTENT_POS,
     min_lemma_length=corelist.MIN_LEMMA_LENGTH,
@@ -203,31 +181,4 @@ FRENCH_CULL_PROFILE = cullflow.CullProfile(
 )
 
 
-def run_cull(request: cullflow.CullRequest) -> cullflow.CullRun:
-    """Run the French cull and write the output files.
 
-    :param request: Options of the run.
-    :returns: The written paths and the counts of the run.
-    """
-    return cullflow.run_cull(request, FRENCH_CULL_PROFILE)
-
-
-# Re-export the shared flow surface that the CLI and the tests read here.
-CullRequest = cullflow.CullRequest
-frequency_ranks = cullflow.frequency_ranks
-default_output = cullflow.default_output
-swadesh_coverage = partial(cullflow.swadesh_coverage, profile=FRENCH_CULL_PROFILE)
-filter_cards = partial(
-    cullflow.filter_cards,
-    card_rule=partial(cullflow.filter_reason, profile=FRENCH_CULL_PROFILE),
-)
-_filter_reason = partial(cullflow.filter_reason, profile=FRENCH_CULL_PROFILE)
-
-
-def check_cull(output_path: Path) -> int:
-    """Run gates G1 to G15 on the files of a cull output.
-
-    :param output_path: Output APKG file.
-    :returns: The exit code of the gate table, 0 on a pass.
-    """
-    return cullgates.check_cull(output_path, FRENCH_CULL_PROFILE)

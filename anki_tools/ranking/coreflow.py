@@ -1380,7 +1380,7 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> CoreRun:
     print(f"wrote {core_csv}")
     print(f"wrote {coverage_csv}")
     print(f"wrote {manifest_path}")
-    return CoreRun(
+    run = CoreRun(
         output_path=output_path,
         core_csv=core_csv,
         coverage_csv=coverage_csv,
@@ -1391,3 +1391,6 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> CoreRun:
         covered1=counts["covered1"],
         covered2=counts["covered2"],
     )
+    if profile.finalize is not None:
+        profile.finalize(run)
+    return run

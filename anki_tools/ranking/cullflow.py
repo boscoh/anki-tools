@@ -424,30 +424,48 @@ def frequency_ranks(
     return {word: rank for rank, (_score, word) in enumerate(scored, start=1)}
 
 
+def _token_pair(
+    token: Any, lemma_map: Callable[[str], str] | None
+) -> tuple[str, str]:
+    """Give the lemma and the part of speech of one token.
+
+    :param token: spaCy token.
+    :param lemma_map: Optional function that re-maps the lowercased lemma.
+    :returns: The lemma and the part of speech.
+    """
+    lemma = token.lemma_.lower()
+    return (lemma_map(lemma) if lemma_map else lemma), token.pos_
+
+
 def tokenize_texts(
-    texts: Iterable[str], *, model: str
+    texts: Iterable[str], *, model: str, lemma_map: Callable[[str], str] | None = None
 ) -> list[list[tuple[str, str]]]:
     """Tokenize texts with a shared spaCy model.
 
     :param texts: Sentence texts.
     :param model: spaCy model name.
+    :param lemma_map: Optional function that re-maps the lowercased lemma of
+        every token, for example the Spanish clitic rule.
     :returns: One list of lowercased ``(lemma, part of speech)`` pairs per text.
         Only alphabetic tokens are kept.
     """
     nlp = load_model(model)
     return [
-        [(token.lemma_.lower(), token.pos_) for token in doc if token.is_alpha]
+        [_token_pair(token, lemma_map) for token in doc if token.is_alpha]
         for doc in nlp.pipe(texts, batch_size=TOKENIZE_BATCH)
     ]
 
-
-def read_names(path: Path) -> set[str]:
+def read_names(path: Path, optional: bool = False) -> set[str]:
     """Read a name stoplist.
 
     :param path: Text file with one name per line.
+    :param optional: Give an empty set when the file is absent instead of
+        raising.
     :returns: Lowercased names. Blank lines and ``#`` comments are skipped.
     """
     names: set[str] = set()
+    if optional and not path.exists():
+        return names
     with path.open(encoding="utf-8") as handle:
         for line in handle:
             name = line.strip().lower()

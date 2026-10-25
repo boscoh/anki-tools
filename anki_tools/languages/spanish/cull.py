@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from functools import partial
 from pathlib import Path
-from typing import Iterable, Sequence
+from typing import Sequence
 
 from anki_tools.apkg.templates import SHARED_CSS_PATH, TEMPLATES_DIR, load_text
 from anki_tools.languages.spanish import core
@@ -32,7 +32,7 @@ from anki_tools.languages.spanish.profile import (
     TOKENIZER,
     prepare_text,
 )
-from anki_tools.ranking import coreflow, corelist, cullflow, cullgates
+from anki_tools.ranking import coreflow, corelist, cullflow
 from anki_tools.ranking.coreflow import InputCard
 from anki_tools.sentence_pack.pack import load_css
 from anki_tools.sentence_pack.tokens import load_model
@@ -40,10 +40,6 @@ from anki_tools.sentence_pack.tokens import load_model
 TATOEBA_PATH = Path("data/tatoeba/spa_sentences.tsv")
 NAMES_PATH = Path("vocab/spanish_names.txt")
 
-
-DEFAULT_MAX_CARDS = cullflow.DEFAULT_MAX_CARDS
-DEFAULT_TARGET_WORDS = cullflow.DEFAULT_TARGET_WORDS
-DEFAULT_MAX_USES = cullflow.DEFAULT_MAX_USES
 
 MODEL_NAME = core.MODEL_NAME
 SENTENCE_FIELD = core.SENTENCE_FIELD
@@ -117,39 +113,18 @@ def load_input_deck(path: Path) -> list[InputCard]:
     )
 
 
-def tokenize_texts(texts: Iterable[str]) -> list[list[tuple[str, str]]]:
-    """Tokenize Spanish texts with the shared spaCy pipeline.
-
-    :param texts: Sentence texts.
-    :returns: One list of lowercased ``(lemma, part of speech)`` pairs per text.
-    """
-    return [
-        [(base_lemma(lemma), pos) for lemma, pos in card_tokens]
-        for card_tokens in cullflow.tokenize_texts(texts, model=TOKENIZER)
-    ]
-
-
 def tokenize_deck(cards: Sequence[InputCard]) -> list[list[tuple[str, str]]]:
     """Tokenize the sentence of every card.
 
     :param cards: Input cards.
     :returns: One list of ``(lemma, part of speech)`` pairs per card.
     """
-    return tokenize_texts(card.sentence for card in cards)
+    return cullflow.tokenize_texts(
+        (card.sentence for card in cards), model=TOKENIZER, lemma_map=base_lemma
+    )
 
 
-def read_names(path: Path = NAMES_PATH) -> set[str]:
-    """Read the Spanish name stoplist, or give an empty set without the file.
-
-    :param path: Text file with one name per line.
-    :returns: Lowercased names. A missing file gives an empty set.
-    """
-    if not path.exists():
-        return set()
-    return cullflow.read_names(path)
-
-
-def load_frequency(
+def read_cull_frequency(
     frequency_path: Path = FREQUENCY_PATH,
 ) -> list[cullflow.FrequencyRow]:
     """Give the Spanish frequency rows of the cull.
@@ -194,9 +169,9 @@ def _reserve_fields(card: cullflow.ReserveCard) -> list[str]:
     return ["", "", back, card.html, "", "", "", f"[sound:{card.audio}]", "", "", ""]
 
 
-load_reserve = partial(cullflow.load_reserve, model_name=SWADESH_MODEL_NAME)
+read_reserve = partial(cullflow.load_reserve, model_name=SWADESH_MODEL_NAME)
 
-write_deck = partial(
+write_cull_deck = partial(
     coreflow.write_deck,
     model_name=MODEL_NAME,
     templates=CARD_TEMPLATES,
@@ -205,10 +180,12 @@ write_deck = partial(
 )
 
 SPANISH_CULL_PROFILE = cullflow.CullProfile(
-    tokenize_texts=tokenize_texts,
-    load_frequency=load_frequency,
+    tokenize_texts=partial(
+        cullflow.tokenize_texts, model=TOKENIZER, lemma_map=base_lemma
+    ),
+    load_frequency=read_cull_frequency,
     frequency_ranks=cullflow.frequency_ranks,
-    read_names=read_names,
+    read_names=partial(cullflow.read_names, NAMES_PATH, optional=True),
     concept_forms=_concept_forms,
     content_pos=corelist.CONTENT_POS,
     min_lemma_length=corelist.MIN_LEMMA_LENGTH,
@@ -236,27 +213,3 @@ SPANISH_CULL_PROFILE = cullflow.CullProfile(
     target_coverage_gate=0.98,
     double_coverage_gate=0.95,
 )
-
-
-# Re-export the shared flow surface that the CLI and the tests read here.
-CullRequest = cullflow.CullRequest
-frequency_ranks = cullflow.frequency_ranks
-default_output = cullflow.default_output
-
-
-def run_cull(request: cullflow.CullRequest) -> cullflow.CullRun:
-    """Run the Spanish cull and write the output files.
-
-    :param request: Options of the run.
-    :returns: The written paths and the counts of the run.
-    """
-    return cullflow.run_cull(request, SPANISH_CULL_PROFILE)
-
-
-def check_cull(output_path: Path) -> int:
-    """Run gates G1 to G15 on the files of a Spanish cull output.
-
-    :param output_path: Output APKG file.
-    :returns: The exit code of the gate table, 0 on a pass.
-    """
-    return cullgates.check_cull(output_path, SPANISH_CULL_PROFILE)
