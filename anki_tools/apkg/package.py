@@ -49,7 +49,7 @@ import tempfile
 import time
 import zipfile
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping, Sequence
 
 try:
     import genanki
@@ -189,6 +189,17 @@ class AnkiPackage:
         """
         return self._db_format in ("anki21", "anki21b")
 
+    def media_dir(self) -> str | None:
+        """Give the directory with the unpacked media files.
+
+        :returns: That directory, or None before the package opens.
+        """
+        return self.temp_dir
+
+    def touch(self) -> None:
+        """Mark the package as changed, so :meth:`save` writes an output file."""
+        self._modified = True
+
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """Exit context manager, close connection and clean up.
 
@@ -227,6 +238,48 @@ class AnkiPackage:
         decks_json = cursor.fetchone()[0]
         decks = json.loads(decks_json)
         return decks
+
+    def _write_legacy_decks(self, decks: dict[str, dict]) -> None:
+        """Write the deck JSON of a legacy collection.
+
+        :param decks: Deck id to deck info mapping.
+        """
+        self.conn.execute(
+            "UPDATE col SET decks = ? WHERE id = 1", (json.dumps(decks),)
+        )
+        self.conn.commit()
+
+    def set_deck_name(self, deck_id: int, deck_name: str) -> None:
+        """Set the name of one deck in either database format.
+
+        :param deck_id: Deck id.
+        :param deck_name: New deck name.
+        """
+        if self._db_format == "anki21b":
+            self.conn.execute(
+                "UPDATE decks SET name = ? WHERE id = ?", (deck_name, deck_id)
+            )
+            self.conn.commit()
+        else:
+            decks = self.get_decks()
+            decks[str(deck_id)]["name"] = deck_name
+            self._write_legacy_decks(decks)
+        self._modified = True
+
+    def delete_deck(self, deck_id: int) -> None:
+        """Delete one empty deck in either database format.
+
+        :param deck_id: Deck id.
+        """
+        if self._db_format == "anki21b":
+            self.conn.execute("DELETE FROM decks WHERE id = ?", (deck_id,))
+            self.conn.commit()
+        else:
+            decks = self.get_decks()
+            if decks.pop(str(deck_id), None) is None:
+                return
+            self._write_legacy_decks(decks)
+        self._modified = True
 
     def _write_varint(self, value: int) -> bytes:
         """Write a varint to bytes.
@@ -682,6 +735,28 @@ class AnkiPackage:
         """)
         return cursor.fetchall()
 
+    def get_new_cards(self) -> list[sqlite3.Row]:
+        """Give the id and the note id of each new card.
+
+        :returns: List of card rows with ``id`` and ``nid`` columns.
+        """
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT id, nid FROM cards WHERE type = 0")
+        return cursor.fetchall()
+
+    def set_card_due(self, dues: Mapping[int, int]) -> None:
+        """Set the due value of cards with one commit.
+
+        :param dues: Card id to due value mapping.
+        """
+        cursor = self.conn.cursor()
+        cursor.executemany(
+            "UPDATE cards SET due = ? WHERE id = ?",
+            [(due, card_id) for card_id, due in dues.items()],
+        )
+        self.conn.commit()
+        self._modified = True
+
     def parse_card(self, card: sqlite3.Row, models: dict, decks: dict) -> dict:
         """
         Parse a card into a readable format.
@@ -889,26 +964,6 @@ class AnkiPackage:
 
         return extracted
 
-    def get_audio_for_card(self, card: sqlite3.Row, models: dict) -> list[str]:
-        """
-        Extract audio filenames referenced in a card's fields.
-
-        :param card: Card row from database (with ``flds`` and ``mid`` fields).
-        :param models: Models dict from :meth:`get_models`.
-        :returns: List of audio filenames referenced in card (e.g., ``['hello.mp3']``).
-        """
-        audio_pattern = r"\[sound:(.*?)\]"
-
-        # Get all field values
-        field_values = card["flds"].split("\x1f")
-
-        audio_files = []
-        for field_value in field_values:
-            matches = re.findall(audio_pattern, field_value)
-            audio_files.extend(matches)
-
-        return audio_files
-
     def get_audio_statistics(self) -> dict:
         """
         Get statistics about audio files in the package.
@@ -947,7 +1002,7 @@ class AnkiPackage:
         .. code-block:: python
 
             filename = pkg.add_media_file("/path/to/audio.mp3")
-            pkg.add_audio_to_card(note_id, 0, filename)
+            pkg._add_audio_to_card(note_id, 0, filename)
         """
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"File not found: {file_path}")
@@ -1036,7 +1091,85 @@ class AnkiPackage:
         self.conn.commit()
         self._modified = True
 
-    def add_audio_to_card(
+    def add_note_and_card(
+        self,
+        fields: Sequence[str],
+        deck_id: int,
+        tags: str,
+        guid: str,
+        mod: int,
+        sfld: str,
+    ) -> None:
+        """Add one note and its card, cloned from the first rows of the collection.
+
+        The note and card rows copy the first row of the collection, so every
+        column of the package schema stays valid.
+
+        :param fields: Field values of the note, one per field of the model.
+        :param deck_id: Deck id of the new card.
+        :param tags: Space-separated tags of the note.
+        :param guid: Globally unique id of the note.
+        :param mod: Modification time in milliseconds since the epoch.
+        :param sfld: Sort field value of the note.
+        :raises RuntimeError: The collection has no note or card row to clone.
+        """
+        conn = self.conn
+        note_template = conn.execute("SELECT * FROM notes LIMIT 1").fetchone()
+        card_template = conn.execute("SELECT * FROM cards LIMIT 1").fetchone()
+        if note_template is None or card_template is None:
+            raise RuntimeError("The input package has no note to use as a template.")
+        note_columns = [row[1] for row in conn.execute("PRAGMA table_info(notes)")]
+        card_columns = [row[1] for row in conn.execute("PRAGMA table_info(cards)")]
+        note_id = int(conn.execute("SELECT MAX(id) FROM notes").fetchone()[0] or 0) + 1
+        card_id = int(conn.execute("SELECT MAX(id) FROM cards").fetchone()[0] or 0) + 1
+
+        note = dict(note_template)
+        note.update(
+            id=note_id,
+            guid=guid,
+            mod=mod,
+            usn=-1,
+            tags=tags,
+            flds="\x1f".join(fields),
+            sfld=sfld,
+            csum=0,
+        )
+        conn.execute(
+            f"INSERT INTO notes ({','.join(note_columns)}) "
+            f"VALUES ({','.join('?' for _ in note_columns)})",
+            [note[column] for column in note_columns],
+        )
+
+        card = dict(card_template)
+        card.update(
+            id=card_id,
+            nid=note_id,
+            did=deck_id,
+            ord=0,
+            mod=mod,
+            usn=-1,
+            type=0,
+            queue=0,
+            due=0,
+            ivl=0,
+            factor=0,
+            reps=0,
+            lapses=0,
+            left=0,
+            odue=0,
+            odid=0,
+            flags=0,
+            data="",
+        )
+        conn.execute(
+            f"INSERT INTO cards ({','.join(card_columns)}) "
+            f"VALUES ({','.join('?' for _ in card_columns)})",
+            [card[column] for column in card_columns],
+        )
+        conn.commit()
+        self._modified = True
+
+    def _add_audio_to_card(
         self, note_id: int, field_index: int, audio_filename: str
     ) -> None:
         """
@@ -1077,138 +1210,7 @@ class AnkiPackage:
         self.conn.commit()
         self._modified = True
 
-    def create_deck(self, deck_name: str, deck_id: int | None = None) -> int:
-        """
-        Create a new deck in the collection.
-
-        :param deck_name: Name of the new deck.
-        :param deck_id: Optional deck ID (auto-generated if not provided).
-        :returns: The deck ID of the newly created deck.
-        :raises ValueError: If deck with given ID already exists.
-        """
-
-        current_time = int(time.time() * 1000)
-
-        # Get existing decks
-        cursor = self.conn.cursor()
-        cursor.execute("SELECT decks FROM col")
-        decks_json = cursor.fetchone()[0]
-        decks = json.loads(decks_json)
-
-        # Generate deck ID if not provided
-        if deck_id is None:
-            # Find the highest existing deck ID and add 1
-            existing_ids = [int(did) for did in decks.keys() if did.isdigit()]
-            deck_id = max(existing_ids) + 1 if existing_ids else 1
-
-        deck_id_str = str(deck_id)
-
-        # Check if deck already exists
-        if deck_id_str in decks:
-            raise ValueError(f"Deck with ID {deck_id} already exists")
-
-        # Create deck structure (minimal required fields)
-        new_deck = {
-            "name": deck_name,
-            "desc": "",
-            "extendNew": 0,
-            "extendRev": 0,
-            "conf": 1,  # Default deck configuration
-            "usn": -1,  # Unsynced
-            "collapsed": False,
-            "browserCollapsed": False,
-            "newToday": [0, 0],  # [day, count]
-            "revToday": [0, 0],
-            "lrnToday": [0, 0],
-            "timeToday": [0, 0],
-            "dyn": 0,  # Not a dynamic deck
-            "mod": current_time,
-        }
-
-        # Add to decks dict
-        decks[deck_id_str] = new_deck
-
-        # Update database
-        cursor.execute(
-            """
-            UPDATE col 
-            SET decks = ?
-            WHERE id = 1
-        """,
-            (json.dumps(decks),),
-        )
-        self.conn.commit()
-        self._modified = True
-
-        return deck_id
-
-    def copy_cards_to_deck(
-        self,
-        source_deck_id: int,
-        target_deck_id: int,
-        card_ids: list[int] | None = None,
-    ) -> int:
-        """
-        Copy cards from one deck to another.
-
-        :param source_deck_id: Source deck ID.
-        :param target_deck_id: Target deck ID.
-        :param card_ids: Optional list of specific card IDs to copy (all if None).
-        :returns: Number of cards copied.
-        """
-
-        mod_time = int(time.time() * 1000)
-
-        cursor = self.conn.cursor()
-
-        # Build query
-        if card_ids:
-            placeholders = ",".join("?" * len(card_ids))
-            query = f"""
-                UPDATE cards 
-                SET did = ?, mod = ?
-                WHERE did = ? AND id IN ({placeholders})
-            """
-            params = [target_deck_id, mod_time, source_deck_id] + card_ids
-        else:
-            query = """
-                UPDATE cards 
-                SET did = ?, mod = ?
-                WHERE did = ?
-            """
-            params = [target_deck_id, mod_time, source_deck_id]
-
-        cursor.execute(query, params)
-        count = cursor.rowcount
-        self.conn.commit()
-        self._modified = True
-
-        return count
-
-    def create_deck_from_cards(
-        self, deck_name: str, card_ids: list[int]
-    ) -> tuple[int, int]:
-        """
-        Create a new deck and move specified cards into it.
-
-        :param deck_name: Name of the new deck.
-        :param card_ids: List of card IDs to move to the new deck.
-        :returns: Tuple of (new_deck_id, number_of_cards_moved).
-        """
-        # Create the new deck
-        new_deck_id = self.create_deck(deck_name)
-
-        # Get source deck ID from first card
-        cursor = self.conn.cursor()
-        cursor.execute("SELECT did FROM cards WHERE id = ?", (card_ids[0],))
-        source_deck_id = cursor.fetchone()[0]
-
-        # Move cards to new deck
-        count = self.copy_cards_to_deck(source_deck_id, new_deck_id, card_ids)
-
-        return new_deck_id, count
-
-    def get_audio_files_for_note(self, note_id: int) -> set[str]:
+    def _get_audio_files_for_note(self, note_id: int) -> set[str]:
         """
         Get all audio files referenced by a note.
 
@@ -1299,7 +1301,7 @@ class AnkiPackage:
         note_id = row[0]
 
         # Get audio files used by this note before deletion
-        audio_files = self.get_audio_files_for_note(note_id) if cleanup_audio else set()
+        audio_files = self._get_audio_files_for_note(note_id) if cleanup_audio else set()
 
         # Delete the card
         cursor.execute("DELETE FROM cards WHERE id = ?", (card_id,))
@@ -1381,45 +1383,6 @@ class AnkiPackage:
                         results["audio_files_deleted"].append(audio_filename)
 
         return results
-
-    def delete_note(self, note_id: int, cleanup_audio: bool = True) -> dict:
-        """
-        Delete a note and all its associated cards, optionally cleaning up unused audio.
-
-        :param note_id: The note ID to delete.
-        :param cleanup_audio: If True, delete audio files that are no longer used.
-        :returns: Dict with keys ``note_deleted``, ``cards_deleted``,
-            ``audio_files_deleted``.
-        """
-        cursor = self.conn.cursor()
-
-        # Get audio files used by this note before deletion
-        audio_files = self.get_audio_files_for_note(note_id) if cleanup_audio else set()
-
-        # Delete all cards associated with this note
-        cursor.execute("DELETE FROM cards WHERE nid = ?", (note_id,))
-        cards_deleted = cursor.rowcount
-
-        # Delete the note
-        cursor.execute("DELETE FROM notes WHERE id = ?", (note_id,))
-        note_deleted = cursor.rowcount > 0
-
-        self.conn.commit()
-        self._modified = True
-
-        # Clean up unused audio files
-        audio_files_deleted = []
-        if cleanup_audio and note_deleted:
-            for audio_filename in audio_files:
-                if not self.is_audio_file_used(audio_filename):
-                    if self.delete_media_file(audio_filename):
-                        audio_files_deleted.append(audio_filename)
-
-        return {
-            "note_deleted": note_deleted,
-            "cards_deleted": cards_deleted,
-            "audio_files_deleted": audio_files_deleted,
-        }
 
     def save(self, output_path: str | Path | None = None) -> None:
         """

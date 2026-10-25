@@ -15,7 +15,6 @@ import csv
 import hashlib
 import json
 import re
-import sqlite3
 import time
 import uuid
 from collections import Counter
@@ -838,68 +837,6 @@ def read_input_deck(
         return cards
 
 
-def _connection(package: AnkiPackage) -> sqlite3.Connection:
-    """Give the open database connection of a package."""
-    if package.conn is None:
-        raise RuntimeError("The package database is closed.")
-    return package.conn
-
-
-def _legacy_decks(package: AnkiPackage) -> dict[str, dict]:
-    """Read the deck JSON of a legacy collection."""
-    row = _connection(package).execute("SELECT decks FROM col").fetchone()
-    try:
-        decks = json.loads(row[0])
-    except (TypeError, json.JSONDecodeError) as error:
-        raise ValueError(f"bad deck JSON: {error}") from error
-    if not isinstance(decks, dict):
-        raise ValueError("the deck cell is not an object")
-    return decks
-
-
-def _write_legacy_decks(package: AnkiPackage, decks: dict[str, dict]) -> None:
-    """Write the deck JSON of a legacy collection."""
-    conn = _connection(package)
-    conn.execute("UPDATE col SET decks = ? WHERE id = 1", (json.dumps(decks),))
-    conn.commit()
-
-
-def set_deck_name(package: AnkiPackage, deck_id: int, deck_name: str) -> None:
-    """Set the name of one deck in either database format.
-
-    :param package: Open package.
-    :param deck_id: Deck id.
-    :param deck_name: New deck name.
-    """
-    if package.db_format == "anki21b":
-        conn = _connection(package)
-        conn.execute("UPDATE decks SET name = ? WHERE id = ?", (deck_name, deck_id))
-        conn.commit()
-    else:
-        decks = _legacy_decks(package)
-        decks[str(deck_id)]["name"] = deck_name
-        _write_legacy_decks(package, decks)
-    package._modified = True
-
-
-def delete_deck(package: AnkiPackage, deck_id: int) -> None:
-    """Delete one empty deck in either database format.
-
-    :param package: Open package.
-    :param deck_id: Deck id.
-    """
-    if package.db_format == "anki21b":
-        conn = _connection(package)
-        conn.execute("DELETE FROM decks WHERE id = ?", (deck_id,))
-        conn.commit()
-    else:
-        decks = _legacy_decks(package)
-        if decks.pop(str(deck_id), None) is None:
-            return
-        _write_legacy_decks(package, decks)
-    package._modified = True
-
-
 def rename_deck(package: AnkiPackage, deck_name: str) -> None:
     """Rename the deck of the kept cards and delete the decks that stay empty.
 
@@ -915,10 +852,10 @@ def rename_deck(package: AnkiPackage, deck_name: str) -> None:
     for row in cards:
         if int(row["did"]) != main:
             package.move_card(int(row["id"]), main)
-    set_deck_name(package, main, deck_name)
+    package.set_deck_name(main, deck_name)
     for deck_id in list(package.get_decks()):
         if int(deck_id) != main:
-            delete_deck(package, int(deck_id))
+            package.delete_deck(int(deck_id))
 
 
 def _trim_templates(package: AnkiPackage, model_id: str) -> None:
@@ -941,32 +878,18 @@ def insert_reserve_cards(
 ) -> None:
     """Insert the reserve notes and cards into an open package.
 
-    The note and card rows copy a kept row of the input model, so every column
-    of the package schema stays valid.
-
     :param package: Open output package after the non-kept cards are deleted.
     :param reserve: Reserve cards to insert.
     :param reserve_pack_path: Pack with the reserve media files.
     :param deck_id: Target deck id.
     :param reserve_fields: Callable that gives the field values of one card.
-    :raises RuntimeError: The package has no template row, or a reserve audio
-        file is not in the pack.
+    :raises RuntimeError: A reserve audio file is not in the pack.
     """
-    conn = _connection(package)
-    note_template = conn.execute("SELECT * FROM notes LIMIT 1").fetchone()
-    card_template = conn.execute("SELECT * FROM cards LIMIT 1").fetchone()
-    if note_template is None or card_template is None:
-        raise RuntimeError("The input package has no note to use as a template.")
-    note_columns = [row[1] for row in conn.execute("PRAGMA table_info(notes)")]
-    card_columns = [row[1] for row in conn.execute("PRAGMA table_info(cards)")]
-    next_note = int(conn.execute("SELECT MAX(id) FROM notes").fetchone()[0] or 0) + 1
-    next_card = int(conn.execute("SELECT MAX(id) FROM cards").fetchone()[0] or 0) + 1
     mod = int(time.time() * 1000)
-
     with AnkiPackage(reserve_pack_path) as swadesh:
-        if swadesh.temp_dir is None:
+        media_dir = swadesh.media_dir()
+        if media_dir is None:
             raise RuntimeError("The reserve pack has no temporary directory.")
-        temp_dir = Path(swadesh.temp_dir)
         media = swadesh.get_media_mapping()
         reverse = {name: key for key, name in media.items()}
         for card in reserve:
@@ -975,56 +898,16 @@ def insert_reserve_cards(
                 raise RuntimeError(
                     f"The reserve audio {card.audio} is not in {reserve_pack_path}."
                 )
-            package.add_media_file(temp_dir / key, card.audio)
-
-    note_sql = (
-        f"INSERT INTO notes ({','.join(note_columns)}) "
-        f"VALUES ({','.join('?' for _ in note_columns)})"
-    )
-    card_sql = (
-        f"INSERT INTO cards ({','.join(card_columns)}) "
-        f"VALUES ({','.join('?' for _ in card_columns)})"
-    )
+            package.add_media_file(Path(media_dir) / key, card.audio)
     for card in reserve:
-        fields = "\x1f".join(reserve_fields(card))
-        note = dict(note_template)
-        note.update(
-            id=next_note,
+        package.add_note_and_card(
+            reserve_fields(card),
+            deck_id,
+            RESERVE_TAGS,
             guid=str(uuid.uuid4()),
             mod=mod,
-            usn=-1,
-            tags=RESERVE_TAGS,
-            flds=fields,
             sfld=card.sentence,
-            csum=0,
         )
-        conn.execute(note_sql, [note[column] for column in note_columns])
-        row = dict(card_template)
-        row.update(
-            id=next_card,
-            nid=next_note,
-            did=deck_id,
-            ord=0,
-            mod=mod,
-            usn=-1,
-            type=0,
-            queue=0,
-            due=0,
-            ivl=0,
-            factor=0,
-            reps=0,
-            lapses=0,
-            left=0,
-            odue=0,
-            odid=0,
-            flags=0,
-            data="",
-        )
-        conn.execute(card_sql, [row[column] for column in card_columns])
-        next_note += 1
-        next_card += 1
-    conn.commit()
-    package._modified = True
 
 
 def write_deck(
@@ -1127,20 +1010,20 @@ def _media_probe_path(path: Path) -> Path:
 
 
 def probe_audio(
-    temp_dir: str | None, media: dict[str, str], names: Collection[str]
+    media_dir: str | None, media: dict[str, str], names: Collection[str]
 ) -> dict[str, float | None]:
     """Probe the duration of the audio files of the kept cards.
 
-    :param temp_dir: Directory with the unpacked media files.
+    :param media_dir: Directory with the unpacked media files.
     :param media: Media file id to name mapping.
     :param names: File names to probe.
     :returns: File name to duration in seconds. The value is None when the
         file is missing or is not a valid MP3.
     """
-    if not temp_dir:
+    if not media_dir:
         return {}
     paths = {
-        name: Path(temp_dir) / file_id
+        name: Path(media_dir) / file_id
         for file_id, name in media.items()
         if name in names
     }
@@ -1185,7 +1068,7 @@ def read_output(path: Path, profile: CoreProfile) -> dict[str, Any]:
         notes = package.get_notes()
         media = package.get_media_mapping()
         names = {card.audio for card in cards if card.audio}
-        durations = probe_audio(package.temp_dir, media, names)
+        durations = probe_audio(package.media_dir(), media, names)
         decks = {deck.get("name") for deck in package.get_decks().values()}
     return {
         "cards": cards,
@@ -1255,7 +1138,7 @@ def _write_bold(
                     cards[index].note_id, field_index, marked
                 )
                 bolded += 1
-        package._modified = True
+        package.touch()
         package.save(output_path)
     return bolded, len(ordered) - bolded
 
@@ -1312,7 +1195,7 @@ def _write_core_model(
         have = len(models[model_id].get("tmpls", ()))
         for number in reversed(range(len(profile.templates), have)):
             package.remove_model_template(model_id, number)
-        package._modified = True
+        package.touch()
         package.save(output_path)
     return filled
 

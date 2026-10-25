@@ -171,7 +171,7 @@ def _read_output(path: Path, profile: CullProfile) -> dict[str, Any]:
         notes = package.get_notes()
         media = package.get_media_mapping()
         names = {card.audio for card in cards if card.audio}
-        durations = probe_audio(package.temp_dir, media, names)
+        durations = probe_audio(package.media_dir(), media, names)
         decks = {deck.get("name") for deck in package.get_decks().values()}
     return {
         "cards": cards,

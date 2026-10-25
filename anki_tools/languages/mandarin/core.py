@@ -270,7 +270,7 @@ def finalize_output(output_path: Path, core_csv: Path) -> int:
             if "<b>" not in text and _BOLD_PATTERN.sub("", text) != sentence:
                 package.update_note_field(note_id, sentence_index, sentence)
                 written += 1
-        package._modified = True
+        package.touch()
         package.save(output_path)
     return written
 

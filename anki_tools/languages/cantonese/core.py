@@ -248,7 +248,7 @@ def finalize_output(output_path: Path, core_csv: Path) -> int:
                     for sound in sounds:
                         package.delete_media_file(sound)
             written += int(changed)
-        package._modified = True
+        package.touch()
         package.save(output_path)
     return written
 
