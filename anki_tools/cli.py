@@ -689,7 +689,8 @@ def _run_core_command(
     :param examples: Core mode: examples per content target.
     :param tail: Core mode: cards after the core passes.
     :param check: Run the gates on the output only.
-    :param spoken_weight: Optional weight of the spoken frequency term.
+    :param spoken_weight: Optional weight of the spoken frequency term. The
+        module's ``SPOKEN_WEIGHT`` applies when it is None.
     """
     if model_id is not None:
         print("Error: --model-id does not apply with --core.")
@@ -719,8 +720,11 @@ def _run_core_command(
         core_words=words,
         options=options,
     )
-    if spoken_weight is not None:
-        request = replace(request, spoken_weight=spoken_weight)
+    weight = spoken_weight
+    if weight is None:
+        weight = getattr(module, "SPOKEN_WEIGHT", None)
+    if weight is not None:
+        request = replace(request, spoken_weight=weight)
     module.run_core(request)
 
 
@@ -1101,7 +1105,6 @@ def yue(
             examples,
             tail,
             check,
-            spoken_weight=cantonese_core.SPOKEN_WEIGHT,
         )
         return
 

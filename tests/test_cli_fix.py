@@ -412,6 +412,41 @@ class TestCantoneseCoreMode:
         assert requests[0].spoken_weight == cli.cantonese_core.SPOKEN_WEIGHT
 
 
+
+class TestCoreSpokenWeight:
+    def test_the_module_weight_applies_when_the_caller_gives_none(
+        self, deck_file: Path, tmp_path: Path
+    ) -> None:
+        requests: list = []
+
+        def fake_module(weight: float | None) -> SimpleNamespace:
+            module = SimpleNamespace(
+                DEFAULT_CORE_WORDS=0,
+                DEFAULT_OPTIONS=cli.cantonese_core.DEFAULT_OPTIONS,
+                CoreRequest=cli.cantonese_core.CoreRequest,
+                default_output=lambda _path: tmp_path / "out.apkg",
+                run_core=requests.append,
+            )
+            if weight is not None:
+                module.SPOKEN_WEIGHT = weight
+            return module
+
+        for weight, expected in ((0.7, 0.7), (None, 0.5)):
+            module = fake_module(weight)
+            cli._run_core_command(
+                module,
+                "Test",
+                deck_file,
+                None,
+                None,
+                None,
+                module.DEFAULT_CORE_WORDS,
+                module.DEFAULT_OPTIONS.per_word,
+                module.DEFAULT_OPTIONS.tail_cards,
+                False,
+            )
+            assert requests[-1].spoken_weight == expected
+
 class TestSpanishMode:
     def test_check_without_core_prints_an_error(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
