@@ -1,4 +1,4 @@
-"""Tests for the French fix command: rank mode and select mode."""
+"""Tests for the French and Cantonese fix commands: rank mode and select mode."""
 
 from __future__ import annotations
 
@@ -158,3 +158,81 @@ class TestRankMode:
         cli.fr(tmp_path / "absent.apkg")
 
         assert "Error: File not found" in capsys.readouterr().out
+
+
+@pytest.fixture
+def no_jyutping(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(cli, "fix_jyutping", lambda *_args, **_kwargs: None)
+
+
+class TestCantoneseRankMode:
+    def test_rank_routes_to_the_pipeline(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, no_jyutping: None
+    ) -> None:
+        calls = []
+
+        def fake_run(paths, **kwargs):
+            calls.append((paths, kwargs))
+            return _fake_deck()
+
+        monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
+
+        cli.yue(deck_file)
+
+        paths, kwargs = calls[0]
+        assert paths.input_path == deck_file
+        assert paths.output_path == deck_file.parent / "input_reordered.apkg"
+        assert paths.ranking_path == deck_file.parent / "input.rank.csv"
+        assert kwargs["romanization_candidates"] == ("Jyutping",)
+        assert kwargs["remove_unranked"] is True
+
+    def test_no_select_disables_remove_unranked(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, no_jyutping: None
+    ) -> None:
+        calls = []
+
+        def fake_run(_paths, **kwargs):
+            calls.append(kwargs)
+            return _fake_deck()
+
+        monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
+
+        cli.yue(deck_file, no_select=True)
+
+        assert calls[0]["remove_unranked"] is False
+
+    def test_rank_uses_the_given_output(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, no_jyutping: None
+    ) -> None:
+        calls = []
+
+        def fake_run(paths, **_kwargs):
+            calls.append(paths)
+            return _fake_deck()
+
+        monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
+        output = deck_file.parent / "ranked.apkg"
+
+        cli.yue(deck_file, output=output)
+
+        assert calls[0].output_path == output
+
+    def test_an_empty_extraction_prints_no_sentences(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
+    ) -> None:
+        monkeypatch.setattr(
+            cli,
+            "run_ranked_deck",
+            lambda _paths, **_kwargs: SimpleNamespace(
+                sentences=[], ranked=[], stats={}
+            ),
+        )
+
+        def fail(*_args, **_kwargs):
+            raise AssertionError("fix_jyutping must not run")
+
+        monkeypatch.setattr(cli, "fix_jyutping", fail)
+
+        cli.yue(deck_file)
+
+        assert "No sentences found!" in capsys.readouterr().out

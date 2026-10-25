@@ -72,14 +72,11 @@ from anki_tools.languages.spanish.rank import rank_sentences_es
 from anki_tools.ranking.latin import latin_word_similarity
 from anki_tools.ranking.rank import (
     Sentence,
-    extract_sentences,
     reduce_sentences_stratified,
-    write_ranking_csv,
 )
 
 
 from anki_tools.ranking.pipeline import rank_paths, run_ranked_deck
-from anki_tools.ranking.reorder import reorder_deck
 from anki_tools.apkg.templates import (
     DEFAULT_TEMPLATE_DIR,
     SHARED_CSS_PATH,
@@ -1084,55 +1081,51 @@ def yue(
         )
         return
 
-    if output is None:
-        output = apkg_path.parent / f"{apkg_path.stem}_reordered.apkg"
-
-    ranking_csv = apkg_path.parent / f"{apkg_path.stem}.rank.csv"
-    select_csv = apkg_path.parent / f"{apkg_path.stem}.select.csv"
-    coverage_csv = apkg_path.parent / f"{apkg_path.stem}.coverage.csv"
+    paths = rank_paths(apkg_path, output)
+    select_csv = paths.input_path.parent / f"{paths.input_path.stem}.select.csv"
+    coverage_csv = paths.input_path.parent / f"{paths.input_path.stem}.coverage.csv"
 
     print("=" * 50)
     print("Processing Cantonese Anki Deck")
     print("=" * 50)
-    print(f"Input:   {apkg_path}")
-    print(f"Output:  {output}")
-    print(f"Ranking: {ranking_csv}")
+    print(f"Input:   {paths.input_path}")
+    print(f"Output:  {paths.output_path}")
+    print(f"Ranking: {paths.ranking_path}")
     print()
 
     print("Step 1: Ranking sentences...")
-    sentences = extract_sentences(
-        str(apkg_path), model_id, romanization_candidates=("Jyutping",)
-    )
 
-    if not sentences:
-        print("No sentences found!")
-        return
+    extracted: list[Sentence] = []
+    counts: dict[str, int] = {}
 
-    extracted = list(sentences)
-    ranked = rank_sentences_yue(sentences, freq=freq, spoken_weight=spoken_weight)
-    if freq_report and freq != "written":
-        comparison = rank_sentences_yue(
-            [
-                Sentence(note_id=s.note_id, text=s.text, original_order=s.original_order)
-                for s in sentences
-            ],
-            freq="written",
-        )
-        rows = rank_change_rows(comparison, ranked)
-        change_csv = apkg_path.parent / f"{apkg_path.stem}.freq_change.csv"
-        write_freq_change_csv(rows, change_csv)
-        print(f"  {len(rows)} sentences move by more than 100 places: {change_csv}")
+    def rank_and_capture(sentences: list[Sentence]) -> list[Sentence]:
+        extracted.extend(sentences)
+        ranked = rank_sentences_yue(sentences, freq=freq, spoken_weight=spoken_weight)
+        counts["ranked"] = len(ranked)
+        return ranked
 
-    if no_select:
-        write_ranking_csv(ranked, str(ranking_csv))
-        print("\nStep 2: Reordering deck...")
-        stats = reorder_deck(
-            str(apkg_path),
-            str(output),
-            str(ranking_csv),
-            remove_filtered=not keep_filtered,
-        )
-    else:
+    def select_or_reorder(ranked: list[Sentence]) -> list[Sentence]:
+        if freq_report and freq != "written":
+            comparison = rank_sentences_yue(
+                [
+                    Sentence(
+                        note_id=sentence.note_id,
+                        text=sentence.text,
+                        original_order=sentence.original_order,
+                    )
+                    for sentence in extracted
+                ],
+                freq="written",
+            )
+            rows = rank_change_rows(comparison, ranked)
+            change_csv = (
+                paths.input_path.parent / f"{paths.input_path.stem}.freq_change.csv"
+            )
+            write_freq_change_csv(rows, change_csv)
+            print(f"  {len(rows)} sentences move by more than 100 places: {change_csv}")
+        if no_select:
+            print("\nStep 2: Reordering deck...")
+            return ranked
         options = SelectionOptions(
             max_sentences=max_sentences,
             per_word=per_word,
@@ -1155,24 +1148,32 @@ def yue(
         ranked_ids = {id(sentence) for sentence in ranked}
         dropped = [s for s in extracted if id(s) not in ranked_ids]
         report = select_yue_sentences(ranked, dropped, frequency, tokenizer, options)
-        write_ranking_csv(report.ordered, str(ranking_csv))
         write_select_csv(report, select_csv)
         write_coverage_csv(report, coverage_csv)
         print_selection_summary(report, options)
-
         print("\nStep 3: Reordering deck...")
-        stats = reorder_deck(
-            str(apkg_path),
-            str(output),
-            str(ranking_csv),
-            remove_filtered=False,
-            remove_unranked=True,
-        )
+        return report.ordered
+
+    deck = run_ranked_deck(
+        paths,
+        rank=rank_and_capture,
+        model_id=model_id,
+        romanization_candidates=("Jyutping",),
+        keep_filtered=keep_filtered,
+        reduce=select_or_reorder,
+        remove_unranked=not no_select,
+    )
+    if not deck.sentences:
+        print("No sentences found!")
+        return
+
+    ranked_count = counts.get("ranked", len(deck.ranked))
+    stats = deck.stats
 
     print("\nFixing jyutping...")
     fix_jyutping(
-        output,
-        output=output,
+        paths.output_path,
+        output=paths.output_path,
         verbose=False,
     )
 
@@ -1180,11 +1181,11 @@ def yue(
     print("=" * 50)
     print("DONE!")
     print("=" * 50)
-    print(f"  Sentences ranked:    {len(ranked)}")
+    print(f"  Sentences ranked:    {ranked_count}")
     print(f"  Cards reordered:     {stats['cards_reordered']}")
     print(f"  Cards removed:       {stats['cards_removed']}")
-    print(f"  Output:              {output}")
-    print(f"  Ranking CSV:         {ranking_csv}")
+    print(f"  Output:              {paths.output_path}")
+    print(f"  Ranking CSV:         {paths.ranking_path}")
     if not no_select:
         print(f"  Select CSV:          {select_csv}")
         print(f"  Coverage CSV:        {coverage_csv}")
