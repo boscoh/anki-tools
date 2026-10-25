@@ -17,6 +17,25 @@ When writing code:
 - reuse existing functions if possible
 - include types
 
+## Design
+
+Use the deep-module vocabulary: module, interface, depth, seam, adapter,
+leverage, locality. Read `GLOSSARY.md` before you name a new concept. Put a
+small interface in front of a large implementation. Put the seam where a test
+can use it. Record one ADR in `docs/adr/` for each new seam or boundary
+decision. The formats live in the `codebase-design` and `domain-modeling`
+skills.
+
+## Simplicity (ponytail)
+
+Ponytail mode `full` is active in every session. The `pi-ponytail` extension
+injects the ruleset into the system prompt. Ponytail limits how much you build.
+It does not lower the depth of a module. Before you write code, climb the
+ladder: does this need to exist (YAGNI); is it already in the codebase; does
+the standard library hold it; is it native to the platform; is it an installed
+dependency; is it one line; is it the minimum that works. For a review of a
+diff, run `/ponytail-review`.
+
 ## File Edits
 
 Do not edit files with a Python script, `sed`, `awk`, `perl`, or a heredoc. Use `replace` and `insert`, which check anchors and support undo. Use `write` for a new file or a complete rewrite only.
