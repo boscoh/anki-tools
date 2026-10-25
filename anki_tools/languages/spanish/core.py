@@ -16,8 +16,11 @@ from typing import Any, Sequence
 
 from anki_tools.languages.spanish.frequency import (
     FREQUENCY_PATH,
+    SpanishFrequencyRow,
+    build_frequency_es,
     frequency_ranks_es,
     load_frequency_es,
+    write_frequency_tsv,
 )
 
 from anki_tools.apkg.templates import SHARED_CSS_PATH, TEMPLATES_DIR, load_text
@@ -115,9 +118,21 @@ def tokenize_deck(cards: Sequence[InputCard]) -> list[list[tuple[str, str]]]:
     ]
 
 
-def load_frequency() -> list[Any]:
-    """Give the Spanish frequency cache rows."""
-    return load_frequency_es()
+def load_frequency() -> list[SpanishFrequencyRow]:
+    """Give the Spanish frequency rows, and build the file when it is absent.
+
+    The frequency module holds no gate function, so the loader writes the built
+    rows without an extra check.
+
+    :raises RuntimeError: The source digest differs from the pinned value, or
+        the file cannot be written.
+    :returns: Rows in rank order.
+    """
+    if FREQUENCY_PATH.exists():
+        return load_frequency_es(FREQUENCY_PATH)
+    rows = build_frequency_es()
+    write_frequency_tsv(rows, FREQUENCY_PATH)
+    return rows
 
 
 def frequency_ranks(rows: Sequence[Any], spoken_weight: float = 0.5) -> dict[str, int]:

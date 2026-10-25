@@ -27,7 +27,7 @@ SOURCE_SHA256 = "b4794c425f3500c21a0ff9367175e36795a978c928a36670e9ad6ae206fb772
 
 COLUMNS = ("word", "lemma", "count", "pm", "rank", "pos", "source", "license")
 
-pytestmark = pytest.mark.skipif(
+needs_cache = pytest.mark.skipif(
     not FREQUENCY_PATH.exists(),
     reason="the Spanish frequency cache is absent",
 )
@@ -42,6 +42,7 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+@needs_cache
 def test_read_tsv() -> None:
     """The cache has the eight columns and 50,000 data rows."""
     with FREQUENCY_PATH.open(newline="", encoding="utf-8") as handle:
@@ -50,6 +51,7 @@ def test_read_tsv() -> None:
     assert len(rows) == 50_000
 
 
+@needs_cache
 def test_known_lemma_ranks() -> None:
     """Common lemmas hold the expected aggregated ranks."""
     ranks = frequency_ranks_es(load_frequency_es())
@@ -62,6 +64,7 @@ def test_known_lemma_ranks() -> None:
     assert ranks["hacer"] == 25
 
 
+@needs_cache
 def test_top_100_spot_check() -> None:
     """The top 100 ranks are contiguous and hold common content lemmas."""
     ranks = frequency_ranks_es(load_frequency_es())
@@ -78,6 +81,7 @@ def test_top_100_spot_check() -> None:
         assert ranks[lemma] == expected
 
 
+@needs_cache
 def test_loader_fields() -> None:
     """The loader returns the new fields for every row."""
     rows = load_frequency_es()
@@ -96,7 +100,40 @@ def test_loader_fields() -> None:
     assert all(row.license == LICENSE for row in rows)
 
 
+@needs_cache
 def test_pin_sha256() -> None:
     """The derived cache and the source file keep their pinned digests."""
     assert _sha256(FREQUENCY_PATH) == PINNED_SHA256
     assert ES_FULL_SHA256 == SOURCE_SHA256
+
+
+def test_loader_builds_the_cache_when_the_file_is_absent(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The loader builds and writes the list once, then reads it back."""
+    from anki_tools.languages.spanish import core
+
+    target = tmp_path / "spanish_frequency.tsv"
+    built = [
+        SpanishFrequencyRow(
+            word="la",
+            lemma="el",
+            count=9,
+            pm=1.0,
+            rank=1,
+            pos="DET",
+            source=SOURCE_NAME,
+            license=LICENSE,
+        )
+    ]
+    monkeypatch.setattr(core, "FREQUENCY_PATH", target)
+    monkeypatch.setattr(core, "build_frequency_es", lambda **_: list(built))
+
+    assert core.load_frequency() == built
+    assert target.exists()
+
+    def again(**_: object) -> list[SpanishFrequencyRow]:
+        raise AssertionError("the loader rebuilt a file that exists")
+
+    monkeypatch.setattr(core, "build_frequency_es", again)
+    assert core.load_frequency() == built
