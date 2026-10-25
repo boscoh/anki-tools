@@ -50,7 +50,7 @@ def test_scores_are_filled() -> None:
     for sent in sentences:
         assert sent.complexity_score == pytest.approx(complexity_score_latin(sent.text))
         assert sent.frequency_score == pytest.approx(
-            frequency_score_latin(sent.text, FREQUENCY)
+            frequency_score_latin(sent.text, FREQUENCY.word_freq)
         )
         assert sent.grammar_score == 40.0
 

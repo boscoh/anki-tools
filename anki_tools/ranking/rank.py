@@ -430,7 +430,7 @@ def rank_word_based(
 
     print("Calculating frequency scores...")
     for sent in sentences:
-        sent.frequency_score = frequency_score_latin(sent.text, freq_data)
+        sent.frequency_score = frequency_score_latin(sent.text, freq_data.word_freq)
 
     print("Calculating grammar scores...")
     for sent in sentences:

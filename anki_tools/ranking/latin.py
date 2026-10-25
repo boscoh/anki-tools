@@ -8,11 +8,7 @@ its frequency score, and its dedupe key. The helpers hold no language data.
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from anki_tools.ranking.rank import FrequencyData
-
+from collections.abc import Mapping
 LETTER_PATTERN = re.compile(r"[a-zA-Z\u00c0-\u024f]+")
 
 #: Rank of a word that the frequency list does not hold.
@@ -52,32 +48,31 @@ def complexity_score_latin(sentence: str) -> float:
 
 
 def get_word_rank(
-    word: str, freq_data: FrequencyData, max_rank: int = DEFAULT_WORD_RANK
+    word: str, word_freq: Mapping[str, int], max_rank: int = DEFAULT_WORD_RANK
 ) -> int:
     """Give the frequency rank of one Latin-script word.
 
     :param word: Word to look up, in any case.
-    :param freq_data: Loaded frequency data.
+    :param word_freq: Word to frequency rank of the loaded data.
     :param max_rank: Rank of a word that the list does not hold.
     :returns: Frequency rank, lower for a more common word.
     """
-    return freq_data.word_freq.get(word.lower(), max_rank)
+    return word_freq.get(word.lower(), max_rank)
 
-
-def frequency_score_latin(sentence: str, freq_data: FrequencyData) -> float:
+def frequency_score_latin(sentence: str, word_freq: Mapping[str, int]) -> float:
     """Give the frequency score of a Latin-script sentence, 0 to 100.
 
     :param sentence: Sentence or phrase.
-    :param freq_data: Loaded frequency data.
+    :param word_freq: Word to frequency rank of the loaded data.
     :returns: Score from 0 to 100, higher for more common words.
     """
     words = tokenize_latin(sentence)
     if not words:
         return 0.0
-    if not freq_data.word_freq:
+    if not word_freq:
         return 50.0
 
-    ranks = [get_word_rank(w, freq_data) for w in words]
+    ranks = [get_word_rank(w, word_freq) for w in words]
     avg_rank = sum(ranks) / len(ranks)
     avg_score = 1.0 - min(avg_rank / DEFAULT_WORD_RANK, 1.0)
     top_5k = sum(1 for r in ranks if r <= 5000) / len(ranks)
