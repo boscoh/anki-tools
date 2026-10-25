@@ -22,7 +22,16 @@ from collections import Counter
 from dataclasses import dataclass, field
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, Collection, Iterable, Iterator, Mapping, Sequence
+from typing import (
+    Any,
+    Callable,
+    Collection,
+    Iterable,
+    Iterator,
+    Mapping,
+    Sequence,
+    cast,
+)
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking import coreflow
@@ -40,6 +49,7 @@ from anki_tools.ranking.coverage import write_rows
 from anki_tools.ranking.duplicates import at_limit
 from anki_tools.sentence_pack.audit import sha256_value
 from anki_tools.sentence_pack.guards import check_sentence_shape
+from anki_tools.sentence_pack.profile import LanguageProfile
 from anki_tools.sentence_pack.tokens import load_model
 
 DEFAULT_MAX_CARDS = 1000
@@ -285,8 +295,11 @@ def filter_reason(
         profile.quote_marks,
         profile.internal_marks,
     )
+    # The cull passes only the length key and the mark keys, so the adapter
+    # gives those values and not the rest of a language profile.
+    guard_profile = cast(LanguageProfile, shape)
     reason = check_sentence_shape(
-        card.sentence, shape, min_words, max_words, keys=LENGTH_RULES
+        card.sentence, guard_profile, min_words, max_words, keys=LENGTH_RULES
     )
     if reason:
         return reason
@@ -294,7 +307,7 @@ def filter_reason(
     if reason:
         return reason
     reason = check_sentence_shape(
-        card.sentence, shape, min_words, max_words, keys=MARK_RULES
+        card.sentence, guard_profile, min_words, max_words, keys=MARK_RULES
     )
     if reason:
         return MARK_RULES[reason]
