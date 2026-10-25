@@ -18,7 +18,7 @@ import time
 import webbrowser
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any, Literal, Sequence
+from typing import Any, Callable, Literal, Sequence
 
 import cyclopts
 from gtts import gTTS
@@ -60,7 +60,12 @@ from anki_tools.ranking.rank import (
 )
 
 
-from anki_tools.ranking.pipeline import RankPaths, rank_paths, run_ranked_deck
+from anki_tools.ranking.pipeline import (
+    RankPaths,
+    RankedDeck,
+    rank_paths,
+    run_ranked_deck,
+)
 from anki_tools.apkg.templates import (
     DEFAULT_TEMPLATE_DIR,
     SHARED_CSS_PATH,
@@ -795,52 +800,39 @@ def zh(
 
     paths = rank_paths(apkg_path, output)
 
-    _print_rank_banner(paths, "Chinese")
+    def after_rank(paths: RankPaths, deck: RankedDeck) -> Sequence[str]:
+        if not no_pinyin_fix:
+            print("\nFixing pinyin...")
+            fix_pinyin(
+                paths.output_path,
+                output=paths.output_path,
+                csv_output=Path("/dev/null"),
+                verbose=verbose,
+            )
+        styles_applied = 0
+        if not no_style:
+            print("\nApplying card styles...")
+            styles_applied, applied = _apply_style(
+                Path(paths.output_path),
+                css_path=CARD_CSS_PATH,
+                front_path=FRONT_TEMPLATE_PATH,
+                back_path=BACK_TEMPLATE_PATH,
+                verbose=False,
+            )
+            if applied:
+                print(f"  Applied: {', '.join(applied)} to {styles_applied} model(s)")
+        return (f"  Styles applied:      {styles_applied} model(s)",)
 
-    print("Step 1: Ranking sentences...")
-
-
-    deck = run_ranked_deck(
+    _run_rank_mode(
         paths,
-        rank=rank_sentences_zh,
-        model_id=model_id,
-        romanization_candidates=("Pinyin",),
-        keep_filtered=keep_filtered,
-    )
-    if not deck.sentences:
-        print("No sentences found!")
-        return
-    ranked = deck.ranked
-    stats = deck.stats
-
-
-    if not no_pinyin_fix:
-        print("\nFixing pinyin...")
-        fix_pinyin(
-            paths.output_path,
-            output=paths.output_path,
-            csv_output=Path("/dev/null"),
-            verbose=verbose,
-        )
-
-    styles_applied = 0
-    if not no_style:
-        print("\nApplying card styles...")
-        styles_applied, applied = _apply_style(
-            Path(paths.output_path),
-            css_path=CARD_CSS_PATH,
-            front_path=FRONT_TEMPLATE_PATH,
-            back_path=BACK_TEMPLATE_PATH,
-            verbose=False,
-        )
-        if applied:
-            print(f"  Applied: {', '.join(applied)} to {styles_applied} model(s)")
-
-    _print_rank_done(
-        paths,
-        len(ranked),
-        stats,
-        extra_lines=(f"  Styles applied:      {styles_applied} model(s)",),
+        "Chinese",
+        rank_sentences_zh,
+        {
+            "model_id": model_id,
+            "romanization_candidates": ("Pinyin",),
+            "keep_filtered": keep_filtered,
+        },
+        after=after_rank,
     )
 
 
@@ -945,25 +937,17 @@ def fr(
 
     paths = rank_paths(apkg_path, output)
 
-    _print_rank_banner(paths, "French")
-
-    print("Step 1: Ranking sentences...")
-    deck = run_ranked_deck(
+    _run_rank_mode(
         paths,
-        rank=rank_sentences_fr,
-        model_id=model_id,
-        text_field=text_field,
-        text_candidates=("French",),
-        keep_filtered=keep_filtered,
+        "French",
+        rank_sentences_fr,
+        {
+            "model_id": model_id,
+            "text_field": text_field,
+            "text_candidates": ("French",),
+            "keep_filtered": keep_filtered,
+        },
     )
-    if not deck.sentences:
-        print("No sentences found!")
-        return
-
-    ranked = deck.ranked
-    stats = deck.stats
-
-    _print_rank_done(paths, len(ranked), stats)
 
 
 def _print_rank_banner(paths: RankPaths, label: str, target: str = "") -> None:
@@ -1018,6 +1002,36 @@ def _print_rank_done(
     if coverage_csv is not None:
         print(f"  Coverage CSV:        {coverage_csv}")
 
+def _run_rank_mode(
+    paths: RankPaths,
+    label: str,
+    rank: Callable[[list[Sentence]], list[Sentence]],
+    deck_kwargs: dict[str, Any],
+    *,
+    target: str = "",
+    count: Callable[[int], int] | None = None,
+    after: Callable[[RankPaths, RankedDeck], Sequence[str]] | None = None,
+) -> None:
+    """Rank, reorder, and report one deck, with the language parts as hooks.
+
+    :param paths: Input, output, and ranking file of the run.
+    :param label: Deck language, for example ``Chinese``.
+    :param rank: Ranker of the language, sentences to ranked sentences.
+    :param deck_kwargs: Extra keyword arguments for ``run_ranked_deck``.
+    :param target: Preformatted extra banner line, or an empty string.
+    :param count: Ranked count hook, or None to use the ranked length.
+    :param after: Hook that prints the language steps and returns the extra
+        DONE lines, or None for no extra lines.
+    """
+    _print_rank_banner(paths, label, target=target)
+    print("Step 1: Ranking sentences...")
+    deck = run_ranked_deck(paths, rank=rank, **deck_kwargs)
+    if not deck.sentences:
+        print("No sentences found!")
+        return
+    ranked_count = count(len(deck.ranked)) if count is not None else len(deck.ranked)
+    extra_lines = after(paths, deck) if after is not None else ()
+    _print_rank_done(paths, ranked_count, deck.stats, extra_lines=extra_lines)
 
 DEFAULT_CANTONESE_APKG = Path("apkg/LTL Cantonese Deck Level 1 - Short.apkg")
 
@@ -1125,10 +1139,6 @@ def yue(
 
     paths = rank_paths(apkg_path, output)
 
-    _print_rank_banner(paths, "Cantonese")
-
-    print("Step 1: Ranking sentences...")
-
     extracted: list[Sentence] = []
     counts: dict[str, int] = {}
 
@@ -1160,30 +1170,29 @@ def yue(
         print("\nStep 2: Reordering deck...")
         return ranked
 
-    deck = run_ranked_deck(
+    def after_rank(paths: RankPaths, deck: RankedDeck) -> Sequence[str]:
+        print("\nFixing jyutping...")
+        fix_jyutping(
+            paths.output_path,
+            output=paths.output_path,
+            verbose=False,
+        )
+        return ()
+
+    _run_rank_mode(
         paths,
-        rank=rank_and_capture,
-        model_id=model_id,
-        romanization_candidates=("Jyutping",),
-        keep_filtered=keep_filtered,
-        reduce=reorder,
-        remove_unranked=False,
+        "Cantonese",
+        rank_and_capture,
+        {
+            "model_id": model_id,
+            "romanization_candidates": ("Jyutping",),
+            "keep_filtered": keep_filtered,
+            "reduce": reorder,
+            "remove_unranked": False,
+        },
+        count=lambda ranked_total: counts.get("ranked", ranked_total),
+        after=after_rank,
     )
-    if not deck.sentences:
-        print("No sentences found!")
-        return
-
-    ranked_count = counts.get("ranked", len(deck.ranked))
-    stats = deck.stats
-
-    print("\nFixing jyutping...")
-    fix_jyutping(
-        paths.output_path,
-        output=paths.output_path,
-        verbose=False,
-    )
-
-    _print_rank_done(paths, ranked_count, stats)
 
 
 DEFAULT_SPANISH_APKG = Path("apkg/Spanish 9000 sentences with native audio.apkg")
@@ -1249,18 +1258,9 @@ def es(
         return
 
     paths = rank_paths(apkg_path, output)
-
-    _print_rank_banner(
-        paths,
-        "Spanish",
-        target=(
-            f"Target:  {max_sentences} sentences (stratified reduction)"
-            if max_sentences
-            else ""
-        ),
-    )
-
-    print("Step 1: Ranking sentences...")
+    def after_rank(paths: RankPaths, deck: RankedDeck) -> Sequence[str]:
+        print(f"Extracted {len(deck.sentences)} sentences")
+        return ()
 
     def reduce_ranked(ranked: list[Sentence]) -> list[Sentence]:
         if not max_sentences or len(ranked) <= max_sentences:
@@ -1273,25 +1273,24 @@ def es(
             similarity_fn=latin_word_similarity,
         )
 
-    deck = run_ranked_deck(
+    _run_rank_mode(
         paths,
-        rank=rank_sentences_es,
-        model_id=model_id,
-        text_field=text_field,
-        keep_filtered=keep_filtered,
-        reduce=reduce_ranked,
-        remove_unranked=bool(max_sentences),
+        "Spanish",
+        rank_sentences_es,
+        {
+            "model_id": model_id,
+            "text_field": text_field,
+            "keep_filtered": keep_filtered,
+            "reduce": reduce_ranked,
+            "remove_unranked": bool(max_sentences),
+        },
+        target=(
+            f"Target:  {max_sentences} sentences (stratified reduction)"
+            if max_sentences
+            else ""
+        ),
+        after=after_rank,
     )
-    if not deck.sentences:
-        print("No sentences found!")
-        return
-
-    print(f"Extracted {len(deck.sentences)} sentences")
-
-    ranked = deck.ranked
-    stats = deck.stats
-
-    _print_rank_done(paths, len(ranked), stats)
 
 
 # =============================================================================
