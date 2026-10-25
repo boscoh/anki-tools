@@ -186,6 +186,8 @@ class CullProfile:
     :param wordfreq_lang: ``wordfreq`` language code.
     :param default_deck_name: Name of the output deck.
     :param licenses: License text per data source.
+    :param target_coverage_gate: Gate share of the targets with one card.
+    :param double_coverage_gate: Gate share of the targets with two cards.
     """
 
     tokenize_texts: Callable[[Iterable[str]], list[list[tuple[str, str]]]]
@@ -222,6 +224,9 @@ class CullProfile:
 
     default_deck_name: str
     licenses: Mapping[str, str]
+
+    target_coverage_gate: float
+    double_coverage_gate: float
 
 
 @dataclass(frozen=True)

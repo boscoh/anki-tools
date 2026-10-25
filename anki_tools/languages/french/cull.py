@@ -209,6 +209,8 @@ FRENCH_CULL_PROFILE = cullflow.CullProfile(
     wordfreq_lang="fr",
     default_deck_name=DEFAULT_DECK_NAME,
     licenses=LICENSES,
+    target_coverage_gate=0.98,
+    double_coverage_gate=0.95,
 )
 
 

@@ -320,4 +320,6 @@ MANDARIN_CORE_PROFILE = CoreProfile(
     default_options=DEFAULT_OPTIONS,
     deck_name=DEFAULT_NAME,
     frequency_source=str(FREQUENCY_PATH),
+    outside_set_ratio=1.3,
+    outside_rare_ratio=0.1,
 )

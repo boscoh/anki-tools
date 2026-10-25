@@ -54,6 +54,10 @@ class CoreProfile:
     :param frequency_source: Label of the frequency source for the manifest.
     :param lemma_overrides: Lemma repair map of the lemmatizer artefacts,
         applied by :func:`scan` to the tokens of every card.
+    :param outside_set_ratio: Largest accepted outside set, as a share of
+        the targets.
+    :param outside_rare_ratio: Largest accepted rare outside count, as a
+        share of the outside set.
     """
 
     load_input_deck: Callable[[Path], Any]
@@ -84,6 +88,8 @@ class CoreProfile:
     deck_name: str
     frequency_source: str
     lemma_overrides: Mapping[str, str] = field(default_factory=dict)
+    outside_set_ratio: float = 1.3
+    outside_rare_ratio: float = 0.1
 
 
 @dataclass(frozen=True)

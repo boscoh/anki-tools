@@ -10,6 +10,7 @@ import csv
 import json
 import math
 from collections import Counter
+from dataclasses import replace
 from pathlib import Path
 from typing import Collection
 
@@ -18,6 +19,7 @@ import pytest
 from anki_tools.languages.french import cull as cull_fr
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking import cullgates
+from anki_tools.ranking.coverage import write_rows
 from anki_tools.sentence_pack.audit import sha256_value
 
 ENGLISH = "A short English line."
@@ -693,6 +695,36 @@ def test_gate_card_templates_fails_on_a_wrong_front(tmp_path: Path) -> None:
 
     assert message is False
 
+
+def test_coverage_gates_read_the_profile_values(tmp_path: Path) -> None:
+    profile = replace(
+        cull_fr.FRENCH_CULL_PROFILE,
+        target_coverage_gate=0.7,
+        double_coverage_gate=0.5,
+    )
+    files = cullgates.cull_files(tmp_path / "gated.apkg", profile)
+    write_rows(
+        files.coverage_csv,
+        cull_fr.COVERAGE_COLUMNS,
+        [
+            {"word": "chat", "rank": "1", "count": "2", "status": "covered"},
+            {"word": "mange", "rank": "2", "count": "2", "status": "covered"},
+            {"word": "vite", "rank": "3", "count": "1", "status": "partial"},
+            {"word": "lent", "rank": "4", "count": "0", "status": "absent"},
+        ],
+    )
+
+    passed, message = cullgates.gate_target_coverage(files)
+    twice_passed, twice_message = cullgates.gate_double_coverage(files)
+    french = cullgates.cull_files(tmp_path / "gated.apkg", cull_fr.FRENCH_CULL_PROFILE)
+    french_passed, french_message = cullgates.gate_target_coverage(french)
+
+    assert passed is True
+    assert message == "3/4 targets covered (0.750, gate 0.7)"
+    assert twice_passed is True
+    assert twice_message == "2/4 targets with 2 cards (0.500, gate 0.5)"
+    assert french_passed is False
+    assert french_message == "3/4 targets covered (0.750, gate 0.98)"
 
 def _fake_tokens(self: cullgates.CullFiles) -> list[list[tuple[str, str]]]:
     return [DECK_TOKENS[card.sentence] for card in self.output()["cards"]]

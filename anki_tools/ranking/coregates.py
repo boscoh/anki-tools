@@ -260,8 +260,9 @@ def gate_outside(files: CoreFiles) -> tuple[bool, str]:
     counts = files.manifest()["counts"]
     targets = max(1, counts["targets"])
     outside = counts["outside"]
-    ok_set = outside <= 1.3 * targets
-    ok_rare = counts["outside_rare"] <= 0.1 * max(1, outside)
+    profile = files.profile
+    ok_set = outside <= profile.outside_set_ratio * targets
+    ok_rare = counts["outside_rare"] <= profile.outside_rare_ratio * max(1, outside)
     return (
         ok_set and ok_rare,
         f"outside {outside} of {targets} targets, rare {counts['outside_rare']}",

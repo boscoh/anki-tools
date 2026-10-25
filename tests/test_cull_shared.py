@@ -73,6 +73,8 @@ def _profile() -> cullflow.CullProfile:
         wordfreq_lang="xx",
         default_deck_name=DECK_NAME,
         licenses={"data": "test license"},
+        target_coverage_gate=0.98,
+        double_coverage_gate=0.95,
     )
 
 

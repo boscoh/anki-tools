@@ -34,8 +34,6 @@ from anki_tools.ranking.cullflow import (
 from anki_tools.sentence_pack.audit import print_audit, sha256_value
 
 SAMPLE = 3
-TARGET_COVERAGE_GATE = 0.98
-DOUBLE_COVERAGE_GATE = 0.95
 CARD_CLASSES = ("sentence", "english", "hint")
 
 GateRow = tuple[str, bool, str]
@@ -274,9 +272,10 @@ def gate_target_coverage(files: CullFiles) -> tuple[bool, str]:
     rows = files.coverage()
     covered = sum(1 for row in rows if int(row.get("count", 0)) >= 1)
     share = covered / len(rows) if rows else 0.0
+    gate = files.profile.target_coverage_gate
     message = f"{covered}/{len(rows)} targets covered ({share:.3f}"
-    message += f", gate {TARGET_COVERAGE_GATE})"
-    return bool(rows) and share >= TARGET_COVERAGE_GATE, message
+    message += f", gate {gate})"
+    return bool(rows) and share >= gate, message
 
 
 def gate_double_coverage(files: CullFiles) -> tuple[bool, str]:
@@ -284,9 +283,10 @@ def gate_double_coverage(files: CullFiles) -> tuple[bool, str]:
     rows = files.coverage()
     twice = sum(1 for row in rows if int(row.get("count", 0)) >= 2)
     share = twice / len(rows) if rows else 0.0
+    gate = files.profile.double_coverage_gate
     message = f"{twice}/{len(rows)} targets with 2 cards ({share:.3f}"
-    message += f", gate {DOUBLE_COVERAGE_GATE})"
-    return bool(rows) and share >= DOUBLE_COVERAGE_GATE, message
+    message += f", gate {gate})"
+    return bool(rows) and share >= gate, message
 
 
 def gate_filter(files: CullFiles) -> tuple[bool, str]:
