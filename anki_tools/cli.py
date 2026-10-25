@@ -1295,6 +1295,14 @@ def es(
     )
 
 
+for _fix_command, _canonical_name in (
+    (zh, "mandarin"),
+    (fr, "french"),
+    (yue, "cantonese"),
+    (es, "spanish"),
+):
+    fix_app.command(_fix_command, name=_canonical_name)
+
 # =============================================================================
 # Swadesh commands - build vocabulary APKG files with audio
 # =============================================================================
