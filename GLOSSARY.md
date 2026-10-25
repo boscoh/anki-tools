@@ -97,6 +97,18 @@ The loop that picks the fewest items and gains the most targets. The code lives 
 `ranking/cover.py`.
 _Avoid_: set cover, solver
 
+**Cull**:
+The flow that filters and selects the cards of a large sentence deck down to a
+small deck, and writes the cull CSV, the coverage CSV, and the manifest. The code
+lives in `ranking/cullflow.py`.
+_Avoid_: filter, prune
+
+**Cull profile**:
+The frozen `CullProfile` that holds every value and hook of one language for the
+cull, for example the model fields, the templates, the reserve pack, and the file
+paths. A language supplies one profile and no flow code.
+_Avoid_: cull config, cull settings
+
 **Ranking CSV**:
 The table with one row for each target and its candidates. The reorder step reads
 it and writes the deck.

@@ -17,6 +17,7 @@ import pytest
 
 from anki_tools.languages.french import cull as cull_fr
 from anki_tools.apkg.package import AnkiPackage
+from anki_tools.ranking import cullgates
 from anki_tools.sentence_pack.audit import sha256_value
 
 ENGLISH = "A short English line."
@@ -414,6 +415,7 @@ def test_manifest_has_params_counts_files_and_kept_order(tmp_path: Path) -> None
         frequency={"spoken_weight": 0.5},
         files={"cull_csv": "sha256:0"},
         kept_order="sha256:1",
+        licenses=cull_fr.LICENSES,
     )
     data = json.loads(path.read_text(encoding="utf-8"))
 
@@ -577,7 +579,9 @@ def test_gate_card_templates_fails_on_a_second_template(tmp_path: Path) -> None:
     cull_fr.write_deck(source, cards, [0], output, DECK_NAME)
     _add_second_template(output)
 
-    rows = cull_fr.run_gates(cull_fr.gate_inputs(output))
+    rows = cullgates.run_gates(
+        cullgates.cull_files(output, cull_fr.FRENCH_CULL_PROFILE)
+    )
     message = dict((gate, passed) for gate, passed, _ in rows)["G15"]
 
     assert message is False
@@ -595,13 +599,15 @@ def test_gate_card_templates_fails_on_a_wrong_front(tmp_path: Path) -> None:
         )
         package.save()
 
-    rows = cull_fr.run_gates(cull_fr.gate_inputs(output))
+    rows = cullgates.run_gates(
+        cullgates.cull_files(output, cull_fr.FRENCH_CULL_PROFILE)
+    )
     message = dict((gate, passed) for gate, passed, _ in rows)["G15"]
 
     assert message is False
 
 
-def _fake_tokens(self: cull_fr.GateInputs) -> list[list[tuple[str, str]]]:
+def _fake_tokens(self: cullgates.CullFiles) -> list[list[tuple[str, str]]]:
     return [DECK_TOKENS[card.sentence] for card in self.output()["cards"]]
 
 
@@ -654,10 +660,12 @@ def test_run_gates_passes_on_a_tiny_output(
         },
         kept_order=cull_fr.kept_order_hash(cards, ordered),
     )
-    monkeypatch.setattr(cull_fr.GateInputs, "tokens", _fake_tokens)
-    monkeypatch.setattr(cull_fr, "_probe_audio", _fake_probe)
+    monkeypatch.setattr(cullgates.CullFiles, "tokens", _fake_tokens)
+    monkeypatch.setattr(cullgates, "probe_audio", _fake_probe)
 
-    rows = cull_fr.run_gates(cull_fr.gate_inputs(output))
+    rows = cullgates.run_gates(
+        cullgates.cull_files(output, cull_fr.FRENCH_CULL_PROFILE)
+    )
 
     assert [gate for gate, _passed, _message in rows] == [
         f"G{number}" for number in range(1, 16)

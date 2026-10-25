@@ -442,7 +442,7 @@ uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
 
 `--exempt-top`, the spoken weight, the word window, the similarity limit,
 the order, the name, and the reserve pack path are fields of `CullRequest`
-with these defaults in `cull.py`.
+with these defaults in `anki_tools/ranking/cullflow.py`.
 
 ### 10.3 Output files
 
@@ -462,7 +462,14 @@ The `.coverage.csv` has these columns: `word`, `rank`, `count`, `status`. The
 
 ### 10.4 Code changes
 
-- Add `anki_tools/languages/french/cull.py` with the stages C1 to C5.
+- Add `anki_tools/ranking/cullflow.py` with the stages C1 to C5 behind a
+  `CullProfile` seam. The profile holds every French value: the scan adapters,
+  the model fields, the templates and the CSS, the reserve pack, and the file
+  paths.
+- Add `anki_tools/ranking/cullgates.py` with gates G1 to G15 behind a
+  `CullFiles` reader.
+- Keep `anki_tools/languages/french/cull.py` for the French values,
+  `FRENCH_CULL_PROFILE`, the bindings, and the re-exports.
 - Add the `--select` option to `anki fix fr` in `cli.py`. Rank mode stays the
   default. The CLI builds a `CullRequest` and calls `run_cull` or `check_cull`.
 - Add `anki_tools/ranking/cover.py` for the greedy cover that both language
@@ -500,7 +507,9 @@ the command with a non-zero exit code.
 ### 11.2 Tests
 
 Add `tests/test_french_cull.py`. Use small fixture APKG and TSV files. Do not
-download a file and do not run a full Tatoeba pass.
+download a file and do not run a full Tatoeba pass. Add
+`tests/test_cull_shared.py` to prove that a second `CullProfile` drives the
+model name, the fields, and the deck name of the output.
 
 | Area           | Test                                                                 |
 | -------------- | -------------------------------------------------------------------- |

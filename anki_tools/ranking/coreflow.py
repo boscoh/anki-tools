@@ -16,12 +16,14 @@ import hashlib
 import json
 import re
 import sqlite3
+import time
+import uuid
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable, Collection, Sequence
+from typing import Any, Callable, Collection, Mapping, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking.cardfilter import _WORD_PATTERN, filter_cards
@@ -691,69 +693,43 @@ def _write_csv(
 def write_manifest(
     path: Path,
     *,
-    request: CoreRequest,
+    source: dict[str, Any],
+    params: dict[str, Any],
     counts: dict[str, int],
-    apkg_path: Path,
+    frequency: dict[str, Any],
     files: dict[str, str],
     kept_order: str,
-    profile: CoreProfile,
-    min_units: int,
-    max_units: int,
-    name: str,
+    licenses: Mapping[str, str] | None = None,
+    reserve_pack: str = "",
+    swadesh_exceptions: Sequence[str] = (),
 ) -> None:
-    """Write the manifest JSON of a core run.
+    """Write the manifest JSON of a deck run.
 
     :param path: Output JSON file.
-    :param request: Options of the run.
-    :param counts: Card and target counts.
-    :param apkg_path: Input APKG file.
+    :param source: Input APKG path, deck name, and model name.
+    :param params: Options of the run.
+    :param counts: Card, lemma, and target counts.
+    :param frequency: Frequency source path and the spoken weight.
     :param files: ``sha256:`` values of the output files.
     :param kept_order: Hash of the kept sentences in their final order.
-    :param profile: Language hooks.
-    :param min_units: Resolved minimum word count.
-    :param max_units: Resolved maximum word count.
-    :param name: Resolved deck name.
+    :param licenses: License text per data source, or None for no block.
+    :param reserve_pack: Reserve pack of the run, empty without a reserve.
+    :param swadesh_exceptions: Reserve concepts that no source sentence covers.
     """
     payload: dict[str, Any] = {
         "build_date": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "source": {
-            "input": str(apkg_path),
-            "deck": name,
-            "model": profile.model_name,
-        },
-        "params": {
-            "core_words": request.core_words,
-            "per_word": request.options.per_word,
-            "third_examples": request.options.third_examples,
-            "ubiquitous_share": request.options.ubiquitous_share,
-            "max_cards": request.options.max_cards,
-            "completion_cards": request.options.completion_cards,
-            "tail_cards": request.options.tail_cards,
-            "outside_budget": request.options.outside_budget,
-            "support_top": request.options.support_top,
-            "hard_top": request.options.hard_top,
-            "lambda_new": request.options.lambda_new,
-            "lambda_repeat": request.options.lambda_repeat,
-            "lambda_len": request.options.lambda_len,
-            "lambda_seed": request.options.lambda_seed,
-            "simple_units": request.options.simple_units,
-            "similarity": request.options.similarity,
-            "min_units": min_units,
-            "max_units": max_units,
-            "spoken_weight": request.spoken_weight,
-            "bold_target": request.bold_target,
-            "name": name,
-            "max_unchecked_sense": request.max_unchecked_sense,
-            "max_unranked": request.max_unranked,
-        },
+        "source": source,
+        "params": params,
         "counts": counts,
-        "frequency": {
-            "path": profile.frequency_source,
-            "spoken_weight": request.spoken_weight,
-        },
+        "frequency": frequency,
         "files": files,
-        "kept_order": kept_order,
     }
+    if licenses is not None:
+        payload["licenses"] = dict(licenses)
+    payload["kept_order"] = kept_order
+    if reserve_pack:
+        payload["reserve_pack"] = reserve_pack
+        payload["swadesh_exceptions"] = list(swadesh_exceptions)
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(
@@ -795,6 +771,16 @@ class InputCard:
 
 
 _SOUND_PATTERN = re.compile(r"\[sound:([^\]]+)\]")
+
+
+def sound_name(field_value: str) -> str:
+    """Read the audio file name from a sound field.
+
+    :param field_value: Raw field text, for example ``[sound:a.mp3]``.
+    :returns: The file name, or an empty string when the field has no sound tag.
+    """
+    match = _SOUND_PATTERN.search(field_value)
+    return match.group(1) if match else ""
 
 
 def read_input_deck(
@@ -943,6 +929,104 @@ def _trim_templates(package: AnkiPackage, model_id: str) -> None:
         package.remove_model_template(model_id, number)
 
 
+RESERVE_TAGS = " swadesh "
+
+
+def insert_reserve_cards(
+    package: AnkiPackage,
+    reserve: Sequence[Any],
+    reserve_pack_path: Path,
+    deck_id: int,
+    reserve_fields: Callable[[Any], Sequence[str]],
+) -> None:
+    """Insert the reserve notes and cards into an open package.
+
+    The note and card rows copy a kept row of the input model, so every column
+    of the package schema stays valid.
+
+    :param package: Open output package after the non-kept cards are deleted.
+    :param reserve: Reserve cards to insert.
+    :param reserve_pack_path: Pack with the reserve media files.
+    :param deck_id: Target deck id.
+    :param reserve_fields: Callable that gives the field values of one card.
+    :raises RuntimeError: The package has no template row, or a reserve audio
+        file is not in the pack.
+    """
+    conn = _connection(package)
+    note_template = conn.execute("SELECT * FROM notes LIMIT 1").fetchone()
+    card_template = conn.execute("SELECT * FROM cards LIMIT 1").fetchone()
+    if note_template is None or card_template is None:
+        raise RuntimeError("The input package has no note to use as a template.")
+    note_columns = [row[1] for row in conn.execute("PRAGMA table_info(notes)")]
+    card_columns = [row[1] for row in conn.execute("PRAGMA table_info(cards)")]
+    next_note = int(conn.execute("SELECT MAX(id) FROM notes").fetchone()[0] or 0) + 1
+    next_card = int(conn.execute("SELECT MAX(id) FROM cards").fetchone()[0] or 0) + 1
+    mod = int(time.time() * 1000)
+
+    with AnkiPackage(reserve_pack_path) as swadesh:
+        if swadesh.temp_dir is None:
+            raise RuntimeError("The reserve pack has no temporary directory.")
+        temp_dir = Path(swadesh.temp_dir)
+        media = swadesh.get_media_mapping()
+        reverse = {name: key for key, name in media.items()}
+        for card in reserve:
+            key = reverse.get(card.audio)
+            if key is None:
+                raise RuntimeError(
+                    f"The reserve audio {card.audio} is not in {reserve_pack_path}."
+                )
+            package.add_media_file(temp_dir / key, card.audio)
+
+    note_sql = (
+        f"INSERT INTO notes ({','.join(note_columns)}) "
+        f"VALUES ({','.join('?' for _ in note_columns)})"
+    )
+    card_sql = (
+        f"INSERT INTO cards ({','.join(card_columns)}) "
+        f"VALUES ({','.join('?' for _ in card_columns)})"
+    )
+    for card in reserve:
+        fields = "\x1f".join(reserve_fields(card))
+        note = dict(note_template)
+        note.update(
+            id=next_note,
+            guid=str(uuid.uuid4()),
+            mod=mod,
+            usn=-1,
+            tags=RESERVE_TAGS,
+            flds=fields,
+            sfld=card.sentence,
+            csum=0,
+        )
+        conn.execute(note_sql, [note[column] for column in note_columns])
+        row = dict(card_template)
+        row.update(
+            id=next_card,
+            nid=next_note,
+            did=deck_id,
+            ord=0,
+            mod=mod,
+            usn=-1,
+            type=0,
+            queue=0,
+            due=0,
+            ivl=0,
+            factor=0,
+            reps=0,
+            lapses=0,
+            left=0,
+            odue=0,
+            odid=0,
+            flags=0,
+            data="",
+        )
+        conn.execute(card_sql, [row[column] for column in card_columns])
+        next_note += 1
+        next_card += 1
+    conn.commit()
+    package._modified = True
+
+
 def write_deck(
     input_path: Path,
     cards: Sequence[Any],
@@ -950,8 +1034,17 @@ def write_deck(
     output_path: Path,
     deck_name: str,
     model_name: str,
+    *,
+    templates: tuple[tuple[str, str], ...] | None = None,
+    card_css: Callable[[], str] | None = None,
+    reserve: Sequence[Any] = (),
+    reserve_pack_path: Path | None = None,
+    reserve_fields: Callable[[Any], Sequence[str]] | None = None,
 ) -> dict[str, int]:
-    """Write the kept cards to an APKG file with one card template.
+    """Write the kept cards to an APKG file.
+
+    The cards of every note that is not kept are deleted, and the media files
+    that no kept card uses are removed with them.
 
     :param input_path: Input APKG file.
     :param cards: Input cards.
@@ -959,6 +1052,14 @@ def write_deck(
     :param output_path: Output APKG file.
     :param deck_name: Name of the output deck.
     :param model_name: Name of the note model.
+    :param templates: Card templates of the output, or None to keep the first
+        template of the input model.
+    :param card_css: Callable that gives the CSS of the output, or None to
+        keep the input CSS.
+    :param reserve: Reserve cards to add to the input model.
+    :param reserve_pack_path: Pack with the reserve media files.
+    :param reserve_fields: Callable that gives the field values of one reserve
+        card. A run with reserve cards needs it.
     :raises RuntimeError: The output note count differs from the kept count.
     :returns: Note, media, and card counts of the output.
     """
@@ -976,10 +1077,26 @@ def write_deck(
         rename_deck(package, deck_name)
         models = package.get_models(include_templates=True)
         model_id = find_model_id(models, model_name)
-        _trim_templates(package, model_id)
+        if reserve:
+            deck_id = int(next(iter(package.get_decks())))
+            insert_reserve_cards(
+                package, reserve, reserve_pack_path, deck_id, reserve_fields
+            )
+        if card_css is not None:
+            package.update_model_template(model_id=model_id, css=card_css())
+        if templates is None:
+            _trim_templates(package, model_id)
+        else:
+            for number, (qfmt, afmt) in enumerate(templates):
+                package.update_model_template(
+                    model_id=model_id, qfmt=qfmt, afmt=afmt, template_index=number
+                )
+            have = len(models[model_id].get("tmpls", ()))
+            for number in reversed(range(len(templates), have)):
+                package.remove_model_template(model_id, number)
         package.save(target)
 
-    expected = len(kept_notes)
+    expected = len(kept_notes) + len(reserve)
     with AnkiPackage(target) as package:
         notes = len(package.get_notes())
         media = len(package.get_media_mapping())
@@ -1312,19 +1429,47 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> CoreRun:
     write_coverage_csv(coverage_rows, coverage_csv)
     write_manifest(
         manifest_path,
-        request=request,
+        source={
+            "input": str(apkg_path),
+            "deck": name,
+            "model": profile.model_name,
+        },
+        params={
+            "core_words": request.core_words,
+            "per_word": request.options.per_word,
+            "third_examples": request.options.third_examples,
+            "ubiquitous_share": request.options.ubiquitous_share,
+            "max_cards": request.options.max_cards,
+            "completion_cards": request.options.completion_cards,
+            "tail_cards": request.options.tail_cards,
+            "outside_budget": request.options.outside_budget,
+            "support_top": request.options.support_top,
+            "hard_top": request.options.hard_top,
+            "lambda_new": request.options.lambda_new,
+            "lambda_repeat": request.options.lambda_repeat,
+            "lambda_len": request.options.lambda_len,
+            "lambda_seed": request.options.lambda_seed,
+            "simple_units": request.options.simple_units,
+            "similarity": request.options.similarity,
+            "min_units": min_units,
+            "max_units": max_units,
+            "spoken_weight": request.spoken_weight,
+            "bold_target": request.bold_target,
+            "name": name,
+            "max_unchecked_sense": request.max_unchecked_sense,
+            "max_unranked": request.max_unranked,
+        },
         counts=counts,
-        apkg_path=apkg_path,
+        frequency={
+            "path": profile.frequency_source,
+            "spoken_weight": request.spoken_weight,
+        },
         files={
             "core_csv": sha256_value(core_csv),
             "coverage_csv": sha256_value(coverage_csv),
             "input_apkg": sha256_value(apkg_path),
         },
         kept_order=kept_order_hash(cards, ordered),
-        profile=profile,
-        min_units=min_units,
-        max_units=max_units,
-        name=name,
     )
 
     print(f"Input:            {apkg_path}")

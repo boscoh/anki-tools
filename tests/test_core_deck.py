@@ -14,6 +14,7 @@ import pytest
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.languages.french import core, cull
+from anki_tools.ranking.coreflow import find_model_id
 from anki_tools.ranking.core import (
     CoreCandidate,
     CoreOptions,
@@ -576,7 +577,9 @@ class TestCardDesign:
     def test_adding_the_field_twice_changes_nothing(self, tmp_path: Path) -> None:
         source = _tiny_deck(tmp_path)
         with AnkiPackage(source) as package:
-            model_id = cull._find_model_id(package.get_models(include_templates=True))
+            model_id = find_model_id(
+                package.get_models(include_templates=True), cull.MODEL_NAME
+            )
             first = package.add_model_field(model_id, "Core")
             second = package.add_model_field(model_id, "Core")
             widths = {len(row["flds"].split("\x1f")) for row in package.get_notes()}

@@ -30,14 +30,16 @@ no language package.
 
 Shared ranking code only. No language data.
 
-| Path                             | Content                                               |
-| -------------------------------- | ----------------------------------------------------- |
-| `anki_tools/ranking/rank.py`     | Sentence data, frequency tables, shared score drivers |
-| `anki_tools/ranking/latin.py`    | Shared Latin-script text helpers and word metrics     |
-| `anki_tools/ranking/reorder.py`  | Reorder a deck from a ranking CSV                     |
-| `anki_tools/ranking/cover.py`    | Generic greedy cover over items with changing gains   |
-| `anki_tools/ranking/core.py`      | Core-word value, cost, passes, and order             |
-| `anki_tools/ranking/pipeline.py` | Shared extract, rank, write, and reorder stages       |
+| Path                              | Content                                               |
+| --------------------------------- | ----------------------------------------------------- |
+| `anki_tools/ranking/rank.py`      | Sentence data, frequency tables, shared score drivers |
+| `anki_tools/ranking/latin.py`     | Shared Latin-script text helpers and word metrics     |
+| `anki_tools/ranking/reorder.py`   | Reorder a deck from a ranking CSV                     |
+| `anki_tools/ranking/cover.py`     | Generic greedy cover over items with changing gains   |
+| `anki_tools/ranking/core.py`      | Core-word value, cost, passes, and order              |
+| `anki_tools/ranking/pipeline.py`  | Shared extract, rank, write, and reorder stages       |
+| `anki_tools/ranking/cullflow.py`  | Cull flow behind the `CullProfile` seam               |
+| `anki_tools/ranking/cullgates.py` | Gates G1 to G15 of the cull deck                      |
 
 `rank_word_based` and `rank_character_based` are the shared score drivers.
 `jaccard_similarity`, `compute_similarity_penalties`, and the word metrics of
@@ -87,7 +89,7 @@ One package per language. The package holds all the code of that language.
 | `anki_tools/languages/mandarin/stages.py`           | S1 to S3 caller of the shared pipeline             |
 | `anki_tools/languages/french/profile.py`            | French profile and form matching                   |
 | `anki_tools/languages/french/rank.py`               | French sentence ranking                            |
-| `anki_tools/languages/french/cull.py`               | French 1000-sentence cull pipeline                 |
+| `anki_tools/languages/french/cull.py`               | French cull profile, values, and bindings          |
 | `anki_tools/languages/french/core.py`               | French core-word deck pipeline                     |
 | `anki_tools/languages/french/core_gates.py`         | Gates K1 to K19 of the core deck                   |
 | `anki_tools/languages/greek/profile.py`             | Greek profile and form matching                    |
