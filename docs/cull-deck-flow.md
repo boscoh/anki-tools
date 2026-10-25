@@ -8,8 +8,8 @@ values live in `anki_tools/languages/<language>/cull.py`.
 The French deck has the `--select` command. Spanish has a `CullProfile`, and
 it has no command flag yet.
 
-Related: `docs/core-deck-flow.md`, `docs/swadesh-sentence-flow.md`, and
-`specs/french-1000-sentence-cull.md`.
+Related: `docs/vocab-deck-flow.md`, `docs/core-deck-flow.md`,
+`docs/swadesh-sentence-flow.md`, and `specs/french-1000-sentence-cull.md`.
 
 ## 1. Stage map
 

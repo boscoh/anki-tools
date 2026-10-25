@@ -5,8 +5,8 @@ a core deck. It shows the stage order, the rule order, and the gate order. The
 shared code lives in `anki_tools/ranking/`. The language values live in
 `anki_tools/languages/<language>/core.py`.
 
-Related: `docs/cull-deck-flow.md`, `docs/swadesh-sentence-flow.md`, and
-`specs/core-word-small-deck.md`.
+Related: `docs/vocab-deck-flow.md`, `docs/cull-deck-flow.md`,
+`docs/swadesh-sentence-flow.md`, and `specs/core-word-small-deck.md`.
 
 ## 1. Stage map
 

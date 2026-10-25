@@ -5,6 +5,9 @@ exports into one Anki deck. It shows the stage order and the guard order. The
 shared code lives in `anki_tools/sentence_pack/`. The language values live in
 `anki_tools/languages/<language>/`.
 
+Related: `docs/vocab-deck-flow.md`, `docs/core-deck-flow.md`, and
+`docs/cull-deck-flow.md`.
+
 ## 1. Stage map
 
 One command runs the stages in order: `anki swadesh pack <language>`. The

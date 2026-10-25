@@ -30,8 +30,12 @@ After installation, the `anki` command is available via `uv run anki`.
 
 See `docs/anki-tools-layout.md` for the package layout.
 
-See `docs/anki-input-sources.md` for the local input file and the upstream
-source of each `anki fix` command.
+See `docs/swadesh-sentence-flow.md`, `docs/vocab-deck-flow.md`,
+`docs/core-deck-flow.md`, and `docs/cull-deck-flow.md` for the stage order of
+each deck.
+
+Each `anki fix` command reads the APKG file that you give it. Run
+`uv run anki fix <lang> --help` to see the default input of that command.
 
 ## Quick Start
 
@@ -287,8 +291,6 @@ The core deck of Mandarin, French, Spanish, and Cantonese comes from
 `--examples`, `--tail`, and `--check`.
 
 See `docs/swadesh-sentence-flow.md` for the stage order and the guard order.
-See `docs/core-deck-flow.md` for the core mode and `docs/cull-deck-flow.md`
-for the cull mode.
 
 The commands write these files:
 
