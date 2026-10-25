@@ -1834,7 +1834,7 @@ def core(
     module = entry.core
     _run_core_command(
         module,
-        label=language.title(),
+        label=lang.title(),
         apkg_path=apkg_path,
         output=output,
         model_id=model_id,
