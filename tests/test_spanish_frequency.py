@@ -163,7 +163,9 @@ def test_loader_builds_the_cache_when_the_file_is_absent(
     assert core.load_frequency() == built
 
 
-def test_count_tatoeba_counts_lemmas(tmp_path: Path) -> None:
+def test_count_tatoeba_counts_lemmas(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """The Tatoeba pass counts the lemmas and the content tokens."""
     path = tmp_path / "spa_sentences.tsv"
     path.write_text(
@@ -173,6 +175,10 @@ def test_count_tatoeba_counts_lemmas(tmp_path: Path) -> None:
         "4\tspa\n",
         encoding="utf-8",
     )
+    from anki_tools.languages.spanish import profile
+    from anki_tools.sentence_pack.tokens import TokenCache
+
+    monkeypatch.setattr(profile, "_TOKEN_CACHE", TokenCache(profile.TOKENIZER))
     counts, content_tokens = _count_tatoeba(path)
     assert counts["casa"] == 2
     assert counts["tiempo"] == 2

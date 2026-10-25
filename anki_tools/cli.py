@@ -18,9 +18,10 @@ import time
 import webbrowser
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any, Callable, Literal, Sequence
+from typing import Annotated, Any, Callable, Literal, Sequence
 
 import cyclopts
+from cyclopts import Parameter
 from gtts import gTTS
 
 from anki_tools.languages.cantonese import core as cantonese_core
@@ -1533,7 +1534,12 @@ app.command(swadesh_app)
 
 
 @swadesh_app.command
-def vocab(language: str, prune: bool = True):
+def vocab(
+    language: Annotated[
+        str, Parameter(help=f"One of {', '.join(VOCAB_LANGUAGES)}, or all.")
+    ],
+    prune: bool = True,
+):
     """Build the Swadesh vocabulary deck for a language.
 
     :param language: One of the supported languages, or all.
@@ -1546,9 +1552,7 @@ def vocab(language: str, prune: bool = True):
         return
 
     if lang not in VOCAB_LANGUAGES:
-        print(
-            f"Unknown language: {language}. Supported: {', '.join(VOCAB_LANGUAGES)}"
-        )
+        print(f"Unknown language: {language}. Supported: {', '.join(VOCAB_LANGUAGES)}")
         return
     _build_apkg(lang, prune=prune)
 
@@ -1570,7 +1574,7 @@ def _fetch_language(profile: LanguageProfile, refresh: bool) -> None:
 
 @swadesh_app.command
 def pack(
-    language: str,
+    language: Annotated[str, Parameter(help=f"One of {SENTENCE_PACK_LANGUAGE_NAMES}.")],
     *,
     refresh: bool = False,
     stage: Literal["fetch", "sentences", "audio", "all"] = "all",
@@ -1643,7 +1647,9 @@ def pack(
 
 
 @swadesh_app.command
-def audit(language: str) -> None:
+def audit(
+    language: Annotated[str, Parameter(help=f"One of {SENTENCE_PACK_LANGUAGE_NAMES}.")],
+) -> None:
     """Run the quality gates of a Swadesh sentence pack.
 
     :param language: Language name, for example mandarin.

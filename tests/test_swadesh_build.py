@@ -78,6 +78,22 @@ def test_vocab_deck_and_model_names(monkeypatch: pytest.MonkeyPatch) -> None:
     assert captured["model_name"] == "Swadesh French Vocabulary"
 
 
+def test_the_swadesh_help_lists_the_languages(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    with pytest.raises(SystemExit):
+        cli.app(["swadesh", "vocab", "--help"])
+    vocab_help = capsys.readouterr().out
+    for name in cli.VOCAB_LANGUAGES:
+        assert name in vocab_help
+
+    with pytest.raises(SystemExit):
+        cli.app(["swadesh", "pack", "--help"])
+    pack_help = capsys.readouterr().out
+    for language in cli.profile_languages():
+        assert language.name in pack_help
+
+
 def test_fetch_language_uses_the_profile_code(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
