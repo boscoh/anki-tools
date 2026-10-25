@@ -190,7 +190,6 @@ def load_frequency() -> list[MandarinFrequencyRow]:
     if FREQUENCY_PATH.exists():
         return load_frequency_zh(FREQUENCY_PATH)
     rows = build_frequency_zh(rows=MAX_ROWS)
-    write_frequency_tsv(rows, FREQUENCY_PATH)
     failures = [
         f"{gate}: {message}"
         for gate, passed, message in check_frequency(rows)
@@ -201,7 +200,9 @@ def load_frequency() -> list[MandarinFrequencyRow]:
             f"The Mandarin frequency list {FREQUENCY_PATH} fails its gates: "
             + "; ".join(failures)
         )
+    write_frequency_tsv(rows, FREQUENCY_PATH)
     return rows
+
 
 def frequency_ranks(
     rows: Sequence[MandarinFrequencyRow], spoken_weight: float = 0.5
