@@ -31,7 +31,7 @@ from anki_tools.languages.mandarin.profile import (
     SORT_FIELD_INDEX,
     Candidate,
     WordForm,
-    build_known_set,
+    known_words,
     build_attribution,
     check_word_table,
     load_user_dictionary,
@@ -294,7 +294,7 @@ def build_candidate_pool(
     :returns: The candidate list and the pool report.
     """
     load_user_dictionary(word_table)
-    known = build_known_set(word_table)
+    known = known_words(word_table)
     return shared_pool.build_candidate_pool(
         word_table,
         MANDARIN,

@@ -12,7 +12,7 @@ from anki_tools.languages.mandarin.profile import (
     SENTENCE_REVIEW_FIELDS,
     Candidate,
     WordForm,
-    build_known_set,
+    known_words,
     count_form_occurrences,
     han_tokens,
     has_orphan_conjunction,
@@ -198,12 +198,12 @@ class TestTokenChecks:
     def test_known_set_grows_with_the_word_table(
         self, pool_table: list[WordForm]
     ) -> None:
-        known = build_known_set(pool_table)
+        known = known_words(pool_table)
         assert {"水", "火"} <= known
         assert "的" in known
 
     def test_unknown_tokens(self, pool_table: list[WordForm]) -> None:
-        known = build_known_set(pool_table)
+        known = known_words(pool_table)
         assert [word for word in han_tokens("我要喝水。") if word not in known] == [
             "喝水"
         ]

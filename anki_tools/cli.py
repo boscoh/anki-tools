@@ -32,24 +32,7 @@ from anki_tools.languages.mandarin import core as mandarin_core
 from anki_tools.languages.mandarin import frequency as mandarin_frequency
 from anki_tools.languages.cantonese.jyutping import fix_jyutping
 from anki_tools.languages.mandarin.pinyin import fix_pinyin
-from anki_tools.languages.mandarin.stages import (
-    DEFAULT_VOICE as MANDARIN_DEFAULT_VOICE,
-    build_candidate_pool,
-    build_pack,
-    build_pack_report,
-    check_word_table,
-    fetch_tatoeba,
-    generate_audio,
-    load_sentence_rows,
-    load_word_table,
-    print_audit,
-    print_sentence_report,
-    run_audit,
-    select_sentences,
-    write_pool_report,
-    write_sentence_csv,
-    write_sentence_review_csv,
-)
+from anki_tools.languages.mandarin.stages import fetch_tatoeba
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.preview import write_preview
 from anki_tools.preview_apkg import write_apkg_preview
@@ -1674,8 +1657,6 @@ def sentences(
     per_word: int = 2,
     max_cards: int = 450,
     max_unknown: int = 2,
-    min_han: int = 4,
-    max_han: int = 7,
     min_words: int | None = None,
     max_words: int | None = None,
 ) -> None:
@@ -1685,8 +1666,6 @@ def sentences(
     :param per_word: Card limit per word form.
     :param max_cards: Hard card cap.
     :param max_unknown: Unknown token budget per sentence.
-    :param min_han: Minimum Han character count for a Mandarin core card.
-    :param max_han: Maximum Han character count.
     :param min_words: Minimum word count for a sentence-pack core card. The
         profile default applies when empty.
     :param max_words: Maximum word count for a sentence-pack card. The profile
@@ -1694,51 +1673,21 @@ def sentences(
     """
     lang = resolve(language)
     entry = LANGUAGES.get(lang)
-    if entry is not None and entry.module is not None:
-        _language_sentences(
-            entry.module,
-            entry.profile,
-            per_word=per_word,
-            max_cards=max_cards,
-            max_unknown=max_unknown,
-            min_words=min_words,
-            max_words=max_words,
-        )
-        return
-    if lang != "mandarin":
+    if entry is None or entry.module is None:
         print(
             f"Unsupported language: {language}. "
             f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
         )
         return
-
-    table = load_word_table()
-    failures = check_word_table(table)
-    if failures:
-        for failure in failures:
-            print(f"Error: {failure}")
-        return
-
-    pool, pool_report = build_candidate_pool(
-        table,
-        min_han=min_han,
-        max_han=max_han,
+    _language_sentences(
+        entry.module,
+        entry.profile,
+        per_word=per_word,
+        max_cards=max_cards,
         max_unknown=max_unknown,
-        fallback=True,
+        min_words=min_words,
+        max_words=max_words,
     )
-    cards, selection = select_sentences(
-        pool, table, per_word=per_word, max_cards=max_cards
-    )
-    report = build_pack_report(pool_report, selection)
-
-    sentence_path = write_sentence_csv(cards)
-    review_path = write_sentence_review_csv(pool, table, per_word=per_word)
-    report_path = write_pool_report(report)
-
-    print_sentence_report(report)
-    print(f"wrote {sentence_path}")
-    print(f"wrote {review_path}")
-    print(f"wrote {report_path}")
 
 
 @swadesh_app.command(name="audio")
@@ -1762,48 +1711,21 @@ def sentence_audio(
     """
     lang = resolve(language)
     entry = LANGUAGES.get(lang)
-    if entry is not None and entry.module is not None:
-        _language_audio(
-            entry.module,
-            entry.profile,
-            native_audio=native_audio,
-            voice=voice,
-            slow_audio=slow_audio,
-            pack_license=pack_license,
-            tts=tts,
-        )
-        return
-    if lang != "mandarin":
+    if entry is None or entry.module is None:
         print(
             f"Unsupported language: {language}. "
             f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
         )
         return
-    if not voice:
-        voice = MANDARIN_DEFAULT_VOICE
-    if tts and tts != "gtts" and tts != "edge":
-        print(f"Unsupported tts engine: {tts}. Use gtts or edge.")
-        return
-
-    rows = load_sentence_rows()
-    result = generate_audio(
-        rows,
-        voice=voice,
+    _language_audio(
+        entry.module,
+        entry.profile,
         native_audio=native_audio,
+        voice=voice,
         slow_audio=slow_audio,
         pack_license=pack_license,
+        tts=tts,
     )
-    print(
-        f"engine {result['engine']} voice {result['voice']}: "
-        f"{result['tts']} tts, {result['native']} native, "
-        f"{result['words']} word, {result['skipped']} cached, "
-        f"{result['failed']} failed, {result['duration_s']:.1f} s"
-    )
-    for failure in result["failures"]:
-        print(f"failed: {failure['filename']} {failure['error']}")
-    print(f"wrote {result['index_path']}")
-    if result["csv_path"]:
-        print(f"wrote {result['csv_path']}")
 
 
 @swadesh_app.command
@@ -1819,26 +1741,13 @@ def pack(
     """
     lang = resolve(language)
     entry = LANGUAGES.get(lang)
-    if entry is not None and entry.module is not None:
-        _language_pack(entry.module, entry.profile, pack_license=pack_license)
-        return
-    if lang != "mandarin":
+    if entry is None or entry.module is None:
         print(
             f"Unsupported language: {language}. "
             f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
         )
         return
-
-    result = build_pack(pack_license=pack_license)
-    counts = result["manifest"]["counts"]
-    print(
-        f"{counts['cards']} cards, {counts['scaffold']} scaffold, "
-        f"{counts['tts_audio']} tts, {counts['native_audio']} native, "
-        f"{result['media_count']} media files, {result['skipped']} skipped"
-    )
-    print(f"wrote {result['output']}")
-    print(f"wrote {result['manifest_path']}")
-    print(f"wrote {result['attribution_path']}")
+    _language_pack(entry.module, entry.profile, pack_license=pack_license)
 
 
 @swadesh_app.command
@@ -1849,19 +1758,13 @@ def audit(language: str) -> None:
     """
     lang = resolve(language)
     entry = LANGUAGES.get(lang)
-    if entry is not None and entry.audit is not None:
-        code = print_gate_table(entry.audit())
-        if code:
-            raise SystemExit(code)
-        return
-    if lang != "mandarin":
+    if entry is None or entry.audit is None:
         print(
             f"Unsupported language: {language}. "
             f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
         )
         return
-
-    code = print_audit(run_audit())
+    code = print_gate_table(entry.audit())
     if code:
         raise SystemExit(code)
 

@@ -4,7 +4,6 @@
 capability:
 
 * a sentence-pack module, which the shared pipeline drives;
-* a profile only, for a language with its own caller code;
 * neither, for a vocabulary-only language, which the age-old ``build`` command
   serves from an ``english-<lang>.csv`` file and an audio directory.
 
@@ -32,6 +31,7 @@ from anki_tools.languages.cantonese import profile as cantonese
 from anki_tools.languages.french import profile as french
 from anki_tools.languages.greek import profile as greek
 from anki_tools.languages.mandarin import profile as mandarin
+from anki_tools.languages.mandarin import stages as mandarin_stages
 from anki_tools.languages.spanish import profile as spanish
 
 
@@ -60,7 +60,14 @@ class CliLanguage:
 LANGUAGES: dict[str, CliLanguage] = {
     language.name: language
     for language in (
-        CliLanguage("mandarin", profile=mandarin.MANDARIN, build=True, tts="zh-cn"),
+        CliLanguage(
+            "mandarin",
+            profile=mandarin.MANDARIN,
+            module=mandarin,
+            audit=mandarin_stages.run_audit,
+            build=True,
+            tts="zh-cn",
+        ),
         CliLanguage(
             "french",
             profile=french.FRENCH,

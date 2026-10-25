@@ -531,7 +531,7 @@ def load_user_dictionary(word_table: list[WordForm]) -> None:
         jieba.add_word(form.mandarin)
 
 
-def build_known_set(word_table: list[WordForm]) -> set[str]:
+def known_words(word_table: list[WordForm]) -> set[str]:
     """Build the known word set from the word table and ``wordfreq``.
 
     :param word_table: Word table from :func:`load_word_table`.

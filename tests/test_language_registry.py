@@ -17,8 +17,8 @@ def test_profiles_and_cli_entries_agree() -> None:
     assert {language.name for language in profile_languages()} == set(PROFILES)
 
 
-def test_every_profile_has_a_pipeline_module_except_mandarin() -> None:
-    assert set(pipeline_languages()) == set(PROFILES) - {"mandarin"}
+def test_every_profile_has_a_pipeline_module() -> None:
+    assert set(pipeline_languages()) == set(PROFILES)
 
 
 def test_build_list_matches_the_vocabulary_languages() -> None:
