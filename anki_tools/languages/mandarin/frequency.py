@@ -26,16 +26,13 @@ See ``specs/core-deck-all-languages.md`` sections 8.1 and 8.2.
 from __future__ import annotations
 
 import csv
-import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Mapping, Sequence
 
 from wordfreq import top_n_list, word_frequency
 
-from anki_tools.cache import download_cached_file
 from anki_tools.languages.mandarin.characters import is_chinese_char
-from anki_tools.languages.mandarin.profile import convert_to_simplified
 
 FREQUENCY_PATH = Path("data/mandarin_frequency.tsv")
 
@@ -48,16 +45,6 @@ SCRIPT = "Hans"
 MAX_ROWS = 50_000
 SOURCE_ROWS = 60_000
 
-FALLBACK_SOURCE_NAME = "FrequencyWords zh_cn+zh_tw"
-FALLBACK_LICENSE = "CC-BY-SA-4.0"
-ZH_CN_URL = (
-    "https://raw.githubusercontent.com/hermitdave/FrequencyWords/"
-    "master/content/2018/zh_cn/zh_cn_50k.txt"
-)
-ZH_TW_URL = (
-    "https://raw.githubusercontent.com/hermitdave/FrequencyWords/"
-    "master/content/2018/zh_tw/zh_tw_50k.txt"
-)
 
 FUNCTION_WORDS = ("的", "是", "在", "我", "你")
 COMMON_CONTENT_WORDS = ("我们", "朋友", "今天")
@@ -181,105 +168,6 @@ def build_frequency_zh(
     ]
 
 
-def zh_source_paths() -> dict[str, Path]:
-    """Return the cache paths of the FrequencyWords fallback files.
-
-    Set the environment variable ``ZH_FREQUENCY_PATH`` to a directory to use
-    other files.
-
-    :returns: ``zh_cn`` and ``zh_tw`` to path.
-    """
-    override = os.environ.get("ZH_FREQUENCY_PATH")
-    if override:
-        base = Path(override)
-    else:
-        cache_home = os.environ.get("XDG_CACHE_HOME")
-        root = Path(cache_home) if cache_home else Path.home() / ".cache"
-        base = root / "anki-tools"
-    return {
-        "zh_cn": base / "zh_cn_50k.txt",
-        "zh_tw": base / "zh_tw_50k.txt",
-    }
-
-
-def download_zh_sources(*, force: bool = False) -> dict[str, Path]:
-    """Download the FrequencyWords ``zh_cn`` and ``zh_tw`` files into the cache.
-
-    :param force: Download again when a cached file already exists.
-    :raises RuntimeError: A download fails.
-    :returns: ``zh_cn`` and ``zh_tw`` to cached path.
-    """
-    paths = zh_source_paths()
-    for key, url in (("zh_cn", ZH_CN_URL), ("zh_tw", ZH_TW_URL)):
-        try:
-            download_cached_file(url, paths[key], force=force)
-        except RuntimeError as exc:
-            raise RuntimeError(
-                f"Cannot download {url}. Set ZH_FREQUENCY_PATH to a directory "
-                "that holds a local copy of the file."
-            ) from exc
-    return paths
-
-
-def _read_word_count_file(path: Path) -> dict[str, int]:
-    """Read a whitespace-separated word and count file.
-
-    Lines with no integer count are skipped, so a header line is ignored.
-
-    :param path: Path to the source file.
-    :raises RuntimeError: The file cannot be read.
-    :returns: Word to occurrence count.
-    """
-    try:
-        text = path.read_text(encoding="utf-8")
-    except OSError as exc:
-        raise RuntimeError(f"Cannot read the frequency file {path}.") from exc
-    counts: dict[str, int] = {}
-    for line in text.splitlines():
-        parts = line.split()
-        if len(parts) != 2 or not parts[1].isdigit():
-            continue
-        word, count = parts
-        counts[word] = counts.get(word, 0) + int(count)
-    return counts
-
-
-def build_frequency_zh_fallback(
-    paths: Mapping[str, Path],
-    *,
-    rows: int = MAX_ROWS,
-) -> list[MandarinFrequencyRow]:
-    """Build the frequency list from the FrequencyWords ``zh_cn`` and ``zh_tw`` files.
-
-    The ``zh_tw`` forms are converted to Simplified Chinese with OpenCC. The
-    counts of equal forms are summed, and the ranks follow the summed counts.
-
-    :param paths: ``zh_cn`` and ``zh_tw`` to source path.
-    :param rows: Number of most frequent forms to keep.
-    :returns: Rows in rank order.
-    """
-    counts: dict[str, int] = {}
-    for key, convert in (("zh_cn", False), ("zh_tw", True)):
-        for word, count in _read_word_count_file(paths[key]).items():
-            form = convert_to_simplified(word) if convert else word
-            if not is_han_only(form):
-                continue
-            counts[form] = counts.get(form, 0) + count
-    total = sum(counts.values()) or 1
-    ordered = sorted(counts.items(), key=lambda item: (-item[1], item[0]))[:rows]
-    return [
-        MandarinFrequencyRow(
-            word=word,
-            lemma=word,
-            count=count,
-            pm=round(count / total * 1_000_000, 6),
-            rank=rank,
-            pos="",
-            source=FALLBACK_SOURCE_NAME,
-            license=FALLBACK_LICENSE,
-        )
-        for rank, (word, count) in enumerate(ordered, 1)
-    ]
 
 
 def write_frequency_tsv(rows: Iterable[MandarinFrequencyRow], path: Path) -> None:
@@ -356,8 +244,6 @@ def _float_cell(text: str | None) -> float:
 
 
 __all__ = [
-    "FALLBACK_LICENSE",
-    "FALLBACK_SOURCE_NAME",
     "FREQUENCY_PATH",
     "LICENSE",
     "MAX_ROWS",
@@ -366,16 +252,11 @@ __all__ = [
     "SOURCE_SHA256",
     "SOURCE_VERSION",
     "WORDFREQ_LANG",
-    "ZH_CN_URL",
-    "ZH_TW_URL",
     "MandarinFrequencyRow",
     "build_frequency_zh",
-    "build_frequency_zh_fallback",
     "check_frequency",
-    "download_zh_sources",
     "frequency_ranks_zh",
     "is_han_only",
     "load_frequency_zh",
     "write_frequency_tsv",
-    "zh_source_paths",
 ]

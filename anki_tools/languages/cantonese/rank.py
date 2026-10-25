@@ -11,6 +11,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from anki_tools.languages.cantonese.frequency import (
+    CIFU_ATTRIBUTION,
     YUE_FREQUENCY_ATTRIBUTION,
     YUE_FREQUENCY_MAX_WORDS,
     _build_frequency_data,
@@ -64,6 +65,7 @@ def load_frequency_data_yue(
             load_yue_frequency(freq=source, spoken_weight=spoken_weight), max_words
         )
         print(f"Loaded {len(data.word_freq)} words ({source} frequency)")
+        print(f"  {CIFU_ATTRIBUTION}; {YUE_FREQUENCY_ATTRIBUTION}")
         return data
     freq_path = Path(path) if path else download_yue_frequency()
     counts = _read_word_count_tsv(freq_path)
