@@ -11,6 +11,7 @@ import pytest
 
 from anki_tools.languages.cantonese import core
 from anki_tools.languages.cantonese.profile import prepare_text
+from anki_tools.ranking import coreflow
 from anki_tools.ranking.corelist import CONTENT_POS
 
 DECK = core.Path("apkg/LTL Cantonese Deck Level 1 - Short.apkg")
@@ -59,7 +60,7 @@ def test_load_input_deck_reads_the_ltl_fields():
 
 def test_tokenize_deck_tags_every_token_as_content():
     """A Han token gets the constant content tag and the punctuation drops."""
-    card = core.InputCard(
+    card = coreflow.InputCard(
         note_id=1, sentence="我睇咗一本書.", english="I read a book.", audio="a.mp3", index=0
     )
     tokens = core.tokenize_deck([card])

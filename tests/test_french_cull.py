@@ -18,7 +18,7 @@ import pytest
 
 from anki_tools.languages.french import cull as cull_fr
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.ranking import cullgates
+from anki_tools.ranking import coreflow, corelist, cullflow, cullgates
 from anki_tools.ranking.coverage import write_rows
 from anki_tools.sentence_pack.audit import sha256_value
 
@@ -26,7 +26,6 @@ ENGLISH = "A short English line."
 BASE_TOKENS = [("le", "DET"), ("chat", "NOUN"), ("mange", "VERB"), ("vite", "ADV")]
 MIN_WORDS = 3
 MAX_WORDS = 12
-CONTENT_POS = cull_fr.FRENCH_CULL_PROFILE.content_pos
 DECK_NAME = "French 1000 Core Sentences"
 DECK_FIELDS = ["French", "sound", "Back", "freq ranks"]
 
@@ -46,8 +45,8 @@ def _card(
     )
 
 
-def _target(lemma: str, rank: int) -> cull_fr.TargetWord:
-    return cull_fr.TargetWord(
+def _target(lemma: str, rank: int) -> corelist.TargetWord:
+    return corelist.TargetWord(
         lemma=lemma,
         rank=rank,
         deck_count=3,
@@ -61,8 +60,8 @@ def _freq_row(
     count: int = 10,
     pm: float = 5.0,
     written: float = 5.0,
-) -> cull_fr.FrequencyRow:
-    return cull_fr.FrequencyRow(
+) -> cullflow.FrequencyRow:
+    return cullflow.FrequencyRow(
         word=word,
         tatoeba_count=count,
         tatoeba_pm=pm,
@@ -72,17 +71,6 @@ def _freq_row(
 
 
 class TestFrequency:
-    def test_a_count_below_five_uses_the_written_term(self) -> None:
-        row = _freq_row("rare", count=4, pm=0.0, written=12.5)
-
-        assert cull_fr.blend_pm(row, spoken_weight=1.0) == pytest.approx(12.5)
-        assert cull_fr.blend_pm(row, spoken_weight=0.0) == pytest.approx(12.5)
-
-    def test_the_middle_weight_uses_both_terms(self) -> None:
-        row = _freq_row("chat", count=10, pm=20.0, written=10.0)
-
-        assert cull_fr.blend_pm(row, spoken_weight=0.5) == pytest.approx(15.0)
-
     def test_the_spoken_weight_changes_the_order(self) -> None:
         rows = [
             _freq_row("parle", pm=100.0, written=1.0),
@@ -106,7 +94,7 @@ class TestFrequency:
         tatoeba_path.write_text("1\tfra\tLe chat mange.\n", encoding="utf-8")
         calls: list[Path] = []
 
-        def fake_build(tatoeba: Path, out_path: Path) -> int:
+        def fake_build(tatoeba: Path, out_path: Path, profile: object) -> int:
             calls.append(out_path)
             with out_path.open("w", newline="", encoding="utf-8") as handle:
                 writer = csv.writer(handle, delimiter="\t", lineterminator="\n")
@@ -116,7 +104,7 @@ class TestFrequency:
                 writer.writerow(["chat", 10, "5.000000", "5.000000", "4.0"])
             return 1
 
-        monkeypatch.setattr(cull_fr, "build_frequency_cache", fake_build)
+        monkeypatch.setattr(cull_fr.cullflow, "build_frequency_cache", fake_build)
 
         rows = cull_fr.load_frequency(frequency_path, tatoeba_path)
         again = cull_fr.load_frequency(frequency_path, tatoeba_path)
@@ -127,60 +115,12 @@ class TestFrequency:
         assert calls == [frequency_path]
 
 
-def _target_fixture() -> tuple[
-    list[cull_fr.InputCard], list[list[tuple[str, str]]], dict[str, int]
-]:
-    pairs = (
-        [("mange", "NOUN")] * 3
-        + [("le", "DET")] * 5
-        + [("table", "NOUN")] * 2
-        + [("fait", "VERB")] * 3
-        + [("fait", "AUX")] * 4
-        + [("a", "VERB")] * 3
-        + [("paris", "PROPN")] * 3
-        + [("chien", "NOUN")] * 4
-    )
-    tokens = [pairs[start : start + 3] for start in range(0, len(pairs), 3)]
-    cards = [_card("Le chat mange ici.", index=index) for index in range(len(tokens))]
-    return cards, tokens, {"mange": 10, "chien": 2, "le": 1}
-
-
 class TestNames:
     def test_read_names_skips_blanks_and_comments(self, tmp_path: Path) -> None:
         path = tmp_path / "names.txt"
         path.write_text("# a comment\n\nParis\n  zoe \n", encoding="utf-8")
 
         assert cull_fr.read_names(path) == {"paris", "zoe"}
-
-
-class TestTargets:
-    def test_the_target_rules_keep_two_of_the_candidates(self) -> None:
-        cards, tokens, ranks = _target_fixture()
-
-        targets, content = cull_fr.build_targets(
-            cards, tokens, ranks, {"paris"}, target_words=300
-        )
-
-        assert [target.lemma for target in targets] == ["chien", "mange"]
-        assert content == 2
-        assert targets[0].rank == 2
-        assert targets[1].rank == 10
-
-    def test_the_target_cut_keeps_the_best_rank(self) -> None:
-        cards, tokens, ranks = _target_fixture()
-
-        targets, content = cull_fr.build_targets(
-            cards, tokens, ranks, {"paris"}, target_words=1
-        )
-
-        assert [target.lemma for target in targets] == ["chien"]
-        assert content == 2
-
-    def test_a_mismatched_token_list_raises(self) -> None:
-        cards, tokens, ranks = _target_fixture()
-
-        with pytest.raises(ValueError):
-            cull_fr.build_targets(cards[:-1], tokens, ranks, set(), target_words=3)
 
 
 @pytest.mark.parametrize(
@@ -233,270 +173,10 @@ def test_filter_cards_rejects_a_duplicate_text() -> None:
     assert reasons == ["", "", "F9"]
 
 
-def _cap_fixture() -> tuple[
-    list[cull_fr.InputCard],
-    list[list[tuple[str, str]]],
-    list[cull_fr.TargetWord],
-    dict[str, int],
-]:
-    sentences = [
-        "Le chat est ici.",
-        "Le chat est la.",
-        "Le chat est seul.",
-        "Le chat est noir.",
-        "Le chat est grand.",
-    ]
-    cards = [_card(sentence, index=index) for index, sentence in enumerate(sentences)]
-    tokens = [
-        [("chat", "NOUN"), (f"f{index}", "NOUN")] for index in range(len(sentences))
-    ]
-    return cards, tokens, [_target("chat", 1)], {"chat": 1}
-
-
-class TestSelection:
-    def test_a_rare_word_wins_over_a_repeated_word(self) -> None:
-        cards = [
-            _card("Une phrase rare ici.", index=0),
-            _card("Une phrase commune ici.", index=1),
-            _card("Une autre phrase commune.", index=2),
-        ]
-        tokens = [
-            [("rare", "NOUN"), ("f1", "NOUN")],
-            [("commune", "NOUN"), ("f2", "NOUN")],
-            [("commune", "NOUN"), ("f3", "NOUN")],
-        ]
-        targets = [_target("rare", 1), _target("commune", 50)]
-        ranks = {"rare": 1, "commune": 50}
-
-        result = cull_fr.select_cards(
-            cards,
-            tokens,
-            targets,
-            ranks,
-            max_cards=10,
-            max_uses=4,
-            exempt_top=0,
-            content_pos=CONTENT_POS,
-        )
-
-        assert result.kept == [0, 1, 2]
-        assert result.gain[1] > result.gain[2]
-
-    def test_a_non_exempt_word_stops_at_the_cap(self) -> None:
-        cards, tokens, targets, ranks = _cap_fixture()
-
-        result = cull_fr.select_cards(
-            cards,
-            tokens,
-            targets,
-            ranks,
-            max_cards=10,
-            max_uses=2,
-            exempt_top=0,
-            content_pos=CONTENT_POS,
-        )
-
-        assert len(result.kept) == 2
-        assert result.uses["chat"] == 2
-
-    def test_a_card_with_a_capped_word_is_skipped(self) -> None:
-        cards, tokens, targets, ranks = _cap_fixture()
-
-        result = cull_fr.select_cards(
-            cards,
-            tokens,
-            targets,
-            ranks,
-            max_cards=10,
-            max_uses=2,
-            exempt_top=0,
-            content_pos=CONTENT_POS,
-        )
-
-        rejected = [index for index in range(len(cards)) if index not in result.kept]
-        assert [result.reasons[index] for index in rejected] == ["use_cap"] * 3
-
-    def test_an_exempt_word_passes_the_cap(self) -> None:
-        cards, tokens, targets, ranks = _cap_fixture()
-
-        result = cull_fr.select_cards(
-            cards,
-            tokens,
-            targets,
-            ranks,
-            max_cards=10,
-            max_uses=2,
-            exempt_top=1,
-            content_pos=CONTENT_POS,
-        )
-
-        assert len(result.kept) == len(cards)
-        assert result.uses["chat"] == len(cards)
-
-    def test_a_lemma_jaccard_of_067_is_duplicate(self) -> None:
-        shared = [f"s{index}" for index in range(67)]
-        first = shared + [f"a{index}" for index in range(20)]
-        second = shared + [f"b{index}" for index in range(13)]
-        cards = [
-            _card("Le chat est ici.", index=0),
-            _card("Le chat est la.", index=1),
-        ]
-        tokens = [
-            [(lemma, "NOUN") for lemma in first],
-            [(lemma, "NOUN") for lemma in second],
-        ]
-        ranks = {lemma: 100 for lemma in shared}
-
-        result = cull_fr.select_cards(
-            cards,
-            tokens,
-            [],
-            ranks,
-            max_cards=10,
-            max_uses=4,
-            exempt_top=0,
-            content_pos=CONTENT_POS,
-        )
-
-        assert len(result.kept) == 1
-        assert result.reasons == {1: "similar"}
-
-    def test_two_runs_keep_the_same_order(self) -> None:
-        cards, tokens, targets, ranks = _cap_fixture()
-
-        first = cull_fr.select_cards(
-            cards,
-            tokens,
-            targets,
-            ranks,
-            max_cards=10,
-            max_uses=2,
-            exempt_top=0,
-            content_pos=CONTENT_POS,
-        )
-        second = cull_fr.select_cards(
-            cards,
-            tokens,
-            targets,
-            ranks,
-            max_cards=10,
-            max_uses=2,
-            exempt_top=0,
-            content_pos=CONTENT_POS,
-        )
-
-        assert first.kept == second.kept
-
-
-ORDER_TOKENS = [
-    [("maison", "NOUN"), ("grande", "ADJ")],
-    [("chat", "NOUN"), ("noir", "ADJ")],
-    [("et", "DET")],
-]
-ORDER_RANKS = {"maison": 5, "grande": 40, "chat": 2, "noir": 900}
-
-
-class TestOrder:
-    def test_coverage_gives_a_non_decreasing_hardest_rank(self) -> None:
-        ordered = cull_fr.order_cards(
-            [0, 1, 2], ORDER_TOKENS, ORDER_RANKS, content_pos=CONTENT_POS
-        )
-
-        hardest = [
-            cull_fr.hardest_rank(ORDER_TOKENS[index], ORDER_RANKS, CONTENT_POS)
-            for index in ordered
-        ]
-        assert ordered == [0, 1, 2]
-        assert hardest == [40, 900, cull_fr.UNRANKED_ORDER]
-
-    def test_input_keeps_the_given_order(self) -> None:
-        ordered = cull_fr.order_cards(
-            [2, 0, 1],
-            ORDER_TOKENS,
-            ORDER_RANKS,
-            order="input",
-            content_pos=CONTENT_POS,
-        )
-
-        assert ordered == [2, 0, 1]
-
-    def test_an_unknown_order_raises(self) -> None:
-        with pytest.raises(ValueError):
-            cull_fr.order_cards(
-                [0], ORDER_TOKENS, ORDER_RANKS, order="random", content_pos=CONTENT_POS
-            )
-
-
-def _read_csv(path: Path) -> tuple[list[str], list[dict[str, str]]]:
-    with path.open(encoding="utf-8", newline="") as handle:
-        reader = csv.DictReader(handle)
-        rows = list(reader)
-        header = list(reader.fieldnames or [])
-    return header, rows
-
-
-def test_cull_csv_columns_and_reasons(tmp_path: Path) -> None:
-    cards = [
-        _card("Le chat mange vite.", index=0),
-        _card("Le chien dort bien.", index=1),
-        _card("Le chat mange vite.", index=2),
-    ]
-    selection = cull_fr.SelectionResult(
-        kept=[1],
-        uses=Counter({"chien": 1}),
-        gain={1: 0.5},
-        exempt=set(),
-        reasons={2: "similar"},
-        card_targets={1: ("chien",)},
-        card_hardest={1: 3},
-    )
-    path = tmp_path / "run.cull.csv"
-
-    cull_fr.write_cull_csv(cards, ["F7", "", ""], selection, [1], path)
-    header, rows = _read_csv(path)
-    raw = path.read_bytes()
-    assert raw.split(b"\n")[0] == ",".join(cull_fr.CULL_COLUMNS).encode()
-    assert b"\r" not in raw
-
-    assert header == list(cull_fr.CULL_COLUMNS)
-    assert len(rows) == 3
-    assert [row["sentence"] for row in rows] == [
-        cards[1].sentence,
-        cards[0].sentence,
-        cards[2].sentence,
-    ]
-    assert [row["kept"] for row in rows] == ["1", "0", "0"]
-    assert [row["reason"] for row in rows] == ["", "F7", "similar"]
-    assert rows[0]["gain"] == "0.500000"
-    assert rows[0]["targets"] == "chien"
-    assert rows[0]["hardest_rank"] == "3"
-    assert rows[1]["gain"] == ""
-
-
-def test_coverage_csv_statuses(tmp_path: Path) -> None:
-    targets = [_target("chat", 1), _target("boire", 2), _target("lait", 3)]
-    selection = cull_fr.SelectionResult(
-        kept=[0, 1],
-        uses=Counter({"chat": 2, "boire": 1}),
-        gain={0: 0.5, 1: 0.4},
-        exempt=set(),
-        reasons={},
-    )
-    path = tmp_path / "run.coverage.csv"
-
-    cull_fr.write_coverage_csv(targets, selection, path)
-    header, rows = _read_csv(path)
-
-    assert header == list(cull_fr.COVERAGE_COLUMNS)
-    assert [row["word"] for row in rows] == ["chat", "boire", "lait"]
-    assert [row["count"] for row in rows] == ["2", "1", "0"]
-    assert [row["status"] for row in rows] == ["covered", "partial", "absent"]
-
-
 def test_manifest_has_params_counts_files_and_kept_order(tmp_path: Path) -> None:
     path = tmp_path / "run.manifest.json"
 
-    cull_fr.write_manifest(
+    coreflow.write_manifest(
         path,
         source={"input": "in.apkg", "deck": DECK_NAME, "model": cull_fr.MODEL_NAME},
         params={"max_cards": 2},
@@ -705,7 +385,7 @@ def test_coverage_gates_read_the_profile_values(tmp_path: Path) -> None:
     files = cullgates.cull_files(tmp_path / "gated.apkg", profile)
     write_rows(
         files.coverage_csv,
-        cull_fr.COVERAGE_COLUMNS,
+        cullflow.COVERAGE_COLUMNS,
         [
             {"word": "chat", "rank": "1", "count": "2", "status": "covered"},
             {"word": "mange", "rank": "2", "count": "2", "status": "covered"},
@@ -725,6 +405,7 @@ def test_coverage_gates_read_the_profile_values(tmp_path: Path) -> None:
     assert twice_message == "2/4 targets with 2 cards (0.500, gate 0.5)"
     assert french_passed is False
     assert french_message == "3/4 targets covered (0.750, gate 0.98)"
+
 
 def _fake_tokens(self: cullgates.CullFiles) -> list[list[tuple[str, str]]]:
     return [DECK_TOKENS[card.sentence] for card in self.output()["cards"]]
@@ -746,17 +427,17 @@ def test_run_gates_passes_on_a_tiny_output(
     cull_fr.write_deck(source, cards, ordered, output, DECK_NAME)
 
     targets = [_target("chat", 1), _target("boire", 2), _target("lait", 3)]
-    selection = cull_fr.SelectionResult(
+    selection = cullflow.SelectionResult(
         kept=ordered,
         uses=Counter({"chat": 2, "boire": 2, "lait": 2}),
         gain={index: 0.5 for index in ordered},
         exempt=set(),
         reasons={},
     )
-    cull_csv, coverage_csv, manifest_path = cull_fr.side_paths(output)
-    cull_fr.write_cull_csv(cards, ["", "", ""], selection, ordered, cull_csv)
-    cull_fr.write_coverage_csv(targets, selection, coverage_csv)
-    cull_fr.write_manifest(
+    cull_csv, coverage_csv, manifest_path = cullflow.side_paths(output)
+    cullflow.write_cull_csv(cards, ["", "", ""], selection, ordered, cull_csv)
+    cullflow.write_coverage_csv(targets, selection, coverage_csv)
+    coreflow.write_manifest(
         manifest_path,
         source={"input": str(source), "deck": DECK_NAME, "model": cull_fr.MODEL_NAME},
         params={
@@ -777,7 +458,7 @@ def test_run_gates_passes_on_a_tiny_output(
             "cull_csv": sha256_value(cull_csv),
             "coverage_csv": sha256_value(coverage_csv),
         },
-        kept_order=cull_fr.kept_order_hash(cards, ordered),
+        kept_order=cullflow.kept_order_hash(cards, ordered),
     )
     monkeypatch.setattr(cullgates.CullFiles, "tokens", _fake_tokens)
     monkeypatch.setattr(cullgates, "probe_audio", _fake_probe)
@@ -883,35 +564,3 @@ def test_swadesh_coverage_counts_a_word_from_another_card() -> None:
 
     assert covered == 1
     assert total == cull_fr.SWADESH_TOTAL
-
-
-def test_dedupe_reserve_drops_an_internal_duplicate() -> None:
-    reserve = [
-        cull_fr.ReserveCard(
-            sentence="Le chat est ici.",
-            html="Le <b>chat</b> est ici.",
-            english="The cat is here.",
-            target="chat",
-            gloss="cat",
-            audio="a.mp3",
-        ),
-        cull_fr.ReserveCard(
-            sentence="Le chat est ici aussi.",
-            html="Le <b>chat</b> est ici aussi.",
-            english="The cat is here too.",
-            target="chat",
-            gloss="cat",
-            audio="b.mp3",
-        ),
-    ]
-    sets = [
-        {"chat", "ici", "aussi"},
-        {"chat", "ici", "aussi", "le"},
-    ]
-
-    kept, kept_sets = cull_fr.dedupe_reserve_sets(
-        reserve, sets, [], [], content_pos=CONTENT_POS
-    )
-
-    assert len(kept) == 1
-    assert kept_sets == [{"chat", "ici", "aussi"}]

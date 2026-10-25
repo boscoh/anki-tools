@@ -13,6 +13,7 @@ import pytest
 from anki_tools.apkg.templates import load_text
 from anki_tools.languages.spanish import cull as cull_es
 from anki_tools.languages.spanish import frequency
+from anki_tools.ranking import cullflow
 from anki_tools.languages.spanish.frequency import (
     LICENSE,
     SOURCE_NAME,
@@ -55,9 +56,9 @@ def test_the_spoken_weight_changes_the_blend_of_a_spanish_row() -> None:
     """A Spanish row holds a spoken term, so the weight changes the score."""
     row = next(row for row in cull_es.load_frequency() if row.tatoeba_count >= 5)
 
-    assert cull_es.blend_pm(row, spoken_weight=0.0) == pytest.approx(row.written_pm)
-    assert cull_es.blend_pm(row, spoken_weight=1.0) == pytest.approx(row.tatoeba_pm)
-    assert cull_es.blend_pm(row, 0.0) != pytest.approx(cull_es.blend_pm(row, 1.0))
+    assert cullflow.blend_pm(row, spoken_weight=0.0) == pytest.approx(row.written_pm)
+    assert cullflow.blend_pm(row, spoken_weight=1.0) == pytest.approx(row.tatoeba_pm)
+    assert cullflow.blend_pm(row, 0.0) != pytest.approx(cullflow.blend_pm(row, 1.0))
 
 
 @needs_cache
@@ -112,7 +113,7 @@ def test_the_clitic_lemma_drops_its_pronoun() -> None:
 
 def test_the_reserve_fields_fit_the_spanish_sentence_model() -> None:
     """The reserve card fills the 11 fields of the input model."""
-    card = cull_es.ReserveCard(
+    card = cullflow.ReserveCard(
         sentence="el gato come",
         html="el <b>gato</b> come",
         english="the cat eats",

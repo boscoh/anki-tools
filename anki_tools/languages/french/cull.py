@@ -31,7 +31,6 @@ FREQUENCY_PATH = Path("data/french_frequency.tsv")
 NAMES_PATH = Path("vocab/french_names.txt")
 TATOEBA_PATH = Path("data/tatoeba/fra_sentences.tsv")
 
-DEFAULT_MAX_CARDS = cullflow.DEFAULT_MAX_CARDS
 DEFAULT_TARGET_WORDS = cullflow.DEFAULT_TARGET_WORDS
 DEFAULT_MAX_USES = cullflow.DEFAULT_MAX_USES
 
@@ -120,20 +119,10 @@ def load_frequency(
                 f"The Tatoeba French corpus {tatoeba_path} is absent. "
                 "Run `anki swadesh fetch french` to fetch it."
             )
-        build_frequency_cache(tatoeba_path, frequency_path)
+        cullflow.build_frequency_cache(
+            tatoeba_path, frequency_path, FRENCH_CULL_PROFILE
+        )
     return cullflow.load_frequency(frequency_path)
-
-
-def build_frequency_cache(
-    tatoeba_path: Path = TATOEBA_PATH, out_path: Path = FREQUENCY_PATH
-) -> int:
-    """Build the cached French frequency list from the Tatoeba corpus.
-
-    :param tatoeba_path: Tatoeba French sentence TSV.
-    :param out_path: Output TSV file.
-    :returns: Number of written rows.
-    """
-    return cullflow.build_frequency_cache(tatoeba_path, out_path, FRENCH_CULL_PROFILE)
 
 
 def card_css(css_path: Path = CARD_CSS_PATH) -> str:
@@ -225,44 +214,14 @@ def run_cull(request: cullflow.CullRequest) -> cullflow.CullRun:
 
 # Re-export the shared flow surface that the CLI and the tests read here.
 CullRequest = cullflow.CullRequest
-CullRun = cullflow.CullRun
-ReserveCard = cullflow.ReserveCard
-FrequencyRow = cullflow.FrequencyRow
-SelectionResult = cullflow.SelectionResult
-CULL_COLUMNS = cullflow.CULL_COLUMNS
-COVERAGE_COLUMNS = cullflow.COVERAGE_COLUMNS
-UNRANKED_ORDER = cullflow.UNRANKED_ORDER
-SWADESH_SOURCE = cullflow.SWADESH_SOURCE
-FREQUENCY_SOURCE = cullflow.FREQUENCY_SOURCE
-blend_pm = cullflow.blend_pm
 frequency_ranks = cullflow.frequency_ranks
-lemma_sets = cullflow.lemma_sets
-select_cards = cullflow.select_cards
-order_cards = cullflow.order_cards
-hardest_rank = cullflow.hardest_rank
-spoken_mass = cullflow.spoken_mass
 default_output = cullflow.default_output
-side_paths = cullflow.side_paths
-write_cull_csv = cullflow.write_cull_csv
-write_coverage_csv = cullflow.write_coverage_csv
-coverage_status = cullflow.coverage_status
-kept_order_hash = cullflow.kept_order_hash
-dedupe_reserve = cullflow.dedupe_reserve
-dedupe_reserve_sets = cullflow.dedupe_reserve_sets
 swadesh_coverage = partial(cullflow.swadesh_coverage, profile=FRENCH_CULL_PROFILE)
 filter_cards = partial(
     cullflow.filter_cards,
     card_rule=partial(cullflow.filter_reason, profile=FRENCH_CULL_PROFILE),
 )
 _filter_reason = partial(cullflow.filter_reason, profile=FRENCH_CULL_PROFILE)
-TargetWord = corelist.TargetWord
-build_targets = corelist.build_targets
-write_manifest = coreflow.write_manifest
-
-
-run_gates = cullgates.run_gates
-GateInputs = cullgates.CullFiles
-gate_inputs = cullgates.gate_inputs
 
 
 def check_cull(output_path: Path) -> int:
@@ -272,7 +231,3 @@ def check_cull(output_path: Path) -> int:
     :returns: The exit code of the gate table, 0 on a pass.
     """
     return cullgates.check_cull(output_path, FRENCH_CULL_PROFILE)
-
-
-
-

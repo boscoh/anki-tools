@@ -14,9 +14,11 @@ import pytest
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.languages.french import core, cull
+from anki_tools.ranking import coreflow, corelist
 from anki_tools.ranking.coreflow import (
     coverage_rows_of,
     find_model_id,
+    InputCard,
     kept_order_hash,
     outside_lemmas,
     sense_match,
@@ -24,7 +26,7 @@ from anki_tools.ranking.coreflow import (
     size_check,
     write_rank_csv,
 )
-from anki_tools.ranking.corelist import build_core_targets
+from anki_tools.ranking.corelist import TargetWord, build_core_targets
 from anki_tools.ranking.core import (
     CoreCandidate,
     CoreOptions,
@@ -42,8 +44,8 @@ def _card(
     index: int = 0,
     english: str = "A short English line.",
     audio: str = "a.mp3",
-) -> cull.InputCard:
-    return cull.InputCard(
+) -> InputCard:
+    return InputCard(
         note_id=1000 + index,
         sentence=sentence,
         english=english,
@@ -59,8 +61,8 @@ def _target(
     form: str = "",
     gloss: str = "",
     senses: frozenset[str] = frozenset(),
-) -> core.CoreTarget:
-    return core.CoreTarget(
+) -> corelist.CoreTarget:
+    return corelist.CoreTarget(
         key=key,
         tier=tier,
         position=position,
@@ -212,23 +214,26 @@ class TestBuildTargets:
 
     def test_a_frequency_lemma_that_is_a_swadesh_form_is_not_added(self) -> None:
         table = [(1, "eau", "water")]
-        frequency = [cull.TargetWord("eau", 1, 3, 1.0, 1.0), cull.TargetWord("pain", 2, 3, 1.0, 1.0)]
+        frequency = [
+            TargetWord("eau", 1, 3, 1.0, 1.0),
+            TargetWord("pain", 2, 3, 1.0, 1.0),
+        ]
 
         targets, _dropped = build_core_targets(table, frequency, {}, 5)
 
         assert [target.key for target in targets] == ["S1:eau", "F:pain"]
 
     def test_the_core_words_cut_the_frequency_list(self) -> None:
-        frequency = [cull.TargetWord(f"w{index}", index, 3, 1.0, 1.0) for index in range(1, 6)]
+        frequency = [TargetWord(f"w{index}", index, 3, 1.0, 1.0) for index in range(1, 6)]
 
         targets, _dropped = build_core_targets([], frequency, {}, 2)
 
         assert [target.key for target in targets] == ["F:w1", "F:w2"]
 
     def test_a_frequency_lemma_gets_its_first_sense_as_the_gloss(self) -> None:
-        frequency = [cull.TargetWord("faire", 1, 3, 1.0, 1.0)]
+        frequency = [TargetWord("faire", 1, 3, 1.0, 1.0)]
         senses = {
-            "faire": core.SenseWords(
+            "faire": corelist.SenseWords(
                 frozenset({"do", "make"}), frozenset(), "do"
             )
         }
@@ -329,7 +334,7 @@ class TestSense:
         loans.write_text("# a comment\nweek-end\n", encoding="utf-8")
 
         assert core.read_senses(senses) == {
-            "pas": core.SenseWords(frozenset({"not"}), frozenset(), "not")
+            "pas": corelist.SenseWords(frozenset({"not"}), frozenset(), "not")
         }
         assert core.read_loanwords(loans) == frozenset({"week-end"})
 
@@ -417,7 +422,7 @@ class TestFiles:
         ]
 
     def test_the_default_output_uses_the_core_suffix(self, tmp_path: Path) -> None:
-        assert core.default_output(tmp_path / "deck.apkg").name == "deck_core.apkg"
+        assert coreflow.default_output(tmp_path / "deck.apkg").name == "deck_core.apkg"
 
 
 def _tiny_deck(tmp_path: Path) -> Path:

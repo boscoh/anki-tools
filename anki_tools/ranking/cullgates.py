@@ -118,9 +118,6 @@ class CullFiles:
         )
 
 
-GateInputs = CullFiles
-
-
 def _sentences(output: dict[str, Any]) -> list[str]:
     """Give the sentence of every card of the output deck."""
     return [card.sentence for card in output["cards"]]
@@ -134,9 +131,6 @@ def cull_files(apkg_path: Path, profile: CullProfile) -> CullFiles:
     :returns: A lazy reader for the APKG and its three side files.
     """
     return CullFiles(apkg_path, profile)
-
-
-gate_inputs = cull_files
 
 
 def _read_output(path: Path, profile: CullProfile) -> dict[str, Any]:

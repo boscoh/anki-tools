@@ -117,8 +117,6 @@ def load_input_deck(path: Path) -> list[InputCard]:
     )
 
 
-
-
 def tokenize_texts(texts: Iterable[str]) -> list[list[tuple[str, str]]]:
     """Tokenize Spanish texts with the shared spaCy pipeline.
 
@@ -149,8 +147,6 @@ def read_names(path: Path = NAMES_PATH) -> set[str]:
     if not path.exists():
         return set()
     return cullflow.read_names(path)
-
-
 
 
 def load_frequency(
@@ -244,46 +240,11 @@ SPANISH_CULL_PROFILE = cullflow.CullProfile(
 
 # Re-export the shared flow surface that the CLI and the tests read here.
 CullRequest = cullflow.CullRequest
-CullRun = cullflow.CullRun
-ReserveCard = cullflow.ReserveCard
-FrequencyRow = cullflow.FrequencyRow
-SelectionResult = cullflow.SelectionResult
-CULL_COLUMNS = cullflow.CULL_COLUMNS
-COVERAGE_COLUMNS = cullflow.COVERAGE_COLUMNS
-UNRANKED_ORDER = cullflow.UNRANKED_ORDER
-SWADESH_SOURCE = cullflow.SWADESH_SOURCE
-FREQUENCY_SOURCE = cullflow.FREQUENCY_SOURCE
-blend_pm = cullflow.blend_pm
 frequency_ranks = cullflow.frequency_ranks
-lemma_sets = cullflow.lemma_sets
-select_cards = cullflow.select_cards
-order_cards = cullflow.order_cards
-hardest_rank = cullflow.hardest_rank
-spoken_mass = cullflow.spoken_mass
 default_output = cullflow.default_output
-side_paths = cullflow.side_paths
-write_cull_csv = cullflow.write_cull_csv
-write_coverage_csv = cullflow.write_coverage_csv
-coverage_status = cullflow.coverage_status
-kept_order_hash = cullflow.kept_order_hash
-dedupe_reserve = cullflow.dedupe_reserve
-dedupe_reserve_sets = cullflow.dedupe_reserve_sets
-swadesh_coverage = partial(cullflow.swadesh_coverage, profile=SPANISH_CULL_PROFILE)
-filter_cards = partial(
-    cullflow.filter_cards,
-    card_rule=partial(cullflow.filter_reason, profile=SPANISH_CULL_PROFILE),
-)
-_filter_reason = partial(cullflow.filter_reason, profile=SPANISH_CULL_PROFILE)
-TargetWord = corelist.TargetWord
-build_targets = corelist.build_targets
-write_manifest = coreflow.write_manifest
-
-run_gates = cullgates.run_gates
-GateInputs = cullgates.CullFiles
-gate_inputs = cullgates.gate_inputs
 
 
-def run_cull(request: CullRequest) -> CullRun:
+def run_cull(request: cullflow.CullRequest) -> cullflow.CullRun:
     """Run the Spanish cull and write the output files.
 
     :param request: Options of the run.

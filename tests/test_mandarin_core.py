@@ -11,6 +11,7 @@ import pytest
 
 from anki_tools.languages.mandarin import core
 from anki_tools.languages.mandarin.profile import shared_pos
+from anki_tools.ranking import coreflow
 from anki_tools.ranking.corelist import CONTENT_POS
 
 DECK = core.Path("apkg/Neri's Chinese Sents Part 2.apkg")
@@ -59,7 +60,7 @@ def test_load_input_deck_reads_the_neri_fields():
 
 def test_tokenize_deck_tags_han_tokens():
     """A Han token gets a shared tag and the punctuation drops."""
-    card = core.InputCard(
+    card = coreflow.InputCard(
         note_id=1,
         sentence="我在喝水.",
         english="I drink water.",

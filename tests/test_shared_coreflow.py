@@ -33,8 +33,8 @@ def _card(
     index: int = 0,
     english: str = "The dog eats bread.",
     audio: str = "a.mp3",
-) -> spanish_core.InputCard:
-    return spanish_core.InputCard(
+) -> coreflow.InputCard:
+    return coreflow.InputCard(
         note_id=1000 + index,
         sentence=sentence,
         english=english,
@@ -99,7 +99,7 @@ class TestSense:
 
 
 def _hit_fixture() -> tuple[
-    list[spanish_core.InputCard], list[list[tuple[str, str]]], list[CoreTarget]
+    list[coreflow.InputCard], list[list[tuple[str, str]]], list[CoreTarget]
 ]:
     cards = [_card("Yo bebo agua.", english="I drink water.")]
     tokens = [[("beber", "VERB")]]
