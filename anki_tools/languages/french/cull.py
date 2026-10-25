@@ -98,9 +98,24 @@ def read_names(path: Path = NAMES_PATH) -> set[str]:
     return cullflow.read_names(path)
 
 
-def load_frequency() -> list[cullflow.FrequencyRow]:
-    """Read the cached French frequency list."""
-    return cullflow.load_frequency(FREQUENCY_PATH)
+def load_frequency(
+    frequency_path: Path = FREQUENCY_PATH, tatoeba_path: Path = TATOEBA_PATH
+) -> list[cullflow.FrequencyRow]:
+    """Give the cached French frequency rows, and build the cache when it is absent.
+
+    :param frequency_path: Frequency cache TSV.
+    :param tatoeba_path: Tatoeba French sentence TSV.
+    :raises RuntimeError: The Tatoeba corpus is absent.
+    :returns: Rows in file order.
+    """
+    if not frequency_path.exists():
+        if not tatoeba_path.exists():
+            raise RuntimeError(
+                f"The Tatoeba French corpus {tatoeba_path} is absent. "
+                "Run `anki swadesh fetch french` to fetch it."
+            )
+        build_frequency_cache(tatoeba_path, frequency_path)
+    return cullflow.load_frequency(frequency_path)
 
 
 def build_frequency_cache(

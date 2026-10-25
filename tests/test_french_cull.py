@@ -95,6 +95,34 @@ class TestFrequency:
             "ecrit": 2,
         }
 
+    def test_the_loader_builds_the_file_when_it_is_absent(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        frequency_path = tmp_path / "french_frequency.tsv"
+        tatoeba_path = tmp_path / "fra_sentences.tsv"
+        tatoeba_path.write_text("1\tfra\tLe chat mange.\n", encoding="utf-8")
+        calls: list[Path] = []
+
+        def fake_build(tatoeba: Path, out_path: Path) -> int:
+            calls.append(out_path)
+            with out_path.open("w", newline="", encoding="utf-8") as handle:
+                writer = csv.writer(handle, delimiter="\t", lineterminator="\n")
+                writer.writerow(
+                    ["word", "tatoeba_count", "tatoeba_pm", "written_pm", "zipf"]
+                )
+                writer.writerow(["chat", 10, "5.000000", "5.000000", "4.0"])
+            return 1
+
+        monkeypatch.setattr(cull_fr, "build_frequency_cache", fake_build)
+
+        rows = cull_fr.load_frequency(frequency_path, tatoeba_path)
+        again = cull_fr.load_frequency(frequency_path, tatoeba_path)
+
+        assert [row.word for row in rows] == ["chat"]
+        assert again == rows
+        assert frequency_path.exists()
+        assert calls == [frequency_path]
+
 
 def _target_fixture() -> tuple[
     list[cull_fr.InputCard], list[list[tuple[str, str]]], dict[str, int]
