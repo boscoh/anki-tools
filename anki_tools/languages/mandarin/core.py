@@ -49,9 +49,13 @@ from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.templates import SHARED_CSS_PATH, TEMPLATES_DIR, load_text
 from anki_tools.languages.mandarin.frequency import (
     FREQUENCY_PATH,
+    MAX_ROWS,
     MandarinFrequencyRow,
+    build_frequency_zh,
+    check_frequency,
     frequency_ranks_zh,
     load_frequency_zh,
+    write_frequency_tsv,
 )
 from anki_tools.languages.mandarin.profile import (
     EXTRA_CSS,
@@ -178,9 +182,26 @@ def tokenize_deck(cards: Sequence[InputCard]) -> list[list[tuple[str, str]]]:
 
 
 def load_frequency() -> list[MandarinFrequencyRow]:
-    """Give the Mandarin frequency cache rows."""
-    return load_frequency_zh()
+    """Give the Mandarin frequency cache rows, and build the file when it is absent.
 
+    :raises RuntimeError: The build fails a gate.
+    :returns: Rows in rank order.
+    """
+    if FREQUENCY_PATH.exists():
+        return load_frequency_zh(FREQUENCY_PATH)
+    rows = build_frequency_zh(rows=MAX_ROWS)
+    write_frequency_tsv(rows, FREQUENCY_PATH)
+    failures = [
+        f"{gate}: {message}"
+        for gate, passed, message in check_frequency(rows)
+        if not passed
+    ]
+    if failures:
+        raise RuntimeError(
+            f"The Mandarin frequency list {FREQUENCY_PATH} fails its gates: "
+            + "; ".join(failures)
+        )
+    return rows
 
 def frequency_ranks(
     rows: Sequence[MandarinFrequencyRow], spoken_weight: float = 0.5

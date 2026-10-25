@@ -129,3 +129,36 @@ def test_cached_file() -> None:
     assert tuple(records[0].keys()) == COLUMNS
     assert len(records) == MAX_ROWS
     assert _sha256(FREQUENCY_PATH) == PINNED_SHA256
+
+
+def test_loader_builds_the_cache_when_the_file_is_absent(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The loader builds, gates, and writes the list once, then reads it back."""
+    from anki_tools.languages.mandarin import core
+
+    target = tmp_path / "mandarin_frequency.tsv"
+    built = [
+        MandarinFrequencyRow(
+            word="的",
+            lemma="的",
+            count=0,
+            pm=1.0,
+            rank=1,
+            pos="",
+            source=SOURCE_NAME,
+            license=LICENSE,
+        )
+    ]
+    monkeypatch.setattr(core, "FREQUENCY_PATH", target)
+    monkeypatch.setattr(core, "check_frequency", lambda rows: [("Z1", True, "ok")])
+    monkeypatch.setattr(core, "build_frequency_zh", lambda **_: list(built))
+
+    assert core.load_frequency() == built
+    assert target.exists()
+
+    def again(**_: object) -> list[MandarinFrequencyRow]:
+        raise AssertionError("the loader rebuilt a file that exists")
+
+    monkeypatch.setattr(core, "build_frequency_zh", again)
+    assert core.load_frequency() == built
