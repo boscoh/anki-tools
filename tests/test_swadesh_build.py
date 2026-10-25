@@ -81,4 +81,6 @@ def test_core_command_reports_a_language_without_a_core_module(
 ) -> None:
     cli.core("greek", tmp_path / "absent.apkg")
 
-    assert "Unsupported language: greek" in capsys.readouterr().out
+    out = capsys.readouterr().out
+    assert "Unsupported language: greek" in out
+    assert "Supported: mandarin, french, spanish, cantonese." in out

@@ -1828,7 +1828,7 @@ def core(
     if entry is None or entry.core is None:
         print(
             f"Unsupported language: {language}. "
-            f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
+            f"Supported: {', '.join(n for n, e in LANGUAGES.items() if e.core)}."
         )
         return
     module = entry.core
