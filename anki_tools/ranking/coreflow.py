@@ -1078,6 +1078,10 @@ def write_deck(
         models = package.get_models(include_templates=True)
         model_id = find_model_id(models, model_name)
         if reserve:
+            if reserve_pack_path is None or reserve_fields is None:
+                raise RuntimeError(
+                    "A run with reserve cards needs a pack path and fields."
+                )
             deck_id = int(next(iter(package.get_decks())))
             insert_reserve_cards(
                 package, reserve, reserve_pack_path, deck_id, reserve_fields
