@@ -783,13 +783,7 @@ def zh(
 
     paths = rank_paths(apkg_path, output)
 
-    print("=" * 50)
-    print("Processing Chinese Anki Deck")
-    print("=" * 50)
-    print(f"Input:   {paths.input_path}")
-    print(f"Output:  {paths.output_path}")
-    print(f"Ranking: {paths.ranking_path}")
-    print()
+    _print_rank_banner(paths, "Chinese")
 
     print("Step 1: Ranking sentences...")
 
@@ -940,13 +934,7 @@ def fr(
 
     paths = rank_paths(apkg_path, output)
 
-    print("=" * 50)
-    print("Processing French Anki Deck")
-    print("=" * 50)
-    print(f"Input:   {paths.input_path}")
-    print(f"Output:  {paths.output_path}")
-    print(f"Ranking: {paths.ranking_path}")
-    print()
+    _print_rank_banner(paths, "French")
 
     print("Step 1: Ranking sentences...")
     deck = run_ranked_deck(
@@ -965,6 +953,24 @@ def fr(
     stats = deck.stats
 
     _print_rank_done(paths, len(ranked), stats)
+
+
+def _print_rank_banner(paths: RankPaths, label: str, target: str = "") -> None:
+    """Print the banner that starts a fix rank run.
+
+    :param paths: Input, output, and ranking file of the run.
+    :param label: Deck language, for example ``Chinese``.
+    :param target: Preformatted extra line, or an empty string.
+    """
+    print("=" * 50)
+    print(f"Processing {label} Anki Deck")
+    print("=" * 50)
+    print(f"Input:   {paths.input_path}")
+    print(f"Output:  {paths.output_path}")
+    print(f"Ranking: {paths.ranking_path}")
+    if target:
+        print(target)
+    print()
 
 
 def _print_rank_done(
@@ -1109,13 +1115,7 @@ def yue(
 
     paths = rank_paths(apkg_path, output)
 
-    print("=" * 50)
-    print("Processing Cantonese Anki Deck")
-    print("=" * 50)
-    print(f"Input:   {paths.input_path}")
-    print(f"Output:  {paths.output_path}")
-    print(f"Ranking: {paths.ranking_path}")
-    print()
+    _print_rank_banner(paths, "Cantonese")
 
     print("Step 1: Ranking sentences...")
 
@@ -1241,15 +1241,15 @@ def es(
 
     paths = rank_paths(apkg_path, output)
 
-    print("=" * 50)
-    print("Processing Spanish Anki Deck")
-    print("=" * 50)
-    print(f"Input:   {paths.input_path}")
-    print(f"Output:  {paths.output_path}")
-    print(f"Ranking: {paths.ranking_path}")
-    if max_sentences:
-        print(f"Target:  {max_sentences} sentences (stratified reduction)")
-    print()
+    _print_rank_banner(
+        paths,
+        "Spanish",
+        target=(
+            f"Target:  {max_sentences} sentences (stratified reduction)"
+            if max_sentences
+            else ""
+        ),
+    )
 
     print("Step 1: Ranking sentences...")
 
