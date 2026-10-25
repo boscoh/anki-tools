@@ -107,7 +107,8 @@ module is `anki_tools/sentence_pack/languages/cantonese.py`.
 | S4    | Audio      | S3                      | `audio/cantonese_sentences/`                 |
 | S5    | Pack       | S3, S4                  | `apkg/swadesh_cantonese_sentences.apkg`      |
 
-`anki swadesh fetch --lang yue` runs S0. The other commands are in section 10.
+`anki swadesh pack cantonese --stage fetch` runs S0. The other stages are in
+section 10.
 Every stage gives the same output for the same input, except the audio cache,
 which skips a file that already passes validation.
 
@@ -335,10 +336,7 @@ voice.
 ## 10. Interface
 
 ```bash
-uv run anki swadesh fetch --lang yue --lang eng              # cache the Tatoeba data
-uv run anki swadesh sentences cantonese --per-word 2 --max-cards 450
-uv run anki swadesh audio cantonese --native-audio auto      # make the audio
-uv run anki swadesh pack cantonese                           # write the APKG
+uv run anki swadesh pack cantonese --per-word 2 --max-cards 450 --native-audio auto  # S0 to S5
 uv run anki swadesh audit cantonese                          # gates G1 to G21
 ```
 

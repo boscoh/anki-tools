@@ -6,17 +6,20 @@ code lives in `anki_tools/sentence_pack/`.
 
 ## 1. Stage map
 
-| Stage | Command                             | Input             | Output                                    |
-| ----- | ----------------------------------- | ----------------- | ----------------------------------------- |
-| S0    | `anki swadesh fetch <language>`     | Tatoeba exports   | `data/tatoeba/*.tsv`                      |
-| S1    | `anki swadesh sentences <language>` | reviewed word CSV | word table in memory                      |
-| S2    | `anki swadesh sentences <language>` | S0 and S1         | candidate pool in memory, pool report     |
-| S3    | `anki swadesh sentences <language>` | S2                | card CSV, review CSV, pool report JSON    |
-| S4    | `anki swadesh audio <language>`     | S3                | `audio/<language>_sentences/*.mp3`, index |
-| S5    | `anki swadesh pack <language>`      | S1, S3, S4        | APKG, manifest, attribution               |
-| Audit | `anki swadesh audit <language>`     | S5 files          | gate table G1 to G21                      |
+One command runs the stages in order: `anki swadesh pack <language>`. The
+`--stage` value stops the run after that stage. The default value runs every
+stage.
 
-The `sentences` command runs S1, S2, and S3 in one process.
+| Stage | Stop after          | Input             | Output                                    |
+| ----- | ------------------- | ----------------- | ----------------------------------------- |
+| S0    | `--stage fetch`     | Tatoeba exports   | `data/tatoeba/*.tsv`                      |
+| S1    | `--stage sentences` | reviewed word CSV | word table in memory                      |
+| S2    | `--stage sentences` | S0 and S1         | candidate pool in memory, pool report     |
+| S3    | `--stage sentences` | S2                | card CSV, review CSV, pool report JSON    |
+| S4    | `--stage audio`     | S3                | `audio/<language>_sentences/*.mp3`, index |
+| S5    | (default)           | S1, S3, S4        | APKG, manifest, attribution               |
+
+The audit gate runs after S5: `anki swadesh audit <language>`.
 
 ## 2. Flow diagram
 

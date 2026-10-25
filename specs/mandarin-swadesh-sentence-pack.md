@@ -665,10 +665,7 @@ Tatoeba text needs this sentence: "Sentences come from Tatoeba
 New commands under the existing `anki swadesh` app. Keep `build` unchanged.
 
 ```bash
-anki swadesh fetch                                   # S0, cache Tatoeba data
-anki swadesh sentences mandarin --per-word 2         # S1 to S3
-anki swadesh audio mandarin --native-audio none      # S4
-anki swadesh pack mandarin                           # S5
+anki swadesh pack mandarin --per-word 2             # S0 to S5
 anki swadesh audit mandarin                          # gates, no writes
 ```
 

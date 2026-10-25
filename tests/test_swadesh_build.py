@@ -6,6 +6,7 @@ import pytest
 
 from anki_tools import cli
 from anki_tools.cli import _content_field_order, _prune_outdated_audio
+from anki_tools.languages.cantonese.profile import CANTONESE
 from anki_tools.sentence_pack import tatoeba as sentence_tatoeba
 
 
@@ -77,7 +78,7 @@ def test_vocab_deck_and_model_names(monkeypatch: pytest.MonkeyPatch) -> None:
     assert captured["model_name"] == "Swadesh French Vocabulary"
 
 
-def test_fetch_command_resolves_the_language_profile(
+def test_fetch_language_uses_the_profile_code(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     captured: list[dict[str, str]] = []
@@ -88,9 +89,7 @@ def test_fetch_command_resolves_the_language_profile(
 
     monkeypatch.setattr(sentence_tatoeba, "fetch_tatoeba", fake_fetch_tatoeba)
 
-    cli.fetch("cantonese")
+    cli._fetch_language(CANTONESE, refresh=False)
     assert any(name.startswith("yue_") for name in captured[0])
+    assert any(name.startswith("eng_") for name in captured[0])
     assert not any(name.startswith("cmn_") for name in captured[0])
-
-    cli.fetch()
-    assert any(name.startswith("cmn_") for name in captured[1])

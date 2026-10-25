@@ -40,6 +40,7 @@ from anki_tools.sentence_pack import pool as sentence_pool
 from anki_tools.sentence_pack import select as sentence_select
 from anki_tools.sentence_pack import tatoeba as sentence_tatoeba
 from anki_tools.sentence_pack.audit import print_audit as print_gate_table
+from anki_tools.sentence_pack.profile import LanguageProfile
 from anki_tools.languages import (
     LANGUAGES,
     profile_languages,
@@ -1552,98 +1553,69 @@ def vocab(language: str, prune: bool = True):
     _build_apkg(lang, prune=prune)
 
 
-def _native_audio(code: str) -> bool:
-    """Report whether a native Tatoeba audio tier exists for a code.
+def _fetch_language(profile: LanguageProfile, refresh: bool) -> None:
+    """Download the Tatoeba exports of one language and English (stage S0).
 
-    :param code: Tatoeba language code, for example ``ell``.
-    :returns: True when the owning profile has a native audio tier, and True
-        for a code that no profile owns.
-    """
-    for entry in LANGUAGES.values():
-        profile = entry.profile
-        if profile is not None and profile.tatoeba_lang == code:
-            return profile.native_audio
-    return True
-
-
-@swadesh_app.command
-def fetch(
-    language: str | None = None,
-    *,
-    refresh: bool = False,
-    lang: list[str] | None = None,
-) -> None:
-    """Fetch the Tatoeba exports of a language pack (stage S0).
-
-    With no argument the command downloads the exports of the Mandarin profile
-    code and of English. A language code whose profile has no native Tatoeba
-    audio skips the ``sentences_with_audio`` export.
-
-    :param language: Language name, for example mandarin or cantonese. Its
-        profile gives the Tatoeba language code.
+    :param profile: Profile of the language. Its code selects the export.
     :param refresh: Ignore the cache and download every file again.
-    :param lang: Tatoeba language codes, for example ``--lang deu``. Use it for
-        a code that no profile owns.
     """
-    codes: list[str] = []
-    if language is not None:
-        entry = LANGUAGES.get(resolve(language))
-        if entry is None or entry.profile is None:
-            print(
-                f"Unsupported language: {language}. "
-                f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
-            )
-            return
-        codes.append(entry.profile.tatoeba_lang)
-    codes.extend(lang or [])
-    if not codes:
-        # ponytail: the fallback profile is a registry invariant, not a runtime
-        # branch; fail loudly if a future edit drops it.
-        mandarin = LANGUAGES["mandarin"].profile
-        if mandarin is None:
-            raise RuntimeError("The Mandarin profile is not registered.")
-        codes.append(mandarin.tatoeba_lang)
-    files: dict[str, str] = {}
-    for code in codes:
-        files.update(
-            sentence_tatoeba.language_files(
-                code,
-                native_audio=_native_audio(code),
-            )
-        )
-    if "eng" not in codes:
-        files.update(sentence_tatoeba.language_files("eng", native_audio=False))
+    files = sentence_tatoeba.language_files(
+        profile.tatoeba_lang, native_audio=profile.native_audio
+    )
+    files.update(sentence_tatoeba.language_files("eng", native_audio=False))
     results = sentence_tatoeba.fetch_tatoeba(files, refresh=refresh)
     for name, info in results.items():
         print(f"{name}.tsv: {info['rows']} rows ({info['source']})")
 
+
 @swadesh_app.command
-def sentences(
+def pack(
     language: str,
+    *,
+    refresh: bool = False,
+    stage: Literal["fetch", "sentences", "audio", "all"] = "all",
     per_word: int = 2,
     max_cards: int = 450,
     max_unknown: int = 2,
     min_words: int | None = None,
     max_words: int | None = None,
+    native_audio: str = "none",
+    voice: str = "",
+    slow_audio: bool = False,
+    pack_license: str = "public",
+    tts: str = "",
 ) -> None:
-    """Build the sentence candidates and write the card CSV files (S1 to S3).
+    """Build one Swadesh sentence pack from the Tatoeba exports (S0 to S5).
+
+    The command runs the stages in order and stops after the ``--stage``
+    value. The default value runs every stage and writes the APKG.
 
     :param language: Language name, for example mandarin.
+    :param refresh: Ignore the Tatoeba cache and download every file again.
+    :param stage: Last stage to run: fetch, sentences, audio, or all.
     :param per_word: Card limit per word form.
     :param max_cards: Hard card cap.
     :param max_unknown: Unknown token budget per sentence.
-    :param min_words: Minimum word count for a sentence-pack core card. The
-        profile default applies when empty.
-    :param max_words: Maximum word count for a sentence-pack card. The profile
-        default applies when empty.
+    :param min_words: Minimum word count of a card. The profile default
+        applies when empty.
+    :param max_words: Maximum word count of a card. The profile default
+        applies when empty.
+    :param native_audio: Tatoeba tier: none, auto, or only.
+    :param voice: TTS voice name. The profile default applies when empty.
+    :param slow_audio: Generate the slow variant.
+    :param pack_license: public or private.
+    :param tts: TTS engine, gtts or edge. The installed engine applies when
+        empty.
     """
-    lang = resolve(language)
-    entry = LANGUAGES.get(lang)
+    entry = LANGUAGES.get(resolve(language))
     if entry is None or entry.module is None:
         print(
             f"Unsupported language: {language}. "
             f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
         )
+        return
+    _fetch_language(entry.profile, refresh=refresh)
+    if stage == "fetch":
         return
     _language_sentences(
         entry.module,
@@ -1654,34 +1626,7 @@ def sentences(
         min_words=min_words,
         max_words=max_words,
     )
-
-
-@swadesh_app.command(name="audio")
-def sentence_audio(
-    language: str,
-    *,
-    native_audio: str = "none",
-    voice: str = "",
-    slow_audio: bool = False,
-    pack_license: str = "public",
-    tts: str = "",
-) -> None:
-    """Generate and validate the audio files of a sentence pack (stage S4).
-
-    :param language: Language name, for example mandarin.
-    :param native_audio: Tatoeba tier: none, auto, or only.
-    :param voice: TTS voice name. The profile default applies when empty.
-    :param slow_audio: Generate the slow variant.
-    :param pack_license: public or private.
-    :param tts: TTS engine, gtts or edge. The installed engine applies when empty.
-    """
-    lang = resolve(language)
-    entry = LANGUAGES.get(lang)
-    if entry is None or entry.module is None:
-        print(
-            f"Unsupported language: {language}. "
-            f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
-        )
+    if stage == "sentences":
         return
     _language_audio(
         entry.module,
@@ -1692,26 +1637,7 @@ def sentence_audio(
         pack_license=pack_license,
         tts=tts,
     )
-
-
-@swadesh_app.command
-def pack(
-    language: str,
-    *,
-    pack_license: str = "public",
-) -> None:
-    """Build one Swadesh sentence pack (stage S5).
-
-    :param language: Language name, for example mandarin.
-    :param pack_license: public or private.
-    """
-    lang = resolve(language)
-    entry = LANGUAGES.get(lang)
-    if entry is None or entry.module is None:
-        print(
-            f"Unsupported language: {language}. "
-            f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
-        )
+    if stage == "audio":
         return
     _language_pack(entry.module, entry.profile, pack_license=pack_license)
 
@@ -1759,7 +1685,7 @@ def _language_sentences(
     if failures:
         for failure in failures:
             print(f"Error: {failure}")
-        return
+        raise SystemExit(1)
     known = module.known_words(table)
     pool, pool_report = sentence_pool.build_candidate_pool(
         table,

@@ -278,10 +278,7 @@ tone-marked pinyin, the English translation, the target word, and two MP3
 files.
 
 ```bash
-uv run anki swadesh fetch mandarin                          # cache the Tatoeba data
-uv run anki swadesh sentences mandarin --per-word 2 --max-cards 450
-uv run anki swadesh audio mandarin --native-audio none      # make the audio
-uv run anki swadesh pack mandarin                           # write the APKG
+uv run anki swadesh pack mandarin --per-word 2 --max-cards 450  # S0 to S5
 uv run anki swadesh audit mandarin                          # gates G1 to G18
 ```
 
@@ -328,10 +325,7 @@ concepts with 300 Tatoeba sentences. Each card holds one sentence, the English
 translation, the target word with a gender gloss, and two MP3 files.
 
 ```bash
-uv run anki swadesh fetch greek                             # cache the Tatoeba data
-uv run anki swadesh sentences greek --per-word 2 --max-cards 340
-uv run anki swadesh audio greek --tts gtts                   # make the audio
-uv run anki swadesh pack greek                               # write the APKG
+uv run anki swadesh pack greek --per-word 2 --max-cards 340 --tts gtts  # S0 to S5
 uv run anki swadesh audit greek                              # gates G1 to G20
 ```
 
@@ -387,10 +381,7 @@ matched token in bold, the English translation, the target word with a gender
 gloss, and two MP3 files.
 
 ```bash
-uv run anki swadesh fetch french                            # cache the Tatoeba data
-uv run anki swadesh sentences french --per-word 2 --max-cards 450
-uv run anki swadesh audio french --native-audio none         # make the audio
-uv run anki swadesh pack french                              # write the APKG
+uv run anki swadesh pack french --per-word 2 --max-cards 450  # S0 to S5
 uv run anki swadesh audit french                             # gates G1 to G21
 ```
 
@@ -617,10 +608,7 @@ matched token in bold, the jyutping reading, the English translation, the
 target word with its reading, and two MP3 files.
 
 ```bash
-uv run anki swadesh fetch cantonese                         # cache the Tatoeba data
-uv run anki swadesh sentences cantonese --per-word 2 --max-cards 450
-uv run anki swadesh audio cantonese --native-audio auto      # make the audio
-uv run anki swadesh pack cantonese                           # write the APKG
+uv run anki swadesh pack cantonese --per-word 2 --max-cards 450 --native-audio auto  # S0 to S5
 uv run anki swadesh audit cantonese                          # gates G1 to G21
 ```
 
@@ -639,8 +627,8 @@ The commands write these files:
 
 Cantonese needs three external things:
 
-1. The Cifu lexicon for the tokenizer. The first `anki swadesh sentences
-   cantonese` downloads it to the cache. The build does not commit it.
+1. The Cifu lexicon for the tokenizer. The first `anki swadesh pack cantonese`
+   run downloads it to the cache. The build does not commit it.
 2. `ffprobe` on the path. The audio step removes a file that fails the header or
    the duration check.
 3. `gtts` for the voice `gtts:yue`. The optional `edge-tts` package adds the

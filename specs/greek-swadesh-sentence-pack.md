@@ -671,10 +671,7 @@ Gate G12 reads only the section for the pack language.
 The commands mirror the French pack, section 11 of that spec:
 
 ```bash
-anki swadesh fetch --lang ell --lang eng                 # S0
-anki swadesh sentences greek --per-word 2                # S1 to S3
-anki swadesh audio greek --tts gtts                      # S4
-anki swadesh pack greek                                  # S5
+anki swadesh pack greek --per-word 2 --tts gtts       # S0 to S5
 anki swadesh audit greek                                 # gates, no writes
 ```
 

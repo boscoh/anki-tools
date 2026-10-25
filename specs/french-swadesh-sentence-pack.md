@@ -695,10 +695,7 @@ Mandarin section.
 New commands under the existing `anki swadesh` app. Keep `build` unchanged.
 
 ```bash
-anki swadesh fetch --lang fra --lang eng                 # S0
-anki swadesh sentences french --per-word 2               # S1 to S3
-anki swadesh audio french --native-audio none            # S4
-anki swadesh pack french                                 # S5
+anki swadesh pack french --per-word 2                  # S0 to S5
 anki swadesh audit french                                # gates, no writes
 ```
 
@@ -719,8 +716,8 @@ Options:
 | `audio`     | `--slow-audio`   | off          | Add a slow variant per card  |
 | `pack`      | `--pack-license` | public       | `public` or `private`        |
 
-`anki swadesh fetch` with no `--lang` keeps the current Mandarin behavior. The
-command must fetch `eng` once and share it between packs.
+The fetch step takes the Tatoeba code from the profile and fetches `eng` once.
+The step shares the English export between packs.
 
 ## 12. File layout
 
