@@ -44,6 +44,7 @@ class CliLanguage:
     """One language of the ``anki swadesh`` command.
 
     :param name: Language name, for example ``greek``.
+    :param label: Display name of the deck commands, for example ``Greek``.
     :param profile: Sentence-pack profile, None for a vocabulary-only language.
     :param module: Sentence-pack module that the shared pipeline drives, None
         when the language has no pipeline module.
@@ -56,6 +57,7 @@ class CliLanguage:
     """
 
     name: str
+    label: str
     profile: LanguageProfile | None = None
     module: ModuleType | None = None
     core: ModuleType | None = None
@@ -69,6 +71,7 @@ LANGUAGES: dict[str, CliLanguage] = {
     for language in (
         CliLanguage(
             "mandarin",
+            label="Mandarin",
             profile=mandarin.MANDARIN,
             module=mandarin,
             core=mandarin_core,
@@ -78,6 +81,7 @@ LANGUAGES: dict[str, CliLanguage] = {
         ),
         CliLanguage(
             "french",
+            label="French",
             profile=french.FRENCH,
             module=french,
             core=french_core,
@@ -85,6 +89,7 @@ LANGUAGES: dict[str, CliLanguage] = {
         ),
         CliLanguage(
             "spanish",
+            label="Spanish",
             profile=spanish.SPANISH,
             module=spanish,
             core=spanish_core,
@@ -94,15 +99,17 @@ LANGUAGES: dict[str, CliLanguage] = {
         ),
         CliLanguage(
             "greek",
+            label="Greek",
             profile=greek.GREEK,
             module=greek,
             audit=greek.run_greek_audit,
             build=True,
             tts="el",
         ),
-        CliLanguage("german", build=True, tts="de"),
+        CliLanguage("german", label="German", build=True, tts="de"),
         CliLanguage(
             "cantonese",
+            label="Cantonese",
             profile=cantonese.CANTONESE,
             module=cantonese,
             core=cantonese_core,
@@ -110,8 +117,8 @@ LANGUAGES: dict[str, CliLanguage] = {
             build=True,
             tts="yue",
         ),
-        CliLanguage("arabic", build=True, tts="ar"),
-        CliLanguage("hindi", build=True, tts="hi"),
+        CliLanguage("arabic", label="Arabic", build=True, tts="ar"),
+        CliLanguage("hindi", label="Hindi", build=True, tts="hi"),
     )
 }
 

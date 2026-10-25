@@ -788,7 +788,7 @@ def zh(
     if core:
         _run_core_command(
             mandarin_core,
-            "Chinese",
+            LANGUAGES["mandarin"].label,
             apkg_path,
             output,
             model_id,
@@ -827,7 +827,7 @@ def zh(
 
     _run_rank_mode(
         paths,
-        "Chinese",
+        LANGUAGES["mandarin"].label,
         rank_sentences_zh,
         {
             "model_id": model_id,
@@ -904,7 +904,7 @@ def fr(
     if core:
         _run_core_command(
             french_core,
-            "French",
+            LANGUAGES["french"].label,
             apkg_path,
             output,
             model_id,
@@ -941,7 +941,7 @@ def fr(
 
     _run_rank_mode(
         paths,
-        "French",
+        LANGUAGES["french"].label,
         rank_sentences_fr,
         {
             "model_id": model_id,
@@ -1096,7 +1096,7 @@ def yue(
     if core:
         _run_core_command(
             cantonese_core,
-            "Cantonese",
+            LANGUAGES["cantonese"].label,
             apkg_path,
             output,
             model_id,
@@ -1184,7 +1184,7 @@ def yue(
 
     _run_rank_mode(
         paths,
-        "Cantonese",
+        LANGUAGES["cantonese"].label,
         rank_and_capture,
         {
             "model_id": model_id,
@@ -1248,7 +1248,7 @@ def es(
     if core:
         _run_core_command(
             spanish_core,
-            "Spanish",
+            LANGUAGES["spanish"].label,
             apkg_path,
             output,
             model_id,
@@ -1278,7 +1278,7 @@ def es(
 
     _run_rank_mode(
         paths,
-        "Spanish",
+        LANGUAGES["spanish"].label,
         rank_sentences_es,
         {
             "model_id": model_id,
@@ -1837,7 +1837,7 @@ def core(
     module = entry.core
     _run_core_command(
         module,
-        label=lang.title(),
+        label=entry.label,
         apkg_path=apkg_path,
         output=output,
         model_id=model_id,

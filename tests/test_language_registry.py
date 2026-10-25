@@ -59,3 +59,9 @@ def test_only_four_languages_have_a_core_module() -> None:
         "spanish",
         "cantonese",
     }
+
+
+def test_every_language_has_a_unique_display_label() -> None:
+    labels = [entry.label for entry in LANGUAGES.values()]
+    assert all(labels)
+    assert len(set(labels)) == len(labels)
