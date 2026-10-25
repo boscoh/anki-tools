@@ -71,27 +71,28 @@ in `docs/swadesh-sentence-flow.md`.
 
 One package per language. The package holds all the code of that language.
 
-| Path                                          | Content                                        |
-| --------------------------------------------- | ---------------------------------------------- |
-| `anki_tools/languages/registry.py`            | `LANGUAGES`, `ALIASES`, and the CLI list       |
-| `anki_tools/languages/cantonese/profile.py`   | Cantonese profile and word metrics             |
-| `anki_tools/languages/cantonese/frequency.py` | Spoken and written frequency list and download |
-| `anki_tools/languages/cantonese/jyutping.py`  | Jyutping repair and Traditional convert        |
-| `anki_tools/languages/cantonese/select.py`    | Rules Y1 to Y8 and the sentence selection      |
-| `anki_tools/languages/cantonese/rank.py`      | Cantonese sentence ranking                     |
-| `anki_tools/languages/mandarin/profile.py`    | Mandarin profile and word metrics              |
-| `anki_tools/languages/mandarin/pinyin.py`     | Pinyin repair for Chinese cards                |
-| `anki_tools/languages/mandarin/characters.py` | Han character helpers and similarity           |
-| `anki_tools/languages/mandarin/rank.py`       | Mandarin sentence ranking                      |
-| `anki_tools/languages/mandarin/stages.py`     | S1 to S3 caller of the shared pipeline         |
-| `anki_tools/languages/french/profile.py`      | French profile and form matching               |
-| `anki_tools/languages/french/rank.py`         | French sentence ranking                        |
-| `anki_tools/languages/french/cull.py`         | French 1000-sentence cull pipeline             |
-| `anki_tools/languages/french/core.py`         | French core-word deck pipeline                 |
-| `anki_tools/languages/french/core_gates.py`   | Gates K1 to K19 of the core deck               |
-| `anki_tools/languages/greek/profile.py`       | Greek profile and form matching                |
-| `anki_tools/languages/greek/rank.py`          | Greek sentence ranking                         |
-| `anki_tools/languages/spanish/rank.py`        | Spanish sentence ranking                       |
+| Path                                                | Content                                            |
+| --------------------------------------------------- | -------------------------------------------------- |
+| `anki_tools/languages/registry.py`                  | `LANGUAGES`, `ALIASES`, and the CLI list           |
+| `anki_tools/languages/cantonese/profile.py`         | Cantonese profile and word metrics                 |
+| `anki_tools/languages/cantonese/frequency.py`       | Spoken and written frequency list and download     |
+| `anki_tools/languages/cantonese/jyutping.py`        | Jyutping repair and Traditional convert            |
+| `anki_tools/languages/cantonese/select.py`          | Rules Y1 to Y8 and the sentence selection          |
+| `anki_tools/languages/cantonese/select_pipeline.py` | Cantonese select-mode pipeline and gates G5 to G12 |
+| `anki_tools/languages/cantonese/rank.py`            | Cantonese sentence ranking                         |
+| `anki_tools/languages/mandarin/profile.py`          | Mandarin profile and word metrics                  |
+| `anki_tools/languages/mandarin/pinyin.py`           | Pinyin repair for Chinese cards                    |
+| `anki_tools/languages/mandarin/characters.py`       | Han character helpers and similarity               |
+| `anki_tools/languages/mandarin/rank.py`             | Mandarin sentence ranking                          |
+| `anki_tools/languages/mandarin/stages.py`           | S1 to S3 caller of the shared pipeline             |
+| `anki_tools/languages/french/profile.py`            | French profile and form matching                   |
+| `anki_tools/languages/french/rank.py`               | French sentence ranking                            |
+| `anki_tools/languages/french/cull.py`               | French 1000-sentence cull pipeline                 |
+| `anki_tools/languages/french/core.py`               | French core-word deck pipeline                     |
+| `anki_tools/languages/french/core_gates.py`         | Gates K1 to K19 of the core deck                   |
+| `anki_tools/languages/greek/profile.py`             | Greek profile and form matching                    |
+| `anki_tools/languages/greek/rank.py`                | Greek sentence ranking                             |
+| `anki_tools/languages/spanish/rank.py`              | Spanish sentence ranking                           |
 
 `languages/mandarin/characters.py` holds the Han script helpers. Cantonese
 imports them, because both languages write the Han script.

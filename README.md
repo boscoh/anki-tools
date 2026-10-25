@@ -213,9 +213,17 @@ uv run anki fix yue deck.apkg --core # Core mode: a small core-word deck
 - The selection keeps the fewest sentences that cover the 1500 most frequent
   words of the deck. Each target word gets 2 cards. One word outside the top
   100 goes in at most 8 kept sentences. The cards go from easy to hard.
-  - `--max-sentences` caps the card count. `--per-word`, `--max-uses`,
-    `--top-words`, and `--order score` control the selection.
+  - `--cards` caps the card count of the chosen mode. `--max-uses` sets the
+    most kept sentences for one word outside the top 100. `--freq` and
+    `--freq-report` set the frequency term and write its report. `--output`
+    names the output file, `--model-id` filters by model, and
+    `--keep-filtered` keeps the similar cards of rank mode.
   - `--no-select` gives the old output: rank and reorder only.
+  - The other selection values are defaults in `SelectRequest`, in
+    `anki_tools/languages/cantonese/select_pipeline.py`. `--order` is no
+    longer a flag: the selection always uses the coverage order.
+  - `--core` builds the core deck instead. `--words`, `--examples`, and
+    `--tail` set its values, and `--check` runs its gates on the output.
 - Outputs `_reordered.apkg`, `.rank.csv` (adds `hardest_rank` and `kept`),
   `.select.csv` (one row per input sentence with the reason), and
   `.coverage.csv` (one row per target word)

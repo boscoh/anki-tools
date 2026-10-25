@@ -69,6 +69,9 @@ DEFAULT_OPTIONS = CoreOptions(
     outside_budget=165,
 )
 
+#: Blend weight that the cached Cantonese frequency list holds.
+SPOKEN_WEIGHT = 0.7
+
 # Every Han token gets this tag: Cifu and jieba give no part of speech, and rule
 # C1 accepts only a verb-like tag, which is a content tag too.
 TOKEN_POS = "VERB"

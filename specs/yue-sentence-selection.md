@@ -459,8 +459,9 @@ introduced. The sort keys, in order:
 3. Han length. Ascending.
 4. Original order. Ascending.
 
-This order replaces the combined score order of `rank_sentences_yue`. Use
-`--order score` to keep the old order.
+This order replaces the combined score order of `rank_sentences_yue`. The
+selection always uses this order: it has no flag, and `SelectRequest.order`
+defaults to `coverage`.
 
 ### 8.5 Word-use cap
 
@@ -496,40 +497,47 @@ anki freq yue --check                # run gates G1, G3, G4
 
 ### 9.2 Options of `anki fix yue`
 
-The existing options stay. These options are new.
+The common flags stay on the command. The selection tuning values live in
+`SelectRequest`, and the core tuning values live in `CoreOptions`. The module
+`anki_tools/languages/cantonese/select_pipeline.py` holds `SelectRequest`,
+`run_select`, `check_select`, and `default_output`.
 
-Selection:
+| Option            | Default | Meaning                                                                    |
+| ----------------- | ------- | -------------------------------------------------------------------------- |
+| `--output`        | none    | Output file, else `<input>_reordered.apkg`                                 |
+| `--model-id`      | none    | Only the cards of this model                                               |
+| `--keep-filtered` | off     | Keep the similar cards (`--no-select` only)                                |
+| `--no-select`     | off     | Run only the ranking, as today                                             |
+| `--max-uses`      | 8       | Most kept sentences for one word outside the top 100; 0 turns it off (8.5) |
+| `--freq`          | blend   | `blend`, `spoken`, or `written`; sets `SelectRequest.freq`                 |
+| `--freq-report`   | off     | Write the sentences that move by more than 100 places (M2)                 |
+| `--core`          | off     | Build the core deck                                                        |
+| `--cards`         | none    | Card cap of the chosen mode; sets `SelectRequest.max_sentences`            |
+| `--words`         | 0       | Core mode: tier F words after the Swadesh set                              |
+| `--examples`      | 2       | Core mode: examples per content target                                     |
+| `--tail`          | 0       | Core mode: cards after the core passes                                     |
+| `--check`         | off     | Run the gates of core mode on the output only                              |
 
-| Option            | Default  | Meaning                                                                    |
-| ----------------- | -------- | -------------------------------------------------------------------------- |
-| `--max-sentences` | none     | Stop Y4 at this count. Without it, Y4 stops at 0 gain                      |
-| `--per-word`      | 2        | Cards wanted for each target word                                          |
-| `--max-uses`      | 8        | Most kept sentences for one word outside the top 100; 0 turns it off (8.5) |
-| `--top-words`     | 1500     | Size of the target set                                                     |
-| `--order`         | coverage | `coverage` (8.4) or `score` (today's order)                                |
-| `--no-select`     | off      | Run only the ranking, as today                                             |
+These values are not flags. The code reads them from `SelectRequest`, and
+`--cards` is the only flag that sets one.
 
-Filter:
+| Field                  | Default    | Rule                                                              |
+| ---------------------- | ---------- | ----------------------------------------------------------------- |
+| `max_sentences`        | none       | Stop Y4 at this count. Without it, Y4 stops at 0 gain (`--cards`) |
+| `per_word`             | 2          | Cards wanted for each target word                                 |
+| `top_words`            | 1500       | Size of the target set                                            |
+| `order`                | `coverage` | `coverage` (8.4); the CLI has no `--order` flag                   |
+| `min_han`              | 3          | Minimum Han characters (Y1)                                       |
+| `max_han`              | 12         | Maximum Han characters (Y1)                                       |
+| `max_unknown`          | 2          | Unknown tokens allowed in a sentence (Y7)                         |
+| `known_top`            | 2000       | Size of the known set (Y7)                                        |
+| `similarity_threshold` | 0.67       | Character Jaccard threshold (8.3)                                 |
+| `final_mark`           | true       | Apply rule Y4; false skips it                                     |
+| `spoken_weight`        | 0.7        | Value of `w` in 5.2                                               |
 
-| Option                   | Default | Meaning                                   |
-| ------------------------ | ------- | ----------------------------------------- |
-| `--min-han`              | 3       | Minimum Han characters (Y1)               |
-| `--max-han`              | 12      | Maximum Han characters (Y1)               |
-| `--max-unknown`          | 2       | Unknown tokens allowed in a sentence (Y7) |
-| `--known-top`            | 2000    | Size of the known set (Y7)                |
-| `--similarity-threshold` | 0.67    | Character Jaccard threshold (8.3)         |
-| `--no-final-mark`        | off     | Skip rule Y4                              |
-
-Frequency:
-
-| Option            | Default | Meaning                                                    |
-| ----------------- | ------- | ---------------------------------------------------------- |
-| `--freq`          | blend   | `blend`, `spoken`, or `written`                            |
-| `--spoken-weight` | 0.7     | Value of `w` in 5.2                                        |
-| `--freq-report`   | off     | Write the sentences that move by more than 100 places (M2) |
-
-`--freq written --order score --no-select` gives a byte-identical result to
-the current version (gate G8).
+`--freq written --no-select` gives a byte-identical result to the current
+version (gate G8). `--order` no longer exists, and it never affected rank
+mode.
 
 ### 9.3 Output files
 

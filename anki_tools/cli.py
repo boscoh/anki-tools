@@ -18,12 +18,13 @@ import time
 import webbrowser
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import cyclopts
 from gtts import gTTS
 
 from anki_tools.languages.cantonese import core as cantonese_core
+from anki_tools.languages.cantonese import select_pipeline as cantonese_select
 from anki_tools.languages.french import core as french_core
 from anki_tools.languages.french import cull as french_cull
 from anki_tools.languages.spanish import core as spanish_core
@@ -76,7 +77,7 @@ from anki_tools.ranking.rank import (
 )
 
 
-from anki_tools.ranking.pipeline import rank_paths, run_ranked_deck
+from anki_tools.ranking.pipeline import RankPaths, rank_paths, run_ranked_deck
 from anki_tools.apkg.templates import (
     DEFAULT_TEMPLATE_DIR,
     SHARED_CSS_PATH,
@@ -89,23 +90,11 @@ from anki_tools.languages.cantonese.frequency import (
     CIFU_ATTRIBUTION,
     YUE_FREQUENCY_ATTRIBUTION,
     FREQUENCY_PATH,
-    build_yue_tokenizer,
     check_frequency,
-    download_cifu,
     load_yue_frequency,
     rank_change_rows,
-    read_cifu,
-    read_overrides,
     write_freq_change_csv,
     write_frequency_tsv,
-)
-from anki_tools.languages.cantonese.select import (
-    SelectionOptions,
-    print_selection_summary,
-    read_names,
-    select_yue_sentences,
-    write_coverage_csv,
-    write_select_csv,
 )
 
 app = cyclopts.App(help="CLI tools for Anki package (.apkg) files")
@@ -975,6 +964,36 @@ def fr(
     print(f"  Ranking CSV:         {paths.ranking_path}")
 
 
+def _print_rank_done(
+    paths: RankPaths,
+    ranked_count: int,
+    stats: dict[str, Any],
+    select_csv: Path | None = None,
+    coverage_csv: Path | None = None,
+) -> None:
+    """Print the DONE table of a rank or a select run.
+
+    :param paths: Input, output, and ranking file of the run.
+    :param ranked_count: Sentences that the ranker kept.
+    :param stats: Card counts of the reorder step.
+    :param select_csv: Select CSV of a select run, or None in rank mode.
+    :param coverage_csv: Coverage CSV of a select run, or None in rank mode.
+    """
+    print()
+    print("=" * 50)
+    print("DONE!")
+    print("=" * 50)
+    print(f"  Sentences ranked:    {ranked_count}")
+    print(f"  Cards reordered:     {stats['cards_reordered']}")
+    print(f"  Cards removed:       {stats['cards_removed']}")
+    print(f"  Output:              {paths.output_path}")
+    print(f"  Ranking CSV:         {paths.ranking_path}")
+    if select_csv is not None:
+        print(f"  Select CSV:          {select_csv}")
+    if coverage_csv is not None:
+        print(f"  Coverage CSV:        {coverage_csv}")
+
+
 DEFAULT_CANTONESE_APKG = Path("apkg/LTL Cantonese Deck Level 1 - Short.apkg")
 
 
@@ -985,20 +1004,9 @@ def yue(
     output: Path | None = None,
     model_id: int | None = None,
     keep_filtered: bool = False,
-    max_sentences: int | None = None,
-    per_word: int = 2,
-    max_uses: int = 8,
-    top_words: int = 1500,
-    order: Literal["coverage", "score"] = "coverage",
     no_select: bool = False,
-    min_han: int = 3,
-    max_han: int = 12,
-    max_unknown: int = 2,
-    known_top: int = 2000,
-    similarity_threshold: float = 0.67,
-    no_final_mark: bool = False,
-    freq: Literal["blend", "spoken", "written"] = "blend",
-    spoken_weight: float = 0.7,
+    max_uses: int = cantonese_select.DEFAULT_MAX_USES,
+    freq: Literal["blend", "spoken", "written"] = cantonese_select.DEFAULT_FREQ,
     freq_report: bool = False,
     core: bool = False,
     cards: int | None = None,
@@ -1007,39 +1015,32 @@ def yue(
     tail: int = cantonese_core.DEFAULT_OPTIONS.tail_cards,
     check: bool = False,
 ):
-    """Fix Cantonese deck: convert to traditional, fix jyutping, select, rank, and reorder.
+    """Fix Cantonese deck: rank and reorder it, or select a smaller deck.
 
-    Converts simplified to traditional Chinese, generates accurate jyutping,
-    and ranks by spoken and written frequency and complexity. Then filters
-    fragments and hard sentences, and keeps the fewest sentences that show the
-    most frequent spoken words, easiest first. Writes .rank.csv, .select.csv,
-    and .coverage.csv next to the input.
+    Rank mode, with ``--no-select``, ranks the sentences and writes
+    ``<input>_reordered.apkg`` and ``.rank.csv``. Select mode is the default.
+    It ranks the sentences, then keeps the fewest sentences that show the most
+    frequent spoken words, easiest first, and writes ``<input>_reordered.apkg``
+    with its rank, select, and coverage CSV files.
+
+    ``--keep-filtered`` applies to rank mode only. ``--core`` builds the core
+    deck instead. The select tuning values live in ``SelectRequest`` and the
+    core tuning values in ``CoreOptions``, and the specs record them.
 
     :param apkg_path: Input .apkg file.
-    :param output: Output .apkg file (default: input_reordered.apkg).
+    :param output: Output .apkg file (default: from the input name).
     :param model_id: Filter by specific model ID.
-    :param keep_filtered: With --no-select, keep high-similarity cards.
-    :param max_sentences: Stop the selection at this count (default: stop at zero gain).
-    :param per_word: Cards wanted for each target word.
-    :param max_uses: Most kept sentences for one word outside the top 100 (0 is no limit).
-    :param top_words: Size of the target set.
-    :param order: coverage (easy to hard) or score (order of the ranker).
+    :param keep_filtered: Rank mode: keep filtered cards instead of removing.
     :param no_select: Only rank and reorder, as before.
-    :param min_han: Minimum Han characters in a sentence.
-    :param max_han: Maximum Han characters in a sentence.
-    :param max_unknown: Unknown words allowed in a sentence.
-    :param known_top: Size of the known word set.
-    :param similarity_threshold: Character Jaccard threshold for duplicates.
-    :param no_final_mark: Keep sentences with no final mark.
+    :param max_uses: Select mode: most cards that hold one non-exempt word.
     :param freq: Frequency term: blend, spoken, or written.
-    :param spoken_weight: Weight of the spoken term in the blend (0 to 1).
     :param freq_report: Write the sentences that the frequency change moves.
     :param core: Build the core deck instead of ranking and selecting.
-    :param cards: Core mode: card cap.
+    :param cards: Card cap of the chosen mode (select: stop at zero gain).
     :param words: Core mode: tier F words after the Swadesh set.
     :param examples: Core mode: examples per content target.
     :param tail: Core mode: cards after the core passes.
-    :param check: Core mode: run the gates on the output only.
+    :param check: Run the gates on the output and do not run the mode again.
     """
     apkg_path = Path(apkg_path)
     if not apkg_path.exists():
@@ -1076,14 +1077,44 @@ def yue(
                 output_path=output_path,
                 core_words=words,
                 options=options,
-                spoken_weight=spoken_weight,
+                spoken_weight=cantonese_core.SPOKEN_WEIGHT,
             )
         )
         return
 
+    if not no_select:
+        output_path = output or cantonese_select.default_output(apkg_path)
+        run = cantonese_select.run_select(
+            cantonese_select.SelectRequest(
+                input_path=apkg_path,
+                output_path=output_path,
+                model_id=model_id,
+                max_sentences=cards,
+                max_uses=max_uses,
+                freq=freq,
+                freq_report=freq_report,
+            )
+        )
+        if run.report is None:
+            print("No sentences found!")
+            return
+        select_csv, coverage_csv = cantonese_select.side_paths(run.paths.output_path)
+        print("\nFixing jyutping...")
+        fix_jyutping(
+            run.paths.output_path,
+            output=run.paths.output_path,
+            verbose=False,
+        )
+        _print_rank_done(
+            run.paths,
+            run.ranked_count,
+            run.stats,
+            select_csv=select_csv,
+            coverage_csv=coverage_csv,
+        )
+        return
+
     paths = rank_paths(apkg_path, output)
-    select_csv = paths.input_path.parent / f"{paths.input_path.stem}.select.csv"
-    coverage_csv = paths.input_path.parent / f"{paths.input_path.stem}.coverage.csv"
 
     print("=" * 50)
     print("Processing Cantonese Anki Deck")
@@ -1100,11 +1131,11 @@ def yue(
 
     def rank_and_capture(sentences: list[Sentence]) -> list[Sentence]:
         extracted.extend(sentences)
-        ranked = rank_sentences_yue(sentences, freq=freq, spoken_weight=spoken_weight)
+        ranked = rank_sentences_yue(sentences, freq=freq)
         counts["ranked"] = len(ranked)
         return ranked
 
-    def select_or_reorder(ranked: list[Sentence]) -> list[Sentence]:
+    def reorder(ranked: list[Sentence]) -> list[Sentence]:
         if freq_report and freq != "written":
             comparison = rank_sentences_yue(
                 [
@@ -1123,36 +1154,8 @@ def yue(
             )
             write_freq_change_csv(rows, change_csv)
             print(f"  {len(rows)} sentences move by more than 100 places: {change_csv}")
-        if no_select:
-            print("\nStep 2: Reordering deck...")
-            return ranked
-        options = SelectionOptions(
-            max_sentences=max_sentences,
-            per_word=per_word,
-            max_uses=max_uses,
-            top_words=top_words,
-            order=order,
-            min_han=min_han,
-            max_han=max_han,
-            max_unknown=max_unknown,
-            known_top=known_top,
-            similarity_threshold=similarity_threshold,
-            final_mark=not no_final_mark,
-            names=read_names(),
-        )
-        print("\nStep 2: Selecting sentences...")
-        frequency = load_yue_frequency(freq=freq, spoken_weight=spoken_weight)
-        tokenizer = build_yue_tokenizer(
-            read_cifu(download_cifu()), extra_words=read_overrides()
-        )
-        ranked_ids = {id(sentence) for sentence in ranked}
-        dropped = [s for s in extracted if id(s) not in ranked_ids]
-        report = select_yue_sentences(ranked, dropped, frequency, tokenizer, options)
-        write_select_csv(report, select_csv)
-        write_coverage_csv(report, coverage_csv)
-        print_selection_summary(report, options)
-        print("\nStep 3: Reordering deck...")
-        return report.ordered
+        print("\nStep 2: Reordering deck...")
+        return ranked
 
     deck = run_ranked_deck(
         paths,
@@ -1160,8 +1163,8 @@ def yue(
         model_id=model_id,
         romanization_candidates=("Jyutping",),
         keep_filtered=keep_filtered,
-        reduce=select_or_reorder,
-        remove_unranked=not no_select,
+        reduce=reorder,
+        remove_unranked=False,
     )
     if not deck.sentences:
         print("No sentences found!")
@@ -1177,18 +1180,7 @@ def yue(
         verbose=False,
     )
 
-    print()
-    print("=" * 50)
-    print("DONE!")
-    print("=" * 50)
-    print(f"  Sentences ranked:    {ranked_count}")
-    print(f"  Cards reordered:     {stats['cards_reordered']}")
-    print(f"  Cards removed:       {stats['cards_removed']}")
-    print(f"  Output:              {paths.output_path}")
-    print(f"  Ranking CSV:         {paths.ranking_path}")
-    if not no_select:
-        print(f"  Select CSV:          {select_csv}")
-        print(f"  Coverage CSV:        {coverage_csv}")
+    _print_rank_done(paths, ranked_count, stats)
 
 
 DEFAULT_SPANISH_APKG = Path("apkg/Spanish 9000 sentences with native audio.apkg")

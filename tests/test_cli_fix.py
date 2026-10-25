@@ -177,29 +177,14 @@ class TestCantoneseRankMode:
 
         monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
 
-        cli.yue(deck_file)
+        cli.yue(deck_file, no_select=True)
 
         paths, kwargs = calls[0]
         assert paths.input_path == deck_file
         assert paths.output_path == deck_file.parent / "input_reordered.apkg"
         assert paths.ranking_path == deck_file.parent / "input.rank.csv"
         assert kwargs["romanization_candidates"] == ("Jyutping",)
-        assert kwargs["remove_unranked"] is True
-
-    def test_no_select_disables_remove_unranked(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, no_jyutping: None
-    ) -> None:
-        calls = []
-
-        def fake_run(_paths, **kwargs):
-            calls.append(kwargs)
-            return _fake_deck()
-
-        monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
-
-        cli.yue(deck_file, no_select=True)
-
-        assert calls[0]["remove_unranked"] is False
+        assert kwargs["remove_unranked"] is False
 
     def test_rank_uses_the_given_output(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, no_jyutping: None
@@ -213,7 +198,7 @@ class TestCantoneseRankMode:
         monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
         output = deck_file.parent / "ranked.apkg"
 
-        cli.yue(deck_file, output=output)
+        cli.yue(deck_file, output=output, no_select=True)
 
         assert calls[0].output_path == output
 
@@ -233,6 +218,135 @@ class TestCantoneseRankMode:
 
         monkeypatch.setattr(cli, "fix_jyutping", fail)
 
+        cli.yue(deck_file, no_select=True)
+
+        assert "No sentences found!" in capsys.readouterr().out
+
+
+def _capture_select(
+    monkeypatch: pytest.MonkeyPatch,
+    report: SimpleNamespace | None = None,
+    ranked_count: int = 0,
+    stats: dict[str, int] | None = None,
+) -> list[cli.cantonese_select.SelectRequest]:
+    """Replace the select run of the CLI with a stub that records the request.
+
+    :param monkeypatch: The pytest monkeypatch fixture.
+    :param report: The report that the stub returns.
+    :param ranked_count: Sentences that the stub reports as ranked.
+    :param stats: Card counts that the stub reports.
+    :returns: The list that the stub appends each request to.
+    """
+    requests: list[cli.cantonese_select.SelectRequest] = []
+
+    def fake_run(request: cli.cantonese_select.SelectRequest):
+        requests.append(request)
+        return cli.cantonese_select.SelectRun(
+            cli.cantonese_select.rank_paths(request.input_path, request.output_path),
+            ranked_count,
+            report,
+            stats or {},
+        )
+
+    monkeypatch.setattr(cli.cantonese_select, "run_select", fake_run)
+    return requests
+
+
+class TestCantoneseSelectMode:
+    def test_select_builds_the_request(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        requests = _capture_select(monkeypatch)
+
+        cli.yue(deck_file)
+
+        request = requests[0]
+        assert request.input_path == deck_file
+        assert request.output_path == deck_file.parent / "input_reordered.apkg"
+        assert request.max_sentences is None
+        assert request.max_uses == 8
+        assert request.freq == "blend"
+        assert request.per_word == 2
+        assert request.final_mark is True
+        assert request.freq_report is False
+        assert request.model_id is None
+
+    def test_cards_sets_the_select_cap(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        requests = _capture_select(monkeypatch)
+
+        cli.yue(deck_file, cards=300)
+
+        assert requests[0].max_sentences == 300
+
+    def test_select_uses_the_given_output(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        requests = _capture_select(monkeypatch)
+        output = deck_file.parent / "small.apkg"
+
+        cli.yue(deck_file, output=output)
+
+        assert requests[0].output_path == output
+
+    def test_select_passes_the_tuning_survivors(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        requests = _capture_select(monkeypatch)
+
+        cli.yue(deck_file, max_uses=3, freq="written", model_id=7, freq_report=True)
+
+        request = requests[0]
+        assert request.max_uses == 3
+        assert request.freq == "written"
+        assert request.model_id == 7
+        assert request.freq_report is True
+
+    def test_select_with_no_report_prints_no_sentences(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
+    ) -> None:
+        _capture_select(monkeypatch)
+
+        def fail(*_args, **_kwargs):
+            raise AssertionError("fix_jyutping must not run")
+
+        monkeypatch.setattr(cli, "fix_jyutping", fail)
+
         cli.yue(deck_file)
 
         assert "No sentences found!" in capsys.readouterr().out
+
+    def test_select_prints_the_csv_names(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
+    ) -> None:
+        _capture_select(
+            monkeypatch,
+            report=SimpleNamespace(),
+            ranked_count=5,
+            stats={"cards_reordered": 3, "cards_removed": 1},
+        )
+        monkeypatch.setattr(cli, "fix_jyutping", lambda *_args, **_kwargs: None)
+
+        cli.yue(deck_file)
+
+        out = capsys.readouterr().out
+        assert "Select CSV:" in out
+        assert "Coverage CSV:" in out
+        assert str(deck_file.parent / "input.select.csv") in out
+        assert str(deck_file.parent / "input.coverage.csv") in out
+
+
+class TestCantoneseCoreMode:
+    def test_core_cards_and_weight(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        requests = []
+        monkeypatch.setattr(
+            cli.cantonese_core, "run_core", lambda request: requests.append(request)
+        )
+
+        cli.yue(deck_file, core=True, cards=42)
+
+        assert requests[0].options.max_cards == 42
+        assert requests[0].spoken_weight == cli.cantonese_core.SPOKEN_WEIGHT
