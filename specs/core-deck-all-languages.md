@@ -264,6 +264,12 @@ One TSV per language in `data/`, for example `data/spanish_frequency.tsv`:
 | source  | Short source name                                  |
 | license | SPDX identifier                                    |
 
+`data/spanish_frequency.tsv` also carries `tatoeba_count`, `tatoeba_pm`,
+`written_pm`, and `zipf`. Those four columns are the cull blend of
+`specs/french-1000-sentence-cull.md`. `cull_frequency_rows()` maps them onto
+the shared `FrequencyRow`. A language adds the four columns when its cull
+needs them.
+
 - Record the file sha256 and the source version in the manifest, next to
   `LICENSES`.
 - `build_targets` looks up lemmas in the rank table. A form-only source needs

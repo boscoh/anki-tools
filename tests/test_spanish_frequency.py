@@ -18,14 +18,30 @@ from anki_tools.languages.spanish.frequency import (
     LICENSE,
     SOURCE_NAME,
     SpanishFrequencyRow,
+    _count_tatoeba,
+    cull_frequency_rows,
     frequency_ranks_es,
     load_frequency_es,
 )
+from anki_tools.ranking.cullflow import blend_pm, spoken_mass
 
-PINNED_SHA256 = "ad19aa90a468dc140d05e98eaeba47da3c23adc69453123257489708396cc278"
+PINNED_SHA256 = "117b36a109abd2d3fed610835c534847e43b878a12424f9604f7def17522a107"
 SOURCE_SHA256 = "b4794c425f3500c21a0ff9367175e36795a978c928a36670e9ad6ae206fb7728"
 
-COLUMNS = ("word", "lemma", "count", "pm", "rank", "pos", "source", "license")
+COLUMNS = (
+    "word",
+    "lemma",
+    "count",
+    "pm",
+    "rank",
+    "pos",
+    "source",
+    "license",
+    "tatoeba_count",
+    "tatoeba_pm",
+    "written_pm",
+    "zipf",
+)
 
 needs_cache = pytest.mark.skipif(
     not FREQUENCY_PATH.exists(),
@@ -95,6 +111,10 @@ def test_loader_fields() -> None:
         pos="DET",
         source=SOURCE_NAME,
         license=LICENSE,
+        tatoeba_count=229646,
+        tatoeba_pm=150100.624401,
+        written_pm=28183.829313,
+        zipf=7.45,
     )
     assert all(row.source == SOURCE_NAME for row in rows)
     assert all(row.license == LICENSE for row in rows)
@@ -124,6 +144,10 @@ def test_loader_builds_the_cache_when_the_file_is_absent(
             pos="DET",
             source=SOURCE_NAME,
             license=LICENSE,
+            tatoeba_count=0,
+            tatoeba_pm=0.0,
+            written_pm=0.0,
+            zipf=0.0,
         )
     ]
     monkeypatch.setattr(core, "FREQUENCY_PATH", target)
@@ -137,3 +161,41 @@ def test_loader_builds_the_cache_when_the_file_is_absent(
 
     monkeypatch.setattr(core, "build_frequency_es", again)
     assert core.load_frequency() == built
+
+
+def test_count_tatoeba_counts_lemmas(tmp_path: Path) -> None:
+    """The Tatoeba pass counts the lemmas and the content tokens."""
+    path = tmp_path / "spa_sentences.tsv"
+    path.write_text(
+        "1\tspa\tLa casa es grande.\n"
+        "2\tspa\tMi casa y el tiempo.\n"
+        "3\tspa\tEl tiempo pasa.\n"
+        "4\tspa\n",
+        encoding="utf-8",
+    )
+    counts, content_tokens = _count_tatoeba(path)
+    assert counts["casa"] == 2
+    assert counts["tiempo"] == 2
+    assert counts["el"] == 3
+    assert counts["y"] == 1
+    assert content_tokens > 0
+
+
+@needs_cache
+def test_blend_pm_uses_the_spoken_term() -> None:
+    """A lemma with a Tatoeba count blends to a different value."""
+    rows = [
+        row
+        for row in cull_frequency_rows(load_frequency_es())
+        if row.tatoeba_count >= 5
+    ]
+    assert rows
+    row = rows[0]
+    assert blend_pm(row, 0.0) != blend_pm(row, 1.0)
+
+
+@needs_cache
+def test_spoken_mass_is_positive() -> None:
+    """A small lemma set covers a positive share of the content tokens."""
+    rows = cull_frequency_rows(load_frequency_es())
+    assert spoken_mass(rows, {"casa", "tiempo"}) > 0
