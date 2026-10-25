@@ -10,16 +10,17 @@ import pytest
 from anki_tools import cli
 
 
-
 def test_the_canonical_names_alias_the_short_codes() -> None:
+    commands = cli.fix_app.resolved_commands()
     for short, canonical, function in (
         ("zh", "mandarin", cli.zh),
         ("fr", "french", cli.fr),
         ("yue", "cantonese", cli.yue),
         ("es", "spanish", cli.es),
     ):
-        assert cli.fix_app._commands[short].default_command is function
-        assert cli.fix_app._commands[canonical].default_command is function
+        assert commands[short].default_command is function
+        assert commands[canonical].default_command is function
+
 
 def _fake_deck() -> SimpleNamespace:
     return SimpleNamespace(
