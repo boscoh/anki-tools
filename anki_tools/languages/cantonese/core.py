@@ -26,10 +26,8 @@ from typing import Sequence
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.templates import SHARED_CSS_PATH, TEMPLATES_DIR, load_text
 from anki_tools.languages.cantonese.frequency import (
-    FREQUENCY_PATH,
     YueFrequency,
     load_yue_frequency,
-    read_frequency_tsv,
 )
 from anki_tools.languages.cantonese.profile import (
     CANTONESE,
@@ -143,16 +141,11 @@ def tokenize_deck(cards: Sequence[InputCard]) -> list[list[tuple[str, str]]]:
 
 
 def load_frequency() -> YueFrequency:
-    """Give the Cantonese frequency list.
+    """Give the Cantonese frequency list, built from the Cifu and Apple Daily sources.
 
-    The frequency list TSV is read when it exists, because it is faster
-    than the blend. Otherwise the blend is built from the Cifu and Apple Daily
-    sources.
-
+    :raises RuntimeError: A gate of the blend fails.
     :returns: The ranked list with the variant map.
     """
-    if FREQUENCY_PATH.exists():
-        return read_frequency_tsv(FREQUENCY_PATH)
     return load_yue_frequency()
 
 
@@ -297,5 +290,5 @@ CANTONESE_CORE_PROFILE = CoreProfile(
     max_units=MAX_UNITS,
     default_options=DEFAULT_OPTIONS,
     deck_name=DEFAULT_NAME,
-    frequency_source=str(FREQUENCY_PATH),
+    frequency_source="Cifu and Apple Daily blend",
 )

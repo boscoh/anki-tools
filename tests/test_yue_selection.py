@@ -22,7 +22,6 @@ from anki_tools.languages.cantonese.frequency import (
     read_overrides,
     read_variants,
     write_freq_change_csv,
-    write_frequency_tsv,
     yue_frequency_path,
 )
 from anki_tools.languages.cantonese.select import (
@@ -150,15 +149,6 @@ class TestVariantsAndOverrides:
 
 
 class TestOutputAndGates:
-    def test_tsv_has_one_row_per_word_sorted_by_rank(self, tmp_path: Path) -> None:
-        data = build_yue_frequency(CIFU, APPLE)
-        out = tmp_path / "list.tsv"
-        write_frequency_tsv(data, out)
-        lines = out.read_text(encoding="utf-8").splitlines()
-        assert lines[0].split("\t")[0] == "word"
-        assert len(lines) == len(data.rows) + 1
-        assert lines[1].split("\t")[6] == "1"
-
     def test_small_list_fails_gate_g1(self) -> None:
         results = {gate: ok for gate, ok, _ in check_frequency(build_yue_frequency(CIFU, APPLE))}
         assert results["G1"] is False

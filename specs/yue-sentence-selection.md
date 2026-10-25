@@ -284,9 +284,10 @@ include its effect. The LTL cells in 3.2, 14.5, and 14.6 predate it.
 
 ## 5. Frequency list
 
-### 5.1 Output file
+### 5.1 Row fields
 
-`data/cantonese_frequency.tsv` has one row per word, sorted by `rank`.
+The list is built in memory and no file is written. It has one row per word,
+sorted by `rank`.
 
 | Column         | Type   | Example | Meaning                                          |
 | -------------- | ------ | ------- | ------------------------------------------------ |
@@ -583,9 +584,8 @@ Rules:
 - The Cifu repository has a GPL-3.0 `LICENSE` file. The data comes from
   corpora with other licenses. Do not copy Cifu into the repository. Check
   the license status before any public release (M0).
-- Write the generated list to `data/cantonese_frequency.tsv`. The `data/`
-  folder is in `.gitignore`.
-  in `.gitignore`.
+- Do not write the generated list to a file. The blend is built in memory on
+  each run.
 - `YUE_FREQUENCY_PATH` keeps its meaning for the Apple Daily file. Add
   `CIFU_PATH` for the Cifu file.
 - Add to `ATTRIBUTION.md`: Cifu (Lai and Winterstein 2020), HKCanCor (Luke

@@ -14,7 +14,6 @@ decision.
 
 from __future__ import annotations
 
-import csv
 import re
 import unicodedata
 from dataclasses import dataclass, replace
@@ -87,7 +86,6 @@ POOL_REPORT_PATH = Path("data/cantonese_pool_report.json")
 AUDIO_DIR = Path("audio/cantonese_sentences")
 AUDIO_TSV_PATH = Path("data/tatoeba/yue_sentences_with_audio.tsv")
 MODULE_CACHE_PATH = Path("data/swadesh/cantonese_module.txt")
-FREQUENCY_PATH = Path("data/cantonese_frequency.tsv")
 
 SWADESH_ROWS = 207
 MIN_FORMS = 205
@@ -95,7 +93,6 @@ MAX_FORMS = 220
 MIN_ZIPF = 3.0
 OPEN_STATUS = "open"
 KNOWN_WORDS_TOP_N = 1000
-KNOWN_YUE_ROWS = 2000
 SIMILARITY_LIMIT = 0.67
 PREFERRED_MIN_HAN = 4
 PREFERRED_MAX_HAN = 8
@@ -768,37 +765,17 @@ def form_positions(table: Sequence[WordForm]) -> dict[str, tuple[int, int]]:
 def known_words(word_table: Sequence[WordForm]) -> set[str]:
     """Build the known word set of filter F11.
 
-    The set holds the Swadesh forms and the most frequent Cantonese words. The
-    frequency list TSV applies when it exists. Otherwise the
-    set uses the top ``wordfreq`` Chinese words in Traditional characters.
+    The set holds the Swadesh forms and the most frequent ``wordfreq`` Chinese
+    words in Traditional characters.
 
     :param word_table: Word table from :func:`load_word_table`.
     :returns: Known word set.
     """
     known = {form.cantonese for form in word_table}
-    if Path(FREQUENCY_PATH).exists():
-        rows = read_csv_rows_tsv(FREQUENCY_PATH, KNOWN_YUE_ROWS)
-        known.update(row["word"] for row in rows)
-    else:
-        known.update(prepare_text(word) for word in top_n_list("zh", KNOWN_WORDS_TOP_N))
+    known.update(prepare_text(word) for word in top_n_list("zh", KNOWN_WORDS_TOP_N))
     return known
 
 
-def read_csv_rows_tsv(path: Path, limit: int) -> list[dict[str, str]]:
-    """Read the first rows of a TSV file.
-
-    :param path: TSV file with a header row.
-    :param limit: Maximum data rows to read.
-    :returns: One mapping per row.
-    """
-    rows: list[dict[str, str]] = []
-    with Path(path).open(encoding="utf-8", newline="") as handle:
-        reader = csv.DictReader(handle, delimiter="\t")
-        for row in reader:
-            if len(rows) >= limit:
-                break
-            rows.append({key: (value or "").strip() for key, value in row.items()})
-    return rows
 
 
 def make_candidate(

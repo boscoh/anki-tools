@@ -31,7 +31,6 @@ CIFU_ATTRIBUTION = (
 VOCAB_DIR = Path(__file__).resolve().parents[3] / "vocab"
 VARIANTS_PATH = VOCAB_DIR / "cantonese_variants.tsv"
 OVERRIDES_PATH = VOCAB_DIR / "cantonese_frequency_overrides.tsv"
-FREQUENCY_PATH = Path("data/cantonese_frequency.tsv")
 YUE_FREQUENCY_URL = (
     "https://raw.githubusercontent.com/chaaklau/appledaily-frequency"
     "/master/release/word-freq.tsv"
@@ -47,16 +46,6 @@ WRITTEN_DICT_WEIGHT = 2
 FREQ_SOURCES = ("blend", "spoken", "written")
 
 _HAN = re.compile(r"[\u4e00-\u9fff]")
-_COLUMNS = (
-    "word",
-    "jyutping",
-    "spoken_count",
-    "spoken_pm",
-    "written_pm",
-    "blend_pm",
-    "rank",
-    "source",
-)
 
 
 @dataclass(frozen=True)
@@ -363,76 +352,6 @@ def to_frequency_data(data: YueFrequency, max_words: int) -> FrequencyData:
     return frequency_data_from_ranks(ranks)
 
 
-def write_frequency_tsv(data: YueFrequency, path: Path) -> None:
-    """Write the list as a TSV file sorted by rank.
-
-    :param data: The ranked list.
-    :param path: Output file.
-    """
-    try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        handle = open(path, "w", encoding="utf-8", newline="")
-    except OSError as exc:
-        raise RuntimeError(f"Cannot write the frequency list {path}.") from exc
-    with handle:
-        writer = csv.writer(handle, delimiter="\t", lineterminator="\n")
-        writer.writerow(_COLUMNS)
-        for row in data.rows:
-            writer.writerow([
-                row.word,
-                row.jyutping,
-                row.spoken_count,
-                f"{row.spoken_pm:.1f}",
-                f"{row.written_pm:.1f}",
-                f"{row.blend_pm:.1f}",
-                row.rank,
-                row.source,
-            ])
-
-
-def read_frequency_tsv(path: Path) -> YueFrequency:
-    """Read a frequency list that :func:`write_frequency_tsv` wrote.
-
-    The variant map of ``vocab/cantonese_variants.tsv`` joins the rows, so a
-    variant form gets the rank of its standard form.
-
-    :param path: TSV file with the ``_COLUMNS`` header.
-    :raises RuntimeError: The file cannot be read.
-    :returns: Rows in rank order and the variant map.
-    """
-    try:
-        handle = open(path, encoding="utf-8", newline="")
-    except OSError as exc:
-        raise RuntimeError(f"Cannot read the frequency list {path}.") from exc
-    rows: list[FreqRow] = []
-    with handle:
-        for row in csv.DictReader(handle, delimiter="\t"):
-            word = (row.get("word") or "").strip()
-            if not word:
-                continue
-            rows.append(
-                FreqRow(
-                    word=word,
-                    jyutping=(row.get("jyutping") or "").strip(),
-                    spoken_count=_count(row.get("spoken_count")),
-                    spoken_pm=_value(row.get("spoken_pm")),
-                    written_pm=_value(row.get("written_pm")),
-                    blend_pm=_value(row.get("blend_pm")),
-                    rank=_count(row.get("rank")),
-                    source=(row.get("source") or "").strip(),
-                )
-            )
-    if not rows:
-        raise ValueError(f"No words found in {path}")
-    return YueFrequency(sorted(rows, key=lambda row: row.rank), read_variants())
-
-
-def _value(text: str | None) -> float:
-    """Read a float cell, with 0.0 for a missing or empty cell."""
-    try:
-        return float((text or "").strip())
-    except ValueError:
-        return 0.0
 
 def check_frequency(data: YueFrequency) -> list[tuple[str, bool, str]]:
     """Run gates G1, G3, and G4 of the spec on the list.
