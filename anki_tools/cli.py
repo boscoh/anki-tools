@@ -18,7 +18,7 @@ import time
 import webbrowser
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, Sequence
 
 import cyclopts
 from gtts import gTTS
@@ -842,16 +842,12 @@ def zh(
         if applied:
             print(f"  Applied: {', '.join(applied)} to {styles_applied} model(s)")
 
-    print()
-    print("=" * 50)
-    print("DONE!")
-    print("=" * 50)
-    print(f"  Sentences ranked:    {len(ranked)}")
-    print(f"  Cards reordered:     {stats['cards_reordered']}")
-    print(f"  Cards removed:       {stats['cards_removed']}")
-    print(f"  Styles applied:      {styles_applied} model(s)")
-    print(f"  Output:              {paths.output_path}")
-    print(f"  Ranking CSV:         {paths.ranking_path}")
+    _print_rank_done(
+        paths,
+        len(ranked),
+        stats,
+        extra_lines=(f"  Styles applied:      {styles_applied} model(s)",),
+    )
 
 
 DEFAULT_FRENCH_APKG = Path("apkg/6000_French_Sentences_w_Audio.apkg")
@@ -980,15 +976,7 @@ def fr(
     ranked = deck.ranked
     stats = deck.stats
 
-    print()
-    print("=" * 50)
-    print("DONE!")
-    print("=" * 50)
-    print(f"  Sentences ranked:    {len(ranked)}")
-    print(f"  Cards reordered:     {stats['cards_reordered']}")
-    print(f"  Cards removed:       {stats['cards_removed']}")
-    print(f"  Output:              {paths.output_path}")
-    print(f"  Ranking CSV:         {paths.ranking_path}")
+    _print_rank_done(paths, len(ranked), stats)
 
 
 def _print_rank_done(
@@ -997,6 +985,8 @@ def _print_rank_done(
     stats: dict[str, Any],
     select_csv: Path | None = None,
     coverage_csv: Path | None = None,
+    *,
+    extra_lines: Sequence[str] = (),
 ) -> None:
     """Print the DONE table of a rank or a select run.
 
@@ -1005,6 +995,7 @@ def _print_rank_done(
     :param stats: Card counts of the reorder step.
     :param select_csv: Select CSV of a select run, or None in rank mode.
     :param coverage_csv: Coverage CSV of a select run, or None in rank mode.
+    :param extra_lines: Preformatted lines to print after the card counts.
     """
     print()
     print("=" * 50)
@@ -1013,6 +1004,8 @@ def _print_rank_done(
     print(f"  Sentences ranked:    {ranked_count}")
     print(f"  Cards reordered:     {stats['cards_reordered']}")
     print(f"  Cards removed:       {stats['cards_removed']}")
+    for line in extra_lines:
+        print(line)
     print(f"  Output:              {paths.output_path}")
     print(f"  Ranking CSV:         {paths.ranking_path}")
     if select_csv is not None:
@@ -1301,15 +1294,7 @@ def es(
     ranked = deck.ranked
     stats = deck.stats
 
-    print()
-    print("=" * 50)
-    print("DONE!")
-    print("=" * 50)
-    print(f"  Sentences ranked:    {len(ranked)}")
-    print(f"  Cards reordered:     {stats['cards_reordered']}")
-    print(f"  Cards removed:       {stats['cards_removed']}")
-    print(f"  Output:              {paths.output_path}")
-    print(f"  Ranking CSV:         {paths.ranking_path}")
+    _print_rank_done(paths, len(ranked), stats)
 
 
 # =============================================================================
