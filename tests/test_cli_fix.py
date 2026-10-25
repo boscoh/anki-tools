@@ -350,3 +350,37 @@ class TestCantoneseCoreMode:
 
         assert requests[0].options.max_cards == 42
         assert requests[0].spoken_weight == cli.cantonese_core.SPOKEN_WEIGHT
+
+
+class TestSpanishMode:
+    def test_check_without_core_prints_an_error(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
+    ) -> None:
+        def fail(*_args, **_kwargs):
+            raise AssertionError("the pipeline must not run")
+
+        monkeypatch.setattr(cli, "run_ranked_deck", fail)
+
+        cli.es(deck_file, check=True)
+
+        assert "Error: --check needs --core." in capsys.readouterr().out
+
+    def test_check_with_core_calls_the_gates(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        checked = []
+        monkeypatch.setattr(
+            cli.spanish_core, "check_core", lambda path: checked.append(path) or 0
+        )
+
+        cli.es(deck_file, core=True, check=True)
+
+        assert checked == [deck_file.parent / "input_core.apkg"]
+
+    def test_check_with_core_exits_on_a_gate_failure(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setattr(cli.spanish_core, "check_core", lambda _path: 1)
+
+        with pytest.raises(SystemExit):
+            cli.es(deck_file, core=True, check=True)

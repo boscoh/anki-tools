@@ -1227,6 +1227,10 @@ def es(
         print(f"Error: File not found: {apkg_path}")
         return
 
+    if check and not core:
+        print("Error: --check needs --core.")
+        return
+
     if core:
         if model_id is not None:
             print("Error: --model-id does not apply with --core.")
