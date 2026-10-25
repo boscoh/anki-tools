@@ -22,6 +22,16 @@ def test_the_canonical_names_alias_the_short_codes() -> None:
         assert commands[canonical].default_command is function
 
 
+
+def test_the_canonical_names_alias_the_freq_short_codes() -> None:
+    commands = cli.freq_app.resolved_commands()
+    for short, canonical, function in (
+        ("yue", "cantonese", cli.freq_yue),
+        ("zh", "mandarin", cli.freq_zh),
+    ):
+        assert commands[short].default_command is function
+        assert commands[canonical].default_command is function
+
 def _fake_deck() -> SimpleNamespace:
     return SimpleNamespace(
         sentences=[object()],

@@ -656,6 +656,13 @@ def freq_zh(
 
 
 
+for _freq_command, _canonical_name in (
+    (freq_yue, "cantonese"),
+    (freq_zh, "mandarin"),
+):
+    freq_app.command(_freq_command, name=_canonical_name)
+
+
 # =============================================================================
 # Fix commands - optimize decks by language
 # =============================================================================
