@@ -1,8 +1,9 @@
 # Swadesh Sentence Pack Flow
 
-This document shows how the `anki swadesh` sentence commands turn the Tatoeba
+This document shows how the `anki swadesh pack` command turns the Tatoeba
 exports into one Anki deck. It shows the stage order and the guard order. The
-code lives in `anki_tools/sentence_pack/`.
+shared code lives in `anki_tools/sentence_pack/`. The language values live in
+`anki_tools/languages/<language>/`.
 
 ## 1. Stage map
 
@@ -102,6 +103,11 @@ The pool measures the sentence only after the shape guards pass.
 | `hits`       | the forms that appear one time, after the form false-friend filter |
 | `sense_hits` | the hits whose English text holds the card sense                   |
 | `dedupe`     | the exact dedupe key of the prepared text                          |
+
+The measure step reads the tokens from the token cache of the language. The
+pool warms the cache in batches of 512 sentences with one spaCy pipeline pass.
+The disk cache at `data/tokens_<language>.sqlite` holds one row per sentence.
+Thus a second build does not tokenize the same sentence again.
 
 ### 3.3 Fact guards
 
@@ -240,8 +246,10 @@ merges some forms into a longer token. So 水 counts inside 喝水.
 | French    | none              | G21                |
 | Greek     | none              | G20                |
 
-The gates call the shared functions in `audit.py`. A pack gives the gate
-number only.
+The shared English sense gate and the shared false-friend gate live in
+`anki_tools/sentence_pack/audit.py`. The word table gate, the boundary gate,
+the attribution gate, and the other language gates live in the language
+module. The gate table of the language lists them in gate number order.
 
 ## 6. Audit gates
 
@@ -261,14 +269,21 @@ A language pack can add a gate. For example, Cantonese adds G20 and G21.
 
 ## 7. File map
 
-| Path                                      | Content                                 |
-| ----------------------------------------- | --------------------------------------- |
-| `anki_tools/sentence_pack/pool.py`        | S2 guards, measure step, pool report    |
-| `anki_tools/sentence_pack/select.py`      | S3 rank key, duplicate index, set cover |
-| `anki_tools/sentence_pack/audit.py`       | gate table and gate implementations     |
-| `anki_tools/sentence_pack/guards.py`      | shared span and occurrence helpers      |
-| `anki_tools/sentence_pack/profile.py`     | language values and hook functions      |
-| `anki_tools/sentence_pack/languages/*.py` | one module per language                 |
+| Path                                         | Content                                  |
+| -------------------------------------------- | ---------------------------------------- |
+| `anki_tools/sentence_pack/pool.py`           | S2 guards, measure step, pool report     |
+| `anki_tools/sentence_pack/select.py`         | S3 rank key, duplicate index, set cover  |
+| `anki_tools/sentence_pack/audit.py`          | gate runner and the shared gates         |
+| `anki_tools/sentence_pack/guards.py`         | shared span and occurrence helpers       |
+| `anki_tools/sentence_pack/english_sense.py`  | English gloss sense check                |
+| `anki_tools/sentence_pack/tokens.py`         | token cache and spaCy pipeline           |
+| `anki_tools/sentence_pack/profile.py`        | profile dataclass and registry           |
+| `anki_tools/sentence_pack/pack.py`           | S5 APKG build and manifest               |
+| `anki_tools/languages/<language>/profile.py` | language values, hooks, gates            |
+| `anki_tools/languages/mandarin/stages.py`    | Mandarin gate runner                     |
+
+A shared module imports no language package. A language module holds the
+values and the gate functions of that language.
 
 ## 8. Guard invariants
 
@@ -280,5 +295,6 @@ A language pack can add a gate. For example, Cantonese adds G20 and G21.
   `FILTER_KEYS` before it can go into a guard table.
 - The audit shape checks use the same guard table. The core check applies all
   shape keys. The scaffold check applies `SCAFFOLD_SHAPE_KEYS`.
-- A language gate function lives in `audit.py`. The language module gives only
-  the gate number and the `false_friend_spans` or `sense_filter` profile hook.
+- A shared gate function lives in `audit.py`. A language gate function lives
+  in the language module. The language profile gives the `false_friend_spans`
+  and `sense_filter` hooks that the shared gates call.

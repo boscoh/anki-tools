@@ -287,6 +287,8 @@ The core deck of Mandarin, French, Spanish, and Cantonese comes from
 `--examples`, `--tail`, and `--check`.
 
 See `docs/swadesh-sentence-flow.md` for the stage order and the guard order.
+See `docs/core-deck-flow.md` for the core mode and `docs/cull-deck-flow.md`
+for the cull mode.
 
 The commands write these files:
 
