@@ -63,6 +63,8 @@ FILTER_NAMES = {
 MIN_ENGLISH_WORDS = 2
 MAX_ENGLISH_WORDS = 12
 
+WARM_BATCH = 512
+
 
 @dataclass(frozen=True)
 class SentenceFacts:
@@ -429,6 +431,19 @@ def read_frames(path: Path) -> list[dict[str, str]]:
         ]
 
 
+def _warm(profile: LanguageProfile, sentences: Sequence[str]) -> None:
+    """Tokenize a batch of sentences before the guards read them.
+
+    Warming after the shape filter skips the sentences that the cheap tests
+    reject, and a batch pays the pipeline overhead once.
+
+    :param profile: Language profile.
+    :param sentences: Sentence texts of the batch.
+    """
+    if profile.warm_tokens is not None:
+        profile.warm_tokens(sentences)
+
+
 def build_candidate_pool(
     word_table: Sequence[WordRow],
     profile: LanguageProfile,
@@ -473,8 +488,6 @@ def build_candidate_pool(
         for sentence_id in links
         if sentence_id in sentences
     }
-    if profile.warm_tokens is not None:
-        profile.warm_tokens(prepared.values())
     wanted_english = {
         english_id for english_ids in links.values() for english_id in english_ids
     }
@@ -488,6 +501,7 @@ def build_candidate_pool(
     seen: set[str] = set()
     relax_seen: set[str] = set()
     total = 0
+    warm_buffer: list[str] = []
     for sentence_id in sorted(links):
         raw = sentences.get(sentence_id)
         if raw is None:
@@ -517,6 +531,10 @@ def build_candidate_pool(
             record_pass(counts, shape)
             continue
 
+        warm_buffer.append(sentence)
+        if len(warm_buffer) >= WARM_BATCH:
+            _warm(profile, warm_buffer)
+            warm_buffer.clear()
         predicate = profile.has_predicate(sentence)
         orphan = profile.has_orphan(sentence)
         unknown_words = profile.count_unknown(sentence, known_words)
@@ -599,6 +617,8 @@ def build_candidate_pool(
                     hits=hits,
                 )
             )
+
+    _warm(profile, warm_buffer)
 
     frame_counts: dict[str, int] = dict.fromkeys(FILTER_KEYS, 0)
     frames = read_frames(frames_path) if frames_path is not None else []

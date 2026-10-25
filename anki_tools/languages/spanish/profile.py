@@ -80,6 +80,7 @@ DECK_DESCRIPTION = (
 SWADESH_URL = "https://en.wiktionary.org/wiki/Module:Swadesh/data/es"
 SWADESH_PAGE = "Module:Swadesh/data/es"
 TOKENIZER = "es_core_news_sm"
+TOKEN_CACHE_PATH = Path("data/tokens_spanish.sqlite")
 TEMPLATE_DIR = TEMPLATES_DIR / "sentence_pack" / "spanish"
 
 FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
@@ -261,7 +262,7 @@ def surface_key(text: str) -> str:
     return prepare_text(text).casefold()
 
 
-_TOKEN_CACHE = TokenCache(TOKENIZER)
+_TOKEN_CACHE = TokenCache(TOKENIZER, path=TOKEN_CACHE_PATH)
 
 
 def spanish_tokens(sentence: str) -> tuple[Token, ...]:

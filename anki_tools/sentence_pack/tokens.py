@@ -6,11 +6,18 @@ with a message that names the install step.
 
 from __future__ import annotations
 
+import hashlib
+import pickle
+import sqlite3
+import zlib
 from dataclasses import dataclass
 from functools import lru_cache
+from pathlib import Path
 from typing import Any, Iterable
 
 PIPE_BATCH = 256
+CACHE_VERSION = 1
+COMMIT_ROWS = 2000
 
 
 @dataclass(frozen=True)
@@ -105,32 +112,61 @@ class TokenCache:
     :param limit: Maximum count of cached sentences.
     """
 
-    def __init__(self, name: str, limit: int = 200_000) -> None:
+    def __init__(
+        self,
+        name: str,
+        limit: int = 200_000,
+        path: Path | None = None,
+    ) -> None:
         self.name = name
         self.limit = limit
+        self.path = Path(path) if path is not None else None
         self._tokens: dict[str, tuple[Token, ...]] = {}
+        self._disk: sqlite3.Connection | None = None
+        self._pending = 0
 
     def get(self, sentence: str) -> tuple[Token, ...]:
-        """Give the tokens of one sentence, and cache them.
-
-        :param sentence: Sentence text.
-        :returns: Tokens of the sentence.
+        """Give the tokens of one sentence, from the memory or the disk cache.
         """
         tokens = self._tokens.get(sentence)
+        if tokens is not None:
+            return tokens
+        key = _key(sentence)
+        tokens = self._read(key)
         if tokens is None:
             tokens = tuple(tokenize(self.name, sentence))
-            self._remember(sentence, tokens)
+            self._write(key, tokens)
+        self._remember(sentence, tokens)
         return tokens
 
     def warm(self, sentences: Iterable[str]) -> None:
-        """Tokenize the sentences that the cache does not hold, in one pass.
+        """Fill the cache for a whole pool.
+
+        A sentence with a disk row is read, not tokenized, so a second build
+        skips the pipeline for every sentence of the first.
 
         :param sentences: Sentence texts of the pool.
         """
-        unique = dict.fromkeys(sentences)
-        missing = [text for text in unique if text not in self._tokens]
-        for sentence, tokens in zip(missing, tokenize_many(self.name, missing)):
-            self._remember(sentence, tuple(tokens))
+        missing: list[str] = []
+        for text in dict.fromkeys(sentences):
+            if text in self._tokens:
+                continue
+            tokens = self._read(_key(text))
+            if tokens is None:
+                missing.append(text)
+            else:
+                self._remember(text, tokens)
+        for text, tokens in zip(missing, tokenize_many(self.name, missing)):
+            tokens = tuple(tokens)
+            self._write(_key(text), tokens)
+            self._remember(text, tokens)
+        self.commit()
+
+    def commit(self) -> None:
+        """Write the pending rows to the disk cache."""
+        if self._disk is not None:
+            self._disk.commit()
+            self._pending = 0
 
     def _remember(self, sentence: str, tokens: tuple[Token, ...]) -> None:
         """Cache one result while the cache holds room.
@@ -140,6 +176,77 @@ class TokenCache:
         """
         if len(self._tokens) < self.limit:
             self._tokens[sentence] = tokens
+
+    def _connection(self) -> sqlite3.Connection | None:
+        """Open the disk cache, and drop its rows when the model changed."""
+        if self.path is None:
+            return None
+        if self._disk is not None:
+            return self._disk
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        connection = sqlite3.connect(self.path)
+        connection.execute(
+            "CREATE TABLE IF NOT EXISTS meta (name TEXT PRIMARY KEY, value TEXT)"
+        )
+        connection.execute(
+            "CREATE TABLE IF NOT EXISTS tokens (key TEXT PRIMARY KEY, value BLOB)"
+        )
+        header = f"{self.name}|{CACHE_VERSION}"
+        row = connection.execute(
+            "SELECT value FROM meta WHERE name = 'header'"
+        ).fetchone()
+        if row is None:
+            connection.execute("INSERT INTO meta VALUES ('header', ?)", (header,))
+        elif row[0] != header:
+            connection.execute("DELETE FROM tokens")
+            connection.execute(
+                "UPDATE meta SET value = ? WHERE name = 'header'", (header,)
+            )
+        connection.commit()
+        self._disk = connection
+        return connection
+
+    def _read(self, key: str) -> tuple[Token, ...] | None:
+        """Read one cached token list.
+
+        :param key: Sentence key.
+        :returns: The tokens, or None when the row is absent.
+        """
+        connection = self._connection()
+        if connection is None:
+            return None
+        row = connection.execute(
+            "SELECT value FROM tokens WHERE key = ?", (key,)
+        ).fetchone()
+        if row is None:
+            return None
+        return tuple(pickle.loads(zlib.decompress(row[0])))
+
+    def _write(self, key: str, tokens: tuple[Token, ...]) -> None:
+        """Store one token list, and commit every :data:`COMMIT_ROWS` rows.
+
+        :param key: Sentence key.
+        :param tokens: Tokens of the sentence.
+        """
+        connection = self._connection()
+        if connection is None:
+            return
+        value = zlib.compress(
+            pickle.dumps(list(tokens), protocol=pickle.HIGHEST_PROTOCOL), 6
+        )
+        connection.execute("INSERT OR REPLACE INTO tokens VALUES (?, ?)", (key, value))
+        self._pending += 1
+        if self._pending >= COMMIT_ROWS:
+            self.commit()
+
+
+def _key(sentence: str) -> str:
+    """Give the disk key of a sentence.
+
+    :param sentence: Sentence text.
+    :returns: SHA-256 hex digest of the text.
+    """
+    return hashlib.sha256(sentence.encode("utf-8")).hexdigest()
 
 
 def words(name: str, text: str) -> list[str]:

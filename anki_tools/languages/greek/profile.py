@@ -76,6 +76,7 @@ DECK_DESCRIPTION = (
 SWADESH_URL = "https://en.wiktionary.org/wiki/Module:Swadesh/data/el"
 SWADESH_PAGE = "Module:Swadesh/data/el"
 TOKENIZER = "el_core_news_sm"
+TOKEN_CACHE_PATH = Path("data/tokens_greek.sqlite")
 TEMPLATE_DIR = TEMPLATES_DIR / "sentence_pack" / "greek"
 
 FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
@@ -329,7 +330,7 @@ def script_problem(text: str) -> str | None:
     return None
 
 
-_TOKEN_CACHE = TokenCache(TOKENIZER)
+_TOKEN_CACHE = TokenCache(TOKENIZER, path=TOKEN_CACHE_PATH)
 
 
 def greek_tokens(sentence: str) -> tuple[Token, ...]:
