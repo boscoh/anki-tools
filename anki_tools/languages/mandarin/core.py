@@ -42,9 +42,8 @@ from __future__ import annotations
 
 import csv
 import re
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Sequence
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.templates import SHARED_CSS_PATH, TEMPLATES_DIR, load_text
@@ -104,37 +103,13 @@ CORE_TEMPLATES = (
 CoreRequest = coreflow.CoreRequest
 CoreRun = coreflow.CoreRun
 default_output = coreflow.default_output
+InputCard = coreflow.InputCard
 
-_SOUND_PATTERN = re.compile(r"\[sound:([^\]]+)\]")
 _BOLD_PATTERN = re.compile(r"</?b>")
 _FINAL_MARKS = {"。": ".", "？": "?", "！": "!"}
 _ASCII_FINAL_MARKS = frozenset(".?!")
 
 _dictionary_ready = False
-
-
-@dataclass(frozen=True)
-class InputCard:
-    """One card of the Mandarin sentence deck.
-
-    :param note_id: Anki note id.
-    :param sentence: Simplified sentence text with an ASCII final mark.
-    :param english: English translation.
-    :param audio: Name of the audio file in the card.
-    :param index: Position of the card in the input order.
-    """
-
-    note_id: int
-    sentence: str
-    english: str
-    audio: str
-    index: int
-
-
-def _audio_name(field_value: str) -> str:
-    """Read the audio file name from a sound field."""
-    match = _SOUND_PATTERN.search(field_value)
-    return match.group(1) if match else ""
 
 
 def _sentence(field_value: str) -> str:
@@ -182,39 +157,14 @@ def load_input_deck(path: Path) -> list[InputCard]:
     :raises RuntimeError: The package has no ``0 2024 Sentences Deck`` model.
     :returns: One card per note, in the input order.
     """
-    with AnkiPackage(path) as package:
-        models = package.get_models()
-        model_id = coreflow.find_model_id(models, MODEL_NAME)
-        fields = [field["name"] for field in models[model_id]["flds"]]
-        index = {name: position for position, name in enumerate(fields)}
-        sentence = index[SENTENCE_FIELD]
-        english = index[ENGLISH_FIELD]
-        audio = index[AUDIO_FIELD]
-
-        chosen: dict[int, Any] = {}
-        for row in package.get_cards():
-            if str(row["mid"]) != model_id:
-                continue
-            if len(row["flds"].split("\x1f")) != len(fields):
-                continue
-            note_id = int(row["nid"])
-            current = chosen.get(note_id)
-            if current is None or int(row["ord"]) < int(current["ord"]):
-                chosen[note_id] = row
-
-        cards: list[InputCard] = []
-        for note_id, row in chosen.items():
-            values = row["flds"].split("\x1f")
-            cards.append(
-                InputCard(
-                    note_id=note_id,
-                    sentence=_sentence(values[sentence]),
-                    english=values[english].strip(),
-                    audio=_audio_name(values[audio]),
-                    index=len(cards),
-                )
-            )
-        return cards
+    return coreflow.read_input_deck(
+        path,
+        MODEL_NAME,
+        SENTENCE_FIELD,
+        ENGLISH_FIELD,
+        AUDIO_FIELD,
+        _sentence,
+    )
 
 
 def tokenize_deck(cards: Sequence[InputCard]) -> list[list[tuple[str, str]]]:

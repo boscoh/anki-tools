@@ -14,13 +14,14 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
+import re
 import sqlite3
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Collection, Sequence
+from typing import Any, Callable, Collection, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking.cardfilter import _WORD_PATTERN, filter_cards
@@ -773,6 +774,82 @@ def find_model_id(models: dict[str, dict], name: str) -> str:
         if model.get("name") == name:
             return model_id
     raise RuntimeError(f"The input APKG has no model {name!r}.")
+
+
+@dataclass(frozen=True)
+class InputCard:
+    """One card of an input sentence deck.
+
+    :param note_id: Anki note id.
+    :param sentence: Sentence text after the language clean step.
+    :param english: English translation.
+    :param audio: Name of the audio file in the card.
+    :param index: Position of the card in the input order.
+    """
+
+    note_id: int
+    sentence: str
+    english: str
+    audio: str
+    index: int
+
+
+_SOUND_PATTERN = re.compile(r"\[sound:([^\]]+)\]")
+
+
+def read_input_deck(
+    path: Path,
+    model_name: str,
+    sentence_field: str,
+    english_field: str,
+    audio_field: str,
+    clean_sentence: Callable[[str], str],
+) -> list[InputCard]:
+    """Read one card per note of the sentence model in an APKG file.
+
+    :param path: Input APKG file.
+    :param model_name: Name of the note model.
+    :param sentence_field: Name of the sentence field.
+    :param english_field: Name of the English field.
+    :param audio_field: Name of the audio field.
+    :param clean_sentence: Cleaner of the raw sentence field value.
+    :raises RuntimeError: The package has no model with that name.
+    :returns: One card per note, in the input order.
+    """
+    with AnkiPackage(path) as package:
+        models = package.get_models()
+        model_id = find_model_id(models, model_name)
+        fields = [field["name"] for field in models[model_id]["flds"]]
+        index = {name: position for position, name in enumerate(fields)}
+        sentence = index[sentence_field]
+        english = index[english_field]
+        audio = index[audio_field]
+
+        chosen: dict[int, Any] = {}
+        for row in package.get_cards():
+            if str(row["mid"]) != model_id:
+                continue
+            if len(row["flds"].split("\x1f")) != len(fields):
+                continue
+            note_id = int(row["nid"])
+            current = chosen.get(note_id)
+            if current is None or int(row["ord"]) < int(current["ord"]):
+                chosen[note_id] = row
+
+        cards: list[InputCard] = []
+        for note_id, row in chosen.items():
+            values = row["flds"].split("\x1f")
+            sound = _SOUND_PATTERN.search(values[audio])
+            cards.append(
+                InputCard(
+                    note_id=note_id,
+                    sentence=clean_sentence(values[sentence]),
+                    english=values[english].strip(),
+                    audio=sound.group(1) if sound else "",
+                    index=len(cards),
+                )
+            )
+        return cards
 
 
 def _connection(package: AnkiPackage) -> sqlite3.Connection:
