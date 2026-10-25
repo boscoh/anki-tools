@@ -1002,6 +1002,7 @@ def _print_rank_done(
     if coverage_csv is not None:
         print(f"  Coverage CSV:        {coverage_csv}")
 
+
 def _run_rank_mode(
     paths: RankPaths,
     label: str,
@@ -1032,6 +1033,7 @@ def _run_rank_mode(
     ranked_count = count(len(deck.ranked)) if count is not None else len(deck.ranked)
     extra_lines = after(paths, deck) if after is not None else ()
     _print_rank_done(paths, ranked_count, deck.stats, extra_lines=extra_lines)
+
 
 DEFAULT_CANTONESE_APKG = Path("apkg/LTL Cantonese Deck Level 1 - Short.apkg")
 
