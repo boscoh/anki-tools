@@ -22,6 +22,11 @@ from anki_tools.apkg.templates import (
     load_css_layers,
     load_text,
 )
+from anki_tools.languages import (
+    LANGUAGES,
+    profile_languages,
+    swadesh_languages,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_PATH = ROOT / "preview" / "cards.html"
@@ -36,32 +41,14 @@ FIELD_PATTERN = re.compile(r"\{\{\{?\s*([^{}#/][^{}]*?)\s*\}\}\}?")
 SOUND_PATTERN = re.compile(r"\[sound:([^\]]+)\]")
 PARENTHETICAL_PATTERN = re.compile(r"\s*\([^)]*\)")
 
-SENTENCE_LANGUAGES: tuple[tuple[str, str], ...] = (
-    ("mandarin", "Mandarin"),
-    ("cantonese", "Cantonese"),
-    ("french", "French"),
-    ("greek", "Greek"),
-    ("spanish", "Spanish"),
+SENTENCE_LANGUAGES: tuple[tuple[str, str], ...] = tuple(
+    (language.name, language.label) for language in profile_languages()
 )
 
-VOCAB_LANGUAGES: tuple[tuple[str, str], ...] = (
-    ("mandarin", "Mandarin"),
-    ("french", "French"),
-    ("spanish", "Spanish"),
-    ("greek", "Greek"),
-    ("german", "German"),
-    ("cantonese", "Cantonese"),
-    ("arabic", "Arabic"),
-    ("hindi", "Hindi"),
+VOCAB_LANGUAGES: tuple[tuple[str, str], ...] = tuple(
+    (name, LANGUAGES[name].label) for name in swadesh_languages()
 )
 
-WORD_FIELDS = {
-    "mandarin": "mandarin",
-    "cantonese": "cantonese",
-    "french": "french",
-    "greek": "greek",
-    "spanish": "spanish",
-}
 CJK_FIELDS = {"characters", "hanzi", "cantonese", "mandarin", "chinese"}
 SCRIPT_15EM_FIELDS = {"arabic", "hindi"}
 
@@ -332,6 +319,17 @@ def read_csv_rows(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(handle))
 
 
+def read_csv_rows_or_empty(path: Path) -> list[dict[str, str]]:
+    """Read a CSV file, or give no rows when the file is absent.
+
+    :param path: CSV file to read.
+    :returns: One mapping for each data row.
+    """
+    if not path.exists():
+        return []
+    return read_csv_rows(path)
+
+
 def audio_name(text: str) -> str:
     """Build the audio file name that the vocabulary builder uses.
 
@@ -436,12 +434,9 @@ def find_word(language: str, target: str) -> dict[str, str] | None:
     :param target: Target-language form.
     :returns: Word table row, or None when the table has no row.
     """
-    field = WORD_FIELDS.get(language)
-    if field is None:
-        return None
     path = VOCAB_DIR / f"english-{language}.csv"
-    for row in read_csv_rows(path):
-        if row.get(field) == target:
+    for row in read_csv_rows_or_empty(path):
+        if row.get(language) == target:
             return row
     return None
 
@@ -694,26 +689,17 @@ def build_sections() -> tuple[PreviewSection, ...]:
     :returns: Sections in display order.
     """
     sentence_cards = []
-    samples = {
-        "mandarin": ("我", "你是我的一切。"),
-        "cantonese": ("我", "我覺得會發生。"),
-        "french": ("tu", "Peux-tu me dire ce que c'est ?"),
-        "greek": ("εσύ", "Δεν χρειάζεται να το κάνεις εσύ."),
-        "spanish": ("yo", "Eso no es lo que yo creo."),
-    }
     for language, title in SENTENCE_LANGUAGES:
-        target, sentence = samples[language]
-        rows = read_csv_rows(VOCAB_DIR / f"{language}_sentences.csv")
-        row = next(
-            entry
-            for entry in rows
-            if entry["target"] == target and entry["sentence"] == sentence
-        )
-        sentence_cards.append(sentence_card(language, f"{title} sentence", row))
+        rows = read_csv_rows_or_empty(VOCAB_DIR / f"{language}_sentences.csv")
+        if rows:
+            sentence_cards.append(
+                sentence_card(language, f"{title} sentence", rows[0])
+            )
 
     vocab_cards = tuple(
         vocab_card(language, f"{title} vocabulary")
         for language, title in VOCAB_LANGUAGES
+        if (VOCAB_DIR / f"english-{language}.csv").exists()
     )
 
     return (
