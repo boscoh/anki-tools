@@ -424,6 +424,8 @@ def build_manifest(
         positions[target][0] for target in targets if target in positions
     }
     manifest: dict[str, Any] = {
+        "deck": profile.deck_name,
+        "model": profile.model_name,
         "build_date": date.today().isoformat(),
         "source_dump_date": source_dump_date(),
         "counts": {

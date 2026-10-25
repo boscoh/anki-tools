@@ -531,7 +531,7 @@ minutes. 200 native downloads take about 4 minutes.
 
 ### 10.1 Note model
 
-Model name: `Mandarin Swadesh Sentence`.
+Model name: `Swadesh Mandarin Sentences`.
 
 | Order | Field       | Content                       |
 | ----- | ----------- | ----------------------------- |

@@ -11,6 +11,11 @@ def test_deck_name_has_the_swadesh_prefix() -> None:
         assert profile.deck_name == f"Swadesh {name.title()} Sentences"
 
 
+def test_every_pack_model_name_matches_its_deck_name() -> None:
+    for name, profile in PROFILES.items():
+        assert profile.model_name == profile.deck_name
+
+
 def test_used_audio_authors_keeps_only_the_native_rows_of_the_pack() -> None:
     authors = {1: "one", 2: "two", 3: "three"}
 

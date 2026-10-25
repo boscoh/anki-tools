@@ -325,6 +325,8 @@ def test_manifest_counts(tmp_path: Path) -> None:
     assert manifest["voice"] == "gtts:el"
     assert manifest["native_audio_available"] is False
     assert manifest["excluded_words"] == ["πίνω", "πόδι"]
+    assert manifest["deck"] == greek.GREEK.deck_name
+    assert manifest["model"] == greek.GREEK.model_name
 
 
 def test_card_cap_holds_the_greek_deck_small() -> None:

@@ -272,7 +272,8 @@ The audio file name comes from the target-language text. If you correct a
 form in the CSV file, the build makes a new MP3 file for it. The old MP3 file
 has no use, and step 2 deletes it.
 
-The deck name has the entry count (for example, `Swadesh Mandarin 207`).
+The deck title is `Swadesh <Language> Vocabulary`; the entry count is in the
+command output, not in the title.
 
 ### Swadesh Mandarin Sentences
 
@@ -775,7 +776,7 @@ APKG files are ZIP archives containing:
 ```text
 #separator:Pipe
 #html:true
-#deck:Mandarin Swadesh 207
+#deck:Swadesh Mandarin Vocabulary
 #notetype:Basic
 I | <span style='font-size: 3rem'>我</span> <br> wǒ [sound:我.mp3]
 ```

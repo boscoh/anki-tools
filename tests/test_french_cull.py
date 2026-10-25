@@ -699,7 +699,7 @@ def _tiny_swadesh_deck(tmp_path: Path) -> Path:
             }
         ],
         media_files=[str(audio), str(word)],
-        model_name="French Swadesh Sentence",
+        model_name="Swadesh French Sentences",
     )
     return source
 

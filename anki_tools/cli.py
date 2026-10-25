@@ -1593,14 +1593,13 @@ def _build_apkg(language: str, prune: bool = True) -> None:
         "language": language,
         "vocab_file": f"vocab/english-{lang_lower}.csv",
         "audio_dir": f"audio/audio_{lang_lower}",
-        "deck_name": f"Swadesh {lang_title}",
-        "model_name": f"Swadesh {lang_title}",
+        "deck_name": f"Swadesh {lang_title} Vocabulary",
+        "model_name": f"Swadesh {lang_title} Vocabulary",
         "output_file": f"swadesh_{lang_lower}.apkg",
         "audio_field_name": lang_lower,
     }
 
     entries = _parse_vocab_entries(config)
-    config["deck_name"] = f"{config['deck_name']} {len(entries)}"
 
     _generate_audio_files(entries, config)
     layout = _build_layout(config, entries)

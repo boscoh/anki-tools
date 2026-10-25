@@ -61,7 +61,7 @@ POOL_REPORT_PATH = Path("data/spanish_pool_report.json")
 AUDIO_DIR = Path("audio/spanish_sentences")
 MODULE_CACHE_PATH = Path("data/swadesh/spanish_module.txt")
 
-MODEL_NAME = "Spanish Swadesh Sentence"
+MODEL_NAME = "Swadesh Spanish Sentences"
 DECK_NAME = "Swadesh Spanish Sentences"
 FIELDS = (
     "Audio",

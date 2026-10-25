@@ -625,7 +625,7 @@ concept and one audio file per card.
 | Concept with no source sentence      | `intestins` |
 
 The pack is read with `AnkiPackage`. The note model is
-`French Swadesh Sentence`. The fields are `Audio`, `Sentence`, `English`,
+`Swadesh French Sentences`. The fields are `Audio`, `Sentence`, `English`,
 `Target`, `Gloss`, `WordAudio`, and `Source`. The audio file comes from the
 pack media, so no external audio directory is needed.
 

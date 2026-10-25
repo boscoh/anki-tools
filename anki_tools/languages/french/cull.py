@@ -55,7 +55,7 @@ AUDIO_FIELD = "sound"
 ENGLISH_FIELD = "Back"
 
 SWADESH_PACK_PATH = Path("apkg/swadesh_french_sentences.apkg")
-SWADESH_MODEL_NAME = "French Swadesh Sentence"
+SWADESH_MODEL_NAME = "Swadesh French Sentences"
 SWADESH_SENTENCE_FIELD = "Sentence"
 SWADESH_ENGLISH_FIELD = "English"
 SWADESH_TARGET_FIELD = "Target"
@@ -282,7 +282,7 @@ def load_reserve(pack_path: Path = SWADESH_PACK_PATH) -> list[ReserveCard]:
     """Read one reserve card per Swadesh target from the Swadesh APKG.
 
     :param pack_path: Swadesh sentence pack file.
-    :raises RuntimeError: The pack has no ``French Swadesh Sentence`` model.
+    :raises RuntimeError: The pack has no ``Swadesh French Sentences`` model.
     :returns: One card per target, in the input order of the pack. A target
         with two cards keeps the first card.
     """

@@ -573,7 +573,7 @@ Measured cost: 450 TTS sentences at 1 request per second take about 8 minutes.
 
 ### 10.1 Note model
 
-Model name: `French Swadesh Sentence`.
+Model name: `Swadesh French Sentences`.
 
 | Order | Field       | Content                       |
 | ----- | ----------- | ----------------------------- |

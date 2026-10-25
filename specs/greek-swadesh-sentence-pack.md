@@ -184,7 +184,7 @@ The Greek pack uses the shared layer from the French spec, section 5.1. The
 | Sentence CSV    | `vocab/greek_sentences.csv`                             |
 | Audio directory | `audio/greek_sentences`                                 |
 | Deck name       | `Swadesh Greek Sentences`                               |
-| Model name      | `Greek Swadesh Sentence`                                |
+| Model name      | `Swadesh Greek Sentences`                               |
 | Word window     | 4 to 10 words                                           |
 | Final marks     | `.?!;`                                                  |
 | Internal marks  | `,·:`                                                   |
@@ -590,7 +590,7 @@ about 9 minutes.
 
 ### 10.1 Note model
 
-Model name: `Greek Swadesh Sentence`. The field list is the same as the French
+Model name: `Swadesh Greek Sentences`. The field list is the same as the French
 model, section 10.1 of that spec:
 
 | Order | Field       | Content                       |

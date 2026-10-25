@@ -156,7 +156,7 @@ WORD_REVIEW_FIELDS = [
     "status",
 ]
 
-MODEL_NAME = "Cantonese Swadesh Sentence"
+MODEL_NAME = "Swadesh Cantonese Sentences"
 DECK_NAME = "Swadesh Cantonese Sentences"
 FIELDS = (
     "Audio",

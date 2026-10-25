@@ -143,7 +143,7 @@ REVIEW_FIELDS = [
 ]
 OVERRIDE_FIELDS = ["mandarin", "pinyin", "reason"]
 
-MODEL_NAME = "Mandarin Swadesh Sentence"
+MODEL_NAME = "Swadesh Mandarin Sentences"
 DECK_NAME = "Swadesh Mandarin Sentences"
 FIELDS = (
     "Audio",
