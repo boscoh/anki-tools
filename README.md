@@ -283,7 +283,7 @@ tone-marked pinyin, the English translation, the target word, and two MP3
 files.
 
 ```bash
-uv run anki swadesh fetch                                   # cache the Tatoeba data
+uv run anki swadesh fetch mandarin                          # cache the Tatoeba data
 uv run anki swadesh sentences mandarin --per-word 2 --max-cards 450
 uv run anki swadesh audio mandarin --native-audio none      # make the audio
 uv run anki swadesh pack mandarin                           # write the APKG
@@ -334,7 +334,7 @@ concepts with 300 Tatoeba sentences. Each card holds one sentence, the English
 translation, the target word with a gender gloss, and two MP3 files.
 
 ```bash
-uv run anki swadesh fetch --lang ell --lang eng              # cache the Tatoeba data
+uv run anki swadesh fetch greek                             # cache the Tatoeba data
 uv run anki swadesh sentences greek --per-word 2 --max-cards 340
 uv run anki swadesh audio greek --tts gtts                   # make the audio
 uv run anki swadesh pack greek                               # write the APKG
@@ -393,7 +393,7 @@ matched token in bold, the English translation, the target word with a gender
 gloss, and two MP3 files.
 
 ```bash
-uv run anki swadesh fetch --lang fra --lang eng              # cache the Tatoeba data
+uv run anki swadesh fetch french                            # cache the Tatoeba data
 uv run anki swadesh sentences french --per-word 2 --max-cards 450
 uv run anki swadesh audio french --native-audio none         # make the audio
 uv run anki swadesh pack french                              # write the APKG
@@ -623,7 +623,7 @@ matched token in bold, the jyutping reading, the English translation, the
 target word with its reading, and two MP3 files.
 
 ```bash
-uv run anki swadesh fetch --lang yue --lang eng              # cache the Tatoeba data
+uv run anki swadesh fetch cantonese                         # cache the Tatoeba data
 uv run anki swadesh sentences cantonese --per-word 2 --max-cards 450
 uv run anki swadesh audio cantonese --native-audio auto      # make the audio
 uv run anki swadesh pack cantonese                           # write the APKG

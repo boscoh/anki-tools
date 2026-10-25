@@ -6,6 +6,7 @@ import pytest
 
 from anki_tools import cli
 from anki_tools.cli import _content_field_order, _prune_outdated_audio
+from anki_tools.sentence_pack import tatoeba as sentence_tatoeba
 
 
 def test_prune_removes_files_not_in_keep(tmp_path: Path) -> None:
@@ -84,3 +85,22 @@ def test_core_command_reports_a_language_without_a_core_module(
     out = capsys.readouterr().out
     assert "Unsupported language: greek" in out
     assert "Supported: mandarin, french, spanish, cantonese." in out
+
+
+def test_fetch_command_resolves_the_language_profile(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    captured: list[dict[str, str]] = []
+
+    def fake_fetch_tatoeba(files: dict[str, str], **_kwargs: object) -> dict:
+        captured.append(dict(files))
+        return {}
+
+    monkeypatch.setattr(sentence_tatoeba, "fetch_tatoeba", fake_fetch_tatoeba)
+
+    cli.fetch("cantonese")
+    assert any(name.startswith("yue_") for name in captured[0])
+    assert not any(name.startswith("cmn_") for name in captured[0])
+
+    cli.fetch()
+    assert any(name.startswith("cmn_") for name in captured[1])

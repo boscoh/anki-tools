@@ -8,7 +8,7 @@ code lives in `anki_tools/sentence_pack/`.
 
 | Stage | Command                             | Input             | Output                                    |
 | ----- | ----------------------------------- | ----------------- | ----------------------------------------- |
-| S0    | `anki swadesh fetch --lang <code>`  | Tatoeba exports   | `data/tatoeba/*.tsv`                      |
+| S0    | `anki swadesh fetch <language>`     | Tatoeba exports   | `data/tatoeba/*.tsv`                      |
 | S1    | `anki swadesh sentences <language>` | reviewed word CSV | word table in memory                      |
 | S2    | `anki swadesh sentences <language>` | S0 and S1         | candidate pool in memory, pool report     |
 | S3    | `anki swadesh sentences <language>` | S2                | card CSV, review CSV, pool report JSON    |

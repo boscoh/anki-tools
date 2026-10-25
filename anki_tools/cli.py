@@ -1662,17 +1662,37 @@ def _native_audio(code: str) -> bool:
 
 
 @swadesh_app.command
-def fetch(*, refresh: bool = False, lang: list[str] | None = None) -> None:
+def fetch(
+    language: str | None = None,
+    *,
+    refresh: bool = False,
+    lang: list[str] | None = None,
+) -> None:
     """Fetch the Tatoeba exports of a language pack (stage S0).
 
-    With no ``--lang`` the command downloads the exports of the Mandarin
-    profile code and of English. A language code whose profile has no native
-    Tatoeba audio skips the ``sentences_with_audio`` export.
+    With no argument the command downloads the exports of the Mandarin profile
+    code and of English. A language code whose profile has no native Tatoeba
+    audio skips the ``sentences_with_audio`` export.
 
+    :param language: Language name, for example mandarin or cantonese. Its
+        profile gives the Tatoeba language code.
     :param refresh: Ignore the cache and download every file again.
-    :param lang: Tatoeba language codes, for example ``ell --lang eng``.
+    :param lang: Tatoeba language codes, for example ``--lang deu``. Use it for
+        a code that no profile owns.
     """
-    codes = lang or [LANGUAGES["mandarin"].profile.tatoeba_lang]
+    codes: list[str] = []
+    if language is not None:
+        entry = LANGUAGES.get(resolve(language))
+        if entry is None or entry.profile is None:
+            print(
+                f"Unsupported language: {language}. "
+                f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
+            )
+            return
+        codes.append(entry.profile.tatoeba_lang)
+    codes.extend(lang or [])
+    if not codes:
+        codes.append(LANGUAGES["mandarin"].profile.tatoeba_lang)
     files: dict[str, str] = {}
     for code in codes:
         files.update(
