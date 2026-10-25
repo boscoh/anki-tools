@@ -37,9 +37,7 @@ class _Counter:
         self.calls.append(text)
         return _fake_tokens(text)
 
-    def tokenize_many(
-        self, _name: str, texts
-    ) -> list[list[token_module.Token]]:
+    def tokenize_many(self, _name: str, texts) -> list[list[token_module.Token]]:
         texts = list(texts)
         self.calls.extend(texts)
         return [_fake_tokens(text) for text in texts]
@@ -54,9 +52,7 @@ def counter(monkeypatch: pytest.MonkeyPatch) -> _Counter:
     return fake
 
 
-def test_the_second_build_reads_the_disk(
-    tmp_path: Path, counter: _Counter
-) -> None:
+def test_the_second_build_reads_the_disk(tmp_path: Path, counter: _Counter) -> None:
     """A warm run tokenizes, a second run reads the rows."""
     path = tmp_path / "tokens.sqlite"
     sentences = ["le chat dort", "le chien court"]
@@ -101,3 +97,21 @@ def test_a_cache_without_a_path_keeps_the_memory_only(counter: _Counter) -> None
     cache.warm(["le chat dort"])
 
     assert counter.calls == ["le chat dort"]
+
+
+def test_two_caches_over_one_file_can_write(tmp_path: Path, counter: _Counter) -> None:
+    """Two caches over one file share the write transaction."""
+    path = tmp_path / "tokens.sqlite"
+    first = token_module.TokenCache("fr_test", path=path)
+    second = token_module.TokenCache("fr_test", path=path)
+
+    assert first.get("le chat dort") == tuple(_fake_tokens("le chat dort"))
+    assert second.get("le chien court") == tuple(_fake_tokens("le chien court"))
+    assert first.get("une phrase") == tuple(_fake_tokens("une phrase"))
+    assert second.get("une autre") == tuple(_fake_tokens("une autre"))
+    assert counter.calls == [
+        "le chat dort",
+        "le chien court",
+        "une phrase",
+        "une autre",
+    ]

@@ -19,6 +19,8 @@ PIPE_BATCH = 256
 CACHE_VERSION = 1
 COMMIT_ROWS = 2000
 
+_CONNECTIONS: dict[Path, sqlite3.Connection] = {}
+
 
 @dataclass(frozen=True)
 class Token:
@@ -108,8 +110,12 @@ class TokenCache:
     The guards read one sentence at a time, so the cache keeps the per-sentence
     result. :meth:`warm` fills it from a whole pool with one pipeline pass.
 
+    The disk connection is shared by the path in one process, so a second
+    cache over the same file joins the same transaction.
+
     :param name: spaCy model name.
     :param limit: Maximum count of cached sentences.
+    :param path: SQLite file of the disk cache, or None for memory only.
     """
 
     def __init__(
@@ -126,8 +132,7 @@ class TokenCache:
         self._pending = 0
 
     def get(self, sentence: str) -> tuple[Token, ...]:
-        """Give the tokens of one sentence, from the memory or the disk cache.
-        """
+        """Give the tokens of one sentence, from the memory or the disk cache."""
         tokens = self._tokens.get(sentence)
         if tokens is not None:
             return tokens
@@ -183,14 +188,20 @@ class TokenCache:
             return None
         if self._disk is not None:
             return self._disk
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        connection = sqlite3.connect(self.path)
-        connection.execute(
-            "CREATE TABLE IF NOT EXISTS meta (name TEXT PRIMARY KEY, value TEXT)"
-        )
-        connection.execute(
-            "CREATE TABLE IF NOT EXISTS tokens (key TEXT PRIMARY KEY, value BLOB)"
-        )
+        resolved = self.path.resolve()
+        connection = _CONNECTIONS.get(resolved)
+        if connection is None:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            connection = sqlite3.connect(resolved)
+            connection.execute("PRAGMA busy_timeout = 30000")
+            connection.execute("PRAGMA journal_mode = WAL")
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS meta (name TEXT PRIMARY KEY, value TEXT)"
+            )
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS tokens (key TEXT PRIMARY KEY, value BLOB)"
+            )
+            _CONNECTIONS[resolved] = connection
         header = f"{self.name}|{CACHE_VERSION}"
         row = connection.execute(
             "SELECT value FROM meta WHERE name = 'header'"
