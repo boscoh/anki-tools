@@ -721,6 +721,19 @@ def _run_core_command(
     module.run_core(request)
 
 
+def _check_guard(check: bool, modes: Sequence[tuple[str, bool]]) -> bool:
+    """Decide if a fix run may continue with the ``--check`` flag.
+
+    :param check: Value of the ``--check`` flag.
+    :param modes: Mode flag names and their enabled state, in message order.
+    :returns: True when the run may continue, False after the error print.
+    """
+    if not check or any(enabled for _, enabled in modes):
+        return True
+    print(f"Error: --check needs {' or '.join(name for name, _ in modes)}.")
+    return False
+
+
 @fix_app.command
 def zh(
     apkg_path: Path,
@@ -762,8 +775,7 @@ def zh(
         print(f"Error: File not found: {apkg_path}")
         return
 
-    if check and not core:
-        print("Error: --check needs --core.")
+    if not _check_guard(check, (("--core", core),)):
         return
 
     if core:
@@ -887,8 +899,7 @@ def fr(
         print(f"Error: File not found: {apkg_path}")
         return
 
-    if check and not (select or core):
-        print("Error: --check needs --select or --core.")
+    if not _check_guard(check, (("--select", select), ("--core", core))):
         return
 
     if core and select:
@@ -1061,8 +1072,7 @@ def yue(
         print(f"Error: File not found: {apkg_path}")
         return
 
-    if check and not core:
-        print("Error: --check needs --core.")
+    if not _check_guard(check, (("--core", core),)):
         return
 
     if core:
@@ -1220,8 +1230,7 @@ def es(
         print(f"Error: File not found: {apkg_path}")
         return
 
-    if check and not core:
-        print("Error: --check needs --core.")
+    if not _check_guard(check, (("--core", core),)):
         return
 
     if core:
