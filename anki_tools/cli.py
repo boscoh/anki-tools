@@ -774,6 +774,11 @@ def zh(
     :param tail: Core mode: cards after the core passes.
     :param check: Core mode: run the gates on the output only.
     """
+    apkg_path = Path(apkg_path)
+    if not apkg_path.exists():
+        print(f"Error: File not found: {apkg_path}")
+        return
+
     if check and not core:
         print("Error: --check needs --core.")
         return

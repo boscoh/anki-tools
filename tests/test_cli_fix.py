@@ -511,6 +511,11 @@ class TestMandarinRankMode:
 
         assert "No sentences found!" in capsys.readouterr().out
 
+    def test_a_missing_input_prints_an_error(self, tmp_path: Path, capsys) -> None:
+        cli.zh(tmp_path / "absent.apkg")
+
+        assert "Error: File not found" in capsys.readouterr().out
+
 
 class TestMandarinCoreMode:
     def test_core_builds_the_request(
@@ -560,7 +565,7 @@ class TestMandarinCoreMode:
         with pytest.raises(SystemExit):
             cli.zh(deck_file, core=True, check=True)
 
-    def test_a_missing_input_prints_an_error(
+    def test_a_missing_input_in_core_mode_prints_an_error(
         self, tmp_path: Path, capsys
     ) -> None:
         cli.zh(tmp_path / "absent.apkg", core=True)
