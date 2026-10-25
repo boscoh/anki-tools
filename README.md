@@ -42,8 +42,7 @@ source of each `anki fix` command.
 uv run anki --help
 
 # Build Swadesh vocabulary decks
-uv run anki swadesh list-languages
-uv run anki swadesh build mandarin
+uv run anki swadesh vocab mandarin
 
 # Fix Chinese deck (rank, reorder, fix pinyin, apply styling)
 uv run anki fix zh input.apkg
@@ -76,7 +75,7 @@ Edit a file, then run the command again to change the deck.
   `back.html`. The `anki style` command and `anki fix zh` read it.
 - Swadesh sentence packs: `templates/sentence_pack/<language>/` with
   `front.html`, `back.html`, and `card.css`.
-- `anki swadesh build <language>`: `templates/vocab/front.html`,
+- `anki swadesh vocab <language>`: `templates/vocab/front.html`,
   `templates/vocab/back.html`, `templates/vocab/card.css`, and an optional
   `templates/vocab/<language>/card.css`.
 - `anki fix fr --select`: `templates/french_cull/front.html` and `back.html`.
@@ -193,7 +192,7 @@ uv run anki fix yue deck.apkg --core # Core mode: a small core-word deck
   Daily counts. The default spoken weight is 0.7.
   - `--freq written` uses the Apple Daily list alone. This is the old ranking.
   - The list is built on demand at the first `anki fix yue` or
-    `anki swadesh core cantonese`. The first run downloads both files to
+    `anki fix yue deck.apkg --core`. The first run downloads both files to
     `~/.cache/anki-tools`. Set `CIFU_PATH` or `YUE_FREQUENCY_PATH` to use
     other files.
   - A variant map in `vocab/cantonese_variants.tsv` and the overrides in
@@ -248,9 +247,8 @@ uv run anki fix es deck.apkg --max-sentences 3000  # Reduce to 3000 with stratif
 Build vocabulary flashcards with audio:
 
 ```bash
-uv run anki swadesh list-languages
-uv run anki swadesh build mandarin
-uv run anki swadesh build all
+uv run anki swadesh vocab mandarin
+uv run anki swadesh vocab all
 ```
 
 Builds `.apkg` files from `vocab/english-<language>.csv` with gTTS audio.
@@ -287,10 +285,9 @@ uv run anki swadesh pack mandarin                           # write the APKG
 uv run anki swadesh audit mandarin                          # gates G1 to G18
 ```
 
-The core deck of mandarin, french, spanish, and cantonese also has a Swadesh
-entry point: `uv run anki swadesh core <language> <input.apkg>`. It reads the
-same input as `anki fix <lang> --core` and takes the same `--output`,
-`--cards`, `--words`, `--examples`, `--tail`, and `--check` flags.
+The core deck of Mandarin, French, Spanish, and Cantonese comes from
+`anki fix <lang> --core`. It takes `--output`, `--cards`, `--words`,
+`--examples`, `--tail`, and `--check`.
 
 See `docs/swadesh-sentence-flow.md` for the stage order and the guard order.
 
@@ -791,7 +788,8 @@ One card per line, fields separated by `|` or tab. Audio embedded with `[sound:f
 
 ## Appendix: Supported Languages
 
-Languages supported by gTTS for Swadesh vocabulary audio generation. Use `uv run anki swadesh list-languages` for the current list.
+Languages supported by gTTS for Swadesh vocabulary audio generation. The
+`uv run anki swadesh vocab` error message lists the languages with a deck.
 
 | Code  | Language                 | Code   | Language                 |
 |-------|--------------------------|--------|--------------------------|

@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from anki_tools.languages import LANGUAGES, profile_languages, swadesh_languages
+from anki_tools.languages import LANGUAGES, profile_languages, vocab_languages
 from anki_tools.preview import (
     SENTENCE_LANGUAGES,
     VOCAB_LANGUAGES,
@@ -61,7 +61,7 @@ def test_the_language_lists_follow_the_registry() -> None:
     for language in profile_languages():
         assert language.name in sentence_names
         assert dict(SENTENCE_LANGUAGES)[language.name] == language.label
-    for name in swadesh_languages():
+    for name in vocab_languages():
         assert name in vocab_names
         assert dict(VOCAB_LANGUAGES)[name] == LANGUAGES[name].label
     assert "french" not in vocab_names

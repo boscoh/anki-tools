@@ -5,7 +5,7 @@ The four core modules (`mandarin_core`, `french_core`, `spanish_core`,
 registry already held the sentence-pack capability (`module`), the profile, and
 the audit runner, so the core deck was the one capability outside the registry.
 
-Status: accepted
+Status: superseded by ADR-0006
 
 ## Decision
 

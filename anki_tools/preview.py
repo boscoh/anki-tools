@@ -25,7 +25,7 @@ from anki_tools.apkg.templates import (
 from anki_tools.languages import (
     LANGUAGES,
     profile_languages,
-    swadesh_languages,
+    vocab_languages,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -46,7 +46,7 @@ SENTENCE_LANGUAGES: tuple[tuple[str, str], ...] = tuple(
 )
 
 VOCAB_LANGUAGES: tuple[tuple[str, str], ...] = tuple(
-    (name, LANGUAGES[name].label) for name in swadesh_languages()
+    (name, LANGUAGES[name].label) for name in vocab_languages()
 )
 
 CJK_FIELDS = {"characters", "hanzi", "cantonese", "mandarin", "chinese"}

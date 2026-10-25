@@ -9,7 +9,7 @@ from anki_tools.languages import (
     pipeline_languages,
     profile_languages,
     resolve,
-    swadesh_languages,
+    vocab_languages,
 )
 
 
@@ -21,8 +21,8 @@ def test_every_profile_has_a_pipeline_module() -> None:
     assert set(pipeline_languages()) == set(PROFILES)
 
 
-def test_build_list_matches_the_vocabulary_languages() -> None:
-    assert swadesh_languages() == (
+def test_vocab_list_matches_the_vocabulary_languages() -> None:
+    assert vocab_languages() == (
         "mandarin",
         "spanish",
         "greek",
@@ -33,8 +33,8 @@ def test_build_list_matches_the_vocabulary_languages() -> None:
     )
 
 
-def test_build_list_is_a_subset_of_the_registry() -> None:
-    assert set(swadesh_languages()) <= set(LANGUAGES)
+def test_vocab_list_is_a_subset_of_the_registry() -> None:
+    assert set(vocab_languages()) <= set(LANGUAGES)
 
 
 def test_alias_gives_the_canonical_name() -> None:
@@ -50,15 +50,6 @@ def test_unknown_name_folds_to_lowercase() -> None:
 
 def test_every_alias_points_at_a_registry_name() -> None:
     assert set(ALIASES.values()) <= set(LANGUAGES)
-
-
-def test_only_four_languages_have_a_core_module() -> None:
-    assert {name for name, entry in LANGUAGES.items() if entry.core} == {
-        "mandarin",
-        "french",
-        "spanish",
-        "cantonese",
-    }
 
 
 def test_every_language_has_a_unique_display_label() -> None:

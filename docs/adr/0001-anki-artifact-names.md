@@ -12,7 +12,7 @@ Status: accepted
 
 | Builder | Deck title | Note type (model) name | Output file |
 | --- | --- | --- | --- |
-| Vocabulary (`anki swadesh build <lang>`) | `Swadesh <Language> Vocabulary` | same as the deck title | `apkg/swadesh_<lang>.apkg` |
+| Vocabulary (`anki swadesh vocab <lang>`) | `Swadesh <Language> Vocabulary` | same as the deck title | `apkg/swadesh_<lang>.apkg` |
 | Sentence pack (`anki swadesh pack <lang>`) | `Swadesh <Language> Sentences` | same as the deck title | `apkg/swadesh_<lang>_sentences.apkg` |
 | Core deck (`anki fix <lang> --core`) | `<Language> Core Sentences` | the note type of the input deck, unchanged | `<input stem>_core.apkg` |
 

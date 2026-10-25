@@ -3,7 +3,7 @@ CLI tools for Anki package (.apkg) files.
 
 Commands:
     inspect - Diagnostic tools to inspect .apkg files
-    swadesh - Build Swadesh vocabulary APKG files with audio
+    swadesh - Build Swadesh decks and run their gates
     fix - Fix and optimize decks (zh, fr, yue)
     style - Apply CSS and card templates to any deck
     preview - Build an HTML preview of the templates or of a package
@@ -44,7 +44,7 @@ from anki_tools.languages import (
     LANGUAGES,
     profile_languages,
     resolve,
-    swadesh_languages,
+    vocab_languages,
 )
 from anki_tools.languages.cantonese.rank import rank_sentences_yue
 from anki_tools.languages.french.rank import rank_sentences_fr
@@ -1217,7 +1217,7 @@ for _fix_command, _canonical_name in (
     fix_app.command(_fix_command, name=_canonical_name)
 
 # =============================================================================
-# Swadesh commands - build vocabulary APKG files with audio
+# Swadesh commands - build decks and run their gates
 # =============================================================================
 
 def _clean_text_for_audio(text: str) -> str:
@@ -1520,33 +1520,33 @@ def _build_apkg(language: str, prune: bool = True) -> None:
     _pack_apkg(config, entries, layout, prune)
 
 
-SWADESH_LANGUAGES = swadesh_languages()
+VOCAB_LANGUAGES = vocab_languages()
 SENTENCE_PACK_LANGUAGE_NAMES = ", ".join(
     language.name for language in profile_languages()
 )
 
 swadesh_app = cyclopts.App(
-    name="swadesh", help="Build Swadesh vocabulary APKG files with audio"
+    name="swadesh", help="Build Swadesh decks and run their gates"
 )
 app.command(swadesh_app)
 
 
 @swadesh_app.command
-def build(language: str, prune: bool = True):
-    """Build Swadesh vocabulary APKG for a language.
+def vocab(language: str, prune: bool = True):
+    """Build the Swadesh vocabulary deck for a language.
 
     :param language: One of the supported languages, or all.
     :param prune: Delete audio files that the current list does not use.
     """
     lang = resolve(language)
     if lang == "all":
-        for name in SWADESH_LANGUAGES:
+        for name in VOCAB_LANGUAGES:
             _build_apkg(name, prune=prune)
         return
 
-    if lang not in SWADESH_LANGUAGES:
+    if lang not in VOCAB_LANGUAGES:
         print(
-            f"Unknown language: {language}. Supported: {', '.join(SWADESH_LANGUAGES)}"
+            f"Unknown language: {language}. Supported: {', '.join(VOCAB_LANGUAGES)}"
         )
         return
     _build_apkg(lang, prune=prune)
@@ -1735,59 +1735,6 @@ def audit(language: str) -> None:
         raise SystemExit(code)
 
 
-@swadesh_app.command
-def core(
-    language: str,
-    apkg_path: Path,
-    *,
-    output: Path | None = None,
-    model_id: int | None = None,
-    cards: int | None = None,
-    words: int | None = None,
-    examples: int | None = None,
-    tail: int | None = None,
-    check: bool = False,
-) -> None:
-    """Build the core deck of a language through the registry.
-
-    :param language: Language name, for example mandarin.
-    :param apkg_path: Input .apkg file.
-    :param output: Output .apkg file (default: from the input name).
-    :param model_id: Rank mode filter, rejected in core mode.
-    :param cards: Core mode: card cap. The module default applies when empty.
-    :param words: Core mode: tier F words after the Swadesh set. The module
-        default applies when empty.
-    :param examples: Core mode: examples per content target. The module
-        default applies when empty.
-    :param tail: Core mode: cards after the core passes. The module default
-        applies when empty.
-    :param check: Run the gates on the output only.
-    """
-    lang = resolve(language)
-    entry = LANGUAGES.get(lang)
-    if entry is None or entry.core is None:
-        print(
-            f"Unsupported language: {language}. "
-            f"Supported: {', '.join(n for n, e in LANGUAGES.items() if e.core)}."
-        )
-        return
-    module = entry.core
-    _run_core_command(
-        module,
-        label=entry.label,
-        apkg_path=apkg_path,
-        output=output,
-        model_id=model_id,
-        cards=cards,
-        words=words if words is not None else module.DEFAULT_CORE_WORDS,
-        examples=(
-            examples if examples is not None else module.DEFAULT_OPTIONS.per_word
-        ),
-        tail=tail if tail is not None else module.DEFAULT_OPTIONS.tail_cards,
-        check=check,
-    )
-
-
 def _language_sentences(
     module,
     profile,
@@ -1916,12 +1863,6 @@ def _language_pack(module, profile, pack_license: str) -> None:
     )
     print(f"wrote {result['output']}")
     print(f"wrote {result['manifest_path']}")
-
-
-@swadesh_app.command
-def list_languages():
-    """List supported Swadesh languages."""
-    print("Supported languages:", ", ".join(SWADESH_LANGUAGES))
 
 
 # =============================================================================

@@ -107,7 +107,6 @@ uv run anki fix yue                    # uses the LTL deck
 uv run anki fix yue --core             # same input, core deck
 uv run anki fix zh "apkg/Neri's Chinese Sents Part 2.apkg" --core  # core deck
 uv run anki fix es apkg/input.apkg
-uv run anki swadesh core french apkg/input.apkg  # the same core deck
 ```
 
 `uv run anki fix <lang> --help` shows the default input of `fr` and `yue`.

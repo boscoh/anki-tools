@@ -4,8 +4,8 @@
 capability:
 
 * a sentence-pack module, which the shared pipeline drives;
-* neither, for a vocabulary-only language, which the age-old ``build`` command
-  serves from an ``english-<lang>.csv`` file and an audio directory.
+* a vocabulary deck, which the ``vocab`` command serves from an
+  ``english-<lang>.csv`` file and an audio directory.
 
 :data:`ALIASES` maps the short codes that a user types to the one canonical
 name of the language.
@@ -27,15 +27,11 @@ from anki_tools.sentence_pack.profile import (
     profile_names,
 )
 
-from anki_tools.languages.cantonese import core as cantonese_core
 from anki_tools.languages.cantonese import profile as cantonese
-from anki_tools.languages.french import core as french_core
 from anki_tools.languages.french import profile as french
 from anki_tools.languages.greek import profile as greek
-from anki_tools.languages.mandarin import core as mandarin_core
 from anki_tools.languages.mandarin import profile as mandarin
 from anki_tools.languages.mandarin import stages as mandarin_stages
-from anki_tools.languages.spanish import core as spanish_core
 from anki_tools.languages.spanish import profile as spanish
 
 
@@ -48,21 +44,19 @@ class CliLanguage:
     :param profile: Sentence-pack profile, None for a vocabulary-only language.
     :param module: Sentence-pack module that the shared pipeline drives, None
         when the language has no pipeline module.
-    :param core: Core-deck module that the ``core`` command drives, None when
-        the language has no core module.
     :param audit: Gate runner of the language, None when it has none.
-    :param build: True when the ``build`` command serves the language from an
+    :param vocab: True when the ``vocab`` command serves the language from an
         ``english-<lang>.csv`` file and an audio directory.
-    :param tts: gTTS language code of the ``build`` command, None when it has none.
+    :param tts: gTTS language code of the ``vocab`` command, None when it has
+        none.
     """
 
     name: str
     label: str
     profile: LanguageProfile | None = None
     module: ModuleType | None = None
-    core: ModuleType | None = None
     audit: Callable[[], Sequence[Any]] | None = None
-    build: bool = False
+    vocab: bool = False
     tts: str | None = None
 
 
@@ -74,9 +68,8 @@ LANGUAGES: dict[str, CliLanguage] = {
             label="Mandarin",
             profile=mandarin.MANDARIN,
             module=mandarin,
-            core=mandarin_core,
             audit=mandarin_stages.run_audit,
-            build=True,
+            vocab=True,
             tts="zh-cn",
         ),
         CliLanguage(
@@ -84,7 +77,6 @@ LANGUAGES: dict[str, CliLanguage] = {
             label="French",
             profile=french.FRENCH,
             module=french,
-            core=french_core,
             audit=french.run_french_audit,
         ),
         CliLanguage(
@@ -92,9 +84,8 @@ LANGUAGES: dict[str, CliLanguage] = {
             label="Spanish",
             profile=spanish.SPANISH,
             module=spanish,
-            core=spanish_core,
             audit=spanish.run_spanish_audit,
-            build=True,
+            vocab=True,
             tts="es",
         ),
         CliLanguage(
@@ -103,22 +94,21 @@ LANGUAGES: dict[str, CliLanguage] = {
             profile=greek.GREEK,
             module=greek,
             audit=greek.run_greek_audit,
-            build=True,
+            vocab=True,
             tts="el",
         ),
-        CliLanguage("german", label="German", build=True, tts="de"),
+        CliLanguage("german", label="German", vocab=True, tts="de"),
         CliLanguage(
             "cantonese",
             label="Cantonese",
             profile=cantonese.CANTONESE,
             module=cantonese,
-            core=cantonese_core,
             audit=cantonese.run_cantonese_audit,
-            build=True,
+            vocab=True,
             tts="yue",
         ),
-        CliLanguage("arabic", label="Arabic", build=True, tts="ar"),
-        CliLanguage("hindi", label="Hindi", build=True, tts="hi"),
+        CliLanguage("arabic", label="Arabic", vocab=True, tts="ar"),
+        CliLanguage("hindi", label="Hindi", vocab=True, tts="hi"),
     )
 }
 
@@ -140,12 +130,12 @@ def resolve(name: str) -> str:
     return ALIASES.get(key, key)
 
 
-def swadesh_languages() -> tuple[str, ...]:
-    """Give the language names of the ``build`` command, in display order.
+def vocab_languages() -> tuple[str, ...]:
+    """Give the language names of the ``vocab`` command, in display order.
 
-    :returns: Every Swadesh language name.
+    :returns: Names of the languages with a vocabulary deck.
     """
-    return tuple(language.name for language in LANGUAGES.values() if language.build)
+    return tuple(language.name for language in LANGUAGES.values() if language.vocab)
 
 
 def profile_languages() -> tuple[CliLanguage, ...]:
@@ -179,5 +169,5 @@ __all__ = [
     "profile_names",
     "resolve",
     "spanish",
-    "swadesh_languages",
+    "vocab_languages",
 ]

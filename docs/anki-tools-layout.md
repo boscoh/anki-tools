@@ -104,7 +104,7 @@ Each language package gives the profile names, so
 language module.
 
 A language with no profile module (`spanish`) has ranking code only. The
-`anki swadesh build` command serves it from `vocab/english-<lang>.csv` and an
+`anki swadesh vocab` command serves it from `vocab/english-<lang>.csv` and an
 audio directory.
 
 ## 6. Import rules

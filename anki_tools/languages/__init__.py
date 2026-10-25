@@ -21,7 +21,7 @@ from .registry import (
     profile_languages,
     profile_names,
     resolve,
-    swadesh_languages,
+    vocab_languages,
 )
 
 __all__ = [
@@ -39,5 +39,5 @@ __all__ = [
     "profile_names",
     "resolve",
     "spanish",
-    "swadesh_languages",
+    "vocab_languages",
 ]

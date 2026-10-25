@@ -26,6 +26,20 @@ _Avoid_: column, attribute
 The card layout and the CSS that style it.
 _Avoid_: skin, theme
 
+## Decks
+
+**Vocabulary deck**:
+The deck with one card per Swadesh concept, its form, and its audio. The
+`anki swadesh vocab` command builds it from an `english-<lang>.csv` file and an
+audio directory, for example `apkg/swadesh_mandarin.apkg`.
+_Avoid_: word deck, word list deck
+
+**Core deck**:
+The small deck that holds one card per Swadesh target, then the tier F words.
+Each card shows one example sentence of a large sentence deck. The
+`anki fix <lang> --core` command writes it.
+_Avoid_: starter deck, base deck, small deck
+
 ## Sentence pack
 
 **Sentence pack**:
@@ -58,7 +72,9 @@ sentence.
 _Avoid_: fallback, stub
 
 **Tier**:
-The quality class of a selected sentence: `core` or `scaffold`.
+The class of a selected sentence: `core` or `scaffold`. A `core` sentence
+covers the target within the window. A `scaffold` sentence comes from the wider
+window and covers the target as a fallback. The tier is not the core deck.
 _Avoid_: level, grade
 
 **Unknown word**:
