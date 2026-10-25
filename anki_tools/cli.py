@@ -678,6 +678,66 @@ fix_app = cyclopts.App(name="fix", help="Fix and optimize Anki decks")
 app.command(fix_app)
 
 
+def _run_core_command(
+    module: Any,
+    label: str,
+    apkg_path: Path,
+    output: Path | None,
+    model_id: int | None,
+    cards: int | None,
+    words: int,
+    examples: int,
+    tail: int,
+    check: bool,
+    spoken_weight: float | None = None,
+) -> None:
+    """Build the core deck for one language.
+
+    :param module: Language core module that holds the core entry points.
+    :param label: Language name that the banner shows.
+    :param apkg_path: Input .apkg file.
+    :param output: Output .apkg file (default: from the input name).
+    :param model_id: Rank mode filter, rejected in core mode.
+    :param cards: Core mode: card cap.
+    :param words: Core mode: tier F words after the Swadesh set.
+    :param examples: Core mode: examples per content target.
+    :param tail: Core mode: cards after the core passes.
+    :param check: Run the gates on the output only.
+    :param spoken_weight: Optional weight of the spoken frequency term.
+    """
+    if model_id is not None:
+        print("Error: --model-id does not apply with --core.")
+        return
+    output_path = output or module.default_output(apkg_path)
+    if check:
+        code = module.check_core(output_path)
+        if code:
+            raise SystemExit(code)
+        return
+    if not apkg_path.exists():
+        print(f"Error: File not found: {apkg_path}")
+        return
+    print("=" * 50)
+    print(f"Processing {label} Anki Deck: core mode")
+    print("=" * 50)
+    options = replace(
+        module.DEFAULT_OPTIONS,
+        per_word=examples,
+        tail_cards=tail,
+    )
+    if cards is not None:
+        options = replace(options, max_cards=cards)
+    request = module.CoreRequest(
+        input_path=apkg_path,
+        output_path=output_path,
+        core_words=words,
+        options=options,
+    )
+    if spoken_weight is not None:
+        request = replace(request, spoken_weight=spoken_weight)
+    module.run_core(request)
+
+
 @fix_app.command
 def zh(
     apkg_path: Path,
@@ -719,35 +779,17 @@ def zh(
         return
 
     if core:
-        if model_id is not None:
-            print("Error: --model-id does not apply with --core.")
-            return
-        output_path = output or mandarin_core.default_output(apkg_path)
-        if check:
-            code = mandarin_core.check_core(output_path)
-            if code:
-                raise SystemExit(code)
-            return
-        if not apkg_path.exists():
-            print(f"Error: File not found: {apkg_path}")
-            return
-        print("=" * 50)
-        print("Processing Chinese Anki Deck: core mode")
-        print("=" * 50)
-        options = replace(
-            mandarin_core.DEFAULT_OPTIONS,
-            per_word=examples,
-            tail_cards=tail,
-        )
-        if cards is not None:
-            options = replace(options, max_cards=cards)
-        mandarin_core.run_core(
-            mandarin_core.CoreRequest(
-                input_path=apkg_path,
-                output_path=output_path,
-                core_words=words,
-                options=options,
-            )
+        _run_core_command(
+            mandarin_core,
+            "Chinese",
+            apkg_path,
+            output,
+            model_id,
+            cards,
+            words,
+            examples,
+            tail,
+            check,
         )
         return
 
@@ -877,32 +919,17 @@ def fr(
 
 
     if core:
-        if model_id is not None:
-            print("Error: --model-id does not apply with --core.")
-            return
-        output_path = output or french_core.default_output(apkg_path)
-        if check:
-            code = french_core.check_core(output_path)
-            if code:
-                raise SystemExit(code)
-            return
-        print("=" * 50)
-        print("Processing French Anki Deck: core mode")
-        print("=" * 50)
-        options = replace(
-            french_core.DEFAULT_OPTIONS,
-            per_word=examples,
-            tail_cards=tail,
-        )
-        if cards is not None:
-            options = replace(options, max_cards=cards)
-        french_core.run_core(
-            french_core.CoreRequest(
-                input_path=apkg_path,
-                output_path=output_path,
-                core_words=words,
-                options=options,
-            )
+        _run_core_command(
+            french_core,
+            "French",
+            apkg_path,
+            output,
+            model_id,
+            cards,
+            words,
+            examples,
+            tail,
+            check,
         )
         return
     if select:
@@ -1052,33 +1079,18 @@ def yue(
         return
 
     if core:
-        if model_id is not None:
-            print("Error: --model-id does not apply with --core.")
-            return
-        output_path = output or cantonese_core.default_output(apkg_path)
-        if check:
-            code = cantonese_core.check_core(output_path)
-            if code:
-                raise SystemExit(code)
-            return
-        print("=" * 50)
-        print("Processing Cantonese Anki Deck: core mode")
-        print("=" * 50)
-        options = replace(
-            cantonese_core.DEFAULT_OPTIONS,
-            per_word=examples,
-            tail_cards=tail,
-        )
-        if cards is not None:
-            options = replace(options, max_cards=cards)
-        cantonese_core.run_core(
-            cantonese_core.CoreRequest(
-                input_path=apkg_path,
-                output_path=output_path,
-                core_words=words,
-                options=options,
-                spoken_weight=cantonese_core.SPOKEN_WEIGHT,
-            )
+        _run_core_command(
+            cantonese_core,
+            "Cantonese",
+            apkg_path,
+            output,
+            model_id,
+            cards,
+            words,
+            examples,
+            tail,
+            check,
+            spoken_weight=cantonese_core.SPOKEN_WEIGHT,
         )
         return
 
@@ -1232,32 +1244,17 @@ def es(
         return
 
     if core:
-        if model_id is not None:
-            print("Error: --model-id does not apply with --core.")
-            return
-        output_path = output or spanish_core.default_output(apkg_path)
-        if check:
-            code = spanish_core.check_core(output_path)
-            if code:
-                raise SystemExit(code)
-            return
-        print("=" * 50)
-        print("Processing Spanish Anki Deck: core mode")
-        print("=" * 50)
-        options = replace(
-            spanish_core.DEFAULT_OPTIONS,
-            per_word=examples,
-            tail_cards=tail,
-        )
-        if cards is not None:
-            options = replace(options, max_cards=cards)
-        spanish_core.run_core(
-            spanish_core.CoreRequest(
-                input_path=apkg_path,
-                output_path=output_path,
-                core_words=words,
-                options=options,
-            )
+        _run_core_command(
+            spanish_core,
+            "Spanish",
+            apkg_path,
+            output,
+            model_id,
+            cards,
+            words,
+            examples,
+            tail,
+            check,
         )
         return
 
