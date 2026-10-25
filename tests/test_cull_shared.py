@@ -8,6 +8,7 @@ tiny package. The output deck must use those values.
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 
 from anki_tools.apkg.package import AnkiPackage
@@ -44,6 +45,11 @@ def _profile() -> cullflow.CullProfile:
         frequency_ranks=cullflow.frequency_ranks,
         read_names=set,
         concept_forms=lambda concept: {concept},
+        content_pos=frozenset({"NOUN"}),
+        min_lemma_length=2,
+        final_marks=".?!",
+        quote_marks='"«»“”',
+        internal_marks=",;:",
         model_name=MODEL_NAME,
         sentence_field="Text",
         english_field="Meaning",
@@ -119,3 +125,39 @@ def test_a_second_profile_drives_every_output_value(tmp_path: Path) -> None:
     assert manifest["source"]["deck"] == DECK_NAME
     assert manifest["licenses"] == {"data": "test license"}
     assert "reserve_pack" not in manifest
+
+
+def _han_profile() -> cullflow.CullProfile:
+    return replace(
+        _profile(),
+        content_pos=frozenset(),
+        min_lemma_length=1,
+        final_marks="。？！",
+        quote_marks="「」『』",
+        internal_marks="，：；",
+    )
+
+
+def test_a_han_profile_keeps_one_character_lemmas_and_a_han_final_mark() -> None:
+    profile = _han_profile()
+    tokens = [[("水", "n")] for _index in range(3)]
+    cards = [
+        cullflow.InputCard(
+            note_id=index, sentence="我 喝 水 。", english="I drink water.", audio="", index=index
+        )
+        for index in range(3)
+    ]
+
+    targets, content = cullflow.build_targets(
+        cards,
+        tokens,
+        {"水": 1},
+        set(),
+        min_lemma_length=profile.min_lemma_length,
+        content_pos=profile.content_pos,
+    )
+
+    assert [target.lemma for target in targets] == ["水"]
+    assert content == 1
+    assert cullflow.filter_reason(cards[0], tokens[0], 1, 12, profile) == ""
+    assert cullflow.filter_reason(cards[0], tokens[0], 1, 12, _profile()) == "F4"

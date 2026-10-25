@@ -20,18 +20,26 @@ import math
 import re
 from collections import Counter
 from dataclasses import dataclass, field
+from functools import partial
 from pathlib import Path
 from typing import Any, Callable, Collection, Iterable, Iterator, Mapping, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking import coreflow
-from anki_tools.ranking.cardfilter import _WORD_PATTERN, filter_cards
+from anki_tools.ranking.cardfilter import (
+    _WORD_PATTERN,
+    english_rule,
+    filter_cards,
+    pos_rule,
+    script_rule,
+)
 from anki_tools.ranking.coreflow import InputCard, write_deck, write_manifest
-from anki_tools.ranking.corelist import CONTENT_POS, UNRANKED_RANK, TargetWord, build_targets
+from anki_tools.ranking.corelist import UNRANKED_RANK, TargetWord, build_targets, is_content
 from anki_tools.ranking.cover import greedy_cover
 from anki_tools.ranking.coverage import write_rows
 from anki_tools.ranking.duplicates import at_limit
 from anki_tools.sentence_pack.audit import sha256_value
+from anki_tools.sentence_pack.guards import check_sentence_shape
 from anki_tools.sentence_pack.tokens import load_model
 
 DEFAULT_MAX_CARDS = 1000
@@ -44,6 +52,11 @@ TATOEBA_BATCH = 1000
 TOKENIZE_BATCH = 256
 FILTER_RULES = ("F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9")
 EXEMPT_GAIN = 0.1
+
+# The shape guard names the mark rules F5 to F8. The cull keeps the names of the
+# shared card filter, where F4 to F7 are the mark rules.
+MARK_RULES = {"F5": "F4", "F6": "F5", "F7": "F6", "F8": "F7"}
+LENGTH_RULES = ("F2",)
 
 RESERVE_SENTENCE_FIELD = "Sentence"
 RESERVE_ENGLISH_FIELD = "English"
@@ -149,6 +162,12 @@ class CullProfile:
     :param concept_forms: Give the forms of one reserve concept, for example the
         lemma and the text forms of a Latin concept or the characters of a Han
         concept.
+    :param content_pos: Parts of speech that count as content, empty for every
+        token.
+    :param min_lemma_length: Shortest accepted lemma.
+    :param final_marks: Accepted sentence-final marks.
+    :param quote_marks: Quotation marks and dialogue dashes of the mark rule.
+    :param internal_marks: Internal punctuation marks of the mark rule.
     :param model_name: Name of the input note model.
     :param sentence_field: Name of the sentence field of the model.
     :param english_field: Name of the English field of the model.
@@ -175,6 +194,12 @@ class CullProfile:
     read_names: Callable[[], set[str]]
     concept_forms: Callable[[str], set[str]]
 
+    content_pos: frozenset[str]
+    min_lemma_length: int
+    final_marks: str
+    quote_marks: str
+    internal_marks: str
+
     model_name: str
     sentence_field: str
     english_field: str
@@ -197,6 +222,78 @@ class CullProfile:
 
     default_deck_name: str
     licenses: Mapping[str, str]
+
+
+@dataclass(frozen=True)
+class CardShape:
+    """Shape-guard values of one card of the cull.
+
+    The cull measures the length window with the tokenizer output, so the unit
+    count comes from the card and not from the sentence text.
+
+    :param units: Token count of the card sentence.
+    :param final_marks: Accepted sentence-final marks of the language.
+    :param quote_marks: Quotation marks and dialogue dashes of the language.
+    :param internal_marks: Internal punctuation marks of the language.
+    """
+
+    units: int
+    final_marks: str
+    quote_marks: str
+    internal_marks: str
+
+    def unit_count(self, sentence: str) -> int:
+        """Give the token count of the card.
+
+        :param sentence: Prepared sentence text.
+        :returns: The token count of the card.
+        """
+        return self.units
+
+
+def filter_reason(
+    card: InputCard,
+    card_tokens: Sequence[tuple[str, str]],
+    min_words: int,
+    max_words: int,
+    profile: CullProfile,
+) -> str:
+    """Give the first failed filter rule F1 to F8 of one card of the cull.
+
+    The English window, the script rule, and the proper-noun rule come from the
+    shared card filter. The length window and the mark rules come from the
+    sentence shape guard, so the marks are the marks of the language profile.
+
+    :param card: Input card.
+    :param card_tokens: Lemma and part of speech of the card sentence.
+    :param min_words: Minimum token count of a card.
+    :param max_words: Maximum token count of a card.
+    :param profile: Language hooks.
+    :returns: The rule name ``F1`` to ``F8``, or the empty string on a pass.
+    """
+    reason = english_rule(card)
+    if reason:
+        return reason
+    shape = CardShape(
+        len(card_tokens),
+        profile.final_marks,
+        profile.quote_marks,
+        profile.internal_marks,
+    )
+    reason = check_sentence_shape(
+        card.sentence, shape, min_words, max_words, keys=LENGTH_RULES
+    )
+    if reason:
+        return reason
+    reason = script_rule(card.sentence)
+    if reason:
+        return reason
+    reason = check_sentence_shape(
+        card.sentence, shape, min_words, max_words, keys=MARK_RULES
+    )
+    if reason:
+        return MARK_RULES[reason]
+    return pos_rule(card_tokens)
 
 
 @dataclass(frozen=True)
@@ -409,14 +506,17 @@ def _reserve_cards(package: AnkiPackage, model_name: str) -> list[ReserveCard]:
 
 def lemma_sets(
     tokens: Sequence[Sequence[tuple[str, str]]],
+    content_pos: frozenset[str],
 ) -> list[set[str]]:
     """Collect the content lemmas of every card.
 
     :param tokens: Lemma and part of speech per card.
+    :param content_pos: Parts of speech that count as content, empty for every
+        token.
     :returns: One set of content lemmas per card.
     """
     return [
-        {lemma for lemma, pos in card_tokens if pos in CONTENT_POS}
+        {lemma for lemma, pos in card_tokens if is_content(pos, content_pos)}
         for card_tokens in tokens
     ]
 
@@ -439,7 +539,7 @@ def reserve_lemma_sets(
         nlp_tokens = profile.tokenize_texts(card.sentence for card in reserve)
     if len(nlp_tokens) != len(reserve):
         raise ValueError("The reserve list and the token list differ in size.")
-    return lemma_sets(nlp_tokens)
+    return lemma_sets(nlp_tokens, profile.content_pos)
 
 
 def dedupe_reserve(
@@ -448,6 +548,8 @@ def dedupe_reserve(
     cards: Sequence[InputCard],
     tokens: Sequence[Sequence[tuple[str, str]]],
     similarity: float = 0.67,
+    *,
+    content_pos: frozenset[str],
 ) -> list[ReserveCard]:
     """Drop the reserve cards that the input deck already holds.
 
@@ -459,10 +561,14 @@ def dedupe_reserve(
     :param cards: Input cards.
     :param tokens: Lemma and part of speech per input card.
     :param similarity: Lemma Jaccard limit of a duplicate pair.
+    :param content_pos: Parts of speech that count as content, empty for every
+        token.
     :raises ValueError: A card list and its token list differ in size.
     :returns: The reserve cards that the input deck does not hold, in order.
     """
-    kept, _sets = dedupe_reserve_sets(reserve, reserve_sets, cards, tokens, similarity)
+    kept, _sets = dedupe_reserve_sets(
+        reserve, reserve_sets, cards, tokens, similarity, content_pos=content_pos
+    )
     return kept
 
 
@@ -472,6 +578,8 @@ def dedupe_reserve_sets(
     cards: Sequence[InputCard],
     tokens: Sequence[Sequence[tuple[str, str]]],
     similarity: float = 0.67,
+    *,
+    content_pos: frozenset[str],
 ) -> tuple[list[ReserveCard], list[set[str]]]:
     """Drop the duplicate reserve cards and return the lemma sets of the rest.
 
@@ -483,6 +591,8 @@ def dedupe_reserve_sets(
     :param cards: Input cards.
     :param tokens: Lemma and part of speech per input card.
     :param similarity: Lemma Jaccard limit of a duplicate pair.
+    :param content_pos: Parts of speech that count as content, empty for every
+        token.
     :raises ValueError: A card list and its token list differ in size.
     :returns: The kept reserve cards and their content lemma sets, in order.
     """
@@ -492,7 +602,7 @@ def dedupe_reserve_sets(
         raise ValueError("The reserve list and the lemma set list differ in size.")
 
     sentences = {card.sentence for card in cards}
-    sets = lemma_sets(tokens)
+    sets = lemma_sets(tokens, content_pos)
     index: dict[str, list[int]] = {}
     for position, lemma_set in enumerate(sets):
         for lemma in lemma_set:
@@ -563,6 +673,7 @@ def select_cards(
     passed: Sequence[int] | None = None,
     reserved: Sequence[ReserveCard] = (),
     reserved_sets: Sequence[set[str]] = (),
+    content_pos: frozenset[str],
 ) -> SelectionResult:
     """Select the kept cards with the greedy cover of spec section 8.
 
@@ -578,6 +689,8 @@ def select_cards(
         when empty.
     :param reserved: Reserve cards that the selection keeps.
     :param reserved_sets: Content lemmas per reserve card.
+    :param content_pos: Parts of speech that count as content, empty for every
+        token.
     :raises ValueError: A card list and its token list differ in size.
     :returns: The kept cards in gain order, the lemma uses, and the reasons.
     """
@@ -586,7 +699,7 @@ def select_cards(
     if len(reserved) != len(reserved_sets):
         raise ValueError("The reserve list and the lemma set list differ in size.")
 
-    sets = lemma_sets(tokens)
+    sets = lemma_sets(tokens, content_pos)
     exempt = {target.lemma for target in targets[:exempt_top]}
     weights = {target.lemma: target.weight for target in targets}
 
@@ -658,13 +771,13 @@ def select_cards(
         hits = {
             lemma
             for lemma, pos in card_tokens
-            if pos in CONTENT_POS and lemma in target_ranks
+            if is_content(pos, content_pos) and lemma in target_ranks
         }
         if hits:
             card_targets[index] = tuple(
                 sorted(hits, key=lambda lemma: (target_ranks[lemma], lemma))
             )
-        card_hardest[index] = hardest_rank(card_tokens, ranks)
+        card_hardest[index] = hardest_rank(card_tokens, ranks, content_pos)
 
     return SelectionResult(
         kept=kept,
@@ -709,6 +822,8 @@ def order_cards(
     tokens: Sequence[Sequence[tuple[str, str]]],
     ranks: dict[str, int],
     order: str = "coverage",
+    *,
+    content_pos: frozenset[str],
 ) -> list[int]:
     """Order the kept cards for learning.
 
@@ -717,6 +832,8 @@ def order_cards(
     :param ranks: Lemma to blended frequency rank.
     :param order: ``coverage`` sorts on ``hardest_rank``; ``input`` keeps the
         given order.
+    :param content_pos: Parts of speech that count as content, empty for every
+        token.
     :raises ValueError: The order is not ``coverage`` or ``input``.
     :returns: The ordered input indices.
     """
@@ -728,18 +845,24 @@ def order_cards(
     return sorted(
         kept,
         key=lambda index: (
-            hardest_rank(tokens[index], ranks),
+            hardest_rank(tokens[index], ranks, content_pos),
             len(tokens[index]),
             index,
         ),
     )
 
 
-def hardest_rank(card_tokens: Sequence[tuple[str, str]], ranks: dict[str, int]) -> int:
+def hardest_rank(
+    card_tokens: Sequence[tuple[str, str]],
+    ranks: dict[str, int],
+    content_pos: frozenset[str],
+) -> int:
     """Give the blended frequency rank of the hardest content lemma of a card.
 
     :param card_tokens: Lemma and part of speech of the card sentence.
     :param ranks: Lemma to blended frequency rank.
+    :param content_pos: Parts of speech that count as content, empty for every
+        token.
     :returns: The rank of the least frequent content lemma, or
         :data:`UNRANKED_ORDER` without a content lemma.
     """
@@ -747,7 +870,7 @@ def hardest_rank(card_tokens: Sequence[tuple[str, str]], ranks: dict[str, int]) 
         (
             ranks.get(lemma, UNRANKED_ORDER)
             for lemma, pos in card_tokens
-            if pos in CONTENT_POS
+            if is_content(pos, content_pos)
         ),
         default=UNRANKED_ORDER,
     )
@@ -950,10 +1073,20 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
     names = profile.read_names()
     tokens = profile.tokenize_texts(card.sentence for card in cards)
     targets, content_lemmas = build_targets(
-        cards, tokens, ranks, names, target_words=request.target_words
+        cards,
+        tokens,
+        ranks,
+        names,
+        target_words=request.target_words,
+        min_lemma_length=profile.min_lemma_length,
+        content_pos=profile.content_pos,
     )
     passed, reasons = filter_cards(
-        cards, tokens, min_words=request.min_words, max_words=request.max_words
+        cards,
+        tokens,
+        min_words=request.min_words,
+        max_words=request.max_words,
+        card_rule=partial(filter_reason, profile=profile),
     )
     reserve: list[ReserveCard] = []
     reserve_sets: list[set[str]] = []
@@ -963,7 +1096,12 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
         reserve = list(all_reserve)
         reserve_sets = reserve_lemma_sets(reserve, profile)
         reserve, reserve_sets = dedupe_reserve_sets(
-            reserve, reserve_sets, cards, tokens, request.similarity
+            reserve,
+            reserve_sets,
+            cards,
+            tokens,
+            request.similarity,
+            content_pos=profile.content_pos,
         )
     selection = select_cards(
         cards,
@@ -977,8 +1115,15 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
         passed=passed,
         reserved=reserve,
         reserved_sets=reserve_sets,
+        content_pos=profile.content_pos,
     )
-    ordered = order_cards(selection.kept, tokens, ranks, order=request.order)
+    ordered = order_cards(
+        selection.kept,
+        tokens,
+        ranks,
+        order=request.order,
+        content_pos=profile.content_pos,
+    )
 
     rejected = Counter(reasons)
     kept_lemmas = set().union(*reserve_sets) if reserve_sets else set()
@@ -986,7 +1131,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
         lemma
         for index in selection.kept
         for lemma, pos in tokens[index]
-        if pos in CONTENT_POS
+        if is_content(pos, profile.content_pos)
     )
     covered = sum(1 for target in targets if selection.uses[target.lemma])
     twice = sum(1 for target in targets if selection.uses[target.lemma] >= 2)
@@ -1005,7 +1150,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
             {
                 lemma
                 for lemma, pos in tokens[index]
-                if pos in CONTENT_POS
+                if is_content(pos, profile.content_pos)
             }
         )
     reserve_uses: Counter[str] = Counter()
@@ -1059,7 +1204,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
             {
                 lemma
                 for lemma, pos in tokens[index]
-                if pos in CONTENT_POS and lemma in target_ranks
+                if is_content(pos, profile.content_pos) and lemma in target_ranks
             },
             key=lambda lemma: target_ranks[lemma],
         )
@@ -1210,7 +1355,7 @@ def count_tatoeba_lemmas(
     for tokens in profile.tokenize_texts(_tatoeba_texts(path)):
         for lemma, pos in tokens:
             counts[lemma] += 1
-            if pos in CONTENT_POS:
+            if is_content(pos, profile.content_pos):
                 content_tokens += 1
     return counts, content_tokens
 

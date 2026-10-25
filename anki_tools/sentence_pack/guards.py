@@ -18,7 +18,7 @@ does not import another language package for it.
 
 from __future__ import annotations
 
-from typing import Iterable, Sequence
+from typing import Collection, Iterable, Sequence
 
 from anki_tools.sentence_pack.pool import shape_failure
 from anki_tools.sentence_pack.profile import LanguageProfile
@@ -74,6 +74,7 @@ def check_sentence_shape(
     max_units: int,
     *,
     final_mark: bool = True,
+    keys: Collection[str] = (),
 ) -> str | None:
     """Apply filters F2 to F8 to one sentence.
 
@@ -82,8 +83,9 @@ def check_sentence_shape(
     :param min_units: Minimum unit count of the window.
     :param max_units: Maximum unit count of the window.
     :param final_mark: Apply filters F5 and F6 (the final-mark rules).
+    :param keys: Guard keys to apply, empty for every key.
     :returns: The first failed filter key, or None when all filters pass.
     """
     return shape_failure(
-        sentence, profile, min_units, max_units, final_mark=final_mark
+        sentence, profile, min_units, max_units, final_mark=final_mark, keys=keys
     )

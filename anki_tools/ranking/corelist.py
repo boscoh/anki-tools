@@ -22,6 +22,19 @@ MIN_LEMMA_LENGTH = 2
 UNRANKED_RANK = 100_000
 
 
+def is_content(pos: str, content_pos: frozenset[str]) -> bool:
+    """Tell whether a token counts as content.
+
+    An empty set counts every token, which a language without a part-of-speech
+    tagger needs.
+
+    :param pos: Part of speech tag of the token.
+    :param content_pos: Parts of speech that count as content.
+    :returns: True when the token counts as content.
+    """
+    return not content_pos or pos in content_pos
+
+
 @dataclass(frozen=True)
 class TargetWord:
     """One target word of the frequency fill.
@@ -95,6 +108,8 @@ def build_targets(
     names: Collection[str],
     target_words: int | None = 300,
     min_deck_count: int = MIN_DECK_COUNT,
+    min_lemma_length: int = MIN_LEMMA_LENGTH,
+    content_pos: frozenset[str] = CONTENT_POS,
 ) -> tuple[list[TargetWord], int]:
     """Build the target word list of the frequency fill.
 
@@ -109,6 +124,9 @@ def build_targets(
     :param names: Name stoplist.
     :param target_words: Number of targets to keep, or None for every candidate.
     :param min_deck_count: Minimum content-token count of a candidate.
+    :param min_lemma_length: Shortest accepted lemma, 1 keeps a Han character.
+    :param content_pos: Parts of speech that count as content, empty for every
+        token.
     :raises ValueError: The card list and the token list have different sizes.
     :returns: The targets in rank order, and the count of content lemmas before
         the target cut.
@@ -121,7 +139,7 @@ def build_targets(
     for card_tokens in tokens:
         for lemma, pos in card_tokens:
             totals[lemma] += 1
-            if pos in CONTENT_POS:
+            if is_content(pos, content_pos):
                 content[lemma] += 1
 
     candidates: list[TargetWord] = []
@@ -131,7 +149,7 @@ def build_targets(
         share = content[lemma] / count
         if share < CONTENT_SHARE:
             continue
-        if len(lemma) < MIN_LEMMA_LENGTH or lemma in names:
+        if len(lemma) < min_lemma_length or lemma in names:
             continue
         rank = ranks.get(lemma, UNRANKED_RANK)
         candidates.append(

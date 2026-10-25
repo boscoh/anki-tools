@@ -15,8 +15,14 @@ from pathlib import Path
 from typing import Iterable, Sequence
 
 from anki_tools.apkg.templates import SHARED_CSS_PATH, TEMPLATES_DIR, load_text
-from anki_tools.languages.french.profile import EXTRA_CSS, TOKENIZER
-from anki_tools.ranking import cardfilter, coreflow, corelist, cullflow, cullgates
+from anki_tools.languages.french.profile import (
+    EXTRA_CSS,
+    FINAL_MARKS,
+    INTERNAL_MARKS,
+    QUOTE_MARKS,
+    TOKENIZER,
+)
+from anki_tools.ranking import coreflow, corelist, cullflow, cullgates
 from anki_tools.ranking.coreflow import InputCard
 from anki_tools.sentence_pack.pack import load_css
 from anki_tools.sentence_pack.tokens import load_model
@@ -180,6 +186,11 @@ FRENCH_CULL_PROFILE = cullflow.CullProfile(
     frequency_ranks=cullflow.frequency_ranks,
     read_names=read_names,
     concept_forms=_concept_forms,
+    content_pos=corelist.CONTENT_POS,
+    min_lemma_length=corelist.MIN_LEMMA_LENGTH,
+    final_marks=FINAL_MARKS,
+    quote_marks=QUOTE_MARKS,
+    internal_marks=INTERNAL_MARKS,
     model_name=MODEL_NAME,
     sentence_field=FRENCH_FIELD,
     english_field=ENGLISH_FIELD,
@@ -237,8 +248,11 @@ kept_order_hash = cullflow.kept_order_hash
 dedupe_reserve = cullflow.dedupe_reserve
 dedupe_reserve_sets = cullflow.dedupe_reserve_sets
 swadesh_coverage = partial(cullflow.swadesh_coverage, profile=FRENCH_CULL_PROFILE)
-filter_cards = cardfilter.filter_cards
-_filter_reason = cardfilter._filter_reason
+filter_cards = partial(
+    cullflow.filter_cards,
+    card_rule=partial(cullflow.filter_reason, profile=FRENCH_CULL_PROFILE),
+)
+_filter_reason = partial(cullflow.filter_reason, profile=FRENCH_CULL_PROFILE)
 TargetWord = corelist.TargetWord
 build_targets = corelist.build_targets
 write_manifest = coreflow.write_manifest

@@ -105,8 +105,9 @@ _Avoid_: filter, prune
 
 **Cull profile**:
 The frozen `CullProfile` that holds every value and hook of one language for the
-cull, for example the model fields, the templates, the reserve pack, and the file
-paths. A language supplies one profile and no flow code.
+cull, for example the model fields, the templates, the reserve pack, the content
+parts of speech, the shortest lemma, the sentence marks, and the file paths. A
+language supplies one profile and no flow code.
 _Avoid_: cull config, cull settings
 
 **Ranking CSV**:

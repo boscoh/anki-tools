@@ -24,6 +24,7 @@ ENGLISH = "A short English line."
 BASE_TOKENS = [("le", "DET"), ("chat", "NOUN"), ("mange", "VERB"), ("vite", "ADV")]
 MIN_WORDS = 3
 MAX_WORDS = 12
+CONTENT_POS = cull_fr.FRENCH_CULL_PROFILE.content_pos
 DECK_NAME = "French 1000 Core Sentences"
 DECK_FIELDS = ["French", "sound", "Back", "freq ranks"]
 
@@ -266,7 +267,14 @@ class TestSelection:
         ranks = {"rare": 1, "commune": 50}
 
         result = cull_fr.select_cards(
-            cards, tokens, targets, ranks, max_cards=10, max_uses=4, exempt_top=0
+            cards,
+            tokens,
+            targets,
+            ranks,
+            max_cards=10,
+            max_uses=4,
+            exempt_top=0,
+            content_pos=CONTENT_POS,
         )
 
         assert result.kept == [0, 1, 2]
@@ -276,7 +284,14 @@ class TestSelection:
         cards, tokens, targets, ranks = _cap_fixture()
 
         result = cull_fr.select_cards(
-            cards, tokens, targets, ranks, max_cards=10, max_uses=2, exempt_top=0
+            cards,
+            tokens,
+            targets,
+            ranks,
+            max_cards=10,
+            max_uses=2,
+            exempt_top=0,
+            content_pos=CONTENT_POS,
         )
 
         assert len(result.kept) == 2
@@ -286,7 +301,14 @@ class TestSelection:
         cards, tokens, targets, ranks = _cap_fixture()
 
         result = cull_fr.select_cards(
-            cards, tokens, targets, ranks, max_cards=10, max_uses=2, exempt_top=0
+            cards,
+            tokens,
+            targets,
+            ranks,
+            max_cards=10,
+            max_uses=2,
+            exempt_top=0,
+            content_pos=CONTENT_POS,
         )
 
         rejected = [index for index in range(len(cards)) if index not in result.kept]
@@ -296,7 +318,14 @@ class TestSelection:
         cards, tokens, targets, ranks = _cap_fixture()
 
         result = cull_fr.select_cards(
-            cards, tokens, targets, ranks, max_cards=10, max_uses=2, exempt_top=1
+            cards,
+            tokens,
+            targets,
+            ranks,
+            max_cards=10,
+            max_uses=2,
+            exempt_top=1,
+            content_pos=CONTENT_POS,
         )
 
         assert len(result.kept) == len(cards)
@@ -317,7 +346,14 @@ class TestSelection:
         ranks = {lemma: 100 for lemma in shared}
 
         result = cull_fr.select_cards(
-            cards, tokens, [], ranks, max_cards=10, max_uses=4, exempt_top=0
+            cards,
+            tokens,
+            [],
+            ranks,
+            max_cards=10,
+            max_uses=4,
+            exempt_top=0,
+            content_pos=CONTENT_POS,
         )
 
         assert len(result.kept) == 1
@@ -327,10 +363,24 @@ class TestSelection:
         cards, tokens, targets, ranks = _cap_fixture()
 
         first = cull_fr.select_cards(
-            cards, tokens, targets, ranks, max_cards=10, max_uses=2, exempt_top=0
+            cards,
+            tokens,
+            targets,
+            ranks,
+            max_cards=10,
+            max_uses=2,
+            exempt_top=0,
+            content_pos=CONTENT_POS,
         )
         second = cull_fr.select_cards(
-            cards, tokens, targets, ranks, max_cards=10, max_uses=2, exempt_top=0
+            cards,
+            tokens,
+            targets,
+            ranks,
+            max_cards=10,
+            max_uses=2,
+            exempt_top=0,
+            content_pos=CONTENT_POS,
         )
 
         assert first.kept == second.kept
@@ -346,24 +396,33 @@ ORDER_RANKS = {"maison": 5, "grande": 40, "chat": 2, "noir": 900}
 
 class TestOrder:
     def test_coverage_gives_a_non_decreasing_hardest_rank(self) -> None:
-        ordered = cull_fr.order_cards([0, 1, 2], ORDER_TOKENS, ORDER_RANKS)
+        ordered = cull_fr.order_cards(
+            [0, 1, 2], ORDER_TOKENS, ORDER_RANKS, content_pos=CONTENT_POS
+        )
 
         hardest = [
-            cull_fr.hardest_rank(ORDER_TOKENS[index], ORDER_RANKS) for index in ordered
+            cull_fr.hardest_rank(ORDER_TOKENS[index], ORDER_RANKS, CONTENT_POS)
+            for index in ordered
         ]
         assert ordered == [0, 1, 2]
         assert hardest == [40, 900, cull_fr.UNRANKED_ORDER]
 
     def test_input_keeps_the_given_order(self) -> None:
         ordered = cull_fr.order_cards(
-            [2, 0, 1], ORDER_TOKENS, ORDER_RANKS, order="input"
+            [2, 0, 1],
+            ORDER_TOKENS,
+            ORDER_RANKS,
+            order="input",
+            content_pos=CONTENT_POS,
         )
 
         assert ordered == [2, 0, 1]
 
     def test_an_unknown_order_raises(self) -> None:
         with pytest.raises(ValueError):
-            cull_fr.order_cards([0], ORDER_TOKENS, ORDER_RANKS, order="random")
+            cull_fr.order_cards(
+                [0], ORDER_TOKENS, ORDER_RANKS, order="random", content_pos=CONTENT_POS
+            )
 
 
 def _read_csv(path: Path) -> tuple[list[str], list[dict[str, str]]]:
@@ -818,7 +877,9 @@ def test_dedupe_reserve_drops_an_internal_duplicate() -> None:
         {"chat", "ici", "aussi", "le"},
     ]
 
-    kept, kept_sets = cull_fr.dedupe_reserve_sets(reserve, sets, [], [])
+    kept, kept_sets = cull_fr.dedupe_reserve_sets(
+        reserve, sets, [], [], content_pos=CONTENT_POS
+    )
 
     assert len(kept) == 1
     assert kept_sets == [{"chat", "ici", "aussi"}]

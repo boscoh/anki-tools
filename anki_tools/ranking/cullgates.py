@@ -18,16 +18,16 @@ from pathlib import Path
 from typing import Any, Callable, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.ranking.cardfilter import _filter_reason
 from anki_tools.ranking.coreflow import InputCard, probe_audio, read_input_deck
 from anki_tools.ranking.coregates import _read_csv
-from anki_tools.ranking.corelist import CONTENT_POS
+from anki_tools.ranking.corelist import is_content
 from anki_tools.ranking.cullflow import (
     FREQUENCY_SOURCE,
     SWADESH_SOURCE,
     CullProfile,
     _is_similar,
     coverage_status,
+    filter_reason,
     lemma_sets,
     side_paths,
 )
@@ -248,7 +248,13 @@ def gate_use_cap(files: CullFiles) -> tuple[bool, str]:
     for card, card_tokens in zip(files.output()["cards"], files.tokens()):
         if card.sentence not in frequency_sentences:
             continue
-        uses.update({lemma for lemma, pos in card_tokens if pos in CONTENT_POS})
+        uses.update(
+            {
+                lemma
+                for lemma, pos in card_tokens
+                if is_content(pos, files.profile.content_pos)
+            }
+        )
     over = {
         lemma: count
         for lemma, count in uses.items()
@@ -299,7 +305,7 @@ def gate_filter(files: CullFiles) -> tuple[bool, str]:
             audio="",
             index=0,
         )
-        reason = _filter_reason(card, card_tokens, min_words, max_words)
+        reason = filter_reason(card, card_tokens, min_words, max_words, files.profile)
         if reason == "F8" and row.get("source") == SWADESH_SOURCE:
             reason = ""
         if not reason and card.sentence in seen:
@@ -316,7 +322,7 @@ def gate_similarity(files: CullFiles) -> tuple[bool, str]:
     """G6: no kept card pair reaches the lemma Jaccard limit."""
     limit = float(files.params().get("similarity", 0.67))
     cards = files.output()["cards"]
-    sets = lemma_sets(files.tokens())
+    sets = lemma_sets(files.tokens(), files.profile.content_pos)
     shared: dict[str, list[int]] = {}
     problems: list[str] = []
     for index, lemma_set in enumerate(sets):
