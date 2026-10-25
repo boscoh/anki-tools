@@ -32,7 +32,6 @@ from anki_tools.languages.mandarin import core as mandarin_core
 from anki_tools.languages.mandarin import frequency as mandarin_frequency
 from anki_tools.languages.cantonese.jyutping import fix_jyutping
 from anki_tools.languages.mandarin.pinyin import fix_pinyin
-from anki_tools.languages.mandarin.stages import fetch_tatoeba
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.preview import write_preview
 from anki_tools.preview_apkg import write_apkg_preview
@@ -44,7 +43,6 @@ from anki_tools.sentence_pack import tatoeba as sentence_tatoeba
 from anki_tools.sentence_pack.audit import print_audit as print_gate_table
 from anki_tools.languages import (
     LANGUAGES,
-    get_profile,
     profile_languages,
     resolve,
     swadesh_languages,
@@ -1639,31 +1637,41 @@ def build(language: str, prune: bool = True):
     _build_apkg(lang, prune=prune)
 
 
+def _native_audio(code: str) -> bool:
+    """Report whether a native Tatoeba audio tier exists for a code.
+
+    :param code: Tatoeba language code, for example ``ell``.
+    :returns: True when the owning profile has a native audio tier, and True
+        for a code that no profile owns.
+    """
+    for entry in LANGUAGES.values():
+        profile = entry.profile
+        if profile is not None and profile.tatoeba_lang == code:
+            return profile.native_audio
+    return True
+
+
 @swadesh_app.command
 def fetch(*, refresh: bool = False, lang: list[str] | None = None) -> None:
     """Fetch the Tatoeba exports of a language pack (stage S0).
 
-    With no ``--lang`` the command keeps the Mandarin behaviour and downloads the
-    Mandarin and English exports. A language with no native Tatoeba audio skips
-    the ``sentences_with_audio`` export.
+    With no ``--lang`` the command downloads the exports of the Mandarin
+    profile code and of English. A language code whose profile has no native
+    Tatoeba audio skips the ``sentences_with_audio`` export.
 
     :param refresh: Ignore the cache and download every file again.
     :param lang: Tatoeba language codes, for example ``ell --lang eng``.
     """
-    if not lang:
-        results = fetch_tatoeba(refresh=refresh)
-        for name, info in results.items():
-            print(f"{name}.tsv: {info['rows']} rows ({info['source']})")
-        return
+    codes = lang or [LANGUAGES["mandarin"].profile.tatoeba_lang]
     files: dict[str, str] = {}
-    for code in lang:
+    for code in codes:
         files.update(
             sentence_tatoeba.language_files(
                 code,
-                native_audio=code != (get_profile("greek").tatoeba_lang),
+                native_audio=_native_audio(code),
             )
         )
-    if "eng" not in lang:
+    if "eng" not in codes:
         files.update(sentence_tatoeba.language_files("eng", native_audio=False))
     results = sentence_tatoeba.fetch_tatoeba(files, refresh=refresh)
     for name, info in results.items():
