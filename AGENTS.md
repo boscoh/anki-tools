@@ -48,6 +48,12 @@ bd sync                         # pull, conflict check, push (at handoff)
 - Never use `bd edit`; it opens an interactive `$EDITOR`. Update a field with a
   flag, for example `bd update <id> --description ...`.
 - Link discovered work with `--deps discovered-from:<id>`.
+- Put `## Acceptance Criteria` in the issue description. A bug also gets
+  `## Steps to Reproduce` and an epic gets `## Success Criteria`.
+  `bd lint` checks these sections.
+- A long-lived epic stays open while a child is open, so `bd doctor
+  --check=conventions` reports it as an orphan. The flag is expected; never
+  close the epic to clear it.
 - Git hooks are shared and committable: `git config core.hooksPath
   .beads-hooks` (installed with `bd hooks install --shared`). Do not use
   `.git/hooks`.
