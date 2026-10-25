@@ -24,7 +24,9 @@ from pathlib import Path
 from typing import Iterable, Sequence
 
 from anki_tools.cache import download_cached_file
+from anki_tools.languages.spanish.profile import prepare_text, spanish_tokens
 from anki_tools.ranking import cullflow
+from anki_tools.ranking.corelist import CONTENT_POS
 
 FREQUENCY_PATH = Path("data/spanish_frequency.tsv")
 ES_SOURCE_PATH = Path("data/es_full.txt")
@@ -216,9 +218,6 @@ def _count_tatoeba(tatoeba_path: Path) -> tuple[Counter[str], int]:
         ``text``.
     :returns: Lemma counts, and the count of content tokens.
     """
-    from anki_tools.languages.spanish.profile import prepare_text, spanish_tokens
-    from anki_tools.ranking.corelist import CONTENT_POS
-
     counts: Counter[str] = Counter()
     content_tokens = 0
     with tatoeba_path.open(newline="", encoding="utf-8") as handle:

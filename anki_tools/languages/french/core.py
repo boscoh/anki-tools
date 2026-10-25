@@ -9,6 +9,7 @@ generic logic lives in ``anki_tools.ranking.coreflow`` and
 from __future__ import annotations
 
 from pathlib import Path
+
 from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
 from anki_tools.languages.french import cull
 from anki_tools.languages.french.profile import FRENCH, load_word_table
@@ -24,11 +25,6 @@ DEFAULT_OPTIONS = CoreOptions(tail_cards=120)
 
 MIN_UNITS = 5
 MAX_UNITS = 9
-
-MODEL_NAME = cull.MODEL_NAME
-FRENCH_FIELD = cull.FRENCH_FIELD
-AUDIO_FIELD = cull.AUDIO_FIELD
-ENGLISH_FIELD = cull.ENGLISH_FIELD
 
 CORE_FIELD = "Core"
 CORE_GLOSS_FIELD = "CoreGloss"
@@ -47,6 +43,8 @@ def word_table() -> list[tuple[int, str, str]]:
         (row.swadesh_index, row.french, row.english) for row in load_word_table()
     ]
 
+
+
 FRENCH_CORE_PROFILE = CoreProfile(
     load_input_deck=cull.load_input_deck,
     tokenize_deck=cull.tokenize_deck,
@@ -61,10 +59,10 @@ FRENCH_CORE_PROFILE = CoreProfile(
     sense_filter=FRENCH.sense_filter,
     highlight=FRENCH.highlight,
     lemma_key=str.casefold,
-    model_name=MODEL_NAME,
-    sentence_field=FRENCH_FIELD,
-    english_field=ENGLISH_FIELD,
-    audio_field=AUDIO_FIELD,
+    model_name=cull.MODEL_NAME,
+    sentence_field=cull.FRENCH_FIELD,
+    english_field=cull.ENGLISH_FIELD,
+    audio_field=cull.AUDIO_FIELD,
     core_field=CORE_FIELD,
     core_gloss_field=CORE_GLOSS_FIELD,
     templates=CORE_TEMPLATES,

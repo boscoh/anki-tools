@@ -25,6 +25,7 @@ from anki_tools.languages.spanish.frequency import (
 
 from anki_tools.apkg.templates import SHARED_CSS_PATH, TEMPLATES_DIR, load_text
 from anki_tools.languages.spanish.profile import (
+    EXTRA_CSS,
     TOKENIZER,
     SPANISH,
     load_word_table,
@@ -152,8 +153,6 @@ def word_table() -> list[tuple[int, str, str]]:
 
 def card_css() -> str:
     """Give the CSS of the Spanish core deck."""
-    from anki_tools.languages.spanish.profile import EXTRA_CSS
-
     return load_css(SHARED_CSS_PATH, EXTRA_CSS)
 
 

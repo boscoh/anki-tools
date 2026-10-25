@@ -41,11 +41,6 @@ TATOEBA_PATH = Path("data/tatoeba/spa_sentences.tsv")
 NAMES_PATH = Path("vocab/spanish_names.txt")
 
 
-MODEL_NAME = core.MODEL_NAME
-SENTENCE_FIELD = core.SENTENCE_FIELD
-ENGLISH_FIELD = core.ENGLISH_FIELD
-AUDIO_FIELD = core.AUDIO_FIELD
-
 SWADESH_PACK_PATH = Path("apkg/swadesh_spanish_sentences.apkg")
 SWADESH_TOTAL = SWADESH_ROWS
 # ``corteza`` has no card in the stale reserve pack. The shared reserve dedupe
@@ -173,7 +168,7 @@ read_reserve = partial(cullflow.load_reserve, model_name=SWADESH_MODEL_NAME)
 
 write_cull_deck = partial(
     coreflow.write_deck,
-    model_name=MODEL_NAME,
+    model_name=core.MODEL_NAME,
     templates=CARD_TEMPLATES,
     card_css=card_css,
     reserve_fields=_reserve_fields,
@@ -192,10 +187,10 @@ SPANISH_CULL_PROFILE = cullflow.CullProfile(
     final_marks=FINAL_MARKS,
     quote_marks=QUOTE_MARKS,
     internal_marks=INTERNAL_MARKS,
-    model_name=MODEL_NAME,
-    sentence_field=SENTENCE_FIELD,
-    english_field=ENGLISH_FIELD,
-    audio_field=AUDIO_FIELD,
+    model_name=core.MODEL_NAME,
+    sentence_field=core.SENTENCE_FIELD,
+    english_field=core.ENGLISH_FIELD,
+    audio_field=core.AUDIO_FIELD,
     clean_sentence=clean_sentence,
     reserve_fields=_reserve_fields,
     templates=CARD_TEMPLATES,
