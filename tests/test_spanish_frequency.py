@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+from anki_tools.languages.spanish import frequency
 from anki_tools.languages.spanish.frequency import (
     ES_FULL_SHA256,
     FREQUENCY_PATH,
@@ -22,10 +23,21 @@ from anki_tools.languages.spanish.frequency import (
     load_frequency_es,
 )
 
-PINNED_SHA256 = "ad19aa90a468dc140d05e98eaeba47da3c23adc69453123257489708396cc278"
+PINNED_SHA256 = "2cd35c876754d305b60c8a948aeade55203a30e0e92ad56c349434cbbb6f2d7e"
 SOURCE_SHA256 = "b4794c425f3500c21a0ff9367175e36795a978c928a36670e9ad6ae206fb7728"
 
-COLUMNS = ("word", "lemma", "count", "pm", "rank", "pos", "source", "license")
+COLUMNS = (
+    "word",
+    "lemma",
+    "count",
+    "pm",
+    "rank",
+    "pos",
+    "source",
+    "license",
+    "tatoeba_count",
+    "written_pm",
+)
 
 needs_cache = pytest.mark.skipif(
     not FREQUENCY_PATH.exists(),
@@ -44,7 +56,7 @@ def _sha256(path: Path) -> str:
 
 @needs_cache
 def test_read_tsv() -> None:
-    """The cache has the eight columns and 50,000 data rows."""
+    """The cache has the ten columns and 50,000 data rows."""
     with FREQUENCY_PATH.open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle, delimiter="\t"))
     assert tuple(rows[0].keys()) == COLUMNS
@@ -95,9 +107,13 @@ def test_loader_fields() -> None:
         pos="DET",
         source=SOURCE_NAME,
         license=LICENSE,
+        tatoeba_count=229647,
+        written_pm=28183.829313,
     )
     assert all(row.source == SOURCE_NAME for row in rows)
     assert all(row.license == LICENSE for row in rows)
+    assert all(row.tatoeba_count >= 0 for row in rows)
+    assert all(row.written_pm > 0 for row in rows)
 
 
 @needs_cache
@@ -124,6 +140,8 @@ def test_loader_builds_the_cache_when_the_file_is_absent(
             pos="DET",
             source=SOURCE_NAME,
             license=LICENSE,
+            tatoeba_count=3,
+            written_pm=10.0,
         )
     ]
     monkeypatch.setattr(core, "FREQUENCY_PATH", target)
@@ -137,3 +155,23 @@ def test_loader_builds_the_cache_when_the_file_is_absent(
 
     monkeypatch.setattr(core, "build_frequency_es", again)
     assert core.load_frequency() == built
+
+
+def test_the_corpus_counts_are_cached(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The first call tokenizes the corpus, and the next call reads the cache."""
+    corpus = tmp_path / "spa_sentences.tsv"
+    corpus.write_text("1\tspa\tEl gato come el pan.\n", encoding="utf-8")
+    cache = tmp_path / "spanish_tatoeba_lemmas.tsv"
+
+    counts = frequency.tatoeba_lemma_counts(corpus, cache)
+
+    assert counts["gato"] == 1
+    assert cache.read_text(encoding="utf-8").splitlines()[0] == "lemma\tcount"
+
+    def boom(*args: object, **kwargs: object) -> None:
+        raise AssertionError("a cached run tokenized the corpus again")
+
+    monkeypatch.setattr(frequency.cullflow, "tokenize_texts", boom)
+    assert frequency.tatoeba_lemma_counts(corpus, cache) == counts
