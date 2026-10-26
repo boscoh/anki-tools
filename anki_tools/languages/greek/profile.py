@@ -535,6 +535,19 @@ def hits(sentence: str, forms: Collection[str]) -> dict[str, int]:
     return found
 
 
+def highlight(sentence: str, form: str) -> str:
+    """Wrap the matched target tokens of a card sentence in a bold tag.
+
+    :param sentence: Greek sentence.
+    :param form: Card target.
+    :returns: Sentence with the matched tokens in ``<b>`` tags.
+    """
+    pattern = re.compile(rf"(?<!\w){re.escape(form)}(?!\w)", re.IGNORECASE)
+    return pattern.sub(
+        lambda match: f"<b>{match.group(0)}</b>", sentence, count=1
+    )
+
+
 def match_count(sentence: str, form: str) -> int:
     """Count the matches of one form, for the audit gates.
 
@@ -957,6 +970,7 @@ GREEK = register(
         has_predicate=has_predicate,
         has_orphan=has_orphan,
         hits=hits,
+        highlight=highlight,
         match_count=match_count,
         candidate_length=lambda card: card.word_len,
         count_unknown=count_unknown,

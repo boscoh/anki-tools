@@ -69,6 +69,7 @@ def test_the_sentence_pack_cards_bold_the_target() -> None:
 
     assert "<b>Je</b>" in by_title["French sentence"].back
     assert "<b>Yo</b>" in by_title["Spanish sentence"].back
+    assert "<b>εσύ</b>" in by_title["Greek sentence"].back
 
 
 def test_render_template_hides_and_shows_sections() -> None:

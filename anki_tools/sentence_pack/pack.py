@@ -504,6 +504,7 @@ def build_pack(
 
     used: list[tuple[WordRow, dict[str, str], dict[str, Any]]] = []
     skipped = 0
+    no_target = 0
     for row in rows:
         word = by_target.get(row["target"])
         if word is None:
@@ -518,6 +519,10 @@ def build_pack(
             skipped += 1
             continue
         card = build_card(row, word, sentence_audio, word_audio, profile)
+        if "<b>" not in card["Sentence"]:
+            skipped += 1
+            no_target += 1
+            continue
         used.append((word, row, card))
     used.sort(key=lambda item: card_sort_key(item[0], item[1], profile))
 
@@ -553,13 +558,13 @@ def build_pack(
     manifest = build_manifest(
         profile,
         table,
-        rows,
+        packed_rows,
         index,
         word_csv=word_csv,
         csv_path=csv_path,
         pack_license=pack_license,
     )
-
+    manifest["counts"]["no_target"] = no_target
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(
         json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
@@ -576,6 +581,7 @@ def build_pack(
         "manifest_path": str(manifest_path),
         "media_count": len(media),
         "skipped": skipped,
+        "no_target": no_target,
         "manifest": manifest,
     }
 

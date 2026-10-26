@@ -190,6 +190,7 @@ def test_pack_manifest_counts(pack_env: dict[str, Path]) -> None:
         "scaffold": 1,
         "native_audio": 0,
         "tts_audio": 2,
+        "no_target": 0,
     }
     assert manifest["coverage"] == {"core_with_card": round(2 / SWADESH_ROWS, 4)}
     assert manifest["voice"] == "gtts:zh-CN"

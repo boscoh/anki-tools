@@ -706,6 +706,24 @@ def vocab_card(language: str, title: str) -> PreviewCard:
     )
 
 
+def first_row_with_bold(language: str, rows: list[dict[str, str]]) -> dict[str, str]:
+    """Give the first row whose sentence holds the target in bold.
+
+    :param language: Language key, for example ``greek``.
+    :param rows: Sentence CSV rows.
+    :returns: The first row with a bold target, or the first row.
+    """
+    profile = LANGUAGES[language].profile
+    for row in rows:
+        target = row["target"]
+        if profile is not None and profile.highlight is not None:
+            if "<b>" in profile.highlight(row["sentence"], target):
+                return row
+        elif "<b>" in row["sentence"].replace(target, f"<b>{target}</b>", 1):
+            return row
+    return rows[0]
+
+
 def build_sections() -> tuple[PreviewSection, ...]:
     """Build all preview sections from the template files.
 
@@ -716,7 +734,7 @@ def build_sections() -> tuple[PreviewSection, ...]:
         rows = read_csv_rows_or_empty(VOCAB_DIR / f"{language}_sentences.csv")
         if rows:
             sentence_cards.append(
-                sentence_card(language, f"{title} sentence", rows[0])
+                sentence_card(language, f"{title} sentence", first_row_with_bold(language, rows))
             )
 
     vocab_cards = tuple(

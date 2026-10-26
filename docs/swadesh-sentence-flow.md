@@ -67,6 +67,9 @@ S5  APKG, manifest, attribution
     audit gates G1 to G21
 ```
 
+The S5 builder writes a card only when its sentence holds the target in bold.
+A row that cannot is skipped and counted in `counts.no_target`. The audit gate
+G5 still reports the missing match in the source CSV.
 ## 3. S2 guard chain
 
 The pool walks the linked sentences in Tatoeba id order. Then it appends the
