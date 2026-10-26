@@ -100,13 +100,40 @@ def output_fields(profile: "DeckProfile") -> tuple[str, ...]:
 class DeckProfile(Protocol):
     """Contract of :func:`write_deck`: the input names and the output shape."""
 
-    input_model_name: str
-    input_sentence_field: str
-    input_english_field: str
-    input_audio_field: str
-    output_model_name: str
-    extra_fields: tuple[str, ...]
-    templates: tuple[tuple[str, str], ...]
+    @property
+    def input_model_name(self) -> str:
+        """Give the name of the input note type."""
+        ...
+
+    @property
+    def input_sentence_field(self) -> str:
+        """Give the name of the input sentence field."""
+        ...
+
+    @property
+    def input_english_field(self) -> str:
+        """Give the name of the input English field."""
+        ...
+
+    @property
+    def input_audio_field(self) -> str:
+        """Give the name of the input audio field."""
+        ...
+
+    @property
+    def output_model_name(self) -> str:
+        """Give the name of the output note type."""
+        ...
+
+    @property
+    def extra_fields(self) -> tuple[str, ...]:
+        """Give the extra output field names."""
+        ...
+
+    @property
+    def templates(self) -> tuple[tuple[str, str], ...]:
+        """Give the card templates of the output."""
+        ...
 
     def card_css(self) -> str:
         """Give the CSS of the output note type."""

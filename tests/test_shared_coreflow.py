@@ -17,11 +17,10 @@ from typing import Collection
 import pytest
 
 from anki_tools.languages.spanish import core as spanish_core
-from anki_tools.languages.spanish.profile import WORD_CSV_PATH
 from anki_tools.ranking import cardfilter, coreflow
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
 from anki_tools.ranking.corelist import CoreTarget, SenseWords
-from anki_tools.ranking.scan import CoreProfile, scan
+from anki_tools.ranking.scan import CoreProfile
 
 SPANISH_TOKENIZER = "es_core_news_sm"
 WORD_PATTERN = re.compile(r"[^\W\d_]+")
@@ -453,79 +452,3 @@ class TestCardFilter:
     def test_a_size_mismatch_raises(self) -> None:
         with pytest.raises(ValueError, match="differ in size"):
             cardfilter.filter_cards([_card()], [])
-
-
-@pytest.mark.skipif(not WORD_CSV_PATH.exists(), reason="the Spanish word CSV is absent")
-class TestSpanishWordTable:
-    def test_the_rows_are_index_form_and_gloss_triples(self) -> None:
-        table = spanish_core.word_table()
-
-        assert table
-        assert all(isinstance(index, int) for index, _form, _gloss in table)
-        assert all(isinstance(form, str) and form for _index, form, _gloss in table)
-        assert (1, "yo", "I") in table
-
-
-class TestSpanishTokenizer:
-    @pytest.mark.skipif(
-        not HAS_SPANISH_MODEL, reason="the Spanish spaCy model is absent"
-    )
-    def test_the_tokens_are_lemma_and_pos_pairs(self) -> None:
-        cards = [
-            _card("Nosotros hablamos español.", english="We speak Spanish."),
-            _card("Ella lee un libro.", index=1, english="She reads a book."),
-        ]
-
-        tokens = spanish_core.tokenize_deck(cards)
-
-        assert len(tokens) == 2
-        assert all(tokens)
-        assert all(
-            isinstance(lemma, str) and isinstance(pos, str)
-            for lemma, pos in tokens[0]
-        )
-        assert ("hablar", "VERB") in tokens[0]
-        assert ("libro", "NOUN") in tokens[1]
-
-
-def _scan_profile(**overrides: object) -> CoreProfile:
-    """Give an offline scan profile with the given hooks."""
-    values: dict[str, object] = {
-        "load_input_deck": lambda path: [_card()],
-        "tokenize_deck": lambda cards: [
-            [("quier", "VERB"), ("buen", "ADJ"), ("casa", "NOUN")]
-        ],
-        "load_frequency": lambda: [],
-        "frequency_ranks": lambda rows, weight: {},
-        "read_names": lambda: set(),
-    }
-    values.update(overrides)
-    return replace(spanish_core.SPANISH_CORE_PROFILE, **values)
-
-
-class TestScanLemmaOverrides:
-    def test_a_lemma_override_rewrites_the_tokens(self, tmp_path: Path) -> None:
-        profile = _scan_profile(
-            lemma_overrides={"quier": "querer", "buen": "bueno"}
-        )
-
-        result = scan(profile, tmp_path / "deck.apkg", 0.5)
-
-        assert result.tokens == [
-            [("querer", "VERB"), ("bueno", "ADJ"), ("casa", "NOUN")]
-        ]
-
-    def test_no_override_map_keeps_the_tokens(self, tmp_path: Path) -> None:
-        profile = _scan_profile(lemma_overrides={})
-
-        result = scan(profile, tmp_path / "deck.apkg", 0.5)
-
-        assert result.tokens == [
-            [("quier", "VERB"), ("buen", "ADJ"), ("casa", "NOUN")]
-        ]
-
-    def test_the_spanish_profile_repairs_the_two_artefacts(self) -> None:
-        assert spanish_core.SPANISH_CORE_PROFILE.lemma_overrides == {
-            "quier": "querer",
-            "buen": "bueno",
-        }

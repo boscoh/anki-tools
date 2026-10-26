@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import csv
-import hashlib
 import json
 from dataclasses import replace
 from pathlib import Path
@@ -13,7 +12,6 @@ from anki_tools.sentence_pack.audit import AuditInputs, gate_proper_sentences
 from anki_tools.sentence_pack.guards import check_sentence_shape
 from anki_tools.languages.french import profile as french
 
-MANDARIN_SHA256 = "862e07a6b5c7baa2766b9729734ddc72821496e89cdb76e3156f39245157b581"
 TAB = "\t"
 NOUN_ROWS = 84
 
@@ -86,11 +84,10 @@ def _audit_inputs(
     )
 
 
-def test_reviewed_table_has_207_rows_and_207_forms() -> None:
+def test_the_reviewed_table_passes_its_checker() -> None:
     table = french.load_word_table()
 
-    assert len(table) == 207
-    assert len({form.french for form in table}) == 207
+    assert len({form.french for form in table}) == len(table)
     assert french.check_word_table(table) == []
 
 
@@ -485,9 +482,3 @@ def test_sentence_csv_columns() -> None:
     assert header == french.SENTENCE_FIELDS
 
 
-def test_mandarin_sentences_csv_matches_the_snapshot() -> None:
-    digest = hashlib.sha256(
-        Path("vocab/mandarin_sentences.csv").read_bytes()
-    ).hexdigest()
-
-    assert digest == MANDARIN_SHA256

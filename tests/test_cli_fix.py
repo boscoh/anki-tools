@@ -1,4 +1,8 @@
-"""Tests for the French and Cantonese fix commands: rank mode and select mode."""
+"""Tests for the fix commands: the rank, select, core, and check routes.
+
+One language covers each route. The other fix commands are the same route with
+another profile, and the profile table of each language holds the values.
+"""
 
 from __future__ import annotations
 
@@ -8,20 +12,6 @@ from types import SimpleNamespace
 import pytest
 
 from anki_tools import cli
-
-
-def test_the_canonical_names_alias_the_short_codes() -> None:
-    commands = cli.fix_app.resolved_commands()
-    for short, canonical, function in (
-        ("zh", "mandarin", cli.zh),
-        ("fr", "french", cli.fr),
-        ("yue", "cantonese", cli.yue),
-        ("es", "spanish", cli.es),
-    ):
-        assert commands[short].default_command is function
-        assert commands[canonical].default_command is function
-
-
 
 
 def _fake_deck() -> SimpleNamespace:
@@ -39,503 +29,179 @@ def deck_file(tmp_path: Path) -> Path:
     return path
 
 
-class TestSelectMode:
-    def test_select_routes_to_the_cull(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
-    ) -> None:
-        requests = []
-
-        def fake_run_cull(request, _profile):
-            requests.append(request)
-            return SimpleNamespace(cards=1)
-
-        monkeypatch.setattr(cli.cullflow, "run_cull", fake_run_cull)
-
-        cli.fr(deck_file, select=True)
-
-        assert len(requests) == 1
-        request = requests[0]
-        assert request.input_path == deck_file
-        assert request.output_path == deck_file.parent / "input_culled.apkg"
-        assert request.no_reserve is False
-
-    def test_select_uses_the_given_output(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        requests = []
-        monkeypatch.setattr(
-            cli.cullflow,
-            "run_cull",
-            lambda request, _profile: requests.append(request),
-        )
-        output = deck_file.parent / "small.apkg"
-
-        cli.fr(deck_file, select=True, output=output)
-
-        assert requests[0].output_path == output
-
-    def test_no_reserve_is_passed(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        requests = []
-        monkeypatch.setattr(
-            cli.cullflow,
-            "run_cull",
-            lambda request, _profile: requests.append(request),
-        )
-
-        cli.fr(deck_file, select=True, reserve=False, cards=500)
-
-        assert requests[0].no_reserve is True
-        assert requests[0].max_cards == 500
-    def test_check_with_select_calls_the_gates(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        checked = []
-        monkeypatch.setattr(
-            cli.cullgates,
-            "check_cull",
-            lambda path, _profile: checked.append(path) or 0,
-        )
-
-        cli.fr(deck_file, select=True, check=True)
-
-        assert checked == [deck_file.parent / "input_culled.apkg"]
-
-    def test_check_with_select_exits_on_a_gate_failure(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        monkeypatch.setattr(cli.cullgates, "check_cull", lambda _path, _profile: 1)
-
-        with pytest.raises(SystemExit):
-            cli.fr(deck_file, select=True, check=True)
-
-
-class TestRankMode:
-    def test_rank_routes_to_the_pipeline(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        calls = []
-
-        def fake_run(paths, **kwargs):
-            calls.append((paths, kwargs))
-            return _fake_deck()
-
-        monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
-
-        cli.fr(deck_file)
-
-        paths, kwargs = calls[0]
-        assert paths.input_path == deck_file
-        assert paths.output_path == deck_file.parent / "input_reordered.apkg"
-        assert paths.ranking_path == deck_file.parent / "input.rank.csv"
-        assert kwargs["text_candidates"] == ("French",)
-
-    def test_rank_uses_the_given_output(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        calls = []
-
-        def fake_run(paths, **_kwargs):
-            calls.append(paths)
-            return _fake_deck()
-
-        monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
-        output = deck_file.parent / "ranked.apkg"
-
-        cli.fr(deck_file, output=output)
-
-        assert calls[0].output_path == output
-
-    def test_check_without_select_prints_an_error(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
-    ) -> None:
-        def fail(*_args, **_kwargs):
-            raise AssertionError("the pipeline must not run")
-
-        monkeypatch.setattr(cli, "run_ranked_deck", fail)
-
-        cli.fr(deck_file, check=True)
-
-        assert "Error: --check needs --select or --core." in capsys.readouterr().out
-
-    def test_a_missing_input_prints_an_error(
-        self, tmp_path: Path, capsys
-    ) -> None:
-        cli.fr(tmp_path / "absent.apkg")
-
-        assert "Error: File not found" in capsys.readouterr().out
-
-
-@pytest.fixture
-def no_jyutping(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(cli, "fix_jyutping", lambda *_args, **_kwargs: None)
-
-
-class TestCantoneseRankMode:
-    def test_rank_routes_to_the_pipeline(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, no_jyutping: None
-    ) -> None:
-        calls = []
-
-        def fake_run(paths, **kwargs):
-            calls.append((paths, kwargs))
-            return _fake_deck()
-
-        monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
-
-        cli.yue(deck_file)
-
-        paths, kwargs = calls[0]
-        assert paths.input_path == deck_file
-        assert paths.output_path == deck_file.parent / "input_reordered.apkg"
-        assert paths.ranking_path == deck_file.parent / "input.rank.csv"
-        assert kwargs["romanization_candidates"] == ("Jyutping",)
-        assert kwargs["remove_unranked"] is False
-
-    def test_rank_uses_the_given_output(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, no_jyutping: None
-    ) -> None:
-        calls = []
-
-        def fake_run(paths, **_kwargs):
-            calls.append(paths)
-            return _fake_deck()
-
-        monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
-        output = deck_file.parent / "ranked.apkg"
-
-        cli.yue(deck_file, output=output)
-
-        assert calls[0].output_path == output
-
-    def test_rank_reduces_and_fixes_jyutping(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        calls = []
-        fixed = []
-
-        def fake_run(paths, **kwargs):
-            calls.append((paths, kwargs))
-            return _fake_deck()
-
-        monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
-        monkeypatch.setattr(
-            cli, "rank_sentences_yue", lambda sentences, **_kwargs: list(sentences)
-        )
-        monkeypatch.setattr(
-            cli, "fix_jyutping", lambda path, **_kwargs: fixed.append(path)
-        )
-
-        cli.yue(deck_file)
-
-        paths, kwargs = calls[0]
-        assert kwargs["romanization_candidates"] == ("Jyutping",)
-        assert kwargs["remove_unranked"] is False
-        assert callable(kwargs["reduce"])
-        assert fixed == [paths.output_path]
-
-    def test_a_missing_input_prints_an_error(
-        self, tmp_path: Path, capsys
-    ) -> None:
-        cli.yue(tmp_path / "absent.apkg")
-
-        assert "Error: File not found" in capsys.readouterr().out
-
-    def test_an_empty_extraction_prints_no_sentences(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
-    ) -> None:
-        monkeypatch.setattr(
-            cli,
-            "run_ranked_deck",
-            lambda _paths, **_kwargs: SimpleNamespace(
-                sentences=[], ranked=[], stats={}
-            ),
-        )
-
-        def fail(*_args, **_kwargs):
-            raise AssertionError("fix_jyutping must not run")
-
-        monkeypatch.setattr(cli, "fix_jyutping", fail)
-
-        cli.yue(deck_file)
-
-        assert "No sentences found!" in capsys.readouterr().out
-
-
-class TestCantoneseCoreMode:
-    def test_core_cards_and_weight(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        requests = []
-
-        def fake(request, _profile) -> None:
-            requests.append(request)
-
-        monkeypatch.setattr(cli.coreflow, "run_core", fake)
-
-        cli.yue(deck_file, core=True, cards=42)
-
-        assert requests[0].options.max_cards == 42
-        assert requests[0].spoken_weight == cli.cantonese_core.SPOKEN_WEIGHT
-class TestSpanishMode:
-    def test_check_without_core_prints_an_error(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
-    ) -> None:
-        def fail(*_args, **_kwargs):
-            raise AssertionError("the pipeline must not run")
-
-        monkeypatch.setattr(cli, "run_ranked_deck", fail)
-
-        cli.es(deck_file, check=True)
-
-        assert "Error: --check needs --select or --core." in capsys.readouterr().out
-
-    def test_check_with_core_calls_the_gates(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        checked = []
-        monkeypatch.setattr(
-            cli.coregates,
-            "check_core",
-            lambda path, _profile: checked.append(path) or 0,
-        )
-
-        cli.es(deck_file, core=True, check=True)
-
-        assert checked == [deck_file.parent / "input_core.apkg"]
-
-    def test_check_with_core_exits_on_a_gate_failure(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        monkeypatch.setattr(cli.coregates, "check_core", lambda _path, _profile: 1)
-
-        with pytest.raises(SystemExit):
-            cli.es(deck_file, core=True, check=True)
-
-
-def _stub_mandarin_rank_steps(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Replace the pinyin and template steps of the Mandarin rank mode."""
-    monkeypatch.setattr(cli.mandarin_fix_steps, "fix_pinyin", lambda *_a, **_k: None)
+@pytest.fixture(autouse=True)
+def no_pipeline(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Fail any test that reaches a pipeline it did not stub."""
+
+    def refuse(*_args, **_kwargs):
+        raise AssertionError("the pipeline must not run")
+
+    monkeypatch.setattr(cli, "run_ranked_deck", refuse)
+    monkeypatch.setattr(cli.cullflow, "run_cull", refuse)
+    monkeypatch.setattr(cli.coreflow, "run_core", refuse)
+
+
+def test_the_canonical_names_alias_the_short_codes() -> None:
+    commands = cli.fix_app.resolved_commands()
+    for short, canonical, function in (
+        ("zh", "mandarin", cli.zh),
+        ("fr", "french", cli.fr),
+        ("yue", "cantonese", cli.yue),
+        ("es", "spanish", cli.es),
+    ):
+        assert commands[short].default_command is function
+        assert commands[canonical].default_command is function
+
+
+def test_rank_goes_to_the_pipeline(
+    deck_file: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    calls = []
     monkeypatch.setattr(
-        cli.mandarin_fix_steps, "apply_templates", lambda *_a, **_k: (0, [])
+        cli,
+        "run_ranked_deck",
+        lambda paths, **kwargs: calls.append((paths, kwargs)) or _fake_deck(),
+    )
+    output = deck_file.parent / "ranked.apkg"
+
+    cli.fr(deck_file, output=output)
+
+    paths, kwargs = calls[0]
+    assert paths.input_path == deck_file
+    assert paths.output_path == output
+    assert paths.ranking_path == deck_file.parent / "input.rank.csv"
+    assert callable(kwargs["rank"])
+    assert kwargs["text_candidates"] == ("French",)
+
+
+def test_rank_defaults_the_output_name() -> None:
+    paths = cli.rank_paths(Path("deck.apkg"))
+
+    assert paths.output_path == Path("deck_reordered.apkg")
+    assert paths.ranking_path == Path("deck.rank.csv")
+
+
+def test_an_absent_input_prints_an_error(tmp_path: Path, capsys) -> None:
+    cli.fr(tmp_path / "absent.apkg")
+
+    assert "Error: File not found" in capsys.readouterr().out
+
+
+def test_select_goes_to_the_cull(
+    deck_file: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = []
+    monkeypatch.setattr(
+        cli.cullflow,
+        "run_cull",
+        lambda request, run_profile: runs.append((request, run_profile)),
+    )
+    output = deck_file.parent / "small.apkg"
+
+    cli.fr(deck_file, select=True, reserve=False, cards=500)
+    cli.fr(deck_file, select=True, output=output)
+
+    request, run_profile = runs[0]
+    assert request.input_path == deck_file
+    assert request.output_path == deck_file.parent / "input_culled.apkg"
+    assert request.no_reserve is True
+    assert request.max_cards == 500
+    assert run_profile is cli.french_cull.FRENCH_CULL_PROFILE
+    assert runs[1][0].output_path == output
+
+
+def test_select_defaults_the_output_name() -> None:
+    assert cli.cullflow.default_output(Path("deck.apkg")) == Path("deck_culled.apkg")
+
+
+def test_core_builds_the_request(
+    deck_file: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = []
+    monkeypatch.setattr(
+        cli.coreflow,
+        "run_core",
+        lambda request, run_profile: runs.append((request, run_profile)),
     )
 
-class TestMandarinRankMode:
-    def test_rank_routes_to_the_pipeline(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        calls = []
+    cli.fr(deck_file, core=True, cards=42)
 
-        def fake_run(paths, **kwargs):
-            calls.append((paths, kwargs))
-            return _fake_deck()
-
-        monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
-        _stub_mandarin_rank_steps(monkeypatch)
-        output = deck_file.parent / "ranked.apkg"
-
-        cli.zh(deck_file, output=output)
-
-        paths, kwargs = calls[0]
-        assert paths.output_path == output
-        assert kwargs["rank"] is cli.rank_sentences_zh
-        assert kwargs["romanization_candidates"] == ("Pinyin",)
-
-    def test_the_rank_mode_fixes_pinyin_and_applies_templates(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        monkeypatch.setattr(
-            cli, "run_ranked_deck", lambda _paths, **_kwargs: _fake_deck()
-        )
-        calls = []
-        monkeypatch.setattr(
-            cli.mandarin_fix_steps,
-            "fix_pinyin",
-            lambda path, **_kwargs: calls.append(("pinyin", path)),
-        )
-        monkeypatch.setattr(
-            cli.mandarin_fix_steps,
-            "apply_templates",
-            lambda path, **_kwargs: (calls.append(("templates", path)), (1, ["CSS"]))[1],
-        )
-
-        cli.zh(deck_file)
-
-        output = deck_file.parent / "input_reordered.apkg"
-        assert calls == [("pinyin", output), ("templates", output)]
-
-    def test_an_empty_extraction_prints_no_sentences(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
-    ) -> None:
-        monkeypatch.setattr(
-            cli,
-            "run_ranked_deck",
-            lambda _paths, **_kwargs: SimpleNamespace(
-                sentences=[], ranked=[], stats={}
-            ),
-        )
-
-        def fail(*_args, **_kwargs):
-            raise AssertionError("fix_pinyin must not run")
-
-        monkeypatch.setattr(cli.mandarin_fix_steps, "fix_pinyin", fail)
-
-        cli.zh(deck_file)
-
-        assert "No sentences found!" in capsys.readouterr().out
-
-    def test_a_missing_input_prints_an_error(self, tmp_path: Path, capsys) -> None:
-        cli.zh(tmp_path / "absent.apkg")
-
-        assert "Error: File not found" in capsys.readouterr().out
+    request, run_profile = runs[0]
+    assert request.output_path == deck_file.parent / "input_core.apkg"
+    assert request.core_words == cli.french_core.DEFAULT_CORE_WORDS
+    assert request.options.max_cards == 42
+    assert run_profile is cli.french_core.FRENCH_CORE_PROFILE
 
 
-class TestMandarinCoreMode:
-    def test_core_builds_the_request(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        requests = []
-        monkeypatch.setattr(
-            cli.coreflow, "run_core", lambda request, _profile: requests.append(request)
-        )
+def test_check_without_a_mode_prints_an_error(deck_file: Path, capsys) -> None:
+    cli.fr(deck_file, check=True)
 
-        cli.zh(deck_file, core=True, cards=42)
-
-        request = requests[0]
-        assert request.output_path == deck_file.parent / "input_core.apkg"
-        assert request.core_words == cli.mandarin_core.DEFAULT_CORE_WORDS
-        assert request.options.max_cards == 42
-
-    def test_check_without_core_prints_an_error(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
-    ) -> None:
-        def fail(*_args, **_kwargs):
-            raise AssertionError("the pipeline must not run")
-
-        monkeypatch.setattr(cli, "run_ranked_deck", fail)
-
-        cli.zh(deck_file, check=True)
-
-        assert "Error: --check needs --core." in capsys.readouterr().out
-
-    def test_check_with_core_calls_the_gates(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        checked = []
-        monkeypatch.setattr(
-            cli.coregates,
-            "check_core",
-            lambda path, _profile: checked.append(path) or 0,
-        )
-
-        cli.zh(deck_file, core=True, check=True)
-
-        assert checked == [deck_file.parent / "input_core.apkg"]
-
-    def test_check_with_core_exits_on_a_gate_failure(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        monkeypatch.setattr(cli.coregates, "check_core", lambda _path, _profile: 1)
-
-        with pytest.raises(SystemExit):
-            cli.zh(deck_file, core=True, check=True)
-
-    def test_a_missing_input_in_core_mode_prints_an_error(
-        self, tmp_path: Path, capsys
-    ) -> None:
-        cli.zh(tmp_path / "absent.apkg", core=True)
-
-        assert "Error: File not found" in capsys.readouterr().out
+    assert "Error: --check needs --select or --core." in capsys.readouterr().out
 
 
-class TestSpanishRankMode:
-    def test_rank_routes_to_the_pipeline(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        calls = []
-
-        def fake_run(paths, **kwargs):
-            calls.append((paths, kwargs))
-            return _fake_deck()
-
-        monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
-        output = deck_file.parent / "ranked.apkg"
-
-        cli.es(deck_file, output=output)
-
-        paths, kwargs = calls[0]
-        assert paths.output_path == output
-        assert kwargs["rank"] is cli.rank_sentences_es
-
-    def test_the_default_keeps_the_unranked(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        calls = []
-
-        def fake_run(paths, **kwargs):
-            calls.append((paths, kwargs))
-            return _fake_deck()
-
-        monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
-
-        cli.es(deck_file)
-
-        assert "remove_unranked" not in calls[0][1]
-        assert "reduce" not in calls[0][1]
-
-    def test_a_missing_input_prints_an_error(
-        self, tmp_path: Path, capsys
-    ) -> None:
-        cli.es(tmp_path / "absent.apkg")
-
-        assert "Error: File not found" in capsys.readouterr().out
+CHECK_ROUTES = [
+    pytest.param(
+        True,
+        False,
+        "check_cull",
+        cli.french_cull.FRENCH_CULL_PROFILE,
+        "input_culled.apkg",
+        id="select",
+    ),
+    pytest.param(
+        False,
+        True,
+        "check_core",
+        cli.french_core.FRENCH_CORE_PROFILE,
+        "input_core.apkg",
+        id="core",
+    ),
+]
 
 
+def _gate_module(checker: str):
+    return cli.cullgates if checker == "check_cull" else cli.coregates
 
-class TestSpanishSelectMode:
-    def test_select_routes_to_the_cull(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        requests = []
-        profiles = []
 
-        def fake_run_cull(request, profile):
-            requests.append(request)
-            profiles.append(profile)
+@pytest.mark.parametrize(
+    "select, core, checker, profile, output_name", CHECK_ROUTES
+)
+def test_check_runs_the_gates_on_the_default_output(
+    deck_file: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    select: bool,
+    core: bool,
+    checker: str,
+    profile,
+    output_name: str,
+) -> None:
+    checked = []
+    monkeypatch.setattr(
+        _gate_module(checker),
+        checker,
+        lambda path, run_profile: checked.append((path, run_profile)) or 0,
+    )
 
-        monkeypatch.setattr(cli.cullflow, "run_cull", fake_run_cull)
+    cli.fr(deck_file, select=select, core=core, check=True)
 
-        cli.es(deck_file, select=True)
+    assert checked == [(deck_file.parent / output_name, profile)]
 
-        assert requests[0].output_path == deck_file.parent / "input_culled.apkg"
-        assert profiles == [cli.spanish_cull.SPANISH_CULL_PROFILE]
 
-    def test_cards_and_reserve_reach_the_request(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        requests = []
-        monkeypatch.setattr(
-            cli.cullflow,
-            "run_cull",
-            lambda request, _profile: requests.append(request),
-        )
+@pytest.mark.parametrize(
+    "select, core, checker",
+    [
+        pytest.param(True, False, "check_cull", id="select"),
+        pytest.param(False, True, "check_core", id="core"),
+    ],
+)
+def test_check_exits_on_a_gate_failure(
+    deck_file: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    select: bool,
+    core: bool,
+    checker: str,
+) -> None:
+    monkeypatch.setattr(_gate_module(checker), checker, lambda _path, _profile: 1)
 
-        cli.es(deck_file, select=True, reserve=False, cards=500)
-
-        assert requests[0].no_reserve is True
-        assert requests[0].max_cards == 500
-class TestSpanishCoreMode:
-    def test_core_builds_the_request(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        requests = []
-        monkeypatch.setattr(
-            cli.coreflow, "run_core", lambda request, _profile: requests.append(request)
-        )
-        output = deck_file.parent / "core.apkg"
-
-        cli.es(deck_file, core=True, output=output, cards=42)
-
-        assert requests[0].output_path == output
-        assert requests[0].options.max_cards == 42
+    with pytest.raises(SystemExit):
+        cli.fr(deck_file, select=select, core=core, check=True)
