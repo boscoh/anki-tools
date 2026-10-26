@@ -52,8 +52,9 @@ uv run anki inspect deck.apkg             # show the package contents
 uv run anki style deck.apkg               # apply the CSS and HTML templates
 ```
 
-Each `anki fix` command reads the APKG file that you give it. Run
-`uv run anki fix <lang> --help` to see the default input of that command.
+The `fr`, `es`, and `yue` commands have a default input path. The `zh` command
+has no default, so give the path. Run `uv run anki fix <lang> --help` to see
+the default input of a command.
 
 ## The Fix Command
 
@@ -63,7 +64,7 @@ Each `anki fix` command reads the APKG file that you give it. Run
 | -------- | -------------------------------------------------- | ------------------------------------- |
 | `zh`     | rank (default), `--core`                           | `_reordered.apkg`, `_core.apkg`       |
 | `fr`     | rank (default), `--select`, `--core`               | `_reordered.apkg`, `_culled`, `_core` |
-| `es`     | rank (default)                                     | `_reordered.apkg`                     |
+| `es`     | rank (default), `--core`                           | `_reordered.apkg`, `_core.apkg`       |
 | `yue`    | select and rank (default), `--no-select`, `--core` | `_reordered.apkg`, `_core.apkg`       |
 
 Every mode writes `.rank.csv` beside the APKG. The cull and core modes also
@@ -102,6 +103,7 @@ uv run anki fix fr deck.apkg --core    # core mode
 ```bash
 uv run anki fix es deck.apkg                        # rank and reorder
 uv run anki fix es deck.apkg --max-sentences 3000    # reduce to 3000 cards
+uv run anki fix es deck.apkg --core                  # core mode
 ```
 
 - Word-based complexity and similarity, like French.
@@ -176,6 +178,7 @@ file, then run the command again.
 | `anki swadesh vocab <lang>`  | `templates/vocab/`                |
 | `anki fix fr --select`       | `templates/french_cull/`          |
 | `anki fix fr --core`         | `templates/french_core/`          |
+| `anki fix es --core`         | `templates/spanish_core/`         |
 | `anki fix yue --core`        | `templates/cantonese_core/`       |
 | `anki fix zh --core`         | `templates/mandarin_core/`        |
 
@@ -364,9 +367,9 @@ CC BY 2.0 FR. The audio follows its engine and voice.
 
 ## Core-Word Decks
 
-The core deck of Mandarin, French, and Cantonese comes from `anki fix <lang>
---core`. Each core word gets 2 examples. A sentence that brings many words
-outside the core costs more, so the deck adds few other words.
+The core deck of Mandarin, French, Spanish, and Cantonese comes from `anki
+fix <lang> --core`. Each core word gets 2 examples. A sentence that brings many
+words outside the core costs more, so the deck adds few other words.
 
 ```bash
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --core
@@ -454,9 +457,23 @@ Measured result on 2026-10-24: 147 cards for 140 targets (90 Swadesh forms and
 the bold target, and all 20 gates pass. The input deck is small, so 23 targets
 stay `absent_sense`.
 
-The French, Cantonese, and Mandarin core decks keep the input audio, under the
-license of the source deck. Mandarin also uses the `wordfreq` list under
-Apache License 2.0.
+### Spanish Core
+
+- Input: the Spanish 9000 deck, with the `SpanishSentence` and
+  `EnglishSentence` fields.
+- Defaults: 50 tier F words, 300 cards, 2 examples per word, and a tail of
+  0 cards.
+- The sentence window is 4 to 10 words.
+- The sense rows are `vocab/spanish_core_senses.tsv`. Rule C4 reads
+  `vocab/spanish_loanwords.txt`.
+
+Measured result on 2026-10-24: 265 cards for 226 targets. 198 targets have two
+cards, 220 have one, and 6 are `absent_sense`. The cards hold 177 support
+words, of which 11 are rare. 201 cards hold the bold target.
+
+The four core decks keep the input audio, under the license of the source
+deck. Mandarin and Spanish also use the `wordfreq` list under Apache License
+2.0.
 
 ## French 1000-Card Cull
 
