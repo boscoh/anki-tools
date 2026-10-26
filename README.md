@@ -56,7 +56,7 @@ options: run `uv run anki fix <lang> --help`.
 ## The Fix Command
 
 `anki fix <lang>` has up to three modes. The four commands take the same
-options, apart from the language additions below.
+options. The Applies to column shows the modes that read each option.
 
 | Language | Modes                                | Output                                          |
 | -------- | ------------------------------------ | ----------------------------------------------- |
@@ -84,17 +84,11 @@ The shared options:
 | `--output`        | every mode           | output deck; default `_reordered` or `_core` |
 | `--text-field`    | rank mode            | sentence field; the build infers the default |
 | `--select`        | `fr`, `es`           | run the cull instead of the rank and reorder |
+| `--reserve`       | `fr`, `es`           | add the Swadesh reserve cards (select mode)  |
 | `--core`          | every command        | build the core-word deck                     |
-| `--cards`         | every mode           | card cap of the chosen mode                  |
+| `--cards`         | `--select`, `--core` | card cap of the mode (select 1000, core 300) |
 | `--words`         | core mode            | tier F words after the Swadesh set           |
 | `--check`         | `--select`, `--core` | run the gates on the written output          |
-
-These options apply to one language:
-
-| Option                   | Language   | Meaning                                     |
-| ------------------------ | ---------- | ------------------------------------------- |
-| `--targets`              | `fr`, `es` | cull target count, 200 to 500               |
-| `--reserve`              | `fr`, `es` | add the Swadesh reserve cards               |
 
 The frequency term and the similarity limit are values of the language module,
 so no flag can change them.

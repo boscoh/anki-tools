@@ -432,15 +432,15 @@ uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
 | Flag         | Default             | Meaning                                      |
 | ------------ | ------------------- | -------------------------------------------- |
 | `--cards`    | 1000                | Card cap                                     |
-| `--targets`  | 300                 | Target count, 200 to 500                     |
 | `--reserve`  | on                  | Add the Swadesh reserve cards                |
 | `--output`   | from the input name | Output APKG                                  |
 | `--check`    | off                 | Run gates G1 to G15 on the output            |
 | `--select`   | off                 | Run the cull instead of the rank and reorder |
 
-`max_uses` (4), `--exempt-top`, the spoken weight, the word window, the
-similarity limit, the order, the name, and the reserve pack path are fields of
-`CullRequest` with these defaults in `anki_tools/ranking/cullflow.py`.
+`max_uses` (4), `target_words` (300), `exempt_top` (100), the spoken
+weight, the word window, the similarity limit, the order, the name, and the
+reserve pack path are fields of `CullRequest` with these defaults in
+`anki_tools/ranking/cullflow.py`.
 
 ### 10.3 Output files
 
@@ -669,10 +669,10 @@ guid is a UUID. The tags include `swadesh`.
 
 ### 16.4 Option
 
-| Option            | Default                              | Meaning                     |
-| ----------------- | ------------------------------------ | --------------------------- |
-| `--reserve-pack`  | `apkg/swadesh_french_sentences.apkg` | Reserve source              |
-| `--no-reserve`    | off                                  | Run the frequency cull only |
+| Option            | Default                              | Meaning                         |
+| ----------------- | ------------------------------------ | ------------------------------- |
+| `--reserve`       | on                                   | Add the Swadesh reserve cards   |
+| `reserve_pack`    | `apkg/swadesh_french_sentences.apkg` | Reserve source, a request field |
 
 ### 16.5 Gate G14
 

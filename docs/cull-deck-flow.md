@@ -26,8 +26,9 @@ One command runs the stages in order: `anki fix <language> --select`. The
 
 The gates G1 to G15 run after C5.
 
-The `--cards`, `--targets`, and `--reserve` values change the request. The
-other `CullRequest` fields, such as `max_uses`, keep their defaults.
+The `--cards` and `--reserve` values change the request. The other
+`CullRequest` fields, such as `max_uses` and `target_words`, keep their
+defaults.
 
 The input fields come from the profile: `model_name`, `sentence_field`,
 `english_field`, and `audio_field`. C0 keeps the lowest card of each note. It
@@ -101,8 +102,8 @@ A target is a content lemma that the deck holds. These rules are in
 | Lemma length   | at least `min_lemma_length`, 2 by default      |
 | Name list      | the lemma is not in the name stoplist          |
 
-The targets are the first `--targets` of the rest in rank order. The default
-is 300.
+The targets are the first `target_words` of the rest in rank order, 300 by
+default. The value is a `CullRequest` field, not a flag.
 
 The target list sets the coverage report. It does not limit the selection.
 The gain uses every ranked content lemma, so the kept cards cover more lemmas

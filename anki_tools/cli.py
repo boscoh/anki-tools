@@ -519,7 +519,7 @@ def zh(
     :param output: Output .apkg file (default: from the input name).
     :param text_field: Rank mode: preferred sentence field (default: infer).
     :param core: Build the core deck instead of ranking.
-    :param cards: Card cap of the chosen mode (core 300).
+    :param cards: Core mode: card cap (300).
     :param words: Core mode: tier F words after the Swadesh set.
     :param check: Run the gates on the output and do not run the mode again.
     """
@@ -569,7 +569,6 @@ def fr(
     select: bool = False,
     core: bool = False,
     cards: int | None = None,
-    targets: int = cullflow.DEFAULT_TARGET_WORDS,
     reserve: bool = True,
     words: int = french_core.DEFAULT_CORE_WORDS,
     check: bool = False,
@@ -586,8 +585,7 @@ def fr(
     :param text_field: Rank mode: preferred sentence field (default: French).
     :param select: Run the card cull instead of the rank and reorder.
     :param core: Build the core deck instead of ranking.
-    :param cards: Card cap of the chosen mode (select 1000, core 300).
-    :param targets: Select mode: target count, 200 to 500.
+    :param cards: Select and core mode: card cap (select 1000, core 300).
     :param reserve: Select mode: add the Swadesh reserve cards.
     :param words: Core mode: tier F words after the Swadesh set.
     :param check: Run the gates on the output and do not run the mode again.
@@ -628,7 +626,6 @@ def fr(
         request = cullflow.CullRequest(
             input_path=apkg_path,
             output_path=output_path,
-            target_words=targets,
             no_reserve=not reserve,
         )
         if cards is not None:
@@ -758,7 +755,7 @@ def yue(
     :param output: Output .apkg file (default: from the input name).
     :param text_field: Rank mode: preferred sentence field (default: infer).
     :param core: Build the core deck instead of ranking.
-    :param cards: Card cap of the chosen mode (core 300).
+    :param cards: Core mode: card cap (300).
     :param words: Core mode: tier F words after the Swadesh set.
     :param check: Run the gates on the output and do not run the mode again.
     """
@@ -833,7 +830,6 @@ def es(
     select: bool = False,
     core: bool = False,
     cards: int | None = None,
-    targets: int = cullflow.DEFAULT_TARGET_WORDS,
     reserve: bool = True,
     words: int = spanish_core.DEFAULT_CORE_WORDS,
     check: bool = False,
@@ -849,8 +845,7 @@ def es(
     :param text_field: Rank mode: preferred sentence field (default: Spanish).
     :param select: Run the cull instead of the rank and reorder.
     :param core: Build the core deck instead of ranking.
-    :param cards: Card cap of the chosen mode (select 1000, core 300).
-    :param targets: Select mode: target count, 200 to 500.
+    :param cards: Select and core mode: card cap (select 1000, core 300).
     :param reserve: Select mode: add the Swadesh reserve cards.
     :param words: Core mode: tier F words after the Swadesh set.
     :param check: Run the gates on the output and do not run the mode again.
@@ -891,7 +886,6 @@ def es(
         request = cullflow.CullRequest(
             input_path=apkg_path,
             output_path=output_path,
-            target_words=targets,
             no_reserve=not reserve,
         )
         if cards is not None:
