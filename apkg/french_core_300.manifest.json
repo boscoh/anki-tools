@@ -1,9 +1,10 @@
 {
-  "build_date": "2026-10-24T00:11:15+00:00",
+  "build_date": "2026-10-26T23:48:01+00:00",
   "source": {
     "input": "apkg/6000_French_Sentences_w_Audio.apkg",
     "deck": "French Core Sentences",
-    "model": "French Sentences"
+    "model": "French Core Sentences",
+    "input_model": "French Sentences"
   },
   "params": {
     "core_words": 50,
@@ -20,29 +21,33 @@
     "lambda_repeat": 0.03,
     "lambda_len": 0.02,
     "lambda_seed": 0.01,
+    "simple_units": 7,
     "similarity": 0.67,
     "min_units": 5,
     "max_units": 9,
     "spoken_weight": 0.5,
     "bold_target": true,
     "name": "French Core Sentences",
-    "max_unchecked_sense": 0
+    "max_unchecked_sense": 0,
+    "max_unranked": 0
   },
   "counts": {
-    "cards": 300,
+    "cards": 273,
     "targets": 209,
     "absent": 0,
     "absent_sense": 5,
     "unchecked": 0,
+    "unranked": 0,
     "covered1": 204,
     "covered2": 183,
     "full": 183,
     "outside": 247,
     "outside_rare": 18,
-    "tail_words": 346,
+    "tail_words": 242,
     "sense_rows": 209,
-    "bolded": 182,
-    "unbolded": 118,
+    "dropped_no_core": 27,
+    "bolded": 273,
+    "unbolded": 0,
     "name_hits": 0,
     "loan_hits": 0,
     "rows": 5928,
@@ -55,9 +60,9 @@
     "spoken_weight": 0.5
   },
   "files": {
-    "core_csv": "sha256:cb129dac4156564837cdfa11609e5ab02e5a0c0c306370199ce2090ccbc83e3e",
+    "core_csv": "sha256:c30b704a5464f35bc16152f78ec1454f20299b72b2219b2af079d6a24c5cbd07",
     "coverage_csv": "sha256:e93bfc7621d75c6b41e151ffb8f23434df1cf18d857bcb7bccde04e78de64e1d",
     "input_apkg": "sha256:230dd01bcf6223bcb8a5ea303eee01fd4a55e19ce418d0bf66a81193037024b5"
   },
-  "kept_order": "sha256:63e0aef0b6f3ec832827acdd7a0275291e166b8be9757bb92c7b254242ec9c87"
+  "kept_order": "sha256:18b563596df2136751279f13fe106f6f05d853c68e860a38a3d6c1cada133190"
 }

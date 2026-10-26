@@ -25,6 +25,7 @@ from typing import Iterable, Sequence
 
 from anki_tools.cache import download_cached_file
 from anki_tools.languages.spanish.profile import prepare_text, spanish_tokens
+from anki_tools.languages.spanish.lemma import CLITIC_LEMMAS, base_lemma
 from anki_tools.ranking import cullflow
 from anki_tools.ranking.corelist import CONTENT_POS
 
@@ -43,42 +44,6 @@ LICENSE = "CC BY-SA 4.0"
 TOKENIZER = "es_core_news_sm"
 MAX_ROWS = 50_000
 
-# ``hacerlo`` gives the lemma ``hacer él``. The cull keys on the verb.
-CLITIC_LEMMAS = frozenset(
-    {
-        "yo",
-        "tú",
-        "él",
-        "ella",
-        "nosotros",
-        "nosotras",
-        "vosotros",
-        "vosotras",
-        "ellos",
-        "ellas",
-        "se",
-        "me",
-        "te",
-        "nos",
-        "os",
-        "le",
-        "les",
-        "lo",
-        "la",
-        "los",
-        "las",
-    }
-)
-
-
-def base_lemma(lemma: str) -> str:
-    """Drop the clitic pronoun that the Spanish model appends to a verb lemma.
-
-    :param lemma: Lemma from the Spanish spaCy model.
-    :returns: The lemma without its clitic pronoun.
-    """
-    head, _, tail = lemma.partition(" ")
-    return head if tail in CLITIC_LEMMAS else lemma
 
 _COLUMNS = (
     "word",

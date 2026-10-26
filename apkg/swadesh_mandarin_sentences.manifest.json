@@ -1,12 +1,15 @@
 {
-  "build_date": "2026-10-24",
+  "deck": "Swadesh Mandarin Sentences",
+  "model": "Swadesh Mandarin Sentences",
+  "build_date": "2026-10-27",
   "source_dump_date": "2026-10-22",
   "counts": {
     "words": 211,
     "cards": 371,
     "scaffold": 2,
     "native_audio": 0,
-    "tts_audio": 371
+    "tts_audio": 371,
+    "no_target": 0
   },
   "coverage": {
     "core_with_card": 0.9227
@@ -23,7 +26,7 @@
   },
   "files": {
     "source_csv": "sha256:8509d2e9b3312f903ece8d8bef027391ff41e3e2aaac4450e9747ae275d89350",
-    "sentences_csv": "sha256:862e07a6b5c7baa2766b9729734ddc72821496e89cdb76e3156f39245157b581"
+    "sentences_csv": "sha256:9cb05039b91fe037bccb050ebc9977dc7ff1c83c749de018e540b2d3a3ce5ac1"
   },
   "licenses": [
     {

@@ -1,9 +1,10 @@
 {
-  "build_date": "2026-10-24T12:24:15+00:00",
+  "build_date": "2026-10-26T23:53:05+00:00",
   "source": {
     "input": "apkg/LTL Cantonese Deck Level 1 - Short.apkg",
     "deck": "Cantonese Core Sentences",
-    "model": "LTL Note Type - Cantonese"
+    "model": "Cantonese Core Sentences",
+    "input_model": "LTL Note Type - Cantonese"
   },
   "params": {
     "core_words": 0,
@@ -44,8 +45,9 @@
     "outside_rare": 10,
     "tail_words": 0,
     "sense_rows": 130,
-    "bolded": 95,
-    "unbolded": 31,
+    "dropped_no_core": 0,
+    "bolded": 126,
+    "unbolded": 0,
     "name_hits": 0,
     "loan_hits": 0,
     "rows": 999,
@@ -54,11 +56,11 @@
     "sense_failures": 752
   },
   "frequency": {
-    "path": "data/cantonese_frequency.tsv",
+    "path": "Cifu and Apple Daily blend",
     "spoken_weight": 0.7
   },
   "files": {
-    "core_csv": "sha256:2bc28ce6452ddb7b10e647dd4fc8bd9e916dc6a43a7386df6f6ff956367fb4e1",
+    "core_csv": "sha256:43ed8841bd508c98070446da052ca7ee54e3f549e6219e0b3b705f9d79837e6d",
     "coverage_csv": "sha256:728f5aee04186e8c4850fcc6ac6ca5f7f1b63c771d3bb19087beb9ec3a7000d5",
     "input_apkg": "sha256:7f4c1d34f8b4423252eabbe475520923bfd0da7659be7bd078cf8d125bf2be00"
   },

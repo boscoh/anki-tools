@@ -1,35 +1,35 @@
 target,swadesh_index,english,variant,status,zipf,candidate_count,scaffold_candidates,rank,sentence,text_original,pinyin,english_text,tatoeba_id,unknown_words,han_len,rank_key,tier
-窄,34,narrow,primary,thin,3.75,1,0,1,到村庄有条窄路。,到村莊有條窄路。,dào cūn zhuāng yǒu tiáo zhǎi lù,There's narrow road to the village.,798069,2,7,2|1|-5.150|0|798069,core
-薄,35,thin,primary,thin,4.26,1,0,1,把肉切成薄片。,把肉切成薄片。,bǎ ròu qiè chéng báo piàn,Cut the meat into thin slices.,395212,2,6,2|1|-4.332|0|395212,core
+窄,34,narrow,primary,thin,3.75,1,0,1,到村庄有条窄路。,到村莊有條窄路。,dào cūn zhuāng yǒu tiáo zhǎi lù,There's narrow road to the village.,798069,2,7,2|0|-5.150|0|798069,core
+薄,35,thin,primary,thin,4.26,1,0,1,把肉切成薄片。,把肉切成薄片。,bǎ ròu qiè chéng báo piàn,Cut the meat into thin slices.,395212,2,6,2|0|-4.332|0|395212,core
 虱子,48,louse,primary,uncovered,1.82,0,0,0,,,,,,,,,
 棍子,53,stick,primary,uncovered,3.49,0,0,0,,,,,,,,,
 种子,55,seed,primary,uncovered,4.61,0,0,0,,,,,,,,,
 根,57,root,primary,uncovered,4.67,0,0,0,,,,,,,,,
-树皮,58,tree bark,primary,thin,3.19,1,0,1,桦树有白树皮。,桦树有白树皮。,huà shù yǒu bái shù pí,Birch trees have white bark.,10752795,1,6,1|1|-4.320|0|10752795,core
+树皮,58,tree bark,primary,thin,3.19,1,0,1,桦树有白树皮。,桦树有白树皮。,huà shù yǒu bái shù pí,Birch trees have white bark.,10752795,1,6,1|0|-4.320|0|10752795,core
 骨头,65,bone,primary,uncovered,4.14,0,0,0,,,,,,,,,
 脂肪,66,fat (noun),primary,uncovered,4.04,0,0,0,,,,,,,,,
-角,68,horn,primary,scaffold_only,4.44,1,1,1,牛有角。,牛有角。,niú yǒu jiǎo,Cows have horns.,10522506,1,3,1|1|-5.370|1|10522506,scaffold
+角,68,horn,primary,scaffold_only,4.44,1,1,1,牛有角。,牛有角。,niú yǒu jiǎo,Cows have horns.,10522506,1,3,1|0|-5.370|1|10522506,scaffold
 羽毛,70,feather,primary,uncovered,3.77,0,0,0,,,,,,,,,
-牙齿,77,tooth,primary,thin,4.26,1,0,1,乌龟没有牙齿。,烏龜沒有牙齒。,wū guī méi yǒu yá chǐ,Turtles don't have teeth.,5444617,1,6,1|1|-4.817|0|5444617,core
+牙齿,77,tooth,primary,thin,4.26,1,0,1,乌龟没有牙齿。,烏龜沒有牙齒。,wū guī méi yǒu yá chǐ,Turtles don't have teeth.,5444617,1,6,1|0|-4.817|0|5444617,core
 舌头,78,tongue,primary,thin,4.16,1,0,1,我咬了我的舌头。,我咬了我的舌頭。,wǒ yǎo le wǒ de shé tou,I bit my tongue.,10368743,0,7,0|0|-6.240|0|10368743,core
-膝盖,82,knee,primary,thin,3.93,1,0,1,我的膝盖疼。,我的膝蓋疼。,wǒ de xī gài téng,My knee aches.,10368432,1,5,1|1|-5.770|0|10368432,core
-翅膀,84,wing,primary,thin,3.98,1,0,1,鸟有翅膀。,鸟有翅膀。,niǎo yǒu chì bǎng,Birds have wings.,352611,0,4,0|1|-5.173|1|352611,core
+膝盖,82,knee,primary,thin,3.93,1,0,1,我的膝盖疼。,我的膝蓋疼。,wǒ de xī gài téng,My knee aches.,10368432,1,5,1|0|-5.770|0|10368432,core
+翅膀,84,wing,primary,thin,3.98,1,0,1,鸟有翅膀。,鸟有翅膀。,niǎo yǒu chì bǎng,Birds have wings.,352611,0,4,0|0|-5.173|1|352611,core
 肠子,86,guts,primary,uncovered,3.35,0,0,0,,,,,,,,,
 乳房,89,breast,primary,uncovered,3.99,0,0,0,,,,,,,,,
 肝,91,liver,primary,uncovered,3.80,0,0,0,,,,,,,,,
-吐,96,to spit,primary,thin,4.41,1,0,1,禁止吐痰。,禁止吐痰。,jìn zhǐ tǔ tán,Spitting is prohibited.,11239888,2,4,2|1|-3.625|1|11239888,core
+吐,96,to spit,primary,thin,4.41,1,0,1,禁止吐痰。,禁止吐痰。,jìn zhǐ tǔ tán,Spitting is prohibited.,11239888,2,4,2|0|-3.625|1|11239888,core
 呕吐,97,to vomit,primary,uncovered,3.81,0,0,0,,,,,,,,,
 打猎,112,to hunt,primary,thin,3.58,1,0,1,他喜欢打猎。,他喜欢打猎。,tā xǐ huān dǎ liè,He likes hunting.,333859,0,5,0|0|-5.330|0|333859,core
 分开,115,to split,primary,uncovered,4.56,0,0,0,,,,,,,,,
-刺,116,to stab,primary,thin,4.35,1,0,1,汤姆企图刺我。,湯姆企圖刺我。,tāng mǔ qǐ tú cì wǒ,Tom tried to stab me.,5574476,2,6,2|1|-4.975|0|5574476,core
-抓,117,to scratch,primary,thin,5.18,1,0,1,你的猫抓伤我了。,你的猫抓伤我了。,nǐ de māo zhuā shāng wǒ le,Your cat scratched me.,8696278,2,7,2|1|-6.147|0|8696278,core
-挖,118,to dig,primary,thin,4.38,1,0,1,他挖了一个洞。,他挖了一个洞。,tā wā le yí gè dòng,He dug a hole.,414486,1,6,1|1|-5.844|0|414486,core
+刺,116,to stab,primary,thin,4.35,1,0,1,汤姆企图刺我。,湯姆企圖刺我。,tāng mǔ qǐ tú cì wǒ,Tom tried to stab me.,5574476,2,6,2|0|-4.975|0|5574476,core
+抓,117,to scratch,primary,thin,5.18,1,0,1,你的猫抓伤我了。,你的猫抓伤我了。,nǐ de māo zhuā shāng wǒ le,Your cat scratched me.,8696278,2,7,2|0|-6.147|0|8696278,core
+挖,118,to dig,primary,thin,4.38,1,0,1,他挖了一个洞。,他挖了一个洞。,tā wā le yí gè dòng,He dug a hole.,414486,1,6,1|0|-5.844|0|414486,core
 挤,130,to squeeze,primary,scaffold_only,4.25,1,1,1,别挤了。,別擠了。,bié jǐ le,Stop shoving.,12179898,1,3,1|0|-5.180|1|12179898,scaffold
 揉,131,to rub,primary,uncovered,3.97,0,0,0,,,,,,,,,
-擦,133,to wipe,primary,thin,4.38,1,0,1,这污点擦不掉。,這污點擦不掉。,zhè wū diǎn cā bú diào,This blot can't be wiped out.,1261451,2,6,2|1|-4.150|0|1261451,core
+擦,133,to wipe,primary,thin,4.38,1,0,1,这污点擦不掉。,這污點擦不掉。,zhè wū diǎn cā bú diào,This blot can't be wiped out.,1261451,2,6,2|0|-4.150|0|1261451,core
 绑,137,to tie,primary,uncovered,4.49,0,0,0,,,,,,,,,
 肿,146,to swell,primary,uncovered,3.78,0,0,0,,,,,,,,,
-灰尘,158,dust,primary,thin,3.75,1,0,1,桌子被灰尘覆盖。,桌子被灰尘覆盖。,zhuō zi bèi huī chén fù gài,The table was covered with dust.,5613712,2,7,2|1|-4.720|0|5613712,core
-土,159,earth,primary,thin,4.46,1,0,1,这里的土壤肥沃。,這裡的土壤肥沃。,zhè lǐ de tǔ rǎng féi wò,The soil here is fertile.,778745,2,7,2|1|-5.345|0|778745,core
+灰尘,158,dust,primary,thin,3.75,1,0,1,桌子被灰尘覆盖。,桌子被灰尘覆盖。,zhuō zi bèi huī chén fù gài,The table was covered with dust.,5613712,2,7,2|0|-4.720|0|5613712,core
+土,159,earth,primary,thin,4.46,1,0,1,这里的土壤肥沃。,這裡的土壤肥沃。,zhè lǐ de tǔ rǎng féi wò,The soil here is fertile.,778745,2,7,2|0|-5.345|0|778745,core
 灰,168,ash,primary,uncovered,4.16,0,0,0,,,,,,,,,
-因为,206,because,primary,thin,6.11,1,0,1,那是因为我爱她.,那是因为我爱她.,nà shì yīn wèi wǒ ài tā,It's because I love her.,2021500,1,7,1|1|-6.016|0|2021500,core
+因为,206,because,primary,thin,6.11,1,0,1,那是因为我爱她.,那是因为我爱她.,nà shì yīn wèi wǒ ài tā,It's because I love her.,2021500,1,7,1|0|-6.016|0|2021500,core

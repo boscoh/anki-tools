@@ -1,125 +1,153 @@
 target,swadesh_index,english,variant,status,zipf,candidate_count,scaffold_candidates,rank,sentence,text_original,jyutping,english_text,tatoeba_id,unknown_words,han_len,rank_key,tier
-我哋,4,we,primary,low_zipf,2.00,166,0,1,我哋有好多嘢要做。,我哋有好多嘢要做。,ngo5 dei6 jau5 hou2 do1 je5 jiu3 zou6,We have lots of things to do.,1132200,0,8,0|0|-5.263|0|1132200,core
-我哋,4,we,primary,low_zipf,2.00,166,0,2,我哋飛的去啦，好冇？,我哋飛的去啦，好冇？,ngo5 dei6 fei1 dik1 heoi3 laa1 hou2 mou2,"Let's go by taxi, OK?",3868859,0,8,0|0|-5.096|0|3868859,core
-我哋,4,we,primary,low_zipf,2.00,166,0,3,我哋兩個都好驚。,我哋兩個都好驚。,ngo5 dei6 loeng5 go3 dou1 hou2 geng1,Both of us were scared.,9536316,0,7,0|0|-4.914|0|9536316,core
-你哋,5,you (plural),primary,low_zipf,2.00,14,0,1,你哋而家喺邊？,你哋而家喺邊？,nei5 dei6 ji4 gaa1 hai2 bin1,Where are you now?,5735083,0,6,0|0|-3.525|0|5735083,core
-你哋,5,you (plural),primary,low_zipf,2.00,14,0,2,部電話係咪你哋㗎？,部電話係咪你哋㗎？,bou6 din6 waa2 hai6 mai6 nei5 dei6 gaa3,Is this your all's cellphone?,6945977,0,7,0|1|-3.870|0|6945977,core
-你哋,5,you (plural),primary,low_zipf,2.00,14,0,3,我想見你哋經理。,我想見你哋經理。,ngo5 soeng2 gin3 nei5 dei6 ging1 lei5,I want to speak to your manager.,5734906,1,7,1|0|-4.315|0|5734906,core
-佢哋,6,they (plural),primary,low_zipf,1.76,72,0,1,佢哋兩個都係我啲同事。,佢哋兩個都係我啲同事。,keoi5 dei6 loeng5 go3 dou1 hai6 ngo5 di1 tung4 si6,They are both colleagues of mine.,750927,0,10,0|0|-4.839|1|750927,core
-佢哋,6,they (plural),primary,low_zipf,1.76,72,0,2,佢哋就開始。,佢哋就開始。,keoi5 dei6 zau6 hoi1 ci2,They are about to start.,4534109,0,5,0|0|-4.797|0|4534109,core
-佢哋,6,they (plural),primary,low_zipf,1.76,72,0,3,佢哋改變咗好多。,佢哋改變咗好多。,keoi5 dei6 goi2 bin3 zo2 hou2 do1,They've changed a lot.,5360916,0,7,0|0|-4.522|0|5360916,core
-嗰,8,that,primary,low_zipf,2.17,45,0,1,我好鍾意嗰個廣告。,我好鍾意嗰個廣告。,ngo5 hou2 zung1 ji3 go2 go3 gwong2 gou3,I love that commercial.,793804,0,8,0|0|-5.035|0|793804,core
-嗰,8,that,primary,low_zipf,2.17,45,0,2,嗰個女人係邊個嚟㗎？,嗰個女人係邊個嚟㗎？,go2 go3 neoi5 jan2 hai6 bin1 go3 lai4 gaa3,Who is that woman?,3869340,0,8,0|0|-4.275|0|3869340,core
-嗰,8,that,primary,low_zipf,2.17,45,0,3,我依家冇時間理嗰樣嘢。,我依家冇時間理嗰樣嘢。,ngo5 ji1 gaa1 mou5 si4 gaan3 lei5 go2 joeng6 je5,I've got no time for that now.,4646266,0,10,0|0|-4.274|1|4646266,core
-嗰度,10,there,primary,low_zipf,1.17,9,0,1,佢一定要去嗰度。,佢一定要去嗰度。,keoi5 jat1 ding6 jiu3 heoi3 go2 dou6,She must go there.,4544289,0,7,0|0|-4.524|0|4544289,core
-嗰度,10,there,primary,low_zipf,1.17,9,0,2,嗰度都唔係人住嘅。,嗰度都唔係人住嘅。,go2 dou6 dou1 m4 hai6 jan4 zyu6 ge3,You'll find it impossible to live there.,389470,0,8,0|0|-4.380|0|389470,core
-嗰度,10,there,primary,low_zipf,1.17,9,0,3,你喺嗰度做咗啲咩呀？,你喺嗰度做咗啲咩呀？,nei5 hai2 go2 dou6 zou6 zo2 di1 me1 aa3,What did you do there?,616138,0,9,0|0|-3.897|1|616138,core
-乜嘢,12,what,primary,low_zipf,1.74,10,0,1,你知唔知佢做咗乜嘢呀？,你知唔知佢做咗乜嘢呀？,nei5 zi1 m4 zi1 keoi5 zou6 zo2 mat1 je5 aa3,Do you know what he has done?,1359743,0,10,0|0|-4.371|1|1359743,core
-乜嘢,12,what,primary,low_zipf,1.74,10,0,2,你知唔知道你想做乜嘢啊？,你知唔知道你想做乜嘢啊？,nei5 zi1 m4 zi1 dou3 nei5 soeng2 zou6 mat1 je5 aa3,Do you know what you want to do?,12278312,0,11,0|1|-5.338|1|12278312,core
-乜嘢,12,what,primary,low_zipf,1.74,10,0,3,你知唔知道佢想做乜嘢啊？,你知唔知道佢想做乜嘢啊？,nei5 zi1 m4 zi1 dou3 keoi5 soeng2 zou6 mat1 je5 aa3,Do you know what he wants to do?,12278313,0,11,0|1|-4.940|1|12278313,core
+我哋,4,we,primary,low_zipf,2.00,95,0,1,我哋兩個都好驚。,我哋兩個都好驚。,ngo5 dei6 loeng5 go3 dou1 hou2 geng1,Both of us were scared.,9536316,0,7,0|0|-4.914|0|9536316,core
+我哋,4,we,primary,low_zipf,2.00,95,0,2,我哋喺間學校附近住。,我哋喺間學校附近住。,ngo5 dei6 hai2 gaan1 hok6 haau6 fu6 gan6 zyu6,We live near the school.,415943,0,9,0|0|-4.403|1|415943,core
+我哋,4,we,primary,low_zipf,2.00,95,0,3,我哋新嚟㗎。,我哋新嚟㗎。,ngo5 dei6 san1 lai4 gaa3,We're newcomers.,6480662,0,4,0|0|-3.597|0|6480662,core
+你哋,5,you (plural),primary,low_zipf,2.00,8,0,1,你哋兩個有好多共通點。,你哋兩個有好多共通點。,nei5 dei6 loeng5 go3 jau5 hou2 do1 gung6 tung1 dim2,You two have a lot in common.,5360942,1,10,1|1|-5.157|1|5360942,core
+你哋,5,you (plural),primary,low_zipf,2.00,8,0,2,部電話係咪你哋㗎？,部電話係咪你哋㗎？,bou6 din6 waa2 hai6 mai6 nei5 dei6 gaa3,Is this your all's cellphone?,6945977,1,7,1|1|-3.870|0|6945977,core
+你哋,5,you (plural),primary,low_zipf,2.00,8,0,3,我想見你哋經理。,我想見你哋經理。,ngo5 soeng2 gin3 nei5 dei6 ging1 lei5,I want to speak to your manager.,5734906,2,7,2|0|-4.315|0|5734906,core
+佢哋,6,they (plural),primary,low_zipf,1.76,56,0,1,佢哋就開始。,佢哋就開始。,keoi5 dei6 zau6 hoi1 ci2,They are about to start.,4534109,0,5,0|0|-4.797|0|4534109,core
+佢哋,6,they (plural),primary,low_zipf,1.76,56,0,2,佢哋啱。,佢哋啱。,keoi5 dei6 ngaam1,They are right.,5794921,0,3,0|0|-1.915|1|5794921,core
+佢哋,6,they (plural),primary,low_zipf,1.76,56,0,3,佢哋嘗試殺我。,佢哋嘗試殺我。,keoi5 dei6 soeng4 si3 saat3 ngo5,They tried to kill me.,4676014,1,6,1|0|-4.732|0|4676014,core
+嗰,8,that,primary,low_zipf,2.17,26,0,1,我信嗰個故事。,我信嗰個故事。,ngo5 seon3 go2 go3 gu3 si6,I believe that story.,10645939,1,6,1|0|-4.527|0|10645939,core
+嗰,8,that,primary,low_zipf,2.17,26,0,2,嗰個女人係邊個嚟㗎？,嗰個女人係邊個嚟㗎？,go2 go3 neoi5 jan2 hai6 bin1 go3 lai4 gaa3,Who is that woman?,3869340,1,8,1|0|-4.275|0|3869340,core
+嗰,8,that,primary,low_zipf,2.17,26,0,3,嗰個幾錢？,嗰個幾錢？,go2 go3 gei2 cin2,How much is that?,1080945,1,4,1|0|-4.173|0|1080945,core
+嗰度,10,there,primary,low_zipf,1.17,7,0,1,佢一定要去嗰度。,佢一定要去嗰度。,keoi5 jat1 ding6 jiu3 heoi3 go2 dou6,She must go there.,4544289,0,7,0|0|-4.524|0|4544289,core
+嗰度,10,there,primary,low_zipf,1.17,7,0,2,睇嗰度！,睇嗰度！,tai2 go2 dou6,Look there!,6485252,0,3,0|1|-2.275|1|6485252,core
+嗰度,10,there,primary,low_zipf,1.17,7,0,3,嗰度情況好危急。,嗰度情況好危急。,go2 dou6 cing4 fong3 hou2 ngai4 gap1,The situation there was critical.,1692133,1,7,1|0|-4.268|0|1692133,core
+乜嘢,12,what,primary,low_zipf,1.74,8,0,1,你知唔知道你想做乜嘢啊？,你知唔知道你想做乜嘢啊？,nei5 zi1 m4 zi1 dou3 nei5 soeng2 zou6 mat1 je5 aa3,Do you know what you want to do?,12278312,1,11,1|1|-5.338|1|12278312,core
+乜嘢,12,what,primary,low_zipf,1.74,8,0,2,你知唔知道佢想做乜嘢啊？,你知唔知道佢想做乜嘢啊？,nei5 zi1 m4 zi1 dou3 keoi5 soeng2 zou6 mat1 je5 aa3,Do you know what he wants to do?,12278313,1,11,1|1|-4.940|1|12278313,core
+乜嘢,12,what,primary,low_zipf,1.74,8,0,3,發生乜嘢事呀？,發生乜嘢事呀？,faat3 sang1 mat1 je5 si6 aa3,What's happened?,1892609,1,6,1|1|-4.607|0|1892609,core
+四,25,four,primary,thin,5.18,1,0,1,奧運會每四年舉辦一次。,奧運會每四年舉辦一次。,ou3 wan6 wui2 mui5 sei3 nin4 geoi2 baan6 jat1 ci3,The Olympic Games are staged every four years.,5794945,2,10,2|1|-4.668|1|5794945,core
 闊,29,wide,primary,uncovered,3.49,0,0,0,,,,,,,,,
 厚,30,thick,primary,uncovered,4.20,0,0,0,,,,,,,,,
+重,31,heavy,primary,thin,5.11,1,0,1,越重越好。,越重越好。,jyut6 cung5 jyut6 hou2,"The heavier, the better.",9955504,1,4,1|1|-5.093|0|9955504,core
+細,32,small,primary,thin,4.25,1,0,1,太細喇。,太細喇。,taai3 sai3 laa3,It's too small.,5359782,2,3,2|0|-3.275|1|5359782,core
+短,33,short,primary,uncovered,4.86,0,0,0,,,,,,,,,
 窄,34,narrow,primary,uncovered,3.75,0,0,0,,,,,,,,,
 薄,35,thin,primary,uncovered,4.26,0,0,0,,,,,,,,,
-動物,44,animal,primary,thin,5.16,1,0,1,佢鍾意動物多過鍾意人。,佢鍾意動物多過鍾意人。,keoi5 zung1 ji3 dung6 mat6 do1 gwo3 zung1 ji3 jan4,He likes animals more than people.,7832942,1,10,1|1|-4.445|1|7832942,core
+老婆,40,wife,primary,thin,4.98,1,0,1,帶埋你老婆嚟吖。,帶埋你老婆嚟吖。,daai3 maai4 nei5 lou5 po4 lai4 aa1,Bring your wife.,5795830,2,7,2|0|-4.520|0|5795830,core
+動物,44,animal,primary,uncovered,5.16,0,0,0,,,,,,,,,
+雀,46,bird,primary,thin,3.51,1,0,1,我唔識畫雀仔。,我唔識畫雀仔。,ngo5 m4 sik1 waak6 zoek3 zai2,I can't draw a bird.,5803968,2,6,2|0|-4.180|0|5803968,core
 蝨,48,louse,primary,uncovered,2.82,0,0,0,,,,,,,,,
+蛇,49,snake,primary,thin,4.42,1,0,1,佢驚蛇。,佢驚蛇。,keoi5 geng1 se4,He is afraid of snakes.,1385196,0,3,0|1|-3.887|1|1385196,core
 蟲,50,worm,primary,thin,4.17,1,0,1,佢好憎昆蟲。,佢好憎昆蟲。,keoi5 hou2 zang1 kwan1 cung4,He hates insects.,4826777,2,5,2|1|-2.923|0|4826777,core
 棍,53,stick,primary,uncovered,3.73,0,0,0,,,,,,,,,
+生果,54,fruit,primary,thin,3.39,1,0,1,你應該食多啲生果。,你應該食多啲生果。,nei5 jing1 goi1 sik6 do1 di1 saang1 gwo2,You should eat more fruit.,534148,1,8,1|0|-4.482|0|534148,core
 種子,55,seed,primary,uncovered,4.61,0,0,0,,,,,,,,,
 葉,56,leaf,primary,uncovered,4.55,0,0,0,,,,,,,,,
 根,57,root,primary,uncovered,4.67,0,0,0,,,,,,,,,
 樹皮,58,tree bark,primary,uncovered,3.19,0,0,0,,,,,,,,,
-繩,61,rope,primary,thin,3.92,1,0,1,我個女好鍾意跳繩。,我個女好鍾意跳繩。,ngo5 go3 neoi5 hou2 zung1 ji3 tiu3 sing2,My daughter loves jumping rope.,7988138,2,8,2|0|-4.020|0|7988138,core
+草,60,grass,primary,thin,4.74,1,0,1,牛食草。,牛食草。,ngau4 sik6 cou2,Cattle feed on grass.,6362124,1,3,1|0|-4.015|1|6362124,core
+繩,61,rope,primary,uncovered,3.92,0,0,0,,,,,,,,,
 皮,62,skin,primary,uncovered,4.48,0,0,0,,,,,,,,,
-骨,65,bone,primary,thin,4.13,1,0,1,我唔好鍾意食有太多骨嘅魚。,我唔好鍾意食有太多骨嘅魚。,ngo5 m4 hou2 zung1 ji3 sik6 jau5 taai3 do1 gwat1 ge3 jyu4,I don't like to eat fish with many bones.,4917636,1,12,1|1|-4.199|1|4917636,core
+血,64,blood,primary,uncovered,4.77,0,0,0,,,,,,,,,
+骨,65,bone,primary,uncovered,4.13,0,0,0,,,,,,,,,
 脂肪,66,fat (noun),primary,uncovered,4.04,0,0,0,,,,,,,,,
 角,68,horn,primary,uncovered,4.44,0,0,0,,,,,,,,,
 尾,69,tail,primary,uncovered,4.28,0,0,0,,,,,,,,,
 羽毛,70,feather,primary,uncovered,3.77,0,0,0,,,,,,,,,
-耳仔,73,ear,primary,low_zipf,2.80,2,0,1,我隻貓好鍾意我幫佢𢯎耳仔。,我隻貓好鍾意我幫佢𢯎耳仔。,ngo5 zek3 maau1 hou2 zung1 ji3 ngo5 bong1 keoi5 ngaau1 ji5 zai2,My cat likes it when I scratch her behind the ears.,795363,1,11,1|1|-4.756|1|795363,core
-耳仔,73,ear,primary,low_zipf,2.80,2,0,2,你想唔想露隻耳仔出嚟呀？,你想唔想露隻耳仔出嚟呀？,nei5 soeng2 m4 soeng2 lou6 zek3 ji5 zai2 ceot1 lai4 aa3,Would you like your ears to show?,676245,1,11,1|1|-4.458|1|676245,core
-鼻,75,nose,primary,thin,3.86,1,0,1,我個鼻好痕。,我個鼻好痕。,ngo5 go3 bei6 hou2 han4,My nose is itchy.,984834,1,5,1|0|-3.810|0|984834,core
+耳仔,73,ear,primary,uncovered,2.80,0,0,0,,,,,,,,,
+鼻,75,nose,primary,thin,3.86,1,0,1,我個鼻好痕。,我個鼻好痕。,ngo5 go3 bei6 hou2 han4,My nose is itchy.,984834,2,5,2|0|-3.810|0|984834,core
 嘴,76,mouth,primary,uncovered,4.69,0,0,0,,,,,,,,,
-脷,78,tongue,primary,thin,1.59,1,0,1,琳達伸咗條脷出嚟。,琳達伸咗條脷出嚟。,lam4 daat6 san1 zo2 tiu4 lei6 ceot1 lai4,Linda stuck her tongue out.,421999,2,8,2|1|-3.020|0|421999,core
-指甲,79,fingernail,primary,thin,3.79,1,0,1,佢好少搽指甲油。,佢好少搽指甲油。,keoi5 hou2 siu2 caa4 zi2 gaap3 jau4,She seldom uses nail polish.,5735067,1,7,1|1|-4.315|0|5735067,core
+脷,78,tongue,primary,uncovered,1.59,0,0,0,,,,,,,,,
+指甲,79,fingernail,primary,thin,3.79,1,0,1,佢好少搽指甲油。,佢好少搽指甲油。,keoi5 hou2 siu2 caa4 zi2 gaap3 jau4,She seldom uses nail polish.,5735067,2,7,2|1|-4.315|0|5735067,core
 腳,80,foot,primary,uncovered,4.86,0,0,0,,,,,,,,,
 腿,81,leg,primary,uncovered,4.72,0,0,0,,,,,,,,,
 膝頭,82,knee,primary,uncovered,2.46,0,0,0,,,,,,,,,
 翼,84,wing,primary,uncovered,4.01,0,0,0,,,,,,,,,
+肚,85,belly,primary,uncovered,3.34,0,0,0,,,,,,,,,
 腸,86,guts,primary,uncovered,3.52,0,0,0,,,,,,,,,
 頸,87,neck,primary,uncovered,3.95,0,0,0,,,,,,,,,
+背,88,back,primary,thin,4.58,1,0,1,你唔應該喺背後講人壞話。,你唔應該喺背後講人壞話。,nei5 m4 jing1 goi1 hai2 bui3 hau6 gong2 jan4 waai6 waa2,You shouldn't talk about people behind their backs.,389981,2,11,2|1|-4.666|1|389981,core
 胸,89,breast,primary,uncovered,4.35,0,0,0,,,,,,,,,
+心,90,heart,primary,thin,5.36,1,0,1,有人搞到你唔開心呀？,有人搞到你唔開心呀？,jau5 jan4 gaau2 dou3 nei5 m4 hoi1 sam1 aa3,Did someone break your heart?,7832898,2,9,2|1|-5.451|1|7832898,core
 肝,91,liver,primary,uncovered,3.80,0,0,0,,,,,,,,,
 咬,94,to bite,primary,uncovered,4.45,0,0,0,,,,,,,,,
 吐,96,to spit,primary,uncovered,4.41,0,0,0,,,,,,,,,
-嘔,97,to vomit,primary,thin,3.19,1,0,1,我想嘔。,我想嘔。,ngo5 soeng2 au2,I feel like throwing up.,417780,0,3,0|0|-4.085|1|417780,core
+嘔,97,to vomit,primary,thin,3.19,1,0,1,我想嘔。,我想嘔。,ngo5 soeng2 au2,I feel like throwing up.,417780,1,3,1|0|-4.085|1|417780,core
 吹,98,to blow,primary,uncovered,4.65,0,0,0,,,,,,,,,
-呼吸,99,to breathe,primary,thin,4.45,1,0,1,個醫生叫我慢慢噉深呼吸。,個醫生叫我慢慢噉深呼吸。,go3 ji1 sang1 giu3 ngo5 maan6 maan2 gam2 sam1 fu1 kap1,The doctor told me to inhale and exhale slowly and deeply.,683075,2,11,2|1|-4.980|1|683075,core
-諗,104,to think,primary,low_zipf,2.50,27,0,1,我都係咁諗。,我都係咁諗。,ngo5 dou1 hai6 gam2 nam2,"I think so, too.",3868854,0,5,0|0|-4.922|0|3868854,core
-諗,104,to think,primary,low_zipf,2.50,27,0,2,我諗我搞得掂㗎喇。,我諗我搞得掂㗎喇。,ngo5 nam2 ngo5 gaau2 dak1 dim6 gaa3 laa3,I think I can handle it.,554628,0,7,0|0|-4.816|0|554628,core
-諗,104,to think,primary,low_zipf,2.50,27,0,3,你喺度諗緊啲咩呀？,你喺度諗緊啲咩呀？,nei5 hai2 dou6 nam2 gan2 di1 me1 aa3,What are you thinking about?,1553759,0,8,0|0|-4.140|0|1553759,core
-瞓覺,107,to sleep,primary,low_zipf,0.94,4,0,1,我要去瞓覺喇。,我要去瞓覺喇。,ngo5 jiu3 heoi3 fan3 gaau3 laa3,I have to go to sleep.,386773,0,6,0|0|-3.862|0|386773,core
-瞓覺,107,to sleep,primary,low_zipf,0.94,4,0,2,我想瞓覺。,我想瞓覺。,ngo5 soeng2 fan3 gaau3,I want to sleep.,12431370,0,4,0|1|-2.960|0|12431370,core
-瞓覺,107,to sleep,primary,low_zipf,0.94,4,0,3,喺地氈上面瞓覺好正。,喺地氈上面瞓覺好正。,hai2 dei6 zin1 soeng6 min6 fan3 gaau3 hou2 zeng3,Sleeping on a carpet is great.,9535743,1,9,1|1|-3.752|1|9535743,core
-打交,111,to fight,primary,thin,3.78,1,0,1,打交解決唔到問題。,打交解決唔到問題。,daa2 gaau1 gaai2 kyut3 m4 dou2 man6 tai4,Fighting won't settle anything.,662795,0,8,0|0|-4.628|0|662795,core
+呼吸,99,to breathe,primary,uncovered,4.45,0,0,0,,,,,,,,,
+諗,104,to think,primary,low_zipf,2.50,14,0,1,等我諗嚇先。,等我諗吓先。,dang2 ngo5 nam2 haak3 sin1,Now let me think.,7996177,1,5,1|0|-4.848|0|7996177,core
+諗,104,to think,primary,low_zipf,2.50,14,0,2,我諗你瞓低會好啲。,我諗你瞓低會好啲。,ngo5 nam2 nei5 fan3 dai1 wui5 hou2 di1,I think it'd be better if you lay down.,5774675,1,8,1|0|-4.509|0|5774675,core
+諗,104,to think,primary,low_zipf,2.50,14,0,3,我諗唔起佢個英文名。,我諗唔起佢個英文名。,ngo5 nam2 m4 hei2 keoi5 go3 jing1 man2 meng2,I cannot quite remember what her English name is.,4320379,1,9,1|1|-4.900|1|4320379,core
+瞓覺,107,to sleep,primary,low_zipf,0.94,4,0,1,我想瞓覺。,我想瞓覺。,ngo5 soeng2 fan3 gaau3,I want to sleep.,12431370,1,4,1|1|-2.960|0|12431370,core
+瞓覺,107,to sleep,primary,low_zipf,0.94,4,0,2,我要去瞓覺喇。,我要去瞓覺喇。,ngo5 jiu3 heoi3 fan3 gaau3 laa3,I have to go to sleep.,386773,2,6,2|0|-3.862|0|386773,core
+瞓覺,107,to sleep,primary,low_zipf,0.94,4,0,3,我瞓覺好易醒。,我瞓覺好易醒。,ngo5 fan3 gaau3 hou2 ji6 seng2,I'm a light sleeper.,1877279,2,6,2|1|-3.970|0|1877279,core
+打交,111,to fight,primary,thin,3.78,1,0,1,打交解決唔到問題。,打交解決唔到問題。,daa2 gaau1 gaai2 kyut3 m4 dou2 man6 tai4,Fighting won't settle anything.,662795,1,8,1|0|-4.628|0|662795,core
 打獵,112,to hunt,primary,uncovered,3.58,0,0,0,,,,,,,,,
 切,114,to cut,primary,uncovered,4.44,0,0,0,,,,,,,,,
 分開,115,to split,primary,uncovered,4.56,0,0,0,,,,,,,,,
 刺,116,to stab,primary,uncovered,4.35,0,0,0,,,,,,,,,
-𢯎,117,to scratch,primary,thin,0.00,1,0,1,我隻貓好鍾意我幫佢𢯎耳仔。,我隻貓好鍾意我幫佢𢯎耳仔。,ngo5 zek3 maau1 hou2 zung1 ji3 ngo5 bong1 keoi5 ngaau1 ji5 zai2,My cat likes it when I scratch her behind the ears.,795363,1,11,1|1|-4.756|1|795363,core
-掘,118,to dig,primary,thin,3.53,1,0,1,我哋喺地下掘咗個窿。,我哋喺地下掘咗個窿。,ngo5 dei6 hai2 dei6 haa2 gwat6 zo2 go3 lung1,We dug a hole in the ground.,423187,1,9,1|0|-2.750|1|423187,core
-嚟,122,to come,primary,low_zipf,2.70,76,0,1,如果你嚟到就好喇。,如果你嚟到就好喇。,jyu4 gwo2 nei5 lai4 dou3 zau6 hou2 laa3,It would be nice if you could come.,5797622,0,8,0|0|-5.430|0|5797622,core
-嚟,122,to come,primary,low_zipf,2.70,76,0,2,我係因為你先嚟㗎咋。,我係因為你先嚟㗎咋。,ngo5 hai6 jan1 wai6 nei5 sin1 lai4 gaa3 zaa3,You're the reason I came.,3500962,0,8,0|0|-5.337|0|3500962,core
-嚟,122,to come,primary,low_zipf,2.70,76,0,3,我自己嚟㗎。,我自己嚟㗎。,ngo5 zi6 gei2 lai4 gaa3,I came by myself.,7045394,0,4,0|0|-5.283|0|7045394,core
-瞓,123,to lie down,primary,low_zipf,1.94,2,0,1,我諗你瞓低會好啲。,我諗你瞓低會好啲。,ngo5 nam2 nei5 fan3 dai1 wui5 hou2 di1,I think it'd be better if you lay down.,5774675,1,8,1|0|-4.509|0|5774675,core
-瞓,123,to lie down,primary,low_zipf,1.94,2,0,2,蕾拉瞓咗喺張牀到。,蕾拉瞓咗喺張床到。,leoi4 laai1 fan3 zo2 hai2 zoeng1 cong4 dou3,Layla was lying on the bed.,6108632,2,8,2|1|-4.126|0|6108632,core
+𢯎,117,to scratch,primary,uncovered,0.00,0,0,0,,,,,,,,,
+掘,118,to dig,primary,uncovered,3.53,0,0,0,,,,,,,,,
+嚟,122,to come,primary,low_zipf,2.70,39,0,1,我自己嚟㗎。,我自己嚟㗎。,ngo5 zi6 gei2 lai4 gaa3,I came by myself.,7045394,0,4,0|0|-5.283|0|7045394,core
+嚟,122,to come,primary,low_zipf,2.70,39,0,2,佢話佢會嚟。,佢話佢會嚟。,keoi5 waa6 keoi5 wui5 lai4,He says he will come.,2057589,0,5,0|1|-4.214|0|2057589,core
+嚟,122,to come,primary,low_zipf,2.70,39,0,3,如果你嚟到就好喇。,如果你嚟到就好喇。,jyu4 gwo2 nei5 lai4 dou3 zau6 hou2 laa3,It would be nice if you could come.,5797622,1,8,1|0|-5.430|0|5797622,core
+瞓,123,to lie down,primary,thin,1.94,1,0,1,我諗你瞓低會好啲。,我諗你瞓低會好啲。,ngo5 nam2 nei5 fan3 dai1 wui5 hou2 di1,I think it'd be better if you lay down.,5774675,1,8,1|0|-4.509|0|5774675,core
 轉,126,to turn (intransitive),primary,thin,5.18,1,0,1,月亮圍住地球轉。,月亮圍住地球轉。,jyut6 loeng6 wai4 zyu6 dei6 kau4 zyun2,The moon moves around the earth.,1692126,2,7,2|0|-4.445|0|1692126,core
-畀,128,to give,primary,low_zipf,2.58,10,0,1,畀個煙灰缸我吖唔該。,畀個煙灰缸我吖唔該。,bei2 go3 jin1 fui1 gong1 ngo5 aa1 m4 goi1,Please give me an ashtray.,1579631,1,9,1|0|-3.870|1|1579631,core
-畀,128,to give,primary,low_zipf,2.58,10,0,2,畀多次機會我啦！,畀多次機會我啦！,bei2 do1 ci3 gei1 wui6 ngo5 laa1,Give me another chance!,12112156,1,7,1|1|-5.028|0|12112156,core
-畀,128,to give,primary,low_zipf,2.58,10,0,3,想要就畀你囉。,想要就畀你囉。,soeng2 jiu3 zau6 bei2 nei5 lo1,"If you want it, you can have it.",12027498,1,6,1|1|-4.976|0|12027498,core
+跌,127,to fall,primary,uncovered,4.18,0,0,0,,,,,,,,,
+畀,128,to give,primary,low_zipf,2.58,4,0,1,畀多次機會我啦！,畀多次機會我啦！,bei2 do1 ci3 gei1 wui6 ngo5 laa1,Give me another chance!,12112156,1,7,1|1|-5.028|0|12112156,core
+畀,128,to give,primary,low_zipf,2.58,4,0,2,想要就畀你囉。,想要就畀你囉。,soeng2 jiu3 zau6 bei2 nei5 lo1,"If you want it, you can have it.",12027498,1,6,1|1|-4.976|0|12027498,core
+畀,128,to give,primary,low_zipf,2.58,4,0,3,畀隻貓我等。,畀隻貓我等。,bei2 zek3 maau1 ngo5 dang2,Give that cat to us.,12133408,2,5,2|1|-4.645|0|12133408,core
 揸,129,to hold,primary,low_zipf,2.54,2,0,1,揸住支蠟燭。,揸住支蠟燭。,zaa1 zyu6 zi1 laap6 zuk1,Hold the candle.,5795821,2,5,2|0|-4.185|0|5795821,core
 揸,129,to hold,primary,low_zipf,2.54,2,0,2,呢個刨又好揸手又夠利。,呢個刨又好揸手又夠利。,ni1 go3 paau4 jau6 hou2 zaa1 sau2 jau6 gau3 lei6,This peeler is easy to hold and slices well.,9535776,2,10,2|1|-4.607|1|9535776,core
 搾,130,to squeeze,primary,uncovered,2.10,0,0,0,,,,,,,,,
 擦,131,to rub,primary,uncovered,4.38,0,0,0,,,,,,,,,
-抹,133,to wipe,primary,thin,4.24,1,0,1,渠抹走啲眼淚。,渠抹走啲眼淚。,keoi4 mut3 zau2 di1 ngaan5 leoi6,She wiped her tears away.,12095744,1,6,1|1|-3.873|0|12095744,core
-拉,134,to pull,primary,thin,5.22,1,0,1,蕾拉嘗試自殺。,蕾拉嘗試自殺。,leoi4 laai1 soeng4 si3 zi6 saat3,Layla tried to commit suicide.,6109468,2,6,2|1|-4.695|0|6109468,core
+抹,133,to wipe,primary,thin,4.24,1,0,1,渠抹走啲眼淚。,渠抹走啲眼淚。,keoi4 mut3 zau2 di1 ngaan5 leoi6,She wiped her tears away.,12095744,2,6,2|1|-3.873|0|12095744,core
+拉,134,to pull,primary,uncovered,5.22,0,0,0,,,,,,,,,
 推,135,to push,primary,uncovered,4.87,0,0,0,,,,,,,,,
-掟,136,to throw,primary,thin,1.72,1,0,1,唔好掟石頭。,唔好掟石頭。,m4 hou2 deng3 sek6 tau4,Don't throw stones.,617699,0,5,0|0|-3.593|0|617699,core
+掟,136,to throw,primary,thin,1.72,1,0,1,唔好掟石頭。,唔好掟石頭。,m4 hou2 deng3 sek6 tau4,Don't throw stones.,617699,1,5,1|0|-3.593|0|617699,core
 綁,137,to tie,primary,uncovered,4.49,0,0,0,,,,,,,,,
-縫,138,to sew,primary,thin,3.92,1,0,1,呢個係咪你親手縫㗎？,呢個係咪你親手縫㗎？,ni1 go3 hai6 mai6 nei5 can1 sau2 fung4 gaa3,Did you sew this by hand?,787388,1,8,1|0|-4.430|0|787388,core
+縫,138,to sew,primary,thin,3.92,1,0,1,呢個係咪你親手縫㗎？,呢個係咪你親手縫㗎？,ni1 go3 hai6 mai6 nei5 can1 sau2 fung4 gaa3,Did you sew this by hand?,787388,2,8,2|0|-4.430|0|787388,core
 數,139,to count,primary,uncovered,5.10,0,0,0,,,,,,,,,
 浮,143,to float,primary,uncovered,3.61,0,0,0,,,,,,,,,
 流,144,to flow,primary,uncovered,4.71,0,0,0,,,,,,,,,
 結冰,145,to freeze,primary,uncovered,3.49,0,0,0,,,,,,,,,
 脹,146,to swell,primary,uncovered,3.44,0,0,0,,,,,,,,,
-星,149,star,primary,thin,4.70,1,0,1,美國國旗上面有五十粒星。,美國國旗上面有五十粒星。,mei5 gwok3 gwok3 kei4 soeng6 min6 jau5 ng5 sap6 nap1 sing1,There are fifty stars in the American flag.,5373678,2,11,2|1|-4.258|1|5373678,core
+月亮,148,moon,primary,thin,4.26,1,0,1,月亮圍住地球轉。,月亮圍住地球轉。,jyut6 loeng6 wai4 zyu6 dei6 kau4 zyun2,The moon moves around the earth.,1692126,2,7,2|0|-4.445|0|1692126,core
+星,149,star,primary,uncovered,4.70,0,0,0,,,,,,,,,
+河,152,river,primary,thin,4.74,1,0,1,我睇到佢遊過河。,我睇到佢游過河。,ngo5 tai2 dou3 keoi5 jau4 gwo3 ho4,I saw him swim across the river.,4544379,1,7,1|1|-5.030|0|4544379,core
 湖,153,lake,primary,uncovered,4.49,0,0,0,,,,,,,,,
+海,154,sea,primary,thin,4.86,1,0,1,佢喺海邊有間屋。,佢喺海邊有間屋。,keoi5 hai2 hoi2 bin1 jau5 gaan1 uk1,She has a house by the sea.,751166,2,7,2|1|-3.586|0|751166,core
 鹽,155,salt,primary,uncovered,4.34,0,0,0,,,,,,,,,
 沙,157,sand,primary,uncovered,4.40,0,0,0,,,,,,,,,
-塵,158,dust,primary,thin,3.59,1,0,1,張枱舖滿咗塵。,張枱舖滿咗塵。,zoeng1 toi2 pou3 mun5 zo2 can4,The desk was covered with dust.,5761090,1,6,1|0|-3.663|0|5761090,core
-泥,159,earth,primary,thin,4.04,1,0,1,小心呀，唔好踩落啲泥到。,小心呀，唔好踩落啲泥到。,siu2 sam1 aa3 m4 hou2 caai2 lok6 di1 nai4 dou3,Be careful not to step in the mud.,5953743,1,10,1|1|-4.409|1|5953743,core
+塵,158,dust,primary,uncovered,3.59,0,0,0,,,,,,,,,
+泥,159,earth,primary,uncovered,4.04,0,0,0,,,,,,,,,
 雲,160,cloud,primary,thin,5.00,1,0,1,一朵雲都無。,一朵雲都無。,jat1 do2 wan4 dou1 mou4,There's not a cloud in sight.,12133432,1,5,1|1|-5.173|0|12133432,core
+霧,161,fog,primary,uncovered,4.26,0,0,0,,,,,,,,,
+天,162,sky,primary,thin,5.55,1,0,1,個天突然間開始變黑。,個天突然間開始變黑。,go3 tin1 dat6 jin4 gaan3 hoi1 ci2 bin3 hak1,The sky suddenly began to darken.,5942690,1,9,1|0|-5.420|1|5942690,core
 風,163,wind,primary,thin,4.94,1,0,1,好大風。,好大風。,hou2 daai6 fung1,It's windy.,6481249,1,3,1|0|-2.700|1|6481249,core
+冰,165,ice,primary,uncovered,4.27,0,0,0,,,,,,,,,
+火,167,fire,primary,thin,4.65,1,0,1,你瞓覺之前最好整熄啲火先。,你瞓覺之前最好整熄啲火先。,nei5 fan3 gaau3 zi1 cin4 zeoi3 hou2 zing2 sik1 di1 fo2 sin1,You had better put out the fire before you go to bed.,616141,2,12,2|1|-3.857|1|616141,core
 灰,168,ash,primary,uncovered,4.16,0,0,0,,,,,,,,,
 燒,169,to burn,primary,uncovered,4.46,0,0,0,,,,,,,,,
 山,171,mountain,primary,thin,4.99,1,0,1,我喺山區長大。,我喺山區長大。,ngo5 hai2 saan1 keoi1 zoeng2 daai6,I grew up in the mountains.,4464878,0,6,0|0|-5.390|0|4464878,core
-黃,174,yellow,primary,thin,5.16,1,0,1,本書係黃色嘅。,本書係黃色嘅。,bun2 syu1 hai6 wong4 sik1 ge3,The book is yellow.,5761227,1,6,1|1|-4.602|0|5761227,core
-滿,182,full,primary,thin,4.75,1,0,1,滿月嗰陣，就有狼人出沒。,滿月嗰陣，就有狼人出沒。,mun5 jyut2 go2 zan6 zau6 jau5 long4 jan4 ceot1 mut6,Werewolves appear on the full moon.,12069064,2,10,2|1|-4.699|1|12069064,core
+紅,172,red,primary,thin,4.95,1,0,1,你最鍾意紅色。,你最鍾意紅色。,nei5 zeoi3 zung1 ji3 hung4 sik1,My favourite colour is red.,9955415,2,6,2|1|-5.235|0|9955415,core
+黃,174,yellow,primary,uncovered,5.16,0,0,0,,,,,,,,,
+白,175,white,primary,thin,4.90,1,0,1,白酒應該要凍一啲。,白酒應該要凍一啲。,baak6 zau2 jing1 goi1 jiu3 dung3 jat1 di1,The white wine should be colder.,1069455,1,8,1|1|-4.827|0|1069455,core
+黑,176,black,primary,uncovered,5.17,0,0,0,,,,,,,,,
+滿,182,full,primary,uncovered,4.75,0,0,0,,,,,,,,,
+壞,186,bad,primary,thin,4.93,1,0,1,生嘅魚好易變壞。,生嘅魚好易變壞。,saang1 ge3 jyu4 hou2 ji6 bin3 waai6,Raw fish easily goes bad.,397093,2,7,2|1|-4.687|0|397093,core
 爛,187,rotten,primary,uncovered,4.44,0,0,0,,,,,,,,,
-污糟,188,dirty,primary,low_zipf,2.57,2,0,1,我唔想整污糟我隻手。,我唔想整污糟我隻手。,ngo5 m4 soeng2 zing2 wu1 zou1 ngo5 zek3 sau2,I don't want to get my hands dirty.,1393435,1,9,1|0|-5.024|1|1393435,core
-污糟,188,dirty,primary,low_zipf,2.57,2,0,2,隻手污糟嗰陣千祈唔好捽眼。,隻手污糟嗰陣千祈唔好捽眼。,zek3 sau2 wu1 zou1 go2 zan6 cin1 kei4 m4 hou2 zeot1 ngaan5,Never rub your eyes with dirty hands.,397021,2,12,2|1|-3.449|1|397021,core
-直,189,straight,primary,thin,4.68,1,0,1,我直程去佢度。,我直程去佢度。,ngo5 zik6 cing4 heoi3 keoi5 dou6,I went to his place straight away.,446300,0,6,0|1|-4.886|0|446300,core
+污糟,188,dirty,primary,thin,2.57,1,0,1,我唔想整污糟我隻手。,我唔想整污糟我隻手。,ngo5 m4 soeng2 zing2 wu1 zou1 ngo5 zek3 sau2,I don't want to get my hands dirty.,1393435,2,9,2|0|-5.024|1|1393435,core
+直,189,straight,primary,thin,4.68,1,0,1,我直程去佢度。,我直程去佢度。,ngo5 zik6 cing4 heoi3 keoi5 dou6,I went to his place straight away.,446300,2,6,2|1|-4.886|0|446300,core
 圓,190,round,primary,uncovered,4.32,0,0,0,,,,,,,,,
 利,191,sharp,primary,uncovered,4.70,0,0,0,,,,,,,,,
 鈍,192,dull,primary,uncovered,3.40,0,0,0,,,,,,,,,
-滑,193,smooth,primary,thin,4.09,1,0,1,呢塊布摸上手好滑。,呢塊布摸上手好滑。,ni1 faai3 bou3 mo2 soeng5 sau2 hou2 waat6,This cloth feels smooth.,530792,1,8,1|0|-5.174|0|530792,core
-濕,194,wet,primary,thin,4.22,1,0,1,我對襪濕咗。,我對襪濕咗。,ngo5 deoi3 mat6 sap1 zo2,My socks are wet.,7988280,1,5,1|0|-4.145|0|7988280,core
+滑,193,smooth,primary,thin,4.09,1,0,1,呢塊布摸上手好滑。,呢塊布摸上手好滑。,ni1 faai3 bou3 mo2 soeng5 sau2 hou2 waat6,This cloth feels smooth.,530792,2,8,2|0|-5.174|0|530792,core
+濕,194,wet,primary,thin,4.22,1,0,1,我對襪濕咗。,我對襪濕咗。,ngo5 deoi3 mat6 sap1 zo2,My socks are wet.,7988280,2,5,2|0|-4.145|0|7988280,core
 乾,195,dry,primary,uncovered,5.52,0,0,0,,,,,,,,,
-啱,196,correct,primary,low_zipf,2.07,15,0,1,你真係講得好啱。,你真係講得好啱。,nei5 zan1 hai6 gong2 dak1 hou2 ngaam1,That's absolutely true.,6961875,0,7,0|0|-4.446|0|6961875,core
-啱,196,correct,primary,low_zipf,2.07,15,0,2,我係啱嘅。,我係啱嘅。,ngo5 hai6 ngaam1 ge3,I'm right.,1345610,0,4,0|0|-4.388|0|1345610,core
-啱,196,correct,primary,low_zipf,2.07,15,0,3,你講得啱。,你講得啱。,nei5 gong2 dak1 ngaam1,You're right.,5374525,0,4,0|0|-3.987|0|5374525,core
-喺,201,at,primary,low_zipf,2.76,29,0,1,留喺屋企好無聊。,留喺屋企好無聊。,lau4 hai2 uk1 kei2 hou2 mou4 liu4,It's boring to stay at home.,4465846,0,7,0|0|-4.206|0|4465846,core
-喺,201,at,primary,low_zipf,2.76,29,0,2,我喺屋企。,我喺屋企。,ngo5 hai2 uk1 kei2,I am at home.,1393443,0,4,0|0|-4.173|0|1393443,core
-喺,201,at,primary,low_zipf,2.76,29,0,3,佢企喺路邊。,佢企喺路邊。,keoi5 kei5 hai2 lou6 bin1,He was standing at the side of the road.,4778630,0,5,0|0|-4.004|0|4778630,core
+啱,196,correct,primary,low_zipf,2.07,12,0,1,佢哋啱。,佢哋啱。,keoi5 dei6 ngaam1,They are right.,5794921,0,3,0|0|-1.915|1|5794921,core
+啱,196,correct,primary,low_zipf,2.07,12,0,2,佢做得啱。,佢做得啱。,keoi5 zou6 dak1 ngaam1,She did the right thing.,1976287,0,4,0|1|-4.327|0|1976287,core
+啱,196,correct,primary,low_zipf,2.07,12,0,3,傳統唔一定啱。,傳統唔一定啱。,cyun4 tung2 m4 jat1 ding6 ngaam1,Just because something is tradition doesn't mean it's right.,7999921,0,6,0|1|-4.327|0|7999921,core
+遠,198,far,primary,thin,5.12,1,0,1,啲沙灘來呢度好遠㗎。,啲沙灘來呢度好遠㗎。,di1 saa1 taan1 loi4 nei1 dou6 hou2 jyun5 gaa3,Those beaches are far from here.,12101337,1,8,1|1|-4.828|0|12101337,core
+右,199,right,primary,thin,4.59,1,0,1,佢左右不分。,佢左右不分。,keoi5 zo2 jau2 bat1 fan1,He can't distinguish between left and right.,10645915,1,5,1|1|-4.280|0|10645915,core
+喺,201,at,primary,low_zipf,2.76,9,0,1,我喺警署。,我喺警署。,ngo5 hai2 ging2 cyu5,I'm at the police station.,5803888,1,4,1|0|-4.353|0|5803888,core
+喺,201,at,primary,low_zipf,2.76,9,0,2,我喺屋企。,我喺屋企。,ngo5 hai2 uk1 kei2,I am at home.,1393443,1,4,1|0|-4.173|0|1393443,core
+喺,201,at,primary,low_zipf,2.76,9,0,3,佢企喺路邊。,佢企喺路邊。,keoi5 kei5 hai2 lou6 bin1,He was standing at the side of the road.,4778630,1,5,1|0|-4.004|0|4778630,core
 裡面,202,in,primary,uncovered,5.24,0,0,0,,,,,,,,,
+因為,206,because,primary,thin,6.11,1,0,1,因為佢蕩失路。,因為佢蕩失路。,jan1 wai6 keoi5 dong6 sat1 lou6,It's because he got lost.,5375355,1,6,1|1|-3.693|0|5375355,core
+老母,42,mother,alternate,thin,3.38,1,0,1,屌你老母。,屌你老母。,diu2 nei5 lou5 mou2,Fuck your mom.,857779,1,4,1|1|-4.660|0|857779,core
+口,76,mouth,alternate,thin,4.92,1,0,1,擘大口！,擘大口！,maak3 daai6 hau2,Open your mouth!,821444,1,3,1|0|-0.150|1|821444,core
 心口,89,breast,alternate,thin,3.79,1,0,1,佢心口好多毛。,佢心口好多毛。,keoi5 sam1 hau2 hou2 do1 mou4,He has a hairy chest.,3364538,1,6,1|1|-4.850|0|3364538,core
+剪,114,to cut,alternate,uncovered,4.16,0,0,0,,,,,,,,,

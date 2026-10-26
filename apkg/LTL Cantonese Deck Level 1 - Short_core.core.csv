@@ -64,37 +64,37 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269685,348,我坐唔定.,"""I can't sit still.""",azure-499b8ade-fced484d-03fb950e-8ea2c324-99bdd938.mp3,1,seed,,S124:坐,S124:坐,0.1336,0.1000,4,1,0,0
 1621761270181,844,企喺度嗰個邊個嚟?,Who is standing there?,azure-9c4eb326-db8c92cc-462481db-9a0bfc9c-64799db6.mp3,1,seed,,S125:企,S125:企,0.1033,0.1300,7,0,0,0
 1621761269558,221,揸住支蠟燭.,Hold the candle.,azure-c1f8ee82-c4874ef2-00162882-7e785f03-75591ec2.mp3,1,seed,,S129:揸,S129:揸,0.0964,0.4600,4,3,0,0
-1621761269761,424,你啱.,"""You're quite right.""",azure-b992adb0-2201d64b-753f7ece-f10e6008-7c1d0bb7.mp3,1,depth,,S196:啱,,0.0459,0.0000,2,0,0,0
-1621761269403,66,我哋係男人.,We are men.,azure-dab8f32e-544542ef-acee585e-f4f826dd-aa4702eb.mp3,1,depth,,S37:男人,,0.0367,0.0300,3,0,0,0
-1621761270101,764,太陽落緊山.,The sun is going down.,azure-69bc7890-ad6c60d5-73d7809a-439e8784-d521794c.mp3,1,depth,,S147:太陽,,0.0185,0.0300,3,1,0,0
-1621761269686,349,我殺咗佢.,I have killed him.,azure-e0f4744e-68a4ef76-7ee345d1-3fdce392-7694fef3.mp3,1,depth,,S110:殺,,0.0215,0.0300,4,0,0,0
-1621761269697,360,俾嗰本書我.,Give me that book.,azure-e6a9964a-8e45b27b-2f956e2a-cdf74005-8253dd6f.mp3,1,depth,,S8:嗰,,0.0504,0.0600,4,1,0,0
-1621761269769,432,你唔坐呀?,"""Won't you sit down?""",azure-d47c6afe-739003ee-6c52945c-5e86fdc8-c813c018.mp3,1,depth,,S124:坐,,0.0202,0.0300,4,0,0,0
-1621761269771,434,唔好笑佢啦.,"""Don't laugh at him.""",azure-21e5abb5-2821601d-c034a7ce-8a55c516-ea691ae0-65e181c5d4c7f59dd1600dbd5e244938c5983e39.mp3,1,completion,,S100:笑,,-0.0074,0.0600,4,0,0,0
-1621761270088,751,唔好企咁埋.,"""Don't stand too close.""",azure-d54e5310-9ae33b21-947da461-2a214b8d-cf01a547.mp3,1,completion,,S125:企,,-0.0398,0.0900,4,0,0,0
-1621761269562,225,我都係咁諗.,"I think so, too.",azure-fad999c2-2d5aa9d2-701523ac-ecb1c6dc-ef68ddfe.mp3,1,completion,,S104:諗,,-0.0079,0.0600,5,0,0,0
-1621761269829,492,佢哋住喺邊度呀?,Where do they live?,azure-4783aa72-d0411943-5b23f50e-ffe08dc7-97291539.mp3,1,depth,,S13:邊度,,0.0319,0.0600,5,0,0,0
-1621761269674,337,嗰個女人係邊個嚟㗎?,Who is the woman?,azure-384fb358-bbda9175-4d04b4d9-5e60b33e-a3fb7104.mp3,1,depth,,S36:女人,,0.0072,0.0600,6,0,0,0
-1621761269742,405,你隻貓係黑色嘅.,Your cat is black.,azure-8c9363ee-b7eb2955-06060e02-8805fafc-ac6de8b4.mp3,1,completion,,S176:黑,,-0.1031,0.1500,6,1,0,0
-1621761270284,947,佢住喺我屋企附近.,He lives near my house.,azure-9a2a0cac-fa302999-44ec97be-4f1bad94-f4a585d7.mp3,1,completion,,S197:近,,-0.0441,0.0900,6,2,0,0
-1621761269427,90,太大喇.,"""It's too big.""",azure-99c6c6b5-a322b5cd-2eb1de2a-5376e2e9-7340d9fe.mp3,1,completion,,S27:大,,-0.1372,0.2100,2,1,0,0
-1621761269691,354,唱歌好易.,"""It's easy to sing.""",azure-f3ce54bb-5d07a249-bb4525be-33d11510-3155f13d.mp3,1,completion,,S141:唱,,-0.1610,0.2100,2,1,0,0
-1621761269357,20,嘩，雪呀!,"Ah, snow!",azure-2ba21b18-87ae0062-2e502f9d-79fdebb8-b64bf2eb.mp3,1,completion,,S164:雪,,-0.0825,0.1300,3,1,0,0
-1621761269822,485,喺LA冇人行㗎.,Nobody walks in LA.,azure-88a22c69-9db21324-fafccefe-6a71cfb0-e58ad334.mp3,1,completion,,S121:行,,-0.1595,0.2100,3,1,0,0
-1621761270224,887,開始落雨喇.,It has started to rain.,azure-f5801698-a52ace0c-b9b90af6-13e7a6f1-eaf758a2.mp3,1,completion,,S151:雨,,-0.1917,0.2400,3,1,0,0
-1621761269617,280,你哋唔攰咩?,"""Aren't you tired?""",azure-3c72b244-e692c5d4-fadcb828-9cc4b2d9-a61419d1.mp3,1,completion,,S5:你哋,,-0.0746,0.2100,4,1,0,0
-1621761269729,392,呢個袋邊個架?,Whose bag is this?,azure-bc432d82-9e5ce7f4-c7d88ae0-8d31c300-544ec4b5.mp3,1,completion,,S7:呢個,,-0.0933,0.2100,4,2,0,0
-1621761270110,773,我要去瞓覺喇.,I have to go to sleep.,azure-613abf91-3b22b47e-c7a26f16-fcacaf04-80637020.mp3,1,completion,,S107:瞓覺,,-0.1082,0.1600,4,1,0,0
-1621761269904,567,我有好多朋友.,I have many friends.,azure-1cf41d73-2db25614-df1b051e-d58be063-860a242b.mp3,1,completion,,S18:多,,-0.0476,0.1300,5,1,0,0
-1621761270010,673,佢個真名係咩?,"""What's his real name?""",azure-b37f635d-8ce1c88c-fc79eda7-71542019-95fc72da.mp3,1,completion,,S207:名,,-0.2245,0.2700,5,1,0,0
-1621761270124,787,你幾時返嚟呀?,When will you be back?,azure-85bb9996-0021129b-b9b4bf73-824f8d4a-ab4ec74b.mp3,1,completion,,S14:幾時,,-0.0404,0.1300,5,1,0,0
-1621761270148,811,佢哋買咗架新車.,They bought a new car.,azure-f07d0825-7d21ca64-15e2190e-517c4039-1e949500.mp3,1,completion,,S183:新,,-0.2235,0.2700,5,2,0,0
-1621761270305,968,佢阿爸係咪醫生嚟㗎?,Is his father a doctor?,azure-077b3f8d-489b529f-b406ec28-453dd443-369a1b4f.mp3,1,completion,,S43:阿爸,,-0.1459,0.2100,5,1,0,0
-1621761269660,323,你買咗啲乜嘢呀?,What did you buy?,azure-5ff1d31b-6816c103-c2103e4a-222d71b6-3b9d7921.mp3,1,completion,,S12:乜嘢,,-0.0654,0.1600,6,0,0,0
-1621761270267,930,今日天氣幾凍㗎.,"""It's rather cold today.""",azure-642098e2-c5b9b188-46573542-4459586c-bdaa9773.mp3,1,completion,,S181:凍,,-0.2634,0.3100,4,3,0,0
-1621761270243,906,我同佢握咗手.,I shook hands with her.,azure-7abb1f06-a54f112a-c061e55a-b610a680-e79b721e.mp3,1,completion,,S83:手,,-0.2552,0.3100,5,2,0,0
-1621761269818,481,我咩都聽唔到喎.,"""I've heard nothing.""",azure-692bcb0a-cffa7ec4-86f7d167-9d52696b-85692b10.mp3,1,completion,,S102:聽,,-0.1777,0.2300,6,2,0,0
-1621761269842,505,我哋喺度睇緊電視.,We are watching TV.,azure-e82cd690-2408b31e-fd77eec5-a694a401-cb45169d.mp3,1,completion,,S101:睇,,-0.1775,0.2300,6,2,0,0
+1621761269761,424,你啱.,"""You're quite right.""",azure-b992adb0-2201d64b-753f7ece-f10e6008-7c1d0bb7.mp3,1,depth,,S196:啱,S2:你,0.0459,0.0000,2,0,0,0
+1621761269403,66,我哋係男人.,We are men.,azure-dab8f32e-544542ef-acee585e-f4f826dd-aa4702eb.mp3,1,depth,,S37:男人,S4:我哋,0.0367,0.0300,3,0,0,0
+1621761270101,764,太陽落緊山.,The sun is going down.,azure-69bc7890-ad6c60d5-73d7809a-439e8784-d521794c.mp3,1,depth,,S147:太陽,S147:太陽,0.0185,0.0300,3,1,0,0
+1621761269686,349,我殺咗佢.,I have killed him.,azure-e0f4744e-68a4ef76-7ee345d1-3fdce392-7694fef3.mp3,1,depth,,S110:殺,S1:我,0.0215,0.0300,4,0,0,0
+1621761269697,360,俾嗰本書我.,Give me that book.,azure-e6a9964a-8e45b27b-2f956e2a-cdf74005-8253dd6f.mp3,1,depth,,S8:嗰,S1:我,0.0504,0.0600,4,1,0,0
+1621761269769,432,你唔坐呀?,"""Won't you sit down?""",azure-d47c6afe-739003ee-6c52945c-5e86fdc8-c813c018.mp3,1,depth,,S124:坐,S2:你,0.0202,0.0300,4,0,0,0
+1621761269771,434,唔好笑佢啦.,"""Don't laugh at him.""",azure-21e5abb5-2821601d-c034a7ce-8a55c516-ea691ae0-65e181c5d4c7f59dd1600dbd5e244938c5983e39.mp3,1,completion,,S100:笑,S3:佢,-0.0074,0.0600,4,0,0,0
+1621761270088,751,唔好企咁埋.,"""Don't stand too close.""",azure-d54e5310-9ae33b21-947da461-2a214b8d-cf01a547.mp3,1,completion,,S125:企,S16:唔,-0.0398,0.0900,4,0,0,0
+1621761269562,225,我都係咁諗.,"I think so, too.",azure-fad999c2-2d5aa9d2-701523ac-ecb1c6dc-ef68ddfe.mp3,1,completion,,S104:諗,S1:我,-0.0079,0.0600,5,0,0,0
+1621761269829,492,佢哋住喺邊度呀?,Where do they live?,azure-4783aa72-d0411943-5b23f50e-ffe08dc7-97291539.mp3,1,depth,,S13:邊度,S6:佢哋,0.0319,0.0600,5,0,0,0
+1621761269674,337,嗰個女人係邊個嚟㗎?,Who is the woman?,azure-384fb358-bbda9175-4d04b4d9-5e60b33e-a3fb7104.mp3,1,depth,,S36:女人,S11:邊個,0.0072,0.0600,6,0,0,0
+1621761269742,405,你隻貓係黑色嘅.,Your cat is black.,azure-8c9363ee-b7eb2955-06060e02-8805fafc-ac6de8b4.mp3,1,completion,,S176:黑,S2:你,-0.1031,0.1500,6,1,0,0
+1621761270284,947,佢住喺我屋企附近.,He lives near my house.,azure-9a2a0cac-fa302999-44ec97be-4f1bad94-f4a585d7.mp3,1,completion,,S197:近,S1:我,-0.0441,0.0900,6,2,0,0
+1621761269427,90,太大喇.,"""It's too big.""",azure-99c6c6b5-a322b5cd-2eb1de2a-5376e2e9-7340d9fe.mp3,1,completion,,S27:大,S27:大,-0.1372,0.2100,2,1,0,0
+1621761269691,354,唱歌好易.,"""It's easy to sing.""",azure-f3ce54bb-5d07a249-bb4525be-33d11510-3155f13d.mp3,1,completion,,S141:唱,S141:唱,-0.1610,0.2100,2,1,0,0
+1621761269357,20,嘩，雪呀!,"Ah, snow!",azure-2ba21b18-87ae0062-2e502f9d-79fdebb8-b64bf2eb.mp3,1,completion,,S164:雪,S164:雪,-0.0825,0.1300,3,1,0,0
+1621761269822,485,喺LA冇人行㗎.,Nobody walks in LA.,azure-88a22c69-9db21324-fafccefe-6a71cfb0-e58ad334.mp3,1,completion,,S121:行,S121:行,-0.1595,0.2100,3,1,0,0
+1621761270224,887,開始落雨喇.,It has started to rain.,azure-f5801698-a52ace0c-b9b90af6-13e7a6f1-eaf758a2.mp3,1,completion,,S151:雨,S151:雨,-0.1917,0.2400,3,1,0,0
+1621761269617,280,你哋唔攰咩?,"""Aren't you tired?""",azure-3c72b244-e692c5d4-fadcb828-9cc4b2d9-a61419d1.mp3,1,completion,,S5:你哋,S5:你哋,-0.0746,0.2100,4,1,0,0
+1621761269729,392,呢個袋邊個架?,Whose bag is this?,azure-bc432d82-9e5ce7f4-c7d88ae0-8d31c300-544ec4b5.mp3,1,completion,,S7:呢個,S7:呢個,-0.0933,0.2100,4,2,0,0
+1621761270110,773,我要去瞓覺喇.,I have to go to sleep.,azure-613abf91-3b22b47e-c7a26f16-fcacaf04-80637020.mp3,1,completion,,S107:瞓覺,S1:我,-0.1082,0.1600,4,1,0,0
+1621761269904,567,我有好多朋友.,I have many friends.,azure-1cf41d73-2db25614-df1b051e-d58be063-860a242b.mp3,1,completion,,S18:多,S1:我,-0.0476,0.1300,5,1,0,0
+1621761270010,673,佢個真名係咩?,"""What's his real name?""",azure-b37f635d-8ce1c88c-fc79eda7-71542019-95fc72da.mp3,1,completion,,S207:名,S3:佢,-0.2245,0.2700,5,1,0,0
+1621761270124,787,你幾時返嚟呀?,When will you be back?,azure-85bb9996-0021129b-b9b4bf73-824f8d4a-ab4ec74b.mp3,1,completion,,S14:幾時,S2:你,-0.0404,0.1300,5,1,0,0
+1621761270148,811,佢哋買咗架新車.,They bought a new car.,azure-f07d0825-7d21ca64-15e2190e-517c4039-1e949500.mp3,1,completion,,S183:新,S6:佢哋,-0.2235,0.2700,5,2,0,0
+1621761270305,968,佢阿爸係咪醫生嚟㗎?,Is his father a doctor?,azure-077b3f8d-489b529f-b406ec28-453dd443-369a1b4f.mp3,1,completion,,S43:阿爸,S3:佢,-0.1459,0.2100,5,1,0,0
+1621761269660,323,你買咗啲乜嘢呀?,What did you buy?,azure-5ff1d31b-6816c103-c2103e4a-222d71b6-3b9d7921.mp3,1,completion,,S12:乜嘢,S2:你,-0.0654,0.1600,6,0,0,0
+1621761270267,930,今日天氣幾凍㗎.,"""It's rather cold today.""",azure-642098e2-c5b9b188-46573542-4459586c-bdaa9773.mp3,1,completion,,S181:凍,S181:凍,-0.2634,0.3100,4,3,0,0
+1621761270243,906,我同佢握咗手.,I shook hands with her.,azure-7abb1f06-a54f112a-c061e55a-b610a680-e79b721e.mp3,1,completion,,S83:手,S1:我,-0.2552,0.3100,5,2,0,0
+1621761269818,481,我咩都聽唔到喎.,"""I've heard nothing.""",azure-692bcb0a-cffa7ec4-86f7d167-9d52696b-85692b10.mp3,1,completion,,S102:聽,S1:我,-0.1777,0.2300,6,2,0,0
+1621761269842,505,我哋喺度睇緊電視.,We are watching TV.,azure-e82cd690-2408b31e-fd77eec5-a694a401-cb45169d.mp3,1,completion,,S101:睇,S4:我哋,-0.1775,0.2300,6,2,0,0
 1621761270244,907,我洗緊碗而家.,"""I'm washing the dishes.""",azure-0fab9455-333a7bf5-7e81e465-45c3f520-36185af8.mp3,1,seed,,S132:洗,S132:洗,0.0817,0.3300,4,1,0,0
 1621761270297,960,講畀我聽你喺邊呀?,"Tell me, where are you?",azure-da0acaf0-91a068dc-0b27b689-0ebd76f3-dcc317bc.mp3,1,depth,,S140:講,S140:講,0.0190,0.0300,7,0,0,0
 1621761269723,386,佢唱女高音架.,She sings soprano.,azure-0d264d8f-8e72b431-ed2fc610-2c98b237-542e1c32.mp3,1,seed,,S141:唱,S141:唱,0.1019,0.3800,5,2,0,0

@@ -19,6 +19,7 @@ from typing import Any, Collection, Iterable, Sequence
 from wordfreq import top_n_list, zipf_frequency
 
 from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
+from anki_tools.languages.spanish.lemma import base_lemma
 from anki_tools.languages.french.profile import NOUN_INDICES
 from anki_tools.sentence_pack.word_table import (
     check_form_labels,
@@ -449,6 +450,7 @@ def _token_keys(token: Token, surface_only: bool = False) -> set[str]:
     keys = {surface_key(token.text)}
     if token.lemma and not surface_only:
         keys.add(surface_key(token.lemma))
+        keys.add(surface_key(base_lemma(token.lemma)))
     return keys
 
 

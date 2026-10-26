@@ -178,70 +178,70 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089871519,249,Es sólo un niño.,He is but a child.,Tatoeba arh sentence EngID 33043292784858583 SpaID 633246.mp3,1,depth,,F:sólo|S39:niño,F:sólo,0.1106,0.0000,4,0,0,0
 1548089871378,108,Espera aquí un poco.,Wait here for a while.,Tatoeba arh sentence EngID 53434 SpaID 758546.mp3,1,depth,,F:esperar,F:esperar,0.0448,0.0000,4,0,0,0
 1548089871350,80,Siento lo de antes.,Sorry about before.,Tatoeba arh sentence EngID 1124639 SpaID 1415641.mp3,1,depth,,F:antes|F:sentir,F:sentir,0.0887,0.0000,4,0,0,0
-1548089871402,132,Yo sé tu nombre.,I know your name.,Tatoeba arh sentence EngID 16887 SpaID 395877.mp3,1,depth,,S207:nombre,,0.0455,0.0000,4,0,0,0
-1548089872503,1233,¿Quién es aquella mujer?,Who is that woman?,Tatoeba arh sentence EngID 68238 SpaID 346648.mp3,1,depth,,S36:mujer,,0.0672,0.0000,4,0,0,0
-1548089873094,1818,Tengo las manos pequeñas.,I have small hands.,Tatoeba arh sentence EngID 2794283 SpaID 3229859.mp3,1,depth,,S32:pequeño|S83:mano,,0.1241,0.0000,4,0,0,0
-1548089874196,2916,La noche estaba fresca.,The night was cool.,Tatoeba arh sentence EngID 2268421 SpaID 2268422.mp3,1,depth,,S177:noche,,0.0168,0.0300,4,0,0,0
-1548089874951,3671,¿De qué te ríes?,What are you laughing at?,Tatoeba arh sentence EngID 24686 SpaID 576632.mp3,1,depth,,S100:reír,,0.0526,0.0000,4,0,0,0
-1548089879596,8316,¿Lo cosiste a mano?,Did you sew this by hand?,Tatoeba arh sentence EngID 54949 SpaID 1287715.mp3,1,depth,,S138:coser,,0.0492,0.0000,4,0,0,0
-1548089871719,449,Todos los hombres deben morir.,All men must die.,Tatoeba arh sentence EngID 270047 SpaID 1684264.mp3,1,depth,,S109:morir,,0.0516,0.0000,5,0,0,0
-1548089871827,557,Él mató a ese hombre.,He killed that man.,Tatoeba arh sentence EngID 476182 SpaID 804945.mp3,1,depth,,S110:matar,,0.0515,0.0000,5,0,0,0
-1548089874296,3016,Nos perdimos en la niebla.,We got lost in the fog.,Tatoeba arh sentence EngID 249403 SpaID 2230019.mp3,1,depth,,S161:niebla,,0.0177,0.0300,5,0,0,0
-1548089871546,276,Sé que está en mi corazón.,I know it in my heart.,Tatoeba arh sentence EngID 2376019 SpaID 2412434.mp3,1,depth,,S90:corazón,,0.0238,0.0300,6,0,0,0
-1548089871673,403,¿Qué tan lejos está de aquí?,How far is it from here?,Tatoeba arh sentence EngID 621191480541 SpaID 1479206.mp3,1,depth,,S198:lejos,,0.0458,0.0000,6,0,0,0
-1548089872187,917,¿Qué tan largo es ese puente?,How long is that bridge?,Tatoeba arh sentence EngID 68453 SpaID 1952250.mp3,1,depth,,S28:largo,,0.0420,0.0300,6,0,0,0
-1548089872299,1029,Está tan frío como el hielo.,It is freezing cold.,Tatoeba arh sentence EngID 269819 SpaID 1147448.mp3,1,depth,,S181:frío,,0.0466,0.0000,6,0,0,0
-1548089873941,2661,Él le teme a los perros.,He is afraid of dogs.,Tatoeba arh sentence EngID 295979387478 SpaID 1367128.mp3,1,depth,,S106:temer,,0.0519,0.0000,6,0,0,0
-1548089874429,3149,Pienso que sería mejor que me quedara aquí.,I think I'd better stay here.,Tatoeba arh sentence EngID 38394 SpaID 1637512.mp3,1,completion,,F:mejor,,-0.0056,0.0500,8,0,0,0
-1548089872555,1285,Es del tamaño correcto.,It's just the right size.,Tatoeba arh sentence EngID 1658059 SpaID 1686869.mp3,1,completion,,S196:correcto,,-0.1341,0.1800,4,1,0,0
-1548089873118,1842,Hubo un incendio cerca.,A fire broke out nearby.,Tatoeba arh sentence EngID 18743 SpaID 1604726.mp3,1,completion,,S197:cerca,,-0.1341,0.1800,4,1,0,0
-1548089874373,3093,¡Qué flores tan bonitas!,What pretty flowers!,Tatoeba arh sentence EngID 36041 SpaID 769714.mp3,1,completion,,S59:flor,,-0.0407,0.1000,4,1,0,0
-1548089874384,3104,Tráeme una toalla seca.,Bring me a dry towel.,Tatoeba arh sentence EngID 21186 SpaID 736709.mp3,1,completion,,S195:seco,,-0.2840,0.3300,4,1,0,0
-1548089874507,3227,Él usaba zapatos viejos.,He wore old shoes.,Tatoeba arh sentence EngID 296126 SpaID 2311783.mp3,1,completion,,S184:viejo,,-0.0835,0.1300,4,1,0,0
-1548089874561,3281,¿Cuándo voy a cobrar?,When do I get paid?,Tatoeba arh sentence EngID 3737713 SpaID 5147817.mp3,1,completion,,S14:cuándo,,-0.0904,0.1800,4,1,0,0
-1548089874881,3601,Es una mala inversión.,It's a bad investment.,Tatoeba arh sentence EngID 3518542 SpaID 3519004.mp3,1,completion,,S186:malo,,-0.1336,0.1800,4,1,0,0
-1548089875780,4500,Las montañas son preciosas.,The mountains are beautiful.,Tatoeba arh sentence EngID 2543432 SpaID 5854073.mp3,1,completion,,S171:montaña,,-0.0529,0.1000,4,1,0,0
-1548089875926,4646,Me pica la nariz.,My nose is itchy.,Tatoeba arh sentence EngID 318193 SpaID 1328405.mp3,1,completion,,S75:nariz,,-0.1240,0.1800,4,1,0,0
-1548089876533,5253,Marchamos bajo la lluvia.,We marched in the rain.,Tatoeba arh sentence EngID 5043048 SpaID 5046906.mp3,1,completion,,S151:lluvia,,-0.1317,0.1800,4,1,0,0
-1548089876602,5322,Mira a la pizarra.,Look at the blackboard.,Tatoeba arh sentence EngID 241500 SpaID 1552886.mp3,1,completion,,F:mirar,,-0.1357,0.1800,4,1,0,0
-1548089876807,5527,Caminamos otras cien yardas.,We walked another hundred yards.,Tatoeba arh sentence EngID 248354 SpaID 1685721.mp3,1,completion,,S121:caminar,,-0.1295,0.1800,4,1,0,0
-1548089876859,5579,Yo necesito primeros auxilios.,I need first aid.,Tatoeba arh sentence EngID 25679 SpaID 1143708.mp3,1,completion,,F:primero,,-0.1360,0.1800,4,1,0,0
-1548089877194,5914,He quemado la tostada.,I've burnt the toast.,Tatoeba arh sentence EngID 38294 SpaID 718817.mp3,1,completion,,S169:quemar,,-0.1328,0.1800,4,1,0,0
-1548089878854,7574,Él tiene hombros anchos.,He has broad shoulders.,Tatoeba arh sentence EngID 296000 SpaID 2311774.mp3,1,completion,,S29:ancho,,-0.1087,0.1800,4,1,0,0
-1548089880100,8820,Él cavó un agujero.,He dug a hole.,Tatoeba arh sentence EngID 295871 SpaID 2606540.mp3,1,completion,,S118:cavar,,-0.1292,0.1800,4,1,0,0
-1548089880487,9207,Me perforé las orejas.,I got my ears pierced.,Tatoeba arh sentence EngID 2396095 SpaID 2477267.mp3,1,completion,,S73:oreja,,-0.2436,0.3000,4,1,0,0
-1548089871468,198,Todo el mundo cuenta contigo.,Everybody is counting on you.,Tatoeba arh sentence EngID 32259 SpaID 1291979.mp3,1,completion,,S139:contar,,-0.0509,0.1000,5,1,0,0
-1548089871741,471,Ella es su madre real.,She is his real mother.,Tatoeba arh sentence EngID 316401 SpaID 1339443.mp3,1,completion,,S42:madre,,-0.0355,0.1000,5,1,0,0
-1548089872207,937,Hoy he visto una estrella.,"Today, I saw a star.",Tatoeba arh sentence EngID 378582511147604156 SpaID 503345.mp3,1,completion,,S149:estrella,,-0.0516,0.1000,5,0,0,0
-1548089872252,982,Mi esposa está muy molesta.,My wife is very upset.,Tatoeba arh sentence EngID 1638600 SpaID 1638614.mp3,1,completion,,S40:esposa,,-0.0347,0.1000,5,1,0,0
-1548089872608,1338,Nosotros éramos más jóvenes entonces.,We were younger then.,Tatoeba arh sentence EngID 68379 SpaID 1320940.mp3,1,completion,,F:entonces,,-0.0554,0.1000,5,1,0,0
-1548089874474,3194,Mi marido es un vago.,My husband is lazy.,Tatoeba arh sentence EngID 1855066 SpaID 1869242.mp3,1,completion,,S41:marido,,-0.1151,0.1800,5,1,0,0
-1548089874515,3235,Hay cuatro estaciones al año.,There are four seasons in a year.,Tatoeba arh sentence EngID 27392 SpaID 1004218.mp3,1,completion,,S25:cuatro,,-0.0255,0.1000,5,1,0,0
-1548089876458,5178,Esta habitación es muy cálida.,This room is very warm.,Tatoeba arh sentence EngID 57330 SpaID 3234033.mp3,1,completion,,S180:cálido,,-0.0533,0.1000,5,0,0,0
-1548089878131,6851,No te muerdas las uñas.,Don't bite your nails.,Tatoeba arh sentence EngID 39753 SpaID 580974.mp3,1,completion,,S79:uña,,-0.2446,0.3000,5,1,0,0
-1548089878410,7130,Las bayas se pueden congelar.,Berries can be frozen.,Tatoeba arh sentence EngID 5878896 SpaID 5880762.mp3,1,completion,,S145:congelar,,-0.1313,0.1800,5,1,0,0
-1548089878982,7702,El sol derritió la nieve.,The sun melted the snow.,Tatoeba arh sentence EngID 275079 SpaID 1138657.mp3,1,completion,,S147:sol|S164:nieve,,-0.0839,0.1800,5,0,0,0
-1548089875952,4672,Los hombres van en manga corta.,The men are wearing short sleeves.,Tatoeba arh sentence EngID 276933 SpaID 991112.mp3,1,completion,,S33:corto,,-0.1112,0.1800,6,1,0,0
-1548089877738,6458,Me tengo que secar el pelo.,I have to dry my hair.,Tatoeba arh sentence EngID 1745160 SpaID 1745361.mp3,1,completion,,S71:pelo,,-0.1233,0.1800,6,1,0,0
-1548089871606,336,Es la última persona que quiero ver.,He is the last man I want to see.,Tatoeba arh sentence EngID 297264 SpaID 958344.mp3,1,completion,,S38:persona,,-0.0338,0.1000,7,1,0,0
-1548089874130,2850,Ese niño tiró una piedra al perro.,That child threw a stone at the dog.,Tatoeba arh sentence EngID 47487 SpaID 963976.mp3,1,completion,,S156:piedra,,-0.0520,0.1000,7,1,0,0
-1548089876086,4806,El cartero fue mordido por ese perro.,The postman was bitten by that dog.,Tatoeba arh sentence EngID 324560 SpaID 962640.mp3,1,completion,,S94:morder,,-0.1267,0.1800,7,1,0,0
-1548089876046,4766,Nos sentamos en un banco en el parque.,We sat on a bench in the park.,Tatoeba arh sentence EngID 22993 SpaID 1733439.mp3,1,completion,,S124:sentarse,,-0.1298,0.1800,8,1,0,0
-1548089877037,5757,Tardó cinco minutos en llegar a la estación.,It took five minutes to get to the station.,Tatoeba arh sentence EngID 26014 SpaID 346061.mp3,1,completion,,S26:cinco,,-0.1864,0.2600,8,1,0,0
-1548089873386,2108,El oro es mucho más pesado que el agua.,Gold is far heavier than water.,Tatoeba arh sentence EngID 18583 SpaID 339125.mp3,1,completion,,S31:pesado,,-0.0700,0.1400,9,1,0,0
-1548089874014,2734,A él no le dan ningún miedo las serpientes.,He's not at all afraid of snakes.,Tatoeba arh sentence EngID 292669 SpaID 521907.mp3,1,completion,,S49:serpiente,,-0.0780,0.1400,9,1,0,0
-1548089877138,5858,Miles de peces muertos fueron encontrados flotando en el lago.,Thousands of dead fish have been found floating in the lake.,Tatoeba arh sentence EngID 972862 SpaID 972872.mp3,1,completion,,S143:flotar|S153:lago,,-0.0930,0.1900,10,1,0,0
-1548089871979,709,Gracias por este regalo maravilloso.,Thank you for the wonderful gift.,Tatoeba arh sentence EngID 51846 SpaID 539229.mp3,1,completion,,F:gracias,,-0.1551,0.2000,5,2,0,0
-1548089872024,754,Todavía puedo oír tu voz.,I can still hear your voice.,Tatoeba arh sentence EngID 32729 SpaID 976250.mp3,1,completion,,S102:oír,,-0.1477,0.2000,5,2,0,0
-1548089873722,2442,Esta sopa tiene demasiada sal.,There's too much salt in this soup.,Tatoeba arh sentence EngID 60998 SpaID 342941.mp3,1,completion,,S155:sal,,-0.2320,0.2800,5,2,0,0
-1548089873960,2680,Tengo algo dormida la mano izquierda.,I have some numbness in my left hand.,Tatoeba arh sentence EngID 243561 SpaID 2445064.mp3,1,completion,,S200:izquierda,,-0.2343,0.2800,6,2,0,0
-1548089877307,6027,Su lengua materna es el francés.,French is his mother tongue.,Tatoeba arh sentence EngID 460259 SpaID 1116512.mp3,1,completion,,S78:lengua,,-0.4245,0.4800,6,2,0,0
-1548089878177,6897,"A menudo, los perros entierran huesos.",Dogs often bury bones.,Tatoeba arh sentence EngID 239178 SpaID 580964.mp3,1,completion,,S65:hueso,,-0.3021,0.3600,6,2,0,0
-1548089874136,2856,El vidrio se hace a partir de arena.,Glass is made from sand.,Tatoeba arh sentence EngID 63527 SpaID 2032084.mp3,1,completion,,S157:arena,,-0.2521,0.3000,8,2,0,0
-1548089879001,7721,"Si no estuviera enfermo, me uniría a vosotros.","If I weren't sick, I'd join you.",Tatoeba arh sentence EngID 1446073 SpaID 2529567.mp3,1,completion,,S5:vosotros,,-0.1946,0.3300,8,2,0,0
-1548089880266,8986,El viento de proa soplaba contra la vela.,The headwind blew against the sail.,Tatoeba arh sentence EngID 2863859 SpaID 5664053.mp3,1,completion,,S98:soplar,,-0.4472,0.5000,8,2,0,0
-1548089878545,7265,Gira el pomo y abre la puerta.,Turn the knob and open the door.,Tatoeba arh sentence EngID 35749 SpaID 1333708.mp3,1,completion,,S126:girar,,-0.4499,0.5000,7,3,0,0
-1548089877558,6278,Hay una necesidad urgente de donaciones de sangre.,There is an urgent need for blood donations.,Tatoeba arh sentence EngID 903689 SpaID 1696219.mp3,1,completion,,S64:sangre,,-0.5019,0.5600,8,3,0,0
+1548089871402,132,Yo sé tu nombre.,I know your name.,Tatoeba arh sentence EngID 16887 SpaID 395877.mp3,1,depth,,S207:nombre,S1:yo,0.0455,0.0000,4,0,0,0
+1548089872503,1233,¿Quién es aquella mujer?,Who is that woman?,Tatoeba arh sentence EngID 68238 SpaID 346648.mp3,1,depth,,S36:mujer,S11:quién,0.0672,0.0000,4,0,0,0
+1548089873094,1818,Tengo las manos pequeñas.,I have small hands.,Tatoeba arh sentence EngID 2794283 SpaID 3229859.mp3,1,depth,,S32:pequeño|S83:mano,S32:pequeño,0.1241,0.0000,4,0,0,0
+1548089874196,2916,La noche estaba fresca.,The night was cool.,Tatoeba arh sentence EngID 2268421 SpaID 2268422.mp3,1,depth,,S177:noche,S177:noche,0.0168,0.0300,4,0,0,0
+1548089874951,3671,¿De qué te ríes?,What are you laughing at?,Tatoeba arh sentence EngID 24686 SpaID 576632.mp3,1,depth,,S100:reír,S12:qué,0.0526,0.0000,4,0,0,0
+1548089879596,8316,¿Lo cosiste a mano?,Did you sew this by hand?,Tatoeba arh sentence EngID 54949 SpaID 1287715.mp3,1,depth,,S138:coser,S83:mano,0.0492,0.0000,4,0,0,0
+1548089871719,449,Todos los hombres deben morir.,All men must die.,Tatoeba arh sentence EngID 270047 SpaID 1684264.mp3,1,depth,,S109:morir,S17:todo,0.0516,0.0000,5,0,0,0
+1548089871827,557,Él mató a ese hombre.,He killed that man.,Tatoeba arh sentence EngID 476182 SpaID 804945.mp3,1,depth,,S110:matar,S3:él,0.0515,0.0000,5,0,0,0
+1548089874296,3016,Nos perdimos en la niebla.,We got lost in the fog.,Tatoeba arh sentence EngID 249403 SpaID 2230019.mp3,1,depth,,S161:niebla,S161:niebla,0.0177,0.0300,5,0,0,0
+1548089871546,276,Sé que está en mi corazón.,I know it in my heart.,Tatoeba arh sentence EngID 2376019 SpaID 2412434.mp3,1,depth,,S90:corazón,S90:corazón,0.0238,0.0300,6,0,0,0
+1548089871673,403,¿Qué tan lejos está de aquí?,How far is it from here?,Tatoeba arh sentence EngID 621191480541 SpaID 1479206.mp3,1,depth,,S198:lejos,S9:aquí,0.0458,0.0000,6,0,0,0
+1548089872187,917,¿Qué tan largo es ese puente?,How long is that bridge?,Tatoeba arh sentence EngID 68453 SpaID 1952250.mp3,1,depth,,S28:largo,S8:ese,0.0420,0.0300,6,0,0,0
+1548089872299,1029,Está tan frío como el hielo.,It is freezing cold.,Tatoeba arh sentence EngID 269819 SpaID 1147448.mp3,1,depth,,S181:frío,S181:frío,0.0466,0.0000,6,0,0,0
+1548089873941,2661,Él le teme a los perros.,He is afraid of dogs.,Tatoeba arh sentence EngID 295979387478 SpaID 1367128.mp3,1,depth,,S106:temer,S3:él,0.0519,0.0000,6,0,0,0
+1548089874429,3149,Pienso que sería mejor que me quedara aquí.,I think I'd better stay here.,Tatoeba arh sentence EngID 38394 SpaID 1637512.mp3,1,completion,,F:mejor,S9:aquí,-0.0056,0.0500,8,0,0,0
+1548089872555,1285,Es del tamaño correcto.,It's just the right size.,Tatoeba arh sentence EngID 1658059 SpaID 1686869.mp3,1,completion,,S196:correcto,S196:correcto,-0.1341,0.1800,4,1,0,0
+1548089873118,1842,Hubo un incendio cerca.,A fire broke out nearby.,Tatoeba arh sentence EngID 18743 SpaID 1604726.mp3,1,completion,,S197:cerca,S197:cerca,-0.1341,0.1800,4,1,0,0
+1548089874373,3093,¡Qué flores tan bonitas!,What pretty flowers!,Tatoeba arh sentence EngID 36041 SpaID 769714.mp3,1,completion,,S59:flor,S12:qué,-0.0407,0.1000,4,1,0,0
+1548089874384,3104,Tráeme una toalla seca.,Bring me a dry towel.,Tatoeba arh sentence EngID 21186 SpaID 736709.mp3,1,completion,,S195:seco,S195:seco,-0.2840,0.3300,4,1,0,0
+1548089874507,3227,Él usaba zapatos viejos.,He wore old shoes.,Tatoeba arh sentence EngID 296126 SpaID 2311783.mp3,1,completion,,S184:viejo,S3:él,-0.0835,0.1300,4,1,0,0
+1548089874561,3281,¿Cuándo voy a cobrar?,When do I get paid?,Tatoeba arh sentence EngID 3737713 SpaID 5147817.mp3,1,completion,,S14:cuándo,S14:cuándo,-0.0904,0.1800,4,1,0,0
+1548089874881,3601,Es una mala inversión.,It's a bad investment.,Tatoeba arh sentence EngID 3518542 SpaID 3519004.mp3,1,completion,,S186:malo,S186:malo,-0.1336,0.1800,4,1,0,0
+1548089875780,4500,Las montañas son preciosas.,The mountains are beautiful.,Tatoeba arh sentence EngID 2543432 SpaID 5854073.mp3,1,completion,,S171:montaña,S171:montaña,-0.0529,0.1000,4,1,0,0
+1548089875926,4646,Me pica la nariz.,My nose is itchy.,Tatoeba arh sentence EngID 318193 SpaID 1328405.mp3,1,completion,,S75:nariz,S75:nariz,-0.1240,0.1800,4,1,0,0
+1548089876533,5253,Marchamos bajo la lluvia.,We marched in the rain.,Tatoeba arh sentence EngID 5043048 SpaID 5046906.mp3,1,completion,,S151:lluvia,S151:lluvia,-0.1317,0.1800,4,1,0,0
+1548089876602,5322,Mira a la pizarra.,Look at the blackboard.,Tatoeba arh sentence EngID 241500 SpaID 1552886.mp3,1,completion,,F:mirar,S201:a,-0.1357,0.1800,4,1,0,0
+1548089876807,5527,Caminamos otras cien yardas.,We walked another hundred yards.,Tatoeba arh sentence EngID 248354 SpaID 1685721.mp3,1,completion,,S121:caminar,S21:otro,-0.1295,0.1800,4,1,0,0
+1548089876859,5579,Yo necesito primeros auxilios.,I need first aid.,Tatoeba arh sentence EngID 25679 SpaID 1143708.mp3,1,completion,,F:primero,S1:yo,-0.1360,0.1800,4,1,0,0
+1548089877194,5914,He quemado la tostada.,I've burnt the toast.,Tatoeba arh sentence EngID 38294 SpaID 718817.mp3,1,completion,,S169:quemar,S169:quemar,-0.1328,0.1800,4,1,0,0
+1548089878854,7574,Él tiene hombros anchos.,He has broad shoulders.,Tatoeba arh sentence EngID 296000 SpaID 2311774.mp3,1,completion,,S29:ancho,S3:él,-0.1087,0.1800,4,1,0,0
+1548089880100,8820,Él cavó un agujero.,He dug a hole.,Tatoeba arh sentence EngID 295871 SpaID 2606540.mp3,1,completion,,S118:cavar,S3:él,-0.1292,0.1800,4,1,0,0
+1548089880487,9207,Me perforé las orejas.,I got my ears pierced.,Tatoeba arh sentence EngID 2396095 SpaID 2477267.mp3,1,completion,,S73:oreja,S73:oreja,-0.2436,0.3000,4,1,0,0
+1548089871468,198,Todo el mundo cuenta contigo.,Everybody is counting on you.,Tatoeba arh sentence EngID 32259 SpaID 1291979.mp3,1,completion,,S139:contar,S17:todo,-0.0509,0.1000,5,1,0,0
+1548089871741,471,Ella es su madre real.,She is his real mother.,Tatoeba arh sentence EngID 316401 SpaID 1339443.mp3,1,completion,,S42:madre,S42:madre,-0.0355,0.1000,5,1,0,0
+1548089872207,937,Hoy he visto una estrella.,"Today, I saw a star.",Tatoeba arh sentence EngID 378582511147604156 SpaID 503345.mp3,1,completion,,S149:estrella,S101:ver,-0.0516,0.1000,5,0,0,0
+1548089872252,982,Mi esposa está muy molesta.,My wife is very upset.,Tatoeba arh sentence EngID 1638600 SpaID 1638614.mp3,1,completion,,S40:esposa,S40:esposa,-0.0347,0.1000,5,1,0,0
+1548089872608,1338,Nosotros éramos más jóvenes entonces.,We were younger then.,Tatoeba arh sentence EngID 68379 SpaID 1320940.mp3,1,completion,,F:entonces,S4:nosotros,-0.0554,0.1000,5,1,0,0
+1548089874474,3194,Mi marido es un vago.,My husband is lazy.,Tatoeba arh sentence EngID 1855066 SpaID 1869242.mp3,1,completion,,S41:marido,S41:marido,-0.1151,0.1800,5,1,0,0
+1548089874515,3235,Hay cuatro estaciones al año.,There are four seasons in a year.,Tatoeba arh sentence EngID 27392 SpaID 1004218.mp3,1,completion,,S25:cuatro,S25:cuatro,-0.0255,0.1000,5,1,0,0
+1548089876458,5178,Esta habitación es muy cálida.,This room is very warm.,Tatoeba arh sentence EngID 57330 SpaID 3234033.mp3,1,completion,,S180:cálido,S180:cálido,-0.0533,0.1000,5,0,0,0
+1548089878131,6851,No te muerdas las uñas.,Don't bite your nails.,Tatoeba arh sentence EngID 39753 SpaID 580974.mp3,1,completion,,S79:uña,S16:no,-0.2446,0.3000,5,1,0,0
+1548089878410,7130,Las bayas se pueden congelar.,Berries can be frozen.,Tatoeba arh sentence EngID 5878896 SpaID 5880762.mp3,1,completion,,S145:congelar,S145:congelar,-0.1313,0.1800,5,1,0,0
+1548089878982,7702,El sol derritió la nieve.,The sun melted the snow.,Tatoeba arh sentence EngID 275079 SpaID 1138657.mp3,1,completion,,S147:sol|S164:nieve,S147:sol,-0.0839,0.1800,5,0,0,0
+1548089875952,4672,Los hombres van en manga corta.,The men are wearing short sleeves.,Tatoeba arh sentence EngID 276933 SpaID 991112.mp3,1,completion,,S33:corto,S33:corto,-0.1112,0.1800,6,1,0,0
+1548089877738,6458,Me tengo que secar el pelo.,I have to dry my hair.,Tatoeba arh sentence EngID 1745160 SpaID 1745361.mp3,1,completion,,S71:pelo,S71:pelo,-0.1233,0.1800,6,1,0,0
+1548089871606,336,Es la última persona que quiero ver.,He is the last man I want to see.,Tatoeba arh sentence EngID 297264 SpaID 958344.mp3,1,completion,,S38:persona,S38:persona,-0.0338,0.1000,7,1,0,0
+1548089874130,2850,Ese niño tiró una piedra al perro.,That child threw a stone at the dog.,Tatoeba arh sentence EngID 47487 SpaID 963976.mp3,1,completion,,S156:piedra,S8:ese,-0.0520,0.1000,7,1,0,0
+1548089876086,4806,El cartero fue mordido por ese perro.,The postman was bitten by that dog.,Tatoeba arh sentence EngID 324560 SpaID 962640.mp3,1,completion,,S94:morder,S8:ese,-0.1267,0.1800,7,1,0,0
+1548089876046,4766,Nos sentamos en un banco en el parque.,We sat on a bench in the park.,Tatoeba arh sentence EngID 22993 SpaID 1733439.mp3,1,completion,,S124:sentarse,S124:sentarse,-0.1298,0.1800,8,1,0,0
+1548089877037,5757,Tardó cinco minutos en llegar a la estación.,It took five minutes to get to the station.,Tatoeba arh sentence EngID 26014 SpaID 346061.mp3,1,completion,,S26:cinco,S26:cinco,-0.1864,0.2600,8,1,0,0
+1548089873386,2108,El oro es mucho más pesado que el agua.,Gold is far heavier than water.,Tatoeba arh sentence EngID 18583 SpaID 339125.mp3,1,completion,,S31:pesado,S31:pesado,-0.0700,0.1400,9,1,0,0
+1548089874014,2734,A él no le dan ningún miedo las serpientes.,He's not at all afraid of snakes.,Tatoeba arh sentence EngID 292669 SpaID 521907.mp3,1,completion,,S49:serpiente,S3:él,-0.0780,0.1400,9,1,0,0
+1548089877138,5858,Miles de peces muertos fueron encontrados flotando en el lago.,Thousands of dead fish have been found floating in the lake.,Tatoeba arh sentence EngID 972862 SpaID 972872.mp3,1,completion,,S143:flotar|S153:lago,S45:pez,-0.0930,0.1900,10,1,0,0
+1548089871979,709,Gracias por este regalo maravilloso.,Thank you for the wonderful gift.,Tatoeba arh sentence EngID 51846 SpaID 539229.mp3,1,completion,,F:gracias,F:gracias,-0.1551,0.2000,5,2,0,0
+1548089872024,754,Todavía puedo oír tu voz.,I can still hear your voice.,Tatoeba arh sentence EngID 32729 SpaID 976250.mp3,1,completion,,S102:oír,S102:oír,-0.1477,0.2000,5,2,0,0
+1548089873722,2442,Esta sopa tiene demasiada sal.,There's too much salt in this soup.,Tatoeba arh sentence EngID 60998 SpaID 342941.mp3,1,completion,,S155:sal,S155:sal,-0.2320,0.2800,5,2,0,0
+1548089873960,2680,Tengo algo dormida la mano izquierda.,I have some numbness in my left hand.,Tatoeba arh sentence EngID 243561 SpaID 2445064.mp3,1,completion,,S200:izquierda,S83:mano,-0.2343,0.2800,6,2,0,0
+1548089877307,6027,Su lengua materna es el francés.,French is his mother tongue.,Tatoeba arh sentence EngID 460259 SpaID 1116512.mp3,1,completion,,S78:lengua,S78:lengua,-0.4245,0.4800,6,2,0,0
+1548089878177,6897,"A menudo, los perros entierran huesos.",Dogs often bury bones.,Tatoeba arh sentence EngID 239178 SpaID 580964.mp3,1,completion,,S65:hueso,S47:perro,-0.3021,0.3600,6,2,0,0
+1548089874136,2856,El vidrio se hace a partir de arena.,Glass is made from sand.,Tatoeba arh sentence EngID 63527 SpaID 2032084.mp3,1,completion,,S157:arena,S157:arena,-0.2521,0.3000,8,2,0,0
+1548089879001,7721,"Si no estuviera enfermo, me uniría a vosotros.","If I weren't sick, I'd join you.",Tatoeba arh sentence EngID 1446073 SpaID 2529567.mp3,1,completion,,S5:vosotros,S5:vosotros,-0.1946,0.3300,8,2,0,0
+1548089880266,8986,El viento de proa soplaba contra la vela.,The headwind blew against the sail.,Tatoeba arh sentence EngID 2863859 SpaID 5664053.mp3,1,completion,,S98:soplar,S98:soplar,-0.4472,0.5000,8,2,0,0
+1548089878545,7265,Gira el pomo y abre la puerta.,Turn the knob and open the door.,Tatoeba arh sentence EngID 35749 SpaID 1333708.mp3,1,completion,,S126:girar,S126:girar,-0.4499,0.5000,7,3,0,0
+1548089877558,6278,Hay una necesidad urgente de donaciones de sangre.,There is an urgent need for blood donations.,Tatoeba arh sentence EngID 903689 SpaID 1696219.mp3,1,completion,,S64:sangre,S64:sangre,-0.5019,0.5600,8,3,0,0
 1548089871382,112,Eso es otra cosa.,That is another matter.,Tatoeba arh sentence EngID 42114496203 SpaID 1651414.mp3,1,depth,,S21:otro,F:cosa,0.0785,0.0000,4,0,0,0
 1548089874322,3042,¿Habrás terminado para entonces?,Can you finish by then?,Tatoeba arh sentence EngID 3327768 SpaID 3564902.mp3,1,seed,,F:entonces,F:entonces,0.1176,0.1000,4,1,0,0
 1548089879469,8189,Pintamos la casa de verde.,We painted the house green.,Tatoeba arh sentence EngID 248069 SpaID 1631427.mp3,1,completion,,S173:verde,F:casa,-0.1330,0.1800,5,1,0,0

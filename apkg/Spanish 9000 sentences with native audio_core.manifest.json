@@ -1,9 +1,10 @@
 {
-  "build_date": "2026-10-24T07:30:02+00:00",
+  "build_date": "2026-10-26T23:48:50+00:00",
   "source": {
     "input": "apkg/Spanish 9000 sentences with native audio.apkg",
     "deck": "Spanish Core Sentences",
-    "model": "Spanish sentences cloze+"
+    "model": "Spanish Core Sentences",
+    "input_model": "Spanish sentences cloze+"
   },
   "params": {
     "core_words": 50,
@@ -44,8 +45,9 @@
     "outside_rare": 11,
     "tail_words": 0,
     "sense_rows": 226,
-    "bolded": 201,
-    "unbolded": 64,
+    "dropped_no_core": 0,
+    "bolded": 265,
+    "unbolded": 0,
     "name_hits": 0,
     "loan_hits": 0,
     "rows": 9263,
@@ -58,7 +60,7 @@
     "spoken_weight": 0.5
   },
   "files": {
-    "core_csv": "sha256:1c69c5d2cc5ac6b2cc27e2814d13b79d00e02a2c8d56a339c5380e8f4d6e0286",
+    "core_csv": "sha256:98ff21d10bfb93afb4550ea499e592346d336825761f60344ffac8de5cef0a00",
     "coverage_csv": "sha256:97c6863980872248560ec3ccb5df20fefbca83f66746d8400331f3566b75e671",
     "input_apkg": "sha256:f67605459feb506bcbbb95830a356ff349c21c28e136c8efc3d82d253ec244e9"
   },

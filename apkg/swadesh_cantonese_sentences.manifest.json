@@ -1,15 +1,18 @@
 {
-  "build_date": "2026-10-24",
+  "deck": "Swadesh Cantonese Sentences",
+  "model": "Swadesh Cantonese Sentences",
+  "build_date": "2026-10-27",
   "source_dump_date": "2026-10-22",
   "counts": {
     "words": 212,
-    "cards": 286,
+    "cards": 229,
     "scaffold": 0,
-    "native_audio": 175,
-    "tts_audio": 111
+    "native_audio": 0,
+    "tts_audio": 229,
+    "no_target": 0
   },
   "coverage": {
-    "core_with_card": 0.7633
+    "core_with_card": 0.6473
   },
   "voice": "gtts:yue",
   "pack_license": "public",
@@ -23,7 +26,7 @@
   },
   "files": {
     "source_csv": "sha256:95ec2804373a0cf876099cd70b6d437d056aadccbf41cfa93a0110333cdb5006",
-    "sentences_csv": "sha256:d43784c88e157fe7416564a096d74a480e1c22314d0e7d1f6d93d1d2f394e2ef"
+    "sentences_csv": "sha256:a7eba6997803d5d036fd83e3108b8f5a2c9351e2b0299abb138d6cf5c7737f7b"
   },
   "licenses": [
     {
@@ -42,24 +45,32 @@
   "excluded_words": [
     "闊",
     "厚",
+    "短",
     "窄",
     "薄",
+    "動物",
     "蝨",
     "棍",
     "種子",
     "葉",
     "根",
     "樹皮",
+    "繩",
     "皮",
+    "血",
+    "骨",
     "脂肪",
     "角",
     "尾",
     "羽毛",
+    "耳仔",
     "嘴",
+    "脷",
     "腳",
     "腿",
     "膝頭",
     "翼",
+    "肚",
     "腸",
     "頸",
     "胸",
@@ -67,13 +78,18 @@
     "咬",
     "吐",
     "吹",
+    "呼吸",
     "打獵",
     "切",
     "分開",
     "刺",
     "𢯎",
+    "掘",
+    "瞓",
+    "跌",
     "搾",
     "擦",
+    "拉",
     "推",
     "綁",
     "數",
@@ -81,16 +97,27 @@
     "流",
     "結冰",
     "脹",
+    "月亮",
+    "星",
     "湖",
     "鹽",
     "沙",
+    "塵",
+    "泥",
+    "霧",
+    "冰",
     "灰",
     "燒",
+    "黃",
+    "黑",
+    "滿",
+    "老",
     "爛",
     "圓",
     "利",
     "鈍",
     "乾",
-    "裡面"
+    "裡面",
+    "剪"
   ]
 }

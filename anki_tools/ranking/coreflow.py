@@ -1104,6 +1104,9 @@ def write_deck(
             insert_reserve_cards(
                 package, reserve, reserve_pack_path, deck_id, output_id, reserve_fields
             )
+        for name in list(package.get_media_mapping().values()):
+            if not package.is_audio_file_used(name):
+                package.delete_media_file(name)
         package.touch()
         package.save(target)
 

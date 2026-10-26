@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from anki_tools.languages.spanish import cull as cull_es
 from anki_tools.ranking import cullflow
+from anki_tools.languages.spanish.profile import highlight
 
 
 def test_the_reserve_fields_fit_the_output_note_type() -> None:
@@ -25,3 +26,10 @@ def test_the_reserve_fields_fit_the_output_note_type() -> None:
         "gato",
         "cat",
     ]
+
+
+def test_the_highlight_bolds_a_clitic_verb() -> None:
+    assert (
+        highlight("Merece la pena intentarlo.", "intentar")
+        == "Merece la pena <b>intentarlo</b>."
+    )

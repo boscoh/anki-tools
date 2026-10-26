@@ -50,47 +50,47 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1734873753327,3620,转过去.,Turn around.,googletts-e0e0a067-6967dc22-2907b4b5-8add02be-53d9dce7.mp3,1,seed,,S126:转,S126:转,0.1144,0.2800,2,2,0,0
 1734873752803,3097,我有东西给你.,I have something for you.,googletts-cc1c6448-2192036e-c334dc31-f26a8bec-34f96f33.mp3,1,depth,,F:东西|S128:给,S128:给,0.0636,0.0300,5,0,0,0
 1734873752160,2454,拿着这个.,Take this.,googletts-be2ab586-a97f8f53-5c3f8173-58ffa15c-f06f0abb.mp3,1,depth,,F:这个|S129:拿,S129:拿,0.0948,0.0000,3,0,0,0
-1734873750466,760,去哪里?,Where are you going?,googletts-595b8b60-39a20a2e-9b6a0e5d-f6e4875d-7f51f5cb.mp3,1,depth,,S13:哪里,,0.0556,0.0300,2,0,0,0
-1734873750474,768,有一个.,There is one.,googletts-cbb6eb67-42a0ad1e-3b84e4a9-27dc39d9-c88a4601.mp3,1,depth,,S22:一,,0.0445,0.0300,2,0,0,0
-1734873750556,850,不需要.,It's not necessary.,googletts-f3bad511-56b72f05-c7e0c27d-05331f8b-fa30ee6f.mp3,1,depth,,F:需要,,0.0447,0.0000,2,0,0,0
-1734873750649,943,快吃.,Eat up.,googletts-ab2cf97c-213da157-bde4cd26-7a42261d-54d49e4f.mp3,1,depth,,S93:吃,,0.0230,0.0300,2,1,0,0
-1734873750651,945,是爸爸.,It's Dad.,googletts-aa809eab-0c6742d0-ab0da561-c71c0811-4c45d229.mp3,1,depth,,S43:爸爸,,0.0330,0.0300,2,0,0,0
-1734873750664,958,怕什么?,What are you afraid of?,googletts-422ad024-63fddfa0-cf7915d4-2d2c60e4-582055e7.mp3,1,depth,,S106:怕,,0.0516,0.0000,2,0,0,0
-1734873750753,1047,我看到.,I saw.,googletts-83d4d186-ddcdc2ce-01e804f6-0f634a6a-3620db65.mp3,1,depth,,F:看到,,0.0440,0.0000,2,0,0,0
-1734873751389,1683,喝什么?,What are you drinking?,googletts-84a8cfde-8096da67-e96cb277-9d8d41fb-4edc3b17.mp3,1,depth,,S92:喝,,0.0532,0.0000,2,0,0,0
-1734873751514,1808,去睡觉.,Go to sleep.,googletts-2026817d-27588408-dace4b38-c57a41b7-4d8e7430.mp3,1,depth,,S107:睡觉,,0.0215,0.0300,2,0,0,0
-1734873753151,3444,打他!,Hit him!,googletts-faa509a2-5b1f9cc8-57dabfa0-122d5cd9-76cdec54.mp3,1,depth,,S113:打,,0.0509,0.0000,2,0,0,0
-1734873750852,1146,对，是的.,"Yes, that's right.",googletts-c79083e7-87b2f947-160dc106-558f6176-994a1ec3.mp3,1,depth,,S196:对,,0.0157,0.0300,3,0,0,0
-1734873751320,1614,有多大?,How big is it?,googletts-5db47e64-4751b4a4-603d02f6-64b0e4a7-515c2d8b.mp3,1,depth,,S27:大,,0.0406,0.0300,3,0,0,0
-1734873751570,1864,是的，妈妈.,"Yes, Mom.",googletts-fb0032fa-e92757d3-dc942a9f-436494ee-c1e0231c.mp3,1,depth,,S42:妈妈,,0.0334,0.0300,3,0,0,0
-1734873751599,1893,我只是觉得.,I just feel...,googletts-52d2e819-8bca979d-afd3e904-55757dbc-eeae2ca8.mp3,1,depth,,F:觉得,,0.0443,0.0000,3,0,0,0
-1734873751607,1901,我们是朋友.,We are friends.,googletts-9eb3ee4f-a5848198-4c486bac-4cbbd6d1-6ec5ab8d.mp3,1,depth,,F:朋友,,0.0139,0.0300,3,0,0,0
-1734873751698,1992,这不重要.,This isn't important.,googletts-b0d7b013-f05031f5-e5b08162-f01f8354-2e770273.mp3,1,depth,,F:重要,,0.0443,0.0000,3,0,0,0
-1734873752131,2425,他出来了.,He came out.,googletts-f82e21fc-a49eafab-08d9042d-c57252bd-6a2c9081.mp3,1,depth,,F:出来,,0.0440,0.0000,3,0,0,0
-1734873752220,2514,你什么时候走?,When are you leaving?,googletts-b698b498-de4aab58-7db426e4-ea5238eb-37889871.mp3,1,depth,,S14:什么时候,,0.0839,0.0000,3,0,0,0
-1734873752433,2727,希望你不介意.,I hope you don't mind.,googletts-d5892959-68d8ea10-edb62130-d7d8e0f3-f276c4d4.mp3,1,depth,,F:希望,,0.0442,0.0000,3,0,0,0
-1734873752437,2731,我在工作.,I'm working.,googletts-d6e9d9a1-5215be7e-30fc059b-f9b642cd-a42f77ca.mp3,1,depth,,F:工作,,0.0449,0.0000,3,0,0,0
-1734873752447,2741,准备好吗?,Are you ready?,googletts-13a4181e-971bfc7a-d194f853-824b17fe-35b5e20d.mp3,1,depth,,F:准备,,0.0437,0.0000,3,0,0,0
-1734873753592,3885,不玩了.,I'm not playing anymore.,googletts-a337853e-8252f78a-f34d14e9-9376a62f-32de8956.mp3,1,depth,,S142:玩,,0.0487,0.0000,3,0,0,0
-1734873753689,3982,杀了他.,Kill him!,googletts-334ff305-5513c57e-3bf354d2-b1a69209-31d4696a.mp3,1,depth,,S110:杀,,0.0512,0.0000,3,0,0,0
-1734873753758,4051,发生什么了?,What happened?,googletts-4793f433-dbcf983a-7702c6e2-886f3839-e9a2843d.mp3,1,depth,,F:发生,,0.0445,0.0000,3,0,0,0
-1734873753828,4121,你必须离开.,You must leave.,googletts-95831f90-af1688c9-e5bf41b1-00a49a4a-14276910.mp3,1,depth,,F:必须,,0.0145,0.0300,3,0,0,0
-1734873753851,4144,我好冷.,I'm so cold.,googletts-e3cf8048-91aa51a7-67d6b034-e2ba3350-f9449796.mp3,1,depth,,S181:冷,,0.0465,0.0000,3,0,0,0
-1734873753874,4167,我不了解.,I don't understand.,googletts-d0ca5227-8867abcd-e1900df0-1c0c2b9c-908b897c.mp3,1,depth,,F:了解,,0.0436,0.0000,3,0,0,0
-1734873752281,2575,感觉到了吗?,Do you feel it?,googletts-c935b005-568c23c7-2b9b7c8e-265789b5-0396fa0a.mp3,1,depth,,F:感觉,,0.0136,0.0300,4,0,0,0
-1734873752417,2711,如果我是你.,If I were you.,googletts-37ac6a53-7027310d-9328cd6f-d815e407-97d900fb.mp3,1,depth,,S205:如果,,0.0154,0.0300,4,0,0,0
-1734873752882,3176,闭上你的眼睛.,Close your eyes.,googletts-ed9e4205-6386bc2b-e12d14d0-5fc43b81-e0d4ff57.mp3,1,depth,,S74:眼睛,,0.0257,0.0300,4,0,0,0
-1734873752680,2974,这就是我说的.,That's what I said.,googletts-704e9e31-030fa382-383843e8-dab342f1-67ef9a27.mp3,1,depth,,F:就是|S140:说,,0.0939,0.0000,5,0,0,0
-1734873750321,615,请坐.,Please sit.,googletts-730e0450-4ca14761-c348c965-ec4a022a-b5f81228.mp3,1,completion,,S124:坐,,-0.0500,0.1000,2,1,0,0
-1734873752577,2871,转过身去.,Turn around.,googletts-a9841be8-ebe645f7-9ac394ef-5e67a623-42434e38.mp3,1,completion,,S126:转,,-0.2802,0.3300,2,1,0,0
-1734873752609,2903,一切就绪.,Everything is ready.,googletts-28aed2df-f7d93288-720c13e2-b3cd92ad-53c8e6ad.mp3,1,completion,,F:一切,,-0.1363,0.1800,2,1,0,0
-1734873753864,4157,着火了.,It's on fire!,googletts-2110ac0e-762a6c1d-b215b9bf-e3efaafe-bc8b87c9.mp3,1,completion,,S167:火,,-0.1328,0.1800,2,1,0,0
-1734873752182,2476,有人找你.,Someone's looking for you.,googletts-4a6040c5-85314b9f-f26fb0c9-066208de-32bb884e.mp3,1,completion,,F:有人,,-0.0562,0.1000,3,1,0,0
-1734873753949,4242,可怜的孩子.,Poor child.,googletts-825a1947-776d9455-d5c7f2ad-4febe0c2-903d2865.mp3,1,completion,,S39:孩子,,-0.1155,0.1800,3,1,0,0
-1734873752250,2544,就像我一样.,Just like me.,googletts-3343e84d-417cf7d3-23cc95dd-df91660f-f299e76c.mp3,1,completion,,F:一样,,-0.0857,0.1300,4,2,0,0
-1734873754597,4890,你一定是疯了.,You must be crazy.,googletts-9b9646ef-23b24a61-4f0eb4b6-56a972b5-145440c9.mp3,1,completion,,F:一定,,-0.1659,0.2100,5,1,0,0
-1734873754682,4975,把你的手拿开.,Take your hands off.,googletts-e136d2aa-25751df6-13c94e31-4741e442-790b0c5d.mp3,1,completion,,S83:手,,-0.0457,0.1000,6,1,0,0
-1734873754049,4342,别靠近我.,Don't come near me.,googletts-01da148c-02c5b694-9396c772-edeb10ab-245017b4.mp3,1,completion,,S197:近,,-0.2343,0.2800,3,2,0,0
+1734873750466,760,去哪里?,Where are you going?,googletts-595b8b60-39a20a2e-9b6a0e5d-f6e4875d-7f51f5cb.mp3,1,depth,,S13:哪里,S13:哪里,0.0556,0.0300,2,0,0,0
+1734873750474,768,有一个.,There is one.,googletts-cbb6eb67-42a0ad1e-3b84e4a9-27dc39d9-c88a4601.mp3,1,depth,,S22:一,S22:一,0.0445,0.0300,2,0,0,0
+1734873750556,850,不需要.,It's not necessary.,googletts-f3bad511-56b72f05-c7e0c27d-05331f8b-fa30ee6f.mp3,1,depth,,F:需要,S16:不,0.0447,0.0000,2,0,0,0
+1734873750649,943,快吃.,Eat up.,googletts-ab2cf97c-213da157-bde4cd26-7a42261d-54d49e4f.mp3,1,depth,,S93:吃,S93:吃,0.0230,0.0300,2,1,0,0
+1734873750651,945,是爸爸.,It's Dad.,googletts-aa809eab-0c6742d0-ab0da561-c71c0811-4c45d229.mp3,1,depth,,S43:爸爸,S43:爸爸,0.0330,0.0300,2,0,0,0
+1734873750664,958,怕什么?,What are you afraid of?,googletts-422ad024-63fddfa0-cf7915d4-2d2c60e4-582055e7.mp3,1,depth,,S106:怕,S12:什么,0.0516,0.0000,2,0,0,0
+1734873750753,1047,我看到.,I saw.,googletts-83d4d186-ddcdc2ce-01e804f6-0f634a6a-3620db65.mp3,1,depth,,F:看到,S1:我,0.0440,0.0000,2,0,0,0
+1734873751389,1683,喝什么?,What are you drinking?,googletts-84a8cfde-8096da67-e96cb277-9d8d41fb-4edc3b17.mp3,1,depth,,S92:喝,S12:什么,0.0532,0.0000,2,0,0,0
+1734873751514,1808,去睡觉.,Go to sleep.,googletts-2026817d-27588408-dace4b38-c57a41b7-4d8e7430.mp3,1,depth,,S107:睡觉,S107:睡觉,0.0215,0.0300,2,0,0,0
+1734873753151,3444,打他!,Hit him!,googletts-faa509a2-5b1f9cc8-57dabfa0-122d5cd9-76cdec54.mp3,1,depth,,S113:打,S3:他,0.0509,0.0000,2,0,0,0
+1734873750852,1146,对，是的.,"Yes, that's right.",googletts-c79083e7-87b2f947-160dc106-558f6176-994a1ec3.mp3,1,depth,,S196:对,S196:对,0.0157,0.0300,3,0,0,0
+1734873751320,1614,有多大?,How big is it?,googletts-5db47e64-4751b4a4-603d02f6-64b0e4a7-515c2d8b.mp3,1,depth,,S27:大,S27:大,0.0406,0.0300,3,0,0,0
+1734873751570,1864,是的，妈妈.,"Yes, Mom.",googletts-fb0032fa-e92757d3-dc942a9f-436494ee-c1e0231c.mp3,1,depth,,S42:妈妈,S42:妈妈,0.0334,0.0300,3,0,0,0
+1734873751599,1893,我只是觉得.,I just feel...,googletts-52d2e819-8bca979d-afd3e904-55757dbc-eeae2ca8.mp3,1,depth,,F:觉得,S1:我,0.0443,0.0000,3,0,0,0
+1734873751607,1901,我们是朋友.,We are friends.,googletts-9eb3ee4f-a5848198-4c486bac-4cbbd6d1-6ec5ab8d.mp3,1,depth,,F:朋友,S4:我们,0.0139,0.0300,3,0,0,0
+1734873751698,1992,这不重要.,This isn't important.,googletts-b0d7b013-f05031f5-e5b08162-f01f8354-2e770273.mp3,1,depth,,F:重要,S7:这,0.0443,0.0000,3,0,0,0
+1734873752131,2425,他出来了.,He came out.,googletts-f82e21fc-a49eafab-08d9042d-c57252bd-6a2c9081.mp3,1,depth,,F:出来,S3:他,0.0440,0.0000,3,0,0,0
+1734873752220,2514,你什么时候走?,When are you leaving?,googletts-b698b498-de4aab58-7db426e4-ea5238eb-37889871.mp3,1,depth,,S14:什么时候,S2:你,0.0839,0.0000,3,0,0,0
+1734873752433,2727,希望你不介意.,I hope you don't mind.,googletts-d5892959-68d8ea10-edb62130-d7d8e0f3-f276c4d4.mp3,1,depth,,F:希望,S2:你,0.0442,0.0000,3,0,0,0
+1734873752437,2731,我在工作.,I'm working.,googletts-d6e9d9a1-5215be7e-30fc059b-f9b642cd-a42f77ca.mp3,1,depth,,F:工作,S1:我,0.0449,0.0000,3,0,0,0
+1734873752447,2741,准备好吗?,Are you ready?,googletts-13a4181e-971bfc7a-d194f853-824b17fe-35b5e20d.mp3,1,depth,,F:准备,F:准备,0.0437,0.0000,3,0,0,0
+1734873753592,3885,不玩了.,I'm not playing anymore.,googletts-a337853e-8252f78a-f34d14e9-9376a62f-32de8956.mp3,1,depth,,S142:玩,S16:不,0.0487,0.0000,3,0,0,0
+1734873753689,3982,杀了他.,Kill him!,googletts-334ff305-5513c57e-3bf354d2-b1a69209-31d4696a.mp3,1,depth,,S110:杀,S3:他,0.0512,0.0000,3,0,0,0
+1734873753758,4051,发生什么了?,What happened?,googletts-4793f433-dbcf983a-7702c6e2-886f3839-e9a2843d.mp3,1,depth,,F:发生,S12:什么,0.0445,0.0000,3,0,0,0
+1734873753828,4121,你必须离开.,You must leave.,googletts-95831f90-af1688c9-e5bf41b1-00a49a4a-14276910.mp3,1,depth,,F:必须,S2:你,0.0145,0.0300,3,0,0,0
+1734873753851,4144,我好冷.,I'm so cold.,googletts-e3cf8048-91aa51a7-67d6b034-e2ba3350-f9449796.mp3,1,depth,,S181:冷,S1:我,0.0465,0.0000,3,0,0,0
+1734873753874,4167,我不了解.,I don't understand.,googletts-d0ca5227-8867abcd-e1900df0-1c0c2b9c-908b897c.mp3,1,depth,,F:了解,S1:我,0.0436,0.0000,3,0,0,0
+1734873752281,2575,感觉到了吗?,Do you feel it?,googletts-c935b005-568c23c7-2b9b7c8e-265789b5-0396fa0a.mp3,1,depth,,F:感觉,F:感觉,0.0136,0.0300,4,0,0,0
+1734873752417,2711,如果我是你.,If I were you.,googletts-37ac6a53-7027310d-9328cd6f-d815e407-97d900fb.mp3,1,depth,,S205:如果,S1:我,0.0154,0.0300,4,0,0,0
+1734873752882,3176,闭上你的眼睛.,Close your eyes.,googletts-ed9e4205-6386bc2b-e12d14d0-5fc43b81-e0d4ff57.mp3,1,depth,,S74:眼睛,S2:你,0.0257,0.0300,4,0,0,0
+1734873752680,2974,这就是我说的.,That's what I said.,googletts-704e9e31-030fa382-383843e8-dab342f1-67ef9a27.mp3,1,depth,,F:就是|S140:说,S1:我,0.0939,0.0000,5,0,0,0
+1734873750321,615,请坐.,Please sit.,googletts-730e0450-4ca14761-c348c965-ec4a022a-b5f81228.mp3,1,completion,,S124:坐,S124:坐,-0.0500,0.1000,2,1,0,0
+1734873752577,2871,转过身去.,Turn around.,googletts-a9841be8-ebe645f7-9ac394ef-5e67a623-42434e38.mp3,1,completion,,S126:转,S126:转,-0.2802,0.3300,2,1,0,0
+1734873752609,2903,一切就绪.,Everything is ready.,googletts-28aed2df-f7d93288-720c13e2-b3cd92ad-53c8e6ad.mp3,1,completion,,F:一切,F:一切,-0.1363,0.1800,2,1,0,0
+1734873753864,4157,着火了.,It's on fire!,googletts-2110ac0e-762a6c1d-b215b9bf-e3efaafe-bc8b87c9.mp3,1,completion,,S167:火,S167:火,-0.1328,0.1800,2,1,0,0
+1734873752182,2476,有人找你.,Someone's looking for you.,googletts-4a6040c5-85314b9f-f26fb0c9-066208de-32bb884e.mp3,1,completion,,F:有人,S2:你,-0.0562,0.1000,3,1,0,0
+1734873753949,4242,可怜的孩子.,Poor child.,googletts-825a1947-776d9455-d5c7f2ad-4febe0c2-903d2865.mp3,1,completion,,S39:孩子,S39:孩子,-0.1155,0.1800,3,1,0,0
+1734873752250,2544,就像我一样.,Just like me.,googletts-3343e84d-417cf7d3-23cc95dd-df91660f-f299e76c.mp3,1,completion,,F:一样,S1:我,-0.0857,0.1300,4,2,0,0
+1734873754597,4890,你一定是疯了.,You must be crazy.,googletts-9b9646ef-23b24a61-4f0eb4b6-56a972b5-145440c9.mp3,1,completion,,F:一定,S2:你,-0.1659,0.2100,5,1,0,0
+1734873754682,4975,把你的手拿开.,Take your hands off.,googletts-e136d2aa-25751df6-13c94e31-4741e442-790b0c5d.mp3,1,completion,,S83:手,S2:你,-0.0457,0.1000,6,1,0,0
+1734873754049,4342,别靠近我.,Don't come near me.,googletts-01da148c-02c5b694-9396c772-edeb10ab-245017b4.mp3,1,completion,,S197:近,S1:我,-0.2343,0.2800,3,2,0,0
 1734873753590,3883,为什么这么说?,Why do you say that?,googletts-520eda32-430b6054-82aa86f9-a24939fc-4cf00589.mp3,1,seed,,F:为什么|F:这么|S140:说,S140:说,0.3921,0.0000,3,0,0,0
 1734873750406,700,玩什么?,What are you playing?,googletts-8e0f4bca-ef6bfbb7-f96d0251-bcd373d9-75bd2dc7.mp3,1,seed,,S142:玩,S142:玩,0.1391,0.0000,2,0,0,0
 1734873753788,4081,起火了.,There's a fire!,googletts-c1f73974-0c21d90b-1f2e5d03-be35b52d-f253b3ff.mp3,1,seed,,S167:火,S167:火,0.1168,0.1800,2,1,0,0

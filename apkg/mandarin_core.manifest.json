@@ -1,9 +1,10 @@
 {
-  "build_date": "2026-10-24T13:13:44+00:00",
+  "build_date": "2026-10-26T23:49:11+00:00",
   "source": {
     "input": "apkg/Neri's Chinese Sents Part 2.apkg",
     "deck": "Mandarin Core Sentences",
-    "model": "0 2024 Sentences Deck"
+    "model": "Mandarin Core Sentences",
+    "input_model": "0 2024 Sentences Deck"
   },
   "params": {
     "core_words": 50,
@@ -44,8 +45,9 @@
     "outside_rare": 1,
     "tail_words": 0,
     "sense_rows": 140,
-    "bolded": 106,
-    "unbolded": 41,
+    "dropped_no_core": 0,
+    "bolded": 147,
+    "unbolded": 0,
     "name_hits": 0,
     "loan_hits": 0,
     "rows": 5009,
@@ -58,7 +60,7 @@
     "spoken_weight": 0.5
   },
   "files": {
-    "core_csv": "sha256:9f554bbb257c4f7a2e6883f3fbf6f4ccceedb44dcab642d6488e11b44c88fef6",
+    "core_csv": "sha256:cb3a823f9f25e2daef289b0a578602a970a9672e6c6058f437e99cd2c89ae068",
     "coverage_csv": "sha256:96c267af42703f960b6711e9840fb35bd68deddb02d6c09f42ac9d3d30736ce1",
     "input_apkg": "sha256:e7c99d9f7e176d108652f810388575438b514d9aedec806d9d09a88e71b1b3f1"
   },
