@@ -43,7 +43,8 @@ presets: a core quota and a breadth cull.
 
 - This spec does not merge the selection algorithms. The core quota and the
   cull use cap stay separate policies.
-- It does not change the current cull or core decks. Any change to a published
+- The output note type of section 14 changes every core deck and every cull
+  deck. That change is the one exception here. A later change to a published
   deck is a separate decision with a new manifest.
 - It adds no per-language CLI flags. The language profile supplies the
   tokenizer, the word table, the sense file, and the frequency source.
@@ -211,8 +212,8 @@ the word core and retires its stratified preset.
   that key.
 - The card back shows the sentence, the English, `Core`, and `CoreGloss`. The
   assigned target is bold.
-- A core deck changes the note model. A breadth deck keeps the input model.
-  That stays a mode choice.
+- Both modes write a note type of their own. The output holds one note type,
+  one field set, and one card template (section 14).
 
 ## 8. Data requirements
 
@@ -290,13 +291,15 @@ sense file from the profile. No new per-language flags.
 
 ## 10. Gates and acceptance
 
-Reuse gates K1 to K20 with the language file paths. A language is accepted when:
+Reuse gates K1 to K21 with the language file paths. A language is accepted when:
 
 - every K gate passes;
 - `checked` equals the targets with a sense row plus every tier S target;
 - `unchecked` is within the limit;
 - `unranked` is within the limit;
-- every `CoreGloss` equals the target's first sense;
+- every note holds one `Core` and one `CoreGloss`, and the gloss equals the
+  target's first sense (K19, section 14.9);
+- the output holds one note type with the output field set (K21, section 14.9);
 - the manifest records the kept order and the hashes.
 
 K3 reports the share of coverable targets with two cards and does not gate.
@@ -502,3 +505,510 @@ all 20 gates passed
 | M5        | Spanish tier F sense rows and the 300-card deck            |
 | M6        | Mandarin: word core; complexity spread retired             |
 | M7        | Cantonese: Swadesh-only core, best-effort examples        |
+| M8        | output note type for both modes (section 14)               |
+
+## 14. Output note type
+
+Both modes write a note type of their own. The output package holds one note
+type, one field set, and one card template. The source note type stays in the
+input package only. Section 7 names this result. This section is the design.
+
+The four inputs use four note types and four field sets: `French Sentences`,
+`Spanish sentences cloze+`, `0 2024 Sentences Deck`, and
+`LTL Note Type - Cantonese`. The Mandarin input has 19 fields and the card
+reads three of them.
+
+### 14.1 Two identities, one seam
+
+The input identity locates the source notes. The output identity names and
+shapes the result. One value must not do both jobs.
+
+`anki_tools/ranking/scan.py` `CoreProfile`:
+
+| Field | Change | Reader |
+| --- | --- | --- |
+| `model_name` | rename to `input_model_name` | `coreflow.read_input_deck`, `coreflow.write_deck` |
+| `sentence_field` | rename to `input_sentence_field` | `coreflow.read_input_deck` |
+| `english_field` | rename to `input_english_field` | `coreflow.read_input_deck` |
+| `audio_field` | rename to `input_audio_field` | `coreflow.read_input_deck` |
+| `core_field` | delete | the constant `OUTPUT_CORE_FIELD` |
+| `core_gloss_field` | delete | the constant `OUTPUT_GLOSS_FIELD` |
+| `output_model_name` | add, `str` | `coreflow.write_deck`, `coregates.gate_identity` |
+| `extra_fields` | add, `tuple[str, ...] = ()` | `coreflow.output_fields`, `coreflow.write_deck` |
+
+`anki_tools/ranking/cullflow.py` `CullProfile` takes the same four renames and
+the same two new fields. It also takes `sense_path: Path`, the sense file of
+section 14.7. `reserve_fields` keeps its name and changes its contract: the
+values come in the `output_fields` order.
+
+`extra_fields` has a default, so the field goes after `finalize` in
+`CoreProfile`, at the end of `CullProfile`.
+
+The output names are not profile values. They live in
+`anki_tools/ranking/coreflow.py`, next to `TARGET_SEPARATOR`:
+
+```python
+OUTPUT_FIELDS = ("Audio", "Sentence", "English", "Core", "CoreGloss")
+OUTPUT_AUDIO_FIELD = "Audio"
+OUTPUT_SENTENCE_FIELD = "Sentence"
+OUTPUT_ENGLISH_FIELD = "English"
+OUTPUT_CORE_FIELD = "Core"
+OUTPUT_GLOSS_FIELD = "CoreGloss"
+```
+
+- `output_fields(profile)` gives
+  `("Audio", "Sentence", "English") + profile.extra_fields + ("Core", "CoreGloss")`.
+- `output_fields` raises `ValueError` when an extra name is one of the five
+  names above, or when a name occurs twice.
+- A language cannot rename `Core`, so a gate cannot lose its field.
+
+Readers after the change:
+
+| Function | Reads |
+| --- | --- |
+| `coreflow.read_input_deck` | `input_model_name`, `input_sentence_field`, `input_english_field`, `input_audio_field` |
+| `coreflow.read_output_deck` (new) | the single output note type and the `OUTPUT_*` names |
+| `coreflow.write_deck` | `input_model_name`, `output_model_name`, `extra_fields`, `templates`, `card_css` |
+| `coreflow._write_bold` | `OUTPUT_SENTENCE_FIELD` |
+| `coreflow.fill_core_fields` | `OUTPUT_CORE_FIELD`, `OUTPUT_GLOSS_FIELD` |
+| `coregates.CoreFiles.fields` | the single output note type |
+| `coregates.gate_bold` (K15) | `OUTPUT_SENTENCE_FIELD` |
+| `coregates.gate_core_word` (K19) | `OUTPUT_CORE_FIELD`, `OUTPUT_GLOSS_FIELD` |
+| `cullflow.run_cull` | the four `input_*` names and `sense_path` |
+| `cullgates._read_output` | `output_model_name` and the `OUTPUT_*` names |
+| `mandarin.core.finalize_output`, `cantonese.core.finalize_output` | `output_model_name`, `OUTPUT_SENTENCE_FIELD` |
+
+`coreflow.read_output_deck(path)` replaces the two output reads that call
+`read_input_deck` today (`coreflow.read_output` and `cullgates._read_output`).
+It gives one `InputCard` per note of the single output note type. It reads
+`Audio`, `Sentence`, and `English`, removes the bold tags from the sentence, and
+skips a note that holds no audio.
+
+`coreflow.write_deck` takes the profile in place of the model name and the
+templates:
+
+```python
+def write_deck(
+    input_path: Path,
+    cards: Sequence[InputCard],
+    kept: Sequence[int],
+    output_path: Path,
+    deck_name: str,
+    profile: DeckProfile,
+    *,
+    reserve: Sequence[ReserveCard] = (),
+    reserve_pack_path: Path | None = None,
+    reserve_fields: Callable[[Any], Sequence[str]] | None = None,
+) -> dict[str, int]
+```
+
+`DeckProfile` is a `Protocol` in `anki_tools/ranking/coreflow.py`. It holds
+`input_model_name`, `input_sentence_field`, `input_english_field`,
+`input_audio_field`, `output_model_name`, `extra_fields`, `templates`, and
+`card_css`. `CoreProfile` and `CullProfile` satisfy it.
+
+`coreflow.find_only_model_id(models)` gives the id of the only note type of a
+package and raises `RuntimeError` when the package holds two or more. The
+writer, `fill_core_fields`, `_write_bold`, `read_output_deck`, and the field
+readers of both gate sets call it, so a spare note type fails a run before a
+gate reports it.
+
+The two `write_cull_deck` partials in `languages/french/cull.py` and
+`languages/spanish/cull.py` become
+`partial(coreflow.write_deck, profile=..., reserve_fields=...)`. The
+`templates=None` branch and `_trim_templates` go away, because the new note
+type starts with our templates.
+
+### 14.2 The output field set
+
+Every mode and every language uses one of two sets. The value rule is the same
+in both.
+
+| Position | Field | Value | Reader |
+| --- | --- | --- | --- |
+| 1 | `Audio` | the input audio field text, `[sound:<file>]`, verbatim | `front.html` and `back.html` of the mode |
+| 2 | `Sentence` | `InputCard.sentence`, the clean plain text; `_write_bold` rewrites it for a bolded card | `back.html`, K15, G5 |
+| 3 | `English` | the input English field text, verbatim; the pack English for a reserve card | `back.html` |
+| 4 | each `extra_fields` name | the input field of the same name, verbatim | `back.html` of that language |
+| 5 | `Core` | the target form of the card (14.7) | `back.html`, K19, G17 |
+| 6 | `CoreGloss` | the English gloss of `Core` (14.7) | `back.html`, K19, G17 |
+
+| Mode | Language | Fields |
+| --- | --- | --- |
+| core | fr, es, zh | `Audio, Sentence, English, Core, CoreGloss` |
+| core | yue | `Audio, Sentence, English, Jyutping, Core, CoreGloss` |
+| cull | fr, es | `Audio, Sentence, English, Core, CoreGloss` |
+
+Rules:
+
+- `Jyutping` is the one extra field. `templates/cantonese_core/back.html` reads
+  it, and the LTL input fills it, so Cantonese sets
+  `extra_fields = ("Jyutping",)`.
+- `Eng Audio` is not an output field, because no template reads it. The
+  `Eng Audio` branch of `cantonese.core.finalize_output` and its media delete
+  go away with the field.
+- `freq ranks`, `Difficulty`, `NumberOfSpanishWords`, `ClozeWord`,
+  `Sentence (Annotated)`, `Explanation 1`, and the other 16 Mandarin fields are
+  not output fields. Section 14.8 gives the reason for `freq ranks`.
+- No written note holds an empty `Audio`, `Sentence`, `English`, `Core`, or
+  `CoreGloss`. An extra field can be empty, so `templates/cantonese_core/back.html`
+  keeps its `{{#Jyutping}}` condition. `Core` and `CoreGloss` are the only late
+  fields, and 14.7 gives their rule.
+
+The templates of `templates/<lang>_core/` and `templates/<lang>_cull/` read the
+output names:
+
+| Template token today | Token after the change |
+| --- | --- |
+| `{{sound}}` | `{{Audio}}` |
+| `{{French}}` | `{{Sentence}}` |
+| `{{Back}}` | `{{English}}` |
+| `{{SpanishSentence}}` | `{{Sentence}}` |
+| `{{EnglishSentence}}` | `{{English}}` |
+| `{{Sentence (Translation)}}` | `{{English}}` |
+| `{{[a]}}` | `{{Audio}}` |
+| `{{Front}}` (Cantonese) | `{{Sentence}}` |
+| `{{Audio}}`, `{{Sentence}}`, `{{#Jyutping}}…{{/Jyutping}}` | no change |
+| `{{Core}}`, `{{CoreGloss}}` | no change |
+
+The core front holds `{{Audio}}` only. The cull front holds `{{Audio}}` and the
+hint line. Both backs hold one unconditional line:
+
+```html
+<div class="target">{{Core}} · {{CoreGloss}}</div>
+```
+
+The `{{#Core}}` condition goes away. Every note holds both fields (K19, G17),
+so a conditional would only hide a fault. The `french_cull` and `spanish_cull`
+backs gain this line.
+
+The CSS comes from `profile.card_css()`, the value of `templates/shared/card.css`
+plus the language layer, as today. K14 and G15 check it.
+
+### 14.3 The note type name
+
+The rule: the note type name is the deck title. ADR 0001 gives this rule for a
+builder that creates the note type, and ADR 0013 confirms it for these two
+modes.
+
+| Mode | Language | `output_model_name` | Deck title | Profile constant |
+| --- | --- | --- | --- | --- |
+| core | fr | `French Core Sentences` | same | `french.core.DEFAULT_NAME` |
+| core | es | `Spanish Core Sentences` | same | `spanish.core.DEFAULT_NAME` |
+| core | zh | `Mandarin Core Sentences` | same | `mandarin.core.DEFAULT_NAME` |
+| core | yue | `Cantonese Core Sentences` | same | `cantonese.core.DEFAULT_NAME` |
+| cull | fr | `French 1000 Core Sentences` | same | `french.cull.DEFAULT_DECK_NAME` |
+| cull | es | `Spanish 1000 Core Sentences` | same | `spanish.cull.DEFAULT_DECK_NAME` |
+
+- Each profile sets `output_model_name` to its deck-name constant. A test pins
+  the pair: `output_model_name == deck_name` for a core profile, and
+  `== default_deck_name` for a cull profile.
+- No CLI flag sets the deck title today, so the name is constant per language
+  and mode.
+- The name holds the name of no input model and no note count.
+
+### 14.4 How the output note type is built
+
+Two routes were possible:
+
+| Route | Keeps | Loses |
+| --- | --- | --- |
+| (a) a new model in the input package, with the kept notes moved to it | the note ids, the guids, the tags, the card ids, the `due` values, every scheduling column, the `revlog`, the media map and its ids, and the input format | nothing that the user sees |
+| (b) a package from scratch with `AnkiPackage.create` | the field values only | the note ids, the card ids, every scheduling column, the `revlog`, and the media ids; a cull would reset the schedule of the user deck |
+
+The flow uses route (a). The cull removes cards from a deck that the user
+studies, so the kept cards must keep their card rows and their `due` values. A
+package from scratch cannot keep a card id, and genanki writes new card rows.
+
+`coreflow.write_deck` does these steps, in this order, in one package:
+
+1. Delete the cards of every note that the run does not keep
+   (`delete_cards(doomed, cleanup_audio=True)`).
+2. `package.prune_extra_cards(input_model_id)`: for each note, delete every card
+   except the one with the lowest `ord`, and set `ord = 0` on the card that
+   stays. The French input holds two cards per note (11,856 cards for 5,928
+   notes), so this step is necessary. The kept card keeps its `id`, its `due`,
+   and every scheduling column.
+3. `rename_deck(package, deck_name)`.
+4. `new_id = package.clone_model(input_model_id, profile.output_model_name,
+   output_fields(profile), profile.templates, profile.card_css())`.
+5. `sort_index = output_fields(profile).index(OUTPUT_SENTENCE_FIELD)`. For each
+   kept note, `package.update_note(note_id, output_values(profile, names, raw,
+   card.sentence), new_id, sort_index)`. `names` are the input field names and
+   `raw` the input field values of that note. The card `ord` of the kept card
+   is already 0 from step 2, so the card belongs to the single template.
+6. `package.delete_model(model_id)` for the input model and for every other
+   model of the package.
+7. Insert the reserve notes into `new_id` when the run holds reserve cards.
+8. `package.save(output_path)`.
+
+`output_values(profile, input_names, input_values, sentence)` gives the values
+in the `output_fields(profile)` order: `Audio` from `input_audio_field`,
+`Sentence` from `sentence`, `English` from `input_english_field`, each extra
+field from the input field of the same name, and `""` for `Core` and
+`CoreGloss`.
+
+The gates read the package after the last write step of the mode, so `Core` and
+`CoreGloss` are set when the run ends. The order of the whole run does not
+change:
+
+| Mode | Steps after the selection |
+| --- | --- |
+| core | `write_rank_csv`, `write_deck` (to `<output>.tmp.apkg`), `reorder_deck`, `fill_core_fields`, `_write_bold` |
+| cull | `write_cull_csv`, `write_coverage_csv`, `write_deck`, `fill_core_fields` |
+
+The cull does not call `reorder_deck` today, and it must not: `reorder_deck`
+writes `due` values from the rank CSV, and it reads only `type = 0` cards.
+The cull keeps the input `due` values.
+
+### 14.5 The AnkiPackage methods
+
+`anki_tools/apkg/package.py` gains four methods and one changed signature.
+No new dependency and no new deck builder.
+
+`clone_model(source_model_id, name, fields, templates, css) -> str`
+
+- Copies the source note type: the `col.models` entry for `anki2`, the
+  `notetypes` config blob for `anki21b`.
+- Gives the copy a new id in `random.randrange(1 << 30, 1 << 31)`, the range of
+  `create`, retried while the id is in use.
+- Sets the name, the ordered field names, one template per `(qfmt, afmt)`
+  named `Card 1`, `Card 2`, and so on, and the CSS. For `anki2`, build each
+  template dict from the first template dict of the source, with the new
+  `name`, `ord`, `qfmt`, and `afmt`.
+- Field config: copy the config of the first field row of the source
+  (`anki21b`), as the current `add_model_field` does. For `anki2`, build each
+  field dict from the first field dict of the source, with the new `name` and
+  `ord`, as the current `add_model_field` does.
+- `anki2`: copy the model dict of the source, so `latexPre`, `latexPost`,
+  `tags`, and `vers` stay valid; then set `sortf = 1`, the `Sentence` field,
+  and `req = [[0, "any", [0]]]`.
+- `anki21b`: keep the notetype config of the source and replace the CSS with
+  `_build_notetype_config`. Set the sort index, protobuf field 1, to the index
+  of `Sentence`. The source values differ: Spanish holds 10, and Mandarin and
+  Cantonese hold no field 1, which reads as 0. A kept source value points at
+  `Audio` or past the last field of the new model.
+- Add no note and no card.
+- `raises NotImplementedError` for the `anki21` format.
+- `returns` the new model id as a string.
+
+`delete_model(model_id) -> None`
+
+- `anki21b`: delete the `notetypes` row and the `fields` and `templates` rows of
+  that id.
+- `anki2`: delete the `col.models` entry.
+- `raises ValueError` when one note still holds that `mid`.
+- `raises NotImplementedError` for the `anki21` format.
+
+`update_note(note_id, field_values, model_id=None, sort_index=0) -> None`
+
+- Write the whole `flds` string with `\x1f` between the values.
+- Set `mid` to `model_id` when it is not None.
+- Set `mod`, `usn = -1`, `sfld` to `field_values[sort_index]` without the HTML
+  tags, and `csum` to the Anki field checksum of `sfld`: `0` for an empty
+  value, else the first 8 hex digits of the SHA1 digest of the stripped
+  value, read as a base-16 integer.
+- `raises ValueError` when the value count differs from the field count of the
+  note type.
+- One commit.
+
+`prune_extra_cards(model_id) -> int`
+
+- For each note that holds `mid = model_id`, find the card with the lowest
+  `ord`, delete the other cards of that note, and set `ord = 0` on the card
+  that stays.
+- Deletes a card row only. It keeps the note, its media, and the scheduling
+  columns of the card that stays.
+- Works on `anki2`, `anki21`, and `anki21b`, because the `cards` table is the
+  same in all three.
+- `returns` the count of deleted cards. One commit.
+
+`add_note_and_card` gains a `model_id: str` argument. It sets
+`note.mid = int(model_id)` and `csum` from `sfld`. Today it clones the `mid`
+of the first note row, and that value is wrong once the package holds a second
+note type.
+
+Format limits:
+
+- `clone_model`, `delete_model`, and `update_note` read and write `anki2` and
+  `anki21b`. An `anki21` package raises `NotImplementedError`, the limit that
+  `add_model_field` has today. No `anki fix` input uses `anki21`.
+  `prune_extra_cards` works on all three formats.
+- The output keeps the format of the input. `anki21b` in gives `anki21b` out,
+  with the zstd collection and the zstd media. `anki2` in gives `anki2` out.
+- `add_model_field` loses its last caller with `_write_core_model`. Delete it
+  and its test. `remove_model_template` and `_trim_templates` lose their
+  callers too, so delete them together.
+
+### 14.6 The unused note types
+
+Step 6 of 14.4 removes every note type except the new one. The French input
+carries `French Sentences` and `Basic`. The Mandarin input carries
+`0 2024 Sentences Deck` and `TEXT CARD`. After the run the output holds one
+note type.
+
+The order is necessary: a note type goes only after the notes that hold it are
+gone or moved. Step 1 deletes the notes that the run does not keep, and step 5
+moves the notes that it keeps, so step 6 can delete the source.
+
+### 14.7 The core word and the gloss
+
+`Core` holds the form of a target that the card teaches. `CoreGloss` holds the
+English gloss of that form. Every written note holds both.
+
+Core mode reads `CoreResult`:
+
+1. the assigned target of the card, `result.assigned[index]`;
+2. else the held target with the lowest position, `min(candidate.targets,
+   key=position)`;
+3. else the card holds no core word.
+
+The gloss is `CoreTarget.gloss`: the word-table gloss of a tier S target, or
+the first sense of the sense row of a tier F target.
+
+Cull mode reads `SelectionResult.card_targets[index]`, the target lemmas of
+the card in rank order. This value exists today, so the rule adds no selection
+logic.
+
+1. Take the first lemma of `card_targets[index]` that has a row in the sense
+   file `profile.sense_path` (`read_senses`, section 5.1). That lemma is the
+   `Core` word.
+2. Its `CoreGloss` is the first sense of that row (`SenseWords.first`).
+3. When no lemma of the card has a sense row, `Core` is the first lemma and
+   `CoreGloss` is empty.
+4. A reserve card takes `Core = ReserveCard.target` and
+   `CoreGloss = ReserveCard.gloss` from the reserve pack, written by
+   `reserve_fields` at insert time.
+
+`coreflow.fill_core_fields(output_path, cards, values)` writes the pairs.
+`values` maps an input index to a `(word, gloss)` pair. It counts the notes
+that it fills.
+
+A kept card with no core word leaves the deck:
+
+- `run_core` and `run_cull` compute the pair of every kept card before the
+  write.
+- A kept card with an empty word is not written. Its CSV row holds `kept = 0`
+  and `reason = no_core`, and the manifest counts it in
+  `counts.dropped_no_core`.
+- `write_rank_csv`, `kept_order_hash`, `write_cull_csv`, and `counts.cards` use
+  the reduced list.
+- The French core run drops 27 cards of 300 today, because a tail card brings
+  new lemmas and teaches no core target. The rule makes the 273 cards that
+  stay compliant.
+
+Reason for one rule and not a per-language tail switch: it covers four
+languages and both modes, and it keeps the 67 tail cards that do hold a
+target.
+
+Data requirement: the sense file must hold one row for every target of the
+cull list, 300 rows at the default `--target-words`. G17 fails until that
+file is complete.
+
+### 14.8 The frequency rank
+
+Decision: the output has no frequency field.
+
+- The source and the scale of the input `freq ranks` value are unknown
+  (`specs/french-1000-sentence-cull.md`, open question 5).
+- The four inputs disagree. French holds `freq ranks`, Spanish holds
+  `Difficulty` and `NumberOfSpanishWords`, and the Mandarin and Cantonese
+  inputs hold no rank field. A card value with no one meaning is noise.
+- The rank is a selection value. It stays in the `rank` column of the coverage
+  CSV and in the rank CSV, where the build and the review read it.
+
+A later build that wants the rank on the card adds one entry to
+`extra_fields` and one line to the back template of that language.
+
+### 14.9 Gates
+
+The gate numbers stay stable. Two gates are new, and two change their check.
+
+| Gate | Mode | Check |
+| --- | --- | --- |
+| K9 `gate_identity` | core | the deck name is `params.name`, and the only note type name is `profile.output_model_name` |
+| K14 `gate_templates` | core | the templates equal `profile.templates` and the CSS equals `profile.card_css()`, on the only note type |
+| K19 `gate_core_word` (renamed from `gate_gloss`) | core | every note holds a non-empty `Core` and a non-empty `CoreGloss`, the gloss holds no comma, and the gloss is a coverage gloss of that word |
+| K21 `gate_output_model` (new) | core | the package holds one note type; its field names equal `output_fields(profile)` in order; it holds one card template; every note holds one card with `ord = 0` |
+| G10 `gate_identity` | cull | the deck name is `params.name`, and the only note type name is `profile.output_model_name` |
+| G15 `gate_card_templates` | cull | the templates and the CSS classes, as today, on the only note type |
+| G16 `gate_output_model` (new) | cull | as K21 |
+| G17 `gate_core_word` (new) | cull | as K19, with the coverage CSV of the cull as the gloss source |
+
+- K19 keeps its number, so an older gate table still maps. Its name changes
+  because it now counts a missing core word, not only a wrong gloss.
+- `CullFiles.output()` gains `fields`, and `write_coverage_csv` gains a
+  `gloss` column, so G17 can compare a note gloss with a coverage gloss:
+  `COVERAGE_COLUMNS = ("word", "rank", "count", "status", "gloss")`.
+- `write_coverage_csv(targets, selection, path, glosses: Mapping[str, str])`
+  reads the gloss of a lemma from the sense file.
+- `coreflow.coverage_glosses(rows)` gives the word-to-gloss map of a coverage
+  CSV. K19 and G17 both read it, so a gloss is spelled one way. It replaces
+  `coregates._target_glosses`.
+
+### 14.10 Tests
+
+Add one small test for each new seam. Do not download a file.
+
+| File | Test | Behaviour |
+| --- | --- | --- |
+| `tests/test_apkg_package.py` | `test_clone_model_copies_the_shape_and_takes_a_new_id` | a clone of an `anki2` model and of an `anki21b` model holds the new name, the new fields, one template, and the CSS; the source keeps its own fields |
+| `tests/test_apkg_package.py` | `test_delete_model_refuses_a_note_that_still_uses_it` | `ValueError`, and the model is still there |
+| `tests/test_apkg_package.py` | `test_update_note_writes_the_fields_and_the_model` | `flds`, `mid`, `sfld`, and `csum` change in one call |
+| `tests/test_apkg_package.py` | `test_prune_extra_cards_keeps_one_card_per_note` | a note with two cards keeps the lowest `ord`, that card has `ord = 0`, and the returned count is 1 |
+| `tests/test_core_deck.py` | `test_the_run_writes_one_note_type_with_the_output_fields` | the tiny deck gives one note type named `profile.output_model_name`, the five fields in order, one template, and one card per note |
+| `tests/test_core_deck.py` | `test_every_kept_note_holds_a_core_word_and_a_gloss` | K19 accepts the tiny deck and rejects a note with an empty `Core` |
+| `tests/test_core_deck.py` | `test_a_kept_card_without_a_core_word_leaves_the_deck` | the card is not written, the CSV row holds `no_core`, and the manifest counts it |
+| `tests/test_core_deck.py` | `test_the_kept_card_keeps_its_note_id_and_due` | the note id and the card `due` of the input row survive |
+| `tests/test_core_deck.py` | `test_gate_output_model_fails_on_a_spare_field` | K21 reports the extra field name |
+| `tests/test_cull_shared.py` | `test_the_cull_writes_the_output_note_type` | one note type named `profile.output_model_name` with the five fields, one card per note, and the input note type gone |
+| `tests/test_cull_shared.py` | `test_the_cull_fills_the_core_word_and_the_gloss` | a frequency card takes its lemma and the first sense; a reserve card takes its pack target and gloss |
+| `tests/test_cull_shared.py` | `test_the_cull_keeps_the_due_of_a_kept_card` | a `due` of 42 on a kept card stays 42, and the dropped card is gone |
+| `tests/test_cull_shared.py` | `test_the_output_model_name_is_the_deck_name` | the profile value equals the deck-name value |
+| `tests/test_cantonese_core.py` | `test_the_jyutping_field_survives_the_new_model` | `extra_fields = ("Jyutping",)` puts the field at position 4 with the input value |
+| `tests/test_mandarin_core.py` | `test_the_templates_read_the_output_audio_field` | no template token names `[a]` |
+
+The tests that must change:
+
+| File | Test or group | Change |
+| --- | --- | --- |
+| `tests/test_core_deck.py` | `TestCardDesign` | the field tokens become `{{Audio}}`, `{{Sentence}}`, `{{English}}`, `{{Core}}`, and `{{CoreGloss}}` |
+| `tests/test_core_deck.py` | `test_the_model_gets_the_core_field_and_templates` | assert the one output note type, its field set, and the `Core` values |
+| `tests/test_core_deck.py` | `test_the_gloss_gate_*` | the gate name, and the two failures: a missing gloss and a wrong gloss |
+| `tests/test_core_deck.py` | `test_adding_the_field_twice_changes_nothing` | delete with `add_model_field` |
+| `tests/test_cull_shared.py` | `_profile()` | the new field names, `output_model_name`, `sense_path`, `extra_fields` |
+| `tests/test_cull_shared.py` | `test_a_second_profile_drives_every_output_value` | assert one note type, the five fields, and the `Core` values |
+| `tests/test_cull_shared.py` | `test_coverage_csv_statuses` | the extra `gloss` column |
+| `tests/test_french_cull.py` | the `write_cull_deck` calls, the G10 and G15 tests | the output note type name; the new G16 and G17 |
+| `tests/test_apkg_package.py` | the `add_model_field` tests | delete with the method |
+| `tests/test_spanish_cull.py` | `test_the_reserve_fields_fit_the_spanish_sentence_model` | five values in the output order |
+| `tests/test_mandarin_core.py` | `test_templates_name_the_audio_field` | `{{Audio}}`, not `{{[a]}}` |
+
+### 14.11 Migration and risk
+
+- The five committed decks change: `apkg/french_core_300.apkg`,
+  `apkg/mandarin_core.apkg`, `apkg/LTL Cantonese Deck Level 1 - Short_core.apkg`,
+  `apkg/Spanish 9000 sentences with native audio_core.apkg`, and
+  `apkg/french_1000_sentences.apkg`. Rebuild each deck in one run and commit the
+  deck with its CSV files and its manifest. The Spanish cull has no committed
+  deck, so its rebuild needs no commit.
+- The side files change in three ways: `manifest.source.model` holds the output
+  name and `manifest.source.input_model` the input name, the cull coverage CSV
+  gains the `gloss` column, and each manifest gains `counts.dropped_no_core`.
+  Delete the stale side files of a deck that the run does not rebuild.
+- The French core deck falls from 300 cards to 273, because 27 tail cards hold
+  no core target (14.7). Replace the numbers of section 14.3 of
+  `specs/core-word-small-deck.md` with the measured values.
+- Anki matches a note type by name. A new name is a new note type, so a user
+  who imports the new deck beside the old deck gets two note types and
+  duplicate cards. The release note must say: delete the old note type in
+  Tools > Manage Note Types, or import into a fresh profile.
+- The deck title does not change, so Anki updates the deck in place.
+- A note keeps its guid, so Anki matches the note and changes its note type on
+  import. A cull import does not delete the notes that the cull drops. That
+  limit holds today.
+- A sense file that does not cover the cull target list fails G17. That is a
+  data task, and the gate message names the row count.
+- `docs/core-deck-flow.md` and `docs/cull-deck-flow.md` name the input model
+  and the two added fields. The implementer updates the profile field list,
+  the writer paragraph, and the gate table of each document.

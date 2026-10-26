@@ -111,8 +111,8 @@ def test_the_clitic_lemma_drops_its_pronoun() -> None:
     assert cull_es.base_lemma("sin embargo") == "sin embargo"
 
 
-def test_the_reserve_fields_fit_the_spanish_sentence_model() -> None:
-    """The reserve card fills the 11 fields of the input model."""
+def test_the_reserve_fields_fit_the_output_note_type() -> None:
+    """The reserve card fills the five output fields in the output order."""
     card = cullflow.ReserveCard(
         sentence="el gato come",
         html="el <b>gato</b> come",
@@ -121,13 +121,9 @@ def test_the_reserve_fields_fit_the_spanish_sentence_model() -> None:
         gloss="cat",
         audio="a.mp3",
     )
-    fields = dict(zip(cull_es.RESERVE_FIELD_ORDER, cull_es._reserve_fields(card)))
+    fields = cull_es._reserve_fields(card)
 
-    assert len(cull_es.RESERVE_FIELD_ORDER) == 11
-    assert fields["SpanishSentence"] == "el <b>gato</b> come"
-    assert fields["EnglishSentence"] == "the cat eats — gato (cat)"
-    assert fields["Audio"] == "[sound:a.mp3]"
-    assert fields["ClozeWord"] == ""
+    assert fields == ["[sound:a.mp3]", "el <b>gato</b> come", "the cat eats", "gato", "cat"]
 
 
 def test_the_cull_templates_come_from_files() -> None:

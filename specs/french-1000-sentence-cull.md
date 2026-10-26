@@ -47,7 +47,7 @@ real speech.
 | Cards per word       | At most 4, with the top 100 words exempt                     | 8.4, 9.3 |
 | Similarity           | Lemma Jaccard at 0.67 or more is a duplicate                 | 8.5      |
 | Audio                | Reuse the input MP3 files, no new TTS                        | 10       |
-| Compatibility        | The output keeps the input model, fields, and deck order option | 10    |
+| Compatibility        | The output keeps the deck order, the note ids, and the card `due` values; it writes a note type of its own (section 17) | 10, 17 |
 
 ## 2. Input analysis
 
@@ -103,7 +103,7 @@ release (open question 6).
    content words. Aim for 1,900 or more.
 4. Do not use one non-exempt word in more than 4 cards.
 5. Keep each sentence short, complete, and unlike the other kept sentences.
-6. Reuse the input audio and the input note model.
+6. Reuse the input audio, the note ids, and the card `due` values (section 17).
 
 ### 3.2 Measures
 
@@ -127,7 +127,8 @@ release (open question 6).
 ### 3.4 Out of scope
 
 - New audio or TTS.
-- New card templates or a new note model.
+- A second card direction, a cloze card, or any card that is not the one
+  comprehension card of section 17.
 - Changes to the French Swadesh pack.
 - A general cull mode for other languages (a later spec).
 
@@ -446,17 +447,19 @@ reserve pack path are fields of `CullRequest` with these defaults in
 
 | File                                 | Content                                                    |
 | ------------------------------------ | ---------------------------------------------------------- |
-| `apkg/french_1000_sentences.apkg`    | The culled deck with the input model, fields, and audio    |
+| `apkg/french_1000_sentences.apkg`    | The culled deck with the output note type of section 17 and the input audio |
 | `apkg/french_1000_sentences.cull.csv`     | One row per input card: `kept`, `reason`, `targets`, `gain` |
-| `apkg/french_1000_sentences.coverage.csv` | One row per target: `word`, `rank`, `count`, `status`       |
+| `apkg/french_1000_sentences.coverage.csv` | One row per target: `word`, `rank`, `count`, `status`, `gloss` |
 | `apkg/french_1000_sentences.manifest.json` | Counts, parameters, frequency source, and hashes        |
 
 The `.cull.csv` has these columns: `source`, `sentence`, `english`, `audio`,
 `kept`, `reason`, `targets`, `gain`, `hardest_rank`. The `source` is `swadesh`
 or `frequency`. The reserve rows come first.
 
-The `.coverage.csv` has these columns: `word`, `rank`, `count`, `status`. The
-`status` is `covered`, `partial` (one card), or `absent`.
+The `.coverage.csv` has these columns: `word`, `rank`, `count`, `status`,
+and `gloss`. The `status` is `covered`, `partial` (one card), or `absent`. The
+`gloss` is the first sense of the sense row of that word, empty when the file
+has no row (section 17.4).
 
 ### 10.4 Code changes
 
@@ -486,7 +489,7 @@ the command with a non-zero exit code.
 
 | Gate | Check                                                                  |
 | ---- | ---------------------------------------------------------------------- |
-| G1   | The card count is `--max-cards` or the pool has no more cards           |
+| G1   | The count plus `dropped_no_core` is the cap, or the pool count        |
 | G2   | No non-exempt content lemma is in more than `--max-uses` kept cards     |
 | G3   | Target coverage is at least 0.98 of `--target-words` (measured 0.997)   |
 | G4   | At least 0.95 of the targets have 2 cards (measured 0.963)              |
@@ -495,19 +498,21 @@ the command with a non-zero exit code.
 | G7   | Every kept card has its input audio file, and the file is a valid MP3   |
 | G8   | The APKG note count equals the cull CSV `kept` count and the manifest   |
 | G9   | The APKG holds exactly the media files of the kept cards                |
-| G10  | The output deck name and the note model are the requested values        |
+| G10  | The output deck name is `params.name`, and the only note type name is `profile.output_model_name` |
 | G11  | A second run gives the same kept set and the same order                 |
 | G12  | The coverage CSV has one row per target word                            |
 | G13  | The manifest hashes match the cull CSV and the coverage CSV             |
 | G14  | The merged deck covers 206 of 207 Swadesh concepts, with `intestins` as the exception |
-| G15  | The deck model holds exactly one Swadesh-style card template and the CSS |
+| G15  | The only note type holds exactly one Swadesh-style card template and the CSS |
+| G16  | The package holds one note type, its fields equal `output_fields(profile)`, and every note holds one card (section 17.5) |
+| G17  | Every note holds a non-empty `Core` and `CoreGloss`, and the gloss is the coverage gloss of that word (section 17.4) |
 
 ### 11.2 Tests
 
 Add `tests/test_french_cull.py`. Use small fixture APKG and TSV files. Do not
 download a file and do not run a full Tatoeba pass. Add
 `tests/test_cull_shared.py` to prove that a second `CullProfile` drives the
-model name, the fields, and the deck name of the output.
+note type name, the fields, and the deck name of the output (section 17.6).
 
 | Area           | Test                                                                 |
 | -------------- | -------------------------------------------------------------------- |
@@ -522,6 +527,9 @@ model name, the fields, and the deck name of the output.
 | Order          | `hardest_rank` does not decrease                                      |
 | Determinism    | Two runs give the same card set and order                              |
 | APKG           | The output holds the kept notes and only their media files             |
+| Note type      | One note type named `profile.output_model_name` with the fields of section 17.2 |
+| Note type      | Every note holds a `Core` and a `CoreGloss`; a reserve card takes its pack gloss |
+| Note type      | A kept card keeps its card row and its `due` value                     |
 
 ## 12. Risks and open questions
 
@@ -636,18 +644,18 @@ The pack is read with `AnkiPackage`. The note model is
 `Target`, `Gloss`, `WordAudio`, and `Source`. The audio file comes from the
 pack media, so no external audio directory is needed.
 
-### 16.2 Merge into the input model
+### 16.2 Merge into the output note type
 
-The output keeps the input model `French Sentences` but replaces its card
-templates and CSS with the Swadesh style of section 16.7. Each reserve card
-becomes one note of that model:
+The output writes the note type of section 17, with the templates and the CSS
+of section 16.7. Each reserve card becomes one note of that note type:
 
-| Input field  | Reserve value                                             |
-| ------------ | --------------------------------------------------------- |
-| `French`     | The sentence with the target token in `<b>` tags          |
-| `sound`      | `[sound:<file>]` of the pack audio                        |
-| `Back`       | `English — target (gloss)`                                |
-| `freq ranks` | Empty                                                     |
+| Output field | Reserve value                                            |
+| ------------ | -------------------------------------------------------- |
+| `Audio`      | `[sound:<file>]` of the pack audio                       |
+| `Sentence`   | The sentence with the target token in `<b>` tags          |
+| `English`    | The English text of the pack card                        |
+| `Core`       | The `Target` field of the pack card                      |
+| `CoreGloss`  | The `Gloss` field of the pack card                       |
 
 The note id and card id come after the highest id of the input package. The
 guid is a UUID. The tags include `swadesh`.
@@ -705,19 +713,137 @@ reserve cards that the duplicate check drops are covered by frequency cards.
 ### 16.7 Card templates
 
 The output replaces the input templates with the Swadesh style, so the two
-decks look alike. The model keeps one card per note: the comprehension card.
-The input deck gives two card directions, so the command removes the second
-template and its cards. The deck has 1,000 cards for 1,000 notes.
+decks look alike. The note type keeps one card per note: the comprehension
+card. The input deck gives two card directions, so the command deletes the
+second card of each kept note and the second template goes with the input note
+type. The deck has 1,000 cards for 1,000 notes.
 
 Card 1 (comprehension):
 
-- Front: the audio and the hint `Tap to show the sentence`.
-- Back: the audio, the French sentence, and the `Back` field.
+- Front: the `Audio` field and the hint `Tap to show the sentence`.
+- Back: the `Audio` field, the `Sentence` field, the `English` field, and the
+  line `<div class="target">{{Core}} · {{CoreGloss}}</div>`.
 
 The templates are in `templates/french_cull/front.html` and `back.html`. The
 CSS is the base `templates/shared/card.css` plus the French pack classes
-(`.front-audio`, `.sentence`, `.english`, `.hint`) of
-`templates/sentence_pack/french/card.css`. The `Back` field of a
-reserve card already holds `English — target (gloss)`, so the target and the
-gloss appear with the English text. Gate G15 checks that the model holds
-exactly this template and the CSS classes.
+(`.front-audio`, `.sentence`, `.english`, `.target`, `.hint`) of
+`templates/sentence_pack/french/card.css`. The target and the gloss hold their
+own fields, so a reserve card and a frequency card read the same way. Gate G15
+checks that the note type holds exactly this template and the CSS classes.
+
+## 17. Output note type
+
+The cull writes a note type of its own. `anki fix fr --select` and `anki fix es
+--select` use the same rule. The shared design is section 14 of
+`specs/core-deck-all-languages.md`.
+
+### 17.1 The seam
+
+`CullProfile` renames `model_name`, `sentence_field`, `english_field`, and
+`audio_field` to `input_model_name`, `input_sentence_field`,
+`input_english_field`, and `input_audio_field`. It adds `output_model_name`,
+`sense_path: Path`, and `extra_fields: tuple[str, ...] = ()`.
+
+`reserve_fields` keeps its name and returns the five values in the field order
+of section 17.2: `Audio`, `Sentence`, `English`, `Core`, and `CoreGloss`.
+
+`languages/french/cull.py` and `languages/spanish/cull.py` set
+`output_model_name = DEFAULT_DECK_NAME` and `sense_path` to
+`vocab/<lang>_core_senses.tsv`.
+
+### 17.2 The field set
+
+| Language | Note type name | Fields |
+| --- | --- | --- |
+| fr | `French 1000 Core Sentences` | `Audio, Sentence, English, Core, CoreGloss` |
+| es | `Spanish 1000 Core Sentences` | `Audio, Sentence, English, Core, CoreGloss` |
+
+The name is the deck title. ADR 0013 holds the rule, and a test pins
+`output_model_name == default_deck_name`.
+
+The template tokens of `templates/french_cull/` and `templates/spanish_cull/`
+follow the table of section 14.2 of `specs/core-deck-all-languages.md`. The two
+back templates gain the unconditional core line.
+
+No field holds a frequency rank. The rank stays in the coverage CSV.
+
+### 17.3 The build
+
+`coreflow.write_deck` clones the input note type into the output name, moves
+the kept notes to it, inserts the reserve notes, and deletes the input note
+type and every other note type. The `Basic` note type of the French input goes
+with it.
+
+The input French deck holds two cards per note. For a kept note the command
+deletes the card that is not the one with the lowest `ord`, and it sets
+`ord = 0` on the card that stays. That card keeps its id, its `due` value, and
+every scheduling column. The cull does not call `reorder_deck`, so the `due`
+values of the user deck stay.
+
+Section 14.4 and section 14.5 of `specs/core-deck-all-languages.md` give the
+steps and the `AnkiPackage` contracts.
+
+### 17.4 The core word on every card
+
+The card shows the target word that it teaches and the English gloss of that
+word.
+
+1. `SelectionResult.card_targets[index]` holds the target lemmas of the card in
+   rank order. This value exists today, so the rule adds no selection logic.
+2. The rule takes the first lemma that has a row in `profile.sense_path`. That
+   lemma is `Core`.
+3. `CoreGloss` is the first sense of that row.
+4. When no lemma of the card has a row, `Core` is the first lemma and
+   `CoreGloss` is empty. Gate G17 fails on that note.
+5. A reserve card takes `Core` from the pack `Target` field and `CoreGloss`
+   from the pack `Gloss` field.
+
+`run_cull` reads the sense file once with
+`coreflow.read_senses(profile.sense_path)`. It keeps the lemma-to-gloss map for
+`write_coverage_csv`, and it keeps the lemma-to-first-sense map for
+`coreflow.fill_core_fields`, which writes the pairs of the frequency cards.
+The reserve cards hold their values at insert time.
+
+A kept card with no target leaves the deck. Its CSV row holds `kept = 0` and
+`reason = no_core`, and the manifest counts it in `counts.dropped_no_core`.
+
+Data task: `vocab/french_core_senses.tsv` and `vocab/spanish_core_senses.tsv`
+must hold one row for every target of the build, 300 rows at the default
+`--target-words`. Until then G17 fails and names the count.
+
+### 17.5 Gates
+
+- G1 adds `counts.dropped_no_core` to the kept count, because a kept card
+  without a core word leaves the deck (section 17.4).
+- G10 compares the deck name with `params.name` and the only note type name
+  with `profile.output_model_name`.
+- G15 checks the one template and the CSS classes of the one note type.
+- G16 is new: one note type, the fields of section 17.2 in order, one card per
+  note, and `ord = 0` on that card.
+- G17 is new: every note holds a `Core` and a `CoreGloss`, and the gloss is the
+  coverage gloss of that word.
+- `CullFiles.output()` gains `fields`, and `write_coverage_csv` writes the
+  `gloss` column of section 10.3.
+
+### 17.6 Tests
+
+| Area | Test |
+| --- | --- |
+| Note type | One note type named `profile.output_model_name` with the five fields, and the input note type is gone |
+| Note type | A frequency card holds its top target lemma and the first sense as the gloss |
+| Note type | A reserve card holds the pack `Target` and `Gloss` values |
+| Note type | A kept card keeps its card id and its `due` value of 42 |
+| Note type | G16 reports a spare field; G17 reports an empty `Core` |
+| Coverage | The coverage CSV holds the `gloss` column, and G17 accepts the deck |
+
+### 17.7 Migration
+
+- `apkg/french_1000_sentences.apkg` is rebuilt and committed with its CSV files
+  and its manifest. The note type name changes (ADR 0013). The Spanish cull has
+  no committed deck.
+- `manifest.source.model` holds the output name and `manifest.source.input_model`
+  the input name. The manifest gains `counts.dropped_no_core`.
+- The deck title does not change, so Anki updates the deck in place. The note
+  type is new, so the user gets a duplicate note type until the old one goes.
+- A cull import does not delete the notes that the cull drops. That limit holds
+  today and this change does not fix it.

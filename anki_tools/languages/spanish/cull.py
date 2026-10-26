@@ -63,21 +63,6 @@ LICENSES = {
     "swadesh": "Swadesh word data: CC BY-SA 4.0",
 }
 
-# Field order of the input model ``Spanish sentences cloze+``. The reserve
-# cards join the input model, so they carry its 11 fields.
-RESERVE_FIELD_ORDER = (
-    "EnglishSentenceID",
-    "SpanishSentenceID",
-    "EnglishSentence",
-    "SpanishSentence",
-    "ClozeWord",
-    "Difficulty",
-    "Text",
-    "Audio",
-    "NumberOfSpanishWords",
-    "Extra",
-    "Other",
-)
 
 
 def clean_sentence(field_value: str) -> str:
@@ -100,10 +85,10 @@ def load_input_deck(path: Path) -> list[InputCard]:
     profile = SPANISH_CULL_PROFILE
     return coreflow.read_input_deck(
         path,
-        profile.model_name,
-        profile.sentence_field,
-        profile.english_field,
-        profile.audio_field,
+        profile.input_model_name,
+        profile.input_sentence_field,
+        profile.input_english_field,
+        profile.input_audio_field,
         profile.clean_sentence,
     )
 
@@ -153,26 +138,16 @@ def _concept_forms(concept: str) -> set[str]:
 
 
 def _reserve_fields(card: cullflow.ReserveCard) -> list[str]:
-    """Give the field values of one reserve card in the input model order.
+    """Give the five output field values of one reserve card.
 
     :param card: Reserve card.
-    :returns: The 11 field values of the ``Spanish sentences cloze+`` model.
+    :returns: The ``Audio``, ``Sentence``, ``English``, ``Core``, and
+        ``CoreGloss`` values.
     """
-    back = f"{card.english} — {card.target}"
-    if card.gloss:
-        back += f" ({card.gloss})"
-    return ["", "", back, card.html, "", "", "", f"[sound:{card.audio}]", "", "", ""]
+    return [f"[sound:{card.audio}]", card.html, card.english, card.target, card.gloss]
 
 
 read_reserve = partial(cullflow.load_reserve, model_name=SWADESH_MODEL_NAME)
-
-write_cull_deck = partial(
-    coreflow.write_deck,
-    model_name=core.MODEL_NAME,
-    templates=CARD_TEMPLATES,
-    card_css=card_css,
-    reserve_fields=_reserve_fields,
-)
 
 SPANISH_CULL_PROFILE = cullflow.CullProfile(
     tokenize_texts=partial(
@@ -187,14 +162,16 @@ SPANISH_CULL_PROFILE = cullflow.CullProfile(
     final_marks=FINAL_MARKS,
     quote_marks=QUOTE_MARKS,
     internal_marks=INTERNAL_MARKS,
-    model_name=core.MODEL_NAME,
-    sentence_field=core.SENTENCE_FIELD,
-    english_field=core.ENGLISH_FIELD,
-    audio_field=core.AUDIO_FIELD,
+    input_model_name=core.MODEL_NAME,
+    input_sentence_field=core.SENTENCE_FIELD,
+    input_english_field=core.ENGLISH_FIELD,
+    input_audio_field=core.AUDIO_FIELD,
+    output_model_name=DEFAULT_DECK_NAME,
     clean_sentence=clean_sentence,
     reserve_fields=_reserve_fields,
     templates=CARD_TEMPLATES,
     card_css=card_css,
+    sense_path=core.SENSE_PATH,
     reserve_pack=SWADESH_PACK_PATH,
     reserve_model_name=SWADESH_MODEL_NAME,
     swadesh_total=SWADESH_TOTAL,
@@ -207,4 +184,10 @@ SPANISH_CULL_PROFILE = cullflow.CullProfile(
     licenses=LICENSES,
     target_coverage_gate=0.98,
     double_coverage_gate=0.95,
+)
+
+write_cull_deck = partial(
+    coreflow.write_deck,
+    profile=SPANISH_CULL_PROFILE,
+    reserve_fields=_reserve_fields,
 )

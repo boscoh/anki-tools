@@ -23,14 +23,15 @@ One command runs the stages in order: `anki fix <language> --core`. The
 | K5    | order   | K4                                        | card order, assigned target per card        |
 | K6    | write   | K0, K4, K5                                | APKG and four side files                    |
 
-The gates K1 to K20 run after K6.
+The gates K1 to K21 run after K6.
 
 The `--cards` and `--words` values change the tier F target count and the
 card cap. The other `CoreRequest` fields keep their defaults.
 
-The input fields come from the profile: `model_name`, `sentence_field`,
-`english_field`, and `audio_field`. K0 keeps the lowest card of each note. It
-cleans the sentence with `clean_sentence`.
+The input fields come from the profile: `input_model_name`,
+`input_sentence_field`, `input_english_field`, and `input_audio_field`. K0
+keeps the lowest card of each note. It cleans the sentence with
+`clean_sentence`.
 
 ## 2. Flow diagram
 
@@ -64,7 +65,7 @@ K5  order: target position, example number, new words, units
 K6  APKG, .core.csv, .coverage.csv, .manifest.json, .rank.csv
         |
         v
-    gates K1 to K20
+    gates K1 to K21
 ```
 
 ## 3. Core list (K2)
@@ -255,15 +256,30 @@ then uses the lowest-position target that the card holds.
 
 `default_output` gives `<stem>_core.apkg` next to the input file.
 
-The deck name comes from `profile.deck_name`. The note model keeps the name
-of the input model. The writer deletes the notes that no kept card uses, and
-it deletes the media files that those notes hold. `reorder_deck` applies the
-order of the rank CSV to the output deck.
+The deck name comes from `profile.deck_name`. The writer clones the input note
+type under the name of `profile.output_model_name`, and the deck title is the
+same string. The output holds one note type, one field set, and one card
+template.
 
-The writer updates the card templates and the CSS of the model. It adds the
-core word field and the core gloss field to the model, and it fills them on
-each kept card that has a target. It writes the assigned target inside a
-`<b>` tag in each sentence field.
+The writer deletes the notes that no kept card uses, and it deletes the media
+files that those notes hold. It deletes the card of a note that the first
+template did not make, keeps the lowest `ord`, and sets that `ord` to 0. The
+kept card keeps its id, its `due` value, and its scheduling columns.
+
+The field set is `output_fields(profile)`: `Audio`, `Sentence`, `English`, each
+`extra_fields` name, `Core`, and `CoreGloss`. The writer moves the kept notes to
+the new note type, then deletes the input note type and every other note type.
+`reorder_deck` applies the order of the rank CSV to the output deck.
+
+The writer writes the assigned target inside a `<b>` tag in each sentence
+field. `fill_core_fields` writes `Core` and `CoreGloss` on each kept card. The
+assigned target gives the pair, or the held target of the lowest core position.
+A kept card that holds no core target is not written. Its CSV row holds
+`kept = 0` and `reason = no_core`, and the manifest counts it in
+`counts.dropped_no_core`.
+
+The manifest records the output note type in `source.model` and the input note
+type in `source.input_model`.
 
 The coverage status of a target is one of these values:
 
@@ -285,23 +301,26 @@ The coverage status of a target is one of these values:
 | coverage   | K2, K3, K11     | covered targets, two-card share, coverage CSV         |
 | rules      | K5, K6, K17     | F1 to F9 and C1 to C5, similarity, name and loan word |
 | files      | K7, K8, K12     | audio files, counts, manifest hashes                  |
-| identity   | K9, K10         | deck name, model name, kept order                     |
+| identity   | K9, K10         | deck name, note type, kept order                      |
 | cards      | K13, K14, K15   | target in the text, templates and CSS, bold target    |
-| sense      | K16, K19, K20   | unchecked target, core gloss, unranked tier F target  |
+| sense      | K16, K19, K20   | unchecked target, core word and gloss, unranked word  |
 | shape      | K18             | each tail card brings a new content lemma             |
+| note type  | K21             | one note type, the output fields, one card per note   |
 
 K3 reports the share of targets with two cards. It does not fail.
 
 K14 checks the templates and the CSS of the language profile. K15 checks that
-the bold text is the assigned target. K19 checks that the core gloss is the
-gloss of the core word, and that the gloss has no comma.
+the bold text is the assigned target. K19 checks that every note holds a `Core`
+and a `CoreGloss`, that the gloss is the coverage gloss of the core word, and
+that the gloss has no comma. K21 checks the single note type, the field set,
+and one card per note.
 
 ## 9. File map
 
 | Path                                            | Content                                    |
 | ----------------------------------------------- | ------------------------------------------ |
 | `anki_tools/ranking/coreflow.py`                | K0 to K6 flow, deck writer, manifest       |
-| `anki_tools/ranking/coregates.py`               | gates K1 to K20                            |
+| `anki_tools/ranking/coregates.py`               | gates K1 to K21                            |
 | `anki_tools/ranking/core.py`                    | value, cost, passes, assignment, order     |
 | `anki_tools/ranking/corelist.py`                | tier S and tier F target list, sense rows  |
 | `anki_tools/ranking/cardfilter.py`              | shared filter rules F1 to F9               |

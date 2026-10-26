@@ -39,12 +39,11 @@ class CoreProfile:
     :param highlight: Wrap the matched target tokens of a sentence in a bold
         tag, or None when the deck does not bold.
     :param lemma_key: Normalize a lemma before the tier F sense guard.
-    :param model_name: Name of the input note model.
-    :param sentence_field: Name of the sentence field of the model.
-    :param english_field: Name of the English field of the model.
-    :param audio_field: Name of the audio field of the model.
-    :param core_field: Name of the core word field.
-    :param core_gloss_field: Name of the core gloss field.
+    :param input_model_name: Name of the input note model.
+    :param input_sentence_field: Name of the sentence field of the input model.
+    :param input_english_field: Name of the English field of the input model.
+    :param input_audio_field: Name of the audio field of the input model.
+    :param output_model_name: Name of the output note model.
     :param templates: Card templates of the core deck.
     :param card_css: CSS of the core deck.
     :param min_units: Minimum word count of a card.
@@ -62,8 +61,9 @@ class CoreProfile:
         request supplies it.
     :param finalize: Post-processing step of the written deck, called with
         the run, or None when the language needs none.
+    :param extra_fields: Names of the output fields that the language adds,
+        after ``English`` and before ``Core``.
     """
-
     load_input_deck: Callable[[Path], Any]
     tokenize_deck: Callable[[Any], Any]
     load_frequency: Callable[[], Any]
@@ -78,12 +78,11 @@ class CoreProfile:
     sense_filter: Callable[[str, str], bool] | None
     highlight: Callable[[str, str], str] | None
     lemma_key: Callable[[str], str]
-    model_name: str
-    sentence_field: str
-    english_field: str
-    audio_field: str
-    core_field: str
-    core_gloss_field: str
+    input_model_name: str
+    input_sentence_field: str
+    input_english_field: str
+    input_audio_field: str
+    output_model_name: str
     templates: tuple[tuple[str, str], ...]
     card_css: Callable[[], str]
     min_units: int
@@ -96,6 +95,7 @@ class CoreProfile:
     outside_rare_ratio: float = 0.1
     spoken_weight: float | None = None
     finalize: Callable[[Any], None] | None = None
+    extra_fields: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

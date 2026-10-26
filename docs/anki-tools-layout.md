@@ -39,7 +39,7 @@ Shared ranking code only. No language data.
 | `anki_tools/ranking/core.py`      | Core-word value, cost, passes, and order              |
 | `anki_tools/ranking/pipeline.py`  | Shared extract, rank, write, and reorder stages       |
 | `anki_tools/ranking/cullflow.py`  | Cull flow behind the `CullProfile` seam               |
-| `anki_tools/ranking/cullgates.py` | Gates G1 to G15 of the cull deck                      |
+| `anki_tools/ranking/cullgates.py` | Gates G1 to G17 of the cull deck                      |
 
 `rank_word_based` and `rank_character_based` are the shared score drivers.
 `jaccard_similarity`, `compute_similarity_penalties`, and the word metrics of

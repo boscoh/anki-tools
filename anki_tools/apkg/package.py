@@ -38,6 +38,7 @@ Anki21b: zstd-compressed protobuf with repeated MediaEntry messages
     Each entry contains filename, file size, and SHA1 hash
 """
 
+import hashlib
 import io
 import json
 import os
@@ -62,6 +63,30 @@ try:
     HAS_ZSTD = True
 except ImportError:
     HAS_ZSTD = False
+
+
+_HTML_TAG_PATTERN = re.compile(r"<[^>]+>")
+
+#: Field that Anki sorts the written decks by. An output note type holds one.
+SORT_FIELD = "Sentence"
+
+
+def field_checksum(value: str) -> int:
+    """Give the Anki field checksum of a sort field value.
+
+    :param value: Sort field text, with or without HTML tags.
+    :returns: 0 for empty text, else the first 8 hex digits of the SHA1 digest,
+        read as a base-16 integer.
+    """
+    text = _HTML_TAG_PATTERN.sub("", value)
+    if not text:
+        return 0
+    return int(hashlib.sha1(text.encode("utf-8")).hexdigest()[:8], 16)
+
+
+def _sort_index(fields: Sequence[str]) -> int:
+    """Give the index of the sort field, or 0 when the field list has none."""
+    return fields.index(SORT_FIELD) if SORT_FIELD in fields else 0
 
 
 class AnkiPackage:
@@ -579,135 +604,302 @@ class AnkiPackage:
         self.conn.commit()
         self._modified = True
 
-    def add_model_field(self, model_id: str, name: str) -> int:
-        """Add a field to the end of a note type and give every note an empty value.
+    def clone_model(
+        self,
+        source_model_id: str,
+        name: str,
+        fields: Sequence[str],
+        templates: Sequence[tuple[str, str]],
+        css: str,
+    ) -> str:
+        """Copy a note type under a new id, with new fields, templates, and CSS.
 
-        The method reads the ``anki2`` and ``anki21b`` formats. A model that
-        already has the field is left as it is.
+        The method reads the ``anki2`` and ``anki21b`` formats. It adds no note
+        and no card.
 
-        :param model_id: Model ID to change.
-        :param name: Name of the new field.
+        :param source_model_id: Model ID to copy.
+        :param name: Name of the new note type.
+        :param fields: Ordered field names of the new note type.
+        :param templates: ``(qfmt, afmt)`` pair per card template.
+        :param css: Styling of the new note type.
         :raises NotImplementedError: The package is in the ``anki21`` format.
-        :raises ValueError: If model not found.
-        :returns: Zero-based index of the field.
+        :raises ValueError: The source model is not in the package.
+        :returns: Model ID of the copy.
         """
         cursor = self.conn.cursor()
-        mod_time = int(time.time())
+        now = int(time.time())
+        sort_index = _sort_index(fields)
 
         if self._db_format == "anki21b":
-            existing = cursor.execute(
-                "SELECT ord FROM fields WHERE ntid = ? AND name = ?",
-                (int(model_id), name),
+            row = cursor.execute(
+                "SELECT config FROM notetypes WHERE id = ?", (int(source_model_id),)
             ).fetchone()
-            if existing is not None:
-                return existing["ord"]
-            max_ord = cursor.execute(
-                "SELECT COALESCE(MAX(ord), -1) FROM fields WHERE ntid = ?",
-                (int(model_id),),
-            ).fetchone()[0]
-            new_ord = max_ord + 1
+            if row is None:
+                raise ValueError(f"Model {source_model_id} not found")
+            taken = [
+                str(entry[0]) for entry in cursor.execute("SELECT id FROM notetypes")
+            ]
+            model_id = self._new_model_id(taken)
+            config = self._clone_notetype_config(row["config"] or b"", css, sort_index)
+            cursor.execute(
+                "INSERT INTO notetypes (id, name, mtime_secs, usn, config) "
+                "VALUES (?, ?, ?, -1, ?)",
+                (int(model_id), name, now, config),
+            )
             sample = cursor.execute(
                 "SELECT config FROM fields WHERE ntid = ? ORDER BY ord LIMIT 1",
-                (int(model_id),),
+                (int(source_model_id),),
             ).fetchone()
-            config = sample["config"] if sample is not None else b""
-            cursor.execute(
+            field_config = sample["config"] if sample is not None else b""
+            cursor.executemany(
                 "INSERT INTO fields (ntid, ord, name, config) VALUES (?, ?, ?, ?)",
-                (int(model_id), new_ord, name, config),
+                [
+                    (int(model_id), number, field, field_config)
+                    for number, field in enumerate(fields)
+                ],
             )
-            cursor.execute("SELECT id, flds FROM notes WHERE mid = ?", (int(model_id),))
-            for row in cursor.fetchall():
-                cursor.execute(
-                    "UPDATE notes SET flds = ?, mod = ?, usn = -1 WHERE id = ?",
-                    (row["flds"] + "\x1f", int(time.time() * 1000), row["id"]),
-                )
+            cursor.executemany(
+                "INSERT INTO templates (ntid, ord, name, mtime_secs, usn, config) "
+                "VALUES (?, ?, ?, ?, -1, ?)",
+                [
+                    (
+                        int(model_id),
+                        number,
+                        f"Card {number + 1}",
+                        now,
+                        self._build_template_config(qfmt, afmt),
+                    )
+                    for number, (qfmt, afmt) in enumerate(templates)
+                ],
+            )
             self.conn.commit()
             self._modified = True
-            return new_ord
+            return model_id
 
         if self._db_format != "anki2":
             raise NotImplementedError(
-                f"add_model_field needs the anki2 format, not {self._db_format}"
+                f"clone_model needs the anki2 or anki21b format, not {self._db_format}"
             )
-
-        cursor.execute("SELECT models FROM col")
-        models = json.loads(cursor.fetchone()[0])
-        if model_id not in models:
-            raise ValueError(f"Model {model_id} not found")
-        model = models[model_id]
-        fields = model["flds"]
-        for index, existing in enumerate(fields):
-            if existing["name"] == name:
-                return index
-
-        template = dict(fields[-1])
-        template.update({"name": name, "ord": len(fields), "media": []})
-        fields.append(template)
-        model["mod"] = int(time.time())
-        model["usn"] = -1
-        cursor.execute(
-            "UPDATE col SET models = ? WHERE id = 1", (json.dumps(models),)
+        models = json.loads(cursor.execute("SELECT models FROM col").fetchone()[0])
+        if source_model_id not in models:
+            raise ValueError(f"Model {source_model_id} not found")
+        source = models[source_model_id]
+        model_id = self._new_model_id(list(models))
+        first_field = source["flds"][0]
+        first_template = source["tmpls"][0]
+        model = dict(source)
+        model.update(
+            id=int(model_id),
+            name=name,
+            flds=[
+                {**first_field, "name": field, "ord": number, "media": []}
+                for number, field in enumerate(fields)
+            ],
+            tmpls=[
+                {
+                    **first_template,
+                    "name": f"Card {number + 1}",
+                    "ord": number,
+                    "qfmt": qfmt,
+                    "afmt": afmt,
+                }
+                for number, (qfmt, afmt) in enumerate(templates)
+            ],
+            css=css,
+            sortf=sort_index,
+            req=[[0, "any", [0]]],
+            mod=now,
+            usn=-1,
         )
-        cursor.execute("SELECT id, flds FROM notes WHERE mid = ?", (int(model_id),))
-        for row in cursor.fetchall():
-            cursor.execute(
-                "UPDATE notes SET flds = ?, mod = ?, usn = -1 WHERE id = ?",
-                (row["flds"] + "\x1f", mod_time, row["id"]),
+        models[model_id] = model
+        cursor.execute("UPDATE col SET models = ? WHERE id = 1", (json.dumps(models),))
+        self.conn.commit()
+        self._modified = True
+        return model_id
+
+    def _new_model_id(self, taken: Sequence[str]) -> str:
+        """Give an unused model id in the range that :meth:`create` uses.
+
+        :param taken: Model ids that the package holds.
+        :returns: The new model id as a string.
+        """
+        used = {int(value) for value in taken}
+        while True:
+            value = random.randrange(1 << 30, 1 << 31)
+            if value not in used:
+                return str(value)
+
+    def _clone_notetype_config(self, source: bytes, css: str, sort_index: int) -> bytes:
+        """Build the config of a cloned note type.
+
+        The sort index is protobuf field 1 and the CSS is field 3. A source
+        value that points at another field of the input note type cannot hold.
+
+        :param source: Config blob of the source note type.
+        :param css: CSS of the new note type.
+        :param sort_index: Zero-based index of the sort field.
+        :returns: Protobuf config bytes.
+        """
+        parsed = self._parse_notetype_config(source)
+        original = parsed["_original"]
+        parts = [
+            bytes([1 << 3]) + self._write_varint(sort_index),
+            self._write_proto_string(3, css),
+        ]
+        for start, end, field_num in parsed["other_fields"]:
+            if field_num not in (1, 3):
+                parts.append(original[start:end])
+        return b"".join(parts)
+
+    def delete_model(self, model_id: str) -> None:
+        """Delete a note type that no note holds.
+
+        The method reads the ``anki2`` and ``anki21b`` formats. For ``anki21b``
+        it deletes the field and template rows of the id too, because either
+        table can hold a row of a note type that ``notetypes`` does not list.
+
+        :param model_id: Model ID.
+        :raises NotImplementedError: The package is in the ``anki21`` format.
+        :raises ValueError: A note still holds the model, or the model is absent.
+        """
+        in_use = self.conn.execute(
+            "SELECT 1 FROM notes WHERE mid = ? LIMIT 1", (int(model_id),)
+        ).fetchone()
+        if in_use is not None:
+            raise ValueError(f"A note still holds the model {model_id}")
+
+        if self._db_format == "anki21b":
+            found = self.conn.execute(
+                "SELECT 1 FROM notetypes WHERE id = ?", (int(model_id),)
+            ).fetchone()
+            if found is None:
+                raise ValueError(f"Model {model_id} not found")
+            for statement in (
+                "DELETE FROM fields WHERE ntid = ?",
+                "DELETE FROM templates WHERE ntid = ?",
+                "DELETE FROM notetypes WHERE id = ?",
+            ):
+                self.conn.execute(statement, (int(model_id),))
+        elif self._db_format == "anki2":
+            models = json.loads(
+                self.conn.execute("SELECT models FROM col").fetchone()[0]
+            )
+            if models.pop(model_id, None) is None:
+                raise ValueError(f"Model {model_id} not found")
+            self.conn.execute(
+                "UPDATE col SET models = ? WHERE id = 1", (json.dumps(models),)
+            )
+        else:
+            raise NotImplementedError(
+                f"delete_model needs the anki2 or anki21b format, not {self._db_format}"
             )
         self.conn.commit()
         self._modified = True
-        return len(fields) - 1
 
-    def remove_model_template(self, model_id: str, template_index: int) -> int:
+    def update_note(
+        self,
+        note_id: int,
+        field_values: Sequence[str],
+        model_id: str | None = None,
+        sort_index: int = 0,
+    ) -> None:
+        """Write the fields, the note type, and the sort value of one note.
+
+        :param note_id: The note ID.
+        :param field_values: Field values in the field order of the note type.
+        :param model_id: New model ID, or None to keep the note type of the note.
+        :param sort_index: Zero-based index of the sort field.
+        :raises ValueError: The note is absent, or the value count differs from
+            the field count of the note type.
         """
-        Remove a card template from a note type, with all the cards that use it.
+        row = self.conn.execute(
+            "SELECT mid FROM notes WHERE id = ?", (note_id,)
+        ).fetchone()
+        if row is None:
+            raise ValueError(f"Note {note_id} not found")
+        target = model_id if model_id is not None else str(row["mid"])
+        count = self._model_field_count(target)
+        if len(field_values) != count:
+            raise ValueError(
+                f"{len(field_values)} values for the {count} fields of model {target}"
+            )
+        sort_value = field_values[sort_index] if sort_index < count else ""
+        sfld = _HTML_TAG_PATTERN.sub("", sort_value)
+        self.conn.execute(
+            "UPDATE notes SET mid = ?, flds = ?, mod = ?, usn = -1, sfld = ?, "
+            "csum = ? WHERE id = ?",
+            (
+                int(target),
+                "\x1f".join(field_values),
+                int(time.time() * 1000),
+                sfld,
+                field_checksum(sfld),
+                note_id,
+            ),
+        )
+        self.conn.commit()
+        self._modified = True
 
-        The method reads the legacy ``anki2`` format only. The later templates
-        and their cards move down by one place.
+    def _model_field_count(self, model_id: str) -> int:
+        """Give the field count of one note type.
 
-        :param model_id: Model ID to change.
-        :param template_index: Zero-based index of the template to remove.
-        :raises NotImplementedError: The package is not in the ``anki2`` format.
-        :raises ValueError: If the model or the template is not found, or the
-            template is the last one.
+        :param model_id: Model ID.
+        :raises ValueError: The model is not in the package.
+        :returns: The field count.
+        """
+        if self._db_format == "anki21b":
+            count = int(
+                self.conn.execute(
+                    "SELECT COUNT(*) FROM fields WHERE ntid = ?", (int(model_id),)
+                ).fetchone()[0]
+            )
+        elif self._db_format == "anki2":
+            models = json.loads(
+                self.conn.execute("SELECT models FROM col").fetchone()[0]
+            )
+            count = len(models[model_id]["flds"]) if model_id in models else 0
+        else:
+            raise NotImplementedError(
+                "The field count needs the anki2 or anki21b format, "
+                f"not {self._db_format}"
+            )
+        if not count:
+            raise ValueError(f"Model {model_id} not found")
+        return count
+
+    def prune_extra_cards(self, model_id: str) -> int:
+        """Keep one card per note of a note type.
+
+        The card with the lowest ``ord`` stays, and its ``ord`` becomes 0. The
+        method deletes a card row only, so the note, its media, and the
+        scheduling columns of the card that stays are unchanged. It reads
+        ``anki2``, ``anki21``, and ``anki21b``.
+
+        :param model_id: Model ID.
         :returns: The count of deleted cards.
         """
-        if self._db_format != "anki2":
-            raise NotImplementedError(
-                f"remove_model_template needs the anki2 format, not {self._db_format}"
-            )
+        rows = self.conn.execute(
+            "SELECT id, nid FROM cards WHERE nid IN "
+            "(SELECT id FROM notes WHERE mid = ?) ORDER BY nid, ord",
+            (int(model_id),),
+        ).fetchall()
+        keep: dict[int, int] = {}
+        doomed: list[tuple[int, ...]] = []
+        for row in rows:
+            note_id = int(row["nid"])
+            if note_id in keep:
+                doomed.append((int(row["id"]),))
+            else:
+                keep[note_id] = int(row["id"])
         cursor = self.conn.cursor()
-        cursor.execute("SELECT models FROM col")
-        models = json.loads(cursor.fetchone()[0])
-        if model_id not in models:
-            raise ValueError(f"Model {model_id} not found")
-        templates = models[model_id]["tmpls"]
-        if not 0 <= template_index < len(templates):
-            raise ValueError(f"Template {template_index} not found")
-        if len(templates) == 1:
-            raise ValueError("A model must keep one template")
-
-        marks = "SELECT id FROM notes WHERE mid = ?"
-        cursor.execute(
-            f"DELETE FROM cards WHERE ord = ? AND nid IN ({marks})",
-            (template_index, int(model_id)),
-        )
-        deleted = cursor.rowcount
-        cursor.execute(
-            f"UPDATE cards SET ord = ord - 1 WHERE ord > ? AND nid IN ({marks})",
-            (template_index, int(model_id)),
-        )
-        del templates[template_index]
-        for number, template in enumerate(templates):
-            template["ord"] = number
-        models[model_id]["mod"] = int(time.time())
-        models[model_id]["usn"] = -1
-        cursor.execute(
-            "UPDATE col SET models = ? WHERE id = 1", (json.dumps(models),)
+        cursor.executemany("DELETE FROM cards WHERE id = ?", doomed)
+        cursor.executemany(
+            "UPDATE cards SET ord = 0 WHERE id = ?",
+            [(card_id,) for card_id in keep.values()],
         )
         self.conn.commit()
         self._modified = True
-        return deleted
+        return len(doomed)
 
     def get_notes(self) -> list[sqlite3.Row]:
         """
@@ -1094,6 +1286,7 @@ class AnkiPackage:
     def add_note_and_card(
         self,
         fields: Sequence[str],
+        model_id: str,
         deck_id: int,
         tags: str,
         guid: str,
@@ -1106,6 +1299,7 @@ class AnkiPackage:
         column of the package schema stays valid.
 
         :param fields: Field values of the note, one per field of the model.
+        :param model_id: Model ID of the note.
         :param deck_id: Deck id of the new card.
         :param tags: Space-separated tags of the note.
         :param guid: Globally unique id of the note.
@@ -1127,12 +1321,13 @@ class AnkiPackage:
         note.update(
             id=note_id,
             guid=guid,
+            mid=int(model_id),
             mod=mod,
             usn=-1,
             tags=tags,
             flds="\x1f".join(fields),
             sfld=sfld,
-            csum=0,
+            csum=field_checksum(sfld),
         )
         conn.execute(
             f"INSERT INTO notes ({','.join(note_columns)}) "

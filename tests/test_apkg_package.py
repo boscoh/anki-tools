@@ -17,7 +17,7 @@ from typing import Iterator
 
 import pytest
 
-from anki_tools.apkg.package import AnkiPackage
+from anki_tools.apkg.package import AnkiPackage, field_checksum
 from tests.deck_fixture import MP3_STUB, build_contract_deck
 
 SOUND = re.compile(r"\[sound:([^\]]+)\]")
@@ -52,14 +52,6 @@ def _card_of(package: AnkiPackage, note_id: int) -> int:
     )
 
 
-def _field_names(package: AnkiPackage) -> list[str]:
-    """Give the field names of the note types, in ordinal order."""
-    models = package.get_models()
-    return [
-        field["name"]
-        for model in models.values()
-        for field in model["flds"]
-    ]
 
 @pytest.fixture(scope="module")
 def deck_path(tmp_path_factory: pytest.TempPathFactory) -> Path:
@@ -81,13 +73,17 @@ def editable(deck_path: Path, tmp_path: Path) -> Iterator[AnkiPackage]:
 
 
 ANKI21B_NOTE_TYPE = "1700000000001"
+ANKI21B_NOTE_TYPE_NAME = "Shared sentences"
 ANKI21B_FIELDS = ("Sentence", "English", "Audio")
 ANKI21B_SCHEMA = """
 CREATE TABLE col (id integer primary key, crt integer, decks text);
-CREATE TABLE notetypes (id integer primary key, name text, config blob);
+CREATE TABLE notetypes (
+    id integer primary key, name text, mtime_secs integer, usn integer, config blob
+);
 CREATE TABLE fields (ntid integer, ord integer, name text, config blob);
 CREATE TABLE templates (
-    ntid integer, ord integer, name text, config blob
+    ntid integer, ord integer, name text, mtime_secs integer, usn integer,
+    config blob
 );
 CREATE TABLE notes (
     id integer primary key, mid integer, flds text, tags text,
@@ -106,7 +102,7 @@ def _anki21b_database(path: Path) -> None:
     connection.executescript(ANKI21B_SCHEMA)
     connection.execute("INSERT INTO col VALUES (1, 0, '{}')")
     connection.execute(
-        "INSERT INTO notetypes VALUES (?, 'Shared sentences', '')",
+        "INSERT INTO notetypes VALUES (?, 'Shared sentences', 0, -1, '')",
         (int(ANKI21B_NOTE_TYPE),),
     )
     connection.executemany(
@@ -117,7 +113,7 @@ def _anki21b_database(path: Path) -> None:
         ],
     )
     connection.execute(
-        "INSERT INTO templates VALUES (?, 0, 'Card 1', '')",
+        "INSERT INTO templates VALUES (?, 0, 'Card 1', 0, -1, '')",
         (int(ANKI21B_NOTE_TYPE),),
     )
     for index, sentence in enumerate(("Hola.", "Adios.")):
@@ -258,38 +254,100 @@ def test_delete_cards_removes_the_unused_media(editable: AnkiPackage) -> None:
     assert result["audio_files_deleted"]
 
 
-def test_anki21b_add_model_field_gives_the_ord_of_a_field(
+CLONE_FIELDS = ("Audio", "Sentence", "English", "Core")
+CLONE_TEMPLATES = (("{{Audio}}", "{{Sentence}}"),)
+CLONE_CSS = ".card { color: black; }"
+
+
+def test_clone_model_copies_the_shape_and_takes_a_new_id(
     anki21b: AnkiPackage,
 ) -> None:
-    """A known field name keeps its ordinal and changes no note."""
-    assert anki21b.db_format == "anki21b"
+    """The clone holds the new shape, and the source keeps its own fields."""
+    source = anki21b.get_models(include_templates=True)[ANKI21B_NOTE_TYPE]
 
-    ord_ = anki21b.add_model_field(ANKI21B_NOTE_TYPE, "English")
+    model_id = anki21b.clone_model(
+        ANKI21B_NOTE_TYPE,
+        "Output Sentences",
+        list(CLONE_FIELDS),
+        list(CLONE_TEMPLATES),
+        CLONE_CSS,
+    )
 
-    assert ord_ == 1
-    assert _field_names(anki21b) == list(ANKI21B_FIELDS)
-    assert {len(row["flds"].split("\x1f")) for row in anki21b.get_notes()} == {3}
+    clone = anki21b.get_models(include_templates=True)[model_id]
+    assert model_id != ANKI21B_NOTE_TYPE
+    assert clone["name"] == "Output Sentences"
+    assert [field["name"] for field in clone["flds"]] == list(CLONE_FIELDS)
+    assert len(clone["tmpls"]) == 1
+    assert clone["css"] == CLONE_CSS
+    assert [field["name"] for field in source["flds"]] == list(ANKI21B_FIELDS)
 
 
-def test_anki21b_add_model_field_appends_an_empty_value(
+def test_clone_model_copies_an_anki2_model(editable: AnkiPackage) -> None:
+    """An anki2 clone holds the new fields and one template."""
+    source = next(iter(editable.get_models(include_templates=True).values()))
+    source_fields = [field["name"] for field in source["flds"]]
+
+    model_id = editable.clone_model(
+        next(iter(editable.get_models())),
+        "Output Sentences",
+        list(CLONE_FIELDS),
+        list(CLONE_TEMPLATES),
+        CLONE_CSS,
+    )
+
+    clone = editable.get_models(include_templates=True)[model_id]
+    assert editable.db_format == "anki2"
+    assert clone["name"] == "Output Sentences"
+    assert [field["name"] for field in clone["flds"]] == list(CLONE_FIELDS)
+    assert len(clone["tmpls"]) == 1
+    assert clone["css"] == CLONE_CSS
+    assert [field["name"] for field in source["flds"]] == source_fields
+
+
+def test_delete_model_refuses_a_note_that_still_uses_it(
     anki21b: AnkiPackage,
 ) -> None:
-    """A new field gets the next ordinal and an empty value on each note."""
-    ord_ = anki21b.add_model_field(ANKI21B_NOTE_TYPE, "Core")
+    """A note type that a note holds stays in the package."""
+    with pytest.raises(ValueError):
+        anki21b.delete_model(ANKI21B_NOTE_TYPE)
 
-    assert ord_ == 3
-    assert _field_names(anki21b) == [*ANKI21B_FIELDS, "Core"]
-    assert all(row["flds"].endswith("\x1f") for row in anki21b.get_notes())
-    assert {len(row["flds"].split("\x1f")) for row in anki21b.get_notes()} == {4}
+    assert anki21b.get_models()[ANKI21B_NOTE_TYPE]["name"] == ANKI21B_NOTE_TYPE_NAME
 
 
-def test_anki21b_add_model_field_twice_changes_nothing(
-    anki21b: AnkiPackage,
-) -> None:
-    """The second call gives the same ordinal and adds no separator."""
-    first = anki21b.add_model_field(ANKI21B_NOTE_TYPE, "Core")
-    second = anki21b.add_model_field(ANKI21B_NOTE_TYPE, "Core")
+def test_update_note_writes_the_fields_and_the_model(editable: AnkiPackage) -> None:
+    """One call sets the fields, the note type, the sort field, and the checksum."""
+    model_id = next(iter(editable.get_models()))
+    note_id = int(editable.get_notes()[0]["id"])
+    values = ["Hola.", "Hello.", "[sound:a.mp3]"]
 
-    assert first == second == 3
-    assert _field_names(anki21b) == [*ANKI21B_FIELDS, "Core"]
-    assert {len(row["flds"].split("\x1f")) for row in anki21b.get_notes()} == {4}
+    editable.update_note(note_id, values, model_id, 1)
+
+    row = editable.conn.execute(
+        "SELECT mid, flds, sfld, csum FROM notes WHERE id = ?", (note_id,)
+    ).fetchone()
+    assert str(row["mid"]) == model_id
+    assert row["flds"] == "\x1f".join(values)
+    assert row["sfld"] == "Hello."
+    assert row["csum"] == field_checksum("Hello.")
+
+
+def test_update_note_refuses_a_wrong_value_count(editable: AnkiPackage) -> None:
+    """A value count that differs from the field count raises."""
+    note_id = int(editable.get_notes()[0]["id"])
+
+    with pytest.raises(ValueError):
+        editable.update_note(note_id, ["Hola."])
+
+
+def test_prune_extra_cards_keeps_one_card_per_note(editable: AnkiPackage) -> None:
+    """The card with the lowest ord stays, and its ord becomes 0."""
+    model_id = next(iter(editable.get_models()))
+    note_id = next(note_id for note_id, count in _note_cards(editable).items() if count > 1)
+
+    deleted = editable.prune_extra_cards(model_id)
+
+    cards = [row for row in editable.get_cards() if int(row["nid"]) == note_id]
+    assert deleted >= 1
+    assert len(cards) == 1
+    assert int(cards[0]["ord"]) == 0
+    assert _note_cards(editable)[note_id] == 1

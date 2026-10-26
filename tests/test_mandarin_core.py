@@ -107,20 +107,19 @@ def test_frequency_ranks_cover_the_deck_words():
 def test_profile_holds_the_deck_paths():
     """The profile names the Neri deck files and the Mandarin hooks."""
     profile = core.MANDARIN_CORE_PROFILE
-    assert profile.model_name == "0 2024 Sentences Deck"
-    assert profile.sentence_field == "Sentence"
-    assert profile.english_field == "Sentence (Translation)"
-    assert profile.audio_field == "[a]"
-    assert profile.core_field == "Core"
-    assert profile.core_gloss_field == "CoreGloss"
+    assert profile.input_model_name == "0 2024 Sentences Deck"
+    assert profile.input_sentence_field == "Sentence"
+    assert profile.input_english_field == "Sentence (Translation)"
+    assert profile.input_audio_field == "[a]"
+    assert profile.output_model_name == core.DEFAULT_NAME
     assert profile.min_units < profile.max_units
     assert profile.templates
     assert profile.card_css().startswith("/*")
     assert profile.frequency_source == str(core.FREQUENCY_PATH)
 
 
-def test_templates_name_the_audio_field():
-    """The model holds the audio in the ``[a]`` field, so the template must name it."""
-    reference = "{{" + core.AUDIO_FIELD + "}}"
-    assert reference in core.CORE_FRONT_TEMPLATE
-    assert reference in core.CORE_BACK_TEMPLATE
+def test_the_templates_read_the_output_audio_field():
+    """The output note type holds its audio in the ``Audio`` field."""
+    for template in (core.CORE_FRONT_TEMPLATE, core.CORE_BACK_TEMPLATE):
+        assert "{[" not in template
+        assert "{{Audio}}" in template

@@ -18,8 +18,16 @@ from pathlib import Path
 from typing import Any, Callable, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.ranking.coreflow import InputCard, probe_audio, read_input_deck
-from anki_tools.ranking.coregates import _read_csv
+from anki_tools.ranking.coreflow import (
+    InputCard,
+    coverage_glosses,
+    read_output,
+)
+from anki_tools.ranking.coregates import (
+    _read_csv,
+    core_word_problems,
+    output_model_problems,
+)
 from anki_tools.ranking.corelist import is_content
 from anki_tools.ranking.cullflow import (
     FREQUENCY_SOURCE,
@@ -109,7 +117,19 @@ class CullFiles:
 
     def output(self) -> dict[str, Any]:
         """Read the output APKG and probe the duration of its audio."""
-        return self._load("output", lambda: _read_output(self.apkg_path, self.profile))
+        return self._load("output", lambda: read_output(self.apkg_path))
+
+    def notes(self) -> dict[int, list[str]]:
+        """Read the note fields of the output deck, keyed by note id."""
+
+        def load() -> dict[int, list[str]]:
+            with AnkiPackage(self.apkg_path) as package:
+                return {
+                    int(row["id"]): str(row["flds"]).split("\x1f")
+                    for row in package.get_notes()
+                }
+
+        return self._load("notes", load)
 
     def tokens(self) -> list[list[tuple[str, str]]]:
         """Tokenize the sentences of the output deck."""
@@ -133,52 +153,10 @@ def cull_files(apkg_path: Path, profile: CullProfile) -> CullFiles:
     return CullFiles(apkg_path, profile)
 
 
-def _read_output(path: Path, profile: CullProfile) -> dict[str, Any]:
-    """Read the notes, the decks, and the media of an output APKG.
-
-    :param path: Output APKG file.
-    :param profile: Language hooks.
-    :returns: Cards, note count, model names, deck names, media names, the
-        card templates and CSS per model, and the audio duration per file.
-    """
-    cards = read_input_deck(
-        path,
-        profile.model_name,
-        profile.sentence_field,
-        profile.english_field,
-        profile.audio_field,
-        profile.clean_sentence,
-    )
-    with AnkiPackage(path) as package:
-        full = package.get_models(include_templates=True)
-        models = {key: model.get("name") for key, model in full.items()}
-        templates = {
-            model.get("name"): [
-                (tmpl.get("qfmt", ""), tmpl.get("afmt", ""))
-                for tmpl in model.get("tmpls", ())
-            ]
-            for model in full.values()
-        }
-        css = {model.get("name"): model.get("css", "") for model in full.values()}
-        notes = package.get_notes()
-        media = package.get_media_mapping()
-        names = {card.audio for card in cards if card.audio}
-        durations = probe_audio(package.media_dir(), media, names)
-        decks = {deck.get("name") for deck in package.get_decks().values()}
-    return {
-        "cards": cards,
-        "notes": len(notes),
-        "note_models": {models.get(str(row["mid"])) for row in notes},
-        "decks": decks,
-        "media": set(media.values()),
-        "audio": durations,
-        "templates": templates,
-        "css": css,
-    }
 
 
 def run_gates(files: CullFiles) -> list[GateRow]:
-    """Run gates G1 to G15 of the spec on the written files.
+    """Run gates G1 to G17 of the spec on the written files.
 
     :param files: Lazy reader for the output files.
     :returns: One ``(gate, passed, message)`` row per gate.
@@ -216,15 +194,25 @@ def _exempt_lemmas(files: CullFiles) -> set[str]:
 
 
 def gate_card_count(files: CullFiles) -> tuple[bool, str]:
-    """G1: the card count is the cap, or the pool has no more cards."""
+    """G1: the card count is the cap, or the pool has no more cards.
+
+    A kept card that holds no core word leaves the deck, so the count before
+    that drop is the value that the gate compares.
+    """
     kept = len(_kept_rows(files))
+    counts = files.manifest().get("counts", {})
+    dropped = int(counts.get("dropped_no_core", 0))
     cap = int(files.params().get("max_cards", 0))
-    pooled = int(files.manifest().get("counts", {}).get("passed", 0))
-    if kept == cap:
-        return True, f"{kept} cards, the cap"
-    if kept == pooled:
-        return True, f"{kept} cards, the pool has no more"
-    return False, f"{kept} cards, not the cap {cap} and below the pool {pooled}"
+    pooled = int(counts.get("passed", 0))
+    total = kept + dropped
+    if total == cap:
+        return True, f"{kept} kept + {dropped} dropped, the cap"
+    if total == pooled:
+        return True, f"{kept} kept + {dropped} dropped, the pool has no more"
+    return False, (
+        f"{kept} kept + {dropped} dropped, not the cap {cap} "
+        f"and below the pool {pooled}"
+    )
 
 
 def gate_use_cap(files: CullFiles) -> tuple[bool, str]:
@@ -372,10 +360,10 @@ def gate_media(files: CullFiles) -> tuple[bool, str]:
 
 
 def gate_identity(files: CullFiles) -> tuple[bool, str]:
-    """G10: the deck name and the note model are the requested values."""
+    """G10: the deck name and the note type are the requested values."""
     output = files.output()
     name = str(files.params().get("name"))
-    model_name = files.profile.model_name
+    model_name = files.profile.output_model_name
     problems: list[str] = []
     if output["decks"] != {name}:
         problems.append(f"decks {sorted(map(str, output['decks']))}")
@@ -450,7 +438,7 @@ def gate_swadesh(files: CullFiles) -> tuple[bool, str]:
 def gate_card_templates(files: CullFiles) -> tuple[bool, str]:
     """G15: the deck model holds the Swadesh-style template and CSS."""
     output = files.output()
-    model_name = files.profile.model_name
+    model_name = files.profile.output_model_name
     templates = output["templates"].get(model_name, [])
     if not templates:
         return False, f"the model {model_name!r} has no card template"
@@ -471,6 +459,22 @@ def gate_card_templates(files: CullFiles) -> tuple[bool, str]:
     return True, f"{len(templates)} card template and the CSS classes match"
 
 
+def gate_output_model(files: CullFiles) -> tuple[bool, str]:
+    """G16: one note type, the output fields, and one card per note."""
+    problems = output_model_problems(files.output(), files.profile)
+    return not problems, f"issues {_sample(problems)}"
+
+
+def gate_core_word(files: CullFiles) -> tuple[bool, str]:
+    """G17: every note holds a core word and the coverage gloss of that word."""
+    problems, filled = core_word_problems(
+        files.notes(),
+        files.output()["fields"],
+        coverage_glosses(files.coverage()),
+    )
+    return not problems, f"{filled} core word(s), {len(problems)} bad: {_sample(problems)}"
+
+
 GATES: tuple[tuple[str, GateCheck], ...] = (
     ("G1", gate_card_count),
     ("G2", gate_use_cap),
@@ -487,11 +491,13 @@ GATES: tuple[tuple[str, GateCheck], ...] = (
     ("G13", gate_manifest_hashes),
     ("G14", gate_swadesh),
     ("G15", gate_card_templates),
+    ("G16", gate_output_model),
+    ("G17", gate_core_word),
 )
 
 
 def check_cull(output_path: Path, profile: CullProfile) -> int:
-    """Run gates G1 to G15 on the files of a cull output.
+    """Run gates G1 to G17 on the files of a cull output.
 
     :param output_path: Output APKG file.
     :param profile: Language hooks.

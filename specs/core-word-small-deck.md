@@ -70,12 +70,13 @@ the full filter. Section 3.2 explains the gap, and 5.3 the reserve option.
 | Selection       | greedy cover of a value minus a cost for outside words     |
 | Sentence rules  | simple, complete, unique, no name, no loan word, audio     |
 | Sense           | a card gets credit only when the English shows the sense    |
-| Card design     | audio-only front; the back adds the core word              |
+| Card design     | audio-only front; the back adds the core word and its gloss |
 | Output size     | about 1.0 card per target at quota 2                       |
 | Swadesh reserve | off. 198 cards cannot fit a 300-card core deck             |
+| Note type       | one note type of our own, named as the deck title (section 15) |
 
-Not in scope: new audio or TTS, a new note model, a grammar syllabus, and a
-change to the cull window.
+Not in scope: new audio or TTS, a second card template, a grammar syllabus,
+and a change to the cull window.
 
 ## 2. Target set
 
@@ -401,10 +402,9 @@ Code changes:
 
 ## 8. Card design
 
-The note ids do not change. The model gains two fields, `Core` and
-`CoreGloss`, and keeps one
-card template, so each note has one card. The CSS is the cull value, so the deck
-looks like the 1,000-card deck and the Swadesh deck.
+The note ids do not change. The run writes a note type of its own (section 15),
+with one card template, so each note has one card. The CSS is the cull value, so
+the deck looks like the 1,000-card deck and the Swadesh deck.
 
 | Card             | Front          | Back                                                                     |
 | ---------------- | -------------- | ------------------------------------------------------------------------ |
@@ -412,20 +412,20 @@ looks like the 1,000-card deck and the Swadesh deck.
 
 | Part      | Value                                                                  |
 | --------- | ---------------------------------------------------------------------- |
-| Templates | `templates/french_core/`, one card, written by `_write_core_model`     |
-| CSS       | `card_css()`: shared `card.css` plus `sentence_pack/french/card.css`   |
+| Templates | `templates/<lang>_core/`, one card, set when the note type is created |
+| CSS       | `card_css()`: shared `card.css` plus `sentence_pack/<lang>/card.css`   |
 | Classes   | `.front-audio`, `.sentence`, `.english`, `.target`                     |
-| Fields    | the input fields, `Core`, and `CoreGloss`                              |
+| Fields    | `Audio`, `Sentence`, `English`, `Core`, `CoreGloss` (section 15)       |
 | Audio     | the input MP3 file                                                     |
 
-The `assigned` target of section 6 is bold in the `French` field. A card can
+The `assigned` target of section 6 is bold in the `Sentence` field. A card can
 hold more than one target, and only the assigned target is bold. This marks
 the word in the sentence.
 
 The `Core` field holds the core word for the back of the card. It is the form of
 the assigned target. A card with no assigned target, such as a second example,
 gets the held target of the lowest position. A tail card that holds no target
-has an empty `Core` field, and the template hides the line.
+has no core word, so the run does not write it (section 15.4).
 
 The `CoreGloss` field holds the English gloss of the core word. A tier S
 target uses the Swadesh gloss of the word table, for example `water`. A tier F
@@ -433,20 +433,19 @@ target uses the first sense of `vocab/french_core_senses.tsv`, for example
 `not` for `pas`. The template shows the word and the gloss with a middle dot,
 so the core deck and the Swadesh deck read the same way.
 
-| Field        | Value of a kept card                                                           |
-| ------------ | ------------------------------------------------------------------------------ |
-| `French`     | the sentence, with the assigned target in `<b>` tags                           |
-| `sound`      | `[sound:<input audio file>]`                                                   |
-| `Back`       | the English text of the card                                                   |
-| `freq ranks` | unchanged                                                                      |
-| `Core`       | the core word of the card, as described above; empty for a card with no target |
-| `CoreGloss`  | the English gloss of the core word; empty for a card with no core word         |
+| Field       | Value of a kept card                                                |
+| ----------- | ------------------------------------------------------------------- |
+| `Audio`     | `[sound:<input audio file>]`                                        |
+| `Sentence`  | the clean sentence, with the assigned target in `<b>` tags           |
+| `English`   | the English text of the card                                        |
+| `Core`      | the core word of the card, as described above                       |
+| `CoreGloss` | the English gloss of the core word                                  |
 
 - `bold_target` is on by default. A false value writes plain text.
 - The CSV holds the plain sentence; the markup stays in the APKG.
   `_plain_sentence` removes it on a later extract.
-- The `Core` field changes the note model. Anki can ask for a full sync when you
-  import the deck over an older copy of it.
+- The run writes a new note type, so Anki adds a note type on import and the
+  deck title updates in place (section 15.5).
 
 ## 9. Interface
 
@@ -458,7 +457,7 @@ so the core deck and the Swadesh deck read the same way.
 | `--cards`     | 300                 | Card cap                                |
 | `--words`     | 50                  | Tier F words after the Swadesh set      |
 | `--output`    | from the input name | Output APKG                             |
-| `--check`     | off                 | Run gates K1 to K19 on the output       |
+| `--check`     | off                 | Run gates K1 to K21 on the output       |
 
 The other values are fields of `CoreOptions` or `CoreRequest`: the third
 examples, the ubiquitous share, the completion cap, the outside budget, the
@@ -473,7 +472,7 @@ spoken weight, and the bold flag. The defaults are in `core.py` and
 
 | File                                 | Content                                                     |
 | ------------------------------------ | ----------------------------------------------------------- |
-| `apkg/french_core_300.apkg`          | the kept cards in core order, with the input model and audio |
+| `apkg/french_core_300.apkg`          | the kept cards in core order, with the output note type (section 15) and the input audio |
 | `apkg/french_core_300.core.csv`      | one row per input card: `note_id`, `index`, `sentence`, `english`, `audio`, `kept`, `pass`, `reason`, `targets`, `assigned`, `value`, `cost`, `units`, `new_lemmas`, `sense`, `bold` |
 | `apkg/french_core_300.coverage.csv`  | one row per target: `key`, `word`, `tier`, `position`, `quota`, `count`, `status` |
 | `apkg/french_core_300.manifest.json` | counts, options, frequency source, hashes                   |
@@ -501,7 +500,7 @@ non-zero.
 | K6   | no kept pair reaches the similarity limit                            |
 | K7   | every kept card has a valid MP3 file                                 |
 | K8   | the note count equals the kept count and the manifest count, and the media files are exactly the kept files |
-| K9   | the deck name and the note model are the requested values             |
+| K9   | the deck name is `profile.deck_name` and the only note type name is `profile.output_model_name` |
 | K10  | the kept order equals the recorded hash, and the CSV holds every kept card |
 | K11  | the coverage CSV has one row per target, the counts match the cards, and every status is valid |
 | K12  | the manifest hashes match the two CSVs                               |
@@ -511,7 +510,9 @@ non-zero.
 | K16  | every target with a card has a sense row, or the unchecked count is within `--max-unchecked-sense` |
 | K17  | no kept card holds a name or a loan word, and the manifest gives both counts |
 | K18  | every tail card brings at least one new content lemma                 |
-| K19  | every note with a `Core` value holds the target gloss of that word, and no other note holds a gloss |
+| K19  | every note holds a non-empty `Core` and `CoreGloss`, and the gloss is a coverage gloss of that word |
+| K20  | the unranked tier F count is within `--max-unranked`                  |
+| K21  | the package holds one note type, its fields equal `output_fields(profile)`, and every note holds one card |
 
 ### 10.2 Tests
 
@@ -537,6 +538,10 @@ file. Do not download a file.
 | Determinism | two runs give the same set and order                                           |
 | Budget      | a small `--core-max-cards` stops with a clear message                          |
 | APKG        | the kept notes, their media files, the templates, and the CSS                  |
+| Note type   | one note type named `profile.output_model_name` with the fields of section 15.2 |
+| Note type   | every note holds one `Core` and one `CoreGloss` (K19)                           |
+| Note type   | a kept card with no core word is not written, and the manifest counts it        |
+| Note type   | a kept note keeps its note id and its card `due`                                |
 
 ## 11. Risks and open questions
 
@@ -551,6 +556,8 @@ file. Do not download a file.
 | No sense file for a language               | K16 fails or many `unchecked`     | build the top 50 first             |
 | A sense row is wrong                       | a good card loses its credit      | review the CSV; `absent_sense`     |
 | The loan word list is incomplete           | a loan word stays in a card       | add a row when the review shows it |
+| The tail cards teach no core target        | 27 of 300 cards leave the deck    | section 15.4; a tail rule later    |
+| The new note type name is a new note type  | Anki duplicates the cards         | the release note of ADR 0013       |
 
 ### 11.2 Open questions
 
@@ -567,7 +574,7 @@ file. Do not download a file.
 | E1        | `anki-eo6` | this spec and the prototype                               | `specs/core-word-small-deck.md` |
 | E2        | `anki-v12` | core list, quota, filter C1 to C5, sense file, name and loan lists | `languages/<lang>/core.py` |
 | E3        | `anki-p62` | value, cost, passes, cover key, sense-filtered hits        | selection report          |
-| E4        | `anki-7z5` | order, writer, CSV files, manifest, gates K1 to K19        | `.apkg` and CSV files     |
+| E4        | `anki-7z5` | order, writer, CSV files, manifest, gates K1 to K21        | `.apkg` and CSV files     |
 | E5        | `anki-yop` | tests, README, docs entry                                 | release check             |
 
 ## 13. Appendix: evidence
@@ -669,9 +676,9 @@ to E5 are closed. Section 14.5 lists what remains.
 | ------------------------------------------- | ------------------------------------------------------------------ |
 | `anki_tools/ranking/core.py`                | value, cost, passes, assignment, order                             |
 | `anki_tools/languages/french/core.py`       | targets, filter C1 to C5, sense, driver, CSV files, manifest, bold |
-| `anki_tools/languages/french/core_gates.py` | gates K1 to K19                                                    |
+| `anki_tools/languages/french/core_gates.py` | gates K1 to K21                                                    |
 | `anki_tools/cli.py`                         | `anki fix fr --core` and its options                               |
-| `anki_tools/apkg/package.py`                | `add_model_field` and `remove_model_template` for `anki2` models   |
+| `anki_tools/apkg/package.py`                | `clone_model`, `delete_model`, and `update_note` for both formats  |
 | `vocab/french_core_senses.tsv`              | 51 rows: the top 50 tier F words and `ne`                          |
 | `vocab/french_loanwords.txt`                | 28 words                                                           |
 | `tests/test_core_deck.py`                   | 31 tests                                                           |
@@ -679,7 +686,7 @@ to E5 are closed. Section 14.5 lists what remains.
 
 ### 14.2 Gates
 
-`anki fix fr --core --check` reads the output files and runs K1 to K19.
+`anki fix fr --core --check` reads the output files and runs K1 to K21.
 
 | Gate | Value                                                                             |
 | ---- | --------------------------------------------------------------------------------- |
@@ -691,7 +698,7 @@ to E5 are closed. Section 14.5 lists what remains.
 | K6   | no kept pair reaches the lemma Jaccard limit                                      |
 | K7   | every kept card has a valid MP3 file                                              |
 | K8   | the note, media, and manifest counts agree                                        |
-| K9   | the deck name and the note model are the requested values                         |
+| K9   | the deck name is `French Core Sentences` and the note type name is the same       |
 | K10  | the kept order matches the recorded hash of the rank CSV                          |
 | K11  | the coverage CSV agrees with the card CSV                                         |
 | K12  | the manifest hashes match the two CSV files                                       |
@@ -701,7 +708,9 @@ to E5 are closed. Section 14.5 lists what remains.
 | K16  | 0 unchecked targets                                                               |
 | K17  | 0 names and 0 loan words in the kept cards                                        |
 | K18  | every tail card brings a new content lemma                                        |
-| K19  | every note with a `Core` value holds the target gloss of that word                |
+| K19  | every note holds a `Core` and a `CoreGloss` (section 15)                          |
+| K20  | 0 unranked tier F targets                                                         |
+| K21  | one note type with the five fields of section 15.2, one card per note             |
 
 ### 14.3 Built deck
 
@@ -709,18 +718,18 @@ to E5 are closed. Section 14.5 lists what remains.
 
 | Measure                         | Value                                                             |
 | ------------------------------- | ----------------------------------------------------------------- |
-| Cards                           | 300                                                               |
+| Cards                           | 273                                                               |
 | Targets                         | 209, of which 159 tier S and 50 tier F                            |
 | Targets with 2 cards            | 183                                                               |
 | Targets with 1 card             | 21                                                                |
 | `absent_sense` targets          | 5                                                                 |
 | Support words in the core cards | 247, of which 18 rare                                             |
-| New words from the tail         | 346                                                               |
-| Bold cards                      | 182, plain 118                                                    |
+| New words from the tail         | 242                                                               |
+| Bold cards                      | 182, plain 91                                                     |
 | Cards with a core word          | 273                                                               |
-| Cards by pass                   | seed 99, depth 25, completion 82, tail 94                         |
+| Cards by pass                   | seed 99, depth 25, completion 82, tail 67                         |
 | Filter reasons                  | F1 163, F2 1,869, F5 22, F7 22, F8 410, C1 39, C2 8, C3 25, C4 32 |
-| Other reasons                   | similar 6, card cap 3,032                                         |
+| Other reasons                   | similar 6, card cap 3,032, no core 27                             |
 
 ### 14.4 Notes on C3 and C4
 
@@ -740,3 +749,99 @@ or loan word adds a row to the list.
 - The reserve pack: off by default, as decided.
 - The `bold` column of the card CSV stays 0 (`anki-4bh`). Only the manifest
   counts the bold cards.
+
+## 15. Output note type
+
+This section replaces section 8. The shared design is section 14 of
+`specs/core-deck-all-languages.md`. This section gives the four core decks and
+the one cull deck of `specs/french-1000-sentence-cull.md`.
+
+### 15.1 The seam
+
+`CoreProfile` renames `model_name`, `sentence_field`, `english_field`, and
+`audio_field` to `input_model_name`, `input_sentence_field`,
+`input_english_field`, and `input_audio_field`. It drops `core_field` and
+`core_gloss_field` for the shared constants `OUTPUT_CORE_FIELD` and
+`OUTPUT_GLOSS_FIELD`. It adds `output_model_name` and
+`extra_fields: tuple[str, ...] = ()`.
+
+`CullProfile` takes the same four renames and the same two new fields, plus
+`sense_path: Path`, the sense file of section 15.4.
+
+The four language `core.py` files set the new fields. The core `deck_name` and
+`output_model_name` hold the same string, and a test pins the pair.
+
+### 15.2 The field set
+
+| Mode | Language | Note type name | Fields |
+| --- | --- | --- | --- |
+| core | fr | `French Core Sentences` | `Audio, Sentence, English, Core, CoreGloss` |
+| core | es | `Spanish Core Sentences` | `Audio, Sentence, English, Core, CoreGloss` |
+| core | zh | `Mandarin Core Sentences` | `Audio, Sentence, English, Core, CoreGloss` |
+| core | yue | `Cantonese Core Sentences` | `Audio, Sentence, English, Jyutping, Core, CoreGloss` |
+| cull | fr | `French 1000 Core Sentences` | `Audio, Sentence, English, Core, CoreGloss` |
+| cull | es | `Spanish 1000 Core Sentences` | `Audio, Sentence, English, Core, CoreGloss` |
+
+- The name is the deck title. ADR 0013 holds the rule.
+- `Jyutping` is the one extra field. `templates/cantonese_core/back.html`
+  reads it. `cantonese.core` sets `extra_fields = ("Jyutping",)`.
+- No output field holds the name of an input field. The input names stay in the
+  package that the run reads.
+- No output field holds a frequency rank. The rank stays in the coverage CSV
+  and the rank CSV. Section 14.8 of `specs/core-deck-all-languages.md` gives
+  the reason.
+
+The six template directories read the output names:
+`templates/french_core`, `templates/spanish_core`, `templates/mandarin_core`,
+`templates/cantonese_core`, `templates/french_cull`, and
+`templates/spanish_cull`. Section 14.2 of
+`specs/core-deck-all-languages.md` gives the token table. The `Core` block of
+every back template loses its `{{#Core}}` condition, and the two cull backs
+gain the line.
+
+### 15.3 The build
+
+`coreflow.write_deck` clones the input note type into the output name, moves
+the kept notes to it, and deletes the input note type and every other note
+type. The note ids, the guids, the card ids, and the `due` values stay.
+`AnkiPackage` gains `clone_model`, `update_note`, `prune_extra_cards`, and
+`delete_model`, and `add_note_and_card` takes a `model_id`. Section 14.4 and
+section 14.5 of `specs/core-deck-all-languages.md` give the steps and the
+contracts.
+
+The French `Basic` note type and the Mandarin `TEXT CARD` note type go with the
+input note type, because the output package holds one note type.
+
+### 15.4 The core word on every card
+
+`Core` and `CoreGloss` are filled from `CoreResult`, as section 8 says. Two
+rules are new:
+
+- The back template shows the line without a condition, so a missing value is
+  visible.
+- A kept card with no core word is not written. Its CSV row holds `kept = 0`
+  and `reason = no_core`, and the manifest counts it in
+  `counts.dropped_no_core`.
+
+Gate K19 fails when one note holds an empty `Core` or an empty `CoreGloss`.
+The French run drops 27 of its 300 cards today, because those tail cards teach
+no core target. The rebuild gives 273 cards, and section 14.3 must hold the
+measured numbers of the rebuild.
+
+The cull deck uses the same rule with `SelectionResult.card_targets`, and its
+gloss comes from `vocab/<lang>_core_senses.tsv` through the new
+`CullProfile.sense_path`. Section 14.7 of
+`specs/core-deck-all-languages.md` gives the rule.
+
+### 15.5 Migration
+
+- The four core decks are rebuilt, and the committed French cull deck with
+  them. The note type of each deck changes, so the release note must warn the
+  user (ADR 0013).
+- The deck title does not change, so Anki updates the deck in place.
+- The manifest holds `source.model` as the output name and
+  `source.input_model` as the input name. The manifest also holds
+  `counts.dropped_no_core`.
+- The French core deck holds 273 cards at the default, not 300. A larger deck
+  needs a tail rule that keeps only cards with a core target, which is a later
+  decision.

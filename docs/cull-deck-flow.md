@@ -24,15 +24,16 @@ One command runs the stages in order: `anki fix <language> --select`. The
 | C4    | select    | C1, C2, C3, reserve pack | kept cards and reserve cards                |
 | C5    | write     | C0, C4                   | APKG and three side files                   |
 
-The gates G1 to G15 run after C5.
+The gates G1 to G17 run after C5.
 
 The `--cards` and `--reserve` values change the request. The other
 `CullRequest` fields, such as `max_uses` and `target_words`, keep their
 defaults.
 
-The input fields come from the profile: `model_name`, `sentence_field`,
-`english_field`, and `audio_field`. C0 keeps the lowest card of each note. It
-cleans the sentence with `clean_sentence`.
+The input fields come from the profile: `input_model_name`,
+`input_sentence_field`, `input_english_field`, and `input_audio_field`. C0
+keeps the lowest card of each note. It cleans the sentence with
+`clean_sentence`.
 
 ## 2. Flow diagram
 
@@ -67,7 +68,7 @@ C4  selection
 C5  APKG, .cull.csv, .coverage.csv, .manifest.json
         |
         v
-    gates G1 to G15
+    gates G1 to G17
 ```
 
 ## 3. Target words (C1 and C2)
@@ -215,7 +216,7 @@ cards, and the reserve notes follow them.
 | -------------------------- | ------------------------------------------------------- |
 | `<stem>_culled.apkg`       | the deck: the kept cards and the reserve cards          |
 | `<stem>.cull.csv`          | one row per input card and reserve card                 |
-| `<stem>.coverage.csv`      | one row per target: word, rank, count, status           |
+| `<stem>.coverage.csv`      | per target: word, rank, count, status, gloss            |
 | `<stem>.manifest.json`     | params, counts, frequency source, licenses, hashes      |
 
 `default_output` gives `<stem>_culled.apkg` next to the input file.
@@ -225,6 +226,9 @@ The cull CSV columns are `source`, `sentence`, `english`, `audio`, `kept`,
 `swadesh` or `frequency`. The rows are the kept reserve cards, then the kept
 input cards in coverage order, then the rejected input cards.
 
+The coverage CSV columns are `word`, `rank`, `count`, `status`, and `gloss`.
+The gloss comes from the sense file of the profile, `sense_path`.
+
 The coverage status of a target is one of these values:
 
 | Status    | Meaning                              |
@@ -233,14 +237,29 @@ The coverage status of a target is one of these values:
 | `partial` | the target holds one card            |
 | `absent`  | the target holds no card             |
 
-The deck name comes from `profile.default_deck_name`. The note model keeps
-the name of the input model. The writer deletes the notes that no kept card
-uses, inserts the reserve notes, and sets the templates and the CSS of the
-profile.
+The deck name comes from `profile.default_deck_name`. The writer clones the
+input note type under the name of `profile.output_model_name`, and the deck
+title is the same string. The output holds one note type, one field set, and
+one card template.
 
-The manifest records the kept order hash of the reserve sentences and the kept
-input sentences. It records the two CSV hashes, the frequency source, the
-licenses, the reserve pack path, and the Swadesh exceptions.
+The writer deletes the notes that no kept card uses, inserts the reserve notes,
+and deletes the input note type and every other note type. It keeps the `due`
+value of each kept card. `reserve_fields` gives the five output values of a
+reserve card, so the pack `Target` becomes `Core` and the pack `Gloss` becomes
+`CoreGloss`.
+
+The field set is `output_fields(profile)`: `Audio`, `Sentence`, `English`, each
+`extra_fields` name, `Core`, and `CoreGloss`. `card_cores` takes the first
+target lemma of the card that has a sense row, and `fill_core_fields` writes
+that lemma and its first sense. A card without a target has no core word, so
+the run does not write it. Its CSV row holds `kept = 0` and `reason = no_core`,
+and the manifest counts it in `counts.dropped_no_core`.
+
+The manifest records the output note type in `source.model` and the input note
+type in `source.input_model`. It records the kept order hash of the reserve
+sentences and the kept input sentences. It records the two CSV hashes, the
+frequency source, the licenses, the reserve pack path, and the Swadesh
+exceptions.
 
 ## 8. Audit gates
 
@@ -252,10 +271,11 @@ licenses, the reserve pack path, and the Swadesh exceptions.
 | coverage  | G3, G4, G12  | covered targets, two-card share, coverage CSV rows        |
 | rules     | G5, G6       | F1 to F9 on every kept card, similarity                   |
 | files     | G7, G8, G9   | audio files, note count, media set                        |
-| identity  | G10, G11     | deck name, model name, kept order                         |
+| identity  | G10, G11     | deck name, note type, kept order                          |
 | manifest  | G13          | the two CSV hashes                                        |
 | swadesh   | G14          | the merged deck covers the reserve concepts               |
 | templates | G15          | the cull templates and the CSS classes                    |
+| note type | G16, G17     | one note type and its fields, the core word and the gloss |
 
 G3 fails below `target_coverage_gate`, 0.98 for French and Spanish. G4 fails
 below `double_coverage_gate`, 0.95. The profile holds both values.
@@ -263,17 +283,21 @@ below `double_coverage_gate`, 0.95. The profile holds both values.
 G5 skips F8 for a reserve card, because the Swadesh pack already checked that
 sentence. G14 needs the Swadesh count minus the exceptions of the profile, for
 example `intestins` in French. G15 needs the template set of the profile and
-each card class in the CSS.
+each card class in the CSS. G16 checks the single note type, the field set, and
+one card per note. G17 checks that every note holds a `Core` and a `CoreGloss`,
+and that the gloss is the coverage gloss of the core word.
 
-G1 passes when the card count reaches the cap, or when the pool has no more
-cards. A small input deck does not fail G1.
+G1 passes when the kept count plus `counts.dropped_no_core` reaches the cap, or
+when the pool has no more cards. A kept card without a core word leaves the
+deck, so the gate compares the count before that drop. A small input deck does
+not fail G1.
 
 ## 9. File map
 
 | Path                                      | Content                                        |
 | ----------------------------------------- | ---------------------------------------------- |
 | `anki_tools/ranking/cullflow.py`          | C0 to C5 flow, profile, selection, files       |
-| `anki_tools/ranking/cullgates.py`         | gates G1 to G15                                |
+| `anki_tools/ranking/cullgates.py`         | gates G1 to G17                                |
 | `anki_tools/ranking/coreflow.py`          | input deck reader, deck writer, reserve insert |
 | `anki_tools/ranking/corelist.py`          | target word list                               |
 | `anki_tools/ranking/cardfilter.py`        | shared filter rules F1 to F9                   |

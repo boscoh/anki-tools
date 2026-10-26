@@ -14,14 +14,19 @@ import hashlib
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, NamedTuple, Protocol, Sequence
+from typing import Any, Callable, Mapping, NamedTuple, Protocol, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking.coreflow import (
+    OUTPUT_CORE_FIELD,
+    OUTPUT_GLOSS_FIELD,
+    OUTPUT_SENTENCE_FIELD,
     STATUSES,
     TARGET_SEPARATOR,
+    DeckProfile,
+    coverage_glosses,
     filter_core_cards,
-    find_model_id,
+    output_fields,
     read_loanwords,
     read_output,
     side_paths,
@@ -37,26 +42,29 @@ __all__ = [
     "Gate",
     "GateResult",
     "check_core",
+    "core_word_problems",
     "gate_audio",
     "gate_bold",
     "gate_card_count",
+    "gate_core_word",
     "gate_counts",
     "gate_coverage",
     "gate_covered1",
     "gate_covered2",
     "gate_filter",
-    "gate_gloss",
     "gate_hashes",
     "gate_hit",
     "gate_identity",
     "gate_names",
     "gate_order",
     "gate_outside",
+    "gate_output_model",
     "gate_sense",
     "gate_similarity",
     "gate_tail",
     "gate_templates",
     "gate_unranked",
+    "output_model_problems",
     "run_gates",
 ]
 
@@ -171,7 +179,7 @@ class CoreFiles:
 
     def output(self) -> dict[str, Any]:
         """Read the output APKG and probe its audio."""
-        return self._load("output", lambda: read_output(self.apkg_path, self.profile))
+        return self._load("output", lambda: read_output(self.apkg_path))
 
     def tokens(self) -> list[list[tuple[str, str]]]:
         """Tokenize the sentences of the output deck."""
@@ -192,15 +200,8 @@ class CoreFiles:
         return self._load("notes", load)
 
     def fields(self) -> list[str]:
-        """Read the field names of the sentence model."""
-
-        def load() -> list[str]:
-            with AnkiPackage(self.apkg_path) as package:
-                models = package.get_models()
-                model = models[find_model_id(models, self.profile.model_name)]
-                return [entry["name"] for entry in model["flds"]]
-
-        return self._load("fields", load)
+        """Read the field names of the only note type."""
+        return self._load("fields", lambda: list(self.output()["fields"]))
 
     def media(self) -> set[str]:
         """Read the media file names of the output deck."""
@@ -352,14 +353,14 @@ def gate_counts(files: CoreFiles) -> tuple[bool, str]:
 
 
 def gate_identity(files: CoreFiles) -> tuple[bool, str]:
-    """K9: the deck name and the note model are the requested values."""
-    manifest = files.manifest()
-    source = manifest["source"]
+    """K9: the deck name and the note type are the requested values."""
+    params = files.manifest()["params"]
     output = files.output()
-    ok_deck = source["deck"] in output["decks"]
-    ok_model = output["note_models"] == {source["model"]}
+    name = files.profile.output_model_name
+    ok_deck = params.get("name") in output["decks"]
+    ok_model = output["note_models"] == {name}
     return ok_deck and ok_model, (
-        f"decks {sorted(output['decks'])}, models {sorted(output['note_models'])}"
+        f"decks {sorted(output['decks'])}, models {sorted(map(str, output['note_models']))}"
     )
 
 
@@ -490,7 +491,7 @@ def gate_bold(files: CoreFiles) -> tuple[bool, str]:
     params = manifest["params"]
     notes = files.notes()
     names = files.fields()
-    sentence_index = names.index(files.profile.sentence_field)
+    sentence_index = names.index(OUTPUT_SENTENCE_FIELD)
     bad: list[str] = []
     bolded = 0
     form = {_key_of(row): row["word"] for row in files.coverage()}
@@ -553,61 +554,84 @@ def gate_tail(files: CoreFiles) -> tuple[bool, str]:
     return not bad, f"{len(tail)} tail card(s), {len(bad)} without a new lemma"
 
 
-def gate_gloss(files: CoreFiles) -> tuple[bool, str]:
-    """K19: the core gloss is the target gloss of the core word."""
-    profile = files.profile
-    names = files.fields()
+def core_word_problems(
+    notes: Mapping[int, Sequence[str]],
+    fields: Sequence[str],
+    glosses: Mapping[str, str],
+) -> tuple[list[str], int]:
+    """Check the core word and the gloss of every note.
+
+    :param notes: Note id to field values.
+    :param fields: Field names of the output note type.
+    :param glosses: Word to its coverage gloss.
+    :returns: The problems, and the count of notes with a core word.
+    """
     missing = [
         name
-        for name in (profile.core_field, profile.core_gloss_field)
-        if name not in names
+        for name in (OUTPUT_CORE_FIELD, OUTPUT_GLOSS_FIELD)
+        if name not in fields
     ]
     if missing:
-        return False, f"model has no {_sample(missing)} field"
-    word_index = names.index(profile.core_field)
-    gloss_index = names.index(profile.core_gloss_field)
-    allowed = _target_glosses(files)
-    bad: list[str] = []
+        return [f"the note type has no {_sample(missing)} field"], 0
+    word_index = fields.index(OUTPUT_CORE_FIELD)
+    gloss_index = fields.index(OUTPUT_GLOSS_FIELD)
+    problems: list[str] = []
     filled = 0
-    for note_id, values in files.notes().items():
+    for note_id, values in notes.items():
         word = values[word_index].strip() if word_index < len(values) else ""
         gloss = values[gloss_index].strip() if gloss_index < len(values) else ""
         if not word:
-            if gloss:
-                bad.append(f"{note_id} has a gloss without a core word")
+            problems.append(f"{note_id} has no core word")
             continue
         filled += 1
         if not gloss:
-            bad.append(f"{note_id} has no gloss")
+            problems.append(f"{note_id} has no gloss")
         elif "," in gloss:
-            bad.append(f"{note_id} holds a comma gloss")
-        elif word in allowed and gloss not in allowed[word]:
-            bad.append(
-                f"{note_id} gloss {gloss!r} is not the target gloss of {word}"
+            problems.append(f"{note_id} holds a comma gloss")
+        elif word in glosses and gloss != glosses[word]:
+            problems.append(
+                f"{note_id} gloss {gloss!r} is not the coverage gloss of {word}"
             )
-    return not bad, f"{filled} core word(s), {len(bad)} bad: {_sample(bad)}"
+    return problems, filled
 
 
-def _target_glosses(files: CoreFiles) -> dict[str, set[str]]:
-    """Read the target glosses of the coverage CSV, keyed by word.
+def gate_core_word(files: CoreFiles) -> tuple[bool, str]:
+    """K19: every note holds a core word and the coverage gloss of that word."""
+    problems, filled = core_word_problems(
+        files.notes(), files.fields(), coverage_glosses(files.coverage())
+    )
+    return not problems, f"{filled} core word(s), {len(problems)} bad: {_sample(problems)}"
 
-    A form can hold more than one target, so the map holds a set per word. A
-    missing coverage file is not this gate's failure: K1 and K11 report it.
 
-    :param files: Lazy reader of the output files.
-    :returns: Word to the set of its target glosses.
+def output_model_problems(
+    output: Mapping[str, Any], profile: DeckProfile
+) -> list[str]:
+    """Check the note type shape of an output package.
+
+    :param output: Output of :func:`anki_tools.ranking.coreflow.read_output`.
+    :param profile: Language hooks of the run.
+    :returns: One problem line per fault.
     """
-    try:
-        rows = files.coverage()
-    except (OSError, ValueError):
-        return {}
-    allowed: dict[str, set[str]] = {}
-    for row in rows:
-        word = (row.get("word") or "").strip()
-        if word:
-            allowed.setdefault(word, set()).add((row.get("gloss") or "").strip())
-    return allowed
+    name = profile.output_model_name
+    problems: list[str] = []
+    if output["note_models"] != {name}:
+        problems.append(f"note types {sorted(map(str, output['note_models']))}")
+    expected = list(output_fields(profile))
+    if output["fields"] != expected:
+        problems.append(f"fields {output['fields']}")
+    templates = output["templates"].get(name, ())
+    if len(templates) != 1:
+        problems.append(f"{len(templates)} card template(s)")
+    ords = list(output["ords"])
+    if len(ords) != output["notes"] or any(ords):
+        problems.append(f"{len(ords)} cards, ordinals {sorted(set(ords))}")
+    return problems
 
+
+def gate_output_model(files: CoreFiles) -> tuple[bool, str]:
+    """K21: one note type, the output fields, and one card per note."""
+    problems = output_model_problems(files.output(), files.profile)
+    return not problems, f"issues {_sample(problems)}"
 
 GATES: tuple[Gate, ...] = (
     CoreGate("K1", gate_card_count),
@@ -628,8 +652,9 @@ GATES: tuple[Gate, ...] = (
     CoreGate("K16", gate_sense),
     CoreGate("K17", gate_names),
     CoreGate("K18", gate_tail),
-    CoreGate("K19", gate_gloss),
+    CoreGate("K19", gate_core_word),
     CoreGate("K20", gate_unranked),
+    CoreGate("K21", gate_output_model),
 )
 
 
@@ -651,7 +676,7 @@ def run_gates(files: CoreFiles) -> list[GateResult]:
 
 
 def check_core(output_path: Path, profile: CoreProfile) -> int:
-    """Run gates K1 to K20 on the files of a core output.
+    """Run gates K1 to K21 on the files of a core output.
 
     :param output_path: Output APKG file.
     :param profile: Language hooks.

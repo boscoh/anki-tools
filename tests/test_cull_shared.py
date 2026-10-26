@@ -14,11 +14,12 @@ import math
 from collections import Counter
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.ranking import coreflow, corelist, cullflow
+from anki_tools.ranking import coreflow, corelist, cullflow, cullgates
 
 SENTENCES = [
     ("kat ser stor.", "cat is big."),
@@ -64,18 +65,21 @@ def _profile() -> cullflow.CullProfile:
         final_marks=".?!",
         quote_marks='"«»“”',
         internal_marks=",;:",
-        model_name=MODEL_NAME,
-        sentence_field="Text",
-        english_field="Meaning",
-        audio_field="Audio",
+        input_model_name=MODEL_NAME,
+        input_sentence_field="Text",
+        input_english_field="Meaning",
+        input_audio_field="Audio",
+        output_model_name=DECK_NAME,
+        sense_path=Path("vocab/test_core_senses.tsv"),
         clean_sentence=str.strip,
         reserve_fields=lambda card: [
-            card.html,
             f"[sound:{card.audio}]",
+            card.html,
             card.english,
-            "",
+            card.target,
+            card.gloss,
         ],
-        templates=(("{{Text}}", "{{Meaning}}"),),
+        templates=(("{{Audio}}", "{{Sentence}}"),),
         card_css=lambda: ".sentence { color: black; }",
         reserve_pack=None,
         reserve_model_name="Reserve Sentences",
@@ -129,15 +133,17 @@ def test_a_second_profile_drives_every_output_value(tmp_path: Path) -> None:
         fields = [field["name"] for model in models.values() for field in model["flds"]]
         notes = [str(note["flds"]).split("\x1f") for note in package.get_notes()]
 
-    assert {model["name"] for model in models.values()} == {MODEL_NAME}
+    assert {model["name"] for model in models.values()} == {DECK_NAME}
     assert decks == {DECK_NAME}
-    assert fields == FIELDS
+    assert fields == list(coreflow.output_fields(_profile()))
     assert run.cards == 2
-    assert notes[0][0].startswith("kat ser")
+    assert notes[0][1].startswith("kat ser")
     assert notes[0][2] == "cat is big."
+    assert notes[0][3] == "kat"
 
     manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
-    assert manifest["source"]["model"] == MODEL_NAME
+    assert manifest["source"]["model"] == DECK_NAME
+    assert manifest["source"]["input_model"] == MODEL_NAME
     assert manifest["source"]["deck"] == DECK_NAME
     assert manifest["licenses"] == {"data": "test license"}
     assert "reserve_pack" not in manifest
@@ -523,13 +529,14 @@ def test_coverage_csv_statuses(tmp_path: Path) -> None:
     )
     path = tmp_path / "run.coverage.csv"
 
-    cullflow.write_coverage_csv(targets, selection, path)
+    cullflow.write_coverage_csv(targets, selection, path, {"chat": "cat"})
     header, rows = _read_csv(path)
 
     assert header == list(cullflow.COVERAGE_COLUMNS)
     assert [row["word"] for row in rows] == ["chat", "boire", "lait"]
     assert [row["count"] for row in rows] == ["2", "1", "0"]
     assert [row["status"] for row in rows] == ["covered", "partial", "absent"]
+    assert [row["gloss"] for row in rows] == ["cat", "", ""]
 
 
 def test_dedupe_reserve_drops_an_internal_duplicate() -> None:
@@ -562,3 +569,236 @@ def test_dedupe_reserve_drops_an_internal_duplicate() -> None:
 
     assert len(kept) == 1
     assert kept_sets == [{"chat", "ici", "aussi"}]
+
+
+RESERVE_PACK_FIELDS = [
+    "Audio",
+    "Sentence",
+    "English",
+    "Target",
+    "Gloss",
+    "WordAudio",
+    "Source",
+]
+
+
+def _reserve_pack(tmp_path: Path) -> Path:
+    """Write a reserve pack with one card."""
+    audio = tmp_path / "reserve.mp3"
+    audio.write_bytes(b"ID3\x03\x00\x00\x00\x00\x00\x00" + bytes(40))
+    path = tmp_path / "reserve.apkg"
+    AnkiPackage.create(
+        path,
+        "Reserve Source",
+        fields=RESERVE_PACK_FIELDS,
+        cards=[
+            {
+                "Audio": "[sound:reserve.mp3]",
+                "Sentence": "<b>je</b> suis ici.",
+                "English": "I am here.",
+                "Target": "je",
+                "Gloss": "I",
+                "WordAudio": "",
+                "Source": "Tatoeba #1",
+            }
+        ],
+        media_files=[str(audio)],
+        model_name="Reserve Sentences",
+    )
+    return path
+
+
+def _notes(path: Path) -> list[list[str]]:
+    """Give the field values of every note of a package."""
+    with AnkiPackage(path) as package:
+        return [str(row["flds"]).split("\x1f") for row in package.get_notes()]
+
+
+def test_the_cull_writes_the_output_note_type(tmp_path: Path) -> None:
+    source = _tiny_deck(tmp_path)
+    output = tmp_path / "culled.apkg"
+    profile = _profile()
+
+    cullflow.run_cull(
+        cullflow.CullRequest(
+            input_path=source,
+            output_path=output,
+            max_cards=2,
+            target_words=2,
+            min_words=2,
+            max_words=4,
+        ),
+        profile,
+    )
+
+    with AnkiPackage(output) as package:
+        models = package.get_models()
+        cards = package.get_cards()
+
+    assert [model["name"] for model in models.values()] == [
+        profile.output_model_name
+    ]
+    model = next(iter(models.values()))
+    assert [field["name"] for field in model["flds"]] == [
+        "Audio",
+        "Sentence",
+        "English",
+        "Core",
+        "CoreGloss",
+    ]
+    assert len(cards) == len(_notes(output)) == 2
+    assert {int(row["ord"]) for row in cards} == {0}
+
+
+def test_the_cull_fills_the_core_word_and_the_gloss(tmp_path: Path) -> None:
+    source = _tiny_deck(tmp_path)
+    output = tmp_path / "culled.apkg"
+    senses = tmp_path / "senses.tsv"
+    senses.write_text("word\tsenses\tfalse_friends\nkat\tcat\t\n", encoding="utf-8")
+    profile = replace(
+        _profile(),
+        sense_path=senses,
+        reserve_pack=_reserve_pack(tmp_path),
+    )
+
+    cullflow.run_cull(
+        cullflow.CullRequest(
+            input_path=source,
+            output_path=output,
+            max_cards=2,
+            target_words=2,
+            min_words=2,
+            max_words=4,
+        ),
+        profile,
+    )
+
+    values = _notes(output)
+    reserve = next(row for row in values if "<b>je</b>" in row[1])
+    frequency = next(row for row in values if "<b>je</b>" not in row[1])
+
+    assert reserve[3:] == ["je", "I"]
+    assert frequency[3:] == ["kat", "cat"]
+
+
+def test_the_cull_keeps_the_due_of_a_kept_card(tmp_path: Path) -> None:
+    source = _tiny_deck(tmp_path)
+    output = tmp_path / "culled.apkg"
+    with AnkiPackage(source) as package:
+        package.conn.execute("UPDATE cards SET due = 42")
+        package.conn.commit()
+        package.touch()
+        package.save()
+
+    cullflow.run_cull(
+        cullflow.CullRequest(
+            input_path=source,
+            output_path=output,
+            max_cards=1,
+            target_words=2,
+            min_words=2,
+            max_words=4,
+        ),
+        _profile(),
+    )
+
+    with AnkiPackage(output) as package:
+        dues = [
+            int(row[0])
+            for row in package.conn.execute("SELECT due FROM cards").fetchall()
+        ]
+
+    assert dues == [42]
+    assert len(_notes(output)) == 1
+
+
+def test_the_output_model_name_is_the_deck_name() -> None:
+    profile = _profile()
+
+    assert profile.output_model_name == profile.default_deck_name
+
+
+def _add_spare_field(path: Path, name: str) -> None:
+    """Append a field to the only note type of a package."""
+    with AnkiPackage(path) as package:
+        conn = package.conn
+        models = json.loads(conn.execute("SELECT models FROM col").fetchone()[0])
+        model = next(iter(models.values()))
+        extra = dict(model["flds"][-1])
+        extra.update({"name": name, "ord": len(model["flds"]), "media": []})
+        model["flds"].append(extra)
+        conn.execute("UPDATE col SET models = ? WHERE id = 1", (json.dumps(models),))
+        conn.commit()
+        package._modified = True
+        package.save()
+
+
+def _run_tiny_cull(tmp_path: Path, profile: cullflow.CullProfile) -> Path:
+    """Run the cull on the tiny deck and give the output path."""
+    output = tmp_path / "culled.apkg"
+    cullflow.run_cull(
+        cullflow.CullRequest(
+            input_path=_tiny_deck(tmp_path),
+            output_path=output,
+            max_cards=2,
+            target_words=2,
+            min_words=2,
+            max_words=4,
+        ),
+        profile,
+    )
+    return output
+
+
+def _sense_profile(tmp_path: Path) -> cullflow.CullProfile:
+    """Give the test profile with a sense file for the target `kat`."""
+    senses = tmp_path / "senses.tsv"
+    senses.write_text("word\tsenses\tfalse_friends\nkat\tcat\t\n", encoding="utf-8")
+    return replace(_profile(), sense_path=senses)
+
+
+def test_gate_output_model_reports_a_spare_field(tmp_path: Path) -> None:
+    profile = _sense_profile(tmp_path)
+    output = _run_tiny_cull(tmp_path, profile)
+    _add_spare_field(output, "Difficulty")
+
+    passed, message = cullgates.gate_output_model(
+        cullgates.cull_files(output, profile)
+    )
+
+    assert not passed
+    assert "Difficulty" in message
+
+
+def test_gate_core_word_reports_an_empty_core(tmp_path: Path) -> None:
+    profile = _sense_profile(tmp_path)
+    output = _run_tiny_cull(tmp_path, profile)
+    files = cullgates.cull_files(output, profile)
+    passed, message = cullgates.gate_core_word(files)
+    notes = files.notes()
+    fields = files.output()["fields"]
+    notes[next(iter(notes))][fields.index("Core")] = ""
+
+    failed, failed_message = cullgates.gate_core_word(files)
+
+    assert passed, message
+    assert not failed
+    assert "no core word" in failed_message
+
+
+def test_gate_card_count_counts_the_no_core_drop() -> None:
+    def files(kept: int, dropped: int) -> SimpleNamespace:
+        return SimpleNamespace(
+            rows=lambda: [{"kept": "1"}] * kept,
+            params=lambda: {"max_cards": 1000},
+            manifest=lambda: {
+                "counts": {"passed": 5000, "dropped_no_core": dropped}
+            },
+        )
+
+    passed, message = cullgates.gate_card_count(files(924, 76))
+    assert passed, message
+
+    passed, message = cullgates.gate_card_count(files(923, 76))
+    assert not passed
+    assert "923 kept + 76 dropped" in message

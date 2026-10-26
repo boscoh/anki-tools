@@ -17,7 +17,7 @@ from anki_tools.ranking import cullflow
 from anki_tools.ranking.core import CoreOptions
 from anki_tools.ranking.scan import CoreProfile
 
-SENSE_PATH = Path("vocab/french_core_senses.tsv")
+SENSE_PATH = cull.SENSE_PATH
 LOAN_PATH = Path("vocab/french_loanwords.txt")
 DEFAULT_NAME = "French Core Sentences"
 DEFAULT_CORE_WORDS = 50
@@ -26,8 +26,6 @@ DEFAULT_OPTIONS = CoreOptions(tail_cards=120)
 MIN_UNITS = 5
 MAX_UNITS = 9
 
-CORE_FIELD = "Core"
-CORE_GLOSS_FIELD = "CoreGloss"
 
 TEMPLATE_DIR = TEMPLATES_DIR / "french_core"
 CORE_FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
@@ -59,12 +57,11 @@ FRENCH_CORE_PROFILE = CoreProfile(
     sense_filter=FRENCH.sense_filter,
     highlight=FRENCH.highlight,
     lemma_key=str.casefold,
-    model_name=cull.MODEL_NAME,
-    sentence_field=cull.FRENCH_FIELD,
-    english_field=cull.ENGLISH_FIELD,
-    audio_field=cull.AUDIO_FIELD,
-    core_field=CORE_FIELD,
-    core_gloss_field=CORE_GLOSS_FIELD,
+    input_model_name=cull.MODEL_NAME,
+    input_sentence_field=cull.FRENCH_FIELD,
+    input_english_field=cull.ENGLISH_FIELD,
+    input_audio_field=cull.AUDIO_FIELD,
+    output_model_name=DEFAULT_NAME,
     templates=CORE_TEMPLATES,
     card_css=cull.card_css,
     min_units=MIN_UNITS,

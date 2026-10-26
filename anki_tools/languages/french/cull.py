@@ -47,6 +47,7 @@ BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")
 CARD_TEMPLATES = ((FRONT_TEMPLATE, BACK_TEMPLATE),)
 
 DEFAULT_DECK_NAME = "French 1000 Core Sentences"
+SENSE_PATH = Path("vocab/french_core_senses.tsv")
 LICENSES = {
     "tatoeba": "Tatoeba sentence text: CC BY 2.0 FR",
     "wordfreq": "wordfreq list: Apache License 2.0",
@@ -64,10 +65,10 @@ def load_input_deck(path: Path) -> list[InputCard]:
     profile = FRENCH_CULL_PROFILE
     return coreflow.read_input_deck(
         path,
-        profile.model_name,
-        profile.sentence_field,
-        profile.english_field,
-        profile.audio_field,
+        profile.input_model_name,
+        profile.input_sentence_field,
+        profile.input_english_field,
+        profile.input_audio_field,
         profile.clean_sentence,
     )
 
@@ -126,26 +127,16 @@ def _concept_forms(concept: str) -> set[str]:
 
 
 def _reserve_fields(card: cullflow.ReserveCard) -> list[str]:
-    """Give the ``French``, ``sound``, ``Back``, and spare field of one card.
+    """Give the five output field values of one reserve card.
 
     :param card: Reserve card.
-    :returns: The field values in the order of the input model.
+    :returns: The ``Audio``, ``Sentence``, ``English``, ``Core``, and
+        ``CoreGloss`` values.
     """
-    back = f"{card.english} — {card.target}"
-    if card.gloss:
-        back += f" ({card.gloss})"
-    return [card.html, f"[sound:{card.audio}]", back, ""]
+    return [f"[sound:{card.audio}]", card.html, card.english, card.target, card.gloss]
 
 
 read_reserve = partial(cullflow.load_reserve, model_name=SWADESH_MODEL_NAME)
-
-write_cull_deck = partial(
-    coreflow.write_deck,
-    model_name=MODEL_NAME,
-    templates=CARD_TEMPLATES,
-    card_css=card_css,
-    reserve_fields=_reserve_fields,
-)
 
 FRENCH_CULL_PROFILE = cullflow.CullProfile(
     tokenize_texts=partial(cullflow.tokenize_texts, model=TOKENIZER),
@@ -158,14 +149,16 @@ FRENCH_CULL_PROFILE = cullflow.CullProfile(
     final_marks=FINAL_MARKS,
     quote_marks=QUOTE_MARKS,
     internal_marks=INTERNAL_MARKS,
-    model_name=MODEL_NAME,
-    sentence_field=FRENCH_FIELD,
-    english_field=ENGLISH_FIELD,
-    audio_field=AUDIO_FIELD,
+    input_model_name=MODEL_NAME,
+    input_sentence_field=FRENCH_FIELD,
+    input_english_field=ENGLISH_FIELD,
+    input_audio_field=AUDIO_FIELD,
+    output_model_name=DEFAULT_DECK_NAME,
     clean_sentence=cullflow.plain_sentence,
     reserve_fields=_reserve_fields,
     templates=CARD_TEMPLATES,
     card_css=card_css,
+    sense_path=SENSE_PATH,
     reserve_pack=SWADESH_PACK_PATH,
     reserve_model_name=SWADESH_MODEL_NAME,
     swadesh_total=SWADESH_TOTAL,
@@ -178,6 +171,12 @@ FRENCH_CULL_PROFILE = cullflow.CullProfile(
     licenses=LICENSES,
     target_coverage_gate=0.98,
     double_coverage_gate=0.95,
+)
+
+write_cull_deck = partial(
+    coreflow.write_deck,
+    profile=FRENCH_CULL_PROFILE,
+    reserve_fields=_reserve_fields,
 )
 
 

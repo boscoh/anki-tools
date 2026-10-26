@@ -14,7 +14,7 @@ Status: accepted
 | --- | --- | --- | --- |
 | Vocabulary (`anki swadesh vocab <lang>`) | `Swadesh <Language> Vocabulary` | same as the deck title | `apkg/swadesh_<lang>.apkg` |
 | Sentence pack (`anki swadesh pack <lang>`) | `Swadesh <Language> Sentences` | same as the deck title | `apkg/swadesh_<lang>_sentences.apkg` |
-| Core deck (`anki fix <lang> --core`) | `<Language> Core Sentences` | the note type of the input deck, unchanged | `<input stem>_core.apkg` |
+| Core deck (`anki fix <lang> --core`) | `<Language> Core Sentences` | **superseded by ADR 0013**: a note type of its own, named as the deck title | `<input stem>_core.apkg` |
 
 `<Language>` is the title case of the canonical name in
 `anki_tools/languages/registry.py`, for example Mandarin or Cantonese.

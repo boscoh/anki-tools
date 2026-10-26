@@ -74,8 +74,6 @@ MODEL_NAME = "0 2024 Sentences Deck"
 SENTENCE_FIELD = "Sentence"
 ENGLISH_FIELD = "Sentence (Translation)"
 AUDIO_FIELD = "[a]"
-CORE_FIELD = "Core"
-CORE_GLOSS_FIELD = "CoreGloss"
 
 SENSE_PATH = Path("vocab/mandarin_core_senses.tsv")
 LOAN_PATH = Path("vocab/mandarin_loanwords.txt")
@@ -252,9 +250,9 @@ def finalize_output(output_path: Path, core_csv: Path) -> int:
     written = 0
     with AnkiPackage(output_path) as package:
         models = package.get_models()
-        model_id = coreflow.find_model_id(models, MODEL_NAME)
+        model_id = coreflow.find_only_model_id(models)
         names = [field["name"] for field in models[model_id]["flds"]]
-        sentence_index = names.index(SENTENCE_FIELD)
+        sentence_index = names.index(coreflow.OUTPUT_SENTENCE_FIELD)
         for note in package.get_notes():
             note_id = int(note["id"])
             sentence = rows.get(note_id)
@@ -283,12 +281,11 @@ MANDARIN_CORE_PROFILE = CoreProfile(
     sense_filter=MANDARIN.sense_filter,
     highlight=MANDARIN.highlight,
     lemma_key=convert_to_simplified,
-    model_name=MODEL_NAME,
-    sentence_field=SENTENCE_FIELD,
-    english_field=ENGLISH_FIELD,
-    audio_field=AUDIO_FIELD,
-    core_field=CORE_FIELD,
-    core_gloss_field=CORE_GLOSS_FIELD,
+    input_model_name=MODEL_NAME,
+    input_sentence_field=SENTENCE_FIELD,
+    input_english_field=ENGLISH_FIELD,
+    input_audio_field=AUDIO_FIELD,
+    output_model_name=DEFAULT_NAME,
     templates=CORE_TEMPLATES,
     card_css=card_css,
     min_units=MIN_UNITS,

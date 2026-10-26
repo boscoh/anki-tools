@@ -7,7 +7,9 @@ spaCy, ffprobe, or the frequency list.
 from __future__ import annotations
 
 import csv
+import json
 from collections import Counter
+from dataclasses import replace
 from pathlib import Path
 from typing import Sequence
 
@@ -18,7 +20,6 @@ from anki_tools.languages.french import core, cull
 from anki_tools.ranking import coreflow, corelist
 from anki_tools.ranking.coreflow import (
     coverage_rows_of,
-    find_model_id,
     InputCard,
     kept_order_hash,
     outside_lemmas,
@@ -38,7 +39,8 @@ from anki_tools.ranking.core import (
     target_quotas,
 )
 from anki_tools.ranking import coregates
-from anki_tools.ranking.coregates import gate_gloss
+from anki_tools.ranking.coregates import gate_core_word
+from anki_tools.ranking.scan import CoreProfile
 
 
 def _card(
@@ -437,6 +439,7 @@ class TestFiles:
 
 def _tiny_deck(tmp_path: Path) -> Path:
     sentences = ["Le chat dort.", "Le chat mange.", "Le lapin court."]
+    english = ["The cat sleeps.", "The cat eats.", "The rabbit runs."]
     media = []
     for index in range(len(sentences)):
         path = tmp_path / f"a{index}.mp3"
@@ -446,10 +449,10 @@ def _tiny_deck(tmp_path: Path) -> Path:
         {
             "French": sentence,
             "sound": f"[sound:a{index}.mp3]",
-            "Back": f"English {index}.",
+            "Back": line,
             "freq ranks": "[ 1 2 ]",
         }
-        for index, sentence in enumerate(sentences)
+        for index, (sentence, line) in enumerate(zip(sentences, english))
     ]
     source = tmp_path / "input.apkg"
     AnkiPackage.create(
@@ -463,170 +466,257 @@ def _tiny_deck(tmp_path: Path) -> Path:
     return source
 
 
+def _tokens(cards: Sequence[InputCard]) -> list[list[tuple[str, str]]]:
+    """Tokenize each sentence into its words, with a content tag."""
+    return [
+        [(word.strip(".").casefold(), "VERB") for word in card.sentence.split()]
+        for card in cards
+    ]
+
+
+def _offline_profile(tmp_path: Path) -> CoreProfile:
+    """Give the French core hooks with no spaCy model and no data file."""
+    return replace(
+        core.FRENCH_CORE_PROFILE,
+        tokenize_deck=_tokens,
+        load_frequency=list,
+        read_names=set,
+        word_table=lambda: [(1, "chat", "cat")],
+        sense_path=tmp_path / "absent_senses.tsv",
+        loan_path=tmp_path / "absent_loans.txt",
+        min_units=1,
+        max_units=9,
+        default_options=CoreOptions(
+            max_cards=10, per_word=1, completion_cards=0, tail_cards=1
+        ),
+    )
+
+
+def _run_core(tmp_path: Path) -> tuple[coreflow.CoreRun, Path, CoreProfile]:
+    """Run the core mode on the tiny deck."""
+    source = _tiny_deck(tmp_path)
+    profile = _offline_profile(tmp_path)
+    output = tmp_path / "core.apkg"
+    run = coreflow.run_core(
+        coreflow.CoreRequest(
+            input_path=source,
+            output_path=output,
+            core_words=0,
+            options=profile.default_options,
+        ),
+        profile,
+    )
+    return run, output, profile
+
+
+def _cards(path: Path) -> dict[int, tuple[int, int, int]]:
+    """Give the card id, due, and ord of each note of a package."""
+    with AnkiPackage(path) as package:
+        rows = package.conn.execute("SELECT id, nid, due, ord FROM cards").fetchall()
+    return {int(row["nid"]): (int(row["id"]), int(row["due"]), int(row["ord"])) for row in rows}
+
+
+def _add_spare_field(path: Path, name: str) -> None:
+    """Append a field to the only note type of a package."""
+    with AnkiPackage(path) as package:
+        conn = package.conn
+        models = json.loads(conn.execute("SELECT models FROM col").fetchone()[0])
+        model = next(iter(models.values()))
+        extra = dict(model["flds"][-1])
+        extra.update({"name": name, "ord": len(model["flds"]), "media": []})
+        model["flds"].append(extra)
+        conn.execute("UPDATE col SET models = ? WHERE id = 1", (json.dumps(models),))
+        conn.commit()
+        package._modified = True
+        package.save()
+
+
 class TestCardDesign:
     def test_the_front_shows_only_the_audio(self) -> None:
         front = core.CORE_FRONT_TEMPLATE
 
-        assert "{{sound}}" in front
-        assert "{{French}}" not in front
-        assert "{{Back}}" not in front
+        assert "{{Audio}}" in front
+        assert "{{Sentence}}" not in front
+        assert "{{English}}" not in front
         assert "{{Core}}" not in front
         assert "hint" not in front
 
     def test_the_back_shows_audio_sentence_english_and_core_word(self) -> None:
         back = core.CORE_BACK_TEMPLATE
-        order = [back.index(f"{{{{{name}}}}}") for name in ("sound", "French", "Back", "Core")]
+        order = [
+            back.index(f"{{{{{name}}}}}")
+            for name in ("Audio", "Sentence", "English", "Core", "CoreGloss")
+        ]
 
         assert order == sorted(order)
+        assert "{{#Core}}" not in back
 
     def test_the_deck_has_one_card_template(self) -> None:
         assert len(core.CORE_TEMPLATES) == 1
+
+    def test_the_run_writes_one_note_type_with_the_output_fields(
+        self, tmp_path: Path
+    ) -> None:
+        run, output, profile = _run_core(tmp_path)
+
+        with AnkiPackage(output) as package:
+            models = package.get_models(include_templates=True)
+            cards = package.get_cards()
+
+        assert [model["name"] for model in models.values()] == [
+            profile.output_model_name
+        ]
+        model = next(iter(models.values()))
+        assert [field["name"] for field in model["flds"]] == list(
+            coreflow.output_fields(profile)
+        )
+        assert [
+            (template["qfmt"], template["afmt"]) for template in model["tmpls"]
+        ] == [core.CORE_TEMPLATES[0]]
+        assert len(cards) == run.cards
+        assert {int(row["ord"]) for row in cards} == {0}
 
     def test_the_model_gets_the_core_field_and_templates(self, tmp_path: Path) -> None:
         source = _tiny_deck(tmp_path)
         cards = cull.load_input_deck(source)
         output = tmp_path / "core.apkg"
-        cull.write_cull_deck(source, cards, [0, 1, 2], output, "Core Deck")
-        targets = [_target("S1:chat", form="chat", gloss="cat")]
-        candidates = [
-            CoreCandidate(index=0, targets=("S1:chat",), outside=(), units=3),
-            CoreCandidate(index=1, targets=("S1:chat",), outside=(), units=3),
-            CoreCandidate(index=2, targets=(), outside=(), units=3),
-        ]
-        result = CoreResult(
-            kept=[0, 1, 2],
-            uses=Counter(),
-            quotas={},
-            assigned={0: "S1:chat"},
-            order=[0, 1, 2],
+        profile = core.FRENCH_CORE_PROFILE
+
+        coreflow.write_deck(source, cards, [0, 1], output, "Core Deck", profile)
+        filled = coreflow.fill_core_fields(
+            output, cards, {0: ("chat", "cat"), 1: ("chat", "cat")}
         )
 
-        filled = coreflow._write_core_model(
-            output,
-            cards,
-            result,
-            [0, 1, 2],
-            targets,
-            candidates,
-            core.FRENCH_CORE_PROFILE,
-        )
-
-        assert filled == 2
         with AnkiPackage(output) as package:
-            models = package.get_models(include_templates=True)
-            model = next(m for m in models.values() if m["name"] == cull.MODEL_NAME)
-            names = [f["name"] for f in model["flds"]]
-            templates = [(t["qfmt"], t["afmt"]) for t in model["tmpls"]]
-            values = {
-                row["flds"].split("\x1f")[0]: row["flds"].split("\x1f")
+            models = package.get_models()
+            notes = {
+                int(row["id"]): str(row["flds"]).split("\x1f")
                 for row in package.get_notes()
             }
 
-        assert names == [
-            "French",
-            "sound",
-            "Back",
-            "freq ranks",
+        assert filled == 2
+        assert list(models) != []
+        model = next(iter(models.values()))
+        assert model["name"] == profile.output_model_name
+        assert [field["name"] for field in model["flds"]] == [
+            "Audio",
+            "Sentence",
+            "English",
             "Core",
             "CoreGloss",
         ]
-        assert templates == [tuple(pair) for pair in core.CORE_TEMPLATES]
-        with AnkiPackage(output) as package:
-            ords = [row["ord"] for row in package.get_cards()]
-        assert ords == [0, 0, 0]
-        assert values["Le chat dort."][4] == "chat"
-        assert values["Le chat mange."][4] == "chat"
-        assert values["Le lapin court."][4] == ""
-        assert values["Le chat dort."][3] == "[ 1 2 ]"
-        assert values["Le chat dort."][5] == "cat"
-        assert values["Le chat mange."][5] == "cat"
-        assert values["Le lapin court."][5] == ""
-
-    def test_the_gloss_gate_passes_on_a_filled_deck(self, tmp_path: Path) -> None:
-
-        source = _tiny_deck(tmp_path)
-        cards = cull.load_input_deck(source)
-        output = tmp_path / "core.apkg"
-        cull.write_cull_deck(source, cards, [0, 1, 2], output, "Core Deck")
-        targets = [_target("S1:chat", form="chat", gloss="cat")]
-        candidates = [
-            CoreCandidate(index=0, targets=("S1:chat",), outside=(), units=3),
-            CoreCandidate(index=1, targets=("S1:chat",), outside=(), units=3),
-            CoreCandidate(index=2, targets=(), outside=(), units=3),
+        assert notes[cards[0].note_id] == [
+            "[sound:a0.mp3]",
+            "Le chat dort.",
+            "The cat sleeps.",
+            "chat",
+            "cat",
         ]
-        result = CoreResult(
-            kept=[0, 1, 2],
-            uses=Counter(),
-            quotas={},
-            assigned={0: "S1:chat"},
-            order=[0, 1, 2],
-        )
-        coreflow._write_core_model(
-            output,
-            cards,
-            result,
-            [0, 1, 2],
-            targets,
-            candidates,
-            core.FRENCH_CORE_PROFILE,
-        )
+        assert notes[cards[1].note_id][3:] == ["chat", "cat"]
 
-        files = coregates.CoreFiles(output, core.FRENCH_CORE_PROFILE)
-        passed, message = gate_gloss(files)
+    def test_every_kept_note_holds_a_core_word_and_a_gloss(
+        self, tmp_path: Path
+    ) -> None:
+        _run, output, profile = _run_core(tmp_path)
+        files = coregates.CoreFiles(output, profile)
+
+        passed, message = gate_core_word(files)
+        core_word_problems, filled = coregates.core_word_problems(
+            files.notes(),
+            files.fields(),
+            coreflow.coverage_glosses(files.coverage()),
+        )
+        notes = files.notes()
+        fields = files.fields()
+        notes[next(iter(notes))][fields.index("Core")] = ""
+
+        failed, failed_message = gate_core_word(files)
 
         assert passed, message
+        assert core_word_problems == []
+        assert filled == 1
+        assert not failed
+        assert "no core word" in failed_message
+
+    def test_the_gloss_gate_fails_on_a_missing_gloss(self, tmp_path: Path) -> None:
+        _run, output, profile = _run_core(tmp_path)
+        with AnkiPackage(output) as package:
+            note = package.get_notes()[0]
+            package.update_note_field(int(note["id"]), 4, "")
+            package.touch()
+            package.save(output)
+
+        passed, message = gate_core_word(coregates.CoreFiles(output, profile))
+
+        assert not passed
+        assert "has no gloss" in message
 
     def test_the_gloss_gate_fails_on_a_wrong_gloss(self, tmp_path: Path) -> None:
-        from anki_tools.ranking.coreflow import side_paths
-
-        source = _tiny_deck(tmp_path)
-        cards = cull.load_input_deck(source)
-        output = tmp_path / "core.apkg"
-        cull.write_cull_deck(source, cards, [0, 1, 2], output, "Core Deck")
-        targets = [_target("S1:chat", form="chat", gloss="cat")]
-        candidates = [
-            CoreCandidate(index=0, targets=("S1:chat",), outside=(), units=3),
-            CoreCandidate(index=1, targets=("S1:chat",), outside=(), units=3),
-            CoreCandidate(index=2, targets=(), outside=(), units=3),
-        ]
-        result = CoreResult(
-            kept=[0, 1, 2],
-            uses=Counter(),
-            quotas={},
-            assigned={0: "S1:chat"},
-            order=[0, 1, 2],
-        )
-        coreflow._write_core_model(
-            output,
-            cards,
-            result,
-            [0, 1, 2],
-            targets,
-            candidates,
-            core.FRENCH_CORE_PROFILE,
-        )
-        _core, coverage, _manifest, _rank = side_paths(output)
-        coverage.write_text(
+        _run, output, profile = _run_core(tmp_path)
+        core_csv, coverage_csv, _manifest, _rank = side_paths(output)
+        coverage_csv.write_text(
             "key,word,gloss,tier,position,quota,count,status\n"
-            "S1:chat,chat,dog,S,1,2,2,covered\n",
+            "S1:chat,chat,dog,S,1,1,1,covered\n",
             encoding="utf-8",
         )
 
-        files = coregates.CoreFiles(output, core.FRENCH_CORE_PROFILE)
-        passed, message = gate_gloss(files)
+        passed, message = gate_core_word(coregates.CoreFiles(output, profile))
 
         assert not passed
-        assert "is not the target gloss" in message
+        assert "is not the coverage gloss" in message
 
-    def test_adding_the_field_twice_changes_nothing(self, tmp_path: Path) -> None:
+    def test_a_kept_card_without_a_core_word_leaves_the_deck(
+        self, tmp_path: Path
+    ) -> None:
+        run, output, profile = _run_core(tmp_path)
+
+        manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
+        with run.core_csv.open(encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+        dropped = [row for row in rows if row["reason"] == "no_core"]
+
+        assert manifest["counts"]["dropped_no_core"] == 1
+        assert len(dropped) == 1
+        assert dropped[0]["kept"] == "0"
+        assert "lapin" in dropped[0]["sentence"]
+        assert run.cards == 1
+        passed, message = coregates.gate_order(coregates.CoreFiles(output, profile))
+        assert passed, message
+        with AnkiPackage(output) as package:
+            sentences = [
+                str(row["flds"]).split("\x1f")[1] for row in package.get_notes()
+            ]
+        assert len(sentences) == 1
+        assert all("lapin" not in sentence for sentence in sentences)
+
+    def test_the_kept_card_keeps_its_note_id_and_due(self, tmp_path: Path) -> None:
         source = _tiny_deck(tmp_path)
+        cards = cull.load_input_deck(source)
         with AnkiPackage(source) as package:
-            model_id = find_model_id(
-                package.get_models(include_templates=True), cull.MODEL_NAME
-            )
-            first = package.add_model_field(model_id, "Core")
-            second = package.add_model_field(model_id, "Core")
-            widths = {len(row["flds"].split("\x1f")) for row in package.get_notes()}
+            package.conn.execute("UPDATE cards SET due = 42")
+            package.conn.commit()
+            package.touch()
+            package.save()
+        before = _cards(source)
+        output = tmp_path / "core.apkg"
 
-        assert first == second == 4
-        assert widths == {5}
+        counts = coreflow.write_deck(
+            source, cards, [0], output, "Core Deck", core.FRENCH_CORE_PROFILE
+        )
+
+        after = _cards(output)
+        note_id = cards[0].note_id
+        assert counts == {"notes": 1, "media": 1, "items": 1}
+        assert after[note_id] == before[note_id]
+        assert after[note_id][1] == 42
+
+    def test_gate_output_model_fails_on_a_spare_field(self, tmp_path: Path) -> None:
+        _run, output, profile = _run_core(tmp_path)
+        _add_spare_field(output, "Difficulty")
+
+        passed, message = coregates.gate_output_model(
+            coregates.CoreFiles(output, profile)
+        )
+
+        assert not passed
+        assert "Difficulty" in message

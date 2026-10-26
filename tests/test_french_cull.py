@@ -277,8 +277,8 @@ def test_write_deck_keeps_the_notes_and_their_media(tmp_path: Path) -> None:
     assert len(notes) == 2
     assert media == {"a0.mp3", "a2.mp3"}
     assert decks == {DECK_NAME}
-    assert models == {cull_fr.MODEL_NAME}
-    assert [card.sentence for card in cull_fr.load_input_deck(output)] == [
+    assert models == {cull_fr.FRENCH_CULL_PROFILE.output_model_name}
+    assert [card.sentence for card in coreflow.read_output_deck(output)] == [
         DECK_SENTENCES[0],
         DECK_SENTENCES[2],
     ]
@@ -294,7 +294,9 @@ def test_write_deck_sets_the_swadesh_templates(tmp_path: Path) -> None:
     with AnkiPackage(output) as package:
         models = package.get_models(include_templates=True)
     model = next(
-        item for item in models.values() if item.get("name") == cull_fr.MODEL_NAME
+        item
+        for item in models.values()
+        if item.get("name") == cull_fr.FRENCH_CULL_PROFILE.output_model_name
     )
     templates = [tuple(template[k] for k in ("qfmt", "afmt")) for template in model["tmpls"]]
 
@@ -349,7 +351,9 @@ def test_write_deck_removes_the_second_card_template(tmp_path: Path) -> None:
         models = package.get_models(include_templates=True)
         rows = package.get_cards()
     model = next(
-        item for item in models.values() if item.get("name") == cull_fr.MODEL_NAME
+        item
+        for item in models.values()
+        if item.get("name") == cull_fr.FRENCH_CULL_PROFILE.output_model_name
     )
 
     assert [template["name"] for template in model["tmpls"]] == ["Card 1"]
@@ -452,10 +456,24 @@ def test_run_gates_passes_on_a_tiny_output(
     )
     cull_csv, coverage_csv, manifest_path = cullflow.side_paths(output)
     cullflow.write_cull_csv(cards, ["", "", ""], selection, ordered, cull_csv)
-    cullflow.write_coverage_csv(targets, selection, coverage_csv)
+    cullflow.write_coverage_csv(
+        targets,
+        selection,
+        coverage_csv,
+        {"chat": "cat", "boire": "drink", "lait": "milk"},
+    )
+    coreflow.fill_core_fields(
+        output,
+        cards,
+        {0: ("chat", "cat"), 1: ("chat", "cat"), 2: ("boire", "drink")},
+    )
     coreflow.write_manifest(
         manifest_path,
-        source={"input": str(source), "deck": DECK_NAME, "model": cull_fr.MODEL_NAME},
+        source={
+            "input": str(source),
+            "deck": DECK_NAME,
+            "model": cull_fr.FRENCH_CULL_PROFILE.output_model_name,
+        },
         params={
             "max_cards": 3,
             "target_words": 3,
@@ -477,14 +495,14 @@ def test_run_gates_passes_on_a_tiny_output(
         kept_order=cullflow.kept_order_hash(cards, ordered),
     )
     monkeypatch.setattr(cullgates.CullFiles, "tokens", _fake_tokens)
-    monkeypatch.setattr(cullgates, "probe_audio", _fake_probe)
+    monkeypatch.setattr(coreflow, "probe_audio", _fake_probe)
 
     rows = cullgates.run_gates(
         cullgates.cull_files(output, cull_fr.FRENCH_CULL_PROFILE)
     )
 
     assert [gate for gate, _passed, _message in rows] == [
-        f"G{number}" for number in range(1, 16)
+        f"G{number}" for number in range(1, 18)
     ]
     for gate, passed, message in rows:
         assert passed, f"{gate}: {message}"
@@ -562,12 +580,13 @@ def test_write_deck_inserts_the_reserve_card(tmp_path: Path) -> None:
 
     assert counts == {"notes": 3, "media": 3, "items": 3}
     assert media == {"a0.mp3", "a1.mp3", "tts_reserve.mp3"}
-    assert models == {cull_fr.MODEL_NAME}
+    assert models == {cull_fr.FRENCH_CULL_PROFILE.output_model_name}
     fields = [str(note["flds"]).split("\x1f") for note in notes]
-    assert any("<b>Je</b> suis ici." in row[0] for row in fields)
-    reserve_row = next(row for row in fields if "<b>Je</b>" in row[0])
-    assert reserve_row[1] == "[sound:tts_reserve.mp3]"
-    assert reserve_row[2] == "I am here. — je (I)"
+    reserve_row = next(row for row in fields if "<b>Je</b>" in row[1])
+    assert reserve_row[0] == "[sound:tts_reserve.mp3]"
+    assert reserve_row[2] == "I am here."
+    assert reserve_row[3] == "je"
+    assert reserve_row[4] == "I"
 
 
 def test_swadesh_coverage_counts_a_word_from_another_card() -> None:

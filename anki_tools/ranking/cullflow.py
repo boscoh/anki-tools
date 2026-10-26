@@ -87,7 +87,7 @@ CULL_COLUMNS = (
     "gain",
     "hardest_rank",
 )
-COVERAGE_COLUMNS = ("word", "rank", "count", "status")
+COVERAGE_COLUMNS = ("word", "rank", "count", "status", "gloss")
 COVERED_STATUS = "covered"
 PARTIAL_STATUS = "partial"
 ABSENT_STATUS = "absent"
@@ -178,10 +178,13 @@ class CullProfile:
     :param final_marks: Accepted sentence-final marks.
     :param quote_marks: Quotation marks and dialogue dashes of the mark rule.
     :param internal_marks: Internal punctuation marks of the mark rule.
-    :param model_name: Name of the input note model.
-    :param sentence_field: Name of the sentence field of the model.
-    :param english_field: Name of the English field of the model.
-    :param audio_field: Name of the audio field of the model.
+    :param input_model_name: Name of the input note model.
+    :param input_sentence_field: Name of the sentence field of the input model.
+    :param input_english_field: Name of the English field of the input model.
+    :param input_audio_field: Name of the audio field of the input model.
+    :param output_model_name: Name of the output note model.
+    :param sense_path: Sense file of the target words.
+    :param extra_fields: Output fields after ``English`` and before ``Core``.
     :param clean_sentence: Cleaner of the raw sentence field value.
     :param reserve_fields: Give the field values of one reserve card.
     :param templates: Card templates of the cull deck.
@@ -212,15 +215,18 @@ class CullProfile:
     quote_marks: str
     internal_marks: str
 
-    model_name: str
-    sentence_field: str
-    english_field: str
-    audio_field: str
+    input_model_name: str
+    input_sentence_field: str
+    input_english_field: str
+    input_audio_field: str
+    output_model_name: str
     clean_sentence: Callable[[str], str]
     reserve_fields: Callable[[ReserveCard], Sequence[str]]
 
     templates: tuple[tuple[str, str], ...]
     card_css: Callable[[], str]
+
+    sense_path: Path
 
     reserve_pack: Path | None
     reserve_model_name: str
@@ -237,6 +243,8 @@ class CullProfile:
 
     target_coverage_gate: float
     double_coverage_gate: float
+
+    extra_fields: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -1029,13 +1037,17 @@ def _cull_row(
 
 
 def write_coverage_csv(
-    targets: Sequence[TargetWord], selection: SelectionResult, path: Path
+    targets: Sequence[TargetWord],
+    selection: SelectionResult,
+    path: Path,
+    glosses: Mapping[str, str],
 ) -> None:
-    """Write one row per target word: word, rank, count, status.
+    """Write one row per target word: word, rank, count, status, gloss.
 
     :param targets: Target words in rank order.
     :param selection: Result of the selection.
     :param path: Output CSV file.
+    :param glosses: Lemma to the gloss of its sense row.
     """
     rows = []
     for target in targets:
@@ -1046,6 +1058,7 @@ def write_coverage_csv(
                 "rank": target.rank,
                 "count": count,
                 "status": coverage_status(count),
+                "gloss": glosses.get(target.lemma, ""),
             }
         )
     write_rows(path, COVERAGE_COLUMNS, rows)
@@ -1083,6 +1096,33 @@ def kept_order_hash(
     return f"sha256:{hashlib.sha256(text.encode('utf-8')).hexdigest()}"
 
 
+def card_cores(
+    selection: SelectionResult,
+    ordered: Sequence[int],
+    glosses: Mapping[str, str],
+) -> dict[int, tuple[str, str]]:
+    """Give the core word and the gloss that each kept card teaches.
+
+    The first target lemma that has a sense row wins, and the gloss is the
+    first sense of that row. A card without such a lemma takes its first
+    target and an empty gloss. A card without a target has no pair, so the
+    run does not write it.
+
+    :param selection: Result of the selection, with the targets per card.
+    :param ordered: Kept cards in card order.
+    :param glosses: Lemma to the gloss of its sense row.
+    :returns: Input index to ``(word, gloss)`` pair.
+    """
+    values: dict[int, tuple[str, str]] = {}
+    for index in ordered:
+        lemmas = selection.card_targets.get(index, ())
+        if not lemmas:
+            continue
+        word = next((lemma for lemma in lemmas if lemma in glosses), lemmas[0])
+        values[index] = (word, glosses.get(word, ""))
+    return values
+
+
 def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
     """Run stages C0 to C5 of the cull and write the four output files.
 
@@ -1098,12 +1138,16 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
     )
     cards = coreflow.read_input_deck(
         apkg_path,
-        profile.model_name,
-        profile.sentence_field,
-        profile.english_field,
-        profile.audio_field,
+        profile.input_model_name,
+        profile.input_sentence_field,
+        profile.input_english_field,
+        profile.input_audio_field,
         profile.clean_sentence,
     )
+    glosses = {
+        lemma: words.first
+        for lemma, words in coreflow.read_senses(profile.sense_path).items()
+    }
     frequency = profile.load_frequency()
     ranks = profile.frequency_ranks(frequency, request.spoken_weight)
     names = profile.read_names()
@@ -1160,12 +1204,19 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
         order=request.order,
         content_pos=profile.content_pos,
     )
+    values = card_cores(selection, ordered, glosses)
+    kept = [index for index in ordered if index in values]
+    reasons = list(reasons)
+    for index in ordered:
+        if index not in values:
+            reasons[index] = coreflow.NO_CORE_REASON
+    dropped_no_core = len(ordered) - len(kept)
 
     rejected = Counter(reasons)
     kept_lemmas = set().union(*reserve_sets) if reserve_sets else set()
     kept_lemmas.update(
         lemma
-        for index in selection.kept
+        for index in kept
         for lemma, pos in tokens[index]
         if is_content(pos, profile.content_pos)
     )
@@ -1181,7 +1232,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
         default=0,
     )
     frequency_uses: Counter[str] = Counter()
-    for index in selection.kept:
+    for index in kept:
         frequency_uses.update(
             {
                 lemma
@@ -1204,7 +1255,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
     if reserve:
         all_concepts += list(profile.swadesh_exceptions)
         merged_sentences = [card.sentence for card in reserve]
-        merged_sentences += [cards[index].sentence for index in ordered]
+        merged_sentences += [cards[index].sentence for index in kept]
         merged_tokens = profile.tokenize_texts(merged_sentences)
         swadesh_covered, swadesh_total = swadesh_coverage(
             all_concepts, merged_sentences, merged_tokens, profile
@@ -1222,8 +1273,8 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
     print(f"Content lemmas:     {content_lemmas}")
     print(f"Reserve:            {len(reserve)}")
     print(f"Swadesh:            {swadesh_covered}/{swadesh_total}")
-    print(f"Cards:              {len(selection.kept) + len(reserve)}")
-    print(f"  Frequency cards:  {len(selection.kept)}")
+    print(f"Cards:              {len(kept) + len(reserve)}")
+    print(f"  Frequency cards:  {len(kept)}")
     print(f"Distinct lemmas:    {len(kept_lemmas)}")
     print(f"Covered targets:    {covered}")
     print(f"Targets with 2:     {twice}")
@@ -1234,7 +1285,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
     print()
     print("First 10 kept cards")
     target_ranks = {target.lemma: target.rank for target in targets}
-    for position, index in enumerate(ordered[:10], start=1):
+    for position, index in enumerate(kept[:10], start=1):
         card = cards[index]
         hits = sorted(
             {
@@ -1249,28 +1300,28 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
         print(f"    targets: {', '.join(hits)}")
 
     cull_csv, coverage_csv, manifest_path = side_paths(output_path)
-    write_cull_csv(cards, reasons, selection, ordered, cull_csv, reserve=reserve)
-    write_coverage_csv(targets, selection, coverage_csv)
+    write_cull_csv(cards, reasons, selection, kept, cull_csv, reserve=reserve)
+    write_coverage_csv(targets, selection, coverage_csv, glosses)
     write_deck(
         apkg_path,
         cards,
-        ordered,
+        kept,
         output_path,
         name,
-        profile.model_name,
-        templates=profile.templates,
-        card_css=profile.card_css,
+        profile,
         reserve=reserve,
         reserve_pack_path=reserve_pack,
         reserve_fields=profile.reserve_fields,
     )
-    kept_order = kept_order_hash(cards, ordered, reserve=reserve)
+    coreflow.fill_core_fields(output_path, cards, values)
+    kept_order = kept_order_hash(cards, kept, reserve=reserve)
     write_manifest(
         manifest_path,
         source={
             "input": str(apkg_path),
             "deck": name,
-            "model": profile.model_name,
+            "model": profile.output_model_name,
+            "input_model": profile.input_model_name,
         },
         params={
             "max_cards": request.max_cards,
@@ -1287,8 +1338,8 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
         counts={
             "input": len(cards),
             "passed": len(passed),
-            "cards": len(ordered) + len(reserve),
-            "frequency_cards": len(ordered),
+            "cards": len(kept) + len(reserve),
+            "frequency_cards": len(kept),
             "reserve": len(reserve),
             "content": len(kept_lemmas),
             "targets": len(targets),
@@ -1296,6 +1347,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
             "covered2": twice,
             "swadesh_covered": swadesh_covered,
             "swadesh_total": swadesh_total,
+            "dropped_no_core": dropped_no_core,
         },
         frequency={
             "path": str(profile.frequency_path),
@@ -1321,8 +1373,8 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
         cull_csv=cull_csv,
         coverage_csv=coverage_csv,
         manifest_path=manifest_path,
-        cards=len(ordered) + len(reserve),
-        frequency_cards=len(ordered),
+        cards=len(kept) + len(reserve),
+        frequency_cards=len(kept),
         reserve=len(reserve),
         targets=len(targets),
     )

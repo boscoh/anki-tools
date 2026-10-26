@@ -12,8 +12,8 @@ constant tag ``TOKEN_POS``. The tag is a content tag and passes rule C1.
 
 The shared filter F4 reads an ASCII final mark. The adapter gives the final
 mark of a sentence its ASCII form and writes that text back to the kept notes.
-The model also has an English sound field that the core templates do not use,
-so the run blanks that field and removes its media files.
+The model also has an unused English sound field, which the output note type
+does not carry.
 """
 
 from __future__ import annotations
@@ -44,10 +44,7 @@ from anki_tools.sentence_pack.pack import load_css
 MODEL_NAME = "LTL Note Type - Cantonese"
 SENTENCE_FIELD = "Front"
 ENGLISH_FIELD = "Back"
-ENGLISH_AUDIO_FIELD = "Eng Audio"
 AUDIO_FIELD = "Audio"
-CORE_FIELD = "Core"
-CORE_GLOSS_FIELD = "CoreGloss"
 
 SENSE_PATH = Path("vocab/cantonese_core_senses.tsv")
 LOAN_PATH = Path("vocab/cantonese_loanwords.txt")
@@ -82,9 +79,6 @@ CORE_BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")
 CORE_TEMPLATES = (
     (CORE_FRONT_TEMPLATE, CORE_BACK_TEMPLATE),
 )
-
-_SOUND_PATTERN = re.compile(r"\[sound:([^\]]+)\]")
-
 
 _BOLD_PATTERN = re.compile(r"</?b>")
 _FINAL_MARKS = {"。": ".", "？": "?", "！": "!"}
@@ -189,9 +183,7 @@ def finalize_output(output_path: Path, core_csv: Path) -> int:
     """Rewrite the kept notes that the shared flow leaves in the input text.
 
     The flow writes bold text, but a card without an assigned target keeps the
-    input sentence, and the shared rules read an ASCII final mark. The function
-    also blanks the English sound field, because the core templates do not use
-    it and gate K8 counts one sound per card.
+    input sentence, and the shared rules read an ASCII final mark.
 
     :param output_path: Output APKG file.
     :param core_csv: Card CSV of the run.
@@ -208,14 +200,9 @@ def finalize_output(output_path: Path, core_csv: Path) -> int:
     written = 0
     with AnkiPackage(output_path) as package:
         models = package.get_models()
-        model_id = coreflow.find_model_id(models, MODEL_NAME)
+        model_id = coreflow.find_only_model_id(models)
         names = [field["name"] for field in models[model_id]["flds"]]
-        sentence_index = names.index(SENTENCE_FIELD)
-        sound_index = (
-            names.index(ENGLISH_AUDIO_FIELD)
-            if ENGLISH_AUDIO_FIELD in names
-            else -1
-        )
+        sentence_index = names.index(coreflow.OUTPUT_SENTENCE_FIELD)
         for note in package.get_notes():
             note_id = int(note["id"])
             sentence = rows.get(note_id)
@@ -227,13 +214,6 @@ def finalize_output(output_path: Path, core_csv: Path) -> int:
             if "<b>" not in text and _BOLD_PATTERN.sub("", text) != sentence:
                 package.update_note_field(note_id, sentence_index, sentence)
                 changed = True
-            if sound_index >= 0:
-                sounds = _SOUND_PATTERN.findall(values[sound_index])
-                if sounds:
-                    package.update_note_field(note_id, sound_index, "")
-                    changed = True
-                    for sound in sounds:
-                        package.delete_media_file(sound)
             written += int(changed)
         package.touch()
         package.save(output_path)
@@ -253,12 +233,11 @@ CANTONESE_CORE_PROFILE = CoreProfile(
     sense_filter=CANTONESE.sense_filter,
     highlight=CANTONESE.highlight,
     lemma_key=str.casefold,
-    model_name=MODEL_NAME,
-    sentence_field=SENTENCE_FIELD,
-    english_field=ENGLISH_FIELD,
-    audio_field=AUDIO_FIELD,
-    core_field=CORE_FIELD,
-    core_gloss_field=CORE_GLOSS_FIELD,
+    input_model_name=MODEL_NAME,
+    input_sentence_field=SENTENCE_FIELD,
+    input_english_field=ENGLISH_FIELD,
+    input_audio_field=AUDIO_FIELD,
+    output_model_name=DEFAULT_NAME,
     templates=CORE_TEMPLATES,
     card_css=card_css,
     min_units=MIN_UNITS,
@@ -269,5 +248,6 @@ CANTONESE_CORE_PROFILE = CoreProfile(
     outside_set_ratio=1.3,
     outside_rare_ratio=0.1,
     spoken_weight=SPOKEN_WEIGHT,
+    extra_fields=("Jyutping",),
     finalize=lambda run: finalize_output(run.output_path, run.core_csv),
 )
