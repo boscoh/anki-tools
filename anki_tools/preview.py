@@ -545,59 +545,73 @@ def default_card() -> PreviewCard:
     )
 
 
-def french_cull_card() -> PreviewCard:
-    """Build the French 1000-card cull card.
+FIX_SAMPLES: dict[str, dict[str, str]] = {
+    "french": {
+        "sentence": "Je ne t'en demanderai pas plus pour aujourd'hui.",
+        "english": "I won't ask you anything else today.",
+        "core": "ne",
+        "gloss": "not",
+    },
+    "spanish": {
+        "sentence": "No te pediré nada más por hoy.",
+        "english": "I won't ask you anything else today.",
+        "core": "pedir",
+        "gloss": "to ask",
+    },
+    "mandarin": {
+        "sentence": "我今天很忙。",
+        "english": "I am very busy today.",
+        "core": "忙",
+        "gloss": "busy",
+    },
+    "cantonese": {
+        "sentence": "我今日好忙。",
+        "english": "I am very busy today.",
+        "core": "忙",
+        "gloss": "busy",
+        "jyutping": "ngo5 gam1 jat6 hou2 mong4",
+    },
+}
 
+
+def fix_card(language: str, mode: str, title: str) -> PreviewCard:
+    """Build one card of the core deck or of the cull deck.
+
+    :param language: Language key, for example ``french``.
+    :param mode: ``core`` or ``cull``.
+    :param title: Card name shown above the preview.
     :returns: Rendered preview card.
     """
-    directory = TEMPLATES_DIR / "french_cull"
+    directory = TEMPLATES_DIR / f"{language}_{mode}"
     css = load_css_layers(
         SHARED_CSS_PATH,
-        TEMPLATES_DIR / "sentence_pack" / "french" / "card.css",
+        TEMPLATES_DIR / "sentence_pack" / language / "card.css",
     )
+    back = load_text(directory / "back.html")
+    if SHARED_SCRIPT and "char-links" in back:
+        back = f"{back.rstrip()}\n{SHARED_SCRIPT}"
+    sample = FIX_SAMPLES[language]
     fields = {
-        "sound": "[sound:6c1f7a.mp3]",
-        "French": "Je pensais qu'ils ne voudraient pas venir.",
-        "Back": "I thought they wouldn't want to come.",
+        "Audio": f"[sound:{language}_{mode}.mp3]",
+        "Sentence": sample["sentence"],
+        "English": sample["english"],
+        "Core": sample["core"],
+        "CoreGloss": sample["gloss"],
     }
+    names = ["Audio", "Sentence", "English"]
+    if "jyutping" in sample:
+        fields["Jyutping"] = sample["jyutping"]
+        names.append("Jyutping")
+    names += ["Core", "CoreGloss"]
     return make_card(
-        "French 1000-card cull",
+        title,
         load_text(directory / "front.html"),
-        load_text(directory / "back.html"),
+        back,
         fields,
         css,
-        source="templates/french_cull/{front,back}",
-        field_list="sound, French, Back",
-        note="The deck keeps the model and the audio of the input deck.",
-    )
-
-
-def french_core_card() -> PreviewCard:
-    """Build the French core-word deck card.
-
-    :returns: Rendered preview card.
-    """
-    directory = TEMPLATES_DIR / "french_core"
-    css = load_css_layers(
-        SHARED_CSS_PATH,
-        TEMPLATES_DIR / "sentence_pack" / "french" / "card.css",
-    )
-    fields = {
-        "sound": "[sound:8f20b1.mp3]",
-        "French": "Je ne t'en demanderai pas plus pour aujourd'hui.",
-        "Back": "I won't ask you anything else today.",
-        "Core": "ne",
-        "CoreGloss": "not",
-    }
-    return make_card(
-        "French core-word deck",
-        load_text(directory / "front.html"),
-        load_text(directory / "back.html"),
-        fields,
-        css,
-        source="templates/french_core/{front,back}",
-        field_list="sound, French, Back, Core, CoreGloss",
-        note="The Core field is empty on a card with no assigned target.",
+        source=f"templates/{language}_{mode}/{{front,back}}",
+        field_list=", ".join(names),
+        note="The deck clones the input note type and writes these fields only.",
     )
 
 
@@ -724,22 +738,31 @@ def build_sections() -> tuple[PreviewSection, ...]:
             cards=tuple(sentence_cards),
         ),
         PreviewSection(
-            anchor="french-cull",
-            title="French 1000-card cull",
+            anchor="culls",
+            title="1000-card culls",
             description=(
-                "The cull keeps the note model and the audio of the input deck. "
-                "It replaces the templates with this one-card pair."
+                "The cull clones the input note type, keeps the card schedule, and "
+                "writes the five output fields. The core word and its gloss are on "
+                "every card."
             ),
-            cards=(french_cull_card(),),
+            cards=(
+                fix_card("french", "cull", "French 1000-card cull"),
+                fix_card("spanish", "cull", "Spanish 1000-card cull"),
+            ),
         ),
         PreviewSection(
-            anchor="french-core",
-            title="French core-word deck",
+            anchor="core",
+            title="Core-word decks",
             description=(
-                "The core deck adds the <code>Core</code> and "
-                "<code>CoreGloss</code> fields to the French sentence model."
+                "The core deck clones the input note type and writes Audio, "
+                "Sentence, English, Core, and CoreGloss. Cantonese adds Jyutping."
             ),
-            cards=(french_core_card(),),
+            cards=(
+                fix_card("french", "core", "French core-word deck"),
+                fix_card("spanish", "core", "Spanish core-word deck"),
+                fix_card("mandarin", "core", "Mandarin core-word deck"),
+                fix_card("cantonese", "core", "Cantonese core-word deck"),
+            ),
         ),
         PreviewSection(
             anchor="vocab",

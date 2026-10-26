@@ -18,18 +18,31 @@ def test_write_preview_writes_every_section(tmp_path: Path) -> None:
     cards, sections = write_preview(output)
 
     text = output.read_text(encoding="utf-8")
-    assert cards == 15
+    assert cards == 19
     assert sections == 5
     assert "Anki card previews" in text
     for title in (
         "Default deck style",
         "Swadesh sentence packs",
-        "French 1000-card cull",
-        "French core-word deck",
+        "1000-card culls",
+        "Core-word decks",
         "Swadesh vocabulary decks",
     ):
         assert title in text
 
+
+
+def test_every_fix_card_writes_the_output_fields() -> None:
+    sections = {section.anchor: section for section in build_sections()}
+    cards = sections["core"].cards + sections["culls"].cards
+
+    assert len(cards) == 6
+    for card in cards:
+        assert "Sentence" in card.fields
+        assert "Core" in card.fields
+        assert "CoreGloss" in card.fields
+        assert card.front.strip()
+        assert "I am very busy today." in card.back or "ask you" in card.back
 
 def test_vocabulary_cards_hold_only_card_content() -> None:
     vocab = next(section for section in build_sections() if section.anchor == "vocab")
