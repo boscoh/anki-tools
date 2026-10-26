@@ -37,9 +37,12 @@ meaning:
 - `--verbose` is deleted. It printed the details of one step in one language.
 - `--max-uses` is deleted. The value stays in `SelectRequest` and
   `CullRequest` with its measured default.
+- The Mandarin `no_pinyin_fix` and `no_style` values become `pinyin_fix` and
+  `style`, both on by default, so the help reads `--pinyin-fix`/`--no-pinyin-fix`
+  and not `--no-no-pinyin-fix`.
 
-A value that one language owns stays on that command: `--no-pinyin-fix` and
-`--no-style` (`zh`), `--targets` and `--reserve` (`fr`),
+A value that one language owns stays on that command: `--pinyin-fix` and
+`--style` (`zh`), `--targets` and `--reserve` (`fr`),
 `--similarity-threshold` (`es`), `--freq` and `--freq-report` (`yue`).
 
 ## Consequences

@@ -60,47 +60,47 @@ options: run `uv run anki fix <lang> --help`.
 `anki fix <lang>` has up to three modes. The four commands take the same
 options.
 
-| Language | Modes                            | Output                                |
-| -------- | -------------------------------- | ------------------------------------- |
-| `zh`     | rank (default), `--core`         | `_reordered.apkg`, `_core.apkg`       |
+| Language | Modes                                | Output                                |
+| -------- | ------------------------------------ | ------------------------------------- |
+| `zh`     | rank (default), `--core`             | `_reordered.apkg`, `_core.apkg`       |
 | `fr`     | rank (default), `--select`, `--core` | `_reordered.apkg`, `_culled`, `_core` |
-| `es`     | rank (default), `--core`         | `_reordered.apkg`, `_core.apkg`       |
-| `yue`    | rank (default), `--select`, `--core` | `_reordered.apkg`, `_core.apkg`   |
+| `es`     | rank (default), `--core`             | `_reordered.apkg`, `_core.apkg`       |
+| `yue`    | rank (default), `--select`, `--core` | `_reordered.apkg`, `_core.apkg`       |
 
 Each command has a default input, so a bare `anki fix <lang>` reads it:
 
-| Language | Default input                                    |
-| -------- | ------------------------------------------------ |
-| `zh`     | `apkg/Neri's Chinese Sents Part 2.apkg`          |
-| `fr`     | `apkg/6000_French_Sentences_w_Audio.apkg`        |
+| Language | Default input                                        |
+| -------- | ---------------------------------------------------- |
+| `zh`     | `apkg/Neri's Chinese Sents Part 2.apkg`              |
+| `fr`     | `apkg/6000_French_Sentences_w_Audio.apkg`            |
 | `es`     | `apkg/Spanish 9000 sentences with native audio.apkg` |
-| `yue`    | `apkg/LTL Cantonese Deck Level 1 - Short.apkg`   |
+| `yue`    | `apkg/LTL Cantonese Deck Level 1 - Short.apkg`       |
 
 Run `uv run anki fix <lang> --help` to see the defaults of a command.
 
 The shared options:
 
-| Option             | Applies to    | Meaning                                     |
-| ------------------ | ------------- | ------------------------------------------- |
-| `apkg-path`        | every mode    | input deck; each command has a default       |
-| `--output`         | every mode    | output deck; default `_reordered` or `_core` |
-| `--model-id`       | rank mode     | filter by one model id                      |
-| `--text-field`     | rank mode     | sentence field; the build infers the default |
-| `--keep-filtered`  | rank mode     | keep the cards that the ranker filters      |
-| `--select`         | `fr`, `yue`   | run the cull or the coverage selection      |
-| `--core`           | every command | build the core-word deck                    |
-| `--cards`          | every mode    | card cap of the chosen mode                 |
-| `--words`          | core mode     | tier F words after the Swadesh set          |
-| `--examples`       | core mode     | examples for each target                    |
-| `--tail`           | core mode     | cards after the core passes                 |
-| `--check`          | `--select`, `--core` | run the gates on the written output   |
+| Option            | Applies to           | Meaning                                      |
+| ----------------- | -------------------- | -------------------------------------------- |
+| `apkg-path`       | every mode           | input deck; each command has a default       |
+| `--output`        | every mode           | output deck; default `_reordered` or `_core` |
+| `--model-id`      | rank mode            | filter by one model id                       |
+| `--text-field`    | rank mode            | sentence field; the build infers the default |
+| `--keep-filtered` | rank mode            | keep the cards that the ranker filters       |
+| `--select`        | `fr`, `yue`          | run the cull or the coverage selection       |
+| `--core`          | every command        | build the core-word deck                     |
+| `--cards`         | every mode           | card cap of the chosen mode                  |
+| `--words`         | core mode            | tier F words after the Swadesh set           |
+| `--examples`      | core mode            | examples for each target                     |
+| `--tail`          | core mode            | cards after the core passes                  |
+| `--check`         | `--select`, `--core` | run the gates on the written output          |
 
 These options apply to one language:
 
 | Option                   | Language | Meaning                                     |
 | ------------------------ | -------- | ------------------------------------------- |
-| `--no-pinyin-fix`        | `zh`     | skip the pinyin correction step             |
-| `--no-style`             | `zh`     | skip the card styling step                  |
+| `--pinyin-fix`           | `zh`     | fix the pinyin formatting (default on)      |
+| `--style`                | `zh`     | apply the card styling (default on)         |
 | `--targets`              | `fr`     | cull target count, 200 to 500               |
 | `--reserve`              | `fr`     | add the Swadesh reserve cards               |
 | `--similarity-threshold` | `es`     | Jaccard limit of the deduplication          |

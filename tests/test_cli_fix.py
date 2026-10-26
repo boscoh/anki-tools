@@ -527,7 +527,7 @@ class TestMandarinRankMode:
 
         monkeypatch.setattr(cli, "fix_pinyin", fail)
 
-        cli.zh(deck_file, no_pinyin_fix=True)
+        cli.zh(deck_file, pinyin_fix=False)
 
     def test_no_style_skips_the_style_step(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
@@ -542,7 +542,7 @@ class TestMandarinRankMode:
 
         monkeypatch.setattr(cli, "_apply_style", fail)
 
-        cli.zh(deck_file, no_style=True)
+        cli.zh(deck_file, style=False)
 
     def test_an_empty_extraction_prints_no_sentences(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys

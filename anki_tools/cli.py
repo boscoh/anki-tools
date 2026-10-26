@@ -664,8 +664,8 @@ def zh(
     model_id: int | None = None,
     text_field: str | None = None,
     keep_filtered: bool = False,
-    no_pinyin_fix: bool = False,
-    no_style: bool = False,
+    pinyin_fix: bool = True,
+    style: bool = True,
     core: bool = False,
     cards: int | None = None,
     words: int = mandarin_core.DEFAULT_CORE_WORDS,
@@ -683,8 +683,8 @@ def zh(
     :param model_id: Rank mode: filter by specific model ID.
     :param text_field: Rank mode: preferred sentence field (default: infer).
     :param keep_filtered: Rank mode: keep filtered cards instead of removing.
-    :param no_pinyin_fix: If True, skip pinyin correction.
-    :param no_style: If True, skip card styling (CSS/templates).
+    :param pinyin_fix: Fix the pinyin formatting.
+    :param style: Apply the card styling (CSS and templates).
     :param core: Build the core deck instead of ranking and reordering.
     :param cards: Core mode: card cap.
     :param words: Core mode: tier F words after the Swadesh set.
@@ -718,7 +718,7 @@ def zh(
     paths = rank_paths(apkg_path, output)
 
     def after_rank(paths: RankPaths, deck: RankedDeck) -> Sequence[str]:
-        if not no_pinyin_fix:
+        if pinyin_fix:
             print("\nFixing pinyin...")
             fix_pinyin(
                 paths.output_path,
@@ -727,7 +727,7 @@ def zh(
                 verbose=False,
             )
         styles_applied = 0
-        if not no_style:
+        if style:
             print("\nApplying card styles...")
             styles_applied, applied = _apply_style(
                 Path(paths.output_path),
