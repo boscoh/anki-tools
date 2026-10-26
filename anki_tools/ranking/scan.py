@@ -61,8 +61,9 @@ class CoreProfile:
         request supplies it.
     :param finalize: Post-processing step of the written deck, called with
         the run, or None when the language needs none.
-    :param extra_fields: Names of the output fields that the language adds,
-        after ``English`` and before ``Core``.
+    :param romanization_source: Input field of the romanization line, for
+        example ``Jyutping`` or ``Sentence (Latin)``. The output field is
+        ``Romanization``. None when the language has no romanization.
     """
     load_input_deck: Callable[[Path], Any]
     tokenize_deck: Callable[[Any], Any]
@@ -95,7 +96,7 @@ class CoreProfile:
     outside_rare_ratio: float = 0.1
     spoken_weight: float | None = None
     finalize: Callable[[Any], None] | None = None
-    extra_fields: tuple[str, ...] = ()
+    romanization_source: str | None = None
 
 
 @dataclass(frozen=True)

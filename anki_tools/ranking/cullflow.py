@@ -184,7 +184,8 @@ class CullProfile:
     :param input_audio_field: Name of the audio field of the input model.
     :param output_model_name: Name of the output note model.
     :param sense_path: Sense file of the target words.
-    :param extra_fields: Output fields after ``English`` and before ``Core``.
+    :param romanization_source: Input field of the romanization line. The
+        output field is ``Romanization``. None when the language has none.
     :param clean_sentence: Cleaner of the raw sentence field value.
     :param reserve_fields: Give the field values of one reserve card.
     :param templates: Card templates of the cull deck.
@@ -244,7 +245,7 @@ class CullProfile:
     target_coverage_gate: float
     double_coverage_gate: float
 
-    extra_fields: tuple[str, ...] = ()
+    romanization_source: str | None = None
 
 
 @dataclass(frozen=True)

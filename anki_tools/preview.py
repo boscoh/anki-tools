@@ -561,6 +561,7 @@ FIX_SAMPLES: dict[str, dict[str, str]] = {
     "mandarin": {
         "sentence": "我今天很忙。",
         "english": "I am very busy today.",
+        "romanization": "wǒ jīn tiān hěn máng",
         "core": "忙",
         "gloss": "busy",
     },
@@ -569,7 +570,7 @@ FIX_SAMPLES: dict[str, dict[str, str]] = {
         "english": "I am very busy today.",
         "core": "忙",
         "gloss": "busy",
-        "jyutping": "ngo5 gam1 jat6 hou2 mong4",
+        "romanization": "ngo5 gam1 jat6 hou2 mong4",
     },
 }
 
@@ -599,9 +600,9 @@ def fix_card(language: str, mode: str, title: str) -> PreviewCard:
         "CoreGloss": sample["gloss"],
     }
     names = ["Audio", "Sentence", "English"]
-    if "jyutping" in sample:
-        fields["Jyutping"] = sample["jyutping"]
-        names.append("Jyutping")
+    if "romanization" in sample:
+        fields["Romanization"] = sample["romanization"]
+        names.append("Romanization")
     names += ["Core", "CoreGloss"]
     return make_card(
         title,

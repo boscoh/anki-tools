@@ -44,6 +44,13 @@ def test_every_fix_card_writes_the_output_fields() -> None:
         assert card.front.strip()
         assert "I am very busy today." in card.back or "ask you" in card.back
 
+    by_title = {card.title: card for card in cards}
+    mandarin = by_title["Mandarin core-word deck"]
+    cantonese = by_title["Cantonese core-word deck"]
+    assert "Romanization" in mandarin.fields
+    assert "wǒ jīn tiān hěn máng" in mandarin.back
+    assert "ngo5 gam1 jat6 hou2 mong4" in cantonese.back
+
 def test_vocabulary_cards_hold_only_card_content() -> None:
     vocab = next(section for section in build_sections() if section.anchor == "vocab")
     by_title = {card.title: card for card in vocab.cards}

@@ -33,11 +33,11 @@ and they write our fields, our templates, and our CSS.
   `Mandarin Core Sentences`, `Cantonese Core Sentences`, and `French 1000 Core
   Sentences` and `Spanish 1000 Core Sentences` for the two culls.
 - The field set is `Audio`, `Sentence`, `English`, `Core`, and `CoreGloss`, plus
-  `Jyutping` for Cantonese. The names are shared constants, not profile values,
-  so a gate cannot lose the field that it checks.
+  `Romanization` for Mandarin and Cantonese. The names are shared constants, not
+  profile values, so a gate cannot lose the field that it checks.
 - The profile splits its two identities: `input_model_name` and the three
   `input_*_field` names locate the source notes; `output_model_name` and
-  `extra_fields` shape the result.
+  `romanization_source` shape the result.
 - The build route is a clone in the input package. Every note id, note guid,
   card id, `due` value, and scheduling column stays, so a cull keeps the
   schedule of the cards that the user already studies. A package from scratch

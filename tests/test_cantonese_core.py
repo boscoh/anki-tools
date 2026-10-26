@@ -15,7 +15,7 @@ def test_profile_holds_the_deck_paths():
     assert profile.input_english_field == "Back"
     assert profile.input_audio_field == "Audio"
     assert profile.output_model_name == core.DEFAULT_NAME
-    assert profile.extra_fields == ("Jyutping",)
+    assert profile.romanization_source == "Jyutping"
     assert profile.min_units < profile.max_units
     assert profile.templates
     assert profile.card_css().startswith("/*")
@@ -53,5 +53,5 @@ def test_the_jyutping_field_survives_the_new_model(tmp_path) -> None:
         names = [field["name"] for field in model["flds"]]
         values = str(package.get_notes()[0]["flds"]).split("\x1f")
 
-    assert names == ["Audio", "Sentence", "English", "Jyutping", "Core", "CoreGloss"]
+    assert names == ["Audio", "Sentence", "English", "Romanization", "Core", "CoreGloss"]
     assert values[3] == "ngo5 tai2 zo2 jat1 bun2 syu1"

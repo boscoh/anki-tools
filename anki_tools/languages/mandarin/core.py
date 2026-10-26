@@ -296,4 +296,5 @@ MANDARIN_CORE_PROFILE = CoreProfile(
     outside_set_ratio=1.3,
     outside_rare_ratio=0.1,
     finalize=lambda run: finalize_output(run.output_path, run.core_csv),
+    romanization_source="Sentence (Latin)",
 )

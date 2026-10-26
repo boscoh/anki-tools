@@ -248,8 +248,9 @@ value of each kept card. `reserve_fields` gives the five output values of a
 reserve card, so the pack `Target` becomes `Core` and the pack `Gloss` becomes
 `CoreGloss`.
 
-The field set is `output_fields(profile)`: `Audio`, `Sentence`, `English`, each
-`extra_fields` name, `Core`, and `CoreGloss`. `card_cores` takes the first
+The field set is `output_fields(profile)`: `Audio`, `Sentence`, `English`, the
+`Romanization` field when the language has a romanization, `Core`, and
+`CoreGloss`. `card_cores` takes the first
 target lemma of the card that has a sense row, and `fill_core_fields` writes
 that lemma and its first sense. A card without a target has no core word, so
 the run does not write it. Its CSV row holds `kept = 0` and `reason = no_core`,

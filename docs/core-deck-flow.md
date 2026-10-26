@@ -266,8 +266,9 @@ files that those notes hold. It deletes the card of a note that the first
 template did not make, keeps the lowest `ord`, and sets that `ord` to 0. The
 kept card keeps its id, its `due` value, and its scheduling columns.
 
-The field set is `output_fields(profile)`: `Audio`, `Sentence`, `English`, each
-`extra_fields` name, `Core`, and `CoreGloss`. The writer moves the kept notes to
+The field set is `output_fields(profile)`: `Audio`, `Sentence`, `English`, the
+`Romanization` field when the language has a romanization, `Core`, and
+`CoreGloss`. The writer moves the kept notes to
 the new note type, then deletes the input note type and every other note type.
 `reorder_deck` applies the order of the rank CSV to the output deck.
 

@@ -742,7 +742,7 @@ The cull writes a note type of its own. `anki fix fr --select` and `anki fix es
 `CullProfile` renames `model_name`, `sentence_field`, `english_field`, and
 `audio_field` to `input_model_name`, `input_sentence_field`,
 `input_english_field`, and `input_audio_field`. It adds `output_model_name`,
-`sense_path: Path`, and `extra_fields: tuple[str, ...] = ()`.
+`sense_path: Path`, and `romanization_source: str | None = None`.
 
 `reserve_fields` keeps its name and returns the five values in the field order
 of section 17.2: `Audio`, `Sentence`, `English`, `Core`, and `CoreGloss`.

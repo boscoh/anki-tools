@@ -534,14 +534,14 @@ shapes the result. One value must not do both jobs.
 | `core_field` | delete | the constant `OUTPUT_CORE_FIELD` |
 | `core_gloss_field` | delete | the constant `OUTPUT_GLOSS_FIELD` |
 | `output_model_name` | add, `str` | `coreflow.write_deck`, `coregates.gate_identity` |
-| `extra_fields` | add, `tuple[str, ...] = ()` | `coreflow.output_fields`, `coreflow.write_deck` |
+| `romanization_source` | add, `str | None = None` | `coreflow.output_fields`, `coreflow.output_values` |
 
 `anki_tools/ranking/cullflow.py` `CullProfile` takes the same four renames and
 the same two new fields. It also takes `sense_path: Path`, the sense file of
 section 14.7. `reserve_fields` keeps its name and changes its contract: the
 values come in the `output_fields` order.
 
-`extra_fields` has a default, so the field goes after `finalize` in
+`romanization_source` has a default, so the field goes after `finalize` in
 `CoreProfile`, at the end of `CullProfile`.
 
 The output names are not profile values. They live in
@@ -552,23 +552,23 @@ OUTPUT_FIELDS = ("Audio", "Sentence", "English", "Core", "CoreGloss")
 OUTPUT_AUDIO_FIELD = "Audio"
 OUTPUT_SENTENCE_FIELD = "Sentence"
 OUTPUT_ENGLISH_FIELD = "English"
+OUTPUT_ROMANIZATION_FIELD = "Romanization"
 OUTPUT_CORE_FIELD = "Core"
 OUTPUT_GLOSS_FIELD = "CoreGloss"
 ```
 
-- `output_fields(profile)` gives
-  `("Audio", "Sentence", "English") + profile.extra_fields + ("Core", "CoreGloss")`.
-- `output_fields` raises `ValueError` when an extra name is one of the five
-  names above, or when a name occurs twice.
-- A language cannot rename `Core`, so a gate cannot lose its field.
-
+- `output_fields(profile)` gives the three shared names, then `Romanization`
+  when `profile.romanization_source` is not None, then `Core` and `CoreGloss`.
+- A language cannot rename `Core` or `Romanization`, so a gate cannot lose its
+  field. A language supplies only the name of the input field that holds the
+  romanization.
 Readers after the change:
 
 | Function | Reads |
 | --- | --- |
 | `coreflow.read_input_deck` | `input_model_name`, `input_sentence_field`, `input_english_field`, `input_audio_field` |
 | `coreflow.read_output_deck` (new) | the single output note type and the `OUTPUT_*` names |
-| `coreflow.write_deck` | `input_model_name`, `output_model_name`, `extra_fields`, `templates`, `card_css` |
+| `coreflow.write_deck` | `input_model_name`, `output_model_name`, `romanization_source`, `templates`, `card_css` |
 | `coreflow._write_bold` | `OUTPUT_SENTENCE_FIELD` |
 | `coreflow.fill_core_fields` | `OUTPUT_CORE_FIELD`, `OUTPUT_GLOSS_FIELD` |
 | `coregates.CoreFiles.fields` | the single output note type |
@@ -604,8 +604,8 @@ def write_deck(
 
 `DeckProfile` is a `Protocol` in `anki_tools/ranking/coreflow.py`. It holds
 `input_model_name`, `input_sentence_field`, `input_english_field`,
-`input_audio_field`, `output_model_name`, `extra_fields`, `templates`, and
-`card_css`. `CoreProfile` and `CullProfile` satisfy it.
+`input_audio_field`, `output_model_name`, `romanization_source`, `templates`,
+and `card_css`. `CoreProfile` and `CullProfile` satisfy it.
 
 `coreflow.find_only_model_id(models)` gives the id of the only note type of a
 package and raises `RuntimeError` when the package holds two or more. The
@@ -629,21 +629,23 @@ in both.
 | 1 | `Audio` | the input audio field text, `[sound:<file>]`, verbatim | `front.html` and `back.html` of the mode |
 | 2 | `Sentence` | `InputCard.sentence`, the clean plain text; `_write_bold` rewrites it for a bolded card | `back.html`, K15, G5 |
 | 3 | `English` | the input English field text, verbatim; the pack English for a reserve card | `back.html` |
-| 4 | each `extra_fields` name | the input field of the same name, verbatim | `back.html` of that language |
+| 4 | `Romanization` | the input field named by `profile.romanization_source`, verbatim; absent when the source is None | `back.html` of every mode |
 | 5 | `Core` | the target form of the card (14.7) | `back.html`, K19, G17 |
 | 6 | `CoreGloss` | the English gloss of `Core` (14.7) | `back.html`, K19, G17 |
 
 | Mode | Language | Fields |
 | --- | --- | --- |
-| core | fr, es, zh | `Audio, Sentence, English, Core, CoreGloss` |
-| core | yue | `Audio, Sentence, English, Jyutping, Core, CoreGloss` |
+| core | fr, es | `Audio, Sentence, English, Core, CoreGloss` |
+| core | zh, yue | `Audio, Sentence, English, Romanization, Core, CoreGloss` |
 | cull | fr, es | `Audio, Sentence, English, Core, CoreGloss` |
 
 Rules:
 
-- `Jyutping` is the one extra field. `templates/cantonese_core/back.html` reads
-  it, and the LTL input fills it, so Cantonese sets
-  `extra_fields = ("Jyutping",)`.
+- `Romanization` is the one optional field. Mandarin sets
+  `romanization_source = "Sentence (Latin)"` and Cantonese sets
+  `romanization_source = "Jyutping"`. The flow adds the field and copies the
+  input value. A language with no romanization leaves the source None, so the
+  field and the card line are absent.
 - `Eng Audio` is not an output field, because no template reads it. The
   `Eng Audio` branch of `cantonese.core.finalize_output` and its media delete
   go away with the field.
@@ -651,9 +653,9 @@ Rules:
   `Sentence (Annotated)`, `Explanation 1`, and the other 16 Mandarin fields are
   not output fields. Section 14.8 gives the reason for `freq ranks`.
 - No written note holds an empty `Audio`, `Sentence`, `English`, `Core`, or
-  `CoreGloss`. An extra field can be empty, so `templates/cantonese_core/back.html`
-  keeps its `{{#Jyutping}}` condition. `Core` and `CoreGloss` are the only late
-  fields, and 14.7 gives their rule.
+  `CoreGloss`. A `Romanization` field can be empty, so every back template
+  keeps its `{{#Romanization}}` condition. A language with no romanization has
+  no such field.
 
 The templates of `templates/<lang>_core/` and `templates/<lang>_cull/` read the
 output names:
@@ -668,7 +670,7 @@ output names:
 | `{{Sentence (Translation)}}` | `{{English}}` |
 | `{{[a]}}` | `{{Audio}}` |
 | `{{Front}}` (Cantonese) | `{{Sentence}}` |
-| `{{Audio}}`, `{{Sentence}}`, `{{#Jyutping}}…{{/Jyutping}}` | no change |
+| `{{Audio}}`, `{{Sentence}}`, `{{#Romanization}}…{{/Romanization}}` | no change |
 | `{{Core}}`, `{{CoreGloss}}` | no change |
 
 The core front holds `{{Audio}}` only. The cull front holds `{{Audio}}` and the
@@ -684,6 +686,11 @@ backs gain this line.
 
 The CSS comes from `profile.card_css()`, the value of `templates/shared/card.css`
 plus the language layer, as today. K14 and G15 check it.
+The romanization is one shared rule, not one rule per language. A new language
+sets `romanization_source` to the input field that holds the reading. The flow
+adds `Romanization` to the field set, and every back template already shows
+the line when the field has a value.
+
 
 ### 14.3 The note type name
 
@@ -917,8 +924,8 @@ Decision: the output has no frequency field.
 - The rank is a selection value. It stays in the `rank` column of the coverage
   CSV and in the rank CSV, where the build and the review read it.
 
-A later build that wants the rank on the card adds one entry to
-`extra_fields` and one line to the back template of that language.
+A later build that wants the rank on the card adds one field to
+`output_fields` and one line to the back template of that language.
 
 ### 14.9 Gates
 
@@ -965,8 +972,9 @@ Add one small test for each new seam. Do not download a file.
 | `tests/test_cull_shared.py` | `test_the_cull_fills_the_core_word_and_the_gloss` | a frequency card takes its lemma and the first sense; a reserve card takes its pack target and gloss |
 | `tests/test_cull_shared.py` | `test_the_cull_keeps_the_due_of_a_kept_card` | a `due` of 42 on a kept card stays 42, and the dropped card is gone |
 | `tests/test_cull_shared.py` | `test_the_output_model_name_is_the_deck_name` | the profile value equals the deck-name value |
-| `tests/test_cantonese_core.py` | `test_the_jyutping_field_survives_the_new_model` | `extra_fields = ("Jyutping",)` puts the field at position 4 with the input value |
+| `tests/test_cantonese_core.py` | `test_the_jyutping_field_survives_the_new_model` | `romanization_source = "Jyutping"` puts `Romanization` at position 4 with the input value |
 | `tests/test_mandarin_core.py` | `test_the_templates_read_the_output_audio_field` | no template token names `[a]` |
+| `tests/test_mandarin_core.py` | `test_output_values_copies_the_pinyin_from_the_latin_field` | `Romanization` comes from `Sentence (Latin)` |
 
 The tests that must change:
 
@@ -976,7 +984,7 @@ The tests that must change:
 | `tests/test_core_deck.py` | `test_the_model_gets_the_core_field_and_templates` | assert the one output note type, its field set, and the `Core` values |
 | `tests/test_core_deck.py` | `test_the_gloss_gate_*` | the gate name, and the two failures: a missing gloss and a wrong gloss |
 | `tests/test_core_deck.py` | `test_adding_the_field_twice_changes_nothing` | delete with `add_model_field` |
-| `tests/test_cull_shared.py` | `_profile()` | the new field names, `output_model_name`, `sense_path`, `extra_fields` |
+| `tests/test_cull_shared.py` | `_profile()` | the new field names, `output_model_name`, `sense_path`, `romanization_source` |
 | `tests/test_cull_shared.py` | `test_a_second_profile_drives_every_output_value` | assert one note type, the five fields, and the `Core` values |
 | `tests/test_cull_shared.py` | `test_coverage_csv_statuses` | the extra `gloss` column |
 | `tests/test_french_cull.py` | the `write_cull_deck` calls, the G10 and G15 tests | the output note type name; the new G16 and G17 |

@@ -74,6 +74,7 @@ OUTPUT_FIELDS: tuple[str, ...] = ("Audio", "Sentence", "English", "Core", "CoreG
 OUTPUT_AUDIO_FIELD = "Audio"
 OUTPUT_SENTENCE_FIELD = "Sentence"
 OUTPUT_ENGLISH_FIELD = "English"
+OUTPUT_ROMANIZATION_FIELD = "Romanization"
 OUTPUT_CORE_FIELD = "Core"
 OUTPUT_GLOSS_FIELD = "CoreGloss"
 
@@ -84,17 +85,15 @@ NO_CORE_REASON = "no_core"
 def output_fields(profile: "DeckProfile") -> tuple[str, ...]:
     """Give the output field names of a deck profile.
 
-    :param profile: Language hooks with the extra field names.
-    :raises ValueError: An extra name is a shared name, or occurs twice.
-    :returns: The three shared names, the extra names, ``Core``, and ``CoreGloss``.
+    :param profile: Language hooks of the run.
+    :returns: ``Audio``, ``Sentence``, ``English``, the optional
+        ``Romanization``, ``Core``, and ``CoreGloss``.
     """
-    extra = tuple(profile.extra_fields)
-    if len(set(extra)) != len(extra):
-        raise ValueError("An extra output field name occurs twice.")
-    clash = [name for name in extra if name in OUTPUT_FIELDS]
-    if clash:
-        raise ValueError(f"The extra output fields {clash} hold a shared name.")
-    return (*OUTPUT_FIELDS[:3], *extra, *OUTPUT_FIELDS[3:])
+    names = [*OUTPUT_FIELDS[:3]]
+    if profile.romanization_source is not None:
+        names.append(OUTPUT_ROMANIZATION_FIELD)
+    names.extend(OUTPUT_FIELDS[3:])
+    return tuple(names)
 
 
 class DeckProfile(Protocol):
@@ -126,8 +125,8 @@ class DeckProfile(Protocol):
         ...
 
     @property
-    def extra_fields(self) -> tuple[str, ...]:
-        """Give the extra output field names."""
+    def romanization_source(self) -> str | None:
+        """Give the input field of the romanization line, or None."""
         ...
 
     @property
@@ -1012,14 +1011,16 @@ def output_values(
         position = index.get(name)
         return input_values[position] if position is not None else ""
 
-    return [
-        value(profile.input_audio_field),
-        sentence,
-        value(profile.input_english_field),
-        *(value(name) for name in profile.extra_fields),
-        "",
-        "",
-    ]
+    values = {
+        OUTPUT_AUDIO_FIELD: value(profile.input_audio_field),
+        OUTPUT_SENTENCE_FIELD: sentence,
+        OUTPUT_ENGLISH_FIELD: value(profile.input_english_field),
+        OUTPUT_CORE_FIELD: "",
+        OUTPUT_GLOSS_FIELD: "",
+    }
+    if profile.romanization_source is not None:
+        values[OUTPUT_ROMANIZATION_FIELD] = value(profile.romanization_source)
+    return [values[name] for name in output_fields(profile)]
 
 
 def write_deck(

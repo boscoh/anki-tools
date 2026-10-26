@@ -763,9 +763,9 @@ the one cull deck of `specs/french-1000-sentence-cull.md`.
 `input_english_field`, and `input_audio_field`. It drops `core_field` and
 `core_gloss_field` for the shared constants `OUTPUT_CORE_FIELD` and
 `OUTPUT_GLOSS_FIELD`. It adds `output_model_name` and
-`extra_fields: tuple[str, ...] = ()`.
+`romanization_source: str | None = None`.
 
-`CullProfile` takes the same four renames and the same two new fields, plus
+`CullProfile` takes the same four renames and the same new fields, plus
 `sense_path: Path`, the sense file of section 15.4.
 
 The four language `core.py` files set the new fields. The core `deck_name` and
@@ -777,14 +777,15 @@ The four language `core.py` files set the new fields. The core `deck_name` and
 | --- | --- | --- | --- |
 | core | fr | `French Core Sentences` | `Audio, Sentence, English, Core, CoreGloss` |
 | core | es | `Spanish Core Sentences` | `Audio, Sentence, English, Core, CoreGloss` |
-| core | zh | `Mandarin Core Sentences` | `Audio, Sentence, English, Core, CoreGloss` |
-| core | yue | `Cantonese Core Sentences` | `Audio, Sentence, English, Jyutping, Core, CoreGloss` |
+| core | zh | `Mandarin Core Sentences` | `Audio, Sentence, English, Romanization, Core, CoreGloss` |
+| core | yue | `Cantonese Core Sentences` | `Audio, Sentence, English, Romanization, Core, CoreGloss` |
 | cull | fr | `French 1000 Core Sentences` | `Audio, Sentence, English, Core, CoreGloss` |
 | cull | es | `Spanish 1000 Core Sentences` | `Audio, Sentence, English, Core, CoreGloss` |
 
 - The name is the deck title. ADR 0013 holds the rule.
-- `Jyutping` is the one extra field. `templates/cantonese_core/back.html`
-  reads it. `cantonese.core` sets `extra_fields = ("Jyutping",)`.
+- `Romanization` is the one optional field. `mandarin.core` sets
+  `romanization_source = "Sentence (Latin)"`, and `cantonese.core` sets
+  `romanization_source = "Jyutping"`.
 - No output field holds the name of an input field. The input names stay in the
   package that the run reads.
 - No output field holds a frequency rank. The rank stays in the coverage CSV
