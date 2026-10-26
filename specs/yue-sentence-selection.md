@@ -65,7 +65,7 @@ cover (2.2). Section 3 has the full tables.
 | Selection method        | Greedy cover, 2 cards per word, weight `1/log2(rank+1)`                   | 8.2, 14.5    |
 | Uses of one word        | A word outside the 100 most frequent words is in at most 8 kept sentences | 8.5, 14.6    |
 | Card order              | Easiest hardest-word first                                                | 8.4          |
-| Compatibility           | `--no-select` reproduces today's output                                   | 9.2, gate G8 |
+| Compatibility           | Rank mode is the default and reproduces today's output                    | 9.2, gate G8 |
 
 ### 1.4 Open blockers
 
@@ -502,9 +502,9 @@ The common flags stay on the command. The selection tuning values live in
 | ----------------- | ------- | -------------------------------------------------------------------------- |
 | `--output`        | none    | Output file, else `<input>_reordered.apkg`                                 |
 | `--model-id`      | none    | Only the cards of this model                                               |
-| `--keep-filtered` | off     | Keep the similar cards (`--no-select` only)                                |
-| `--no-select`     | off     | Run only the ranking, as today                                             |
-| `--max-uses`      | 8       | Most kept sentences for one word outside the top 100; 0 turns it off (8.5) |
+| `--text-field`    | none    | Sentence field of rank mode; else inferred                                |
+| `--keep-filtered` | off     | Keep the similar cards (rank mode only)                                    |
+| `--select`        | off     | Run the coverage selection; the default is rank mode                       |
 | `--freq`          | blend   | `blend`, `spoken`, or `written`; sets `SelectRequest.freq`                 |
 | `--freq-report`   | off     | Write the sentences that move by more than 100 places (M2)                 |
 | `--core`          | off     | Build the core deck                                                        |
@@ -531,7 +531,7 @@ These values are not flags. The code reads them from `SelectRequest`, and
 | `final_mark`           | true       | Apply rule Y4; false skips it                                     |
 | `spoken_weight`        | 0.7        | Value of `w` in 5.2                                               |
 
-`--freq written --no-select` gives a byte-identical result to the current
+`--freq written` in rank mode gives a byte-identical result to the old
 version (gate G8). `--order` no longer exists, and it never affected rank
 mode.
 
@@ -607,17 +607,17 @@ stops the run with a `RuntimeError`. Lower a value only with a new measurement.
 | G5   | No kept sentence fails Y1 to Y8                                                                                                 | M3   |
 | G6   | No two kept sentences are duplicates by 8.3                                                                                     | M4   |
 | G7   | Every kept sentence has a row in `.select.csv`, and the row counts match the input                                              | M3   |
-| G8   | `--no-select --freq written --order score` gives the same ranking CSV as the current version                                    | M5   |
+| G8   | rank mode with `--freq written` gives the same ranking CSV as the old version                                                   | M5   |
 | G9   | The kept cards have a non-decreasing `hardest_rank` when `--order coverage`                                                     | M4   |
-| G10  | LTL deck, `--max-sentences 300`: at least 650 words, 210 top500 words, and `spoken_mass` 65.0 or more (measured 688, 217, 66.1) | M4   |
+| G10  | LTL deck, `--select --cards 300`: at least 650 words, 210 top500 words, and `spoken_mass` 65.0 or more (measured 688, 217, 66.1) | M4   |
 | G11  | LTL deck, defaults: 641 cards, within 5 percent (measured 641)                                                                  | M4   |
-| G12  | No word outside the 100 most frequent words is in more than `--max-uses` kept sentences (8.5)                                   | M4   |
+| G12  | No word outside the 100 most frequent words is in more than `max_uses` kept sentences (8.5)                                     | M4   |
 
 G2 comes from 14.2. G10 and G11 come from 3.1 and 3.3.
 
-G8 was checked on 2026-10-19: `--no-select --freq written --order score` gives
-the same rank, note id, sentence, and score for all 998 LTL rows as the code
-before this spec.
+G8 was checked on 2026-10-19: rank mode with `--freq written` gives the same
+rank, note id, sentence, and score for all 998 LTL rows as the code before
+this spec.
 
 ### 11.2 Tests
 

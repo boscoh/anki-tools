@@ -293,7 +293,7 @@ gain of 0. With the defaults, the selection reaches 1,000 cards.
 
 | Setting          | Value                                                   |
 | ---------------- | ------------------------------------------------------- |
-| `--max-uses`     | 4                                                       |
+| `max_uses`       | 4                                                       |
 | `--exempt-top`   | 100 content lemmas by rank                              |
 | Exempt meaning   | A word that can appear in more than 4 cards             |
 | Cap meaning      | A non-exempt word appears in at most 4 kept cards       |
@@ -353,7 +353,7 @@ The most-used words in this spec: pas 190, ne 181, pouvoir 70, faire 69, plus
 
 Target 300, all other defaults.
 
-| `--max-uses` | Content | Covered | Covered 2+ | `spoken_mass` |
+| `max_uses`   | Content | Covered | Covered 2+ | `spoken_mass` |
 | ------------ | ------- | ------- | ---------- | ------------- |
 | 2            | 1,759   | 300     | 282        | 0.517         |
 | 3            | 1,951   | 298     | 285        | 0.535         |
@@ -434,15 +434,14 @@ uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
 | ------------ | ------------------- | -------------------------------------------- |
 | `--cards`    | 1000                | Card cap                                     |
 | `--targets`  | 300                 | Target count, 200 to 500                     |
-| `--max-uses` | 4                   | Most cards for one non-exempt word           |
 | `--reserve`  | on                  | Add the Swadesh reserve cards                |
 | `--output`   | from the input name | Output APKG                                  |
 | `--check`    | off                 | Run gates G1 to G15 on the output            |
 | `--select`   | off                 | Run the cull instead of the rank and reorder |
 
-`--exempt-top`, the spoken weight, the word window, the similarity limit,
-the order, the name, and the reserve pack path are fields of `CullRequest`
-with these defaults in `anki_tools/ranking/cullflow.py`.
+`max_uses` (4), `--exempt-top`, the spoken weight, the word window, the
+similarity limit, the order, the name, and the reserve pack path are fields of
+`CullRequest` with these defaults in `anki_tools/ranking/cullflow.py`.
 
 ### 10.3 Output files
 

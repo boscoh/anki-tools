@@ -653,16 +653,19 @@ def _check_guard(check: bool, modes: Sequence[tuple[str, bool]]) -> bool:
     return False
 
 
+DEFAULT_MANDARIN_APKG = Path("apkg/Neri's Chinese Sents Part 2.apkg")
+
+
 @fix_app.command
 def zh(
-    apkg_path: Path,
+    apkg_path: Path = DEFAULT_MANDARIN_APKG,
     *,
     output: Path | None = None,
     model_id: int | None = None,
+    text_field: str | None = None,
     keep_filtered: bool = False,
     no_pinyin_fix: bool = False,
     no_style: bool = False,
-    verbose: bool = False,
     core: bool = False,
     cards: int | None = None,
     words: int = mandarin_core.DEFAULT_CORE_WORDS,
@@ -676,12 +679,12 @@ def zh(
     fixes pinyin formatting, and applies card styling.
 
     :param apkg_path: Input .apkg file.
-    :param output: Output .apkg file (default: input_reordered.apkg).
-    :param model_id: Filter by specific model ID.
-    :param keep_filtered: If True, keep filtered cards (names, invalid).
+    :param output: Output .apkg file (default: from the input name).
+    :param model_id: Rank mode: filter by specific model ID.
+    :param text_field: Rank mode: preferred sentence field (default: infer).
+    :param keep_filtered: Rank mode: keep filtered cards instead of removing.
     :param no_pinyin_fix: If True, skip pinyin correction.
     :param no_style: If True, skip card styling (CSS/templates).
-    :param verbose: If True, show detailed output.
     :param core: Build the core deck instead of ranking and reordering.
     :param cards: Core mode: card cap.
     :param words: Core mode: tier F words after the Swadesh set.
@@ -721,7 +724,7 @@ def zh(
                 paths.output_path,
                 output=paths.output_path,
                 csv_output=Path("/dev/null"),
-                verbose=verbose,
+                verbose=False,
             )
         styles_applied = 0
         if not no_style:
@@ -743,6 +746,7 @@ def zh(
         rank_sentences_zh,
         {
             "model_id": model_id,
+            "text_field": text_field,
             "romanization_candidates": ("Pinyin",),
             "keep_filtered": keep_filtered,
         },
@@ -765,7 +769,6 @@ def fr(
     core: bool = False,
     cards: int | None = None,
     targets: int = cullflow.DEFAULT_TARGET_WORDS,
-    max_uses: int = cullflow.DEFAULT_MAX_USES,
     reserve: bool = True,
     words: int = french_core.DEFAULT_CORE_WORDS,
     examples: int = french_core.DEFAULT_OPTIONS.per_word,
@@ -793,7 +796,6 @@ def fr(
     :param core: Run the core-word selection instead of the rank and reorder.
     :param cards: Card cap of the chosen mode (select 1000, core 300).
     :param targets: Select mode: target count, 200 to 500.
-    :param max_uses: Select mode: most cards that hold one non-exempt word.
     :param reserve: Select mode: add the Swadesh reserve cards.
     :param words: Core mode: tier F words after the Swadesh set.
     :param examples: Core mode: examples per content target, 1 to 3.
@@ -843,7 +845,6 @@ def fr(
             input_path=apkg_path,
             output_path=output_path,
             target_words=targets,
-            max_uses=max_uses,
             no_reserve=not reserve,
         )
         if cards is not None:
@@ -960,13 +961,13 @@ def yue(
     *,
     output: Path | None = None,
     model_id: int | None = None,
+    text_field: str | None = None,
     keep_filtered: bool = False,
-    no_select: bool = False,
-    max_uses: int = cantonese_select.DEFAULT_MAX_USES,
-    freq: Literal["blend", "spoken", "written"] = cantonese_select.DEFAULT_FREQ,
-    freq_report: bool = False,
+    select: bool = False,
     core: bool = False,
     cards: int | None = None,
+    freq: Literal["blend", "spoken", "written"] = cantonese_select.DEFAULT_FREQ,
+    freq_report: bool = False,
     words: int = cantonese_core.DEFAULT_CORE_WORDS,
     examples: int = cantonese_core.DEFAULT_OPTIONS.per_word,
     tail: int = cantonese_core.DEFAULT_OPTIONS.tail_cards,
@@ -974,26 +975,28 @@ def yue(
 ):
     """Fix Cantonese deck: rank and reorder it, or select a smaller deck.
 
-    Rank mode, with ``--no-select``, ranks the sentences and writes
-    ``<input>_reordered.apkg`` and ``.rank.csv``. Select mode is the default.
-    It ranks the sentences, then keeps the fewest sentences that show the most
-    frequent spoken words, easiest first, and writes ``<input>_reordered.apkg``
-    with its rank, select, and coverage CSV files.
+    Rank mode is the default. It ranks the sentences and writes
+    ``<input>_reordered.apkg`` and ``.rank.csv``, with the jyutping fixes.
+    Select mode, with ``--select``, ranks the sentences, then keeps the
+    fewest sentences that show the most frequent spoken words, easiest first.
+    It writes ``<input>_reordered.apkg`` with its rank, select, and coverage
+    CSV files.
 
-    ``--keep-filtered`` applies to rank mode only. ``--core`` builds the core
-    deck instead. The select tuning values live in ``SelectRequest`` and the
-    core tuning values in ``CoreOptions``, and the specs record them.
+    ``--model-id``, ``--text-field``, and ``--keep-filtered`` apply to rank
+    mode only. ``--core`` builds the core deck instead. The select tuning
+    values live in ``SelectRequest`` and the core tuning values in
+    ``CoreOptions``, and the specs record them.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
-    :param model_id: Filter by specific model ID.
+    :param model_id: Rank mode: filter by specific model ID.
+    :param text_field: Rank mode: preferred sentence field (default: infer).
     :param keep_filtered: Rank mode: keep filtered cards instead of removing.
-    :param no_select: Only rank and reorder, as before.
-    :param max_uses: Select mode: most cards that hold one non-exempt word.
-    :param freq: Frequency term: blend, spoken, or written.
-    :param freq_report: Write the sentences that the frequency change moves.
+    :param select: Run the coverage selection instead of the rank and reorder.
     :param core: Build the core deck instead of ranking and selecting.
     :param cards: Card cap of the chosen mode (select: stop at zero gain).
+    :param freq: Frequency term: blend, spoken, or written.
+    :param freq_report: Write the sentences that the frequency change moves.
     :param words: Core mode: tier F words after the Swadesh set.
     :param examples: Core mode: examples per content target.
     :param tail: Core mode: cards after the core passes.
@@ -1004,7 +1007,7 @@ def yue(
         print(f"Error: File not found: {apkg_path}")
         return
 
-    if not _check_guard(check, (("--core", core),)):
+    if not _check_guard(check, (("--select", select), ("--core", core))):
         return
 
     if core:
@@ -1022,7 +1025,7 @@ def yue(
         )
         return
 
-    if not no_select:
+    if select:
         output_path = output or cantonese_select.default_output(apkg_path)
         run = cantonese_select.run_select(
             cantonese_select.SelectRequest(
@@ -1030,7 +1033,6 @@ def yue(
                 output_path=output_path,
                 model_id=model_id,
                 max_sentences=cards,
-                max_uses=max_uses,
                 freq=freq,
                 freq_report=freq_report,
             )
@@ -1102,6 +1104,7 @@ def yue(
         rank_and_capture,
         {
             "model_id": model_id,
+            "text_field": text_field,
             "romanization_candidates": ("Jyutping",),
             "keep_filtered": keep_filtered,
             "reduce": reorder,
@@ -1122,10 +1125,9 @@ def es(
     model_id: int | None = None,
     text_field: str = "Spanish",
     keep_filtered: bool = False,
-    max_sentences: int | None = None,
-    similarity_threshold: float = 0.5,
     core: bool = False,
     cards: int | None = None,
+    similarity_threshold: float = 0.5,
     words: int = spanish_core.DEFAULT_CORE_WORDS,
     examples: int = spanish_core.DEFAULT_OPTIONS.per_word,
     tail: int = spanish_core.DEFAULT_OPTIONS.tail_cards,
@@ -1142,10 +1144,10 @@ def es(
     :param model_id: Rank mode: filter by specific model ID.
     :param text_field: Rank mode: preferred sentence field (default: Spanish).
     :param keep_filtered: Rank mode: keep filtered cards instead of removing.
-    :param max_sentences: Rank mode: optional max sentence count (e.g., 3000).
-    :param similarity_threshold: Jaccard threshold for deduplication (default 0.5).
     :param core: Build the core deck instead of ranking.
-    :param cards: Core mode: card cap.
+    :param cards: Card cap of the chosen mode (rank 3000, core 300).
+    :param similarity_threshold: Rank mode: Jaccard threshold for
+        deduplication (default 0.5).
     :param words: Core mode: tier F words after the Swadesh set (default 50).
     :param examples: Core mode: examples per content target.
     :param tail: Core mode: cards after the core passes.
@@ -1180,12 +1182,12 @@ def es(
         return ()
 
     def reduce_ranked(ranked: list[Sentence]) -> list[Sentence]:
-        if not max_sentences or len(ranked) <= max_sentences:
+        if not cards or len(ranked) <= cards:
             return ranked
-        print(f"\nStep 2: Reducing to {max_sentences} sentences...")
+        print(f"\nStep 2: Reducing to {cards} sentences...")
         return reduce_sentences_stratified(
             ranked,
-            target_count=max_sentences,
+            target_count=cards,
             similarity_threshold=similarity_threshold,
             similarity_fn=latin_word_similarity,
         )
@@ -1199,12 +1201,10 @@ def es(
             "text_field": text_field,
             "keep_filtered": keep_filtered,
             "reduce": reduce_ranked,
-            "remove_unranked": bool(max_sentences),
+            "remove_unranked": bool(cards),
         },
         target=(
-            f"Target:  {max_sentences} sentences (stratified reduction)"
-            if max_sentences
-            else ""
+            f"Target:  {cards} sentences (stratified reduction)" if cards else ""
         ),
         after=after_rank,
     )

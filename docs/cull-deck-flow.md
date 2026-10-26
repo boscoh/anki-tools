@@ -27,8 +27,8 @@ One command runs the stages in order: `anki fix <language> --select`. The
 
 The gates G1 to G15 run after C5.
 
-The `--cards`, `--targets`, `--max-uses`, and `--reserve` values change the
-request. The other `CullRequest` fields keep their defaults.
+The `--cards`, `--targets`, and `--reserve` values change the request. The
+other `CullRequest` fields, such as `max_uses`, keep their defaults.
 
 The input fields come from the profile: `model_name`, `sentence_field`,
 `english_field`, and `audio_field`. C0 keeps the lowest card of each note. It

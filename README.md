@@ -46,26 +46,66 @@ uv run anki --help                        # list the commands
 uv run anki swadesh vocab mandarin        # build a Swadesh vocabulary deck
 uv run anki fix zh input.apkg             # rank, reorder, fix pinyin, style
 uv run anki fix fr input.apkg             # rank and reorder a French deck
-uv run anki fix yue input.apkg            # convert, jyutping, select, reorder
-uv run anki fix es input.apkg --max-sentences 3000
+uv run anki fix yue input.apkg --select   # rank, jyutping, coverage select
+uv run anki fix es input.apkg --cards 3000
 uv run anki inspect deck.apkg             # show the package contents
 uv run anki style deck.apkg               # apply the CSS and HTML templates
 ```
 
-The `fr`, `es`, and `yue` commands have a default input path. The `zh` command
-has no default, so give the path. Run `uv run anki fix <lang> --help` to see
-the default input of a command.
+Every `fix` command has a default input path, and every command lists its
+options: run `uv run anki fix <lang> --help`.
 
 ## The Fix Command
 
-`anki fix <lang>` has up to three modes:
+`anki fix <lang>` has up to three modes. The four commands take the same
+options.
 
-| Language | Modes                                              | Output                                |
-| -------- | -------------------------------------------------- | ------------------------------------- |
-| `zh`     | rank (default), `--core`                           | `_reordered.apkg`, `_core.apkg`       |
-| `fr`     | rank (default), `--select`, `--core`               | `_reordered.apkg`, `_culled`, `_core` |
-| `es`     | rank (default), `--core`                           | `_reordered.apkg`, `_core.apkg`       |
-| `yue`    | select and rank (default), `--no-select`, `--core` | `_reordered.apkg`, `_core.apkg`       |
+| Language | Modes                            | Output                                |
+| -------- | -------------------------------- | ------------------------------------- |
+| `zh`     | rank (default), `--core`         | `_reordered.apkg`, `_core.apkg`       |
+| `fr`     | rank (default), `--select`, `--core` | `_reordered.apkg`, `_culled`, `_core` |
+| `es`     | rank (default), `--core`         | `_reordered.apkg`, `_core.apkg`       |
+| `yue`    | rank (default), `--select`, `--core` | `_reordered.apkg`, `_core.apkg`   |
+
+Each command has a default input, so a bare `anki fix <lang>` reads it:
+
+| Language | Default input                                    |
+| -------- | ------------------------------------------------ |
+| `zh`     | `apkg/Neri's Chinese Sents Part 2.apkg`          |
+| `fr`     | `apkg/6000_French_Sentences_w_Audio.apkg`        |
+| `es`     | `apkg/Spanish 9000 sentences with native audio.apkg` |
+| `yue`    | `apkg/LTL Cantonese Deck Level 1 - Short.apkg`   |
+
+Run `uv run anki fix <lang> --help` to see the defaults of a command.
+
+The shared options:
+
+| Option             | Applies to    | Meaning                                     |
+| ------------------ | ------------- | ------------------------------------------- |
+| `apkg-path`        | every mode    | input deck; each command has a default       |
+| `--output`         | every mode    | output deck; default `_reordered` or `_core` |
+| `--model-id`       | rank mode     | filter by one model id                      |
+| `--text-field`     | rank mode     | sentence field; the build infers the default |
+| `--keep-filtered`  | rank mode     | keep the cards that the ranker filters      |
+| `--select`         | `fr`, `yue`   | run the cull or the coverage selection      |
+| `--core`           | every command | build the core-word deck                    |
+| `--cards`          | every mode    | card cap of the chosen mode                 |
+| `--words`          | core mode     | tier F words after the Swadesh set          |
+| `--examples`       | core mode     | examples for each target                    |
+| `--tail`           | core mode     | cards after the core passes                 |
+| `--check`          | `--select`, `--core` | run the gates on the written output   |
+
+These options apply to one language:
+
+| Option                   | Language | Meaning                                     |
+| ------------------------ | -------- | ------------------------------------------- |
+| `--no-pinyin-fix`        | `zh`     | skip the pinyin correction step             |
+| `--no-style`             | `zh`     | skip the card styling step                  |
+| `--targets`              | `fr`     | cull target count, 200 to 500               |
+| `--reserve`              | `fr`     | add the Swadesh reserve cards               |
+| `--similarity-threshold` | `es`     | Jaccard limit of the deduplication          |
+| `--freq`                 | `yue`    | frequency term: blend, spoken, or written   |
+| `--freq-report`          | `yue`    | write the sentences that the blend moves    |
 
 Every mode writes `.rank.csv` beside the APKG. The cull and core modes also
 write the CSV files and the manifest that the "French 1000-Card Cull" and
@@ -102,7 +142,7 @@ uv run anki fix fr deck.apkg --core    # core mode
 
 ```bash
 uv run anki fix es deck.apkg                        # rank and reorder
-uv run anki fix es deck.apkg --max-sentences 3000    # reduce to 3000 cards
+uv run anki fix es deck.apkg --cards 3000           # reduce to 3000 cards
 uv run anki fix es deck.apkg --core                  # core mode
 ```
 
@@ -121,7 +161,8 @@ uv run anki fix es deck.apkg --core                  # core mode
 ### Cantonese
 
 ```bash
-uv run anki fix yue deck.apkg         # convert, fix jyutping, select, rank
+uv run anki fix yue deck.apkg         # rank, reorder, fix jyutping
+uv run anki fix yue deck.apkg --select  # rank, jyutping, coverage select
 uv run anki fix yue deck.apkg --core  # core mode
 ```
 
@@ -152,10 +193,9 @@ uv run anki fix yue deck.apkg --core  # core mode
 - The selection keeps the fewest sentences that cover the 1500 most frequent
   words of the deck. Each target word gets 2 cards. A word outside the top 100
   goes in at most 8 kept sentences. The cards go from easy to hard.
-  - `--cards` caps the card count. `--max-uses` sets the most kept sentences
-    for one word outside the top 100. `--output` names the output file.
+  - `--cards` caps the card count. `--output` names the output file.
     `--model-id` filters by model. `--keep-filtered` keeps the similar cards
-    of rank mode. `--no-select` gives the old output: rank and reorder only.
+    of rank mode.
   - `--freq` and `--freq-report` set the frequency term and write its report.
   - The other values are defaults in `SelectRequest`, in
     `anki_tools/languages/cantonese/select_pipeline.py`. The selection always
@@ -588,7 +628,7 @@ uv run pytest tests/test_apkg_package.py -v                # one file
 uv run pytest tests/ --cov=anki_tools --cov-report=term-missing
 ```
 
-The suite holds 450 tests. They cover the package API, the deck gates, the
+The suite holds 632 tests. They cover the package API, the deck gates, the
 language pack rules, and the ranking. A test that needs a large input file or
 a cache skips when the file is absent. The tests build their own small APKG
 files, so the repository holds no deck binary.

@@ -317,7 +317,7 @@ Input: `apkg/Spanish 9000 sentences with native audio.apkg`.
 | S2   | Swadesh-only core list, 0 tier F rows, 1 to 2 examples           | K1 to K19 pass with 0 unchecked               |
 | S3   | build the frequency cache (8.2), then author 50 tier F rows      | every tier F target is `checked`              |
 | S4   | build the 300-card deck                                          | K1 to K19 pass; coverage CSV agrees           |
-| S5   | compare with the current `fix es --max-sentences` output         | report coverage, outside words, sense rejects |
+| S5   | compare with the current `fix es --cards` output                  | report coverage, outside words, sense rejects |
 
 Step S2 proves the flow without any new data. Step S3 proves the sense contract.
 Step S5 decides whether the core guarantee beats the current complexity spread.

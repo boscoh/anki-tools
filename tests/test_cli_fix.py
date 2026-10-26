@@ -197,7 +197,7 @@ class TestCantoneseRankMode:
 
         monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
 
-        cli.yue(deck_file, no_select=True)
+        cli.yue(deck_file)
 
         paths, kwargs = calls[0]
         assert paths.input_path == deck_file
@@ -218,7 +218,7 @@ class TestCantoneseRankMode:
         monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
         output = deck_file.parent / "ranked.apkg"
 
-        cli.yue(deck_file, output=output, no_select=True)
+        cli.yue(deck_file, output=output)
 
         assert calls[0].output_path == output
 
@@ -240,7 +240,7 @@ class TestCantoneseRankMode:
             cli, "fix_jyutping", lambda path, **_kwargs: fixed.append(path)
         )
 
-        cli.yue(deck_file, no_select=True)
+        cli.yue(deck_file)
 
         paths, kwargs = calls[0]
         assert kwargs["romanization_candidates"] == ("Jyutping",)
@@ -251,7 +251,7 @@ class TestCantoneseRankMode:
     def test_a_missing_input_prints_an_error(
         self, tmp_path: Path, capsys
     ) -> None:
-        cli.yue(tmp_path / "absent.apkg", no_select=True)
+        cli.yue(tmp_path / "absent.apkg")
 
         assert "Error: File not found" in capsys.readouterr().out
 
@@ -271,7 +271,7 @@ class TestCantoneseRankMode:
 
         monkeypatch.setattr(cli, "fix_jyutping", fail)
 
-        cli.yue(deck_file, no_select=True)
+        cli.yue(deck_file)
 
         assert "No sentences found!" in capsys.readouterr().out
 
@@ -311,7 +311,7 @@ class TestCantoneseSelectMode:
     ) -> None:
         requests = _capture_select(monkeypatch)
 
-        cli.yue(deck_file)
+        cli.yue(deck_file, select=True)
 
         request = requests[0]
         assert request.input_path == deck_file
@@ -329,7 +329,7 @@ class TestCantoneseSelectMode:
     ) -> None:
         requests = _capture_select(monkeypatch)
 
-        cli.yue(deck_file, cards=300)
+        cli.yue(deck_file, select=True, cards=300)
 
         assert requests[0].max_sentences == 300
 
@@ -339,7 +339,7 @@ class TestCantoneseSelectMode:
         requests = _capture_select(monkeypatch)
         output = deck_file.parent / "small.apkg"
 
-        cli.yue(deck_file, output=output)
+        cli.yue(deck_file, select=True, output=output)
 
         assert requests[0].output_path == output
 
@@ -348,10 +348,10 @@ class TestCantoneseSelectMode:
     ) -> None:
         requests = _capture_select(monkeypatch)
 
-        cli.yue(deck_file, max_uses=3, freq="written", model_id=7, freq_report=True)
+        cli.yue(deck_file, select=True, freq="written", model_id=7, freq_report=True)
 
         request = requests[0]
-        assert request.max_uses == 3
+        assert request.max_uses == 8
         assert request.freq == "written"
         assert request.model_id == 7
         assert request.freq_report is True
@@ -366,11 +366,11 @@ class TestCantoneseSelectMode:
 
         monkeypatch.setattr(cli, "fix_jyutping", fail)
 
-        cli.yue(deck_file)
+        cli.yue(deck_file, select=True)
 
         assert "No sentences found!" in capsys.readouterr().out
 
-    def test_default_mode_skips_the_rank_pipeline(
+    def test_select_mode_skips_the_rank_pipeline(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         requests = _capture_select(monkeypatch)
@@ -381,7 +381,7 @@ class TestCantoneseSelectMode:
 
         monkeypatch.setattr(cli, "run_ranked_deck", fail)
 
-        cli.yue(deck_file)
+        cli.yue(deck_file, select=True)
 
         assert len(requests) == 1
 
@@ -396,7 +396,7 @@ class TestCantoneseSelectMode:
         )
         monkeypatch.setattr(cli, "fix_jyutping", lambda *_args, **_kwargs: None)
 
-        cli.yue(deck_file)
+        cli.yue(deck_file, select=True)
 
         out = capsys.readouterr().out
         assert "Select CSV:" in out
@@ -662,7 +662,7 @@ class TestSpanishRankMode:
 
         assert calls[0][1]["keep_filtered"] is True
 
-    def test_max_sentences_removes_the_unranked(
+    def test_cards_removes_the_unranked(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         calls = []
@@ -673,7 +673,7 @@ class TestSpanishRankMode:
 
         monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
 
-        cli.es(deck_file, max_sentences=3)
+        cli.es(deck_file, cards=3)
 
         assert calls[0][1]["remove_unranked"] is True
 
