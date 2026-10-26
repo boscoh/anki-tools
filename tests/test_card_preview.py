@@ -60,6 +60,17 @@ def test_vocabulary_cards_hold_only_card_content() -> None:
     assert by_title["Greek vocabulary"].fields == "audio, greek, english"
 
 
+def test_the_sentence_pack_cards_bold_the_target() -> None:
+    section = next(
+        section for section in build_sections()
+        if section.anchor == "sentence-packs"
+    )
+    by_title = {card.title: card for card in section.cards}
+
+    assert "<b>Je</b>" in by_title["French sentence"].back
+    assert "<b>Yo</b>" in by_title["Spanish sentence"].back
+
+
 def test_render_template_hides_and_shows_sections() -> None:
     template = "{{#Tag}}yes{{/Tag}}{{^Tag}}no{{/Tag}}"
 

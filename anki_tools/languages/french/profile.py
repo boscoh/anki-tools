@@ -640,7 +640,10 @@ def highlight(sentence: str, form: str) -> str:
     :param form: Card target.
     :returns: Sentence with the matched tokens in ``<b>`` tags.
     """
-    spans = match_spans(sentence, form)
+    needle = "ne pas" if form == "ne" else form
+    spans = match_spans(sentence, needle)
+    if not spans and form == "ne":
+        spans = match_spans(sentence, form)
     if not spans:
         return sentence
     parts: list[str] = []

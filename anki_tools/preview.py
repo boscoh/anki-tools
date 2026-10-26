@@ -485,7 +485,11 @@ def sentence_card(language: str, title: str, row: dict[str, str]) -> PreviewCard
         directory / "card.css",
     )
     target = row["target"]
-    sentence = row["sentence"].replace(target, f"<b>{target}</b>", 1)
+    profile = LANGUAGES[language].profile
+    if profile is not None and profile.highlight is not None:
+        sentence = profile.highlight(row["sentence"], target)
+    else:
+        sentence = row["sentence"].replace(target, f"<b>{target}</b>", 1)
     fields = {
         "Audio": f"[sound:{sentence_audio_name(row)}]",
         "Sentence": sentence,
@@ -591,9 +595,13 @@ def fix_card(language: str, mode: str, title: str) -> PreviewCard:
     if SHARED_SCRIPT and "char-links" in back:
         back = f"{back.rstrip()}\n{SHARED_SCRIPT}"
     sample = FIX_SAMPLES[language]
-    sentence = sample["sentence"].replace(
-        sample["core"], f"<b>{sample['core']}</b>", 1
-    )
+    profile = LANGUAGES[language].profile
+    if profile is not None and profile.highlight is not None:
+        sentence = profile.highlight(sample["sentence"], sample["core"])
+    else:
+        sentence = sample["sentence"].replace(
+            sample["core"], f"<b>{sample['core']}</b>", 1
+        )
     fields = {
         "Audio": f"[sound:{language}_{mode}.mp3]",
         "Sentence": sentence,

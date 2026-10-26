@@ -123,6 +123,13 @@ def test_review_file_holds_the_nine_reviewed_rows() -> None:
     assert {int(row["index"]) for row in review} == expected
 
 
+
+def test_the_negative_target_bolds_ne_and_pas() -> None:
+    assert (
+        french.highlight("Je ne parle pas.", "ne")
+        == "Je <b>ne</b> parle <b>pas</b>."
+    )
+
 def test_module_cleanup() -> None:
     assert french.clean_term("[[ne]] [[pas]]") == "ne pas"
     assert french.clean_term("se battre") == "se battre"
