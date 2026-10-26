@@ -1,4 +1,4 @@
-"""Tests for the Cantonese core output note type."""
+"""Tests for the Cantonese core adapter and its output note type."""
 
 from __future__ import annotations
 

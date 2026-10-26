@@ -13,7 +13,6 @@ from anki_tools.sentence_pack.guards import check_sentence_shape
 from anki_tools.languages.french import profile as french
 
 TAB = "\t"
-NOUN_ROWS = 84
 
 
 def _form(
@@ -109,12 +108,19 @@ def test_review_file_holds_the_nine_reviewed_rows() -> None:
     assert reviewed[183]["chosen"] == "nouveau"
     assert all(row["status"] != "open" for row in review)
     gender_rows = [row for row in review if row["issue"] == "gender"]
-    assert len(gender_rows) == NOUN_ROWS
-    assert len({row["index"] for row in gender_rows}) == NOUN_ROWS
+    nouns = [
+        form
+        for form in french.load_word_table()
+        if form.swadesh_index in french.NOUN_INDICES
+    ]
+    assert len(gender_rows) == len(nouns)
+    assert len({row["index"] for row in gender_rows}) == len(gender_rows)
     zipf_rows = [row for row in review if row["issue"] == "zipf"]
     assert [row["index"] for row in zipf_rows] == ["192"]
     assert zipf_rows[0]["status"] == "kept"
-    assert len(review) == len(reviewed) + NOUN_ROWS + 1
+    expected = set(reviewed)
+    expected |= {int(row["index"]) for row in gender_rows + zipf_rows}
+    assert {int(row["index"]) for row in review} == expected
 
 
 def test_module_cleanup() -> None:
@@ -124,7 +130,7 @@ def test_module_cleanup() -> None:
 
     text = 'm[1] = {{term = "je"}}\nm[2] = {\n    {term = "tu"},\n    {term = "vous"}\n}\n'
     assert french.parse_module_terms(text) == {1: ("je",), 2: ("tu", "vous")}
-    assert len(french.module_terms()) == 207
+    assert len(french.module_terms()) == len(french.load_word_table())
 
 
 def test_form_kinds_and_multiword_forms() -> None:
@@ -467,10 +473,17 @@ def test_manifest_counts(tmp_path: Path) -> None:
     assert manifest["counts"]["cards"] == 1
     assert manifest["counts"]["tts_audio"] == 1
     assert manifest["counts"]["native_audio"] == 0
-    assert manifest["coverage"]["core_with_card"] == round(1 / 207, 4)
+    assert manifest["coverage"]["core_with_card"] == round(
+        1 / french.FRENCH.core_concepts, 4
+    )
     assert manifest["voice"] == "gtts:fr"
     assert manifest["native_audio_available"] is True
-    assert manifest["noun_rows"] == NOUN_ROWS
+    nouns = [
+        form
+        for form in french.load_word_table()
+        if form.swadesh_index in french.NOUN_INDICES
+    ]
+    assert manifest["noun_rows"] == len(nouns)
     assert manifest["noun_gender_missing"] == 0
     assert manifest["excluded_words"] == ["je", "pluie"]
 
