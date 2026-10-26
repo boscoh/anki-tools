@@ -468,21 +468,6 @@ class TestSpanishRankMode:
         assert paths.output_path == output
         assert kwargs["rank"] is cli.rank_sentences_es
 
-    def test_keep_filtered_reaches_the_pipeline(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        calls = []
-
-        def fake_run(paths, **kwargs):
-            calls.append((paths, kwargs))
-            return _fake_deck()
-
-        monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
-
-        cli.es(deck_file, keep_filtered=True)
-
-        assert calls[0][1]["keep_filtered"] is True
-
     def test_the_default_keeps_the_unranked(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:

@@ -25,9 +25,8 @@ One command runs the stages in order: `anki fix <language> --core`. The
 
 The gates K1 to K20 run after K6.
 
-The `--cards`, `--words`, `--examples`, and `--tail` values change
-`CoreOptions` and the tier F target count. The other `CoreRequest` fields
-keep their defaults.
+The `--cards` and `--words` values change the tier F target count and the
+card cap. The other `CoreRequest` fields keep their defaults.
 
 The input fields come from the profile: `model_name`, `sentence_field`,
 `english_field`, and `audio_field`. K0 keeps the lowest card of each note. It

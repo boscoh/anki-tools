@@ -83,13 +83,10 @@ The shared options:
 | `apkg-path`       | every mode           | input deck; each command has a default       |
 | `--output`        | every mode           | output deck; default `_reordered` or `_core` |
 | `--text-field`    | rank mode            | sentence field; the build infers the default |
-| `--keep-filtered` | rank mode            | keep the cards that the ranker filters       |
 | `--select`        | `fr`, `es`           | run the cull instead of the rank and reorder |
 | `--core`          | every command        | build the core-word deck                     |
 | `--cards`         | every mode           | card cap of the chosen mode                  |
 | `--words`         | core mode            | tier F words after the Swadesh set           |
-| `--examples`      | core mode            | examples for each target                     |
-| `--tail`          | core mode            | cards after the core passes                  |
 | `--check`         | `--select`, `--core` | run the gates on the written output          |
 
 These options apply to one language:
@@ -382,8 +379,7 @@ uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --core \
 The flags:
 
 - `--words` adds content lemmas in blended frequency order.
-- `--cards`, `--examples`, and `--tail` set the card count, the examples per
-  word, and the tail of non-core cards.
+- `--cards` sets the card cap.
 - `--output` sets the path. The default is `<input>_core.apkg`.
 - `--check` runs the gates K1 to K20 on the built deck.
 

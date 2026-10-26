@@ -282,7 +282,7 @@ needs them.
 Keep the reduced surface of `anki fix fr`:
 
 ```text
---core --cards --words --examples --tail --output --check
+--core --cards --words --output --check
 ```
 
 The language command selects the tokenizer, word table, frequency source, and

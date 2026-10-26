@@ -457,8 +457,6 @@ so the core deck and the Swadesh deck read the same way.
 | `--core`      | off                 | Run the core selection                  |
 | `--cards`     | 300                 | Card cap                                |
 | `--words`     | 50                  | Tier F words after the Swadesh set      |
-| `--examples`  | 2                   | Examples per content target, 1 to 3     |
-| `--tail`      | 120                 | Cards after the core passes             |
 | `--output`    | from the input name | Output APKG                             |
 | `--check`     | off                 | Run gates K1 to K19 on the output       |
 

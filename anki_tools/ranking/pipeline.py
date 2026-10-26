@@ -75,7 +75,6 @@ def run_ranked_deck(
     text_field: str | None = None,
     text_candidates: Sequence[str] = (),
     romanization_candidates: Sequence[str] = (),
-    keep_filtered: bool = True,
     reduce: Reducer | None = None,
     remove_unranked: bool = False,
 ) -> RankedDeck:
@@ -88,7 +87,6 @@ def run_ranked_deck(
     :param text_field: Preferred sentence field, or None to infer the field.
     :param text_candidates: Sentence field names of the language, in order.
     :param romanization_candidates: Romanization field names, in order.
-    :param keep_filtered: Keep the cards that the ranker marks for removal.
     :param reduce: Reducer of the ranked sentences, or None to keep them all.
     :param remove_unranked: Remove the cards that the ranking CSV does not hold.
     :returns: The extracted sentences, the ranked sentences, and the card counts.
@@ -111,7 +109,6 @@ def run_ranked_deck(
         str(paths.input_path),
         str(paths.output_path),
         str(paths.ranking_path),
-        remove_filtered=not keep_filtered,
         remove_unranked=remove_unranked,
     )
     return RankedDeck(paths, sentences, ranked, stats)

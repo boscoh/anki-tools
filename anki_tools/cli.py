@@ -444,8 +444,6 @@ def _run_core_command(
     output: Path | None,
     cards: int | None,
     words: int,
-    examples: int,
-    tail: int,
     check: bool,
 ) -> None:
     """Build the core deck for one language.
@@ -456,8 +454,6 @@ def _run_core_command(
     :param output: Output .apkg file (default: from the input name).
     :param cards: Core mode: card cap.
     :param words: Core mode: tier F words after the Swadesh set.
-    :param examples: Core mode: examples per content target.
-    :param tail: Core mode: cards after the core passes.
     :param check: Run the gates on the output only.
     """
     output_path = output or coreflow.default_output(apkg_path)
@@ -472,11 +468,7 @@ def _run_core_command(
     print("=" * 50)
     print(f"Processing {label} Anki Deck: core mode")
     print("=" * 50)
-    options = replace(
-        profile.default_options,
-        per_word=examples,
-        tail_cards=tail,
-    )
+    options = profile.default_options
     if cards is not None:
         options = replace(options, max_cards=cards)
     request = coreflow.CoreRequest(
@@ -512,12 +504,9 @@ def zh(
     *,
     output: Path | None = None,
     text_field: str | None = None,
-    keep_filtered: bool = False,
     core: bool = False,
     cards: int | None = None,
     words: int = mandarin_core.DEFAULT_CORE_WORDS,
-    examples: int = mandarin_core.DEFAULT_OPTIONS.per_word,
-    tail: int = mandarin_core.DEFAULT_OPTIONS.tail_cards,
     check: bool = False,
 ):
     """Fix Chinese deck: rank, reorder, fix pinyin, and apply styling.
@@ -529,12 +518,9 @@ def zh(
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
     :param text_field: Rank mode: preferred sentence field (default: infer).
-    :param keep_filtered: Rank mode: keep filtered cards instead of removing.
     :param core: Build the core deck instead of ranking.
     :param cards: Card cap of the chosen mode (core 300).
     :param words: Core mode: tier F words after the Swadesh set.
-    :param examples: Core mode: examples per content target.
-    :param tail: Core mode: cards after the core passes.
     :param check: Run the gates on the output and do not run the mode again.
     """
     apkg_path = Path(apkg_path)
@@ -553,8 +539,6 @@ def zh(
             output,
             cards,
             words,
-            examples,
-            tail,
             check,
         )
         return
@@ -568,7 +552,6 @@ def zh(
         {
             "text_field": text_field,
             "romanization_candidates": ("Pinyin",),
-            "keep_filtered": keep_filtered,
         },
         after=mandarin_fix_steps.after_rank,
     )
@@ -583,15 +566,12 @@ def fr(
     *,
     output: Path | None = None,
     text_field: str = "French",
-    keep_filtered: bool = False,
     select: bool = False,
     core: bool = False,
     cards: int | None = None,
     targets: int = cullflow.DEFAULT_TARGET_WORDS,
     reserve: bool = True,
     words: int = french_core.DEFAULT_CORE_WORDS,
-    examples: int = french_core.DEFAULT_OPTIONS.per_word,
-    tail: int = french_core.DEFAULT_OPTIONS.tail_cards,
     check: bool = False,
 ):
     """Fix French deck: rank and reorder it, or select a smaller deck.
@@ -604,15 +584,12 @@ def fr(
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
     :param text_field: Rank mode: preferred sentence field (default: French).
-    :param keep_filtered: Rank mode: keep filtered cards instead of removing.
     :param select: Run the card cull instead of the rank and reorder.
     :param core: Build the core deck instead of ranking.
     :param cards: Card cap of the chosen mode (select 1000, core 300).
     :param targets: Select mode: target count, 200 to 500.
     :param reserve: Select mode: add the Swadesh reserve cards.
     :param words: Core mode: tier F words after the Swadesh set.
-    :param examples: Core mode: examples per content target.
-    :param tail: Core mode: cards after the core passes.
     :param check: Run the gates on the output and do not run the mode again.
     """
     apkg_path = Path(apkg_path)
@@ -636,8 +613,6 @@ def fr(
             output,
             cards,
             words,
-            examples,
-            tail,
             check,
         )
         return
@@ -670,7 +645,6 @@ def fr(
         {
             "text_field": text_field,
             "text_candidates": ("French",),
-            "keep_filtered": keep_filtered,
         },
     )
 
@@ -769,12 +743,9 @@ def yue(
     *,
     output: Path | None = None,
     text_field: str | None = None,
-    keep_filtered: bool = False,
     core: bool = False,
     cards: int | None = None,
     words: int = cantonese_core.DEFAULT_CORE_WORDS,
-    examples: int = cantonese_core.DEFAULT_OPTIONS.per_word,
-    tail: int = cantonese_core.DEFAULT_OPTIONS.tail_cards,
     check: bool = False,
 ):
     """Fix Cantonese deck: rank and reorder it, or build a core deck.
@@ -786,12 +757,9 @@ def yue(
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
     :param text_field: Rank mode: preferred sentence field (default: infer).
-    :param keep_filtered: Rank mode: keep filtered cards instead of removing.
     :param core: Build the core deck instead of ranking.
     :param cards: Card cap of the chosen mode (core 300).
     :param words: Core mode: tier F words after the Swadesh set.
-    :param examples: Core mode: examples per content target.
-    :param tail: Core mode: cards after the core passes.
     :param check: Run the gates on the output and do not run the mode again.
     """
     apkg_path = Path(apkg_path)
@@ -810,8 +778,6 @@ def yue(
             output,
             cards,
             words,
-            examples,
-            tail,
             check,
         )
         return
@@ -848,7 +814,6 @@ def yue(
         {
             "text_field": text_field,
             "romanization_candidates": ("Jyutping",),
-            "keep_filtered": keep_filtered,
             "reduce": reorder,
             "remove_unranked": False,
         },
@@ -865,15 +830,12 @@ def es(
     *,
     output: Path | None = None,
     text_field: str = "Spanish",
-    keep_filtered: bool = False,
     select: bool = False,
     core: bool = False,
     cards: int | None = None,
     targets: int = cullflow.DEFAULT_TARGET_WORDS,
     reserve: bool = True,
     words: int = spanish_core.DEFAULT_CORE_WORDS,
-    examples: int = spanish_core.DEFAULT_OPTIONS.per_word,
-    tail: int = spanish_core.DEFAULT_OPTIONS.tail_cards,
     check: bool = False,
 ):
     """Fix Spanish deck: rank and reorder it, or select a smaller deck.
@@ -885,15 +847,12 @@ def es(
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
     :param text_field: Rank mode: preferred sentence field (default: Spanish).
-    :param keep_filtered: Rank mode: keep filtered cards instead of removing.
     :param select: Run the cull instead of the rank and reorder.
     :param core: Build the core deck instead of ranking.
     :param cards: Card cap of the chosen mode (select 1000, core 300).
     :param targets: Select mode: target count, 200 to 500.
     :param reserve: Select mode: add the Swadesh reserve cards.
     :param words: Core mode: tier F words after the Swadesh set.
-    :param examples: Core mode: examples per content target.
-    :param tail: Core mode: cards after the core passes.
     :param check: Run the gates on the output and do not run the mode again.
     """
     apkg_path = Path(apkg_path)
@@ -916,8 +875,6 @@ def es(
             output,
             cards,
             words,
-            examples,
-            tail,
             check,
         )
         return
@@ -950,7 +907,6 @@ def es(
         rank_sentences_es,
         {
             "text_field": text_field,
-            "keep_filtered": keep_filtered,
         },
     )
 
