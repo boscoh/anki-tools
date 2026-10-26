@@ -2,13 +2,19 @@
 
 import re
 
+from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.templates import (
     DEFAULT_TEMPLATE_DIR,
     SHARED_CSS_PATH,
     TEMPLATES_DIR,
+    apply_field_mapping,
+    apply_templates,
+    find_best_match,
+    load_char_links,
     load_css_layers,
     load_text,
 )
+from tests.deck_fixture import build_contract_deck
 from anki_tools.languages import PROFILES
 from anki_tools.languages.french import core as french_core
 from anki_tools.languages.french import cull as french_cull
@@ -154,3 +160,38 @@ def test_the_default_card_uses_the_shared_card_classes() -> None:
     assert 'class="sentence char-links"' in back
     assert 'class="romanization"' in back
     assert 'class="english"' in back
+
+
+def test_apply_templates_writes_the_sheet_and_the_card(tmp_path) -> None:
+    path = build_contract_deck(tmp_path)
+
+    models, applied = apply_templates(path, verbose=False)
+
+    assert models == 1
+    assert applied == ["CSS", "front", "back"]
+    with AnkiPackage(path) as package:
+        model = next(iter(package.get_models(include_templates=True).values()))
+    assert model["css"].startswith(load_text(SHARED_CSS_PATH))
+    template = model["tmpls"][0]
+    assert template["qfmt"] == load_text(DEFAULT_TEMPLATE_DIR / "front.html")
+    assert template["afmt"].startswith(
+        load_text(DEFAULT_TEMPLATE_DIR / "back.html")
+    )
+    assert template["afmt"].endswith(load_char_links())
+
+
+def test_the_mapper_takes_the_nearest_field_name() -> None:
+    deck_fields = {"Annotated Sentence", "Translated English"}
+    mapping = {
+        name: find_best_match(name, deck_fields)
+        for name in ("Sentence", "Translation", "Audio")
+    }
+
+    assert mapping == {
+        "Sentence": "Annotated Sentence",
+        "Translation": None,
+        "Audio": None,
+    }
+    assert apply_field_mapping("{{Translation}}", {"Translation": "English"}) == (
+        "{{English}}"
+    )

@@ -488,10 +488,11 @@ class TestSpanishMode:
 
 
 def _stub_mandarin_rank_steps(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Replace the pinyin and style steps of the Mandarin rank mode."""
-    monkeypatch.setattr(cli, "fix_pinyin", lambda *_args, **_kwargs: None)
-    monkeypatch.setattr(cli, "_apply_style", lambda *_args, **_kwargs: (0, []))
-
+    """Replace the pinyin and template steps of the Mandarin rank mode."""
+    monkeypatch.setattr(cli.mandarin_fix_steps, "fix_pinyin", lambda *_a, **_k: None)
+    monkeypatch.setattr(
+        cli.mandarin_fix_steps, "apply_templates", lambda *_a, **_k: (0, [])
+    )
 
 class TestMandarinRankMode:
     def test_rank_routes_to_the_pipeline(
@@ -514,35 +515,28 @@ class TestMandarinRankMode:
         assert kwargs["rank"] is cli.rank_sentences_zh
         assert kwargs["romanization_candidates"] == ("Pinyin",)
 
-    def test_no_pinyin_fix_skips_the_pinyin_step(
+    def test_the_rank_mode_fixes_pinyin_and_applies_templates(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.setattr(
             cli, "run_ranked_deck", lambda _paths, **_kwargs: _fake_deck()
         )
-        _stub_mandarin_rank_steps(monkeypatch)
-
-        def fail(*_args, **_kwargs):
-            raise AssertionError("fix_pinyin must not run")
-
-        monkeypatch.setattr(cli, "fix_pinyin", fail)
-
-        cli.zh(deck_file, pinyin_fix=False)
-
-    def test_no_style_skips_the_style_step(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+        calls = []
         monkeypatch.setattr(
-            cli, "run_ranked_deck", lambda _paths, **_kwargs: _fake_deck()
+            cli.mandarin_fix_steps,
+            "fix_pinyin",
+            lambda path, **_kwargs: calls.append(("pinyin", path)),
         )
-        monkeypatch.setattr(cli, "fix_pinyin", lambda *_args, **_kwargs: None)
+        monkeypatch.setattr(
+            cli.mandarin_fix_steps,
+            "apply_templates",
+            lambda path, **_kwargs: (calls.append(("templates", path)), (1, ["CSS"]))[1],
+        )
 
-        def fail(*_args, **_kwargs):
-            raise AssertionError("_apply_style must not run")
+        cli.zh(deck_file)
 
-        monkeypatch.setattr(cli, "_apply_style", fail)
-
-        cli.zh(deck_file, style=False)
+        output = deck_file.parent / "input_reordered.apkg"
+        assert calls == [("pinyin", output), ("templates", output)]
 
     def test_an_empty_extraction_prints_no_sentences(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
@@ -558,7 +552,7 @@ class TestMandarinRankMode:
         def fail(*_args, **_kwargs):
             raise AssertionError("fix_pinyin must not run")
 
-        monkeypatch.setattr(cli, "fix_pinyin", fail)
+        monkeypatch.setattr(cli.mandarin_fix_steps, "fix_pinyin", fail)
 
         cli.zh(deck_file)
 

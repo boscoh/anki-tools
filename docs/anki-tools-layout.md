@@ -21,10 +21,10 @@ no language package.
 
 ## 2. apkg
 
-| Path                           | Content                                 |
-| ------------------------------ | --------------------------------------- |
-| `anki_tools/apkg/package.py`   | Read, write, and edit APKG files        |
-| `anki_tools/apkg/templates.py` | Card template and CSS file loaders      |
+| Path                           | Content                                         |
+| ------------------------------ | ----------------------------------------------- |
+| `anki_tools/apkg/package.py`   | Read, write, and edit APKG files                |
+| `anki_tools/apkg/templates.py` | Template and CSS loaders, and `apply_templates` |
 
 ## 3. ranking
 
@@ -84,6 +84,7 @@ One package per language. The package holds all the code of that language.
 | `anki_tools/languages/cantonese/rank.py`            | Cantonese sentence ranking                         |
 | `anki_tools/languages/mandarin/profile.py`          | Mandarin profile and word metrics                  |
 | `anki_tools/languages/mandarin/pinyin.py`           | Pinyin repair for Chinese cards                    |
+| `anki_tools/languages/mandarin/fix_steps.py`        | Pinyin and template steps after the reorder        |
 | `anki_tools/languages/mandarin/characters.py`       | Han character helpers and similarity               |
 | `anki_tools/languages/mandarin/rank.py`             | Mandarin sentence ranking                          |
 | `anki_tools/languages/mandarin/stages.py`           | S1 to S3 caller of the shared pipeline             |

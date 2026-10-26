@@ -31,7 +31,7 @@ from anki_tools.languages.french import cull as french_cull
 from anki_tools.languages.spanish import core as spanish_core
 from anki_tools.languages.mandarin import core as mandarin_core
 from anki_tools.languages.cantonese.jyutping import fix_jyutping
-from anki_tools.languages.mandarin.pinyin import fix_pinyin
+from anki_tools.languages.mandarin import fix_steps as mandarin_fix_steps
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.preview import write_preview
 from anki_tools.preview_apkg import write_apkg_preview
@@ -66,9 +66,12 @@ from anki_tools.ranking.pipeline import (
 )
 from anki_tools.ranking.scan import CoreProfile
 from anki_tools.apkg.templates import (
-    DEFAULT_TEMPLATE_DIR,
+    DEFAULT_BACK_PATH,
+    DEFAULT_CSS_PATH,
+    DEFAULT_FRONT_PATH,
     SHARED_CSS_PATH,
     TEMPLATES_DIR,
+    apply_templates,
     load_char_links,
     load_css_layers,
     load_text,
@@ -375,142 +378,6 @@ def sample(apkg_path: Path, *, count: int = 5):
 # Style - apply CSS and card templates (any deck)
 # =============================================================================
 
-def _extract_template_fields(template: str) -> set[str]:
-    """Extract field names from Anki template ({{FieldName}} syntax).
-
-    :param template: Template string (qfmt or afmt).
-    :returns: Set of field names referenced.
-    """
-    matches = re.findall(r"\{\{([^#/}]+)\}\}", template)
-    builtins = {"FrontSide", "Tags", "Type", "Deck", "Subdeck", "Card"}
-    return {m.strip() for m in matches if m.strip() not in builtins}
-
-
-def _find_best_match(field: str, deck_fields: set[str]) -> str | None:
-    """Find the best matching deck field for a template field.
-
-    :param field: Template field name.
-    :param deck_fields: Set of deck field names.
-    :returns: Best matching deck field name or None.
-    """
-    field_lower = field.lower()
-
-    for deck_field in deck_fields:
-        if deck_field.lower() == field_lower:
-            return deck_field
-
-    field_words = set(re.split(r"[^a-zA-Z]+", field_lower))
-    best_match = None
-    best_score = 0
-
-    for deck_field in deck_fields:
-        deck_words = set(re.split(r"[^a-zA-Z]+", deck_field.lower()))
-        common = field_words & deck_words
-        if common and len(common) > best_score:
-            best_score = len(common)
-            best_match = deck_field
-
-    return best_match
-
-
-def _apply_field_mapping(template: str, mapping: dict[str, str]) -> str:
-    """Replace field references in template using mapping.
-
-    :param template: Template string with {{FieldName}} refs.
-    :param mapping: Dict mapping old field names to new.
-    :returns: Template with refs replaced.
-    """
-    result = template
-    for old_name, new_name in mapping.items():
-        result = result.replace(f"{{{{{old_name}}}}}", f"{{{{{new_name}}}}}")
-    return result
-
-
-CARD_CSS_PATH = DEFAULT_TEMPLATE_DIR / "card.css"
-FRONT_TEMPLATE_PATH = DEFAULT_TEMPLATE_DIR / "front.html"
-BACK_TEMPLATE_PATH = DEFAULT_TEMPLATE_DIR / "back.html"
-
-
-def _apply_style(
-    target_apkg: Path,
-    *,
-    css_path: Path = CARD_CSS_PATH,
-    front_path: Path = FRONT_TEMPLATE_PATH,
-    back_path: Path = BACK_TEMPLATE_PATH,
-    verbose: bool = True,
-) -> tuple[int, list[str]]:
-    """Load CSS/templates, map fields to deck, update target package. Returns (models_updated, applied_names)."""
-    with AnkiPackage(str(target_apkg)) as pkg:
-        models = pkg.get_models(include_templates=True)
-        all_fields = set()
-        for model in models.values():
-            all_fields.update(f["name"] for f in model.get("flds", []))
-        if verbose:
-            print("Deck fields:")
-            for _mid, model in models.items():
-                print(f"  {', '.join(f['name'] for f in model['flds'])}")
-
-    css_content = load_css_layers(SHARED_CSS_PATH, css_path)
-    if css_content and verbose:
-        print(f"\nLoaded: {SHARED_CSS_PATH} and {css_path}")
-    elif verbose:
-        print(f"\nNo CSS found in {SHARED_CSS_PATH} or {css_path}, skipping CSS")
-
-    qfmt = None
-    if front_path.exists():
-        qfmt = front_path.read_text(encoding="utf-8")
-        if verbose:
-            print(f"Loaded: {front_path}")
-        missing = _extract_template_fields(qfmt) - all_fields
-        if missing:
-            mapping = {f: _find_best_match(f, all_fields) for f in missing}
-            mapping = {k: v for k, v in mapping.items() if v}
-            if mapping and verbose:
-                print(f"  Auto-mapping: {mapping}")
-            qfmt = _apply_field_mapping(qfmt, mapping)
-    elif verbose:
-        print(f"No {front_path} found, skipping front template")
-
-    afmt = None
-    if back_path.exists():
-        afmt = back_path.read_text(encoding="utf-8")
-        if verbose:
-            print(f"Loaded: {back_path}")
-        missing = _extract_template_fields(afmt) - all_fields
-        if missing:
-            mapping = {f: _find_best_match(f, all_fields) for f in missing}
-            mapping = {k: v for k, v in mapping.items() if v}
-            if mapping and verbose:
-                print(f"  Auto-mapping: {mapping}")
-            afmt = _apply_field_mapping(afmt, mapping)
-        script = load_char_links()
-        if script and "char-links" in afmt:
-            afmt = f"{afmt.rstrip()}\n{script}"
-    elif verbose:
-        print(f"No {back_path} found, skipping back template")
-
-    if not css_content and not qfmt and not afmt:
-        return (0, [])
-
-    with AnkiPackage(str(target_apkg)) as pkg:
-        models = pkg.get_models()
-        for model_id in models:
-            pkg.update_model_template(
-                model_id=model_id, css=css_content, qfmt=qfmt, afmt=afmt
-            )
-        pkg.save(target_apkg)
-
-    applied = []
-    if css_content:
-        applied.append("CSS")
-    if qfmt:
-        applied.append("front")
-    if afmt:
-        applied.append("back")
-    if verbose:
-        print(f"Updated {len(models)} model(s)")
-    return (len(models), applied)
-
 
 style_app = cyclopts.App(
     name="style", help="Apply CSS and card templates to an Anki deck"
@@ -554,17 +421,17 @@ def apply(
         except OSError as exc:
             raise RuntimeError(f"Cannot copy {apkg_path} to {output}.") from exc
 
-    _n, applied = _apply_style(
+    _n, applied = apply_templates(
         output,
-        css_path=css or CARD_CSS_PATH,
-        front_path=front or FRONT_TEMPLATE_PATH,
-        back_path=back or BACK_TEMPLATE_PATH,
+        css_path=css or DEFAULT_CSS_PATH,
+        front_path=front or DEFAULT_FRONT_PATH,
+        back_path=back or DEFAULT_BACK_PATH,
         verbose=True,
     )
     if not applied:
         print(
-            f"\nNothing to apply. Check {CARD_CSS_PATH}, "
-            f"{FRONT_TEMPLATE_PATH}, and {BACK_TEMPLATE_PATH} first."
+            f"\nNothing to apply. Check {DEFAULT_CSS_PATH}, "
+            f"{DEFAULT_FRONT_PATH}, and {DEFAULT_BACK_PATH} first."
         )
         return
     print(f"\nSaved: {output}")
@@ -664,8 +531,6 @@ def zh(
     model_id: int | None = None,
     text_field: str | None = None,
     keep_filtered: bool = False,
-    pinyin_fix: bool = True,
-    style: bool = True,
     core: bool = False,
     cards: int | None = None,
     words: int = mandarin_core.DEFAULT_CORE_WORDS,
@@ -683,8 +548,6 @@ def zh(
     :param model_id: Rank mode: filter by specific model ID.
     :param text_field: Rank mode: preferred sentence field (default: infer).
     :param keep_filtered: Rank mode: keep filtered cards instead of removing.
-    :param pinyin_fix: Fix the pinyin formatting.
-    :param style: Apply the card styling (CSS and templates).
     :param core: Build the core deck instead of ranking and reordering.
     :param cards: Core mode: card cap.
     :param words: Core mode: tier F words after the Swadesh set.
@@ -717,29 +580,6 @@ def zh(
 
     paths = rank_paths(apkg_path, output)
 
-    def after_rank(paths: RankPaths, deck: RankedDeck) -> Sequence[str]:
-        if pinyin_fix:
-            print("\nFixing pinyin...")
-            fix_pinyin(
-                paths.output_path,
-                output=paths.output_path,
-                csv_output=Path("/dev/null"),
-                verbose=False,
-            )
-        styles_applied = 0
-        if style:
-            print("\nApplying card styles...")
-            styles_applied, applied = _apply_style(
-                Path(paths.output_path),
-                css_path=CARD_CSS_PATH,
-                front_path=FRONT_TEMPLATE_PATH,
-                back_path=BACK_TEMPLATE_PATH,
-                verbose=False,
-            )
-            if applied:
-                print(f"  Applied: {', '.join(applied)} to {styles_applied} model(s)")
-        return (f"  Styles applied:      {styles_applied} model(s)",)
-
     _run_rank_mode(
         paths,
         LANGUAGES["mandarin"].label,
@@ -750,7 +590,7 @@ def zh(
             "romanization_candidates": ("Pinyin",),
             "keep_filtered": keep_filtered,
         },
-        after=after_rank,
+        after=mandarin_fix_steps.after_rank,
     )
 
 

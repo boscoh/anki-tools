@@ -99,8 +99,6 @@ These options apply to one language:
 
 | Option                   | Language | Meaning                                     |
 | ------------------------ | -------- | ------------------------------------------- |
-| `--pinyin-fix`           | `zh`     | fix the pinyin formatting (default on)      |
-| `--style`                | `zh`     | apply the card styling (default on)         |
 | `--targets`              | `fr`     | cull target count, 200 to 500               |
 | `--reserve`              | `fr`     | add the Swadesh reserve cards               |
 | `--similarity-threshold` | `es`     | Jaccard limit of the deduplication          |
@@ -122,7 +120,8 @@ uv run anki fix zh deck.apkg --core  # core mode, see "Core-Word Decks"
 - `wordfreq` frequency data with an HSK vocabulary bonus.
 - Removes repeated-pattern sentences before ranking, for example `走吧走吧`
   and `好了，好了`.
-- Fixes pinyin formatting and applies the card styling.
+- Fixes the pinyin field and writes the card templates from
+  `templates/default/`. Both steps always run.
 
 ### French
 
