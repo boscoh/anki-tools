@@ -88,19 +88,6 @@ class TestSelectMode:
 
         assert requests[0].no_reserve is True
         assert requests[0].max_cards == 500
-
-    def test_model_id_with_select_prints_an_error(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
-    ) -> None:
-        def fail(_request, _profile):
-            raise AssertionError("run_cull must not run")
-
-        monkeypatch.setattr(cli.cullflow, "run_cull", fail)
-
-        cli.fr(deck_file, select=True, model_id=7)
-
-        assert "Error: --model-id" in capsys.readouterr().out
-
     def test_check_with_select_calls_the_gates(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -553,18 +540,6 @@ class TestSpanishSelectMode:
 
         assert requests[0].no_reserve is True
         assert requests[0].max_cards == 500
-
-    def test_model_id_with_select_prints_an_error(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
-    ) -> None:
-        def fail(_request, _profile):
-            raise AssertionError("run_cull must not run")
-
-        monkeypatch.setattr(cli.cullflow, "run_cull", fail)
-
-        cli.es(deck_file, select=True, model_id=7)
-
-        assert "Error: --model-id" in capsys.readouterr().out
 class TestSpanishCoreMode:
     def test_core_builds_the_request(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch

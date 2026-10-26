@@ -82,7 +82,6 @@ The shared options:
 | ----------------- | -------------------- | -------------------------------------------- |
 | `apkg-path`       | every mode           | input deck; each command has a default       |
 | `--output`        | every mode           | output deck; default `_reordered` or `_core` |
-| `--model-id`      | rank mode            | filter by one model id                       |
 | `--text-field`    | rank mode            | sentence field; the build infers the default |
 | `--keep-filtered` | rank mode            | keep the cards that the ranker filters       |
 | `--select`        | `fr`, `es`           | run the cull instead of the rank and reorder |
@@ -100,8 +99,8 @@ These options apply to one language:
 | `--targets`              | `fr`, `es` | cull target count, 200 to 500               |
 | `--reserve`              | `fr`, `es` | add the Swadesh reserve cards               |
 
-`yue` has no `--model-id`. The frequency term and the similarity limit are
-values of the language module, so no flag can change them.
+The frequency term and the similarity limit are values of the language module,
+so no flag can change them.
 
 Every mode writes `.rank.csv` beside the APKG. The cull and core modes also
 write the CSV files and the manifest that the "French 1000-Card Cull" and

@@ -120,7 +120,6 @@ def _resolve_extract_fields(
 
 def extract_sentences(
     apkg_path: str,
-    model_id: int | None = None,
     *,
     text_field: str | None = None,
     text_candidates: Sequence[str] = (),
@@ -133,7 +132,6 @@ def extract_sentences(
     language as a candidate list.
 
     :param apkg_path: Path to the .apkg file.
-    :param model_id: Optional model ID to filter by; extracts all if None.
     :param text_field: Preferred main sentence field (inferred if None).
     :param text_candidates: Main field names of the language, tried in order.
     :param romanization_candidates: Romanization field names of the language.
@@ -155,9 +153,6 @@ def extract_sentences(
         card_index = 0
         for card in cards:
             card_model_id = str(card["mid"])
-
-            if model_id and card_model_id != str(model_id):
-                continue
 
             model = models.get(card_model_id, {})
             field_names = [f["name"] for f in model.get("flds", [])]

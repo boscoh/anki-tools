@@ -67,6 +67,10 @@ now belongs to `fr` and `es`.
 `es` gained `--select` with the cull of `SPANISH_CULL_PROFILE`. Its rank mode no
 longer reads `--cards`, so the flag is a cap in every command.
 
+`--model-id` is deleted from the four commands, `extract_sentences`, and
+`run_ranked_deck`. No deck holds cards in more than one note type, and the field
+inference picks the sentence field per model.
+
 ## Rejected
 
 Give each command a shared options dataclass. Cyclopts flattens a dataclass

@@ -72,7 +72,6 @@ def run_ranked_deck(
     paths: RankPaths,
     *,
     rank: Callable[[list[Sentence]], list[Sentence]],
-    model_id: int | None = None,
     text_field: str | None = None,
     text_candidates: Sequence[str] = (),
     romanization_candidates: Sequence[str] = (),
@@ -86,7 +85,6 @@ def run_ranked_deck(
 
     :param paths: Input, output, and ranking file of the run.
     :param rank: Ranker of the language, sentences to ranked sentences.
-    :param model_id: Model id to filter by, or None for every model.
     :param text_field: Preferred sentence field, or None to infer the field.
     :param text_candidates: Sentence field names of the language, in order.
     :param romanization_candidates: Romanization field names, in order.
@@ -97,7 +95,6 @@ def run_ranked_deck(
     """
     sentences = extract_sentences(
         str(paths.input_path),
-        model_id,
         text_field=text_field,
         text_candidates=text_candidates,
         romanization_candidates=romanization_candidates,

@@ -442,7 +442,6 @@ def _run_core_command(
     label: str,
     apkg_path: Path,
     output: Path | None,
-    model_id: int | None,
     cards: int | None,
     words: int,
     examples: int,
@@ -455,16 +454,12 @@ def _run_core_command(
     :param label: Language name that the banner shows.
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
-    :param model_id: Rank mode filter, rejected in core mode.
     :param cards: Core mode: card cap.
     :param words: Core mode: tier F words after the Swadesh set.
     :param examples: Core mode: examples per content target.
     :param tail: Core mode: cards after the core passes.
     :param check: Run the gates on the output only.
     """
-    if model_id is not None:
-        print("Error: --model-id does not apply with --core.")
-        return
     output_path = output or coreflow.default_output(apkg_path)
     if check:
         code = coregates.check_core(output_path, profile)
@@ -516,7 +511,6 @@ def zh(
     apkg_path: Path = DEFAULT_MANDARIN_APKG,
     *,
     output: Path | None = None,
-    model_id: int | None = None,
     text_field: str | None = None,
     keep_filtered: bool = False,
     core: bool = False,
@@ -534,7 +528,6 @@ def zh(
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
-    :param model_id: Rank mode: filter by specific model ID.
     :param text_field: Rank mode: preferred sentence field (default: infer).
     :param keep_filtered: Rank mode: keep filtered cards instead of removing.
     :param core: Build the core deck instead of ranking.
@@ -558,7 +551,6 @@ def zh(
             LANGUAGES["mandarin"].label,
             apkg_path,
             output,
-            model_id,
             cards,
             words,
             examples,
@@ -574,7 +566,6 @@ def zh(
         LANGUAGES["mandarin"].label,
         rank_sentences_zh,
         {
-            "model_id": model_id,
             "text_field": text_field,
             "romanization_candidates": ("Pinyin",),
             "keep_filtered": keep_filtered,
@@ -591,7 +582,6 @@ def fr(
     apkg_path: Path = DEFAULT_FRENCH_APKG,
     *,
     output: Path | None = None,
-    model_id: int | None = None,
     text_field: str = "French",
     keep_filtered: bool = False,
     select: bool = False,
@@ -613,7 +603,6 @@ def fr(
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
-    :param model_id: Rank mode: filter by specific model ID.
     :param text_field: Rank mode: preferred sentence field (default: French).
     :param keep_filtered: Rank mode: keep filtered cards instead of removing.
     :param select: Run the card cull instead of the rank and reorder.
@@ -645,7 +634,6 @@ def fr(
             LANGUAGES["french"].label,
             apkg_path,
             output,
-            model_id,
             cards,
             words,
             examples,
@@ -654,9 +642,6 @@ def fr(
         )
         return
     if select:
-        if model_id is not None:
-            print("Error: --model-id does not apply with --select.")
-            return
         output_path = output or cullflow.default_output(apkg_path)
         if check:
             code = cullgates.check_cull(
@@ -683,7 +668,6 @@ def fr(
         LANGUAGES["french"].label,
         rank_sentences_fr,
         {
-            "model_id": model_id,
             "text_field": text_field,
             "text_candidates": ("French",),
             "keep_filtered": keep_filtered,
@@ -824,7 +808,6 @@ def yue(
             LANGUAGES["cantonese"].label,
             apkg_path,
             output,
-            None,
             cards,
             words,
             examples,
@@ -881,7 +864,6 @@ def es(
     apkg_path: Path = DEFAULT_SPANISH_APKG,
     *,
     output: Path | None = None,
-    model_id: int | None = None,
     text_field: str = "Spanish",
     keep_filtered: bool = False,
     select: bool = False,
@@ -902,7 +884,6 @@ def es(
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
-    :param model_id: Rank mode: filter by specific model ID.
     :param text_field: Rank mode: preferred sentence field (default: Spanish).
     :param keep_filtered: Rank mode: keep filtered cards instead of removing.
     :param select: Run the cull instead of the rank and reorder.
@@ -933,7 +914,6 @@ def es(
             LANGUAGES["spanish"].label,
             apkg_path,
             output,
-            model_id,
             cards,
             words,
             examples,
@@ -943,9 +923,6 @@ def es(
         return
 
     if select:
-        if model_id is not None:
-            print("Error: --model-id does not apply with --select.")
-            return
         output_path = output or cullflow.default_output(apkg_path)
         if check:
             code = cullgates.check_cull(
@@ -972,7 +949,6 @@ def es(
         LANGUAGES["spanish"].label,
         rank_sentences_es,
         {
-            "model_id": model_id,
             "text_field": text_field,
             "keep_filtered": keep_filtered,
         },
