@@ -20,10 +20,8 @@ from anki_tools.languages.cantonese.frequency import (
     download_cifu,
     han_tokens,
     load_yue_frequency,
-    rank_change_rows,
     read_cifu,
     read_overrides,
-    write_freq_change_csv,
 )
 from anki_tools.languages.cantonese.rank import rank_sentences_yue
 from anki_tools.languages.cantonese.select import (
@@ -46,13 +44,6 @@ from anki_tools.sentence_pack.audit import print_audit, sample
 _DEFAULTS = SelectionOptions()
 #: Output name suffix of a select run.
 OUTPUT_SUFFIX = "_reordered"
-
-#: Default frequency term of a select run.
-DEFAULT_FREQ = "blend"
-
-#: Default weight of the spoken term in the blended frequency term.
-DEFAULT_SPOKEN_WEIGHT = 0.7
-
 #: Default use cap of a select run, from the filter options.
 DEFAULT_MAX_USES = _DEFAULTS.max_uses
 
@@ -78,7 +69,6 @@ class SelectRequest:
 
     :param input_path: Input APKG file.
     :param output_path: Output APKG file.
-    :param model_id: Model id to filter by, or None for every model.
     :param max_sentences: Stop the selection at this count, or None at zero gain.
     :param per_word: Cards wanted for each target word.
     :param max_uses: Most kept sentences for one word outside the top 100.
@@ -90,14 +80,10 @@ class SelectRequest:
     :param known_top: Size of the known word set.
     :param similarity_threshold: Character Jaccard threshold for duplicates.
     :param final_mark: Apply the final-mark rule Y4.
-    :param freq: Frequency term: ``blend``, ``spoken``, or ``written``.
-    :param spoken_weight: Weight of the spoken term in the blend.
-    :param freq_report: Write the sentences that the frequency change moves.
     """
 
     input_path: Path
     output_path: Path
-    model_id: int | None = None
     max_sentences: int | None = None
     per_word: int = _DEFAULTS.per_word
     max_uses: int = _DEFAULTS.max_uses
@@ -109,9 +95,6 @@ class SelectRequest:
     known_top: int = _DEFAULTS.known_top
     similarity_threshold: float = _DEFAULTS.similarity_threshold
     final_mark: bool = _DEFAULTS.final_mark
-    freq: str = DEFAULT_FREQ
-    spoken_weight: float = DEFAULT_SPOKEN_WEIGHT
-    freq_report: bool = False
 
     def options(self) -> SelectionOptions:
         """Build the filter and selection options of the run.
@@ -219,34 +202,14 @@ def run_select(request: SelectRequest) -> SelectRun:
 
     def rank_and_capture(sentences: list[Sentence]) -> list[Sentence]:
         extracted.extend(sentences)
-        ranked = rank_sentences_yue(
-            sentences, freq=request.freq, spoken_weight=request.spoken_weight
-        )
+        ranked = rank_sentences_yue(sentences)
         counts["ranked"] = len(ranked)
         return ranked
 
     def select_ranked(ranked: list[Sentence]) -> list[Sentence]:
-        if request.freq_report and request.freq != "written":
-            comparison = rank_sentences_yue(
-                [
-                    Sentence(
-                        note_id=sentence.note_id,
-                        text=sentence.text,
-                        original_order=sentence.original_order,
-                    )
-                    for sentence in extracted
-                ],
-                freq="written",
-            )
-            rows = rank_change_rows(comparison, ranked)
-            change_csv = Path(f"{output_stem(paths.output_path)}.freq_change.csv")
-            write_freq_change_csv(rows, change_csv)
-            print(f"  {len(rows)} sentences move by more than 100 places: {change_csv}")
         options = request.options()
         print("\nStep 2: Selecting sentences...")
-        frequency = load_yue_frequency(
-            freq=request.freq, spoken_weight=request.spoken_weight
-        )
+        frequency = load_yue_frequency()
         tokenizer = build_yue_tokenizer(
             read_cifu(download_cifu()), extra_words=read_overrides()
         )
@@ -263,7 +226,6 @@ def run_select(request: SelectRequest) -> SelectRun:
     deck = run_ranked_deck(
         paths,
         rank=rank_and_capture,
-        model_id=request.model_id,
         romanization_candidates=("Jyutping",),
         reduce=select_ranked,
         remove_unranked=True,

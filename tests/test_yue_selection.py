@@ -5,24 +5,20 @@ from pathlib import Path
 import jieba
 import pytest
 
-from anki_tools.languages.cantonese.rank import load_frequency_data_yue
 from anki_tools.ranking.rank import Sentence
 from anki_tools.languages.cantonese.frequency import (
     CifuEntry,
-    _build_frequency_data,
     FreqRow,
     YueFrequency,
+    add_variant_ranks,
     build_yue_frequency,
     build_yue_tokenizer,
     check_frequency,
     han_tokens,
     load_yue_frequency,
-    rank_change_rows,
     read_cifu,
     read_overrides,
     read_variants,
-    write_freq_change_csv,
-    yue_frequency_path,
 )
 from anki_tools.languages.cantonese.select import (
     UNRANKED,
@@ -78,24 +74,14 @@ APPLE = {"係": 10, "嘅": 5000, "新聞": 9000, "咁": 20, "噉": 5}
 
 class TestBlend:
     def test_count_below_five_uses_the_written_term(self) -> None:
-        data = build_yue_frequency(CIFU, APPLE, spoken_weight=1.0)
+        data = build_yue_frequency(CIFU, APPLE)
         row = next(r for r in data.rows if r.word == "嘅")
         assert row.blend_pm == pytest.approx(row.written_pm)
 
-    def test_weight_changes_the_order(self) -> None:
-        spoken = build_yue_frequency(CIFU, APPLE, spoken_weight=1.0)
-        written = build_yue_frequency(CIFU, APPLE, spoken_weight=0.0)
-        assert spoken.ranks["係"] < written.ranks["係"]
-        assert written.ranks["嘅"] < written.ranks["係"]
-        assert [r.word for r in spoken.rows] != [r.word for r in written.rows]
-
-    def test_freq_written_ignores_spoken_counts(self) -> None:
-        data = build_yue_frequency(CIFU, APPLE, freq="written")
-        assert data.ranks["新聞"] < data.ranks["係"]
-
-    def test_unknown_source_is_rejected(self) -> None:
-        with pytest.raises(ValueError):
-            build_yue_frequency(CIFU, APPLE, freq="loud")
+    def test_the_blend_weights_the_spoken_term(self) -> None:
+        data = build_yue_frequency(CIFU, APPLE)
+        row = next(r for r in data.rows if r.word == "係")
+        assert row.blend_pm == pytest.approx(0.7 * row.spoken_pm + 0.3 * row.written_pm)
 
     def test_ranks_are_contiguous_and_source_is_recorded(self) -> None:
         data = build_yue_frequency(CIFU, APPLE)
@@ -136,16 +122,16 @@ class TestVariantsAndOverrides:
         assert read_variants(variants) == {"噉": "咁"}
         assert read_overrides(overrides) == {"你好": "多謝"}
 
-    def test_written_ranks_carry_the_variant_map(self) -> None:
-        """The written Apple Daily path applies the variant map too."""
-        data = _build_frequency_data({"咁": 100, "枱": 50}, 10, {"噉": "咁", "檯": "枱"})
-        assert data.word_freq["噉"] == data.word_freq["咁"] == 1
-        assert data.word_freq["檯"] == data.word_freq["枱"] == 2
-        assert data.char_freq["噉"] == 1
+    def test_variant_ranks_come_from_the_standard_form(self) -> None:
+        ranks = {"咁": 1, "枱": 2}
+        add_variant_ranks(ranks, {"噉": "咁", "檯": "枱"})
+        assert ranks["噉"] == 1
+        assert ranks["檯"] == 2
 
     def test_variant_without_a_standard_form_gets_no_rank(self) -> None:
-        data = _build_frequency_data({"咁": 100}, 10, {"噉": "無此詞"})
-        assert "噉" not in data.word_freq
+        ranks = {"咁": 1}
+        add_variant_ranks(ranks, {"噉": "無此詞"})
+        assert "噉" not in ranks
 
 
 class TestOutputAndGates:
@@ -192,26 +178,6 @@ class TestTokenizer:
         assert han_tokens(tokenizer, "你好") == ["你好"]
 
 
-class TestRankChangeReport:
-    def test_reports_rows_past_the_threshold_sorted_by_move(self) -> None:
-        before = [
-            Sentence(note_id=n, text=f"s{n}", original_order=n) for n in (1, 2, 3)
-        ]
-        after = [before[2], before[0], before[1]]
-        rows = rank_change_rows(before, after, threshold=0)
-        assert [row["sentence"] for row in rows] == ["s3", "s1", "s2"]
-        assert rows[0]["move"] == 2
-        assert rows[1]["move"] == -1
-        assert rows[2]["move"] == -1
-        assert rank_change_rows(before, after, threshold=2) == []
-
-    def test_writes_a_header_and_one_row_per_change(self, tmp_path: Path) -> None:
-        rows = [{"sentence": "我明。", "rank_before": 5, "rank_after": 986, "move": -981}]
-        out = tmp_path / "change.csv"
-        write_freq_change_csv(rows, out)
-        lines = out.read_text(encoding="utf-8").splitlines()
-        assert lines[0] == "sentence,rank_before,rank_after,move"
-        assert lines[1] == "我明。,5,986,-981"
 
 
 def make_freq(words: list[str]) -> YueFrequency:
@@ -487,16 +453,3 @@ class TestSpokenMass:
         candidates = [Candidate(make_sentence("我。", 0), ["我"], 1)]
         assert spoken_mass(freq, candidates) == pytest.approx(0.75)
 
-
-class TestWrittenRegression:
-    @pytest.mark.skipif(
-        not yue_frequency_path().exists(), reason="the Apple Daily cache is absent"
-    )
-    def test_written_source_does_not_read_cifu(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        def boom(*_args: object, **_kwargs: object) -> None:
-            raise AssertionError("the written source read Cifu")
-
-        monkeypatch.setattr("anki_tools.languages.cantonese.frequency.load_yue_frequency", boom)
-        data = load_frequency_data_yue(source="written", max_words=1000)
-        assert data.word_freq
-        assert data.word_freq.get("係", 0) > 0

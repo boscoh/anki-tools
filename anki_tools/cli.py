@@ -51,7 +51,10 @@ from anki_tools.languages import (
 from anki_tools.languages.cantonese.rank import rank_sentences_yue
 from anki_tools.languages.french.rank import rank_sentences_fr
 from anki_tools.languages.mandarin.rank import rank_sentences_zh
-from anki_tools.languages.spanish.rank import rank_sentences_es
+from anki_tools.languages.spanish.rank import (
+    SIMILARITY_THRESHOLD,
+    rank_sentences_es,
+)
 from anki_tools.ranking import coreflow, coregates, cullflow, cullgates
 from anki_tools.ranking.latin import latin_word_similarity
 from anki_tools.ranking.rank import (
@@ -75,10 +78,6 @@ from anki_tools.apkg.templates import (
     load_char_links,
     load_css_layers,
     load_text,
-)
-from anki_tools.languages.cantonese.frequency import (
-    rank_change_rows,
-    write_freq_change_csv,
 )
 
 app = cyclopts.App(help="CLI tools for Anki package (.apkg) files")
@@ -456,7 +455,6 @@ def _run_core_command(
     examples: int,
     tail: int,
     check: bool,
-    spoken_weight: float | None = None,
 ) -> None:
     """Build the core deck for one language.
 
@@ -470,8 +468,6 @@ def _run_core_command(
     :param examples: Core mode: examples per content target.
     :param tail: Core mode: cards after the core passes.
     :param check: Run the gates on the output only.
-    :param spoken_weight: Optional weight of the spoken frequency term. The
-        profile weight applies when it is None.
     """
     if model_id is not None:
         print("Error: --model-id does not apply with --core.")
@@ -501,9 +497,8 @@ def _run_core_command(
         core_words=words,
         options=options,
     )
-    weight = spoken_weight if spoken_weight is not None else profile.spoken_weight
-    if weight is not None:
-        request = replace(request, spoken_weight=weight)
+    if profile.spoken_weight is not None:
+        request = replace(request, spoken_weight=profile.spoken_weight)
     coreflow.run_core(request, profile)
 
 
@@ -540,20 +535,21 @@ def zh(
 ):
     """Fix Chinese deck: rank, reorder, fix pinyin, and apply styling.
 
-    Ranks sentences by frequency and complexity, reorders the deck,
-    fixes pinyin formatting, and applies card styling.
+    Rank mode writes ``<input>_reordered.apkg`` and ``.rank.csv``, then fixes
+    the pinyin and writes the card templates. ``--core`` builds
+    ``<input>_core.apkg`` with its CSV files and manifest.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
     :param model_id: Rank mode: filter by specific model ID.
     :param text_field: Rank mode: preferred sentence field (default: infer).
     :param keep_filtered: Rank mode: keep filtered cards instead of removing.
-    :param core: Build the core deck instead of ranking and reordering.
-    :param cards: Core mode: card cap.
+    :param core: Build the core deck instead of ranking.
+    :param cards: Card cap of the chosen mode (core 300).
     :param words: Core mode: tier F words after the Swadesh set.
     :param examples: Core mode: examples per content target.
     :param tail: Core mode: cards after the core passes.
-    :param check: Core mode: run the gates on the output only.
+    :param check: Run the gates on the output and do not run the mode again.
     """
     apkg_path = Path(apkg_path)
     if not apkg_path.exists():
@@ -617,15 +613,10 @@ def fr(
 ):
     """Fix French deck: rank and reorder it, or select a smaller deck.
 
-    Rank mode is the default. It ranks the sentences and writes
-    ``<input>_reordered.apkg`` and ``.rank.csv``. Select mode, with
-    ``--select``, runs the 1000-card cull and writes ``<input>_culled.apkg``
-    with its CSV files and manifest.
-
-    ``--model-id``, ``--text-field``, and ``--keep-filtered`` apply to rank
-    mode only. ``--select`` adds the cull options, and ``--core`` adds the
-    core options. The tuning values live in ``CullRequest`` and
-    ``CoreOptions``, and the specs record them.
+    Rank mode writes ``<input>_reordered.apkg`` and ``.rank.csv``. Select mode,
+    with ``--select``, runs the 1000-card cull and writes
+    ``<input>_culled.apkg``. ``--core`` builds ``<input>_core.apkg`` with its
+    CSV files and manifest.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
@@ -633,12 +624,12 @@ def fr(
     :param text_field: Rank mode: preferred sentence field (default: French).
     :param keep_filtered: Rank mode: keep filtered cards instead of removing.
     :param select: Run the card cull instead of the rank and reorder.
-    :param core: Run the core-word selection instead of the rank and reorder.
+    :param core: Build the core deck instead of ranking.
     :param cards: Card cap of the chosen mode (select 1000, core 300).
     :param targets: Select mode: target count, 200 to 500.
     :param reserve: Select mode: add the Swadesh reserve cards.
     :param words: Core mode: tier F words after the Swadesh set.
-    :param examples: Core mode: examples per content target, 1 to 3.
+    :param examples: Core mode: examples per content target.
     :param tail: Core mode: cards after the core passes.
     :param check: Run the gates on the output and do not run the mode again.
     """
@@ -800,14 +791,11 @@ def yue(
     apkg_path: Path = DEFAULT_CANTONESE_APKG,
     *,
     output: Path | None = None,
-    model_id: int | None = None,
     text_field: str | None = None,
     keep_filtered: bool = False,
     select: bool = False,
     core: bool = False,
     cards: int | None = None,
-    freq: Literal["blend", "spoken", "written"] = cantonese_select.DEFAULT_FREQ,
-    freq_report: bool = False,
     words: int = cantonese_core.DEFAULT_CORE_WORDS,
     examples: int = cantonese_core.DEFAULT_OPTIONS.per_word,
     tail: int = cantonese_core.DEFAULT_OPTIONS.tail_cards,
@@ -815,28 +803,18 @@ def yue(
 ):
     """Fix Cantonese deck: rank and reorder it, or select a smaller deck.
 
-    Rank mode is the default. It ranks the sentences and writes
-    ``<input>_reordered.apkg`` and ``.rank.csv``, with the jyutping fixes.
-    Select mode, with ``--select``, ranks the sentences, then keeps the
-    fewest sentences that show the most frequent spoken words, easiest first.
-    It writes ``<input>_reordered.apkg`` with its rank, select, and coverage
-    CSV files.
-
-    ``--model-id``, ``--text-field``, and ``--keep-filtered`` apply to rank
-    mode only. ``--core`` builds the core deck instead. The select tuning
-    values live in ``SelectRequest`` and the core tuning values in
-    ``CoreOptions``, and the specs record them.
+    Rank mode writes ``<input>_reordered.apkg`` and ``.rank.csv``, with the
+    jyutping fixes. Select mode, with ``--select``, keeps the fewest sentences
+    that show the most frequent spoken words, easiest first. ``--core`` builds
+    ``<input>_core.apkg`` with its CSV files and manifest.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
-    :param model_id: Rank mode: filter by specific model ID.
     :param text_field: Rank mode: preferred sentence field (default: infer).
     :param keep_filtered: Rank mode: keep filtered cards instead of removing.
     :param select: Run the coverage selection instead of the rank and reorder.
-    :param core: Build the core deck instead of ranking and selecting.
+    :param core: Build the core deck instead of ranking.
     :param cards: Card cap of the chosen mode (select: stop at zero gain).
-    :param freq: Frequency term: blend, spoken, or written.
-    :param freq_report: Write the sentences that the frequency change moves.
     :param words: Core mode: tier F words after the Swadesh set.
     :param examples: Core mode: examples per content target.
     :param tail: Core mode: cards after the core passes.
@@ -856,7 +834,7 @@ def yue(
             LANGUAGES["cantonese"].label,
             apkg_path,
             output,
-            model_id,
+            None,
             cards,
             words,
             examples,
@@ -871,10 +849,7 @@ def yue(
             cantonese_select.SelectRequest(
                 input_path=apkg_path,
                 output_path=output_path,
-                model_id=model_id,
                 max_sentences=cards,
-                freq=freq,
-                freq_report=freq_report,
             )
         )
         if run.report is None:
@@ -903,29 +878,11 @@ def yue(
 
     def rank_and_capture(sentences: list[Sentence]) -> list[Sentence]:
         extracted.extend(sentences)
-        ranked = rank_sentences_yue(sentences, freq=freq)
+        ranked = rank_sentences_yue(sentences)
         counts["ranked"] = len(ranked)
         return ranked
 
     def reorder(ranked: list[Sentence]) -> list[Sentence]:
-        if freq_report and freq != "written":
-            comparison = rank_sentences_yue(
-                [
-                    Sentence(
-                        note_id=sentence.note_id,
-                        text=sentence.text,
-                        original_order=sentence.original_order,
-                    )
-                    for sentence in extracted
-                ],
-                freq="written",
-            )
-            rows = rank_change_rows(comparison, ranked)
-            change_csv = (
-                paths.input_path.parent / f"{paths.input_path.stem}.freq_change.csv"
-            )
-            write_freq_change_csv(rows, change_csv)
-            print(f"  {len(rows)} sentences move by more than 100 places: {change_csv}")
         print("\nStep 2: Reordering deck...")
         return ranked
 
@@ -943,7 +900,6 @@ def yue(
         LANGUAGES["cantonese"].label,
         rank_and_capture,
         {
-            "model_id": model_id,
             "text_field": text_field,
             "romanization_candidates": ("Jyutping",),
             "keep_filtered": keep_filtered,
@@ -967,7 +923,6 @@ def es(
     keep_filtered: bool = False,
     core: bool = False,
     cards: int | None = None,
-    similarity_threshold: float = 0.5,
     words: int = spanish_core.DEFAULT_CORE_WORDS,
     examples: int = spanish_core.DEFAULT_OPTIONS.per_word,
     tail: int = spanish_core.DEFAULT_OPTIONS.tail_cards,
@@ -975,9 +930,9 @@ def es(
 ):
     """Fix Spanish deck: rank and reorder it, or build a core deck.
 
-    Rank mode is the default. ``--core`` builds the core deck of the Swadesh
-    rows and the tier F words, and writes ``<input>_core.apkg`` with its CSV
-    files and manifest.
+    Rank mode writes ``<input>_reordered.apkg`` and ``.rank.csv``; ``--cards``
+    also runs the stratified reduction. ``--core`` builds
+    ``<input>_core.apkg`` with its CSV files and manifest.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
@@ -986,9 +941,7 @@ def es(
     :param keep_filtered: Rank mode: keep filtered cards instead of removing.
     :param core: Build the core deck instead of ranking.
     :param cards: Card cap of the chosen mode (rank 3000, core 300).
-    :param similarity_threshold: Rank mode: Jaccard threshold for
-        deduplication (default 0.5).
-    :param words: Core mode: tier F words after the Swadesh set (default 50).
+    :param words: Core mode: tier F words after the Swadesh set.
     :param examples: Core mode: examples per content target.
     :param tail: Core mode: cards after the core passes.
     :param check: Run the gates on the output and do not run the mode again.
@@ -1028,7 +981,7 @@ def es(
         return reduce_sentences_stratified(
             ranked,
             target_count=cards,
-            similarity_threshold=similarity_threshold,
+            similarity_threshold=SIMILARITY_THRESHOLD,
             similarity_fn=latin_word_similarity,
         )
 

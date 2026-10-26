@@ -318,11 +318,8 @@ class TestCantoneseSelectMode:
         assert request.output_path == deck_file.parent / "input_reordered.apkg"
         assert request.max_sentences is None
         assert request.max_uses == 8
-        assert request.freq == "blend"
         assert request.per_word == 2
         assert request.final_mark is True
-        assert request.freq_report is False
-        assert request.model_id is None
 
     def test_cards_sets_the_select_cap(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
@@ -342,20 +339,6 @@ class TestCantoneseSelectMode:
         cli.yue(deck_file, select=True, output=output)
 
         assert requests[0].output_path == output
-
-    def test_select_passes_the_tuning_survivors(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        requests = _capture_select(monkeypatch)
-
-        cli.yue(deck_file, select=True, freq="written", model_id=7, freq_report=True)
-
-        request = requests[0]
-        assert request.max_uses == 8
-        assert request.freq == "written"
-        assert request.model_id == 7
-        assert request.freq_report is True
-
     def test_select_with_no_report_prints_no_sentences(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
     ) -> None:
@@ -420,37 +403,6 @@ class TestCantoneseCoreMode:
 
         assert requests[0].options.max_cards == 42
         assert requests[0].spoken_weight == cli.cantonese_core.SPOKEN_WEIGHT
-
-
-
-class TestCoreSpokenWeight:
-    def test_the_profile_weight_applies_when_the_caller_gives_none(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        requests: list = []
-
-        def fake(request, _profile) -> None:
-            requests.append(request)
-
-        monkeypatch.setattr(cli.coreflow, "run_core", fake)
-        options = cli.cantonese_core.DEFAULT_OPTIONS
-
-        for weight, expected in ((0.7, 0.7), (None, 0.5)):
-            profile = SimpleNamespace(default_options=options, spoken_weight=weight)
-            cli._run_core_command(
-                profile,
-                "Test",
-                deck_file,
-                None,
-                None,
-                None,
-                0,
-                options.per_word,
-                options.tail_cards,
-                False,
-            )
-            assert requests[-1].spoken_weight == expected
-
 class TestSpanishMode:
     def test_check_without_core_prints_an_error(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys

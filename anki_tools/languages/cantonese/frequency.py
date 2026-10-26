@@ -16,13 +16,13 @@ import re
 from dataclasses import dataclass, field
 from functools import cached_property
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Protocol
 
 import jieba
 
 from anki_tools.languages.mandarin.characters import get_chinese_chars
 from anki_tools.cache import download_cached_file
-from anki_tools.ranking.rank import FrequencyData, Sentence
+from anki_tools.ranking.rank import FrequencyData
 
 CIFU_URL = "https://raw.githubusercontent.com/gwinterstein/Cifu/master/Lexicon/Cifu-v1.txt"
 CIFU_ATTRIBUTION = (
@@ -43,7 +43,7 @@ YUE_FREQUENCY_MAX_WORDS = 50000
 MIN_SPOKEN_COUNT = 5
 SPOKEN_DICT_WEIGHT = 40
 WRITTEN_DICT_WEIGHT = 2
-FREQ_SOURCES = ("blend", "spoken", "written")
+SPOKEN_WEIGHT = 0.7
 
 _HAN = re.compile(r"[\u4e00-\u9fff]")
 
@@ -210,25 +210,18 @@ def build_yue_frequency(
     *,
     variants: dict[str, str] | None = None,
     overrides: dict[str, str] | None = None,
-    freq: str = "blend",
-    spoken_weight: float = 0.7,
 ) -> YueFrequency:
     """Blend the Cifu and Apple Daily counts into one ranked list.
 
-    ``blend_pm`` is ``w * spoken_pm + (1 - w) * written_pm`` when the spoken
-    count is at least 5, else ``written_pm``. The ``spoken`` source uses
-    ``spoken_pm`` alone, and the ``written`` source uses ``written_pm`` alone.
+    ``blend_pm`` is ``SPOKEN_WEIGHT * spoken_pm + (1 - SPOKEN_WEIGHT) *
+    written_pm`` when the spoken count is at least 5, else ``written_pm``.
 
     :param cifu: Cifu entries.
     :param apple: Apple Daily word counts.
     :param variants: Variant to standard form. Counts of a variant add to the standard form.
     :param overrides: Word to the word that gives its value.
-    :param freq: ``blend``, ``spoken``, or ``written``.
-    :param spoken_weight: Value of ``w``.
     :returns: Rows sorted by rank.
     """
-    if freq not in FREQ_SOURCES:
-        raise ValueError(f"freq must be one of {FREQ_SOURCES}, got {freq!r}")
     variants = variants or {}
     overrides = overrides or {}
     spoken_total = sum(e.spoken for e in cifu.values()) or 1
@@ -262,13 +255,10 @@ def build_yue_frequency(
         if apple_count.get(word, 0) > 0:
             parts.append(1e6 * apple_count[word] / apple_total)
         written_pm = sum(parts) / len(parts) if parts else 0.0
-        has_spoken = spoken.get(word, 0) >= MIN_SPOKEN_COUNT
-        if freq == "spoken":
-            value = spoken_pm if has_spoken else 0.0
-        elif freq == "written" or not has_spoken:
-            value = written_pm
+        if spoken.get(word, 0) >= MIN_SPOKEN_COUNT:
+            value = SPOKEN_WEIGHT * spoken_pm + (1 - SPOKEN_WEIGHT) * written_pm
         else:
-            value = spoken_weight * spoken_pm + (1 - spoken_weight) * written_pm
+            value = written_pm
         in_apple = apple_count.get(word, 0) > 0
         if word in in_cifu and in_apple:
             source = "cifu+ad"
@@ -302,14 +292,10 @@ def build_yue_frequency(
 
 def load_yue_frequency(
     *,
-    freq: str = "blend",
-    spoken_weight: float = 0.7,
     refresh: bool = False,
 ) -> YueFrequency:
     """Load the sources, downloading missing files, and build the list.
 
-    :param freq: ``blend``, ``spoken``, or ``written``.
-    :param spoken_weight: Value of ``w``.
     :param refresh: Download both source files again.
     :raises RuntimeError: The blend fails a gate of the spec.
     :returns: The ranked list.
@@ -321,22 +307,16 @@ def load_yue_frequency(
         apple,
         variants=read_variants(),
         overrides=read_overrides(),
-        freq=freq,
-        spoken_weight=spoken_weight,
     )
-    if freq == "blend":
-        # ponytail: the gates describe the blend; the written-only list
-        # lacks the colloquial forms that G3 and G4 name.
-        failures = [
-            f"{gate}: {message}"
-            for gate, passed, message in check_frequency(data)
-            if not passed
-        ]
-        if failures:
-            raise RuntimeError(
-                "The Cantonese frequency list fails its gates: "
-                + "; ".join(failures)
-            )
+    failures = [
+        f"{gate}: {message}"
+        for gate, passed, message in check_frequency(data)
+        if not passed
+    ]
+    if failures:
+        raise RuntimeError(
+            "The Cantonese frequency list fails its gates: " + "; ".join(failures)
+        )
     return data
 
 
@@ -375,51 +355,6 @@ def check_frequency(data: YueFrequency) -> list[tuple[str, bool, str]]:
         ok = all(rank is not None and rank <= limit for rank in found.values())
         results.append((gate, ok, f"ranks within {limit}: {found}"))
     return results
-
-
-FREQ_CHANGE_COLUMNS: tuple[str, ...] = ("sentence", "rank_before", "rank_after", "move")
-
-
-def rank_change_rows(
-    before: list[Sentence], after: list[Sentence], threshold: int = 100
-) -> list[dict[str, Any]]:
-    """List sentences whose rank moves by more than a threshold.
-
-    :param before: Ranking with the first frequency term, best first.
-    :param after: Ranking with the second frequency term, best first.
-    :param threshold: Smallest move in places to report.
-    :returns: Rows sorted by the size of the move, largest first.
-    """
-    old = {s.note_id: i for i, s in enumerate(before, 1)}
-    rows: list[dict[str, Any]] = []
-    for new_rank, sentence in enumerate(after, 1):
-        old_rank = old.get(sentence.note_id)
-        if old_rank is None or abs(new_rank - old_rank) <= threshold:
-            continue
-        rows.append({
-            "sentence": sentence.text,
-            "rank_before": old_rank,
-            "rank_after": new_rank,
-            "move": old_rank - new_rank,
-        })
-    return sorted(rows, key=lambda row: -abs(row["move"]))
-
-
-def write_freq_change_csv(rows: list[dict[str, Any]], path: Path) -> None:
-    """Write the sentences that the new frequency term moves.
-
-    :param rows: Rows from :func:`rank_change_rows`.
-    :param path: Output file.
-    """
-    try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        handle = open(path, "w", encoding="utf-8", newline="")
-    except OSError as exc:
-        raise RuntimeError(f"Cannot write {path}.") from exc
-    with handle:
-        writer = csv.DictWriter(handle, fieldnames=FREQ_CHANGE_COLUMNS, lineterminator="\n")
-        writer.writeheader()
-        writer.writerows(rows)
 
 
 class Tokenizer(Protocol):
@@ -583,19 +518,3 @@ def add_variant_ranks(ranks: dict[str, int], variants: dict[str, str]) -> None:
         if standard in ranks:
             ranks.setdefault(variant, ranks[standard])
 
-
-def _build_frequency_data(
-    counts: dict[str, int], max_words: int, variants: dict[str, str] | None = None
-) -> FrequencyData:
-    """Build rank tables from word counts.
-
-    :param counts: Word to occurrence count.
-    :param max_words: Number of most common words to keep.
-    :param variants: Variant to standard form. The written Apple Daily list
-        needs the map, because it holds news-standard characters only.
-    :returns: Filled :class:`FrequencyData`.
-    """
-    ordered = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
-    ranks = {word: rank for rank, (word, _) in enumerate(ordered[:max_words], 1)}
-    add_variant_ranks(ranks, variants or {})
-    return frequency_data_from_ranks(ranks)

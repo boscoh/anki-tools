@@ -65,14 +65,12 @@ cover (2.2). Section 3 has the full tables.
 | Selection method        | Greedy cover, 2 cards per word, weight `1/log2(rank+1)`                   | 8.2, 14.5    |
 | Uses of one word        | A word outside the 100 most frequent words is in at most 8 kept sentences | 8.5, 14.6    |
 | Card order              | Easiest hardest-word first                                                | 8.4          |
-| Compatibility           | Rank mode is the default and reproduces today's output                    | 9.2, gate G8 |
+| Compatibility           | Rank mode is the default and reproduces today's output                    | 9.2          |
 
 ### 1.4 Open blockers
 
 - Cifu is usable for local builds. Its license for a public build is not
   clear (open question 1, M0).
-- The new default frequency changes today's ranking. M2 must report the
-  changed sentences before the default changes (`anki-afn`).
 
 ## 2. Goals and scope
 
@@ -309,17 +307,14 @@ blend_pm   = w * spoken_pm + (1 - w) * written_pm      if spoken_count >= 5
 blend_pm   = written_pm                                 otherwise
 ```
 
-- `w` is `--spoken-weight`, default 0.7.
-- `--freq` selects the term: `blend` (default), `spoken`, or `written`.
-- `--freq written` gives today's behavior (Apple Daily only).
+- `w` is `SPOKEN_WEIGHT`, 0.7. The module sets it; no option changes it.
 - The spoken sample is small, so a count below 5 uses the written term only.
 
 The blend fixes most spoken words (14.1). It does not fix `你好`, because
 HKCanCor writes it as two tokens. The override file (5.4) covers this case.
 
 The blend changes the order of the old list. On the LTL deck, 603 of 998
-sentences move by more than 100 places (M2). The option `--freq-report` writes
-those sentences to `deck.freq_change.csv`.
+sentences move by more than 100 places (M2).
 
 ### 5.3 Variant map
 
@@ -441,7 +436,7 @@ test of four weights is in 14.5.
 Two sentences are duplicates in either case:
 
 - They have the same unique-character count, and their character Jaccard
-  value is at or above `--similarity-threshold` (default 0.67, as in `fix zh`).
+  value is at or above 0.67, the value of `SelectionOptions.similarity_threshold`.
 - They have the same token set.
 
 Reuse `char_similarity_zh` and `char_similarity_zh_same_len` from
@@ -501,12 +496,9 @@ The common flags stay on the command. The selection tuning values live in
 | Option            | Default | Meaning                                                                    |
 | ----------------- | ------- | -------------------------------------------------------------------------- |
 | `--output`        | none    | Output file, else `<input>_reordered.apkg`                                 |
-| `--model-id`      | none    | Only the cards of this model                                               |
 | `--text-field`    | none    | Sentence field of rank mode; else inferred                                |
 | `--keep-filtered` | off     | Keep the similar cards (rank mode only)                                    |
 | `--select`        | off     | Run the coverage selection; the default is rank mode                       |
-| `--freq`          | blend   | `blend`, `spoken`, or `written`; sets `SelectRequest.freq`                 |
-| `--freq-report`   | off     | Write the sentences that move by more than 100 places (M2)                 |
 | `--core`          | off     | Build the core deck                                                        |
 | `--cards`         | none    | Card cap of the chosen mode; sets `SelectRequest.max_sentences`            |
 | `--words`         | 0       | Core mode: tier F words after the Swadesh set                              |
@@ -529,11 +521,8 @@ These values are not flags. The code reads them from `SelectRequest`, and
 | `known_top`            | 2000       | Size of the known set (Y7)                                        |
 | `similarity_threshold` | 0.67       | Character Jaccard threshold (8.3)                                 |
 | `final_mark`           | true       | Apply rule Y4; false skips it                                     |
-| `spoken_weight`        | 0.7        | Value of `w` in 5.2                                               |
 
-`--freq written` in rank mode gives a byte-identical result to the old
-version (gate G8). `--order` no longer exists, and it never affected rank
-mode.
+`--order` no longer exists, and it never affected rank mode.
 
 ### 9.3 Output files
 

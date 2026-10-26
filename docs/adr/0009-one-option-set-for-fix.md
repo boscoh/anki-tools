@@ -39,9 +39,7 @@ meaning:
   `CullRequest` with its measured default.
 
 A value that one language owns stays on that command: `--targets` and
-`--reserve` (`fr`), `--similarity-threshold` (`es`), `--freq` and
-`--freq-report` (`yue`). ADR 0010 moves the two Mandarin steps out of the
-command.
+`--reserve` (`fr`). ADR 0010 moves the two Mandarin steps out of the command.
 
 ## Consequences
 
@@ -55,6 +53,12 @@ A typed `anki fix es <deck> --max-sentences 3000` fails. The new name is
 `--max-uses 3` on `fr` or `yue` fails. The value is a request field, and a
 change to it needs a code edit, as the specs already describe the measured
 presets.
+
+## Later changes
+
+`yue` lost `--model-id`, `--freq`, and `--freq-report`. `es` lost
+`--similarity-threshold`. The value of each one stays in the language module, so
+no flag can drift from the measured default.
 
 ## Rejected
 

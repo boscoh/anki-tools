@@ -2,7 +2,11 @@
 
 import pytest
 
-from anki_tools.languages.cantonese.rank import load_frequency_data_yue
+from anki_tools.languages.cantonese.frequency import (
+    FreqRow,
+    YueFrequency,
+    to_frequency_data,
+)
 from anki_tools.languages.mandarin.characters import (
     char_similarity_zh,
     get_chinese_chars,
@@ -125,32 +129,28 @@ class TestCharSimilarity:
 
 class TestYueFrequency:
     @pytest.fixture
-    def freq_file(self, tmp_path):
-        path = tmp_path / "yue.tsv"
-        path.write_text(
-            "word\tcount\n嘅\t900\n我\t800\n食\t10\n",
-            encoding="utf-8",
-        )
-        return path
+    def frequency(self):
+        counts = (("嘅", 900.0), ("我", 800.0), ("食", 10.0))
+        rows = [
+            FreqRow(word, "", 0, 0.0, count, count, rank=rank, source="ad")
+            for rank, (word, count) in enumerate(counts, 1)
+        ]
+        return YueFrequency(rows)
 
-    def test_ranks_follow_count_order(self, freq_file):
-        data = load_frequency_data_yue(freq_file)
+    def test_ranks_follow_count_order(self, frequency):
+        data = to_frequency_data(frequency, 50_000)
         assert data.word_freq == {"嘅": 1, "我": 2, "食": 3}
 
-    def test_header_line_is_skipped(self, freq_file):
-        data = load_frequency_data_yue(freq_file)
-        assert "word" not in data.word_freq
-
-    def test_char_rank_from_first_word(self, freq_file):
-        data = load_frequency_data_yue(freq_file)
+    def test_char_rank_from_first_word(self, frequency):
+        data = to_frequency_data(frequency, 50_000)
         assert data.char_freq == {"嘅": 1, "我": 2, "食": 3}
 
-    def test_max_words_truncates(self, freq_file):
-        data = load_frequency_data_yue(freq_file, max_words=2)
+    def test_max_words_truncates(self, frequency):
+        data = to_frequency_data(frequency, 2)
         assert set(data.word_freq) == {"嘅", "我"}
 
-    def test_cantonese_scores_above_mandarin_proxy(self, freq_file):
-        yue_data = load_frequency_data_yue(freq_file)
+    def test_cantonese_scores_above_mandarin_proxy(self, frequency):
+        yue_data = to_frequency_data(frequency, 50_000)
         zh_data = FrequencyData()
         zh_data.word_freq = {"我": 1, "食": 2}
         zh_data.char_freq = {"我": 1, "食": 2}

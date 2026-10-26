@@ -58,7 +58,7 @@ options: run `uv run anki fix <lang> --help`.
 ## The Fix Command
 
 `anki fix <lang>` has up to three modes. The four commands take the same
-options.
+options, apart from the language additions below.
 
 | Language | Modes                                | Output                                |
 | -------- | ------------------------------------ | ------------------------------------- |
@@ -101,9 +101,9 @@ These options apply to one language:
 | ------------------------ | -------- | ------------------------------------------- |
 | `--targets`              | `fr`     | cull target count, 200 to 500               |
 | `--reserve`              | `fr`     | add the Swadesh reserve cards               |
-| `--similarity-threshold` | `es`     | Jaccard limit of the deduplication          |
-| `--freq`                 | `yue`    | frequency term: blend, spoken, or written   |
-| `--freq-report`          | `yue`    | write the sentences that the blend moves    |
+
+`yue` has no `--model-id`. The frequency term and the similarity limit are
+values of the language module, so no flag can change them.
 
 Every mode writes `.rank.csv` beside the APKG. The cull and core modes also
 write the CSV files and the manifest that the "French 1000-Card Cull" and
@@ -170,15 +170,12 @@ uv run anki fix yue deck.apkg --core  # core mode
 - The frequency term blends spoken and written counts. The spoken term is the
   Cifu `SpokenAdult` count. The written term is the mean of the Cifu and Apple
   Daily counts. The spoken weight is 0.7.
-  - `--freq written` uses the Apple Daily list alone. This is the old ranking.
   - The first `anki fix yue` run builds the list. It downloads both files to
     `~/.cache/anki-tools`. Set `CIFU_PATH` or `YUE_FREQUENCY_PATH` to use
     other files.
   - `vocab/cantonese_variants.tsv` and the overrides in
     `vocab/cantonese_frequency_overrides.tsv` fix common spoken forms and
     greetings.
-  - `--freq-report` writes `deck.freq_change.csv` for the sentences that the
-    blend moves by more than 100 places.
 - The filter drops fragments and hard sentences. A sentence passes when it
   meets all of these tests:
   - 3 to 12 Han characters.
@@ -193,9 +190,7 @@ uv run anki fix yue deck.apkg --core  # core mode
   words of the deck. Each target word gets 2 cards. A word outside the top 100
   goes in at most 8 kept sentences. The cards go from easy to hard.
   - `--cards` caps the card count. `--output` names the output file.
-    `--model-id` filters by model. `--keep-filtered` keeps the similar cards
-    of rank mode.
-  - `--freq` and `--freq-report` set the frequency term and write its report.
+    `--keep-filtered` keeps the similar cards of rank mode.
   - The other values are defaults in `SelectRequest`, in
     `anki_tools/languages/cantonese/select_pipeline.py`. The selection always
     uses the coverage order.

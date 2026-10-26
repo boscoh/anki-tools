@@ -21,6 +21,8 @@ from anki_tools.ranking.rank import (
     rank_word_based,
 )
 
+#: The word-set Jaccard value at which two Spanish sentences are duplicates.
+SIMILARITY_THRESHOLD = 0.5
 
 def load_frequency_data_es() -> FrequencyData:
     """Load Spanish word frequency data from wordfreq.
