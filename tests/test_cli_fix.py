@@ -302,7 +302,7 @@ class TestSpanishMode:
 
         cli.es(deck_file, check=True)
 
-        assert "Error: --check needs --core." in capsys.readouterr().out
+        assert "Error: --check needs --select or --core." in capsys.readouterr().out
 
     def test_check_with_core_calls_the_gates(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
@@ -496,21 +496,6 @@ class TestSpanishRankMode:
 
         assert calls[0][1]["keep_filtered"] is True
 
-    def test_cards_removes_the_unranked(
-        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        calls = []
-
-        def fake_run(paths, **kwargs):
-            calls.append((paths, kwargs))
-            return _fake_deck()
-
-        monkeypatch.setattr(cli, "run_ranked_deck", fake_run)
-
-        cli.es(deck_file, cards=3)
-
-        assert calls[0][1]["remove_unranked"] is True
-
     def test_the_default_keeps_the_unranked(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -524,7 +509,8 @@ class TestSpanishRankMode:
 
         cli.es(deck_file)
 
-        assert calls[0][1]["remove_unranked"] is False
+        assert "remove_unranked" not in calls[0][1]
+        assert "reduce" not in calls[0][1]
 
     def test_a_missing_input_prints_an_error(
         self, tmp_path: Path, capsys
@@ -534,6 +520,51 @@ class TestSpanishRankMode:
         assert "Error: File not found" in capsys.readouterr().out
 
 
+
+class TestSpanishSelectMode:
+    def test_select_routes_to_the_cull(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        requests = []
+        profiles = []
+
+        def fake_run_cull(request, profile):
+            requests.append(request)
+            profiles.append(profile)
+
+        monkeypatch.setattr(cli.cullflow, "run_cull", fake_run_cull)
+
+        cli.es(deck_file, select=True)
+
+        assert requests[0].output_path == deck_file.parent / "input_culled.apkg"
+        assert profiles == [cli.spanish_cull.SPANISH_CULL_PROFILE]
+
+    def test_cards_and_reserve_reach_the_request(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        requests = []
+        monkeypatch.setattr(
+            cli.cullflow,
+            "run_cull",
+            lambda request, _profile: requests.append(request),
+        )
+
+        cli.es(deck_file, select=True, reserve=False, cards=500)
+
+        assert requests[0].no_reserve is True
+        assert requests[0].max_cards == 500
+
+    def test_model_id_with_select_prints_an_error(
+        self, deck_file: Path, monkeypatch: pytest.MonkeyPatch, capsys
+    ) -> None:
+        def fail(_request, _profile):
+            raise AssertionError("run_cull must not run")
+
+        monkeypatch.setattr(cli.cullflow, "run_cull", fail)
+
+        cli.es(deck_file, select=True, model_id=7)
+
+        assert "Error: --model-id" in capsys.readouterr().out
 class TestSpanishCoreMode:
     def test_core_builds_the_request(
         self, deck_file: Path, monkeypatch: pytest.MonkeyPatch

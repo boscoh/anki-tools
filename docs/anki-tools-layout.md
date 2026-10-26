@@ -93,6 +93,7 @@ One package per language. The package holds all the code of that language.
 | `anki_tools/languages/greek/profile.py`             | Greek profile and form matching                    |
 | `anki_tools/languages/greek/rank.py`                | Greek sentence ranking                             |
 | `anki_tools/languages/spanish/rank.py`              | Spanish sentence ranking                           |
+| `anki_tools/languages/spanish/cull.py`              | Spanish cull profile, values, and bindings        |
 
 `languages/mandarin/characters.py` holds the Han script helpers. Cantonese
 imports them, because both languages write the Han script.
@@ -101,7 +102,7 @@ Each language package gives the profile names, so
 `from anki_tools.languages import cantonese` gives the same names as a flat
 language module.
 
-A language with no profile module (`spanish`) has ranking code only. The
+The `spanish` package holds the ranking code and the cull profile. The
 `anki swadesh vocab` command serves it from `vocab/english-<lang>.csv` and an
 audio directory.
 

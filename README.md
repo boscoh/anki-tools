@@ -45,7 +45,7 @@ uv run anki swadesh vocab mandarin        # build a Swadesh vocabulary deck
 uv run anki fix zh input.apkg             # rank, reorder, fix pinyin, style
 uv run anki fix fr input.apkg             # rank and reorder a French deck
 uv run anki fix yue input.apkg            # rank, reorder, fix jyutping
-uv run anki fix es input.apkg --cards 3000
+uv run anki fix es input.apkg --select    # cull a Spanish deck
 uv run anki inspect deck.apkg             # show the package contents
 uv run anki style deck.apkg               # apply the CSS and HTML templates
 ```
@@ -62,7 +62,7 @@ options, apart from the language additions below.
 | -------- | ------------------------------------ | ----------------------------------------------- |
 | `zh`     | rank (default), `--core`             | `_reordered.apkg`, `_core.apkg`                 |
 | `fr`     | rank (default), `--select`, `--core` | `_reordered.apkg`, `_culled.apkg`, `_core.apkg` |
-| `es`     | rank (default), `--core`             | `_reordered.apkg`, `_core.apkg`                 |
+| `es`     | rank (default), `--select`, `--core` | `_reordered.apkg`, `_culled.apkg`, `_core.apkg` |
 | `yue`    | rank (default), `--core`             | `_reordered.apkg`, `_core.apkg`                 |
 
 Each command has a default input, so a bare `anki fix <lang>` reads it:
@@ -85,7 +85,7 @@ The shared options:
 | `--model-id`      | rank mode            | filter by one model id                       |
 | `--text-field`    | rank mode            | sentence field; the build infers the default |
 | `--keep-filtered` | rank mode            | keep the cards that the ranker filters       |
-| `--select`        | `fr`                 | run the cull instead of the rank and reorder |
+| `--select`        | `fr`, `es`           | run the cull instead of the rank and reorder |
 | `--core`          | every command        | build the core-word deck                     |
 | `--cards`         | every mode           | card cap of the chosen mode                  |
 | `--words`         | core mode            | tier F words after the Swadesh set           |
@@ -95,10 +95,10 @@ The shared options:
 
 These options apply to one language:
 
-| Option                   | Language | Meaning                                     |
-| ------------------------ | -------- | ------------------------------------------- |
-| `--targets`              | `fr`     | cull target count, 200 to 500               |
-| `--reserve`              | `fr`     | add the Swadesh reserve cards               |
+| Option                   | Language   | Meaning                                     |
+| ------------------------ | ---------- | ------------------------------------------- |
+| `--targets`              | `fr`, `es` | cull target count, 200 to 500               |
+| `--reserve`              | `fr`, `es` | add the Swadesh reserve cards               |
 
 `yue` has no `--model-id`. The frequency term and the similarity limit are
 values of the language module, so no flag can change them.
@@ -140,19 +140,16 @@ uv run anki fix fr deck.apkg --core    # core mode
 ### Spanish
 
 ```bash
-uv run anki fix es deck.apkg               # rank and reorder
-uv run anki fix es deck.apkg --cards 3000  # rank, then reduce to 3000 cards
-uv run anki fix es deck.apkg --core        # core mode
+uv run anki fix es deck.apkg           # rank and reorder
+uv run anki fix es deck.apkg --select  # the cull
+uv run anki fix es deck.apkg --core    # core mode
 ```
 
 - Rank mode uses word-based complexity and similarity, with `wordfreq`
   frequency data.
 - Rank mode adds a grammar score for the subjunctive, the relative clauses, the
   conditionals, and the commas.
-- Rank mode with `--cards` keeps the most frequent sentences of four
-  complexity bins: P0 to P40, P40 to P70, P70 to P90, and P90 to P100. The bins
-  take 35, 35, 20, and 10 percent of the target count. The Jaccard 0.5 dedupe
-  applies inside one bin only.
+- Select mode runs the cull. See `specs/french-1000-sentence-cull.md`.
 
 ### Cantonese
 
@@ -183,6 +180,7 @@ file, then run the command again.
 | `anki swadesh vocab <lang>`  | `templates/vocab/`                |
 | `anki fix fr --select`       | `templates/french_cull/`          |
 | `anki fix fr --core`         | `templates/french_core/`          |
+| `anki fix es --select`       | `templates/spanish_cull/`         |
 | `anki fix es --core`         | `templates/spanish_core/`         |
 | `anki fix yue --core`        | `templates/cantonese_core/`       |
 | `anki fix zh --core`         | `templates/mandarin_core/`        |

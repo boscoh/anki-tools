@@ -26,7 +26,6 @@ from anki_tools.ranking.rank import (
     FrequencyData,
     Sentence,
     extract_sentences,
-    reduce_sentences_stratified,
     write_ranking_csv,
 )
 from anki_tools.ranking.reorder import load_ranking, reorder_deck
@@ -75,7 +74,6 @@ __all__ = [
     "extract_sentences",
     "rank_sentences_zh",
     "rank_sentences_es",
-    "reduce_sentences_stratified",
     "write_ranking_csv",
     "complexity_score_zh",
     "frequency_score_zh",

@@ -28,6 +28,7 @@ from anki_tools.languages.cantonese import core as cantonese_core
 from anki_tools.languages.french import core as french_core
 from anki_tools.languages.french import cull as french_cull
 from anki_tools.languages.spanish import core as spanish_core
+from anki_tools.languages.spanish import cull as spanish_cull
 from anki_tools.languages.mandarin import core as mandarin_core
 from anki_tools.languages.cantonese.jyutping import fix_jyutping
 from anki_tools.languages.mandarin import fix_steps as mandarin_fix_steps
@@ -50,16 +51,9 @@ from anki_tools.languages import (
 from anki_tools.languages.cantonese.rank import rank_sentences_yue
 from anki_tools.languages.french.rank import rank_sentences_fr
 from anki_tools.languages.mandarin.rank import rank_sentences_zh
-from anki_tools.languages.spanish.rank import (
-    SIMILARITY_THRESHOLD,
-    rank_sentences_es,
-)
+from anki_tools.languages.spanish.rank import rank_sentences_es
 from anki_tools.ranking import coreflow, coregates, cullflow, cullgates
-from anki_tools.ranking.latin import latin_word_similarity
-from anki_tools.ranking.rank import (
-    Sentence,
-    reduce_sentences_stratified,
-)
+from anki_tools.ranking.rank import Sentence
 from anki_tools.ranking.pipeline import (
     RankPaths,
     RankedDeck,
@@ -890,26 +884,32 @@ def es(
     model_id: int | None = None,
     text_field: str = "Spanish",
     keep_filtered: bool = False,
+    select: bool = False,
     core: bool = False,
     cards: int | None = None,
+    targets: int = cullflow.DEFAULT_TARGET_WORDS,
+    reserve: bool = True,
     words: int = spanish_core.DEFAULT_CORE_WORDS,
     examples: int = spanish_core.DEFAULT_OPTIONS.per_word,
     tail: int = spanish_core.DEFAULT_OPTIONS.tail_cards,
     check: bool = False,
 ):
-    """Fix Spanish deck: rank and reorder it, or build a core deck.
+    """Fix Spanish deck: rank and reorder it, or select a smaller deck.
 
-    Rank mode writes ``<input>_reordered.apkg`` and ``.rank.csv``; ``--cards``
-    also runs the stratified reduction. ``--core`` builds
-    ``<input>_core.apkg`` with its CSV files and manifest.
+    Rank mode writes ``<input>_reordered.apkg`` and ``.rank.csv``. Select mode,
+    with ``--select``, runs the cull and writes ``<input>_culled.apkg``.
+    ``--core`` builds ``<input>_core.apkg`` with its CSV files and manifest.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
     :param model_id: Rank mode: filter by specific model ID.
     :param text_field: Rank mode: preferred sentence field (default: Spanish).
     :param keep_filtered: Rank mode: keep filtered cards instead of removing.
+    :param select: Run the cull instead of the rank and reorder.
     :param core: Build the core deck instead of ranking.
-    :param cards: Card cap of the chosen mode (rank 3000, core 300).
+    :param cards: Card cap of the chosen mode (select 1000, core 300).
+    :param targets: Select mode: target count, 200 to 500.
+    :param reserve: Select mode: add the Swadesh reserve cards.
     :param words: Core mode: tier F words after the Swadesh set.
     :param examples: Core mode: examples per content target.
     :param tail: Core mode: cards after the core passes.
@@ -920,7 +920,11 @@ def es(
         print(f"Error: File not found: {apkg_path}")
         return
 
-    if not _check_guard(check, (("--core", core),)):
+    if not _check_guard(check, (("--select", select), ("--core", core))):
+        return
+
+    if core and select:
+        print("Error: --core and --select cannot be used together.")
         return
 
     if core:
@@ -938,21 +942,30 @@ def es(
         )
         return
 
-    paths = rank_paths(apkg_path, output)
-    def after_rank(paths: RankPaths, deck: RankedDeck) -> Sequence[str]:
-        print(f"Extracted {len(deck.sentences)} sentences")
-        return ()
-
-    def reduce_ranked(ranked: list[Sentence]) -> list[Sentence]:
-        if not cards or len(ranked) <= cards:
-            return ranked
-        print(f"\nStep 2: Reducing to {cards} sentences...")
-        return reduce_sentences_stratified(
-            ranked,
-            target_count=cards,
-            similarity_threshold=SIMILARITY_THRESHOLD,
-            similarity_fn=latin_word_similarity,
+    if select:
+        if model_id is not None:
+            print("Error: --model-id does not apply with --select.")
+            return
+        output_path = output or cullflow.default_output(apkg_path)
+        if check:
+            code = cullgates.check_cull(
+                output_path, spanish_cull.SPANISH_CULL_PROFILE
+            )
+            if code:
+                raise SystemExit(code)
+            return
+        request = cullflow.CullRequest(
+            input_path=apkg_path,
+            output_path=output_path,
+            target_words=targets,
+            no_reserve=not reserve,
         )
+        if cards is not None:
+            request = replace(request, max_cards=cards)
+        cullflow.run_cull(request, spanish_cull.SPANISH_CULL_PROFILE)
+        return
+
+    paths = rank_paths(apkg_path, output)
 
     _run_rank_mode(
         paths,
@@ -962,13 +975,7 @@ def es(
             "model_id": model_id,
             "text_field": text_field,
             "keep_filtered": keep_filtered,
-            "reduce": reduce_ranked,
-            "remove_unranked": bool(cards),
         },
-        target=(
-            f"Target:  {cards} sentences (stratified reduction)" if cards else ""
-        ),
-        after=after_rank,
     )
 
 

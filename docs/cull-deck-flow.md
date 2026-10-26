@@ -5,8 +5,7 @@ to a small deck of wide cards. It shows the stage order, the rule order, and
 the gate order. The shared code lives in `anki_tools/ranking/`. The language
 values live in `anki_tools/languages/<language>/cull.py`.
 
-The French deck has the `--select` command. Spanish has a `CullProfile`, and
-it has no command flag yet.
+The French and Spanish decks have the `--select` command.
 
 Related: `docs/vocab-deck-flow.md`, `docs/core-deck-flow.md`,
 `docs/swadesh-sentence-flow.md`, and `specs/french-1000-sentence-cull.md`.

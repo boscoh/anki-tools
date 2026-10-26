@@ -62,7 +62,10 @@ no flag can drift from the measured default.
 
 `yue` lost `--select` with the coverage selection. The frequency list and the
 tokenizer stay, and `specs/cantonese-frequency-list.md` names them. `--select`
-now belongs to `fr` alone.
+now belongs to `fr` and `es`.
+
+`es` gained `--select` with the cull of `SPANISH_CULL_PROFILE`. Its rank mode no
+longer reads `--cards`, so the flag is a cap in every command.
 
 ## Rejected
 
