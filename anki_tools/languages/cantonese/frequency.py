@@ -5,7 +5,7 @@ written term is the mean of the Cifu written count and the Apple Daily count.
 A variant map folds common spoken characters into the news-standard form, and
 an override file fixes words that the corpora split or miss.
 
-See ``specs/yue-sentence-selection.md`` sections 5 and 6.
+See ``specs/cantonese-frequency-list.md`` sections 2 and 3.
 """
 
 from __future__ import annotations

@@ -8,7 +8,6 @@
 | Input   | a sentence deck with a text field, an English field, and audio |
 | Related | `specs/core-word-small-deck.md` (French core deck)             |
 | Related | `specs/french-1000-sentence-cull.md` (breadth cull)            |
-| Related | `specs/yue-sentence-selection.md` (Cantonese cover)            |
 | Issues  | anki-ww9                                                       |
 
 ## Contents
@@ -94,8 +93,8 @@ The flow starts with one pass over the deck:
 The frequency candidate builder is shared: `anki_tools/ranking/corelist.py`
 holds `build_targets`. The scan helpers still live in the French package:
 `load_input_deck`, `tokenize_deck`, `load_frequency`, and `frequency_ranks`.
-The Cantonese selection scans inside its own module. The Spanish and Mandarin
-rank modes do not scan at all today.
+The Cantonese core scan lives in its own module. The Spanish and Mandarin rank
+modes do not scan at all today.
 
 ## 4. Core list
 

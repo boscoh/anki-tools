@@ -60,6 +60,10 @@ presets.
 `--similarity-threshold`. The value of each one stays in the language module, so
 no flag can drift from the measured default.
 
+`yue` lost `--select` with the coverage selection. The frequency list and the
+tokenizer stay, and `specs/cantonese-frequency-list.md` names them. `--select`
+now belongs to `fr` alone.
+
 ## Rejected
 
 Give each command a shared options dataclass. Cyclopts flattens a dataclass

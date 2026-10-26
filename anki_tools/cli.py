@@ -25,7 +25,6 @@ from cyclopts import Parameter
 from gtts import gTTS
 
 from anki_tools.languages.cantonese import core as cantonese_core
-from anki_tools.languages.cantonese import select_pipeline as cantonese_select
 from anki_tools.languages.french import core as french_core
 from anki_tools.languages.french import cull as french_cull
 from anki_tools.languages.spanish import core as spanish_core
@@ -793,7 +792,6 @@ def yue(
     output: Path | None = None,
     text_field: str | None = None,
     keep_filtered: bool = False,
-    select: bool = False,
     core: bool = False,
     cards: int | None = None,
     words: int = cantonese_core.DEFAULT_CORE_WORDS,
@@ -801,20 +799,18 @@ def yue(
     tail: int = cantonese_core.DEFAULT_OPTIONS.tail_cards,
     check: bool = False,
 ):
-    """Fix Cantonese deck: rank and reorder it, or select a smaller deck.
+    """Fix Cantonese deck: rank and reorder it, or build a core deck.
 
     Rank mode writes ``<input>_reordered.apkg`` and ``.rank.csv``, with the
-    jyutping fixes. Select mode, with ``--select``, keeps the fewest sentences
-    that show the most frequent spoken words, easiest first. ``--core`` builds
-    ``<input>_core.apkg`` with its CSV files and manifest.
+    jyutping fixes. ``--core`` builds ``<input>_core.apkg`` with its CSV files
+    and manifest.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the input name).
     :param text_field: Rank mode: preferred sentence field (default: infer).
     :param keep_filtered: Rank mode: keep filtered cards instead of removing.
-    :param select: Run the coverage selection instead of the rank and reorder.
     :param core: Build the core deck instead of ranking.
-    :param cards: Card cap of the chosen mode (select: stop at zero gain).
+    :param cards: Card cap of the chosen mode (core 300).
     :param words: Core mode: tier F words after the Swadesh set.
     :param examples: Core mode: examples per content target.
     :param tail: Core mode: cards after the core passes.
@@ -825,7 +821,7 @@ def yue(
         print(f"Error: File not found: {apkg_path}")
         return
 
-    if not _check_guard(check, (("--select", select), ("--core", core))):
+    if not _check_guard(check, (("--core", core),)):
         return
 
     if core:
@@ -843,33 +839,6 @@ def yue(
         )
         return
 
-    if select:
-        output_path = output or cantonese_select.default_output(apkg_path)
-        run = cantonese_select.run_select(
-            cantonese_select.SelectRequest(
-                input_path=apkg_path,
-                output_path=output_path,
-                max_sentences=cards,
-            )
-        )
-        if run.report is None:
-            print("No sentences found!")
-            return
-        select_csv, coverage_csv = cantonese_select.side_paths(run.paths.output_path)
-        print("\nFixing jyutping...")
-        fix_jyutping(
-            run.paths.output_path,
-            output=run.paths.output_path,
-            verbose=False,
-        )
-        _print_rank_done(
-            run.paths,
-            run.ranked_count,
-            run.stats,
-            select_csv=select_csv,
-            coverage_csv=coverage_csv,
-        )
-        return
 
     paths = rank_paths(apkg_path, output)
 

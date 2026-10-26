@@ -7,7 +7,7 @@
 | Owner   | anki-tools                                               |
 | Input   | a sentence deck with English and audio, for example `apkg/6000_French_Sentences_w_Audio.apkg` |
 | Related | `specs/french-1000-sentence-cull.md` (cull mode)         |
-| Related | `specs/yue-sentence-selection.md` (spoken frequency)     |
+| Related | `specs/cantonese-frequency-list.md` (spoken frequency)   |
 | Related | `docs/swadesh-sentence-flow.md` (guards and word table)  |
 | Issues  | epic `anki-eo6`; milestones E1 to E5 (section 12)        |
 

@@ -4,7 +4,7 @@ The ranking reuses the Han character scoring of
 :mod:`anki_tools.languages.mandarin.characters` and the Cantonese frequency
 sources of :mod:`anki_tools.languages.cantonese.frequency`. The Apple Daily
 list is written Hong Kong Chinese; the ``spoken`` and ``blend`` sources add the
-Cifu spoken counts. See ``specs/yue-sentence-selection.md``.
+Cifu spoken counts. See ``specs/cantonese-frequency-list.md``.
 """
 from __future__ import annotations
 

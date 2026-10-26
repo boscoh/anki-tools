@@ -6,7 +6,7 @@
 | Date    | 2026-10-20                                                     |
 | Owner   | anki-tools                                                     |
 | Depends | `specs/mandarin-swadesh-sentence-pack.md` (pipeline shape)     |
-| Related | `specs/yue-sentence-selection.md` (frequency and name rules)   |
+| Related | `specs/cantonese-frequency-list.md` (frequency list)           |
 | Issues  | epic `anki-ana`; milestones C1 to C6 (section 14)              |
 
 ## 1. Purpose
@@ -41,7 +41,7 @@ In scope:
 Out of scope:
 
 - Changes to the existing word deck and its templates.
-- The `anki fix yue` selection of section 8 of `specs/yue-sentence-selection.md`.
+- The `anki fix yue` rank and core modes.
 - Grammar explanations or spaced-repetition tuning.
 - A Cantonese frequency file. The pack builds the Cifu and Apple Daily blend
   in memory and writes no frequency file.
@@ -288,9 +288,8 @@ F12 rules with the Cantonese values below.
 | F11  | The English text has 2 to 12 words                           |
 | F12  | The sentence text is unique                                  |
 
-The window of 3 to 12 Han characters follows rule Y1 of
-`specs/yue-sentence-selection.md`. Cantonese sentences are short, so the
-fallback window of the scaffold tier starts at 3 too.
+The 3 to 12 Han character window is a Cantonese value: Cantonese sentences are
+short, so the fallback window of the scaffold tier starts at 3 too.
 
 The known set of the unknown-token budget holds the reviewed forms and the top
 1,000 `wordfreq` Chinese words in Traditional characters. A sentence may hold

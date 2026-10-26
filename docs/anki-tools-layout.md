@@ -79,8 +79,6 @@ One package per language. The package holds all the code of that language.
 | `anki_tools/languages/cantonese/profile.py`         | Cantonese profile and word metrics                 |
 | `anki_tools/languages/cantonese/frequency.py`       | Spoken and written frequency list and download     |
 | `anki_tools/languages/cantonese/jyutping.py`        | Jyutping repair and Traditional convert            |
-| `anki_tools/languages/cantonese/select.py`          | Rules Y1 to Y8 and the sentence selection          |
-| `anki_tools/languages/cantonese/select_pipeline.py` | Cantonese select-mode pipeline and gates G5 to G12 |
 | `anki_tools/languages/cantonese/rank.py`            | Cantonese sentence ranking                         |
 | `anki_tools/languages/mandarin/profile.py`          | Mandarin profile and word metrics                  |
 | `anki_tools/languages/mandarin/pinyin.py`           | Pinyin repair for Chinese cards                    |

@@ -696,7 +696,7 @@ def has_predicate(_sentence: str) -> bool:
 
 
 def has_orphan_conjunction(_sentence: str) -> bool:
-    """Filter F10 is off, because the yue selection spec did not test it.
+    """Filter F10 is off, because no Cantonese rule tested it.
 
     :param sentence: Traditional Cantonese sentence.
     :returns: Always False.

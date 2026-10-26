@@ -6,7 +6,6 @@
 | Date    | 2026-10-20                                                     |
 | Owner   | anki-tools                                                     |
 | Input   | `apkg/6000_French_Sentences_w_Audio.apkg`                      |
-| Related | `specs/yue-sentence-selection.md` (selection shape)            |
 | Related | `specs/french-swadesh-sentence-pack.md` (French tokenizer)     |
 | Issues  | epic `anki-ckn`; milestones D1 to D5 (section 13)              |
 

@@ -19,8 +19,6 @@ Deck goals:
 - **Deck management** - create decks, copy cards, and move cards.
 - **Sentence ranking** - rank sentences by complexity, frequency, and
   similarity (Chinese, French, Spanish, and Cantonese).
-- **Cantonese selection** - drop fragments and keep the fewest sentences that
-  show the most frequent spoken words.
 - **Vocabulary decks** - build Swadesh vocabulary decks with gTTS audio.
 - **No Anki install** - direct SQLite access with minimal dependencies.
 
@@ -46,7 +44,7 @@ uv run anki --help                        # list the commands
 uv run anki swadesh vocab mandarin        # build a Swadesh vocabulary deck
 uv run anki fix zh input.apkg             # rank, reorder, fix pinyin, style
 uv run anki fix fr input.apkg             # rank and reorder a French deck
-uv run anki fix yue input.apkg --select   # rank, jyutping, coverage select
+uv run anki fix yue input.apkg            # rank, reorder, fix jyutping
 uv run anki fix es input.apkg --cards 3000
 uv run anki inspect deck.apkg             # show the package contents
 uv run anki style deck.apkg               # apply the CSS and HTML templates
@@ -60,12 +58,12 @@ options: run `uv run anki fix <lang> --help`.
 `anki fix <lang>` has up to three modes. The four commands take the same
 options, apart from the language additions below.
 
-| Language | Modes                                | Output                                |
-| -------- | ------------------------------------ | ------------------------------------- |
-| `zh`     | rank (default), `--core`             | `_reordered.apkg`, `_core.apkg`       |
-| `fr`     | rank (default), `--select`, `--core` | `_reordered.apkg`, `_culled`, `_core` |
-| `es`     | rank (default), `--core`             | `_reordered.apkg`, `_core.apkg`       |
-| `yue`    | rank (default), `--select`, `--core` | `_reordered.apkg`, `_core.apkg`       |
+| Language | Modes                                | Output                                          |
+| -------- | ------------------------------------ | ----------------------------------------------- |
+| `zh`     | rank (default), `--core`             | `_reordered.apkg`, `_core.apkg`                 |
+| `fr`     | rank (default), `--select`, `--core` | `_reordered.apkg`, `_culled.apkg`, `_core.apkg` |
+| `es`     | rank (default), `--core`             | `_reordered.apkg`, `_core.apkg`                 |
+| `yue`    | rank (default), `--core`             | `_reordered.apkg`, `_core.apkg`                 |
 
 Each command has a default input, so a bare `anki fix <lang>` reads it:
 
@@ -87,7 +85,7 @@ The shared options:
 | `--model-id`      | rank mode            | filter by one model id                       |
 | `--text-field`    | rank mode            | sentence field; the build infers the default |
 | `--keep-filtered` | rank mode            | keep the cards that the ranker filters       |
-| `--select`        | `fr`, `yue`          | run the cull or the coverage selection       |
+| `--select`        | `fr`                 | run the cull instead of the rank and reorder |
 | `--core`          | every command        | build the core-word deck                     |
 | `--cards`         | every mode           | card cap of the chosen mode                  |
 | `--words`         | core mode            | tier F words after the Swadesh set           |
@@ -116,12 +114,12 @@ uv run anki fix zh deck.apkg         # rank, reorder, fix pinyin, apply styling
 uv run anki fix zh deck.apkg --core  # core mode, see "Core-Word Decks"
 ```
 
-- Character-based complexity and similarity.
-- `wordfreq` frequency data with an HSK vocabulary bonus.
-- Removes repeated-pattern sentences before ranking, for example `走吧走吧`
-  and `好了，好了`.
-- Fixes the pinyin field and writes the card templates from
-  `templates/default/`. Both steps always run.
+- Rank mode uses character-based complexity and similarity, with `wordfreq`
+  frequency data and an HSK vocabulary bonus.
+- Rank mode removes repeated-pattern sentences before it ranks, for example
+  `走吧走吧` and `好了，好了`.
+- Rank mode fixes the pinyin field and applies `templates/default/`. Both steps
+  always run.
 
 ### French
 
@@ -131,74 +129,47 @@ uv run anki fix fr deck.apkg --select  # the 1000-card cull
 uv run anki fix fr deck.apkg --core    # core mode
 ```
 
-- Rank mode uses word-based complexity and similarity.
-- Select mode runs the cull. See "French 1000-Card Cull".
-- Uses `wordfreq` frequency data.
-- Optional spaCy grammar scoring:
+- Rank mode uses word-based complexity and similarity, with `wordfreq`
+  frequency data.
+- Rank mode adds a grammar score. The optional spaCy model
+  `fr_core_news_sm` gives a parse-tree score:
   `uv run python -m spacy download fr_core_news_sm`.
+- Select mode runs the 1000-card cull. See
+  `specs/french-1000-sentence-cull.md`.
 
 ### Spanish
 
 ```bash
-uv run anki fix es deck.apkg                        # rank and reorder
-uv run anki fix es deck.apkg --cards 3000           # reduce to 3000 cards
-uv run anki fix es deck.apkg --core                  # core mode
+uv run anki fix es deck.apkg               # rank and reorder
+uv run anki fix es deck.apkg --cards 3000  # rank, then reduce to 3000 cards
+uv run anki fix es deck.apkg --core        # core mode
 ```
 
-- Word-based complexity and similarity, like French.
-- `wordfreq` frequency data.
-- Word-based deduplication with a Jaccard similarity limit of 0.5.
-- Optional reduction by complexity percentile bins:
-
-| Bin | Percentile  | Share | Level        |
-| --- | ----------- | ----- | ------------ |
-| 1   | P0 to P40   | 35%   | simple       |
-| 2   | P40 to P70  | 35%   | elementary   |
-| 3   | P70 to P90  | 20%   | intermediate |
-| 4   | P90 to P100 | 10%   | advanced     |
+- Rank mode uses word-based complexity and similarity, with `wordfreq`
+  frequency data.
+- Rank mode adds a grammar score for the subjunctive, the relative clauses, the
+  conditionals, and the commas.
+- Rank mode with `--cards` keeps the most frequent sentences of four
+  complexity bins: P0 to P40, P40 to P70, P70 to P90, and P90 to P100. The bins
+  take 35, 35, 20, and 10 percent of the target count. The Jaccard 0.5 dedupe
+  applies inside one bin only.
 
 ### Cantonese
 
 ```bash
 uv run anki fix yue deck.apkg         # rank, reorder, fix jyutping
-uv run anki fix yue deck.apkg --select  # rank, jyutping, coverage select
 uv run anki fix yue deck.apkg --core  # core mode
 ```
 
-- Converts Simplified to Traditional characters.
-- Generates jyutping romanization.
-- The frequency term blends spoken and written counts. The spoken term is the
-  Cifu `SpokenAdult` count. The written term is the mean of the Cifu and Apple
-  Daily counts. The spoken weight is 0.7.
-  - The first `anki fix yue` run builds the list. It downloads both files to
-    `~/.cache/anki-tools`. Set `CIFU_PATH` or `YUE_FREQUENCY_PATH` to use
-    other files.
-  - `vocab/cantonese_variants.tsv` and the overrides in
-    `vocab/cantonese_frequency_overrides.tsv` fix common spoken forms and
-    greetings.
-- The filter drops fragments and hard sentences. A sentence passes when it
-  meets all of these tests:
-  - 3 to 12 Han characters.
-  - No Latin letter and no digit.
-  - No repeated pattern.
-  - One final mark at the end, no quotation mark, and at most one internal
-    mark.
-  - At most 2 words outside the top 2000.
-  - No foreign name from `vocab/cantonese_names.tsv`. Add a row for a new
-    name.
-- The selection keeps the fewest sentences that cover the 1500 most frequent
-  words of the deck. Each target word gets 2 cards. A word outside the top 100
-  goes in at most 8 kept sentences. The cards go from easy to hard.
-  - `--cards` caps the card count. `--output` names the output file.
-    `--keep-filtered` keeps the similar cards of rank mode.
-  - The other values are defaults in `SelectRequest`, in
-    `anki_tools/languages/cantonese/select_pipeline.py`. The selection always
-    uses the coverage order.
-  - `--core` builds the core deck. `--words`, `--examples`, and `--tail` set
-    its values. `--check` runs its gates on the output.
-- Outputs: `_reordered.apkg`, `.rank.csv` (adds `hardest_rank` and `kept`),
-  `.select.csv` (one row per input sentence with the reason), and
-  `.coverage.csv` (one row per target word).
+- Rank mode uses the character-based complexity, similarity, and
+  repeated-pattern filter of Chinese, with a frequency term that blends the Cifu
+  spoken count at weight 0.7 with the written count. The written count is the
+  mean of the Cifu and Apple Daily counts. See
+  `specs/cantonese-frequency-list.md`.
+- Rank mode converts Simplified to Traditional characters, then writes the
+  jyutping.
+- The first run downloads both frequency files to `~/.cache/anki-tools`. Set
+  `CIFU_PATH` or `YUE_FREQUENCY_PATH` to use other files.
 
 ## Card Templates
 
