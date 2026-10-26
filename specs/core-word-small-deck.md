@@ -418,9 +418,9 @@ the deck looks like the 1,000-card deck and the Swadesh deck.
 | Fields    | `Audio`, `Sentence`, `English`, `Core`, `CoreGloss` (section 15)       |
 | Audio     | the input MP3 file                                                     |
 
-The `assigned` target of section 6 is bold in the `Sentence` field. A card can
-hold more than one target, and only the assigned target is bold. This marks
-the word in the sentence.
+Every kept card bolds its core word in the `Sentence` field. The core word is
+the assigned target of section 6, or the held target of the lowest position. A
+card with no core word is not written (section 15.4).
 
 The `Core` field holds the core word for the back of the card. It is the form of
 the assigned target. A card with no assigned target, such as a second example,
@@ -436,7 +436,7 @@ so the core deck and the Swadesh deck read the same way.
 | Field       | Value of a kept card                                                |
 | ----------- | ------------------------------------------------------------------- |
 | `Audio`     | `[sound:<input audio file>]`                                        |
-| `Sentence`  | the clean sentence, with the assigned target in `<b>` tags           |
+| `Sentence`  | the clean sentence, with the core word in `<b>` tags                  |
 | `English`   | the English text of the card                                        |
 | `Core`      | the core word of the card, as described above                       |
 | `CoreGloss` | the English gloss of the core word                                  |
@@ -506,7 +506,7 @@ non-zero.
 | K12  | the manifest hashes match the two CSVs                               |
 | K13  | each target's cards hold its form or lemma                           |
 | K14  | the templates equal `CORE_TEMPLATES` and the CSS equals `card_css()` |
-| K15  | the bold text is the assigned target, and the CSV holds plain text    |
+| K15  | every kept card holds a bold core word, and the CSV holds plain text  |
 | K16  | every target with a card has a sense row, or the unchecked count is within `--max-unchecked-sense` |
 | K17  | no kept card holds a name or a loan word, and the manifest gives both counts |
 | K18  | every tail card brings at least one new content lemma                 |
@@ -704,7 +704,7 @@ to E5 are closed. Section 14.5 lists what remains.
 | K12  | the manifest hashes match the two CSV files                                       |
 | K13  | each target's cards hold its form or lemma                                        |
 | K14  | the templates equal `CORE_TEMPLATES` and the CSS equals the cull CSS              |
-| K15  | 182 cards hold the bold assignment; the CSV holds plain text                      |
+| K15  | every kept card holds the bold core word; the CSV holds plain text                |
 | K16  | 0 unchecked targets                                                               |
 | K17  | 0 names and 0 loan words in the kept cards                                        |
 | K18  | every tail card brings a new content lemma                                        |

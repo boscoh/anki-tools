@@ -467,6 +467,12 @@ def test_run_gates_passes_on_a_tiny_output(
         cards,
         {0: ("chat", "cat"), 1: ("chat", "cat"), 2: ("boire", "drink")},
     )
+    coreflow.fill_bold(
+        output,
+        cards,
+        {0: "chat", 1: "chat", 2: "chien"},
+        cull_fr.FRENCH_CULL_PROFILE.highlight,
+    )
     coreflow.write_manifest(
         manifest_path,
         source={

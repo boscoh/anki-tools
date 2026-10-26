@@ -137,12 +137,13 @@ def test_the_cards_center_the_text() -> None:
     assert "text-align: center" in shared
 
 
-def test_the_arabic_deck_aligns_the_text_to_the_right() -> None:
-    arabic = load_text(TEMPLATES_DIR / "vocab" / "arabic" / "card.css")
-
-    assert "direction: rtl" in arabic
-    assert "text-align: right" in arabic
-
+def test_the_vocab_deck_uses_the_shared_card_style() -> None:
+    """The vocab decks use the shared classes, with no explicit alignment."""
+    assert not (TEMPLATES_DIR / "vocab" / "card.css").exists()
+    assert not (TEMPLATES_DIR / "vocab" / "arabic" / "card.css").exists()
+    cantonese = load_text(TEMPLATES_DIR / "vocab" / "cantonese" / "card.css")
+    assert "direction" not in cantonese
+    assert "text-align" not in cantonese
 
 def test_the_default_card_uses_the_shared_card_classes() -> None:
     front = load_text(DEFAULT_TEMPLATE_DIR / "front.html")

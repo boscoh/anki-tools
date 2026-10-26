@@ -42,7 +42,8 @@ def test_every_fix_card_writes_the_output_fields() -> None:
         assert "Core" in card.fields
         assert "CoreGloss" in card.fields
         assert card.front.strip()
-        assert "I am very busy today." in card.back or "ask you" in card.back
+        assert "I am very busy today." in card.back or "ask" in card.back
+        assert "<b>" in card.back
 
     by_title = {card.title: card for card in cards}
     mandarin = by_title["Mandarin core-word deck"]

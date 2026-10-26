@@ -30,6 +30,7 @@ from anki_tools.languages.spanish.profile import (
     QUOTE_MARKS,
     SWADESH_ROWS,
     TOKENIZER,
+    SPANISH,
     prepare_text,
 )
 from anki_tools.ranking import coreflow, corelist, cullflow
@@ -184,6 +185,7 @@ SPANISH_CULL_PROFILE = cullflow.CullProfile(
     licenses=LICENSES,
     target_coverage_gate=0.98,
     double_coverage_gate=0.95,
+    highlight=SPANISH.highlight,
 )
 
 write_cull_deck = partial(

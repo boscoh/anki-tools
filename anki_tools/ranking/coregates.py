@@ -503,6 +503,7 @@ def gate_bold(files: CoreFiles) -> tuple[bool, str]:
             bad.append(f"text of {row['sentence']}")
             continue
         if "<b>" not in text:
+            bad.append(f"no bold: {row['sentence']}")
             continue
         bolded += 1
         target = row["assigned"]
@@ -559,7 +560,7 @@ def core_word_problems(
     fields: Sequence[str],
     glosses: Mapping[str, str],
 ) -> tuple[list[str], int]:
-    """Check the core word and the gloss of every note.
+    """Check the core word, the gloss, and the bold text of every note.
 
     :param notes: Note id to field values.
     :param fields: Field names of the output note type.
@@ -575,6 +576,11 @@ def core_word_problems(
         return [f"the note type has no {_sample(missing)} field"], 0
     word_index = fields.index(OUTPUT_CORE_FIELD)
     gloss_index = fields.index(OUTPUT_GLOSS_FIELD)
+    sentence_index = (
+        fields.index(OUTPUT_SENTENCE_FIELD)
+        if OUTPUT_SENTENCE_FIELD in fields
+        else -1
+    )
     problems: list[str] = []
     filled = 0
     for note_id, values in notes.items():
@@ -584,6 +590,11 @@ def core_word_problems(
             problems.append(f"{note_id} has no core word")
             continue
         filled += 1
+        sentence = (
+            values[sentence_index] if 0 <= sentence_index < len(values) else ""
+        )
+        if "<b>" not in sentence:
+            problems.append(f"{note_id} has no bold")
         if not gloss:
             problems.append(f"{note_id} has no gloss")
         elif "," in gloss:

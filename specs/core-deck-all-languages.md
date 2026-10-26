@@ -211,7 +211,7 @@ the word core and retires its stratified preset.
 - Order the cards by core position, or by difficulty when the language chooses
   that key.
 - The card back shows the sentence, the English, `Core`, and `CoreGloss`. The
-  assigned target is bold.
+  core word is bold.
 - Both modes write a note type of their own. The output holds one note type,
   one field set, and one card template (section 14).
 
@@ -443,7 +443,7 @@ with its `.core.csv`, `.coverage.csv`, `.manifest.json`, and `.rank.csv`.
 
 Two repairs followed the first build. The templates now read the audio field
 `[a]` of the model, because `{{Audio}}` named no field, and the Mandarin
-profile sets the `highlight` hook, so the assigned target is bold. The sense
+profile sets the `highlight` hook, so the core word is bold. The sense
 rows of `一样` and `计划` now start with `same` and `plan`, because the deck
 gave those words in that sense.
 
@@ -569,7 +569,7 @@ Readers after the change:
 | `coreflow.read_input_deck` | `input_model_name`, `input_sentence_field`, `input_english_field`, `input_audio_field` |
 | `coreflow.read_output_deck` (new) | the single output note type and the `OUTPUT_*` names |
 | `coreflow.write_deck` | `input_model_name`, `output_model_name`, `romanization_source`, `templates`, `card_css` |
-| `coreflow._write_bold` | `OUTPUT_SENTENCE_FIELD` |
+| `coreflow.fill_bold` | `OUTPUT_SENTENCE_FIELD` |
 | `coreflow.fill_core_fields` | `OUTPUT_CORE_FIELD`, `OUTPUT_GLOSS_FIELD` |
 | `coregates.CoreFiles.fields` | the single output note type |
 | `coregates.gate_bold` (K15) | `OUTPUT_SENTENCE_FIELD` |
@@ -609,7 +609,7 @@ and `card_css`. `CoreProfile` and `CullProfile` satisfy it.
 
 `coreflow.find_only_model_id(models)` gives the id of the only note type of a
 package and raises `RuntimeError` when the package holds two or more. The
-writer, `fill_core_fields`, `_write_bold`, `read_output_deck`, and the field
+writer, `fill_core_fields`, `fill_bold`, `read_output_deck`, and the field
 readers of both gate sets call it, so a spare note type fails a run before a
 gate reports it.
 
@@ -627,7 +627,7 @@ in both.
 | Position | Field | Value | Reader |
 | --- | --- | --- | --- |
 | 1 | `Audio` | the input audio field text, `[sound:<file>]`, verbatim | `front.html` and `back.html` of the mode |
-| 2 | `Sentence` | `InputCard.sentence`, the clean plain text; `_write_bold` rewrites it for a bolded card | `back.html`, K15, G5 |
+| 2 | `Sentence` | `InputCard.sentence`, the clean plain text; `fill_bold` writes the core word in bold | `back.html`, K15, G5, G17 |
 | 3 | `English` | the input English field text, verbatim; the pack English for a reserve card | `back.html` |
 | 4 | `Romanization` | the input field named by `profile.romanization_source`, verbatim; absent when the source is None | `back.html` of every mode |
 | 5 | `Core` | the target form of the card (14.7) | `back.html`, K19, G17 |
@@ -761,8 +761,8 @@ change:
 
 | Mode | Steps after the selection |
 | --- | --- |
-| core | `write_rank_csv`, `write_deck` (to `<output>.tmp.apkg`), `reorder_deck`, `fill_core_fields`, `_write_bold` |
-| cull | `write_cull_csv`, `write_coverage_csv`, `write_deck`, `fill_core_fields` |
+| core | `write_rank_csv`, `write_deck` (to `<output>.tmp.apkg`), `reorder_deck`, `fill_core_fields`, `fill_bold` |
+| cull | `write_cull_csv`, `write_coverage_csv`, `write_deck`, `fill_core_fields`, `fill_bold` |
 
 The cull does not call `reorder_deck` today, and it must not: `reorder_deck`
 writes `due` values from the rank CSV, and it reads only `type = 0` cards.
@@ -935,7 +935,8 @@ The gate numbers stay stable. Two gates are new, and two change their check.
 | --- | --- | --- |
 | K9 `gate_identity` | core | the deck name is `params.name`, and the only note type name is `profile.output_model_name` |
 | K14 `gate_templates` | core | the templates equal `profile.templates` and the CSS equals `profile.card_css()`, on the only note type |
-| K19 `gate_core_word` (renamed from `gate_gloss`) | core | every note holds a non-empty `Core` and a non-empty `CoreGloss`, the gloss holds no comma, and the gloss is a coverage gloss of that word |
+| K15 `gate_bold` | core | every kept note holds a bold core word in the `Sentence` field |
+| K19 `gate_core_word` (renamed from `gate_gloss`) | core | every note holds a non-empty `Core`, a non-empty `CoreGloss`, and a bold core word; the gloss holds no comma, and the gloss is a coverage gloss of that word |
 | K21 `gate_output_model` (new) | core | the package holds one note type; its field names equal `output_fields(profile)` in order; it holds one card template; every note holds one card with `ord = 0` |
 | G10 `gate_identity` | cull | the deck name is `params.name`, and the only note type name is `profile.output_model_name` |
 | G15 `gate_card_templates` | cull | the templates and the CSS classes, as today, on the only note type |
@@ -965,6 +966,7 @@ Add one small test for each new seam. Do not download a file.
 | `tests/test_apkg_package.py` | `test_prune_extra_cards_keeps_one_card_per_note` | a note with two cards keeps the lowest `ord`, that card has `ord = 0`, and the returned count is 1 |
 | `tests/test_core_deck.py` | `test_the_run_writes_one_note_type_with_the_output_fields` | the tiny deck gives one note type named `profile.output_model_name`, the five fields in order, one template, and one card per note |
 | `tests/test_core_deck.py` | `test_every_kept_note_holds_a_core_word_and_a_gloss` | K19 accepts the tiny deck and rejects a note with an empty `Core` |
+| `tests/test_core_deck.py` | `test_every_kept_note_holds_a_bold_core_word` | every kept note holds `<b>` in the `Sentence` field |
 | `tests/test_core_deck.py` | `test_a_kept_card_without_a_core_word_leaves_the_deck` | the card is not written, the CSV row holds `no_core`, and the manifest counts it |
 | `tests/test_core_deck.py` | `test_the_kept_card_keeps_its_note_id_and_due` | the note id and the card `due` of the input row survive |
 | `tests/test_core_deck.py` | `test_gate_output_model_fails_on_a_spare_field` | K21 reports the extra field name |

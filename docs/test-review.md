@@ -7,8 +7,8 @@ One review of `tests/`. It gives what was cut, why, and what is now uncovered.
 | Item              | Before | Cut   | Now   |
 | ----------------- | ------ | ----- | ----- |
 | Test files        | 44     | 30    | 33    |
-| Tests collected   | 553    | 379   | 401   |
-| Lines in `tests/` | 9 296  | 6 432 | 7 020 |
+| Tests collected   | 553    | 379   | 402   |
+| Lines in `tests/` | 9 296  | 6 432 | 7 034 |
 | Run time          | 14 s   | 6 s   | 6 s   |
 
 Two cuts happened. The first removed repetition and kept every claim. The

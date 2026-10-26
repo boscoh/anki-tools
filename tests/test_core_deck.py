@@ -638,6 +638,16 @@ class TestCardDesign:
         assert not failed
         assert "no core word" in failed_message
 
+    def test_every_kept_note_holds_a_bold_core_word(self, tmp_path: Path) -> None:
+        _run, output, profile = _run_core(tmp_path)
+        files = coregates.CoreFiles(output, profile)
+        notes = files.notes()
+        sentence_index = files.fields().index("Sentence")
+
+        assert all(
+            "<b>" in values[sentence_index] for values in notes.values()
+        )
+
     def test_the_gloss_gate_fails_on_a_missing_gloss(self, tmp_path: Path) -> None:
         _run, output, profile = _run_core(tmp_path)
         with AnkiPackage(output) as package:

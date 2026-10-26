@@ -797,11 +797,15 @@ word.
    `CoreGloss` is empty. Gate G17 fails on that note.
 5. A reserve card takes `Core` from the pack `Target` field and `CoreGloss`
    from the pack `Gloss` field.
+6. The card bolds the core word in the `Sentence` field. `coreflow.fill_bold`
+   writes it, and a note without a bold fails G17. A reserve card already holds
+   the bold of the pack.
 
 `run_cull` reads the sense file once with
 `coreflow.read_senses(profile.sense_path)`. It keeps the lemma-to-gloss map for
 `write_coverage_csv`, and it keeps the lemma-to-first-sense map for
 `coreflow.fill_core_fields`, which writes the pairs of the frequency cards.
+`coreflow.fill_bold` then bolds the core word in the sentence.
 The reserve cards hold their values at insert time.
 
 A kept card with no target leaves the deck. Its CSV row holds `kept = 0` and
@@ -820,8 +824,8 @@ must hold one row for every target of the build, 300 rows at the default
 - G15 checks the one template and the CSS classes of the one note type.
 - G16 is new: one note type, the fields of section 17.2 in order, one card per
   note, and `ord = 0` on that card.
-- G17 is new: every note holds a `Core` and a `CoreGloss`, and the gloss is the
-  coverage gloss of that word.
+- G17 is new: every note holds a `Core`, a `CoreGloss`, and a bold core word,
+  and the gloss is the coverage gloss of that word.
 - `CullFiles.output()` gains `fields`, and `write_coverage_csv` writes the
   `gloss` column of section 10.3.
 

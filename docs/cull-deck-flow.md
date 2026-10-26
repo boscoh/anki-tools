@@ -276,7 +276,7 @@ exceptions.
 | manifest  | G13          | the two CSV hashes                                        |
 | swadesh   | G14          | the merged deck covers the reserve concepts               |
 | templates | G15          | the cull templates and the CSS classes                    |
-| note type | G16, G17     | one note type and its fields, the core word and the gloss |
+| note type | G16, G17     | one note type, its fields, the core word, gloss, and bold |
 
 G3 fails below `target_coverage_gate`, 0.98 for French and Spanish. G4 fails
 below `double_coverage_gate`, 0.95. The profile holds both values.
@@ -285,8 +285,8 @@ G5 skips F8 for a reserve card, because the Swadesh pack already checked that
 sentence. G14 needs the Swadesh count minus the exceptions of the profile, for
 example `intestins` in French. G15 needs the template set of the profile and
 each card class in the CSS. G16 checks the single note type, the field set, and
-one card per note. G17 checks that every note holds a `Core` and a `CoreGloss`,
-and that the gloss is the coverage gloss of the core word.
+one card per note. G17 checks that every note holds a `Core`, a `CoreGloss`,
+and a bold core word, and that the gloss is the coverage gloss of that word.
 
 G1 passes when the kept count plus `counts.dropped_no_core` reaches the cap, or
 when the pool has no more cards. A kept card without a core word leaves the

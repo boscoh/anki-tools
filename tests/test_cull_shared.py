@@ -93,6 +93,9 @@ def _profile() -> cullflow.CullProfile:
         licenses={"data": "test license"},
         target_coverage_gate=0.98,
         double_coverage_gate=0.95,
+        highlight=lambda sentence, word: sentence.replace(
+            word, f"<b>{word}</b>", 1
+        ),
     )
 
 
@@ -137,7 +140,7 @@ def test_a_second_profile_drives_every_output_value(tmp_path: Path) -> None:
     assert decks == {DECK_NAME}
     assert fields == list(coreflow.output_fields(_profile()))
     assert run.cards == 2
-    assert notes[0][1].startswith("kat ser")
+    assert notes[0][1].startswith("<b>kat</b> ser")
     assert notes[0][2] == "cat is big."
     assert notes[0][3] == "kat"
 

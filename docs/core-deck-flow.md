@@ -303,7 +303,7 @@ The coverage status of a target is one of these values:
 | rules      | K5, K6, K17     | F1 to F9 and C1 to C5, similarity, name and loan word |
 | files      | K7, K8, K12     | audio files, counts, manifest hashes                  |
 | identity   | K9, K10         | deck name, note type, kept order                      |
-| cards      | K13, K14, K15   | target in the text, templates and CSS, bold target    |
+| cards      | K13, K14, K15   | target in the text, templates and CSS, bold core word |
 | sense      | K16, K19, K20   | unchecked target, core word and gloss, unranked word  |
 | shape      | K18             | each tail card brings a new content lemma             |
 | note type  | K21             | one note type, the output fields, one card per note   |
@@ -311,8 +311,9 @@ The coverage status of a target is one of these values:
 K3 reports the share of targets with two cards. It does not fail.
 
 K14 checks the templates and the CSS of the language profile. K15 checks that
-the bold text is the assigned target. K19 checks that every note holds a `Core`
-and a `CoreGloss`, that the gloss is the coverage gloss of the core word, and
+every kept note holds a bold core word. K19 checks that every note holds a
+`Core`, a `CoreGloss`, and a bold core word, that the gloss is the coverage
+gloss of the core word, and
 that the gloss has no comma. K21 checks the single note type, the field set,
 and one card per note.
 

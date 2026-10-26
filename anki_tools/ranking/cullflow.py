@@ -246,6 +246,7 @@ class CullProfile:
     double_coverage_gate: float
 
     romanization_source: str | None = None
+    highlight: Callable[[str, str], str] | None = None
 
 
 @dataclass(frozen=True)
@@ -1315,6 +1316,12 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
         reserve_fields=profile.reserve_fields,
     )
     coreflow.fill_core_fields(output_path, cards, values)
+    bolded, unbolded = coreflow.fill_bold(
+        output_path,
+        cards,
+        {index: values[index][0] for index in kept},
+        profile.highlight,
+    )
     kept_order = kept_order_hash(cards, kept, reserve=reserve)
     write_manifest(
         manifest_path,
@@ -1349,6 +1356,8 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
             "swadesh_covered": swadesh_covered,
             "swadesh_total": swadesh_total,
             "dropped_no_core": dropped_no_core,
+            "bolded": bolded,
+            "unbolded": unbolded,
         },
         frequency={
             "path": str(profile.frequency_path),

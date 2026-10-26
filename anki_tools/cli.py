@@ -1076,9 +1076,8 @@ def _build_layout(config: dict, entries: list[dict]) -> _BuildLayout:
     front_template = load_text(TEMPLATES_DIR / "vocab" / "front.html")
     back_template = load_text(TEMPLATES_DIR / "vocab" / "back.html")
 
-    css_path = TEMPLATES_DIR / "vocab" / "card.css"
     language_css_path = TEMPLATES_DIR / "vocab" / config["language"].lower() / "card.css"
-    css_content = load_css_layers(SHARED_CSS_PATH, css_path, language_css_path)
+    css_content = load_css_layers(SHARED_CSS_PATH, language_css_path)
 
     csv_fields = (
         [k for k in entries[0].keys() if k != "audio_filename"] if entries else []
@@ -1089,17 +1088,18 @@ def _build_layout(config: dict, entries: list[dict]) -> _BuildLayout:
     char_click_script = load_char_links()
 
     cjk_fields = {"characters", "hanzi", "cantonese", "mandarin", "chinese"}
-    script_15em_fields = {"arabic", "hindi"}
     field_parts: list[str] = []
     for field in content_order:
-        if field.lower() in cjk_fields:
-            field_parts.append(
-                f"<div class='char-links' style='font-size: 3rem'>{{{{{field}}}}}</div>"
-            )
-        elif field.lower() in script_15em_fields:
-            field_parts.append(f"<div style='font-size: 1.5em'>{{{{{field}}}}}</div>")
+        name = field.lower()
+        if name in cjk_fields:
+            classes = "target char-links"
+        elif name == "transliteration":
+            classes = "romanization"
+        elif name == "english":
+            classes = "english"
         else:
-            field_parts.append(f"<div style='font-size: 2rem'>{{{{{field}}}}}</div>")
+            classes = "target"
+        field_parts.append(f"<div class='{classes}'>{{{{{field}}}}}</div>")
     if char_click_script:
         field_parts.append(char_click_script)
     answer_format = back_template.replace("{{fields}}", "\n".join(field_parts))
@@ -1110,7 +1110,7 @@ def _build_layout(config: dict, entries: list[dict]) -> _BuildLayout:
         front_template=front_template,
         answer_format=answer_format,
         css_content=css_content,
-        css_path=css_path,
+        css_path=language_css_path,
     )
 
 

@@ -125,22 +125,23 @@ Thus the mandarin card holds `mandarin`, `transliteration`, `english`, and
 | ------------------------------------- | -------------------------------------- |
 | `templates/vocab/front.html`          | the audio of the card                  |
 | `templates/vocab/back.html`           | the audio, a divider, then every field |
-| `templates/vocab/card.css`            | the CSS of the vocabulary card         |
 | `templates/vocab/<language>/card.css` | the CSS of one language, when present  |
 | `templates/shared/card.css`           | the shared CSS layer                   |
 | `templates/shared/char_links.html`    | the Han character link script          |
 
-The CSS layers join in this order: shared, vocab, language. A later layer
-overrides an earlier layer. A missing language layer adds no text.
-
+The CSS layers join in this order: shared, language. A later layer overrides an
+earlier layer. A missing language layer adds no text. The shared layer centers
+the card. No layer sets a direction or an alignment: a script that reads right
+to left, for example Arabic, follows the Unicode bidirectional algorithm.
 The back template replaces `{{fields}}` with one `<div>` per content field.
-The field size depends on the field name:
+The field name gives the shared class:
 
-| Field name                                                | Size and wrapper                       |
-| --------------------------------------------------------- | -------------------------------------- |
-| `characters`, `hanzi`, `cantonese`, `mandarin`, `chinese` | 3rem, inside the character link script |
-| `arabic`, `hindi`                                         | 1.5em                                  |
-| any other field                                           | 2rem                                   |
+| Field name                                                | Class                 |
+| --------------------------------------------------------- | --------------------- |
+| `characters`, `hanzi`, `cantonese`, `mandarin`, `chinese` | `target char-links`   |
+| `transliteration`                                         | `romanization`        |
+| `english`                                                 | `english`             |
+| any other field                                           | `target`              |
 
 The character link script makes each Han character a link to the CC-Canto
 dictionary.
@@ -201,7 +202,7 @@ audio file that is absent from the media set of the APKG.
 | `vocab/english-<language>.csv`              | the word list of one language               |
 | `templates/vocab/front.html`                | the front template                          |
 | `templates/vocab/back.html`                 | the back template                           |
-| `templates/vocab/card.css`                  | the base CSS of the card                    |
+| `templates/shared/card.css`                 | the shared CSS of every deck                |
 | `templates/shared/char_links.html`          | the Han character link script               |
 
 ## 10. Invariants

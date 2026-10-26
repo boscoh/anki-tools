@@ -16,6 +16,7 @@ from typing import Sequence
 
 from anki_tools.apkg.templates import SHARED_CSS_PATH, TEMPLATES_DIR, load_text
 from anki_tools.languages.french.profile import (
+    FRENCH,
     EXTRA_CSS,
     FINAL_MARKS,
     INTERNAL_MARKS,
@@ -171,6 +172,7 @@ FRENCH_CULL_PROFILE = cullflow.CullProfile(
     licenses=LICENSES,
     target_coverage_gate=0.98,
     double_coverage_gate=0.95,
+    highlight=FRENCH.highlight,
 )
 
 write_cull_deck = partial(

@@ -533,6 +533,8 @@ def card_rows(
     candidates: Sequence[CoreCandidate],
     targets: Sequence[CoreTarget],
     reasons: Sequence[str],
+    *,
+    assigned: Mapping[int, str],
 ) -> list[dict[str, Any]]:
     """Build the card CSV rows in card order.
 
@@ -543,6 +545,7 @@ def card_rows(
     :param candidates: Cards that passed the filter.
     :param targets: Core list.
     :param reasons: Filter reason per input index.
+    :param assigned: Target key of each kept card.
     :returns: One row per kept card, then one row per other input card.
     """
     by_key = {target.key: target for target in targets}
@@ -553,7 +556,7 @@ def card_rows(
         candidate = by_index[index]
         new = [word for word in candidate.outside if word not in introduced]
         introduced.update(candidate.outside)
-        target = result.assigned.get(index, "")
+        target = assigned.get(index, "")
         unchecked = sum(
             1 for key in candidate.targets if not by_key[key].checked
         )
@@ -1257,13 +1260,13 @@ def read_output(path: Path) -> dict[str, Any]:
     }
 
 
-def core_values(
+def core_keys(
     result: CoreResult,
     ordered: Sequence[int],
     candidates: Sequence[CoreCandidate],
     targets: Sequence[CoreTarget],
-) -> dict[int, tuple[str, str]]:
-    """Give the core word and the gloss that each kept card teaches.
+) -> dict[int, str]:
+    """Give the target key that each kept card teaches.
 
     The assigned target wins. A card without an assigned target teaches the
     target of the lowest core position that it holds.
@@ -1272,20 +1275,35 @@ def core_values(
     :param ordered: Kept cards in card order.
     :param candidates: Cards that passed the filter, with the targets they hold.
     :param targets: Core list.
-    :returns: Input index to ``(word, gloss)`` pair. A card without a target
-        has no pair.
+    :returns: Input index to target key. A card without a target has no key.
     """
     by_key = {target.key: target for target in targets}
     held = {candidate.index: candidate.targets for candidate in candidates}
-    values: dict[int, tuple[str, str]] = {}
+    keys: dict[int, str] = {}
     for index in ordered:
         key = result.assigned.get(index)
         if key is None and held.get(index):
             key = min(held[index], key=lambda item: (by_key[item].position, item))
-        if key is None:
-            continue
-        values[index] = (by_key[key].form, by_key[key].gloss)
-    return values
+        if key is not None:
+            keys[index] = key
+    return keys
+
+
+def core_values(
+    keys: Mapping[int, str],
+    targets: Sequence[CoreTarget],
+) -> dict[int, tuple[str, str]]:
+    """Give the core word and the gloss that each kept card teaches.
+
+    :param keys: Input index to target key.
+    :param targets: Core list.
+    :returns: Input index to ``(word, gloss)`` pair.
+    """
+    by_key = {target.key: target for target in targets}
+    return {
+        index: (by_key[key].form, by_key[key].gloss)
+        for index, key in keys.items()
+    }
 
 
 def coverage_glosses(rows: Sequence[Mapping[str, str]]) -> dict[str, str]:
@@ -1332,39 +1350,31 @@ def fill_core_fields(
     return len(values)
 
 
-def _write_bold(
+def fill_bold(
     output_path: Path,
     cards: Sequence[Any],
-    result: CoreResult,
-    ordered: Sequence[int],
-    targets: Sequence[CoreTarget],
-    profile: CoreProfile,
+    words: Mapping[int, str],
+    highlight: Callable[[str, str], str] | None,
 ) -> tuple[int, int]:
-    """Write the assigned target of each kept card in bold.
+    """Write the core word of each kept card in bold in the sentence.
 
     :param output_path: Output APKG file.
     :param cards: Input cards.
-    :param result: Selection result with the assignment.
-    :param ordered: Kept cards in card order.
-    :param targets: Core list.
-    :param profile: Language hooks.
+    :param words: Input index to the core word of the card.
+    :param highlight: Language hook, or None when the language does not bold.
     :raises RuntimeError: The package holds two or more note types.
     :returns: The count of bolded cards and the count of the others.
     """
-    if profile.highlight is None:
-        return 0, len(ordered)
-    by_key = {target.key: target for target in targets}
+    if highlight is None:
+        return 0, len(words)
     bolded = 0
     with AnkiPackage(output_path) as package:
         models = package.get_models()
         model_id = find_only_model_id(models)
-        names = [field["name"] for field in models[model_id]["flds"]]
+        names = [entry["name"] for entry in models[model_id]["flds"]]
         field_index = names.index(OUTPUT_SENTENCE_FIELD)
-        for index in ordered:
-            target = result.assigned.get(index)
-            if target is None:
-                continue
-            marked = profile.highlight(cards[index].sentence, by_key[target].form)
+        for index, word in words.items():
+            marked = highlight(cards[index].sentence, word)
             if marked != cards[index].sentence:
                 package.update_note_field(
                     cards[index].note_id, field_index, marked
@@ -1372,7 +1382,7 @@ def _write_bold(
                 bolded += 1
         package.touch()
         package.save(output_path)
-    return bolded, len(ordered) - bolded
+    return bolded, len(words) - bolded
 
 def run_core(request: CoreRequest, profile: CoreProfile) -> CoreRun:
     """Run stages K0 to K6 of the core mode and write the output files.
@@ -1459,9 +1469,10 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> CoreRun:
         options=request.options,
     )
     ordered = result.order
-    values = core_values(result, ordered, candidates, targets)
-    kept = [index for index in ordered if index in values]
-    dropped = [index for index in ordered if index not in values]
+    keys = core_keys(result, ordered, candidates, targets)
+    values = core_values(keys, targets)
+    kept = [index for index in ordered if index in keys]
+    dropped = [index for index in ordered if index not in keys]
     reasons = list(reasons)
     for index in dropped:
         reasons[index] = NO_CORE_REASON
@@ -1474,13 +1485,18 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> CoreRun:
     temporary.unlink(missing_ok=True)
     fill_core_fields(output_path, cards, values)
     bolded, unbolded = (
-        _write_bold(output_path, cards, result, kept, targets, profile)
+        fill_bold(
+            output_path,
+            cards,
+            {index: values[index][0] for index in kept},
+            profile.highlight,
+        )
         if request.bold_target
         else (0, 0)
     )
 
     rows = card_rows(
-        cards, tokens, result, kept, candidates, targets, reasons
+        cards, tokens, result, kept, candidates, targets, reasons, assigned=keys
     )
     coverage_rows = coverage_rows_of(targets, result, present, quotas)
     counts = manifest_counts(

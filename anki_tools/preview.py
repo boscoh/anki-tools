@@ -50,7 +50,6 @@ VOCAB_LANGUAGES: tuple[tuple[str, str], ...] = tuple(
 )
 
 CJK_FIELDS = {"characters", "hanzi", "cantonese", "mandarin", "chinese"}
-SCRIPT_15EM_FIELDS = {"arabic", "hindi"}
 
 PREVIEW_CARD_CSS = """
 body {
@@ -553,8 +552,8 @@ FIX_SAMPLES: dict[str, dict[str, str]] = {
         "gloss": "not",
     },
     "spanish": {
-        "sentence": "No te pediré nada más por hoy.",
-        "english": "I won't ask you anything else today.",
+        "sentence": "Quiero pedir la cuenta.",
+        "english": "I want to ask for the bill.",
         "core": "pedir",
         "gloss": "to ask",
     },
@@ -592,9 +591,12 @@ def fix_card(language: str, mode: str, title: str) -> PreviewCard:
     if SHARED_SCRIPT and "char-links" in back:
         back = f"{back.rstrip()}\n{SHARED_SCRIPT}"
     sample = FIX_SAMPLES[language]
+    sentence = sample["sentence"].replace(
+        sample["core"], f"<b>{sample['core']}</b>", 1
+    )
     fields = {
         "Audio": f"[sound:{language}_{mode}.mp3]",
-        "Sentence": sample["sentence"],
+        "Sentence": sentence,
         "English": sample["english"],
         "Core": sample["core"],
         "CoreGloss": sample["gloss"],
@@ -655,14 +657,16 @@ def vocab_card(language: str, title: str) -> PreviewCard:
     field_parts: list[str] = []
     for field in content_order:
         value = row.get(field, "")
-        if field.lower() in CJK_FIELDS:
-            field_parts.append(
-                f"<div class='char-links' style='font-size: 3rem'>{value}</div>"
-            )
-        elif field.lower() in SCRIPT_15EM_FIELDS:
-            field_parts.append(f"<div style='font-size: 1.5em'>{value}</div>")
+        name = field.lower()
+        if name in CJK_FIELDS:
+            classes = "target char-links"
+        elif name == "transliteration":
+            classes = "romanization"
+        elif name == "english":
+            classes = "english"
         else:
-            field_parts.append(f"<div style='font-size: 2rem'>{value}</div>")
+            classes = "target"
+        field_parts.append(f"<div class='{classes}'>{value}</div>")
     if SHARED_SCRIPT:
         field_parts.append(SHARED_SCRIPT)
     back_template = load_text(TEMPLATES_DIR / "vocab" / "back.html").replace(
@@ -670,11 +674,7 @@ def vocab_card(language: str, title: str) -> PreviewCard:
     )
     front_template = load_text(TEMPLATES_DIR / "vocab" / "front.html")
     language_css = TEMPLATES_DIR / "vocab" / language / "card.css"
-    css = load_css_layers(
-        SHARED_CSS_PATH,
-        TEMPLATES_DIR / "vocab" / "card.css",
-        language_css,
-    )
+    css = load_css_layers(SHARED_CSS_PATH, language_css)
     fields = {
         "audio": f"[sound:{audio_name(row[language])}]",
     }
@@ -691,7 +691,7 @@ def vocab_card(language: str, title: str) -> PreviewCard:
         back_template,
         fields,
         css,
-        source="templates/vocab/{front,back,card}"
+        source="templates/vocab/{front,back}"
         + (f" + templates/vocab/{language}/card.css" if language_css.exists() else ""),
         field_list=", ".join(["audio", *content_order]),
         note=note,
