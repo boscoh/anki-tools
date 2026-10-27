@@ -17,6 +17,7 @@ profiles of :data:`anki_tools.sentence_pack.profile.PROFILES`.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from types import ModuleType
 from typing import Any, Callable, Sequence
 
@@ -27,12 +28,42 @@ from anki_tools.sentence_pack.profile import (
     profile_names,
 )
 
+from anki_tools.languages.cantonese import core as cantonese_core
 from anki_tools.languages.cantonese import profile as cantonese
+from anki_tools.languages.french import core as french_core
+from anki_tools.languages.french import cull as french_cull
 from anki_tools.languages.french import profile as french
 from anki_tools.languages.greek import profile as greek
+from anki_tools.languages.mandarin import core as mandarin_core
 from anki_tools.languages.mandarin import profile as mandarin
 from anki_tools.languages.mandarin import stages as mandarin_stages
+from anki_tools.languages.spanish import core as spanish_core
+from anki_tools.languages.spanish import cull as spanish_cull
 from anki_tools.languages.spanish import profile as spanish
+from anki_tools.ranking.cullflow import CullProfile
+from anki_tools.ranking.scan import CoreProfile
+
+
+@dataclass(frozen=True)
+class FixCommand:
+    """Declaration of one ``fix`` deck command.
+
+    :param code: Short command name, for example ``zh``.
+    :param apkg_path: Default input package of the command.
+    :param core: Core mode view of the language.
+    :param cull: Cull mode view of the language, None when it has no cull.
+    :param words: Default tier F word count of the core mode.
+    :param description: Description block of the command help.
+    :param select_help: Help line of the ``--select`` flag.
+    """
+
+    code: str
+    apkg_path: Path
+    core: CoreProfile
+    cull: CullProfile | None = None
+    words: int = 0
+    description: str = ""
+    select_help: str = ""
 
 
 @dataclass(frozen=True)
@@ -49,6 +80,7 @@ class CliLanguage:
         ``english-<lang>.csv`` file and an audio directory.
     :param tts: gTTS language code of the ``vocab`` command, None when it has
         none.
+    :param fix: Declared ``fix`` deck command, None when the language has none.
     """
 
     name: str
@@ -58,6 +90,7 @@ class CliLanguage:
     audit: Callable[[], Sequence[Any]] | None = None
     vocab: bool = False
     tts: str | None = None
+    fix: FixCommand | None = None
 
 
 LANGUAGES: dict[str, CliLanguage] = {
@@ -71,6 +104,14 @@ LANGUAGES: dict[str, CliLanguage] = {
             audit=mandarin_stages.run_audit,
             vocab=True,
             tts="zh-cn",
+            fix=FixCommand(
+                "zh", Path("apkg/Neri's Chinese Sents Part 2.apkg"),
+                core=mandarin_core.MANDARIN_CORE_PROFILE,
+                words=mandarin_core.DEFAULT_CORE_WORDS,
+                description="""Fix Chinese deck: build the core deck.
+
+``--core`` builds ``apkg/mandarin_core.apkg`` with its CSV files and manifest.""",
+            ),
         ),
         CliLanguage(
             "french",
@@ -78,6 +119,17 @@ LANGUAGES: dict[str, CliLanguage] = {
             profile=french.FRENCH,
             module=french,
             audit=french.run_french_audit,
+            fix=FixCommand(
+                "fr", Path("apkg/6000_French_Sentences_w_Audio.apkg"),
+                core=french_core.FRENCH_CORE_PROFILE,
+                cull=french_cull.FRENCH_CULL_PROFILE,
+                words=french_core.DEFAULT_CORE_WORDS,
+                description="""Fix French deck: select a smaller deck, or build a core deck.
+
+``--select`` runs the 1000-card cull and writes ``apkg/french_1000.apkg``.
+``--core`` builds ``apkg/french_core.apkg`` with its CSV files and manifest.""",
+                select_help="Run the card cull.",
+            ),
         ),
         CliLanguage(
             "spanish",
@@ -87,6 +139,17 @@ LANGUAGES: dict[str, CliLanguage] = {
             audit=spanish.run_spanish_audit,
             vocab=True,
             tts="es",
+            fix=FixCommand(
+                "es", Path("apkg/Spanish 9000 sentences with native audio.apkg"),
+                core=spanish_core.SPANISH_CORE_PROFILE,
+                cull=spanish_cull.SPANISH_CULL_PROFILE,
+                words=spanish_core.DEFAULT_CORE_WORDS,
+                description="""Fix Spanish deck: select a smaller deck, or build a core deck.
+
+``--select`` runs the cull and writes ``apkg/spanish_1000.apkg``. ``--core``
+builds ``apkg/spanish_core.apkg`` with its CSV files and manifest.""",
+                select_help="Run the cull.",
+            ),
         ),
         CliLanguage(
             "greek",
@@ -106,6 +169,14 @@ LANGUAGES: dict[str, CliLanguage] = {
             audit=cantonese.run_cantonese_audit,
             vocab=True,
             tts="yue",
+            fix=FixCommand(
+                "yue", Path("apkg/LTL Cantonese Deck Level 1 - Short.apkg"),
+                core=cantonese_core.CANTONESE_CORE_PROFILE,
+                words=cantonese_core.DEFAULT_CORE_WORDS,
+                description="""Fix Cantonese deck: build the core deck.
+
+``--core`` builds ``apkg/cantonese_core.apkg`` with its CSV files and manifest.""",
+            ),
         ),
         CliLanguage("arabic", label="Arabic", vocab=True, tts="ar"),
         CliLanguage("hindi", label="Hindi", vocab=True, tts="hi"),
@@ -159,6 +230,7 @@ __all__ = [
     "LANGUAGES",
     "PROFILES",
     "CliLanguage",
+    "FixCommand",
     "cantonese",
     "french",
     "get_profile",

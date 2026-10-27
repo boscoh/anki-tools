@@ -71,6 +71,11 @@ longer reads `--cards`, so the flag is a cap in every command.
 `run_ranked_deck`. No deck holds cards in more than one note type, and the field
 inference picks the sentence field per model.
 
+The four commands are declared from `LANGUAGES`. A `FixCommand` value holds the
+default path, the mode views, the word count, and the help text of each
+language, and two factories state the option set. The signature keeps each real
+default, so the help page still shows the value.
+
 ## Rejected
 
 Give each command a shared options dataclass. Cyclopts flattens a dataclass

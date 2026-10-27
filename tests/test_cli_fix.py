@@ -11,6 +11,8 @@ from pathlib import Path
 import pytest
 
 from anki_tools import cli
+from anki_tools.languages.french import core as french_core
+from anki_tools.languages.french import cull as french_cull
 from anki_tools.ranking import fixrun, identity
 
 
@@ -70,7 +72,7 @@ def test_select_goes_to_the_cull(
     assert request.output_path == Path("apkg/french_1000.apkg")
     assert request.no_reserve is True
     assert request.max_cards == 500
-    assert run_profile is cli.french_cull.FRENCH_CULL_PROFILE
+    assert run_profile is french_cull.FRENCH_CULL_PROFILE
     assert runs[1][0].output_path == output
 
 
@@ -92,9 +94,9 @@ def test_core_builds_the_request(
 
     request, run_profile = runs[0]
     assert request.output_path == Path("apkg/french_core.apkg")
-    assert request.core_words == cli.french_core.DEFAULT_CORE_WORDS
+    assert request.core_words == french_core.DEFAULT_CORE_WORDS
     assert request.max_cards == 42
-    assert run_profile is cli.french_core.FRENCH_CORE_PROFILE
+    assert run_profile is french_core.FRENCH_CORE_PROFILE
 
 
 def test_check_without_a_mode_is_an_error(deck_file: Path) -> None:
@@ -117,7 +119,7 @@ CHECK_ROUTES = [
         True,
         False,
         "check_cull",
-        cli.french_cull.FRENCH_CULL_PROFILE,
+        french_cull.FRENCH_CULL_PROFILE,
         "apkg/french_1000.apkg",
         id="select",
     ),
@@ -125,7 +127,7 @@ CHECK_ROUTES = [
         False,
         True,
         "check_core",
-        cli.french_core.FRENCH_CORE_PROFILE,
+        french_core.FRENCH_CORE_PROFILE,
         "apkg/french_core.apkg",
         id="core",
     ),

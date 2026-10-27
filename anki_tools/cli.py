@@ -18,18 +18,12 @@ import time
 import webbrowser
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated, Callable, Literal
 
 import cyclopts
 from cyclopts import Parameter
 from gtts import gTTS
 
-from anki_tools.languages.cantonese import core as cantonese_core
-from anki_tools.languages.french import core as french_core
-from anki_tools.languages.french import cull as french_cull
-from anki_tools.languages.spanish import core as spanish_core
-from anki_tools.languages.spanish import cull as spanish_cull
-from anki_tools.languages.mandarin import core as mandarin_core
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.preview import write_preview
 from anki_tools.preview_apkg import write_apkg_preview
@@ -46,6 +40,7 @@ from anki_tools.languages import (
     resolve,
     vocab_languages,
 )
+from anki_tools.languages.registry import FixCommand
 from anki_tools.ranking import fixrun
 from anki_tools.apkg.templates import (
     DEFAULT_BACK_PATH,
@@ -423,180 +418,104 @@ fix_app = cyclopts.App(name="fix", help="Fix and optimize Anki decks")
 app.command(fix_app)
 
 
-DEFAULT_MANDARIN_APKG = Path("apkg/Neri's Chinese Sents Part 2.apkg")
-DEFAULT_FRENCH_APKG = Path("apkg/6000_French_Sentences_w_Audio.apkg")
-DEFAULT_CANTONESE_APKG = Path("apkg/LTL Cantonese Deck Level 1 - Short.apkg")
-DEFAULT_SPANISH_APKG = Path("apkg/Spanish 9000 sentences with native audio.apkg")
+_PARAMS_DOC = """
+:param apkg_path: Input .apkg file.
+:param output: Output .apkg file (default: from the language and mode).
+:param core: Build the core deck.
+:param words: Core mode: tier F words after the Swadesh set.
+:param check: Run the gates on the output and do not run the mode again.
+"""
 
 
-@fix_app.command
-def zh(
-    apkg_path: Path = DEFAULT_MANDARIN_APKG,
-    *,
-    output: Path | None = None,
-    core: bool = False,
-    cards: int | None = None,
-    words: int = mandarin_core.DEFAULT_CORE_WORDS,
-    check: bool = False,
-):
-    """Fix Chinese deck: build the core deck.
+def _declare_core_fix(
+    route: fixrun.FixLanguage, declaration: FixCommand
+) -> Callable[..., None]:
+    """Declare the ``fix`` command of a language without a cull mode.
 
-    ``--core`` builds ``apkg/mandarin_core.apkg`` with its CSV files and
-    manifest.
-
-    :param apkg_path: Input .apkg file.
-    :param output: Output .apkg file (default: from the language and mode).
-    :param core: Build the core deck.
-    :param cards: Core mode: card cap (300).
-    :param words: Core mode: tier F words after the Swadesh set.
-    :param check: Run the gates on the output and do not run the mode again.
+    :param route: Values of the shared fix route.
+    :param declaration: Declared ``fix`` command of the language.
+    :returns: Command with the shared option set.
     """
-    fixrun.run_fix(
-        fixrun.FixLanguage(
-            name="mandarin",
-            label=LANGUAGES["mandarin"].label,
-            core=mandarin_core.MANDARIN_CORE_PROFILE,
-        ),
-        apkg_path=apkg_path,
-        output=output,
-        core=core,
-        cards=cards,
-        words=words,
-        check=check,
-    )
+    def command(
+        apkg_path: Path = declaration.apkg_path,
+        *,
+        output: Path | None = None,
+        core: bool = False,
+        cards: Annotated[
+            int | None, Parameter(help="Core mode: card cap (300).")
+        ] = None,
+        words: int = declaration.words,
+        check: bool = False,
+    ) -> None:
+        fixrun.run_fix(
+            route,
+            apkg_path=apkg_path,
+            output=output,
+            core=core,
+            cards=cards,
+            words=words,
+            check=check,
+        )
+
+    command.__doc__ = declaration.description + _PARAMS_DOC
+    return command
 
 
-@fix_app.command
-def fr(
-    apkg_path: Path = DEFAULT_FRENCH_APKG,
-    *,
-    output: Path | None = None,
-    select: bool = False,
-    core: bool = False,
-    cards: int | None = None,
-    reserve: bool = True,
-    words: int = french_core.DEFAULT_CORE_WORDS,
-    check: bool = False,
-):
-    """Fix French deck: select a smaller deck, or build a core deck.
+def _declare_cull_fix(
+    route: fixrun.FixLanguage, declaration: FixCommand
+) -> Callable[..., None]:
+    """Declare the ``fix`` command of a language with a cull mode.
 
-    ``--select`` runs the 1000-card cull and writes ``apkg/french_1000.apkg``.
-    ``--core`` builds ``apkg/french_core.apkg`` with its CSV files and manifest.
-
-    :param apkg_path: Input .apkg file.
-    :param output: Output .apkg file (default: from the language and mode).
-    :param select: Run the card cull.
-    :param core: Build the core deck.
-    :param cards: Select and core mode: card cap (select 1000, core 300).
-    :param reserve: Select mode: add the Swadesh reserve cards.
-    :param words: Core mode: tier F words after the Swadesh set.
-    :param check: Run the gates on the output and do not run the mode again.
+    :param route: Values of the shared fix route.
+    :param declaration: Declared ``fix`` command of the language.
+    :returns: Command with the shared option set and the select options.
     """
-    fixrun.run_fix(
-        fixrun.FixLanguage(
-            name="french",
-            label=LANGUAGES["french"].label,
-            core=french_core.FRENCH_CORE_PROFILE,
-            cull=french_cull.FRENCH_CULL_PROFILE,
-        ),
-        apkg_path=apkg_path,
-        output=output,
-        core=core,
-        select=select,
-        cards=cards,
-        reserve=reserve,
-        words=words,
-        check=check,
+    def command(
+        apkg_path: Path = declaration.apkg_path,
+        *,
+        output: Path | None = None,
+        select: Annotated[bool, Parameter(help=declaration.select_help)] = False,
+        core: bool = False,
+        cards: Annotated[
+            int | None,
+            Parameter(help="Select and core mode: card cap (select 1000, core 300)."),
+        ] = None,
+        reserve: Annotated[
+            bool, Parameter(help="Select mode: add the Swadesh reserve cards.")
+        ] = True,
+        words: int = declaration.words,
+        check: bool = False,
+    ) -> None:
+        fixrun.run_fix(
+            route,
+            apkg_path=apkg_path,
+            output=output,
+            core=core,
+            select=select,
+            cards=cards,
+            reserve=reserve,
+            words=words,
+            check=check,
+        )
+
+    command.__doc__ = declaration.description + _PARAMS_DOC
+    return command
+
+
+for _language in LANGUAGES.values():
+    _declaration = _language.fix
+    if _declaration is None:
+        continue
+    _declare = _declare_cull_fix if _declaration.cull else _declare_core_fix
+    _route = fixrun.FixLanguage(
+        name=_language.name,
+        label=_language.label,
+        core=_declaration.core,
+        cull=_declaration.cull,
     )
-
-
-@fix_app.command
-def yue(
-    apkg_path: Path = DEFAULT_CANTONESE_APKG,
-    *,
-    output: Path | None = None,
-    core: bool = False,
-    cards: int | None = None,
-    words: int = cantonese_core.DEFAULT_CORE_WORDS,
-    check: bool = False,
-):
-    """Fix Cantonese deck: build the core deck.
-
-    ``--core`` builds ``apkg/cantonese_core.apkg`` with its CSV files and
-    manifest.
-
-    :param apkg_path: Input .apkg file.
-    :param output: Output .apkg file (default: from the language and mode).
-    :param core: Build the core deck.
-    :param cards: Core mode: card cap (300).
-    :param words: Core mode: tier F words after the Swadesh set.
-    :param check: Run the gates on the output and do not run the mode again.
-    """
-    fixrun.run_fix(
-        fixrun.FixLanguage(
-            name="cantonese",
-            label=LANGUAGES["cantonese"].label,
-            core=cantonese_core.CANTONESE_CORE_PROFILE,
-        ),
-        apkg_path=apkg_path,
-        output=output,
-        core=core,
-        cards=cards,
-        words=words,
-        check=check,
-    )
-
-
-@fix_app.command
-def es(
-    apkg_path: Path = DEFAULT_SPANISH_APKG,
-    *,
-    output: Path | None = None,
-    select: bool = False,
-    core: bool = False,
-    cards: int | None = None,
-    reserve: bool = True,
-    words: int = spanish_core.DEFAULT_CORE_WORDS,
-    check: bool = False,
-):
-    """Fix Spanish deck: select a smaller deck, or build a core deck.
-
-    ``--select`` runs the cull and writes ``apkg/spanish_1000.apkg``. ``--core``
-    builds ``apkg/spanish_core.apkg`` with its CSV files and manifest.
-
-    :param apkg_path: Input .apkg file.
-    :param output: Output .apkg file (default: from the language and mode).
-    :param select: Run the cull.
-    :param core: Build the core deck.
-    :param cards: Select and core mode: card cap (select 1000, core 300).
-    :param reserve: Select mode: add the Swadesh reserve cards.
-    :param words: Core mode: tier F words after the Swadesh set.
-    :param check: Run the gates on the output and do not run the mode again.
-    """
-    fixrun.run_fix(
-        fixrun.FixLanguage(
-            name="spanish",
-            label=LANGUAGES["spanish"].label,
-            core=spanish_core.SPANISH_CORE_PROFILE,
-            cull=spanish_cull.SPANISH_CULL_PROFILE,
-        ),
-        apkg_path=apkg_path,
-        output=output,
-        core=core,
-        select=select,
-        cards=cards,
-        reserve=reserve,
-        words=words,
-        check=check,
-    )
-
-for _fix_command, _canonical_name in (
-    (zh, "mandarin"),
-    (fr, "french"),
-    (yue, "cantonese"),
-    (es, "spanish"),
-):
-    fix_app.command(_fix_command, name=_canonical_name)
+    _command = _declare(_route, _declaration)
+    globals()[_declaration.code] = _command
+    fix_app.command(_command, name=_language.name, alias=_declaration.code)
 
 # =============================================================================
 # Swadesh commands - build decks and run their gates
