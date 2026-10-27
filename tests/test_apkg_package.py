@@ -351,3 +351,25 @@ def test_prune_extra_cards_keeps_one_card_per_note(editable: AnkiPackage) -> Non
     assert len(cards) == 1
     assert int(cards[0]["ord"]) == 0
     assert _note_cards(editable)[note_id] == 1
+
+
+# Leading bytes of the note type config of the note type "Spanish sentences
+# cloze+" in apkg/Spanish 9000 sentences with native audio.apkg. The kind is
+# 1, the sort field index 5, and the CSS starts at byte 7.
+CLOZE_CONFIG = bytes.fromhex("080110051ac5012e")
+
+# Leading bytes of the note type config of the note type "Mandarin (Chinese)
+# Basic" in apkg/Mandarin (Chinese) (25-02-22).apkg. The kind field is absent
+# and the CSS starts at byte 3.
+STANDARD_CONFIG = bytes.fromhex("1af9022e63617264")
+
+
+def test_the_parser_reads_the_kind_and_the_sort_index(anki21b: AnkiPackage) -> None:
+    """The field numbers come from the Anki proto message, not from the writer."""
+    cloze = anki21b._parse_notetype_config(CLOZE_CONFIG)
+    standard = anki21b._parse_notetype_config(STANDARD_CONFIG)
+
+    assert cloze["kind"] == 1
+    assert cloze["sort_field_idx"] == 5
+    assert standard["kind"] == 0
+    assert standard["sort_field_idx"] is None

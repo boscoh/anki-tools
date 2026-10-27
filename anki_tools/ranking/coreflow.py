@@ -879,8 +879,8 @@ def read_output(path: Path) -> dict[str, Any]:
     :param path: Output APKG file.
     :raises RuntimeError: The package holds two or more note types.
     :returns: Cards, note count, field names, model names, deck names, media
-        names, the card ordinals, the card templates and CSS per model, and the
-        audio duration per file.
+        names, the card ordinals, the card templates and CSS per model, the note
+        type kind, and the audio duration per file.
     """
     cards = read_output_deck(path)
     with AnkiPackage(path) as package:
@@ -909,6 +909,7 @@ def read_output(path: Path) -> dict[str, Any]:
             ]
         },
         "css": {name: model.get("css", "")},
+        "kind": model.get("kind"),
     }
 
 

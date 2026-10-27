@@ -109,6 +109,7 @@ def test_the_shape_holds_on_an_anki2_fixture(tmp_path: Path) -> None:
     with AnkiPackage(output) as package:
         model = next(iter(package.get_models().values()))
     assert model["type"] == 0
+    assert model["kind"] == 0
 
 
 def test_the_shape_holds_on_an_anki21b_fixture(tmp_path: Path) -> None:
@@ -124,5 +125,7 @@ def test_the_shape_holds_on_an_anki21b_fixture(tmp_path: Path) -> None:
         row = package.conn.execute(
             "SELECT config FROM notetypes WHERE name = ?", (shape.model_name,)
         ).fetchone()
+        model = next(iter(package.get_models().values()))
     assert _config_field(row["config"] or b"", 1) == 0
     assert _config_field(row["config"] or b"", 2) == 1
+    assert model["kind"] == 0

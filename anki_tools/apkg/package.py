@@ -73,6 +73,13 @@ _HTML_TAG_PATTERN = re.compile(r"<[^>]+>")
 #: Field that Anki sorts the written decks by. An output note type holds one.
 SORT_FIELD = "Sentence"
 
+# Fields of the anki21b note type config, the proto message
+# anki.notetypes.Notetype.Config. Field 1 is the kind, field 2 the sort field
+# index, and field 3 the CSS.
+NOTETYPE_CONFIG_FIELD_KIND = 1
+NOTETYPE_CONFIG_FIELD_SORT_IDX = 2
+NOTETYPE_CONFIG_FIELD_CSS = 3
+
 
 def field_checksum(value: str) -> int:
     """Give the Anki field checksum of a sort field value.
@@ -387,12 +394,19 @@ class AnkiPackage:
         return self._write_proto_string(1, qfmt) + self._write_proto_string(2, afmt)
 
     def _parse_notetype_config(self, config: bytes) -> dict:
-        """Parse protobuf config blob from notetypes table to extract CSS.
+        """Parse protobuf config blob from notetypes table.
 
         :param config: Raw protobuf config bytes.
-        :returns: Dict with ``css`` and ``other_fields`` keys.
+        :returns: Dict with ``kind``, ``sort_field_idx``, ``css``, and
+            ``other_fields`` keys. ``kind`` is 0 and ``sort_field_idx`` is None
+            when the field is absent.
         """
-        result = {"css": "", "other_fields": []}
+        result: dict[str, Any] = {
+            "kind": 0,
+            "sort_field_idx": None,
+            "css": "",
+            "other_fields": [],
+        }
         pos = 0
         while pos < len(config):
             start_pos = pos
@@ -403,7 +417,7 @@ class AnkiPackage:
 
             if wire_type == 2:
                 length, pos = self._read_varint(config, pos)
-                if field_num == 3:
+                if field_num == NOTETYPE_CONFIG_FIELD_CSS:
                     result["css"] = config[pos : pos + length].decode(
                         "utf-8", errors="replace"
                     )
@@ -411,7 +425,11 @@ class AnkiPackage:
                     result["other_fields"].append((start_pos, pos + length, field_num))
                 pos += length
             elif wire_type == 0:
-                _, end_pos = self._read_varint(config, pos)
+                value, end_pos = self._read_varint(config, pos)
+                if field_num == NOTETYPE_CONFIG_FIELD_KIND:
+                    result["kind"] = value
+                elif field_num == NOTETYPE_CONFIG_FIELD_SORT_IDX:
+                    result["sort_field_idx"] = value
                 result["other_fields"].append((start_pos, end_pos, field_num))
                 pos = end_pos
             else:
@@ -442,8 +460,8 @@ class AnkiPackage:
 
             if wire_type == 2:
                 length, pos = self._read_varint(original, pos)
-                if field_num == 3:
-                    result += self._write_proto_string(3, css)
+                if field_num == NOTETYPE_CONFIG_FIELD_CSS:
+                    result += self._write_proto_string(NOTETYPE_CONFIG_FIELD_CSS, css)
                 else:
                     result += original[start : pos + length]
                 pos += length
@@ -461,9 +479,10 @@ class AnkiPackage:
         Get all note models/templates (called "notetypes" in Anki UI).
 
         :param include_templates: If True, include template and CSS info for anki21b.
-        :returns: Dict mapping model ID (string) to model info with ``'name'``
-            and ``'flds'`` keys. The ``'flds'`` key contains a list of field
-            dicts with ``'name'`` key.
+        :returns: Dict mapping model ID (string) to model info with ``'name'``,
+            ``'flds'``, and ``'kind'`` keys. The ``'flds'`` key contains a list of
+            field dicts with ``'name'`` key. ``'kind'`` is 0 for a standard note
+            type and 1 for a cloze note type.
 
         .. note::
             Schema differs by format:
@@ -473,22 +492,17 @@ class AnkiPackage:
         cursor = self.conn.cursor()
 
         if self._db_format == "anki21b":
-            if include_templates:
-                cursor.execute("SELECT id, name, config FROM notetypes")
-            else:
-                cursor.execute("SELECT id, name FROM notetypes")
+            cursor.execute("SELECT id, name, config FROM notetypes")
             models = {}
             for row in cursor.fetchall():
                 model_id = str(row["id"])
-                css = ""
-                if include_templates:
-                    parsed = self._parse_notetype_config(row["config"] or b"")
-                    css = parsed["css"]
+                parsed = self._parse_notetype_config(row["config"] or b"")
                 models[model_id] = {
                     "name": row["name"],
                     "flds": [],
                     "tmpls": [],
-                    "css": css,
+                    "css": parsed["css"] if include_templates else "",
+                    "kind": parsed["kind"],
                 }
 
             cursor.execute("SELECT ntid, name, ord FROM fields ORDER BY ntid, ord")
@@ -518,6 +532,8 @@ class AnkiPackage:
         cursor.execute("SELECT models FROM col")
         models_json = cursor.fetchone()[0]
         models = json.loads(models_json)
+        for model in models.values():
+            model["kind"] = int(model.get("type", 0))
         return models
 
     def update_model_template(
@@ -765,11 +781,14 @@ class AnkiPackage:
         parsed = self._parse_notetype_config(source)
         original = parsed["_original"]
         parts = [
-            bytes([2 << 3]) + self._write_varint(sort_index),
-            self._write_proto_string(3, css),
+            bytes([NOTETYPE_CONFIG_FIELD_SORT_IDX << 3]) + self._write_varint(sort_index),
+            self._write_proto_string(NOTETYPE_CONFIG_FIELD_CSS, css),
         ]
         for start, end, field_num in parsed["other_fields"]:
-            if field_num not in (2, 3):
+            if field_num not in (
+                NOTETYPE_CONFIG_FIELD_SORT_IDX,
+                NOTETYPE_CONFIG_FIELD_CSS,
+            ):
                 parts.append(original[start:end])
         return b"".join(parts)
 
@@ -822,7 +841,8 @@ class AnkiPackage:
         """Set the kind of a note type. Kind 0 is the standard kind, 1 the cloze kind.
 
         The ``anki2`` model dict holds the kind in ``type``. The ``anki21b``
-        note type config holds the kind in protobuf field 1.
+        note type config holds the kind in protobuf field
+        ``NOTETYPE_CONFIG_FIELD_KIND``.
 
         :param model_id: Model ID.
         :param kind: Note type kind.
@@ -840,15 +860,23 @@ class AnkiPackage:
             parts: list[bytes] = []
             found = False
             for start, end, field_num in parsed["other_fields"]:
-                if field_num == 1:
-                    parts.append(bytes([1 << 3]) + self._write_varint(kind))
+                if field_num == NOTETYPE_CONFIG_FIELD_KIND:
+                    parts.append(
+                        bytes([NOTETYPE_CONFIG_FIELD_KIND << 3])
+                        + self._write_varint(kind)
+                    )
                     found = True
                 else:
                     parts.append(original[start:end])
             if not found:
-                parts.append(bytes([1 << 3]) + self._write_varint(kind))
+                parts.append(
+                    bytes([NOTETYPE_CONFIG_FIELD_KIND << 3])
+                    + self._write_varint(kind)
+                )
             if parsed["css"]:
-                parts.append(self._write_proto_string(3, parsed["css"]))
+                parts.append(
+                    self._write_proto_string(NOTETYPE_CONFIG_FIELD_CSS, parsed["css"])
+                )
             self.conn.execute(
                 "UPDATE notetypes SET config = ? WHERE id = ?",
                 (b"".join(parts), int(model_id)),

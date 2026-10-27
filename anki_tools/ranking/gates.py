@@ -204,6 +204,8 @@ def output_model_problems(files: GateFiles) -> list[str]:
     problems: list[str] = []
     if output["note_models"] != {model}:
         problems.append(f"note types {sorted(map(str, output['note_models']))}")
+    if output["kind"] != 0:
+        problems.append(f"note type kind {output['kind']}")
     expected = list(output_fields(files.profile))
     if output["fields"] != expected:
         problems.append(f"fields {output['fields']}")
@@ -217,7 +219,7 @@ def output_model_problems(files: GateFiles) -> list[str]:
 
 
 def gate_output_model(files: GateFiles) -> tuple[bool, str]:
-    """K21 and G16: one note type, the output fields, and one card per note."""
+    """K21 and G16: one standard note type, the output fields, one card per note."""
     problems = output_model_problems(files)
     return not problems, f"issues {sample(problems)}"
 
