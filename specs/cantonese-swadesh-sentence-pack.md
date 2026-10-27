@@ -411,7 +411,7 @@ with a non-zero exit code.
 | Sense filter      | drive and temperature English reject, hold and burn keep   |
 | Unknown budget    | a known and an unknown sentence                            |
 | Filters           | F2, F3, F5, F6, F7, F8, and the off rules F9 and F10       |
-| Gloss and fields  | the gloss and the `Jyutping` field                         |
+| Gloss and fields  | the gloss and the `Romanization` field                     |
 | Pool              | a small Tatoeba fixture, the filter counts, and the rank key |
 
 The tests do not download a file and do not need Cifu. A fake tokenizer

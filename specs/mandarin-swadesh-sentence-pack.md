@@ -533,16 +533,16 @@ minutes. 200 native downloads take about 4 minutes.
 
 Model name: `Swadesh Mandarin Sentences`.
 
-| Order | Field       | Content                       |
-| ----- | ----------- | ----------------------------- |
-| 0     | `Audio`     | `[sound:tts_...mp3]`          |
-| 1     | `Sentence`  | Sentence with `<b>target</b>` |
-| 2     | `Pinyin`    | Tone-marked pinyin            |
-| 3     | `English`   | English translation           |
-| 4     | `Target`    | Target word                   |
-| 5     | `Gloss`     | Short gloss plus pinyin       |
-| 6     | `WordAudio` | `[sound:word_...mp3]`         |
-| 7     | `Source`    | `Tatoeba #1234567 · author`   |
+| Order | Field          | Content                       |
+| ----- | -------------- | ----------------------------- |
+| 0     | `Audio`        | `[sound:tts_...mp3]`          |
+| 1     | `Sentence`     | Sentence with `<b>target</b>` |
+| 2     | `Romanization` | Tone-marked pinyin            |
+| 3     | `English`      | English translation           |
+| 4     | `Target`       | Target word                   |
+| 5     | `Gloss`        | Short gloss plus pinyin       |
+| 6     | `WordAudio`    | `[sound:word_...mp3]`         |
+| 7     | `Source`       | `Tatoeba #1234567 · author`   |
 
 Sort field index: 4 (`Target`). This groups cards by word in the browser.
 
@@ -563,7 +563,7 @@ Back template:
 {{Audio}}
 <hr id=answer>
 <div class="sentence char-links">{{Sentence}}</div>
-<div class="romanization">{{Pinyin}}</div>
+{{#Romanization}}<div class="romanization">{{Romanization}}</div>{{/Romanization}}
 <div class="english">{{English}}</div>
 <div class="target">{{Target}} {{Gloss}} {{WordAudio}}</div>
 <div class="source">{{Source}}</div>

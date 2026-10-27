@@ -148,7 +148,7 @@ DECK_NAME = "Swadesh Mandarin Sentences"
 FIELDS = (
     "Audio",
     "Sentence",
-    "Pinyin",
+    "Romanization",
     "English",
     "Target",
     "Gloss",
@@ -877,7 +877,7 @@ def _gloss(word: WordForm) -> str:
 
 
 def _card_fields(row: dict[str, str], word: WordForm) -> dict[str, str]:
-    return {"Pinyin": row.get("pinyin", "")}
+    return {"Romanization": row.get("pinyin", "")}
 
 
 def _card_order(word: WordForm, row: dict[str, str]) -> tuple:

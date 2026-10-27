@@ -83,7 +83,7 @@ def test_build_card_fields_and_tags() -> None:
     assert list(card)[:8] == deck.FIELDS
     assert card["Audio"] == "[sound:tts_aaaa.mp3]"
     assert card["Sentence"] == "我要喝<b>水</b>。"
-    assert card["Pinyin"] == "wǒ yào hē shuǐ"
+    assert card["Romanization"] == "wǒ yào hē shuǐ"
     assert card["English"] == "I want to drink water."
     assert card["Target"] == "水"
     assert card["Gloss"] == "water · shuǐ"

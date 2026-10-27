@@ -495,9 +495,9 @@ def sentence_card(language: str, title: str, row: dict[str, str]) -> PreviewCard
         "Sentence": sentence,
     }
     if language == "mandarin":
-        fields["Pinyin"] = row.get("pinyin", "")
+        fields["Romanization"] = row.get("pinyin", "")
     if language == "cantonese":
-        fields["Jyutping"] = row.get("jyutping", "")
+        fields["Romanization"] = row.get("jyutping", "")
     fields.update(
         {
             "English": row["english"],
@@ -782,7 +782,8 @@ def build_sections() -> tuple[PreviewSection, ...]:
             title="Core-word decks",
             description=(
                 "The core deck clones the input note type and writes Audio, "
-                "Sentence, English, Core, and CoreGloss. Cantonese adds Jyutping."
+                "Sentence, English, Core, and CoreGloss. Mandarin and Cantonese add"
+                " Romanization."
             ),
             cards=(
                 fix_card("french", "core", "French core-word deck"),

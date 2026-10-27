@@ -158,7 +158,7 @@ DECK_NAME = "Swadesh Cantonese Sentences"
 FIELDS = (
     "Audio",
     "Sentence",
-    "Jyutping",
+    "Romanization",
     "English",
     "Target",
     "Gloss",
@@ -830,9 +830,9 @@ def card_fields(row: dict[str, str], _word: WordForm) -> dict[str, str]:
 
     :param row: Sentence CSV row.
     :param word: Reviewed word form.
-    :returns: Mapping from the ``Jyutping`` field to its value.
+    :returns: Mapping from the ``Romanization`` field to its value.
     """
-    return {"Jyutping": row.get("jyutping", "")}
+    return {"Romanization": row.get("jyutping", "")}
 
 
 def card_order(word: WordForm, row: dict[str, str]) -> tuple:
