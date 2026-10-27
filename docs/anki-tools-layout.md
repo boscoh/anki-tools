@@ -39,7 +39,6 @@ Shared ranking code only. No language data.
 | `anki_tools/ranking/reorder.py`   | Reorder a deck from a ranking CSV                     |
 | `anki_tools/ranking/cover.py`     | Generic greedy cover over items with changing gains   |
 | `anki_tools/ranking/core.py`      | Core-word value, cost, passes, and order              |
-| `anki_tools/ranking/pipeline.py`  | Shared extract, rank, write, and reorder stages       |
 | `anki_tools/ranking/identity.py`  | The output stem, deck title, note type, and side paths |
 | `anki_tools/ranking/assemble.py`  | The deck, the side files, the manifest, and the report |
 | `anki_tools/ranking/gates.py`     | The gate runner, the report, and the shared gates     |
@@ -48,15 +47,12 @@ Shared ranking code only. No language data.
 | `anki_tools/ranking/cullflow.py`  | Cull flow behind the `CullProfile` seam               |
 | `anki_tools/ranking/cullgates.py` | Gates G1 to G17 of the cull deck                      |
 
-`rank_word_based` and `rank_character_based` are the shared score drivers.
 `jaccard_similarity`, `compute_similarity_penalties`, and the word metrics of
-`latin.py` are the public shared helpers. A language package calls them.
+`latin.py` are the shared helpers. The core and cull flows call them.
 
 `cover.greedy_cover` holds the selection loop. A language module gives the
 gain, the heap key, the reject test, and the callbacks, so each language
-keeps its own reason labels. `pipeline.run_ranked_deck` calls the ranker and
-the optional reducer of a language, then writes the ranking CSV and reorders
-the deck.
+keeps its own reason labels.
 
 ## 4. sentence_pack
 
@@ -86,20 +82,15 @@ One package per language. The package holds all the code of that language.
 | `anki_tools/languages/cantonese/profile.py`         | Cantonese profile and word metrics                 |
 | `anki_tools/languages/cantonese/frequency.py`       | Spoken and written frequency list and download     |
 | `anki_tools/languages/cantonese/jyutping.py`        | Jyutping repair and Traditional convert            |
-| `anki_tools/languages/cantonese/rank.py`            | Cantonese sentence ranking                         |
 | `anki_tools/languages/mandarin/profile.py`          | Mandarin profile and word metrics                  |
 | `anki_tools/languages/mandarin/pinyin.py`           | Pinyin repair for Chinese cards                    |
-| `anki_tools/languages/mandarin/fix_steps.py`        | Pinyin and template steps after the reorder        |
 | `anki_tools/languages/mandarin/characters.py`       | Han character helpers and similarity               |
-| `anki_tools/languages/mandarin/rank.py`             | Mandarin sentence ranking                          |
 | `anki_tools/languages/mandarin/stages.py`           | S1 to S3 caller of the shared pipeline             |
 | `anki_tools/languages/french/profile.py`            | French profile and form matching                   |
-| `anki_tools/languages/french/rank.py`               | French sentence ranking                            |
 | `anki_tools/languages/french/cull.py`               | French cull profile, values, and bindings          |
 | `anki_tools/languages/french/core.py`               | French core deck: profile, wrappers, and gates     |
 | `anki_tools/languages/greek/profile.py`             | Greek profile and form matching                    |
 | `anki_tools/languages/greek/rank.py`                | Greek sentence ranking                             |
-| `anki_tools/languages/spanish/rank.py`              | Spanish sentence ranking                           |
 | `anki_tools/languages/spanish/cull.py`              | Spanish cull profile, values, and bindings        |
 
 `languages/mandarin/characters.py` holds the Han script helpers. Cantonese
@@ -109,7 +100,7 @@ Each language package gives the profile names, so
 `from anki_tools.languages import cantonese` gives the same names as a flat
 language module.
 
-The `spanish` package holds the ranking code and the cull profile. The
+The `spanish` package holds the cull profile. The
 `anki swadesh vocab` command serves it from `vocab/english-<lang>.csv` and an
 audio directory.
 

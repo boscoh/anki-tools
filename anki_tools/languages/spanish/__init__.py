@@ -1,6 +1,6 @@
 """Spanish language package.
 
-Holds the Spanish profile, the Spanish text helpers, and the Spanish ranking.
+Holds the Spanish profile and the Spanish text helpers.
 The Spanish Swadesh deck has a vocabulary layer and a sentence layer.
 
 The package gives the profile attributes, so ``from anki_tools.languages import
@@ -12,7 +12,6 @@ from __future__ import annotations
 from typing import Any
 
 from . import profile as profile  # noqa: F401
-from . import rank  # noqa: F401
 
 
 def __getattr__(name: str) -> Any:

@@ -10,7 +10,6 @@ from anki_tools.ranking.identity import DeckIdentity, default_output
 def test_the_default_output_names_one_stem_per_language_and_mode() -> None:
     assert default_output("french", "core") == Path("apkg/french_core.apkg")
     assert default_output("french", "cull") == Path("apkg/french_1000.apkg")
-    assert default_output("french", "rank") == Path("apkg/french_reordered.apkg")
     assert default_output("spanish", "cull") == Path("apkg/spanish_1000.apkg")
 
 

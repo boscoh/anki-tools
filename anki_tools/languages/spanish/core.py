@@ -32,7 +32,6 @@ from anki_tools.languages.spanish.profile import (
     load_word_table,
     prepare_text,
 )
-from anki_tools.languages.spanish.rank import SIMILARITY_THRESHOLD
 from anki_tools.ranking import coreflow, cullflow
 from anki_tools.ranking.core import CoreOptions
 from anki_tools.ranking.deckprofile import LanguageDeckProfile
@@ -53,6 +52,9 @@ DEFAULT_CORE_WORDS = 50
 LEMMA_OVERRIDES = {"quier": "querer", "buen": "bueno"}
 # A tier F card can hold one content lemma, so the selection deduplicates on a
 # lower Jaccard limit than the gate K6 limit of 0.67.
+#: The word-set Jaccard value at which two Spanish sentences are duplicates.
+SIMILARITY_THRESHOLD = 0.5
+
 DEFAULT_OPTIONS = CoreOptions(
     tail_cards=0, hard_top=50_000, similarity=SIMILARITY_THRESHOLD
 )

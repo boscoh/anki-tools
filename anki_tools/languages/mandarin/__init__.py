@@ -1,7 +1,7 @@
 """Mandarin language package.
 
-Holds the Mandarin profile, the pinyin helpers, the sentence ranking, and the
-stage callers of the shared pipeline.
+Holds the Mandarin profile, the pinyin helpers, and the stage callers of the
+shared pipeline.
 
 The package gives the profile attributes, so ``from anki_tools.languages import
 mandarin`` gives the same names as the flat language module of the old layout.
@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import pinyin, rank, stages  # noqa: F401
+from . import pinyin, stages  # noqa: F401
 
 
 def __getattr__(name: str) -> Any:

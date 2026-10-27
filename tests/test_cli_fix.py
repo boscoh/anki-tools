@@ -1,4 +1,4 @@
-"""Tests for the fix commands: the rank, select, core, and check routes.
+"""Tests for the fix commands: the select, core, and check routes.
 
 One language covers each route. The four commands pass their profile and label
 to ``anki_tools.ranking.fixrun``, so these tests cross that one seam.
@@ -7,20 +7,11 @@ to ``anki_tools.ranking.fixrun``, so these tests cross that one seam.
 from __future__ import annotations
 
 from pathlib import Path
-from types import SimpleNamespace
 
 import pytest
 
 from anki_tools import cli
 from anki_tools.ranking import fixrun, identity
-
-
-def _fake_deck() -> SimpleNamespace:
-    return SimpleNamespace(
-        sentences=[object()],
-        ranked=[object()],
-        stats={"cards_reordered": 1, "cards_removed": 0},
-    )
 
 
 @pytest.fixture
@@ -37,7 +28,6 @@ def no_pipeline(monkeypatch: pytest.MonkeyPatch) -> None:
     def refuse(*_args, **_kwargs):
         raise AssertionError("the pipeline must not run")
 
-    monkeypatch.setattr(fixrun, "run_ranked_deck", refuse)
     monkeypatch.setattr(fixrun.cullflow, "run_cull", refuse)
     monkeypatch.setattr(fixrun.coreflow, "run_core", refuse)
 
@@ -53,30 +43,6 @@ def test_the_canonical_names_alias_the_short_codes() -> None:
         assert commands[short].default_command is function
         assert commands[canonical].default_command is function
 
-
-def test_rank_goes_to_the_pipeline(
-    deck_file: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    calls = []
-    monkeypatch.setattr(
-        fixrun,
-        "run_ranked_deck",
-        lambda paths, **kwargs: calls.append((paths, kwargs)) or _fake_deck(),
-    )
-    output = deck_file.parent / "ranked.apkg"
-
-    cli.fr(deck_file, rank=True, output=output)
-
-    paths, kwargs = calls[0]
-    assert paths.input_path == deck_file
-    assert paths.output_path == output
-    assert paths.ranking_path == deck_file.parent / "ranked.rank.csv"
-    assert callable(kwargs["rank"])
-    assert kwargs["text_candidates"] == ("French",)
-
-
-def test_rank_defaults_the_output_name() -> None:
-    assert identity.default_output("french", "rank") == Path("apkg/french_reordered.apkg")
 
 
 def test_an_absent_input_prints_an_error(tmp_path: Path, capsys) -> None:
@@ -143,7 +109,7 @@ def test_a_bare_command_is_an_error(deck_file: Path) -> None:
 
 def test_two_modes_are_an_error(deck_file: Path) -> None:
     with pytest.raises(SystemExit, match="choose one mode"):
-        cli.fr(deck_file, rank=True, core=True)
+        cli.fr(deck_file, core=True, select=True)
 
 
 CHECK_ROUTES = [

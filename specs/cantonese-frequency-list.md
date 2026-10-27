@@ -9,7 +9,7 @@
 
 ## 1. Summary
 
-The Cantonese rank mode and core mode need a word frequency list that ranks
+The Cantonese core mode needs a word frequency list that ranks
 spoken words well. The Apple Daily list comes from written news text, and it
 ranks the spoken particles low. This spec blends that list with the Cifu
 spoken counts.

@@ -4,7 +4,7 @@ The four `anki fix` commands ranked the deck when no mode flag was set. A bare
 command started the longest run and rewrote the deck, and the user had no
 request that made the work happen.
 
-Status: accepted
+Status: superseded by ADR 0017
 
 ## Decision
 

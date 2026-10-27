@@ -10,7 +10,7 @@ Modules:
     ranking.rank    - Shared sentence ranking helpers
     ranking.latin   - Shared Latin-script text helpers
     ranking.reorder - Deck reordering based on ranking
-    languages       - One package per language: profile, rank, frequency, cull
+    languages       - One package per language: profile, frequency, cull
     sentence_pack   - Shared Swadesh sentence pack stages
     cli             - Command-line interface
 
@@ -36,13 +36,6 @@ _LAZY: dict[str, tuple[str, str]] = {
         "anki_tools.languages.mandarin.characters",
         "char_similarity_zh",
     ),
-    "complexity_score_zh": (
-        "anki_tools.languages.mandarin.rank",
-        "complexity_score_zh",
-    ),
-    "frequency_score_zh": ("anki_tools.languages.mandarin.rank", "frequency_score_zh"),
-    "rank_sentences_zh": ("anki_tools.languages.mandarin.rank", "rank_sentences_zh"),
-    "rank_sentences_es": ("anki_tools.languages.spanish.rank", "rank_sentences_es"),
 }
 
 
@@ -72,11 +65,7 @@ __all__ = [
     "Sentence",
     "FrequencyData",
     "extract_sentences",
-    "rank_sentences_zh",
-    "rank_sentences_es",
     "write_ranking_csv",
-    "complexity_score_zh",
-    "frequency_score_zh",
     "char_similarity_zh",
     "reorder_deck",
     "load_ranking",

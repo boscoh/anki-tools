@@ -17,8 +17,6 @@ Deck goals:
 - **CLI tools** - one command for each common workflow.
 - **Audio** - extract media files, add audio, and delete unused files.
 - **Deck management** - create decks, copy cards, and move cards.
-- **Sentence ranking** - rank sentences by complexity, frequency, and
-  similarity (Chinese, French, Spanish, and Cantonese).
 - **Vocabulary decks** - build Swadesh vocabulary decks with gTTS audio.
 - **No Anki install** - direct SQLite access with minimal dependencies.
 
@@ -42,9 +40,7 @@ Related documents:
 ```bash
 uv run anki --help                        # list the commands
 uv run anki swadesh vocab mandarin        # build a Swadesh vocabulary deck
-uv run anki fix zh --rank input.apkg      # rank, reorder, fix pinyin, style
-uv run anki fix fr --rank input.apkg      # rank and reorder a French deck
-uv run anki fix yue --rank input.apkg     # rank, reorder, fix jyutping
+uv run anki fix fr input.apkg --select    # cull a French deck
 uv run anki fix es input.apkg --select    # cull a Spanish deck
 uv run anki inspect deck.apkg             # show the package contents
 uv run anki style deck.apkg               # apply the CSS and HTML templates
@@ -55,15 +51,15 @@ options: run `uv run anki fix <lang> --help`.
 
 ## The Fix Command
 
-`anki fix <lang>` has up to three modes. The four commands take the same
+`anki fix <lang>` has up to two modes. The four commands take the same
 options. The Applies to column shows the modes that read each option.
 
 | Language | Modes                                | Output                                                                                  |
 | -------- | ------------------------------------ | --------------------------------------------------------------------------------------- |
-| `zh`     | `--rank`, `--core`                   | `apkg/mandarin_reordered.apkg`, `apkg/mandarin_core.apkg`                               |
-| `fr`     | `--rank`, `--select`, `--core`       | `apkg/french_reordered.apkg`, `apkg/french_1000.apkg`, `apkg/french_core.apkg`          |
-| `es`     | `--rank`, `--select`, `--core`       | `apkg/spanish_reordered.apkg`, `apkg/spanish_1000.apkg`, `apkg/spanish_core.apkg`       |
-| `yue`    | `--rank`, `--core`                   | `apkg/cantonese_reordered.apkg`, `apkg/cantonese_core.apkg`                             |
+| `zh`     | `--core`                             | `apkg/mandarin_core.apkg`                                                               |
+| `fr`     | `--select`, `--core`                 | `apkg/french_1000.apkg`, `apkg/french_core.apkg`                                        |
+| `es`     | `--select`, `--core`                 | `apkg/spanish_1000.apkg`, `apkg/spanish_core.apkg`                                      |
+| `yue`    | `--core`                             | `apkg/cantonese_core.apkg`                                                              |
 
 Each command has a default input. A mode flag is required, so no bare command runs:
 
@@ -82,9 +78,7 @@ The shared options:
 | ----------------- | -------------------- | -------------------------------------------- |
 | `apkg-path`       | every mode           | input deck; each command has a default       |
 | `--output`        | every mode           | output deck; default `apkg/<language>_<mode>.apkg` |
-| `--text-field`    | rank mode            | sentence field; the build infers the default |
-| `--rank`          | every command        | rank and reorder the deck                    |
-| `--select`        | `fr`, `es`           | run the cull instead of the rank and reorder |
+| `--select`        | `fr`, `es`           | run the cull                                 |
 | `--reserve`       | `fr`, `es`           | add the Swadesh reserve cards (select mode)  |
 | `--core`          | every command        | build the core-word deck                     |
 | `--cards`         | `--select`, `--core` | card cap of the mode (select 1000, core 300) |
@@ -94,68 +88,42 @@ The shared options:
 The frequency term and the similarity limit are values of the language module,
 so no flag can change them.
 
-Every mode writes `.rank.csv` beside the APKG. The cull and core modes also
-write the CSV files and the manifest that the "French 1000-Card Cull" and
-"Core-Word Decks" sections list.
+The core mode writes `.rank.csv` beside the APKG. The cull and core modes
+also write the CSV files and the manifest that the "French 1000-Card Cull"
+and "Core-Word Decks" sections list.
 
 ### Chinese
 
 ```bash
-uv run anki fix zh --rank deck.apkg   # rank, reorder, fix pinyin, apply styling
 uv run anki fix zh deck.apkg --core  # core mode, see "Core-Word Decks"
 ```
 
-- Rank mode uses character-based complexity and similarity, with `wordfreq`
-  frequency data and an HSK vocabulary bonus.
-- Rank mode removes repeated-pattern sentences before it ranks, for example
-  `走吧走吧` and `好了，好了`.
-- Rank mode fixes the pinyin field and applies `templates/default/`. Both steps
-  always run.
 
 ### French
 
 ```bash
-uv run anki fix fr --rank deck.apkg     # rank and reorder
 uv run anki fix fr deck.apkg --select  # the 1000-card cull
 uv run anki fix fr deck.apkg --core    # core mode
 ```
 
-- Rank mode uses word-based complexity and similarity, with `wordfreq`
-  frequency data.
-- Rank mode adds a grammar score. The optional spaCy model
-  `fr_core_news_sm` gives a parse-tree score:
-  `uv run python -m spacy download fr_core_news_sm`.
 - Select mode runs the 1000-card cull. See
   `specs/french-1000-sentence-cull.md`.
 
 ### Spanish
 
 ```bash
-uv run anki fix es --rank deck.apkg     # rank and reorder
 uv run anki fix es deck.apkg --select  # the cull
 uv run anki fix es deck.apkg --core    # core mode
 ```
 
-- Rank mode uses word-based complexity and similarity, with `wordfreq`
-  frequency data.
-- Rank mode adds a grammar score for the subjunctive, the relative clauses, the
-  conditionals, and the commas.
 - Select mode runs the cull. See `specs/french-1000-sentence-cull.md`.
 
 ### Cantonese
 
 ```bash
-uv run anki fix yue --rank deck.apkg    # rank, reorder, fix jyutping
 uv run anki fix yue deck.apkg --core  # core mode
 ```
 
-- Rank mode uses the character-based complexity, similarity, and
-  repeated-pattern filter of Chinese, with a frequency term that blends the Cifu
-  spoken count at weight 0.7 with the written count. The written count is the
-  mean of the Cifu and Apple Daily counts. See
-  `specs/cantonese-frequency-list.md`.
-- Rank mode converts Simplified to Traditional characters, then writes the
-  jyutping.
 - The first run downloads both frequency files to `~/.cache/anki-tools`. Set
   `CIFU_PATH` or `YUE_FREQUENCY_PATH` to use other files.
 
@@ -166,7 +134,7 @@ file, then run the command again.
 
 | Command                      | Template directory                |
 | ---------------------------- | --------------------------------- |
-| `anki style`, `anki fix zh --rank` | `templates/default/`        |
+| `anki style`                | `templates/default/`              |
 | `anki swadesh pack <lang>`   | `templates/sentence_pack/<lang>/` |
 | `anki swadesh vocab <lang>`  | `templates/vocab/`                |
 | `anki fix fr --select`       | `templates/french_cull/`          |
@@ -563,10 +531,7 @@ Editing: `update_note_field()`, `move_card()`, `delete_card()`,
 from anki_tools import (
     fix_pinyin,           # Fix pinyin formatting
     extract_sentences,    # Extract sentences from a deck
-    rank_sentences_zh,    # Rank Chinese sentences
     write_ranking_csv,    # Write a ranking to a CSV file
-    complexity_score_zh,  # Calculate a complexity score
-    frequency_score_zh,   # Calculate a frequency score
     char_similarity_zh,   # Calculate a character similarity
     reorder_deck,         # Reorder a deck by its ranking
     load_ranking,         # Load a ranking from a CSV file
@@ -581,8 +546,8 @@ uv run pytest tests/test_apkg_package.py -v                # one file
 uv run pytest tests/ --cov=anki_tools --cov-report=term-missing
 ```
 
-The suite holds 632 tests. They cover the package API, the deck gates, the
-language pack rules, and the ranking. A test that needs a large input file or
+The suite holds 404 tests. They cover the package API, the deck gates, and the
+language pack rules. A test that needs a large input file or
 a cache skips when the file is absent. The tests build their own small APKG
 files, so the repository holds no deck binary.
 

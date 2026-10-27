@@ -1,7 +1,7 @@
 """French language package.
 
-Holds the French profile, the French text helpers, the French ranking, and the
-French cull pipeline.
+Holds the French profile, the French text helpers, and the French cull
+pipeline.
 
 The package gives the profile attributes, so ``from anki_tools.languages import
 french`` gives the same names as the flat language module of the old layout.
@@ -11,9 +11,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import cull, rank
+from . import cull
 
-__all__ = ["cull", "rank"]
+__all__ = ["cull"]
 
 
 def __getattr__(name: str) -> Any:

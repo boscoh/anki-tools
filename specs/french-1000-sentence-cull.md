@@ -440,7 +440,7 @@ uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
 | `--reserve`  | on                  | Add the Swadesh reserve cards                |
 | `--output`   | `apkg/<language>_1000.apkg` | Output APKG                         |
 | `--check`    | off                 | Run gates G1 to G17 on the output            |
-| `--select`   | off                 | Run the cull instead of the rank and reorder |
+| `--select`   | off                 | Run the cull                                 |
 
 `max_uses` (4), `target_words` (300), `exempt_top` (100), the spoken
 weight, the word window, the similarity limit, the order, the name, and the
@@ -475,12 +475,10 @@ has no row (section 17.4).
   `CullFiles` reader.
 - Keep `anki_tools/languages/french/cull.py` for the French values,
   `FRENCH_CULL_PROFILE`, the bindings, and the re-exports.
-- Add the `--select` option to `anki fix fr` in `cli.py`. Rank mode stays the
-  default. The CLI builds a `CullRequest` and calls `run_cull` or `check_cull`.
+- Add the `--select` option to `anki fix fr` in `cli.py`. The CLI builds a
+  `CullRequest` and calls `run_cull` or `check_cull`.
 - Add `anki_tools/ranking/cover.py` for the greedy cover that both language
   selectors use.
-- Add `anki_tools/ranking/pipeline.py` for the shared extract, rank, write, and
-  reorder stages.
 - Reuse `AnkiPackage` for the input and the output.
 - Reuse the French spaCy model and `TOKENIZER` from the French pack.
 

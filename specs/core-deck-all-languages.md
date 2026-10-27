@@ -536,7 +536,7 @@ The output identity has one source of truth: the output file stem of the run.
 `DeckIdentity(output_path)` gives `stem`, `title`, `model_name`, and `side()`,
 plus `core_sides()` and `cull_sides()`. `identity.default_output(language,
 mode)` gives the default file of a mode: `apkg/french_core.apkg`,
-`apkg/french_1000.apkg`, and `apkg/french_reordered.apkg`. ADR 0015 records
+`apkg/french_1000.apkg`. ADR 0015 records
 the decision.
 
 The input identity stays in the profile: `input_model_name`,
@@ -694,12 +694,10 @@ truth (section 14.1). ADR 0015 replaces the naming rows of ADR 0001 and ADR
 | --- | --- | --- | --- |
 | core | `apkg/french_core.apkg` | `french_core` | `french_core` |
 | cull | `apkg/french_1000.apkg` | `french_1000` | `french_1000` |
-| rank | `apkg/french_reordered.apkg` | `french_reordered` | the input note type |
 
 - `--output <path>` sets the stem for every one of these names.
-- The rank flow rewrites an existing deck, so it keeps the input note type and
-  renames the deck (ADR 0001). The core and cull flows create their note type,
-  so its name is the deck title (ADR 0013).
+- The core and cull flows create their note type, so its name is the deck
+  title (ADR 0013).
 - The name holds the name of no input model and no note count.
 - The manifest `source.deck` and `source.model` hold the same value. Gate K9 and
   gate G10 compare the output with those manifest values.

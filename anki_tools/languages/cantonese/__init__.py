@@ -1,7 +1,7 @@
 """Cantonese language package.
 
-Holds the Cantonese profile, the jyutping helpers, the frequency sources, and
-the sentence ranking.
+Holds the Cantonese profile, the jyutping helpers, and the frequency
+sources.
 
 The package gives the profile attributes, so ``from anki_tools.languages import
 cantonese`` gives the same names as the flat language module of the old layout.
@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import frequency, jyutping, rank  # noqa: F401
+from . import frequency, jyutping  # noqa: F401
 
 
 def __getattr__(name: str) -> Any:

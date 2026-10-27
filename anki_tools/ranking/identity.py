@@ -5,9 +5,8 @@ type name, the manifest ``source.model`` value, and the side-file stems equal
 that stem, so a rename is one edit. This module is the only place that builds
 these names.
 
-The core flow, the cull flow, and the rank flow cross the seam. The mode suffix
-table is the one default output stem per language and mode. ADR 0015 records
-the decision.
+The core flow and the cull flow cross the seam. The mode suffix table is the
+one default output stem per language and mode. ADR 0015 records the decision.
 """
 
 from __future__ import annotations
@@ -22,7 +21,6 @@ OUTPUT_DIR = Path("apkg")
 MODE_SUFFIX: dict[str, str] = {
     "core": "core",
     "cull": "1000",
-    "rank": "reordered",
 }
 
 
@@ -30,7 +28,7 @@ def default_output(language: str, mode: str) -> Path:
     """Give the default output file of one language and mode.
 
     :param language: Canonical language name, for example ``french``.
-    :param mode: ``core``, ``cull``, or ``rank``.
+    :param mode: ``core`` or ``cull``.
     :raises KeyError: The mode holds no default stem.
     :returns: ``apkg/<language>_<mode suffix>.apkg``.
     """

@@ -470,8 +470,7 @@ sense and loan word paths, the unchecked limit, the similarity limit, the
 spoken weight, and the bold flag. The defaults are in `core.py` and
 `ranking/core.py`.
 
-`--core` and `--select` cannot be used together. Every command needs one mode:
-`--rank`, `--select`, or `--core`.
+`--core` and `--select` cannot be used together. Every command needs one mode.
 
 ### 9.2 Output files
 
