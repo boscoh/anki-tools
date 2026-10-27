@@ -197,7 +197,5 @@ SPANISH_CORE_PROFILE = SPANISH_LANGUAGE.core(
     max_units=MAX_UNITS,
     default_options=DEFAULT_OPTIONS,
     frequency_source=str(FREQUENCY_PATH),
-    outside_set_ratio=1.3,
-    outside_rare_ratio=0.1,
     lemma_overrides=LEMMA_OVERRIDES,
 )

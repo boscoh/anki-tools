@@ -93,7 +93,7 @@ def test_core_builds_the_request(
     request, run_profile = runs[0]
     assert request.output_path == Path("apkg/french_core.apkg")
     assert request.core_words == cli.french_core.DEFAULT_CORE_WORDS
-    assert request.options.max_cards == 42
+    assert request.max_cards == 42
     assert run_profile is cli.french_core.FRENCH_CORE_PROFILE
 
 

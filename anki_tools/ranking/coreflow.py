@@ -18,7 +18,7 @@ import hashlib
 import re
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Callable, Collection, Mapping, Sequence
 
@@ -87,32 +87,15 @@ class CoreRequest:
     :param input_path: Input APKG file.
     :param output_path: Output APKG file.
     :param core_words: Tier F words after the Swadesh set.
-    :param options: Selection settings.
-    :param min_units: Minimum word count of a card, or None for the profile
-        value.
-    :param max_units: Maximum word count of a card, or None for the profile
-        value.
     :param spoken_weight: Weight of the spoken term in the blend.
-    :param sense_path: Sense file of the tier F targets, or None for the
-        profile value.
-    :param loan_path: Loan word list of rule C4, or None for the profile value.
-    :param bold_target: Bold the assigned target in the sentence.
-    :param max_unchecked_sense: Unchecked targets that gate K16 accepts.
-    :param max_unranked: Unranked tier F targets that gate K20 accepts.
+    :param max_cards: Card cap of the cover, or None for the profile value.
     """
 
     input_path: Path
     output_path: Path
     core_words: int
-    options: CoreOptions
-    min_units: int | None = None
-    max_units: int | None = None
     spoken_weight: float = 0.5
-    sense_path: Path | None = None
-    loan_path: Path | None = None
-    bold_target: bool = True
-    max_unchecked_sense: int = 0
-    max_unranked: int = 0
+    max_cards: int | None = None
 
 
 def read_senses(path: Path) -> dict[str, SenseWords]:
@@ -1002,10 +985,13 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> assemble.RunFiles:
     """
     apkg_path = Path(request.input_path)
     output_path = Path(request.output_path)
-    min_units = request.min_units if request.min_units is not None else profile.min_units
-    max_units = request.max_units if request.max_units is not None else profile.max_units
-    sense_path = request.sense_path or profile.sense_path
-    loan_path = request.loan_path or profile.loan_path
+    options = profile.default_options
+    if request.max_cards is not None:
+        options = replace(options, max_cards=request.max_cards)
+    min_units = profile.min_units
+    max_units = profile.max_units
+    sense_path = profile.sense_path
+    loan_path = profile.loan_path
     identity = DeckIdentity(output_path)
 
     scanned = scan(profile, apkg_path, request.spoken_weight)
@@ -1024,7 +1010,7 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> assemble.RunFiles:
         ranks,
         names,
         target_words=None,
-        min_deck_count=request.options.per_word + 1,
+        min_deck_count=options.per_word + 1,
     )
     targets, merged = build_core_targets(
         table,
@@ -1055,8 +1041,8 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> assemble.RunFiles:
         / len(passed)
         for target in targets
     }
-    quotas = target_quotas(positions, shares, request.options)
-    size_check(quotas, request.options.max_cards)
+    quotas = target_quotas(positions, shares, options)
+    size_check(quotas, options.max_cards)
 
     core_forms = frozenset(target.form.casefold() for target in targets)
     candidates = [
@@ -1073,7 +1059,7 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> assemble.RunFiles:
         positions=positions,
         quotas=quotas,
         ranks=ranks,
-        options=request.options,
+        options=options,
     )
     ordered = result.order
     keys = core_keys(result, ordered, candidates, targets)
@@ -1090,7 +1076,7 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> assemble.RunFiles:
         kept,
         profile,
         core_words,
-        bold=request.bold_target,
+        bold=True,
     )
 
     rows = card_rows(
@@ -1098,7 +1084,7 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> assemble.RunFiles:
     )
     coverage_rows = coverage_rows_of(targets, result, present, quotas)
     counts = manifest_counts(
-        rows, coverage_rows, result, candidates, kept, ranks, request.options,
+        rows, coverage_rows, result, candidates, kept, ranks, options,
         bolded=bolded, unbolded=unbolded, dropped_no_core=len(dropped),
     )
     counts["rejected_c3"] = sum(1 for reason in reasons if reason == "C3")
@@ -1142,27 +1128,27 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> assemble.RunFiles:
                 input_model=profile.input_model_name,
                 params={
                     "core_words": request.core_words,
-                    "per_word": request.options.per_word,
-                    "third_examples": request.options.third_examples,
-                    "ubiquitous_share": request.options.ubiquitous_share,
-                    "max_cards": request.options.max_cards,
-                    "completion_cards": request.options.completion_cards,
-                    "tail_cards": request.options.tail_cards,
-                    "outside_budget": request.options.outside_budget,
-                    "support_top": request.options.support_top,
-                    "hard_top": request.options.hard_top,
-                    "lambda_new": request.options.lambda_new,
-                    "lambda_repeat": request.options.lambda_repeat,
-                    "lambda_len": request.options.lambda_len,
-                    "lambda_seed": request.options.lambda_seed,
-                    "simple_units": request.options.simple_units,
-                    "similarity": request.options.similarity,
+                    "per_word": options.per_word,
+                    "third_examples": options.third_examples,
+                    "ubiquitous_share": options.ubiquitous_share,
+                    "max_cards": options.max_cards,
+                    "completion_cards": options.completion_cards,
+                    "tail_cards": options.tail_cards,
+                    "outside_budget": options.outside_budget,
+                    "support_top": options.support_top,
+                    "hard_top": options.hard_top,
+                    "lambda_new": options.lambda_new,
+                    "lambda_repeat": options.lambda_repeat,
+                    "lambda_len": options.lambda_len,
+                    "lambda_seed": options.lambda_seed,
+                    "simple_units": options.simple_units,
+                    "similarity": options.similarity,
                     "min_units": min_units,
                     "max_units": max_units,
                     "spoken_weight": request.spoken_weight,
-                    "bold_target": request.bold_target,
-                    "max_unchecked_sense": request.max_unchecked_sense,
-                    "max_unranked": request.max_unranked,
+                    "bold_target": True,
+                    "max_unchecked_sense": 0,
+                    "max_unranked": 0,
                 },
                 counts=counts,
                 frequency={

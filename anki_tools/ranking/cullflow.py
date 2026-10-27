@@ -56,7 +56,7 @@ from anki_tools.sentence_pack.tokens import load_model
 DEFAULT_MAX_CARDS = 1000
 DEFAULT_TARGET_WORDS = 300
 DEFAULT_MAX_USES = 4
-
+SIMILARITY = 0.67
 SMALL_COUNT = 5
 UNRANKED_ORDER = 1_000_000
 TATOEBA_BATCH = 1000
@@ -195,8 +195,6 @@ class CullProfile:
     :param swadesh_total: Concept count of the reserve pack.
     :param swadesh_exceptions: Reserve concepts that no source sentence covers.
     :param frequency_path: Frequency file of the language.
-    :param names_path: Name stoplist of the language.
-    :param tatoeba_path: Tatoeba sentence file of the language.
     :param wordfreq_lang: ``wordfreq`` language code.
     :param licenses: License text per data source.
     :param target_coverage_gate: Gate share of the targets with one card.
@@ -233,8 +231,6 @@ class CullProfile:
     swadesh_exceptions: tuple[str, ...]
 
     frequency_path: Path
-    names_path: Path
-    tatoeba_path: Path
     wordfreq_lang: str
 
     licenses: Mapping[str, str]
@@ -329,14 +325,9 @@ class CullRequest:
     :param output_path: Output APKG file.
     :param max_cards: Card cap.
     :param target_words: Number of target words.
-    :param max_uses: Most kept cards that hold one non-exempt lemma.
-    :param exempt_top: Number of top targets that are exempt from the cap.
     :param spoken_weight: Weight of the Tatoeba term, 0 to 1.
     :param min_words: Minimum word count of a card.
     :param max_words: Maximum word count of a card.
-    :param similarity: Lemma Jaccard limit of a duplicate pair.
-    :param order: ``coverage`` or ``input`` card order.
-    :param reserve_pack: Reserve pack of the run, or None for the profile value.
     :param no_reserve: Run the frequency cull without the reserve cards.
     """
 
@@ -344,14 +335,9 @@ class CullRequest:
     output_path: Path
     max_cards: int = DEFAULT_MAX_CARDS
     target_words: int = DEFAULT_TARGET_WORDS
-    max_uses: int = DEFAULT_MAX_USES
-    exempt_top: int = 100
     spoken_weight: float = 0.5
     min_words: int = 3
     max_words: int = 12
-    similarity: float = 0.67
-    order: str = "coverage"
-    reserve_pack: Path | None = None
     no_reserve: bool = False
 
 
@@ -1116,9 +1102,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> assemble.RunFiles:
     """
     apkg_path = Path(request.input_path)
     output_path = Path(request.output_path)
-    reserve_pack = (
-        request.reserve_pack if request.reserve_pack is not None else profile.reserve_pack
-    )
+    reserve_pack = profile.reserve_pack
     cards = coreflow.read_input_deck(
         apkg_path,
         profile.input_model_name,
@@ -1163,7 +1147,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> assemble.RunFiles:
             reserve_sets,
             cards,
             tokens,
-            request.similarity,
+            SIMILARITY,
             content_pos=profile.content_pos,
         )
     selection = select_cards(
@@ -1172,9 +1156,9 @@ def run_cull(request: CullRequest, profile: CullProfile) -> assemble.RunFiles:
         targets,
         ranks,
         max_cards=request.max_cards,
-        max_uses=request.max_uses,
-        exempt_top=request.exempt_top,
-        similarity=request.similarity,
+        max_uses=DEFAULT_MAX_USES,
+        exempt_top=100,
+        similarity=SIMILARITY,
         passed=passed,
         reserved=reserve,
         reserved_sets=reserve_sets,
@@ -1184,7 +1168,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> assemble.RunFiles:
         selection.kept,
         tokens,
         ranks,
-        order=request.order,
+        order="coverage",
         content_pos=profile.content_pos,
     )
     values = card_cores(selection, ordered, glosses)
@@ -1313,13 +1297,13 @@ def run_cull(request: CullRequest, profile: CullProfile) -> assemble.RunFiles:
                 params={
                     "max_cards": request.max_cards,
                     "target_words": request.target_words,
-                    "max_uses": request.max_uses,
-                    "exempt_top": request.exempt_top,
+                    "max_uses": DEFAULT_MAX_USES,
+                    "exempt_top": 100,
                     "spoken_weight": request.spoken_weight,
                     "min_words": request.min_words,
                     "max_words": request.max_words,
-                    "similarity": request.similarity,
-                    "order": request.order,
+                    "similarity": SIMILARITY,
+                    "order": "coverage",
                 },
                 counts={
                     "input": len(cards),

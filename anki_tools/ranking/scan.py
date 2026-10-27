@@ -55,8 +55,6 @@ class CoreProfile:
         the targets.
     :param outside_rare_ratio: Largest accepted rare outside count, as a
         share of the outside set.
-    :param spoken_weight: Blend weight of the spoken term, or None when the
-        request supplies it.
     :param finalize: Post-processing step of the written deck, called with
         the run, or None when the language needs none.
     :param romanization_source: Input field of the romanization line, for
@@ -90,7 +88,6 @@ class CoreProfile:
     lemma_overrides: Mapping[str, str] = field(default_factory=dict)
     outside_set_ratio: float = 1.3
     outside_rare_ratio: float = 0.1
-    spoken_weight: float | None = None
     finalize: Callable[[Any], None] | None = None
     romanization_source: str | None = None
 

@@ -16,9 +16,8 @@ reader. `CullProfile` holds `target_coverage_gate` and
 `double_coverage_gate`; `CoreProfile` holds `outside_set_ratio` and
 `outside_rare_ratio`, with the old values as defaults.
 
-Every language profile sets its four values explicitly. The French and Spanish
-cull profiles keep `0.98` and `0.95`. The four core profiles keep `1.3` and
-`0.1`.
+A language profile writes a threshold only when the value differs from the
+default. The defaults `0.98`, `0.95`, `1.3`, and `0.1` are the shared values.
 
 The gate messages do not change. G3 and G4 format the profile value the same
 way as the constant, so the four tables stay byte-identical.

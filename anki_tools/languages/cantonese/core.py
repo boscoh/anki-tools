@@ -62,8 +62,6 @@ DEFAULT_OPTIONS = CoreOptions(
     outside_budget=165,
 )
 
-#: Blend weight that the cached Cantonese frequency list holds.
-SPOKEN_WEIGHT = 0.7
 
 # Every Han token gets this tag: Cifu and jieba give no part of speech, and rule
 # C1 accepts only a verb-like tag, which is a content tag too.
@@ -244,8 +242,5 @@ CANTONESE_CORE_PROFILE = CANTONESE_LANGUAGE.core(
     max_units=MAX_UNITS,
     default_options=DEFAULT_OPTIONS,
     frequency_source="Cifu and Apple Daily blend",
-    outside_set_ratio=1.3,
-    outside_rare_ratio=0.1,
-    spoken_weight=SPOKEN_WEIGHT,
     finalize=lambda run: finalize_output(run.output_path, run.card_csv),
 )

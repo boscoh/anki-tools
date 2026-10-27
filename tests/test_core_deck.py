@@ -503,7 +503,7 @@ def _run_core(tmp_path: Path) -> tuple[assemble.RunFiles, Path, CoreProfile]:
             input_path=source,
             output_path=output,
             core_words=0,
-            options=profile.default_options,
+            max_cards=profile.default_options.max_cards,
         ),
         profile,
     )

@@ -106,17 +106,12 @@ def _run_core(
     print("=" * 50)
     print(f"Processing {language.label} Anki Deck: core mode")
     print("=" * 50)
-    options = profile.default_options
-    if cards is not None:
-        options = replace(options, max_cards=cards)
     request = coreflow.CoreRequest(
         input_path=apkg_path,
         output_path=output_path,
         core_words=words,
-        options=options,
+        max_cards=cards,
     )
-    if profile.spoken_weight is not None:
-        request = replace(request, spoken_weight=profile.spoken_weight)
     coreflow.run_core(request, profile)
 
 

@@ -86,8 +86,6 @@ def _profile() -> cullflow.CullProfile:
         swadesh_total=0,
         swadesh_exceptions=(),
         frequency_path=Path("data/test_frequency.tsv"),
-        names_path=Path("vocab/test_names.txt"),
-        tatoeba_path=Path("data/tatoeba/test_sentences.tsv"),
         wordfreq_lang="xx",
         licenses={"data": "test license"},
         target_coverage_gate=0.98,
