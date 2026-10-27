@@ -1,9 +1,9 @@
 {
-  "build_date": "2026-10-27T04:28:18+00:00",
+  "build_date": "2026-10-27T10:34:01+00:00",
   "source": {
     "input": "apkg/Spanish 9000 sentences with native audio.apkg",
     "deck": "spanish_core",
-    "model": "Spanish Core Sentences",
+    "model": "spanish_core",
     "input_model": "Spanish sentences cloze+"
   },
   "params": {
@@ -27,9 +27,9 @@
     "max_units": 10,
     "spoken_weight": 0.5,
     "bold_target": true,
-    "name": "spanish_core",
     "max_unchecked_sense": 0,
-    "max_unranked": 0
+    "max_unranked": 0,
+    "name": "spanish_core"
   },
   "counts": {
     "cards": 267,

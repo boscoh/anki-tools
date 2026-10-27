@@ -1,9 +1,9 @@
 {
-  "build_date": "2026-10-27T04:28:52+00:00",
+  "build_date": "2026-10-27T10:33:40+00:00",
   "source": {
     "input": "apkg/Spanish 9000 sentences with native audio.apkg",
     "deck": "spanish_1000",
-    "model": "Spanish 1000 Core Sentences",
+    "model": "spanish_1000",
     "input_model": "Spanish sentences cloze+"
   },
   "params": {
@@ -39,8 +39,8 @@
     "spoken_weight": 0.5
   },
   "files": {
-    "cull_csv": "sha256:03d659cf7e41ab4ae766234e5a5a60ed1f8410a4076a91856e4fa38a5ee58001",
-    "coverage_csv": "sha256:de0d56d6dc068ee608dc91b8542a7dd9f7e6cc3eca9a16f8b770858ca2562749",
+    "cull_csv": "sha256:7a23ec855ef61e3ca893a3947a769767e41a1a92251cbdb73a5b3d014a9d7d34",
+    "coverage_csv": "sha256:190d45dd5362bbbb084b8f44f0e36bbb143323ebd8e09772a1f88f32e8942bef",
     "input_apkg": "sha256:f67605459feb506bcbbb95830a356ff349c21c28e136c8efc3d82d253ec244e9"
   },
   "licenses": {

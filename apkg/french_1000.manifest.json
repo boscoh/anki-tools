@@ -1,9 +1,9 @@
 {
-  "build_date": "2026-10-27T00:24:42+00:00",
+  "build_date": "2026-10-27T10:32:54+00:00",
   "source": {
     "input": "apkg/6000_French_Sentences_w_Audio.apkg",
-    "deck": "French 1000 Core Sentences",
-    "model": "French 1000 Core Sentences",
+    "deck": "french_1000",
+    "model": "french_1000",
     "input_model": "French Sentences"
   },
   "params": {
@@ -16,7 +16,7 @@
     "max_words": 12,
     "similarity": 0.67,
     "order": "coverage",
-    "name": "French 1000 Core Sentences"
+    "name": "french_1000"
   },
   "counts": {
     "input": 5928,
@@ -39,8 +39,8 @@
     "spoken_weight": 0.5
   },
   "files": {
-    "cull_csv": "sha256:0624fafaed905b64732f44eb2e6b65e17aa547023c6ce77c33d9c53d5cf9eaf1",
-    "coverage_csv": "sha256:6767f85c7cc571b746e652d1122e89032bbfc45abad0128880f73ecf3ffd67b9",
+    "cull_csv": "sha256:74c72a63ad61afa3185dec3bb5c662ee834fdeda2715137dad63db8738b21a46",
+    "coverage_csv": "sha256:8d550ffbd65ab97b99de1e61db3d8d4fb348f388256dcf6bf984a1aa2ffc85ae",
     "input_apkg": "sha256:230dd01bcf6223bcb8a5ea303eee01fd4a55e19ce418d0bf66a81193037024b5"
   },
   "licenses": {

@@ -446,20 +446,22 @@ def zh(
     *,
     output: Path | None = None,
     text_field: str | None = None,
+    rank: bool = False,
     core: bool = False,
     cards: int | None = None,
     words: int = mandarin_core.DEFAULT_CORE_WORDS,
     check: bool = False,
 ):
-    """Fix Chinese deck: rank, reorder, fix pinyin, and apply styling.
+    """Fix Chinese deck: rank and reorder it, or build a core deck.
 
-    Rank mode writes ``apkg/mandarin_reordered.apkg`` and its rank CSV, then
+    ``--rank`` writes ``apkg/mandarin_reordered.apkg`` and its rank CSV, then
     fixes the pinyin and writes the card templates. ``--core`` builds
     ``apkg/mandarin_core.apkg`` with its CSV files and manifest.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the language and mode).
     :param text_field: Rank mode: preferred sentence field (default: infer).
+    :param rank: Rank and reorder the deck.
     :param core: Build the core deck instead of ranking.
     :param cards: Core mode: card cap (300).
     :param words: Core mode: tier F words after the Swadesh set.
@@ -477,6 +479,7 @@ def zh(
         apkg_path=apkg_path,
         output=output,
         text_field=text_field,
+        rank=rank,
         core=core,
         cards=cards,
         words=words,
@@ -491,6 +494,7 @@ def fr(
     output: Path | None = None,
     text_field: str = "French",
     select: bool = False,
+    rank: bool = False,
     core: bool = False,
     cards: int | None = None,
     reserve: bool = True,
@@ -499,7 +503,7 @@ def fr(
 ):
     """Fix French deck: rank and reorder it, or select a smaller deck.
 
-    Rank mode writes ``apkg/french_reordered.apkg`` and its rank CSV. Select
+    ``--rank`` writes ``apkg/french_reordered.apkg`` and its rank CSV. Select
     mode, with ``--select``, runs the 1000-card cull and writes
     ``apkg/french_1000.apkg``. ``--core`` builds ``apkg/french_core.apkg``
     with its CSV files and manifest.
@@ -508,6 +512,7 @@ def fr(
     :param output: Output .apkg file (default: from the language and mode).
     :param text_field: Rank mode: preferred sentence field (default: French).
     :param select: Run the card cull instead of the rank and reorder.
+    :param rank: Rank and reorder the deck.
     :param core: Build the core deck instead of ranking.
     :param cards: Select and core mode: card cap (select 1000, core 300).
     :param reserve: Select mode: add the Swadesh reserve cards.
@@ -526,6 +531,7 @@ def fr(
         apkg_path=apkg_path,
         output=output,
         text_field=text_field,
+        rank=rank,
         core=core,
         select=select,
         cards=cards,
@@ -541,6 +547,7 @@ def yue(
     *,
     output: Path | None = None,
     text_field: str | None = None,
+    rank: bool = False,
     core: bool = False,
     cards: int | None = None,
     words: int = cantonese_core.DEFAULT_CORE_WORDS,
@@ -548,13 +555,14 @@ def yue(
 ):
     """Fix Cantonese deck: rank and reorder it, or build a core deck.
 
-    Rank mode writes ``apkg/cantonese_reordered.apkg`` and its rank CSV, with
+    ``--rank`` writes ``apkg/cantonese_reordered.apkg`` and its rank CSV, with
     the jyutping fixes. ``--core`` builds ``apkg/cantonese_core.apkg`` with its
     CSV files and manifest.
 
     :param apkg_path: Input .apkg file.
     :param output: Output .apkg file (default: from the language and mode).
     :param text_field: Rank mode: preferred sentence field (default: infer).
+    :param rank: Rank and reorder the deck.
     :param core: Build the core deck instead of ranking.
     :param cards: Core mode: card cap (300).
     :param words: Core mode: tier F words after the Swadesh set.
@@ -593,6 +601,7 @@ def yue(
         apkg_path=apkg_path,
         output=output,
         text_field=text_field,
+        rank=rank,
         core=core,
         cards=cards,
         words=words,
@@ -607,6 +616,7 @@ def es(
     output: Path | None = None,
     text_field: str = "Spanish",
     select: bool = False,
+    rank: bool = False,
     core: bool = False,
     cards: int | None = None,
     reserve: bool = True,
@@ -615,7 +625,7 @@ def es(
 ):
     """Fix Spanish deck: rank and reorder it, or select a smaller deck.
 
-    Rank mode writes ``apkg/spanish_reordered.apkg`` and its rank CSV. Select
+    ``--rank`` writes ``apkg/spanish_reordered.apkg`` and its rank CSV. Select
     mode, with ``--select``, runs the cull and writes ``apkg/spanish_1000.apkg``.
     ``--core`` builds ``apkg/spanish_core.apkg`` with its CSV files and
     manifest.
@@ -624,6 +634,7 @@ def es(
     :param output: Output .apkg file (default: from the language and mode).
     :param text_field: Rank mode: preferred sentence field (default: Spanish).
     :param select: Run the cull instead of the rank and reorder.
+    :param rank: Rank and reorder the deck.
     :param core: Build the core deck instead of ranking.
     :param cards: Select and core mode: card cap (select 1000, core 300).
     :param reserve: Select mode: add the Swadesh reserve cards.
@@ -641,6 +652,7 @@ def es(
         apkg_path=apkg_path,
         output=output,
         text_field=text_field,
+        rank=rank,
         core=core,
         select=select,
         cards=cards,

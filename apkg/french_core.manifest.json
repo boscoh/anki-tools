@@ -1,9 +1,9 @@
 {
-  "build_date": "2026-10-27T00:23:22+00:00",
+  "build_date": "2026-10-27T10:33:15+00:00",
   "source": {
     "input": "apkg/6000_French_Sentences_w_Audio.apkg",
-    "deck": "French Core Sentences",
-    "model": "French Core Sentences",
+    "deck": "french_core",
+    "model": "french_core",
     "input_model": "French Sentences"
   },
   "params": {
@@ -27,9 +27,9 @@
     "max_units": 9,
     "spoken_weight": 0.5,
     "bold_target": true,
-    "name": "French Core Sentences",
     "max_unchecked_sense": 0,
-    "max_unranked": 0
+    "max_unranked": 0,
+    "name": "french_core"
   },
   "counts": {
     "cards": 273,

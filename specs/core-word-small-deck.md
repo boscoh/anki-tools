@@ -460,7 +460,7 @@ so the core deck and the Swadesh deck read the same way.
 | `--core`      | off                 | Run the core selection                  |
 | `--cards`     | 300                 | Card cap                                |
 | `--words`     | 50                  | Tier F words after the Swadesh set      |
-| `--output`    | from the input name | Output APKG                             |
+| `--output`    | `apkg/<language>_core.apkg` | Output APKG                     |
 | `--check`     | off                 | Run gates K1 to K21 on the output       |
 
 The other values are fields of `CoreOptions` or `CoreRequest`: the third
@@ -470,7 +470,8 @@ sense and loan word paths, the unchecked limit, the similarity limit, the
 spoken weight, and the bold flag. The defaults are in `core.py` and
 `ranking/core.py`.
 
-`--core` and `--select` cannot be used together. Rank mode stays the default.
+`--core` and `--select` cannot be used together. Every command needs one mode:
+`--rank`, `--select`, or `--core`.
 
 ### 9.2 Output files
 

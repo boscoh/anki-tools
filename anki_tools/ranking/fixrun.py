@@ -58,6 +58,13 @@ class FixLanguage:
     def modes(self) -> tuple[str, ...]:
         """Give the mode flags of the deck, in message order."""
         if self.cull is None:
+            return ("--rank", "--core")
+        return ("--rank", "--select", "--core")
+
+    @property
+    def check_modes(self) -> tuple[str, ...]:
+        """Give the mode flags that accept ``--check``."""
+        if self.cull is None:
             return ("--core",)
         return ("--select", "--core")
 
@@ -68,6 +75,7 @@ def run_fix(
     apkg_path: Path,
     output: Path | None = None,
     text_field: str | None = None,
+    rank: bool = False,
     core: bool = False,
     select: bool = False,
     cards: int | None = None,
@@ -81,30 +89,33 @@ def run_fix(
     :param apkg_path: Input APKG file.
     :param output: Output APKG file, or None for the default name of the mode.
     :param text_field: Rank mode: preferred sentence field, or None to infer.
+    :param rank: Rank and reorder the deck.
     :param core: Build the core deck.
     :param select: Run the cull.
     :param cards: Core and select mode: card cap.
     :param reserve: Select mode: add the Swadesh reserve cards.
     :param words: Core mode: tier F words after the Swadesh set.
     :param check: Run the gates on the output and do not run the mode again.
-    :raises SystemExit: A gate of the ``--check`` run fails.
+    :raises SystemExit: No mode is set, two modes are set, or a gate fails.
     """
     apkg_path = Path(apkg_path)
     if not apkg_path.exists():
         print(f"Error: File not found: {apkg_path}")
         return
     if check and not (core or select):
-        print(f"Error: --check needs {' or '.join(language.modes)}.")
-        return
-    if core and select:
-        print("Error: --core and --select cannot be used together.")
-        return
+        raise SystemExit(f"Error: --check needs {' or '.join(language.check_modes)}.")
+    if not any((rank, core, select)):
+        raise SystemExit(f"Error: choose a mode: {' '.join(language.modes)}")
+    if sum((rank, core, select)) > 1:
+        raise SystemExit(f"Error: choose one mode: {' '.join(language.modes)}")
     if core:
         _run_core(language, apkg_path, output, cards, words, check)
         return
     if select and language.cull is not None:
         _run_cull(language, apkg_path, output, cards, reserve, check)
         return
+    if select:
+        raise SystemExit(f"Error: {language.label} has no --select mode.")
     _run_rank(language, apkg_path, output, text_field)
 
 

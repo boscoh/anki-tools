@@ -1,9 +1,9 @@
 {
-  "build_date": "2026-10-27T03:53:40+00:00",
+  "build_date": "2026-10-27T10:34:43+00:00",
   "source": {
     "input": "apkg/LTL Cantonese Deck Level 1 - Short.apkg",
-    "deck": "Cantonese Core Sentences",
-    "model": "Cantonese Core Sentences",
+    "deck": "cantonese_core",
+    "model": "cantonese_core",
     "input_model": "LTL Note Type - Cantonese"
   },
   "params": {
@@ -27,9 +27,9 @@
     "max_units": 7,
     "spoken_weight": 0.7,
     "bold_target": true,
-    "name": "Cantonese Core Sentences",
     "max_unchecked_sense": 0,
-    "max_unranked": 0
+    "max_unranked": 0,
+    "name": "cantonese_core"
   },
   "counts": {
     "cards": 126,

@@ -42,9 +42,9 @@ Related documents:
 ```bash
 uv run anki --help                        # list the commands
 uv run anki swadesh vocab mandarin        # build a Swadesh vocabulary deck
-uv run anki fix zh input.apkg             # rank, reorder, fix pinyin, style
-uv run anki fix fr input.apkg             # rank and reorder a French deck
-uv run anki fix yue input.apkg            # rank, reorder, fix jyutping
+uv run anki fix zh --rank input.apkg      # rank, reorder, fix pinyin, style
+uv run anki fix fr --rank input.apkg      # rank and reorder a French deck
+uv run anki fix yue --rank input.apkg     # rank, reorder, fix jyutping
 uv run anki fix es input.apkg --select    # cull a Spanish deck
 uv run anki inspect deck.apkg             # show the package contents
 uv run anki style deck.apkg               # apply the CSS and HTML templates
@@ -60,12 +60,12 @@ options. The Applies to column shows the modes that read each option.
 
 | Language | Modes                                | Output                                                                                  |
 | -------- | ------------------------------------ | --------------------------------------------------------------------------------------- |
-| `zh`     | rank (default), `--core`             | `apkg/mandarin_reordered.apkg`, `apkg/mandarin_core.apkg`                               |
-| `fr`     | rank (default), `--select`, `--core` | `apkg/french_reordered.apkg`, `apkg/french_1000.apkg`, `apkg/french_core.apkg`          |
-| `es`     | rank (default), `--select`, `--core` | `apkg/spanish_reordered.apkg`, `apkg/spanish_1000.apkg`, `apkg/spanish_core.apkg`       |
-| `yue`    | rank (default), `--core`             | `apkg/cantonese_reordered.apkg`, `apkg/cantonese_core.apkg`                             |
+| `zh`     | `--rank`, `--core`                   | `apkg/mandarin_reordered.apkg`, `apkg/mandarin_core.apkg`                               |
+| `fr`     | `--rank`, `--select`, `--core`       | `apkg/french_reordered.apkg`, `apkg/french_1000.apkg`, `apkg/french_core.apkg`          |
+| `es`     | `--rank`, `--select`, `--core`       | `apkg/spanish_reordered.apkg`, `apkg/spanish_1000.apkg`, `apkg/spanish_core.apkg`       |
+| `yue`    | `--rank`, `--core`                   | `apkg/cantonese_reordered.apkg`, `apkg/cantonese_core.apkg`                             |
 
-Each command has a default input, so a bare `anki fix <lang>` reads it:
+Each command has a default input. A mode flag is required, so no bare command runs:
 
 | Language | Default input                                        |
 | -------- | ---------------------------------------------------- |
@@ -83,6 +83,7 @@ The shared options:
 | `apkg-path`       | every mode           | input deck; each command has a default       |
 | `--output`        | every mode           | output deck; default `apkg/<language>_<mode>.apkg` |
 | `--text-field`    | rank mode            | sentence field; the build infers the default |
+| `--rank`          | every command        | rank and reorder the deck                    |
 | `--select`        | `fr`, `es`           | run the cull instead of the rank and reorder |
 | `--reserve`       | `fr`, `es`           | add the Swadesh reserve cards (select mode)  |
 | `--core`          | every command        | build the core-word deck                     |
@@ -100,7 +101,7 @@ write the CSV files and the manifest that the "French 1000-Card Cull" and
 ### Chinese
 
 ```bash
-uv run anki fix zh deck.apkg         # rank, reorder, fix pinyin, apply styling
+uv run anki fix zh --rank deck.apkg   # rank, reorder, fix pinyin, apply styling
 uv run anki fix zh deck.apkg --core  # core mode, see "Core-Word Decks"
 ```
 
@@ -114,7 +115,7 @@ uv run anki fix zh deck.apkg --core  # core mode, see "Core-Word Decks"
 ### French
 
 ```bash
-uv run anki fix fr deck.apkg           # rank and reorder
+uv run anki fix fr --rank deck.apkg     # rank and reorder
 uv run anki fix fr deck.apkg --select  # the 1000-card cull
 uv run anki fix fr deck.apkg --core    # core mode
 ```
@@ -130,7 +131,7 @@ uv run anki fix fr deck.apkg --core    # core mode
 ### Spanish
 
 ```bash
-uv run anki fix es deck.apkg           # rank and reorder
+uv run anki fix es --rank deck.apkg     # rank and reorder
 uv run anki fix es deck.apkg --select  # the cull
 uv run anki fix es deck.apkg --core    # core mode
 ```
@@ -144,7 +145,7 @@ uv run anki fix es deck.apkg --core    # core mode
 ### Cantonese
 
 ```bash
-uv run anki fix yue deck.apkg         # rank, reorder, fix jyutping
+uv run anki fix yue --rank deck.apkg    # rank, reorder, fix jyutping
 uv run anki fix yue deck.apkg --core  # core mode
 ```
 
@@ -165,7 +166,7 @@ file, then run the command again.
 
 | Command                      | Template directory                |
 | ---------------------------- | --------------------------------- |
-| `anki style`, `anki fix zh`  | `templates/default/`              |
+| `anki style`, `anki fix zh --rank` | `templates/default/`        |
 | `anki swadesh pack <lang>`   | `templates/sentence_pack/<lang>/` |
 | `anki swadesh vocab <lang>`  | `templates/vocab/`                |
 | `anki fix fr --select`       | `templates/french_cull/`          |

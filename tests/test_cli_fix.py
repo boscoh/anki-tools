@@ -65,7 +65,7 @@ def test_rank_goes_to_the_pipeline(
     )
     output = deck_file.parent / "ranked.apkg"
 
-    cli.fr(deck_file, output=output)
+    cli.fr(deck_file, rank=True, output=output)
 
     paths, kwargs = calls[0]
     assert paths.input_path == deck_file
@@ -131,10 +131,19 @@ def test_core_builds_the_request(
     assert run_profile is cli.french_core.FRENCH_CORE_PROFILE
 
 
-def test_check_without_a_mode_prints_an_error(deck_file: Path, capsys) -> None:
-    cli.fr(deck_file, check=True)
+def test_check_without_a_mode_is_an_error(deck_file: Path) -> None:
+    with pytest.raises(SystemExit, match="--check needs --select or --core"):
+        cli.fr(deck_file, check=True)
 
-    assert "Error: --check needs --select or --core." in capsys.readouterr().out
+
+def test_a_bare_command_is_an_error(deck_file: Path) -> None:
+    with pytest.raises(SystemExit, match="choose a mode"):
+        cli.fr(deck_file)
+
+
+def test_two_modes_are_an_error(deck_file: Path) -> None:
+    with pytest.raises(SystemExit, match="choose one mode"):
+        cli.fr(deck_file, rank=True, core=True)
 
 
 CHECK_ROUTES = [
