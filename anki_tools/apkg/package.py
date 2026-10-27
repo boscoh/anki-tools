@@ -372,7 +372,7 @@ class AnkiPackage:
         """
         data = value.encode("utf-8")
         tag = (field_num << 3) | 2
-        return bytes([tag]) + self._write_varint(len(data)) + data
+        return self._write_varint(tag) + self._write_varint(len(data)) + data
 
     def _parse_template_config(self, config: bytes) -> dict[str, str]:
         """Parse protobuf config blob from templates table.
@@ -385,8 +385,7 @@ class AnkiPackage:
         while pos < len(config):
             if pos >= len(config):
                 break
-            tag = config[pos]
-            pos += 1
+            tag, pos = self._read_varint(config, pos)
             field_num = tag >> 3
             wire_type = tag & 0x07
 
@@ -431,8 +430,7 @@ class AnkiPackage:
         pos = 0
         while pos < len(config):
             start_pos = pos
-            tag = config[pos]
-            pos += 1
+            tag, pos = self._read_varint(config, pos)
             field_num = tag >> 3
             wire_type = tag & 0x07
 
@@ -473,11 +471,10 @@ class AnkiPackage:
         pos = 0
 
         while pos < len(original):
-            tag = original[pos]
+            start = pos
+            tag, pos = self._read_varint(original, pos)
             field_num = tag >> 3
             wire_type = tag & 0x07
-            start = pos
-            pos += 1
 
             if wire_type == 2:
                 length, pos = self._read_varint(original, pos)

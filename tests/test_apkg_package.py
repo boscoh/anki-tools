@@ -373,3 +373,22 @@ def test_the_parser_reads_the_kind_and_the_sort_index(anki21b: AnkiPackage) -> N
     assert cloze["sort_field_idx"] == 5
     assert standard["kind"] == 0
     assert standard["sort_field_idx"] is None
+
+
+def test_a_config_with_a_two_byte_tag_copies_whole(anki21b: AnkiPackage) -> None:
+    """Anki writes field 255, so a tag can hold more than one byte."""
+    other = b'{"tags":[],"vers":[]}'
+    field_255 = bytes([0xFA, 0x0F]) + anki21b._write_varint(len(other)) + other
+    config = b"\x08\x00" + anki21b._write_proto_string(3, ".card {}") + field_255
+
+    parsed = anki21b._parse_notetype_config(config)
+
+    assert [number for _start, _end, number in parsed["other_fields"]] == [1, 255]
+
+    clone = anki21b._clone_notetype_config(config, ".card { color: red }", 1)
+    again = anki21b._parse_notetype_config(clone)
+    start, end, number = again["other_fields"][-1]
+
+    assert number == 255
+    assert clone[start:end] == field_255
+    assert again["css"] == ".card { color: red }"
