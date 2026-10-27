@@ -53,7 +53,7 @@ import zipfile
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from anki_tools.apkg import media
+from anki_tools.apkg import media, notetype
 
 try:
     import genanki
@@ -73,12 +73,6 @@ _HTML_TAG_PATTERN = re.compile(r"<[^>]+>")
 #: Field that Anki sorts the written decks by. An output note type holds one.
 SORT_FIELD = "Sentence"
 
-# Fields of the anki21b note type config, the proto message
-# anki.notetypes.Notetype.Config. Field 1 is the kind, field 2 the sort field
-# index, and field 3 the CSS.
-NOTETYPE_CONFIG_FIELD_KIND = 1
-NOTETYPE_CONFIG_FIELD_SORT_IDX = 2
-NOTETYPE_CONFIG_FIELD_CSS = 3
 
 
 def field_checksum(value: str) -> int:
@@ -350,147 +344,6 @@ class AnkiPackage:
             self._write_legacy_decks(decks)
         self._modified = True
 
-    def _write_varint(self, value: int) -> bytes:
-        """Write a varint to bytes.
-
-        :param value: Integer to encode.
-        :returns: Varint-encoded bytes.
-        """
-        result = b""
-        while value > 127:
-            result += bytes([(value & 0x7F) | 0x80])
-            value >>= 7
-        result += bytes([value])
-        return result
-
-    def _write_proto_string(self, field_num: int, value: str) -> bytes:
-        """Write a protobuf length-delimited string field.
-
-        :param field_num: Protobuf field number.
-        :param value: String value to encode.
-        :returns: Encoded bytes.
-        """
-        data = value.encode("utf-8")
-        tag = (field_num << 3) | 2
-        return self._write_varint(tag) + self._write_varint(len(data)) + data
-
-    def _parse_template_config(self, config: bytes) -> dict[str, str]:
-        """Parse protobuf config blob from templates table.
-
-        :param config: Raw protobuf config bytes.
-        :returns: Dict with ``qfmt`` and ``afmt`` keys.
-        """
-        result = {"qfmt": "", "afmt": ""}
-        pos = 0
-        while pos < len(config):
-            if pos >= len(config):
-                break
-            tag, pos = self._read_varint(config, pos)
-            field_num = tag >> 3
-            wire_type = tag & 0x07
-
-            if wire_type == 2:
-                length, pos = self._read_varint(config, pos)
-                value = config[pos : pos + length].decode("utf-8", errors="replace")
-                pos += length
-                if field_num == 1:
-                    result["qfmt"] = value
-                elif field_num == 2:
-                    result["afmt"] = value
-            elif wire_type == 0:
-                _, pos = self._read_varint(config, pos)
-            else:
-                break
-
-        return result
-
-    def _build_template_config(self, qfmt: str, afmt: str) -> bytes:
-        """Build protobuf config blob for templates table.
-
-        :param qfmt: Question template format.
-        :param afmt: Answer template format.
-        :returns: Protobuf config bytes.
-        """
-        return self._write_proto_string(1, qfmt) + self._write_proto_string(2, afmt)
-
-    def _parse_notetype_config(self, config: bytes) -> dict:
-        """Parse protobuf config blob from notetypes table.
-
-        :param config: Raw protobuf config bytes.
-        :returns: Dict with ``kind``, ``sort_field_idx``, ``css``, and
-            ``other_fields`` keys. ``kind`` is 0 and ``sort_field_idx`` is None
-            when the field is absent.
-        """
-        result: dict[str, Any] = {
-            "kind": 0,
-            "sort_field_idx": None,
-            "css": "",
-            "other_fields": [],
-        }
-        pos = 0
-        while pos < len(config):
-            start_pos = pos
-            tag, pos = self._read_varint(config, pos)
-            field_num = tag >> 3
-            wire_type = tag & 0x07
-
-            if wire_type == 2:
-                length, pos = self._read_varint(config, pos)
-                if field_num == NOTETYPE_CONFIG_FIELD_CSS:
-                    result["css"] = config[pos : pos + length].decode(
-                        "utf-8", errors="replace"
-                    )
-                else:
-                    result["other_fields"].append((start_pos, pos + length, field_num))
-                pos += length
-            elif wire_type == 0:
-                value, end_pos = self._read_varint(config, pos)
-                if field_num == NOTETYPE_CONFIG_FIELD_KIND:
-                    result["kind"] = value
-                elif field_num == NOTETYPE_CONFIG_FIELD_SORT_IDX:
-                    result["sort_field_idx"] = value
-                result["other_fields"].append((start_pos, end_pos, field_num))
-                pos = end_pos
-            else:
-                break
-
-        result["_original"] = config
-        return result
-
-    def _build_notetype_config(self, parsed: dict, new_css: str | None = None) -> bytes:
-        """Rebuild notetype config with optionally updated CSS.
-
-        :param parsed: Parsed config from :meth:`_parse_notetype_config`.
-        :param new_css: Optional new CSS string; uses existing if None.
-        :returns: Protobuf config bytes.
-        """
-        original = parsed["_original"]
-        css = new_css if new_css is not None else parsed["css"]
-
-        result = b""
-        pos = 0
-
-        while pos < len(original):
-            start = pos
-            tag, pos = self._read_varint(original, pos)
-            field_num = tag >> 3
-            wire_type = tag & 0x07
-
-            if wire_type == 2:
-                length, pos = self._read_varint(original, pos)
-                if field_num == NOTETYPE_CONFIG_FIELD_CSS:
-                    result += self._write_proto_string(NOTETYPE_CONFIG_FIELD_CSS, css)
-                else:
-                    result += original[start : pos + length]
-                pos += length
-            elif wire_type == 0:
-                _, pos = self._read_varint(original, pos)
-                result += original[start:pos]
-            else:
-                result += original[start:]
-                break
-
-        return result
 
     def get_models(self, include_templates: bool = False) -> dict[str, dict]:
         """
@@ -514,13 +367,13 @@ class AnkiPackage:
             models = {}
             for row in cursor.fetchall():
                 model_id = str(row["id"])
-                parsed = self._parse_notetype_config(row["config"] or b"")
+                config = notetype.parse(row["config"] or b"")
                 models[model_id] = {
                     "name": row["name"],
                     "flds": [],
                     "tmpls": [],
-                    "css": parsed["css"] if include_templates else "",
-                    "kind": parsed["kind"],
+                    "css": config.css if include_templates else "",
+                    "kind": config.kind,
                 }
 
             cursor.execute("SELECT ntid, name, ord FROM fields ORDER BY ntid, ord")
@@ -536,12 +389,14 @@ class AnkiPackage:
                 for row in cursor.fetchall():
                     model_id = str(row["ntid"])
                     if model_id in models:
-                        config = self._parse_template_config(row["config"] or b"")
+                        qfmt, afmt = notetype.parse_template(
+                            row["config"] or b""
+                        )
                         tmpl = {
                             "name": row["name"],
                             "ord": row["ord"],
-                            "qfmt": config["qfmt"],
-                            "afmt": config["afmt"],
+                            "qfmt": qfmt,
+                            "afmt": afmt,
                         }
                         models[model_id]["tmpls"].append(tmpl)
 
@@ -590,8 +445,7 @@ class AnkiPackage:
                 if not row:
                     raise ValueError(f"Model {model_id} not found")
 
-                parsed = self._parse_notetype_config(row["config"] or b"")
-                new_config = self._build_notetype_config(parsed, css)
+                new_config = notetype.with_css(row["config"] or b"", css)
                 cursor.execute(
                     "UPDATE notetypes SET config = ? WHERE id = ?",
                     (new_config, int(model_id)),
@@ -608,10 +462,12 @@ class AnkiPackage:
                         f"Template {template_index} not found for model {model_id}"
                     )
 
-                current = self._parse_template_config(row["config"] or b"")
-                new_qfmt = qfmt if qfmt is not None else current["qfmt"]
-                new_afmt = afmt if afmt is not None else current["afmt"]
-                new_config = self._build_template_config(new_qfmt, new_afmt)
+                current_qfmt, current_afmt = notetype.parse_template(
+                    row["config"] or b""
+                )
+                new_qfmt = qfmt if qfmt is not None else current_qfmt
+                new_afmt = afmt if afmt is not None else current_afmt
+                new_config = notetype.build_template(new_qfmt, new_afmt)
 
                 cursor.execute(
                     "UPDATE templates SET config = ? WHERE ntid = ? AND ord = ?",
@@ -693,7 +549,7 @@ class AnkiPackage:
                 str(entry[0]) for entry in cursor.execute("SELECT id FROM notetypes")
             ]
             model_id = self._new_model_id(taken)
-            config = self._clone_notetype_config(row["config"] or b"", css, sort_index)
+            config = notetype.clone(row["config"] or b"", css, sort_index)
             cursor.execute(
                 "INSERT INTO notetypes (id, name, mtime_secs, usn, config) "
                 "VALUES (?, ?, ?, -1, ?)",
@@ -720,7 +576,7 @@ class AnkiPackage:
                         number,
                         f"Card {number + 1}",
                         now,
-                        self._build_template_config(qfmt, afmt),
+                        notetype.build_template(qfmt, afmt),
                     )
                     for number, (qfmt, afmt) in enumerate(templates)
                 ],
@@ -784,32 +640,6 @@ class AnkiPackage:
             if value not in used:
                 return str(value)
 
-    def _clone_notetype_config(self, source: bytes, css: str, sort_index: int) -> bytes:
-        """Build the config of a cloned note type.
-
-        The kind is protobuf field 1, the sort index field 2, and the CSS field
-        3. The source kind stays, and the caller sets it. A source value that
-        points at another field of the input note type cannot hold.
-
-        :param source: Config blob of the source note type.
-        :param css: CSS of the new note type.
-        :param sort_index: Zero-based index of the sort field.
-        :returns: Protobuf config bytes.
-        """
-        parsed = self._parse_notetype_config(source)
-        original = parsed["_original"]
-        parts = [
-            bytes([NOTETYPE_CONFIG_FIELD_SORT_IDX << 3]) + self._write_varint(sort_index),
-            self._write_proto_string(NOTETYPE_CONFIG_FIELD_CSS, css),
-        ]
-        for start, end, field_num in parsed["other_fields"]:
-            if field_num not in (
-                NOTETYPE_CONFIG_FIELD_SORT_IDX,
-                NOTETYPE_CONFIG_FIELD_CSS,
-            ):
-                parts.append(original[start:end])
-        return b"".join(parts)
-
     def delete_model(self, model_id: str) -> None:
         """Delete a note type that no note holds.
 
@@ -860,7 +690,7 @@ class AnkiPackage:
 
         The ``anki2`` model dict holds the kind in ``type``. The ``anki21b``
         note type config holds the kind in protobuf field
-        ``NOTETYPE_CONFIG_FIELD_KIND``.
+        ``notetype.FIELD_KIND``.
 
         :param model_id: Model ID.
         :param kind: Note type kind.
@@ -873,31 +703,9 @@ class AnkiPackage:
             ).fetchone()
             if row is None:
                 raise ValueError(f"Model {model_id} not found")
-            parsed = self._parse_notetype_config(row["config"] or b"")
-            original = parsed["_original"]
-            parts: list[bytes] = []
-            found = False
-            for start, end, field_num in parsed["other_fields"]:
-                if field_num == NOTETYPE_CONFIG_FIELD_KIND:
-                    parts.append(
-                        bytes([NOTETYPE_CONFIG_FIELD_KIND << 3])
-                        + self._write_varint(kind)
-                    )
-                    found = True
-                else:
-                    parts.append(original[start:end])
-            if not found:
-                parts.append(
-                    bytes([NOTETYPE_CONFIG_FIELD_KIND << 3])
-                    + self._write_varint(kind)
-                )
-            if parsed["css"]:
-                parts.append(
-                    self._write_proto_string(NOTETYPE_CONFIG_FIELD_CSS, parsed["css"])
-                )
             self.conn.execute(
                 "UPDATE notetypes SET config = ? WHERE id = ?",
-                (b"".join(parts), int(model_id)),
+                (notetype.with_kind(row["config"] or b"", kind), int(model_id)),
             )
         elif self._db_format == "anki2":
             models = json.loads(
@@ -1128,28 +936,6 @@ class AnkiPackage:
         :param used: Media file names that a note still references.
         """
         media.prune(self, used)
-
-    def _read_varint(self, data: bytes, pos: int) -> tuple[int, int]:
-        """
-        Read a protobuf varint from data starting at pos.
-
-        :param data: Binary data to read from.
-        :param pos: Starting position in data.
-        :returns: Tuple of (value, new_position).
-
-        Varints use 7 bits per byte with MSB as continuation flag.
-        Example: ``0x80 0x5a`` = ``(0x00 << 7) | 0x5a`` = ``0x2d00`` = 11520
-        """
-        result = 0
-        shift = 0
-        while pos < len(data):
-            byte = data[pos]
-            pos += 1
-            result |= (byte & 0x7F) << shift
-            if (byte & 0x80) == 0:
-                break
-            shift += 7
-        return result, pos
 
     def extract_audio_files(
         self, output_dir: str | Path, audio_only: bool = True

@@ -33,6 +33,13 @@ protobuf message, and the entry order is the file id. The code lives in
 `anki_tools/apkg/media.py`.
 _Avoid_: media index, media listing
 
+**Note type config**:
+The protobuf message in the `config` column of the `notetypes` table of an
+`anki21b` package. It holds the kind, the sort field index, and the CSS. The
+templates table holds one message for each template. The code lives in
+`anki_tools/apkg/notetype.py`.
+_Avoid_: notetype blob, model config
+
 ## Decks
 
 **Vocabulary deck**:
