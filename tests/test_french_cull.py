@@ -300,7 +300,9 @@ def test_write_deck_sets_the_swadesh_templates(tmp_path: Path) -> None:
     )
     templates = [tuple(template[k] for k in ("qfmt", "afmt")) for template in model["tmpls"]]
 
-    assert templates == [cull_fr.CARD_TEMPLATES[0]]
+    assert templates == list(
+        coreflow.deck_templates(cull_fr.FRENCH_CULL_PROFILE)
+    )
     assert ".sentence" in model["css"]
     assert ".english" in model["css"]
     assert ".hint" in model["css"]

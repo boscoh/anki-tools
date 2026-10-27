@@ -24,6 +24,7 @@ from anki_tools.ranking.coreflow import (
     STATUSES,
     TARGET_SEPARATOR,
     DeckProfile,
+    deck_templates,
     coverage_glosses,
     filter_core_cards,
     output_fields,
@@ -458,7 +459,7 @@ def gate_templates(files: CoreFiles) -> tuple[bool, str]:
     used = [name for name in output["note_models"] if name]
     templates = [output["templates"].get(name, []) for name in used]
     css = [output["css"].get(name, "") for name in used]
-    expected = [list(pair) for pair in files.profile.templates]
+    expected = [list(pair) for pair in deck_templates(files.profile)]
     ok_templates = all(
         [list(pair) for pair in value] == expected for value in templates
     )

@@ -81,6 +81,25 @@ OUTPUT_GLOSS_FIELD = "CoreGloss"
 #: Reason of a kept card that holds no core word, so the run does not write it.
 NO_CORE_REASON = "no_core"
 
+ROMANIZATION_BLOCK = re.compile(
+    r"\{\{#Romanization\}\}.*?\{\{/Romanization\}\}", re.DOTALL
+)
+
+
+def deck_templates(profile: "DeckProfile") -> tuple[tuple[str, str], ...]:
+    """Give the templates of a run, minus the romanization block when the
+    language has no romanization field.
+
+    :param profile: Language hooks of the run.
+    :returns: The template pairs of the output note type.
+    """
+    if profile.romanization_source is not None:
+        return tuple(profile.templates)
+    return tuple(
+        (qfmt, ROMANIZATION_BLOCK.sub("", afmt).strip())
+        for qfmt, afmt in profile.templates
+    )
+
 
 def output_fields(profile: "DeckProfile") -> tuple[str, ...]:
     """Give the output field names of a deck profile.
@@ -1082,7 +1101,7 @@ def write_deck(
             input_id,
             profile.output_model_name,
             names,
-            profile.templates,
+            deck_templates(profile),
             profile.card_css(),
             deck_id=deck_id,
         )

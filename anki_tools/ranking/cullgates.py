@@ -20,6 +20,7 @@ from typing import Any, Callable, Sequence
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking.coreflow import (
     InputCard,
+    deck_templates,
     coverage_glosses,
     read_output,
 )
@@ -442,7 +443,7 @@ def gate_card_templates(files: CullFiles) -> tuple[bool, str]:
     templates = output["templates"].get(model_name, [])
     if not templates:
         return False, f"the model {model_name!r} has no card template"
-    expected = list(files.profile.templates)
+    expected = list(deck_templates(files.profile))
     problems = [
         f"card {index + 1} is {qfmt!r} / {afmt!r}"
         for index, (qfmt, afmt) in enumerate(templates)

@@ -572,7 +572,7 @@ class TestCardDesign:
         )
         assert [
             (template["qfmt"], template["afmt"]) for template in model["tmpls"]
-        ] == [core.CORE_TEMPLATES[0]]
+        ] == [coreflow.deck_templates(profile)[0]]
         assert len(cards) == run.cards
         assert {int(row["ord"]) for row in cards} == {0}
 

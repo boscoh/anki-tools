@@ -653,9 +653,9 @@ Rules:
   `Sentence (Annotated)`, `Explanation 1`, and the other 16 Mandarin fields are
   not output fields. Section 14.8 gives the reason for `freq ranks`.
 - No written note holds an empty `Audio`, `Sentence`, `English`, `Core`, or
-  `CoreGloss`. A `Romanization` field can be empty, so every back template
-  keeps its `{{#Romanization}}` condition. A language with no romanization has
-  no such field.
+  `CoreGloss`. A `Romanization` field can be empty. Every back template
+  keeps the `{{#Romanization}}` block only when the field exists. The flow strips
+  the block for a language with no romanization.
 
 The templates of `templates/<lang>_core/` and `templates/<lang>_cull/` read the
 output names:
@@ -688,8 +688,9 @@ The CSS comes from `profile.card_css()`, the value of `templates/shared/card.css
 plus the language layer, as today. K14 and G15 check it.
 The romanization is one shared rule, not one rule per language. A new language
 sets `romanization_source` to the input field that holds the reading. The flow
-adds `Romanization` to the field set, and every back template already shows
-the line when the field has a value.
+adds `Romanization` to the field set. When the source is None, the flow removes
+the block from the template, because Anki rejects a template that names a
+missing field. When the field exists, every back shows the line.
 
 
 ### 14.3 The note type name
