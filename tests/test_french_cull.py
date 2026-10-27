@@ -17,12 +17,12 @@ from typing import Collection
 
 import pytest
 
-from anki_tools.languages.french import cull as cull_fr
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.ranking import coreflow, corelist, cullflow, cullgates
+from anki_tools.apkg.shape import OutputShape, write_package
+from anki_tools.languages.french import cull as cull_fr
+from anki_tools.ranking import assemble, coreflow, corelist, cullflow, cullgates
 from anki_tools.ranking.coverage import write_rows
-from anki_tools.sentence_pack.audit import sha256_value
-
+from anki_tools.ranking.identity import DeckIdentity
 ENGLISH = "A short English line."
 BASE_TOKENS = [("le", "DET"), ("chat", "NOUN"), ("mange", "VERB"), ("vite", "ADV")]
 MIN_WORDS = 3
@@ -189,29 +189,6 @@ def test_filter_cards_rejects_a_duplicate_text() -> None:
     assert reasons == ["", "", "F9"]
 
 
-def test_manifest_has_params_counts_files_and_kept_order(tmp_path: Path) -> None:
-    path = tmp_path / "run.manifest.json"
-
-    coreflow.write_manifest(
-        path,
-        source={"input": "in.apkg", "deck": DECK_NAME, "model": cull_fr.MODEL_NAME},
-        params={"max_cards": 2},
-        counts={"cards": 2},
-        frequency={"spoken_weight": 0.5},
-        files={"cull_csv": "sha256:0"},
-        kept_order="sha256:1",
-        licenses=cull_fr.LICENSES,
-    )
-    data = json.loads(path.read_text(encoding="utf-8"))
-
-    assert data["source"]["model"] == cull_fr.MODEL_NAME
-    assert data["params"] == {"max_cards": 2}
-    assert data["counts"] == {"cards": 2}
-    assert data["frequency"] == {"spoken_weight": 0.5}
-    assert data["files"] == {"cull_csv": "sha256:0"}
-    assert data["licenses"] == cull_fr.LICENSES
-    assert data["kept_order"] == "sha256:1"
-    assert data["build_date"]
 
 
 DECK_SENTENCES = [
@@ -260,12 +237,45 @@ def _tiny_deck(tmp_path: Path) -> Path:
     return source
 
 
+def _write_cull_deck(
+    source: Path,
+    cards: list[cull_fr.InputCard],
+    kept: list[int],
+    output: Path,
+    *,
+    reserve: list[cullflow.ReserveCard] = [],
+    reserve_pack_path: Path | None = None,
+) -> dict[str, int]:
+    """Write the kept cards with the shape of the cull profile."""
+    profile = cull_fr.FRENCH_CULL_PROFILE
+    identity = DeckIdentity(output)
+    values, _bolded, _unbolded = coreflow.note_values(
+        source, cards, kept, profile, {}
+    )
+    return write_package(
+        source,
+        output,
+        OutputShape(
+            deck_name=identity.title,
+            model_name=identity.model_name,
+            input_model_name=profile.input_model_name,
+            fields=coreflow.output_fields(profile),
+            templates=coreflow.deck_templates(profile),
+            css=profile.card_css(),
+        ),
+        values,
+        reserve=reserve,
+        reserve_pack_path=reserve_pack_path,
+        reserve_values=profile.reserve_fields,
+    )
+
+
 def test_write_deck_keeps_the_notes_and_their_media(tmp_path: Path) -> None:
     source = _tiny_deck(tmp_path)
     cards = cull_fr.load_input_deck(source)
     output = tmp_path / "output.apkg"
 
-    counts = cull_fr.write_cull_deck(source, cards, [0, 2], output, DECK_NAME)
+    counts = _write_cull_deck(source, cards, [0, 2], output)
 
     with AnkiPackage(output) as package:
         notes = package.get_notes()
@@ -276,8 +286,8 @@ def test_write_deck_keeps_the_notes_and_their_media(tmp_path: Path) -> None:
     assert counts == {"notes": 2, "media": 2, "items": 2}
     assert len(notes) == 2
     assert media == {"a0.mp3", "a2.mp3"}
-    assert decks == {DECK_NAME}
-    assert models == {cull_fr.FRENCH_CULL_PROFILE.output_model_name}
+    assert decks == {output.stem}
+    assert models == {output.stem}
     assert [card.sentence for card in coreflow.read_output_deck(output)] == [
         DECK_SENTENCES[0],
         DECK_SENTENCES[2],
@@ -289,14 +299,14 @@ def test_write_deck_sets_the_swadesh_templates(tmp_path: Path) -> None:
     cards = cull_fr.load_input_deck(source)
     output = tmp_path / "templated.apkg"
 
-    cull_fr.write_cull_deck(source, cards, [0], output, DECK_NAME)
+    _write_cull_deck(source, cards, [0], output)
 
     with AnkiPackage(output) as package:
         models = package.get_models(include_templates=True)
     model = next(
         item
         for item in models.values()
-        if item.get("name") == cull_fr.FRENCH_CULL_PROFILE.output_model_name
+        if item.get("name") == output.stem
     )
     templates = [tuple(template[k] for k in ("qfmt", "afmt")) for template in model["tmpls"]]
 
@@ -347,7 +357,7 @@ def test_write_deck_removes_the_second_card_template(tmp_path: Path) -> None:
     cards = cull_fr.load_input_deck(source)
     output = tmp_path / "one-card.apkg"
 
-    cull_fr.write_cull_deck(source, cards, [0, 1], output, DECK_NAME)
+    _write_cull_deck(source, cards, [0, 1], output)
 
     with AnkiPackage(output) as package:
         models = package.get_models(include_templates=True)
@@ -355,7 +365,7 @@ def test_write_deck_removes_the_second_card_template(tmp_path: Path) -> None:
     model = next(
         item
         for item in models.values()
-        if item.get("name") == cull_fr.FRENCH_CULL_PROFILE.output_model_name
+        if item.get("name") == output.stem
     )
 
     assert [template["name"] for template in model["tmpls"]] == ["Card 1"]
@@ -367,11 +377,11 @@ def test_gate_card_templates_fails_on_a_second_template(tmp_path: Path) -> None:
     source = _tiny_deck(tmp_path)
     cards = cull_fr.load_input_deck(source)
     output = tmp_path / "two-templates.apkg"
-    cull_fr.write_cull_deck(source, cards, [0], output, DECK_NAME)
+    _write_cull_deck(source, cards, [0], output)
     _add_second_template(output)
 
     rows = cullgates.run_gates(
-        cullgates.cull_files(output, cull_fr.FRENCH_CULL_PROFILE)
+        cullgates.GATES, cullgates.cull_files(output, cull_fr.FRENCH_CULL_PROFILE)
     )
     message = dict((gate, passed) for gate, passed, _ in rows)["G15"]
 
@@ -382,7 +392,7 @@ def test_gate_card_templates_fails_on_a_wrong_front(tmp_path: Path) -> None:
     source = _tiny_deck(tmp_path)
     cards = cull_fr.load_input_deck(source)
     output = tmp_path / "wrong.apkg"
-    cull_fr.write_cull_deck(source, cards, [0], output, DECK_NAME)
+    _write_cull_deck(source, cards, [0], output)
 
     with AnkiPackage(output) as package:
         package.update_model_template(
@@ -391,7 +401,7 @@ def test_gate_card_templates_fails_on_a_wrong_front(tmp_path: Path) -> None:
         package.save()
 
     rows = cullgates.run_gates(
-        cullgates.cull_files(output, cull_fr.FRENCH_CULL_PROFILE)
+        cullgates.GATES, cullgates.cull_files(output, cull_fr.FRENCH_CULL_PROFILE)
     )
     message = dict((gate, passed) for gate, passed, _ in rows)["G15"]
 
@@ -446,8 +456,8 @@ def test_run_gates_passes_on_a_tiny_output(
     cards = cull_fr.load_input_deck(source)
     output = tmp_path / "gated.apkg"
     ordered = [0, 1, 2]
-    cull_fr.write_cull_deck(source, cards, ordered, output, DECK_NAME)
-
+    profile = cull_fr.FRENCH_CULL_PROFILE
+    identity = DeckIdentity(output)
     targets = [_target("chat", 1), _target("boire", 2), _target("lait", 3)]
     selection = cullflow.SelectionResult(
         kept=ordered,
@@ -456,57 +466,66 @@ def test_run_gates_passes_on_a_tiny_output(
         exempt=set(),
         reasons={},
     )
-    cull_csv, coverage_csv, manifest_path = cullflow.side_paths(output)
-    cullflow.write_cull_csv(cards, ["", "", ""], selection, ordered, cull_csv)
-    cullflow.write_coverage_csv(
-        targets,
-        selection,
-        coverage_csv,
-        {"chat": "cat", "boire": "drink", "lait": "milk"},
-    )
-    coreflow.fill_core_fields(
-        output,
+    values, _bolded, _unbolded = coreflow.note_values(
+        source,
         cards,
-        {0: ("chat", "cat"), 1: ("chat", "cat"), 2: ("boire", "drink")},
+        ordered,
+        profile,
+        {0: ("chat", "cat"), 1: ("chat", "cat"), 2: ("chien", "dog")},
     )
-    coreflow.fill_bold(
-        output,
-        cards,
-        {0: "chat", 1: "chat", 2: "chien"},
-        cull_fr.FRENCH_CULL_PROFILE.highlight,
+    assemble.write_run(
+        assemble.DeckRun(
+            identity=identity,
+            input_path=source,
+            shape=OutputShape(
+                deck_name=identity.title,
+                model_name=identity.model_name,
+                input_model_name=profile.input_model_name,
+                fields=coreflow.output_fields(profile),
+                templates=coreflow.deck_templates(profile),
+                css=profile.card_css(),
+            ),
+            values=values,
+            card_table=assemble.SideTable(
+                "cull.csv",
+                cullflow.CULL_COLUMNS,
+                cullflow.cull_rows(cards, ["", "", ""], selection, ordered),
+            ),
+            coverage_table=assemble.SideTable(
+                "coverage.csv",
+                cullflow.COVERAGE_COLUMNS,
+                cullflow.coverage_rows(
+                    targets,
+                    selection,
+                    {"chat": "cat", "boire": "drink", "lait": "milk"},
+                ),
+            ),
+            manifest=assemble.ManifestValues(
+                input_model=profile.input_model_name,
+                params={
+                    "max_cards": 3,
+                    "target_words": 3,
+                    "max_uses": 4,
+                    "exempt_top": 0,
+                    "spoken_weight": 0.5,
+                    "min_words": MIN_WORDS,
+                    "max_words": MAX_WORDS,
+                    "similarity": 0.67,
+                    "order": "coverage",
+                },
+                counts={"input": 3, "passed": 3, "cards": 3},
+                frequency={"path": str(cull_fr.FREQUENCY_PATH), "spoken_weight": 0.5},
+                kept_order=cullflow.kept_order_hash(cards, ordered),
+            ),
+            report=(),
+        )
     )
-    coreflow.write_manifest(
-        manifest_path,
-        source={
-            "input": str(source),
-            "deck": DECK_NAME,
-            "model": cull_fr.FRENCH_CULL_PROFILE.output_model_name,
-        },
-        params={
-            "max_cards": 3,
-            "target_words": 3,
-            "max_uses": 4,
-            "exempt_top": 0,
-            "spoken_weight": 0.5,
-            "min_words": MIN_WORDS,
-            "max_words": MAX_WORDS,
-            "similarity": 0.67,
-            "order": "coverage",
-            "name": DECK_NAME,
-        },
-        counts={"input": 3, "passed": 3, "cards": 3},
-        frequency={"path": str(cull_fr.FREQUENCY_PATH), "spoken_weight": 0.5},
-        files={
-            "cull_csv": sha256_value(cull_csv),
-            "coverage_csv": sha256_value(coverage_csv),
-        },
-        kept_order=cullflow.kept_order_hash(cards, ordered),
-    )
+
     monkeypatch.setattr(cullgates.CullFiles, "tokens", _fake_tokens)
     monkeypatch.setattr(coreflow, "probe_audio", _fake_probe)
 
     rows = cullgates.run_gates(
-        cullgates.cull_files(output, cull_fr.FRENCH_CULL_PROFILE)
+        cullgates.GATES, cullgates.cull_files(output, cull_fr.FRENCH_CULL_PROFILE)
     )
 
     assert [gate for gate, _passed, _message in rows] == [
@@ -571,12 +590,11 @@ def test_write_deck_inserts_the_reserve_card(tmp_path: Path) -> None:
     reserve = cull_fr.read_reserve(swadesh)
     output = tmp_path / "merged.apkg"
 
-    counts = cull_fr.write_cull_deck(
+    counts = _write_cull_deck(
         source,
         cards,
         [0, 1],
         output,
-        DECK_NAME,
         reserve=reserve,
         reserve_pack_path=swadesh,
     )
@@ -588,7 +606,7 @@ def test_write_deck_inserts_the_reserve_card(tmp_path: Path) -> None:
 
     assert counts == {"notes": 3, "media": 3, "items": 3}
     assert media == {"a0.mp3", "a1.mp3", "tts_reserve.mp3"}
-    assert models == {cull_fr.FRENCH_CULL_PROFILE.output_model_name}
+    assert models == {output.stem}
     fields = [str(note["flds"]).split("\x1f") for note in notes]
     reserve_row = next(row for row in fields if "<b>Je</b>" in row[1])
     assert reserve_row[0] == "[sound:tts_reserve.mp3]"

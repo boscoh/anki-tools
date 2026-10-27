@@ -19,8 +19,9 @@ the built decks in `apkg/` found four faults:
 ADR 0001 says a builder that rewrites an existing deck keeps the input note type.
 That row is the one this ADR reverses.
 
-Status: accepted. Supersedes the core-deck row of ADR 0001. The rest of ADR 0001
-stands.
+Status: accepted. Supersedes the core-deck row of ADR 0001. The naming rows of
+this ADR are superseded by ADR 0015: the note type name equals the output file
+stem. The rest of ADR 0001 stands.
 
 ## Decision
 

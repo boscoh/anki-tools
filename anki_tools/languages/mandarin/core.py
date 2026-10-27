@@ -43,7 +43,7 @@ from __future__ import annotations
 import csv
 import re
 from pathlib import Path
-from typing import Sequence
+from typing import Iterable, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.templates import SHARED_CSS_PATH, TEMPLATES_DIR, load_text
@@ -67,7 +67,7 @@ from anki_tools.languages.mandarin.profile import (
 )
 from anki_tools.ranking import coreflow
 from anki_tools.ranking.core import CoreOptions
-from anki_tools.ranking.scan import CoreProfile
+from anki_tools.ranking.deckprofile import LanguageDeckProfile
 from anki_tools.sentence_pack.pack import load_css
 
 MODEL_NAME = "0 2024 Sentences Deck"
@@ -78,7 +78,6 @@ AUDIO_FIELD = "[a]"
 SENSE_PATH = Path("vocab/mandarin_core_senses.tsv")
 LOAN_PATH = Path("vocab/mandarin_loanwords.txt")
 
-DEFAULT_NAME = "Mandarin Core Sentences"
 # The reviewed tier F word count of the deck. Every row of
 # vocab/mandarin_core_senses.tsv holds a sense, so the 50 targets are checked.
 DEFAULT_CORE_WORDS = 50
@@ -164,14 +163,14 @@ def load_input_deck(path: Path) -> list[coreflow.InputCard]:
     )
 
 
-def tokenize_deck(cards: Sequence[coreflow.InputCard]) -> list[list[tuple[str, str]]]:
-    """Tokenize the sentence of every card with jieba.
+def tokenize_texts(texts: Iterable[str]) -> list[list[tuple[str, str]]]:
+    """Tokenize sentence texts with jieba.
 
-    :param cards: Input cards.
-    :returns: One list of ``(token, part of speech)`` pairs per card.
+    :param texts: Sentence texts.
+    :returns: One list of ``(token, part of speech)`` pairs per text.
     """
     _ensure_dictionary()
-    return [tokens_with_pos(card.sentence) for card in cards]
+    return [tokens_with_pos(text) for text in texts]
 
 
 def load_frequency() -> list[MandarinFrequencyRow]:
@@ -267,34 +266,36 @@ def finalize_output(output_path: Path, core_csv: Path) -> int:
         package.save(output_path)
     return written
 
-MANDARIN_CORE_PROFILE = CoreProfile(
+MANDARIN_LANGUAGE = LanguageDeckProfile(
     load_input_deck=load_input_deck,
-    tokenize_deck=tokenize_deck,
+    tokenize_texts=tokenize_texts,
     load_frequency=load_frequency,
     frequency_ranks=frequency_ranks,
     read_names=read_names,
-    word_table=word_table,
-    sense_path=SENSE_PATH,
-    loan_path=LOAN_PATH,
-    has_orphan=MANDARIN.has_orphan,
-    hits=MANDARIN.hits,
-    sense_filter=MANDARIN.sense_filter,
-    highlight=MANDARIN.highlight,
-    lemma_key=convert_to_simplified,
     input_model_name=MODEL_NAME,
     input_sentence_field=SENTENCE_FIELD,
     input_english_field=ENGLISH_FIELD,
     input_audio_field=AUDIO_FIELD,
-    output_model_name=DEFAULT_NAME,
-    templates=CORE_TEMPLATES,
+    clean_sentence=_sentence,
     card_css=card_css,
+    sense_path=SENSE_PATH,
+    highlight=MANDARIN.highlight,
+    romanization_source="Sentence (Latin)",
+)
+
+MANDARIN_CORE_PROFILE = MANDARIN_LANGUAGE.core(
+    word_table=word_table,
+    loan_path=LOAN_PATH,
+    has_orphan=MANDARIN.has_orphan,
+    hits=MANDARIN.hits,
+    sense_filter=MANDARIN.sense_filter,
+    lemma_key=convert_to_simplified,
+    templates=CORE_TEMPLATES,
     min_units=MIN_UNITS,
     max_units=MAX_UNITS,
     default_options=DEFAULT_OPTIONS,
-    deck_name=DEFAULT_NAME,
     frequency_source=str(FREQUENCY_PATH),
     outside_set_ratio=1.3,
     outside_rare_ratio=0.1,
     finalize=lambda run: finalize_output(run.output_path, run.core_csv),
-    romanization_source="Sentence (Latin)",
 )

@@ -18,7 +18,8 @@ from anki_tools.ranking.rank import (
     write_ranking_csv,
 )
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.ranking.coreflow import rename_deck
+from anki_tools.apkg.shape import rename_deck
+from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.ranking.reorder import reorder_deck
 
 #: A reducer takes the ranked sentences and gives the kept sentences.
@@ -55,19 +56,19 @@ class RankedDeck:
     stats: dict[str, Any]
 
 
-def rank_paths(apkg_path: Path, output: Path | None = None) -> RankPaths:
-    """Build the three file paths of a rank run from the input name.
+def rank_paths(apkg_path: Path, output: Path) -> RankPaths:
+    """Build the three file paths of a rank run from its identity.
 
     :param apkg_path: Input APKG file.
-    :param output: Output APKG file, or None for the ``_reordered`` name.
+    :param output: Output APKG file.
     :returns: The input path, the output path, and the ranking CSV path.
     """
-    path = Path(apkg_path)
-    output_path = (
-        Path(output) if output is not None else path.parent / f"{path.stem}_reordered.apkg"
+    output_path = Path(output)
+    return RankPaths(
+        Path(apkg_path),
+        output_path,
+        DeckIdentity(output_path).side("rank.csv"),
     )
-    ranking_path = path.parent / f"{path.stem}.rank.csv"
-    return RankPaths(path, output_path, ranking_path)
 
 
 def run_ranked_deck(

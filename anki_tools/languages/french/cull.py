@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from functools import partial
 from pathlib import Path
-from typing import Sequence
+from typing import Iterable
 
 from anki_tools.apkg.templates import SHARED_CSS_PATH, TEMPLATES_DIR, load_text
 from anki_tools.languages.french.profile import (
@@ -25,6 +25,7 @@ from anki_tools.languages.french.profile import (
 )
 from anki_tools.ranking import coreflow, corelist, cullflow
 from anki_tools.ranking.coreflow import InputCard
+from anki_tools.ranking.deckprofile import LanguageDeckProfile
 from anki_tools.sentence_pack.pack import load_css
 from anki_tools.sentence_pack.tokens import load_model
 
@@ -47,7 +48,6 @@ FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
 BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")
 CARD_TEMPLATES = ((FRONT_TEMPLATE, BACK_TEMPLATE),)
 
-DEFAULT_DECK_NAME = "French 1000 Core Sentences"
 SENSE_PATH = Path("vocab/french_core_senses.tsv")
 LICENSES = {
     "tatoeba": "Tatoeba sentence text: CC BY 2.0 FR",
@@ -63,25 +63,23 @@ def load_input_deck(path: Path) -> list[InputCard]:
     :raises RuntimeError: The package has no ``French Sentences`` model.
     :returns: One card per note, in the input order.
     """
-    profile = FRENCH_CULL_PROFILE
     return coreflow.read_input_deck(
         path,
-        profile.input_model_name,
-        profile.input_sentence_field,
-        profile.input_english_field,
-        profile.input_audio_field,
-        profile.clean_sentence,
+        MODEL_NAME,
+        FRENCH_FIELD,
+        ENGLISH_FIELD,
+        AUDIO_FIELD,
+        cullflow.plain_sentence,
     )
 
 
-def tokenize_deck(cards: Sequence[InputCard]) -> list[list[tuple[str, str]]]:
-    """Tokenize the sentence of every card.
+def tokenize_texts(texts: Iterable[str]) -> list[list[tuple[str, str]]]:
+    """Tokenize sentence texts with the French spaCy model.
 
-    :param cards: Input cards.
-    :returns: One list of ``(lemma, part of speech)`` pairs per card.
+    :param texts: Sentence texts.
+    :returns: One list of ``(lemma, part of speech)`` pairs per text.
     """
-    return cullflow.tokenize_texts((card.sentence for card in cards), model=TOKENIZER)
-
+    return cullflow.tokenize_texts(texts, model=TOKENIZER)
 
 def load_or_build_frequency(
     frequency_path: Path = FREQUENCY_PATH, tatoeba_path: Path = TATOEBA_PATH
@@ -139,27 +137,31 @@ def _reserve_fields(card: cullflow.ReserveCard) -> list[str]:
 
 read_reserve = partial(cullflow.load_reserve, model_name=SWADESH_MODEL_NAME)
 
-FRENCH_CULL_PROFILE = cullflow.CullProfile(
-    tokenize_texts=partial(cullflow.tokenize_texts, model=TOKENIZER),
+FRENCH_LANGUAGE = LanguageDeckProfile(
+    load_input_deck=load_input_deck,
+    tokenize_texts=tokenize_texts,
     load_frequency=load_or_build_frequency,
     frequency_ranks=cullflow.frequency_ranks,
     read_names=partial(cullflow.read_names, NAMES_PATH),
+    input_model_name=MODEL_NAME,
+    input_sentence_field=FRENCH_FIELD,
+    input_english_field=ENGLISH_FIELD,
+    input_audio_field=AUDIO_FIELD,
+    clean_sentence=cullflow.plain_sentence,
+    card_css=card_css,
+    sense_path=SENSE_PATH,
+    highlight=FRENCH.highlight,
+)
+
+FRENCH_CULL_PROFILE = FRENCH_LANGUAGE.cull(
     concept_forms=_concept_forms,
     content_pos=corelist.CONTENT_POS,
     min_lemma_length=corelist.MIN_LEMMA_LENGTH,
     final_marks=FINAL_MARKS,
     quote_marks=QUOTE_MARKS,
     internal_marks=INTERNAL_MARKS,
-    input_model_name=MODEL_NAME,
-    input_sentence_field=FRENCH_FIELD,
-    input_english_field=ENGLISH_FIELD,
-    input_audio_field=AUDIO_FIELD,
-    output_model_name=DEFAULT_DECK_NAME,
-    clean_sentence=cullflow.plain_sentence,
     reserve_fields=_reserve_fields,
     templates=CARD_TEMPLATES,
-    card_css=card_css,
-    sense_path=SENSE_PATH,
     reserve_pack=SWADESH_PACK_PATH,
     reserve_model_name=SWADESH_MODEL_NAME,
     swadesh_total=SWADESH_TOTAL,
@@ -168,18 +170,7 @@ FRENCH_CULL_PROFILE = cullflow.CullProfile(
     names_path=NAMES_PATH,
     tatoeba_path=TATOEBA_PATH,
     wordfreq_lang="fr",
-    default_deck_name=DEFAULT_DECK_NAME,
     licenses=LICENSES,
     target_coverage_gate=0.98,
     double_coverage_gate=0.95,
-    highlight=FRENCH.highlight,
 )
-
-write_cull_deck = partial(
-    coreflow.write_deck,
-    profile=FRENCH_CULL_PROFILE,
-    reserve_fields=_reserve_fields,
-)
-
-
-

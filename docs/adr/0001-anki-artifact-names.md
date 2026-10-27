@@ -8,7 +8,9 @@ identity, not a label. The rule: a builder that creates the note type sets the
 model name equal to the deck title. A builder that rewrites an existing deck
 keeps the input note type.
 
-Status: accepted
+Status: accepted. The naming rows of this ADR are superseded by ADR 0015:
+the deck title, the note type name, and the side-file stems equal the output
+file stem.
 
 | Builder | Deck title | Note type (model) name | Output file |
 | --- | --- | --- | --- |

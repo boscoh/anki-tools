@@ -21,7 +21,7 @@ from __future__ import annotations
 import csv
 import re
 from pathlib import Path
-from typing import Sequence
+from typing import Iterable
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.templates import SHARED_CSS_PATH, TEMPLATES_DIR, load_text
@@ -38,7 +38,7 @@ from anki_tools.languages.cantonese.profile import (
 )
 from anki_tools.ranking import coreflow
 from anki_tools.ranking.core import CoreOptions
-from anki_tools.ranking.scan import CoreProfile
+from anki_tools.ranking.deckprofile import LanguageDeckProfile
 from anki_tools.sentence_pack.pack import load_css
 
 MODEL_NAME = "LTL Note Type - Cantonese"
@@ -50,7 +50,6 @@ SENSE_PATH = Path("vocab/cantonese_core_senses.tsv")
 LOAN_PATH = Path("vocab/cantonese_loanwords.txt")
 NAMES_PATH = Path("vocab/cantonese_names.tsv")
 
-DEFAULT_NAME = "Cantonese Core Sentences"
 # The tier F sense rows are not authored yet (anki-eiy). Raise this to 50 with
 # the rows in vocab/cantonese_core_senses.tsv.
 DEFAULT_CORE_WORDS = 0
@@ -116,16 +115,13 @@ def load_input_deck(path: Path) -> list[coreflow.InputCard]:
     )
 
 
-def tokenize_deck(cards: Sequence[coreflow.InputCard]) -> list[list[tuple[str, str]]]:
-    """Tokenize the sentence of every card with the Cantonese tokenizer.
+def tokenize_texts(texts: Iterable[str]) -> list[list[tuple[str, str]]]:
+    """Tokenize sentence texts with the Cantonese tokenizer.
 
-    :param cards: Input cards.
-    :returns: One list of ``(lemma, part of speech)`` pairs per card.
+    :param texts: Sentence texts.
+    :returns: One list of ``(lemma, part of speech)`` pairs per text.
     """
-    return [
-        [(token, TOKEN_POS) for token in han_tokens(card.sentence)]
-        for card in cards
-    ]
+    return [[(token, TOKEN_POS) for token in han_tokens(text)] for text in texts]
 
 
 def load_frequency() -> YueFrequency:
@@ -219,35 +215,37 @@ def finalize_output(output_path: Path, core_csv: Path) -> int:
         package.save(output_path)
     return written
 
-CANTONESE_CORE_PROFILE = CoreProfile(
+CANTONESE_LANGUAGE = LanguageDeckProfile(
     load_input_deck=load_input_deck,
-    tokenize_deck=tokenize_deck,
+    tokenize_texts=tokenize_texts,
     load_frequency=load_frequency,
     frequency_ranks=frequency_ranks,
     read_names=read_names,
-    word_table=word_table,
-    sense_path=SENSE_PATH,
-    loan_path=LOAN_PATH,
-    has_orphan=CANTONESE.has_orphan,
-    hits=CANTONESE.hits,
-    sense_filter=CANTONESE.sense_filter,
-    highlight=CANTONESE.highlight,
-    lemma_key=str.casefold,
     input_model_name=MODEL_NAME,
     input_sentence_field=SENTENCE_FIELD,
     input_english_field=ENGLISH_FIELD,
     input_audio_field=AUDIO_FIELD,
-    output_model_name=DEFAULT_NAME,
-    templates=CORE_TEMPLATES,
+    clean_sentence=_sentence,
     card_css=card_css,
+    sense_path=SENSE_PATH,
+    highlight=CANTONESE.highlight,
+    romanization_source="Jyutping",
+)
+
+CANTONESE_CORE_PROFILE = CANTONESE_LANGUAGE.core(
+    word_table=word_table,
+    loan_path=LOAN_PATH,
+    has_orphan=CANTONESE.has_orphan,
+    hits=CANTONESE.hits,
+    sense_filter=CANTONESE.sense_filter,
+    lemma_key=str.casefold,
+    templates=CORE_TEMPLATES,
     min_units=MIN_UNITS,
     max_units=MAX_UNITS,
     default_options=DEFAULT_OPTIONS,
-    deck_name=DEFAULT_NAME,
     frequency_source="Cifu and Apple Daily blend",
     outside_set_ratio=1.3,
     outside_rare_ratio=0.1,
     spoken_weight=SPOKEN_WEIGHT,
-    romanization_source="Jyutping",
     finalize=lambda run: finalize_output(run.output_path, run.core_csv),
 )

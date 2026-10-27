@@ -16,9 +16,9 @@ import re
 import shutil
 import time
 import webbrowser
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Annotated, Any, Callable, Literal, Sequence
+from typing import Annotated, Literal, Sequence
 
 import cyclopts
 from cyclopts import Parameter
@@ -52,15 +52,12 @@ from anki_tools.languages.cantonese.rank import rank_sentences_yue
 from anki_tools.languages.french.rank import rank_sentences_fr
 from anki_tools.languages.mandarin.rank import rank_sentences_zh
 from anki_tools.languages.spanish.rank import rank_sentences_es
-from anki_tools.ranking import coreflow, coregates, cullflow, cullgates
+from anki_tools.ranking import fixrun
 from anki_tools.ranking.rank import Sentence
 from anki_tools.ranking.pipeline import (
     RankPaths,
     RankedDeck,
-    rank_paths,
-    run_ranked_deck,
 )
-from anki_tools.ranking.scan import CoreProfile
 from anki_tools.apkg.templates import (
     DEFAULT_BACK_PATH,
     DEFAULT_CSS_PATH,
@@ -437,66 +434,10 @@ fix_app = cyclopts.App(name="fix", help="Fix and optimize Anki decks")
 app.command(fix_app)
 
 
-def _run_core_command(
-    profile: CoreProfile,
-    label: str,
-    apkg_path: Path,
-    output: Path | None,
-    cards: int | None,
-    words: int,
-    check: bool,
-) -> None:
-    """Build the core deck for one language.
-
-    :param profile: Language hooks of the shared core flow.
-    :param label: Language name that the banner shows.
-    :param apkg_path: Input .apkg file.
-    :param output: Output .apkg file (default: from the input name).
-    :param cards: Core mode: card cap.
-    :param words: Core mode: tier F words after the Swadesh set.
-    :param check: Run the gates on the output only.
-    """
-    output_path = output or coreflow.default_output(apkg_path)
-    if check:
-        code = coregates.check_core(output_path, profile)
-        if code:
-            raise SystemExit(code)
-        return
-    if not apkg_path.exists():
-        print(f"Error: File not found: {apkg_path}")
-        return
-    print("=" * 50)
-    print(f"Processing {label} Anki Deck: core mode")
-    print("=" * 50)
-    options = profile.default_options
-    if cards is not None:
-        options = replace(options, max_cards=cards)
-    request = coreflow.CoreRequest(
-        input_path=apkg_path,
-        output_path=output_path,
-        core_words=words,
-        options=options,
-        name=output_path.stem,
-    )
-    if profile.spoken_weight is not None:
-        request = replace(request, spoken_weight=profile.spoken_weight)
-    coreflow.run_core(request, profile)
-
-
-def _check_guard(check: bool, modes: Sequence[tuple[str, bool]]) -> bool:
-    """Decide if a fix run may continue with the ``--check`` flag.
-
-    :param check: Value of the ``--check`` flag.
-    :param modes: Mode flag names and their enabled state, in message order.
-    :returns: True when the run may continue, False after the error print.
-    """
-    if not check or any(enabled for _, enabled in modes):
-        return True
-    print(f"Error: --check needs {' or '.join(name for name, _ in modes)}.")
-    return False
-
-
 DEFAULT_MANDARIN_APKG = Path("apkg/Neri's Chinese Sents Part 2.apkg")
+DEFAULT_FRENCH_APKG = Path("apkg/6000_French_Sentences_w_Audio.apkg")
+DEFAULT_CANTONESE_APKG = Path("apkg/LTL Cantonese Deck Level 1 - Short.apkg")
+DEFAULT_SPANISH_APKG = Path("apkg/Spanish 9000 sentences with native audio.apkg")
 
 
 @fix_app.command
@@ -512,53 +453,35 @@ def zh(
 ):
     """Fix Chinese deck: rank, reorder, fix pinyin, and apply styling.
 
-    Rank mode writes ``<input>_reordered.apkg`` and ``.rank.csv``, then fixes
-    the pinyin and writes the card templates. ``--core`` builds
-    ``<input>_core.apkg`` with its CSV files and manifest.
+    Rank mode writes ``apkg/mandarin_reordered.apkg`` and its rank CSV, then
+    fixes the pinyin and writes the card templates. ``--core`` builds
+    ``apkg/mandarin_core.apkg`` with its CSV files and manifest.
 
     :param apkg_path: Input .apkg file.
-    :param output: Output .apkg file (default: from the input name).
+    :param output: Output .apkg file (default: from the language and mode).
     :param text_field: Rank mode: preferred sentence field (default: infer).
     :param core: Build the core deck instead of ranking.
     :param cards: Core mode: card cap (300).
     :param words: Core mode: tier F words after the Swadesh set.
     :param check: Run the gates on the output and do not run the mode again.
     """
-    apkg_path = Path(apkg_path)
-    if not apkg_path.exists():
-        print(f"Error: File not found: {apkg_path}")
-        return
-
-    if not _check_guard(check, (("--core", core),)):
-        return
-
-    if core:
-        _run_core_command(
-            mandarin_core.MANDARIN_CORE_PROFILE,
-            LANGUAGES["mandarin"].label,
-            apkg_path,
-            output,
-            cards,
-            words,
-            check,
-        )
-        return
-
-    paths = rank_paths(apkg_path, output)
-
-    _run_rank_mode(
-        paths,
-        LANGUAGES["mandarin"].label,
-        rank_sentences_zh,
-        {
-            "text_field": text_field,
-            "romanization_candidates": ("Pinyin",),
-        },
-        after=mandarin_fix_steps.after_rank,
+    fixrun.run_fix(
+        fixrun.FixLanguage(
+            name="mandarin",
+            label=LANGUAGES["mandarin"].label,
+            core=mandarin_core.MANDARIN_CORE_PROFILE,
+            rank=rank_sentences_zh,
+            deck_kwargs={"romanization_candidates": ("Pinyin",)},
+            after=mandarin_fix_steps.after_rank,
+        ),
+        apkg_path=apkg_path,
+        output=output,
+        text_field=text_field,
+        core=core,
+        cards=cards,
+        words=words,
+        check=check,
     )
-
-
-DEFAULT_FRENCH_APKG = Path("apkg/6000_French_Sentences_w_Audio.apkg")
 
 
 @fix_app.command
@@ -576,13 +499,13 @@ def fr(
 ):
     """Fix French deck: rank and reorder it, or select a smaller deck.
 
-    Rank mode writes ``<input>_reordered.apkg`` and ``.rank.csv``. Select mode,
-    with ``--select``, runs the 1000-card cull and writes
-    ``<input>_culled.apkg``. ``--core`` builds ``<input>_core.apkg`` with its
-    CSV files and manifest.
+    Rank mode writes ``apkg/french_reordered.apkg`` and its rank CSV. Select
+    mode, with ``--select``, runs the 1000-card cull and writes
+    ``apkg/french_1000.apkg``. ``--core`` builds ``apkg/french_core.apkg``
+    with its CSV files and manifest.
 
     :param apkg_path: Input .apkg file.
-    :param output: Output .apkg file (default: from the input name).
+    :param output: Output .apkg file (default: from the language and mode).
     :param text_field: Rank mode: preferred sentence field (default: French).
     :param select: Run the card cull instead of the rank and reorder.
     :param core: Build the core deck instead of ranking.
@@ -591,149 +514,25 @@ def fr(
     :param words: Core mode: tier F words after the Swadesh set.
     :param check: Run the gates on the output and do not run the mode again.
     """
-    apkg_path = Path(apkg_path)
-    if not apkg_path.exists():
-        print(f"Error: File not found: {apkg_path}")
-        return
-
-    if not _check_guard(check, (("--select", select), ("--core", core))):
-        return
-
-    if core and select:
-        print("Error: --core and --select cannot be used together.")
-        return
-
-
-    if core:
-        _run_core_command(
-            french_core.FRENCH_CORE_PROFILE,
-            LANGUAGES["french"].label,
-            apkg_path,
-            output,
-            cards,
-            words,
-            check,
-        )
-        return
-    if select:
-        output_path = output or cullflow.default_output(apkg_path)
-        if check:
-            code = cullgates.check_cull(
-                output_path, french_cull.FRENCH_CULL_PROFILE
-            )
-            if code:
-                raise SystemExit(code)
-            return
-        request = cullflow.CullRequest(
-            input_path=apkg_path,
-            output_path=output_path,
-            no_reserve=not reserve,
-            name=output_path.stem,
-        )
-        if cards is not None:
-            request = replace(request, max_cards=cards)
-        cullflow.run_cull(request, french_cull.FRENCH_CULL_PROFILE)
-        return
-
-    paths = rank_paths(apkg_path, output)
-
-    _run_rank_mode(
-        paths,
-        LANGUAGES["french"].label,
-        rank_sentences_fr,
-        {
-            "text_field": text_field,
-            "text_candidates": ("French",),
-        },
+    fixrun.run_fix(
+        fixrun.FixLanguage(
+            name="french",
+            label=LANGUAGES["french"].label,
+            core=french_core.FRENCH_CORE_PROFILE,
+            cull=french_cull.FRENCH_CULL_PROFILE,
+            rank=rank_sentences_fr,
+            deck_kwargs={"text_candidates": ("French",)},
+        ),
+        apkg_path=apkg_path,
+        output=output,
+        text_field=text_field,
+        core=core,
+        select=select,
+        cards=cards,
+        reserve=reserve,
+        words=words,
+        check=check,
     )
-
-
-def _print_rank_banner(paths: RankPaths, label: str, target: str = "") -> None:
-    """Print the banner that starts a fix rank run.
-
-    :param paths: Input, output, and ranking file of the run.
-    :param label: Deck language, for example ``Chinese``.
-    :param target: Preformatted extra line, or an empty string.
-    """
-    print("=" * 50)
-    print(f"Processing {label} Anki Deck")
-    print("=" * 50)
-    print(f"Input:   {paths.input_path}")
-    print(f"Output:  {paths.output_path}")
-    print(f"Ranking: {paths.ranking_path}")
-    if target:
-        print(target)
-    print()
-
-
-def _print_rank_done(
-    paths: RankPaths,
-    ranked_count: int,
-    stats: dict[str, Any],
-    select_csv: Path | None = None,
-    coverage_csv: Path | None = None,
-    *,
-    extra_lines: Sequence[str] = (),
-) -> None:
-    """Print the DONE table of a rank or a select run.
-
-    :param paths: Input, output, and ranking file of the run.
-    :param ranked_count: Sentences that the ranker kept.
-    :param stats: Card counts of the reorder step.
-    :param select_csv: Select CSV of a select run, or None in rank mode.
-    :param coverage_csv: Coverage CSV of a select run, or None in rank mode.
-    :param extra_lines: Preformatted lines to print after the card counts.
-    """
-    print()
-    print("=" * 50)
-    print("DONE!")
-    print("=" * 50)
-    print(f"  Sentences ranked:    {ranked_count}")
-    print(f"  Cards reordered:     {stats['cards_reordered']}")
-    print(f"  Cards removed:       {stats['cards_removed']}")
-    for line in extra_lines:
-        print(line)
-    print(f"  Output:              {paths.output_path}")
-    print(f"  Ranking CSV:         {paths.ranking_path}")
-    if select_csv is not None:
-        print(f"  Select CSV:          {select_csv}")
-    if coverage_csv is not None:
-        print(f"  Coverage CSV:        {coverage_csv}")
-
-
-def _run_rank_mode(
-    paths: RankPaths,
-    label: str,
-    rank: Callable[[list[Sentence]], list[Sentence]],
-    deck_kwargs: dict[str, Any],
-    *,
-    target: str = "",
-    count: Callable[[int], int] | None = None,
-    after: Callable[[RankPaths, RankedDeck], Sequence[str]] | None = None,
-) -> None:
-    """Rank, reorder, and report one deck, with the language parts as hooks.
-
-    :param paths: Input, output, and ranking file of the run.
-    :param label: Deck language, for example ``Chinese``.
-    :param rank: Ranker of the language, sentences to ranked sentences.
-    :param deck_kwargs: Extra keyword arguments for ``run_ranked_deck``.
-    :param target: Preformatted extra banner line, or an empty string.
-    :param count: Ranked count hook, or None to use the ranked length.
-    :param after: Hook that prints the language steps and returns the extra
-        DONE lines, or None for no extra lines.
-    """
-    _print_rank_banner(paths, label, target=target)
-    print("Step 1: Ranking sentences...")
-    deck = run_ranked_deck(paths, rank=rank, **deck_kwargs)
-    if not deck.sentences:
-        print("No sentences found!")
-        return
-    ranked_count = count(len(deck.ranked)) if count is not None else len(deck.ranked)
-    extra_lines = after(paths, deck) if after is not None else ()
-    _print_rank_done(paths, ranked_count, deck.stats, extra_lines=extra_lines)
-
-
-DEFAULT_CANTONESE_APKG = Path("apkg/LTL Cantonese Deck Level 1 - Short.apkg")
 
 
 @fix_app.command
@@ -749,46 +548,21 @@ def yue(
 ):
     """Fix Cantonese deck: rank and reorder it, or build a core deck.
 
-    Rank mode writes ``<input>_reordered.apkg`` and ``.rank.csv``, with the
-    jyutping fixes. ``--core`` builds ``<input>_core.apkg`` with its CSV files
-    and manifest.
+    Rank mode writes ``apkg/cantonese_reordered.apkg`` and its rank CSV, with
+    the jyutping fixes. ``--core`` builds ``apkg/cantonese_core.apkg`` with its
+    CSV files and manifest.
 
     :param apkg_path: Input .apkg file.
-    :param output: Output .apkg file (default: from the input name).
+    :param output: Output .apkg file (default: from the language and mode).
     :param text_field: Rank mode: preferred sentence field (default: infer).
     :param core: Build the core deck instead of ranking.
     :param cards: Core mode: card cap (300).
     :param words: Core mode: tier F words after the Swadesh set.
     :param check: Run the gates on the output and do not run the mode again.
     """
-    apkg_path = Path(apkg_path)
-    if not apkg_path.exists():
-        print(f"Error: File not found: {apkg_path}")
-        return
-
-    if not _check_guard(check, (("--core", core),)):
-        return
-
-    if core:
-        _run_core_command(
-            cantonese_core.CANTONESE_CORE_PROFILE,
-            LANGUAGES["cantonese"].label,
-            apkg_path,
-            output,
-            cards,
-            words,
-            check,
-        )
-        return
-
-
-    paths = rank_paths(apkg_path, output)
-
-    extracted: list[Sentence] = []
     counts: dict[str, int] = {}
 
     def rank_and_capture(sentences: list[Sentence]) -> list[Sentence]:
-        extracted.extend(sentences)
         ranked = rank_sentences_yue(sentences)
         counts["ranked"] = len(ranked)
         return ranked
@@ -799,29 +573,32 @@ def yue(
 
     def after_rank(paths: RankPaths, deck: RankedDeck) -> Sequence[str]:
         print("\nFixing jyutping...")
-        fix_jyutping(
-            paths.output_path,
-            output=paths.output_path,
-            verbose=False,
-        )
+        fix_jyutping(paths.output_path, output=paths.output_path, verbose=False)
         return ()
 
-    _run_rank_mode(
-        paths,
-        LANGUAGES["cantonese"].label,
-        rank_and_capture,
-        {
-            "text_field": text_field,
-            "romanization_candidates": ("Jyutping",),
-            "reduce": reorder,
-            "remove_unranked": False,
-        },
-        count=lambda ranked_total: counts.get("ranked", ranked_total),
-        after=after_rank,
+    fixrun.run_fix(
+        fixrun.FixLanguage(
+            name="cantonese",
+            label=LANGUAGES["cantonese"].label,
+            core=cantonese_core.CANTONESE_CORE_PROFILE,
+            rank=rank_and_capture,
+            deck_kwargs={
+                "romanization_candidates": ("Jyutping",),
+                "reduce": reorder,
+                "remove_unranked": False,
+            },
+            after=after_rank,
+            count=lambda total: counts.get("ranked", total),
+        ),
+        apkg_path=apkg_path,
+        output=output,
+        text_field=text_field,
+        core=core,
+        cards=cards,
+        words=words,
+        check=check,
     )
 
-
-DEFAULT_SPANISH_APKG = Path("apkg/Spanish 9000 sentences with native audio.apkg")
 
 @fix_app.command
 def es(
@@ -838,12 +615,13 @@ def es(
 ):
     """Fix Spanish deck: rank and reorder it, or select a smaller deck.
 
-    Rank mode writes ``<input>_reordered.apkg`` and ``.rank.csv``. Select mode,
-    with ``--select``, runs the cull and writes ``<input>_culled.apkg``.
-    ``--core`` builds ``<input>_core.apkg`` with its CSV files and manifest.
+    Rank mode writes ``apkg/spanish_reordered.apkg`` and its rank CSV. Select
+    mode, with ``--select``, runs the cull and writes ``apkg/spanish_1000.apkg``.
+    ``--core`` builds ``apkg/spanish_core.apkg`` with its CSV files and
+    manifest.
 
     :param apkg_path: Input .apkg file.
-    :param output: Output .apkg file (default: from the input name).
+    :param output: Output .apkg file (default: from the language and mode).
     :param text_field: Rank mode: preferred sentence field (default: Spanish).
     :param select: Run the cull instead of the rank and reorder.
     :param core: Build the core deck instead of ranking.
@@ -852,61 +630,24 @@ def es(
     :param words: Core mode: tier F words after the Swadesh set.
     :param check: Run the gates on the output and do not run the mode again.
     """
-    apkg_path = Path(apkg_path)
-    if not apkg_path.exists():
-        print(f"Error: File not found: {apkg_path}")
-        return
-
-    if not _check_guard(check, (("--select", select), ("--core", core))):
-        return
-
-    if core and select:
-        print("Error: --core and --select cannot be used together.")
-        return
-
-    if core:
-        _run_core_command(
-            spanish_core.SPANISH_CORE_PROFILE,
-            LANGUAGES["spanish"].label,
-            apkg_path,
-            output,
-            cards,
-            words,
-            check,
-        )
-        return
-
-    if select:
-        output_path = output or cullflow.default_output(apkg_path)
-        if check:
-            code = cullgates.check_cull(
-                output_path, spanish_cull.SPANISH_CULL_PROFILE
-            )
-            if code:
-                raise SystemExit(code)
-            return
-        request = cullflow.CullRequest(
-            input_path=apkg_path,
-            output_path=output_path,
-            no_reserve=not reserve,
-            name=output_path.stem,
-        )
-        if cards is not None:
-            request = replace(request, max_cards=cards)
-        cullflow.run_cull(request, spanish_cull.SPANISH_CULL_PROFILE)
-        return
-
-    paths = rank_paths(apkg_path, output)
-
-    _run_rank_mode(
-        paths,
-        LANGUAGES["spanish"].label,
-        rank_sentences_es,
-        {
-            "text_field": text_field,
-        },
+    fixrun.run_fix(
+        fixrun.FixLanguage(
+            name="spanish",
+            label=LANGUAGES["spanish"].label,
+            core=spanish_core.SPANISH_CORE_PROFILE,
+            cull=spanish_cull.SPANISH_CULL_PROFILE,
+            rank=rank_sentences_es,
+        ),
+        apkg_path=apkg_path,
+        output=output,
+        text_field=text_field,
+        core=core,
+        select=select,
+        cards=cards,
+        reserve=reserve,
+        words=words,
+        check=check,
     )
-
 
 for _fix_command, _canonical_name in (
     (zh, "mandarin"),

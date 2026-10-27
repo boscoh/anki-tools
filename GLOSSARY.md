@@ -46,6 +46,51 @@ The small deck that holds one card per Swadesh target, then the tier F words.
 Each card shows one example sentence of a large sentence deck. The
 `anki fix <lang> --core` command writes it.
 _Avoid_: starter deck, base deck, small deck
+## Deck output
+
+**Output stem**:
+The file stem of the written package. The deck title, the note type name, and
+the side-file stems all equal it. The code lives in
+`anki_tools/ranking/identity.py`.
+_Avoid_: deck name, model name, title
+
+**Output identity**:
+The one name that a written package and its side files share. ADR 0015 records
+the rule.
+_Avoid_: deck identity, artifact name
+
+**Output package shape**:
+The invariant of a written package: one deck, one standard note type with the
+stated fields, and one card per note. The code lives in
+`anki_tools/apkg/shape.py`.
+_Avoid_: deck layout, package template
+
+**Deck assembler**:
+The module that writes the package, the side files, the manifest, and the
+report of one run. The core selection and the cull selection are its two
+adapters. The code lives in `anki_tools/ranking/assemble.py`.
+_Avoid_: writer, builder, exporter
+
+**Gate table**:
+The runner, the report, and the shared gates of the core and cull modes. Each
+mode supplies a file reader. The code lives in `anki_tools/ranking/gates.py`.
+_Avoid_: audit list, check list
+
+**Language deck profile**:
+The language facts of one deck family, with a core mode view and a cull mode
+view over them. The code lives in `anki_tools/ranking/deckprofile.py`.
+_Avoid_: deck config, deck settings
+
+**Mode view**:
+The `CoreProfile` or the `CullProfile` that a language deck profile gives for
+one flow. It holds the language facts and the values of that mode.
+_Avoid_: mode profile, sub profile
+
+**Fix run**:
+The shared route behind the four `anki fix` commands: the path check, the
+`--check` guard, the mode branch, the request build, and the rank report. The
+code lives in `anki_tools/ranking/fixrun.py`.
+_Avoid_: dispatcher, router
 
 ## Sentence pack
 

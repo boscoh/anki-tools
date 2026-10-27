@@ -13,7 +13,6 @@ def test_profile_holds_the_deck_paths():
     assert profile.input_sentence_field == "Sentence"
     assert profile.input_english_field == "Sentence (Translation)"
     assert profile.input_audio_field == "[a]"
-    assert profile.output_model_name == core.DEFAULT_NAME
     assert profile.romanization_source == "Sentence (Latin)"
     assert profile.min_units < profile.max_units
     assert profile.templates

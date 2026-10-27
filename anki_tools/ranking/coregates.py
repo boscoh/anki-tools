@@ -14,31 +14,39 @@ import hashlib
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Mapping, NamedTuple, Protocol, Sequence
+from typing import Any, Callable
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking.coreflow import (
-    OUTPUT_CORE_FIELD,
-    OUTPUT_GLOSS_FIELD,
     OUTPUT_SENTENCE_FIELD,
     STATUSES,
     TARGET_SEPARATOR,
-    DeckProfile,
     deck_templates,
-    coverage_glosses,
     filter_core_cards,
-    output_fields,
     read_loanwords,
     read_output,
-    side_paths,
 )
 from anki_tools.ranking.corelist import CONTENT_POS
+from anki_tools.ranking.gates import (
+    Gate,
+    GateResult,
+    core_word_problems,
+    gate_core_word,
+    gate_identity,
+    gate_output_model,
+    output_model_problems,
+    read_csv,
+    read_json,
+    report,
+    run_gates,
+)
+from anki_tools.ranking.gates import sample as _sample
+from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.ranking.scan import CoreProfile
-from anki_tools.sentence_pack.audit import print_audit, sha256_value
+from anki_tools.sentence_pack.audit import sha256_value
 
 __all__ = [
     "CoreFiles",
-    "CoreGate",
     "GATES",
     "Gate",
     "GateResult",
@@ -69,68 +77,6 @@ __all__ = [
     "run_gates",
 ]
 
-SAMPLE = 3
-
-
-class GateResult(NamedTuple):
-    """Result of one gate.
-
-    :param name: Gate label, for example ``K1``.
-    :param passed: True when the gate accepts the files.
-    :param message: Detail line of the gate table.
-    """
-
-    name: str
-    passed: bool
-    message: str
-
-
-class Gate(Protocol):
-    """Contract of one core gate."""
-
-    name: str
-
-    def check(self, files: "CoreFiles") -> GateResult:
-        """Run the gate on the output files and give the result."""
-        ...
-
-
-@dataclass
-class CoreGate:
-    """One gate value built from a ``(passed, message)`` check function.
-
-    :param name: Gate label, for example ``K1``.
-    :param check: Check that gives ``(passed, message)`` for the files.
-    """
-
-    name: str
-    _check: Callable[["CoreFiles"], tuple[bool, str]]
-
-    def check(self, files: "CoreFiles") -> GateResult:
-        """Run the check and wrap the result with the gate name."""
-        passed, message = self._check(files)
-        return GateResult(self.name, passed, message)
-
-
-def _read_csv(path: Path) -> list[dict[str, str]]:
-    """Read a CSV file into row mappings."""
-    import csv
-
-    with Path(path).open(encoding="utf-8", newline="") as handle:
-        return list(csv.DictReader(handle))
-
-
-def _read_json(path: Path) -> dict[str, Any]:
-    """Read a JSON object file."""
-    import json
-
-    try:
-        text = Path(path).read_text(encoding="utf-8")
-        return json.loads(text)
-    except (OSError, json.JSONDecodeError) as error:
-        raise ValueError(f"cannot read {path}") from error
-
-
 @dataclass
 class CoreFiles:
     """Lazy reader for the four files of a core run.
@@ -147,7 +93,7 @@ class CoreFiles:
         """Set the paths and start an empty cache."""
         self.apkg_path = Path(self.apkg_path)
         self.core_csv, self.coverage_csv, self.manifest_path, self.rank_csv = (
-            side_paths(self.apkg_path)
+            DeckIdentity(self.apkg_path).core_sides()
         )
 
     def _load(self, name: str, loader: Callable[[], Any]) -> Any:
@@ -164,19 +110,24 @@ class CoreFiles:
 
     def rows(self) -> list[dict[str, str]]:
         """Read the card CSV rows."""
-        return self._load("rows", lambda: _read_csv(self.core_csv))
+        return self._load("rows", lambda: read_csv(self.core_csv))
 
     def coverage(self) -> list[dict[str, str]]:
         """Read the coverage CSV rows."""
-        return self._load("coverage", lambda: _read_csv(self.coverage_csv))
+        return self._load("coverage", lambda: read_csv(self.coverage_csv))
 
     def manifest(self) -> dict[str, Any]:
         """Read the manifest JSON."""
-        return self._load("manifest", lambda: _read_json(self.manifest_path))
+        return self._load("manifest", lambda: read_json(self.manifest_path))
+
+    def params(self) -> dict[str, Any]:
+        """Read the run options of the manifest."""
+        params = self.manifest().get("params", {})
+        return dict(params)
 
     def rank_rows(self) -> list[dict[str, str]]:
         """Read the rank CSV rows."""
-        return self._load("rank", lambda: _read_csv(self.rank_csv))
+        return self._load("rank", lambda: read_csv(self.rank_csv))
 
     def output(self) -> dict[str, Any]:
         """Read the output APKG and probe its audio."""
@@ -208,10 +159,6 @@ class CoreFiles:
         """Read the media file names of the output deck."""
         return self._load("media", lambda: set(self.output()["media"]))
 
-
-def _sample(items: Sequence[str], limit: int = SAMPLE) -> str:
-    """Join a bounded sample of failure items."""
-    return ", ".join(items[:limit])
 
 
 def _kept(files: CoreFiles) -> list[dict[str, str]]:
@@ -353,16 +300,6 @@ def gate_counts(files: CoreFiles) -> tuple[bool, str]:
     return ok, f"notes {notes}, CSV {len(kept)}, media {len(media)} of {len(audio)}"
 
 
-def gate_identity(files: CoreFiles) -> tuple[bool, str]:
-    """K9: the deck name and the note type are the requested values."""
-    params = files.manifest()["params"]
-    output = files.output()
-    name = files.profile.output_model_name
-    ok_deck = params.get("name") in output["decks"]
-    ok_model = output["note_models"] == {name}
-    return ok_deck and ok_model, (
-        f"decks {sorted(output['decks'])}, models {sorted(map(str, output['note_models']))}"
-    )
 
 
 def gate_order(files: CoreFiles) -> tuple[bool, str]:
@@ -556,135 +493,30 @@ def gate_tail(files: CoreFiles) -> tuple[bool, str]:
     return not bad, f"{len(tail)} tail card(s), {len(bad)} without a new lemma"
 
 
-def core_word_problems(
-    notes: Mapping[int, Sequence[str]],
-    fields: Sequence[str],
-    glosses: Mapping[str, str],
-) -> tuple[list[str], int]:
-    """Check the core word, the gloss, and the bold text of every note.
-
-    :param notes: Note id to field values.
-    :param fields: Field names of the output note type.
-    :param glosses: Word to its coverage gloss.
-    :returns: The problems, and the count of notes with a core word.
-    """
-    missing = [
-        name
-        for name in (OUTPUT_CORE_FIELD, OUTPUT_GLOSS_FIELD)
-        if name not in fields
-    ]
-    if missing:
-        return [f"the note type has no {_sample(missing)} field"], 0
-    word_index = fields.index(OUTPUT_CORE_FIELD)
-    gloss_index = fields.index(OUTPUT_GLOSS_FIELD)
-    sentence_index = (
-        fields.index(OUTPUT_SENTENCE_FIELD)
-        if OUTPUT_SENTENCE_FIELD in fields
-        else -1
-    )
-    problems: list[str] = []
-    filled = 0
-    for note_id, values in notes.items():
-        word = values[word_index].strip() if word_index < len(values) else ""
-        gloss = values[gloss_index].strip() if gloss_index < len(values) else ""
-        if not word:
-            problems.append(f"{note_id} has no core word")
-            continue
-        filled += 1
-        sentence = (
-            values[sentence_index] if 0 <= sentence_index < len(values) else ""
-        )
-        if "<b>" not in sentence:
-            problems.append(f"{note_id} has no bold")
-        if not gloss:
-            problems.append(f"{note_id} has no gloss")
-        elif "," in gloss:
-            problems.append(f"{note_id} holds a comma gloss")
-        elif word in glosses and gloss != glosses[word]:
-            problems.append(
-                f"{note_id} gloss {gloss!r} is not the coverage gloss of {word}"
-            )
-    return problems, filled
-
-
-def gate_core_word(files: CoreFiles) -> tuple[bool, str]:
-    """K19: every note holds a core word and the coverage gloss of that word."""
-    problems, filled = core_word_problems(
-        files.notes(), files.fields(), coverage_glosses(files.coverage())
-    )
-    return not problems, f"{filled} core word(s), {len(problems)} bad: {_sample(problems)}"
-
-
-def output_model_problems(
-    output: Mapping[str, Any], profile: DeckProfile
-) -> list[str]:
-    """Check the note type shape of an output package.
-
-    :param output: Output of :func:`anki_tools.ranking.coreflow.read_output`.
-    :param profile: Language hooks of the run.
-    :returns: One problem line per fault.
-    """
-    name = profile.output_model_name
-    problems: list[str] = []
-    if output["note_models"] != {name}:
-        problems.append(f"note types {sorted(map(str, output['note_models']))}")
-    expected = list(output_fields(profile))
-    if output["fields"] != expected:
-        problems.append(f"fields {output['fields']}")
-    templates = output["templates"].get(name, ())
-    if len(templates) != 1:
-        problems.append(f"{len(templates)} card template(s)")
-    ords = list(output["ords"])
-    if len(ords) != output["notes"] or any(ords):
-        problems.append(f"{len(ords)} cards, ordinals {sorted(set(ords))}")
-    return problems
-
-
-def gate_output_model(files: CoreFiles) -> tuple[bool, str]:
-    """K21: one note type, the output fields, and one card per note."""
-    problems = output_model_problems(files.output(), files.profile)
-    return not problems, f"issues {_sample(problems)}"
 
 GATES: tuple[Gate, ...] = (
-    CoreGate("K1", gate_card_count),
-    CoreGate("K2", gate_covered1),
-    CoreGate("K3", gate_covered2),
-    CoreGate("K4", gate_outside),
-    CoreGate("K5", gate_filter),
-    CoreGate("K6", gate_similarity),
-    CoreGate("K7", gate_audio),
-    CoreGate("K8", gate_counts),
-    CoreGate("K9", gate_identity),
-    CoreGate("K10", gate_order),
-    CoreGate("K11", gate_coverage),
-    CoreGate("K12", gate_hashes),
-    CoreGate("K13", gate_hit),
-    CoreGate("K14", gate_templates),
-    CoreGate("K15", gate_bold),
-    CoreGate("K16", gate_sense),
-    CoreGate("K17", gate_names),
-    CoreGate("K18", gate_tail),
-    CoreGate("K19", gate_core_word),
-    CoreGate("K20", gate_unranked),
-    CoreGate("K21", gate_output_model),
+    Gate("K1", gate_card_count),
+    Gate("K2", gate_covered1),
+    Gate("K3", gate_covered2),
+    Gate("K4", gate_outside),
+    Gate("K5", gate_filter),
+    Gate("K6", gate_similarity),
+    Gate("K7", gate_audio),
+    Gate("K8", gate_counts),
+    Gate("K9", gate_identity),
+    Gate("K10", gate_order),
+    Gate("K11", gate_coverage),
+    Gate("K12", gate_hashes),
+    Gate("K13", gate_hit),
+    Gate("K14", gate_templates),
+    Gate("K15", gate_bold),
+    Gate("K16", gate_sense),
+    Gate("K17", gate_names),
+    Gate("K18", gate_tail),
+    Gate("K19", gate_core_word),
+    Gate("K20", gate_unranked),
+    Gate("K21", gate_output_model),
 )
-
-
-def run_gates(files: CoreFiles) -> list[GateResult]:
-    """Run every gate and catch the error of a gate that cannot read a file.
-
-    :param files: Lazy reader of the output files.
-    :returns: One result per gate.
-    """
-    results: list[GateResult] = []
-    for gate in GATES:
-        try:
-            results.append(gate.check(files))
-        except Exception as error:  # noqa: BLE001 - a gate reports the error
-            results.append(
-                GateResult(gate.name, False, f"{type(error).__name__}: {error}")
-            )
-    return results
 
 
 def check_core(output_path: Path, profile: CoreProfile) -> int:
@@ -694,4 +526,4 @@ def check_core(output_path: Path, profile: CoreProfile) -> int:
     :param profile: Language hooks.
     :returns: The exit code of the gate table, 0 on a pass.
     """
-    return print_audit(run_gates(CoreFiles(Path(output_path), profile)))
+    return report(run_gates(GATES, CoreFiles(Path(output_path), profile)))

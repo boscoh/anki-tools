@@ -214,12 +214,13 @@ cards, and the reserve notes follow them.
 
 | File                       | Content                                                 |
 | -------------------------- | ------------------------------------------------------- |
-| `<stem>_culled.apkg`       | the deck: the kept cards and the reserve cards          |
+| `<language>_1000.apkg`       | the deck: the kept cards and the reserve cards          |
 | `<stem>.cull.csv`          | one row per input card and reserve card                 |
 | `<stem>.coverage.csv`      | per target: word, rank, count, status, gloss            |
 | `<stem>.manifest.json`     | params, counts, frequency source, licenses, hashes      |
 
-`default_output` gives `<stem>_culled.apkg` next to the input file.
+`identity.default_output(language, "cull")` gives `apkg/<language>_1000.apkg`.
+Every name comes from the output file stem (`anki_tools/ranking/identity.py`).
 
 The cull CSV columns are `source`, `sentence`, `english`, `audio`, `kept`,
 `reason`, `targets`, `gain`, and `hardest_rank`. The `source` value is
@@ -237,10 +238,11 @@ The coverage status of a target is one of these values:
 | `partial` | the target holds one card            |
 | `absent`  | the target holds no card             |
 
-The deck name comes from `profile.default_deck_name`. The writer clones the
-input note type under the name of `profile.output_model_name`, and the deck
-title is the same string. The output holds one note type, one field set, and
-one card template.
+The deck title and the note type name are the output file stem, and so is
+`manifest.source.model`. The writer (`anki_tools/apkg/shape.py`) clones the
+input note type under that name. The output holds one note type, one field
+set, and one card template. The assembler (`anki_tools/ranking/assemble.py`)
+writes the side files, the manifest, and the report.
 
 The writer deletes the notes that no kept card uses, inserts the reserve notes,
 and deletes the input note type and every other note type. It keeps the `due`
@@ -251,7 +253,7 @@ reserve card, so the pack `Target` becomes `Core` and the pack `Gloss` becomes
 The field set is `output_fields(profile)`: `Audio`, `Sentence`, `English`, the
 `Romanization` field when the language has a romanization, `Core`, and
 `CoreGloss`. `card_cores` takes the first
-target lemma of the card that has a sense row, and `fill_core_fields` writes
+target lemma of the card that has a sense row, and `coreflow.note_values` writes
 that lemma and its first sense. A card without a target has no core word, so
 the run does not write it. Its CSV row holds `kept = 0` and `reason = no_core`,
 and the manifest counts it in `counts.dropped_no_core`.
@@ -297,9 +299,15 @@ not fail G1.
 
 | Path                                      | Content                                        |
 | ----------------------------------------- | ---------------------------------------------- |
-| `anki_tools/ranking/cullflow.py`          | C0 to C5 flow, profile, selection, files       |
+| `anki_tools/ranking/cullflow.py`          | C0 to C5 flow, profile, selection, values      |
 | `anki_tools/ranking/cullgates.py`         | gates G1 to G17                                |
-| `anki_tools/ranking/coreflow.py`          | input deck reader, deck writer, reserve insert |
+| `anki_tools/ranking/gates.py`             | gate runner, report, shared gates              |
+| `anki_tools/ranking/assemble.py`          | deck, side files, manifest, report             |
+| `anki_tools/ranking/identity.py`          | deck title, note type, side-file stems         |
+| `anki_tools/ranking/deckprofile.py`       | language facts, core view, cull view           |
+| `anki_tools/apkg/shape.py`                | the written package shape                      |
+| `anki_tools/ranking/fixrun.py`            | the shared `fix` route                         |
+| `anki_tools/ranking/coreflow.py`          | input deck reader, output field values         |
 | `anki_tools/ranking/corelist.py`          | target word list                               |
 | `anki_tools/ranking/cardfilter.py`        | shared filter rules F1 to F9                   |
 | `anki_tools/ranking/cover.py`             | the generic greedy cover loop                  |

@@ -1,7 +1,7 @@
 """Tests for the fix commands: the rank, select, core, and check routes.
 
-One language covers each route. The other fix commands are the same route with
-another profile, and the profile table of each language holds the values.
+One language covers each route. The four commands pass their profile and label
+to ``anki_tools.ranking.fixrun``, so these tests cross that one seam.
 """
 
 from __future__ import annotations
@@ -12,6 +12,7 @@ from types import SimpleNamespace
 import pytest
 
 from anki_tools import cli
+from anki_tools.ranking import fixrun, identity
 
 
 def _fake_deck() -> SimpleNamespace:
@@ -36,9 +37,9 @@ def no_pipeline(monkeypatch: pytest.MonkeyPatch) -> None:
     def refuse(*_args, **_kwargs):
         raise AssertionError("the pipeline must not run")
 
-    monkeypatch.setattr(cli, "run_ranked_deck", refuse)
-    monkeypatch.setattr(cli.cullflow, "run_cull", refuse)
-    monkeypatch.setattr(cli.coreflow, "run_core", refuse)
+    monkeypatch.setattr(fixrun, "run_ranked_deck", refuse)
+    monkeypatch.setattr(fixrun.cullflow, "run_cull", refuse)
+    monkeypatch.setattr(fixrun.coreflow, "run_core", refuse)
 
 
 def test_the_canonical_names_alias_the_short_codes() -> None:
@@ -58,7 +59,7 @@ def test_rank_goes_to_the_pipeline(
 ) -> None:
     calls = []
     monkeypatch.setattr(
-        cli,
+        fixrun,
         "run_ranked_deck",
         lambda paths, **kwargs: calls.append((paths, kwargs)) or _fake_deck(),
     )
@@ -69,16 +70,13 @@ def test_rank_goes_to_the_pipeline(
     paths, kwargs = calls[0]
     assert paths.input_path == deck_file
     assert paths.output_path == output
-    assert paths.ranking_path == deck_file.parent / "input.rank.csv"
+    assert paths.ranking_path == deck_file.parent / "ranked.rank.csv"
     assert callable(kwargs["rank"])
     assert kwargs["text_candidates"] == ("French",)
 
 
 def test_rank_defaults_the_output_name() -> None:
-    paths = cli.rank_paths(Path("deck.apkg"))
-
-    assert paths.output_path == Path("deck_reordered.apkg")
-    assert paths.ranking_path == Path("deck.rank.csv")
+    assert identity.default_output("french", "rank") == Path("apkg/french_reordered.apkg")
 
 
 def test_an_absent_input_prints_an_error(tmp_path: Path, capsys) -> None:
@@ -92,7 +90,7 @@ def test_select_goes_to_the_cull(
 ) -> None:
     runs = []
     monkeypatch.setattr(
-        cli.cullflow,
+        fixrun.cullflow,
         "run_cull",
         lambda request, run_profile: runs.append((request, run_profile)),
     )
@@ -103,7 +101,7 @@ def test_select_goes_to_the_cull(
 
     request, run_profile = runs[0]
     assert request.input_path == deck_file
-    assert request.output_path == deck_file.parent / "input_culled.apkg"
+    assert request.output_path == Path("apkg/french_1000.apkg")
     assert request.no_reserve is True
     assert request.max_cards == 500
     assert run_profile is cli.french_cull.FRENCH_CULL_PROFILE
@@ -111,7 +109,7 @@ def test_select_goes_to_the_cull(
 
 
 def test_select_defaults_the_output_name() -> None:
-    assert cli.cullflow.default_output(Path("deck.apkg")) == Path("deck_culled.apkg")
+    assert identity.default_output("french", "cull") == Path("apkg/french_1000.apkg")
 
 
 def test_core_builds_the_request(
@@ -119,7 +117,7 @@ def test_core_builds_the_request(
 ) -> None:
     runs = []
     monkeypatch.setattr(
-        cli.coreflow,
+        fixrun.coreflow,
         "run_core",
         lambda request, run_profile: runs.append((request, run_profile)),
     )
@@ -127,7 +125,7 @@ def test_core_builds_the_request(
     cli.fr(deck_file, core=True, cards=42)
 
     request, run_profile = runs[0]
-    assert request.output_path == deck_file.parent / "input_core.apkg"
+    assert request.output_path == Path("apkg/french_core.apkg")
     assert request.core_words == cli.french_core.DEFAULT_CORE_WORDS
     assert request.options.max_cards == 42
     assert run_profile is cli.french_core.FRENCH_CORE_PROFILE
@@ -145,7 +143,7 @@ CHECK_ROUTES = [
         False,
         "check_cull",
         cli.french_cull.FRENCH_CULL_PROFILE,
-        "input_culled.apkg",
+        "apkg/french_1000.apkg",
         id="select",
     ),
     pytest.param(
@@ -153,19 +151,13 @@ CHECK_ROUTES = [
         True,
         "check_core",
         cli.french_core.FRENCH_CORE_PROFILE,
-        "input_core.apkg",
+        "apkg/french_core.apkg",
         id="core",
     ),
 ]
 
 
-def _gate_module(checker: str):
-    return cli.cullgates if checker == "check_cull" else cli.coregates
-
-
-@pytest.mark.parametrize(
-    "select, core, checker, profile, output_name", CHECK_ROUTES
-)
+@pytest.mark.parametrize("select, core, checker, profile, output_name", CHECK_ROUTES)
 def test_check_runs_the_gates_on_the_default_output(
     deck_file: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -177,14 +169,14 @@ def test_check_runs_the_gates_on_the_default_output(
 ) -> None:
     checked = []
     monkeypatch.setattr(
-        _gate_module(checker),
+        fixrun,
         checker,
         lambda path, run_profile: checked.append((path, run_profile)) or 0,
     )
 
     cli.fr(deck_file, select=select, core=core, check=True)
 
-    assert checked == [(deck_file.parent / output_name, profile)]
+    assert checked == [(Path(output_name), profile)]
 
 
 @pytest.mark.parametrize(
@@ -201,7 +193,7 @@ def test_check_exits_on_a_gate_failure(
     core: bool,
     checker: str,
 ) -> None:
-    monkeypatch.setattr(_gate_module(checker), checker, lambda _path, _profile: 1)
+    monkeypatch.setattr(fixrun, checker, lambda _path, _profile: 1)
 
     with pytest.raises(SystemExit):
         cli.fr(deck_file, select=select, core=core, check=True)
