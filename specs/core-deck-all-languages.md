@@ -999,7 +999,7 @@ The tests that must change:
 - The five committed decks change: `apkg/french_core_300.apkg`,
   `apkg/mandarin_core.apkg`, `apkg/LTL Cantonese Deck Level 1 - Short_core.apkg`,
   `apkg/Spanish 9000 sentences with native audio_core.apkg`, and
-  `apkg/french_1000_sentences.apkg`. Rebuild each deck in one run and commit the
+  `apkg/french_1000_core_sentences.apkg`. Rebuild each deck in one run and commit the
   deck with its CSV files and its manifest. The Spanish cull has no committed
   deck, so its rebuild needs no commit.
 - The side files change in three ways: `manifest.source.model` holds the output

@@ -576,6 +576,17 @@ class TestCardDesign:
         assert len(cards) == run.cards
         assert {int(row["ord"]) for row in cards} == {0}
 
+
+    def test_the_note_type_points_at_the_output_deck(self, tmp_path: Path) -> None:
+        _run, output, _profile = _run_core(tmp_path)
+
+        with AnkiPackage(output) as package:
+            decks = package.get_decks()
+            models = json.loads(
+                package.conn.execute("SELECT models FROM col").fetchone()[0]
+            )
+
+        assert str(next(iter(models.values()))["did"]) in decks
     def test_the_model_gets_the_core_field_and_templates(self, tmp_path: Path) -> None:
         source = _tiny_deck(tmp_path)
         cards = cull.load_input_deck(source)

@@ -476,23 +476,23 @@ non-exempt word appears in more than 4 cards.
 
 ```bash
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
-    --output apkg/french_1000_sentences.apkg
+    --output apkg/french_1000_core_sentences.apkg
 
 # Run gates G1 to G15 on the written output
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
-    --output apkg/french_1000_sentences.apkg --check
+    --output apkg/french_1000_core_sentences.apkg --check
 ```
 
 The defaults build the measured deck. The tuning values, such as the spoken
 weight and the similarity limit, are fields of `CullRequest`.
 `specs/french-1000-sentence-cull.md` records them.
 
-| Path                                       | Content                                                     |
-| ------------------------------------------ | ----------------------------------------------------------- |
-| `apkg/french_1000_sentences.apkg`          | the culled deck with the input model, fields, and audio     |
-| `apkg/french_1000_sentences.cull.csv`      | one row per input card: `kept`, `reason`, `targets`, `gain` |
-| `apkg/french_1000_sentences.coverage.csv`  | one row per target: `word`, `rank`, `count`, `status`       |
-| `apkg/french_1000_sentences.manifest.json` | counts, parameters, frequency source, and hashes            |
+| Path                                              | Content                                                     |
+| ------------------------------------------------- | ----------------------------------------------------------- |
+| `apkg/french_1000_core_sentences.apkg`            | the culled deck with the output note type, fields, and audio |
+| `apkg/french_1000_core_sentences.cull.csv`        | one row per input card: `kept`, `reason`, `targets`, `gain` |
+| `apkg/french_1000_core_sentences.coverage.csv`    | one row per target: `word`, `rank`, `count`, `status`       |
+| `apkg/french_1000_core_sentences.manifest.json`   | counts, parameters, frequency source, and hashes            |
 
 A target `status` is `covered` for two or more cards, `partial` for one card,
 and `absent` for no card.

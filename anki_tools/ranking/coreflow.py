@@ -926,12 +926,13 @@ def read_input_deck(
         return cards
 
 
-def rename_deck(package: AnkiPackage, deck_name: str) -> None:
+def rename_deck(package: AnkiPackage, deck_name: str) -> int:
     """Rename the deck of the kept cards and delete the decks that stay empty.
 
     :param package: Open package.
     :param deck_name: New deck name.
     :raises RuntimeError: The collection has no card.
+    :returns: The deck id of the renamed deck.
     """
     cards = package.get_cards()
     counts = Counter(str(row["did"]) for row in cards)
@@ -945,6 +946,7 @@ def rename_deck(package: AnkiPackage, deck_name: str) -> None:
     for deck_id in list(package.get_decks()):
         if int(deck_id) != main:
             package.delete_deck(int(deck_id))
+    return main
 
 
 RESERVE_TAGS = " swadesh "
@@ -1075,13 +1077,14 @@ def write_deck(
         models = package.get_models()
         input_id = find_model_id(models, profile.input_model_name)
         package.prune_extra_cards(input_id)
-        rename_deck(package, deck_name)
+        deck_id = rename_deck(package, deck_name)
         output_id = package.clone_model(
             input_id,
             profile.output_model_name,
             names,
             profile.templates,
             profile.card_css(),
+            deck_id=deck_id,
         )
         input_names = [field["name"] for field in models[input_id]["flds"]]
         for row in package.get_notes():

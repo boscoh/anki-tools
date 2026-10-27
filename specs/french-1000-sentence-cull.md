@@ -425,7 +425,7 @@ parameter change, not a gate failure.
 
 ```bash
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
-    --output apkg/french_1000_sentences.apkg
+    --output apkg/french_1000_core_sentences.apkg
 ```
 
 ### 10.2 Options
@@ -445,12 +445,12 @@ reserve pack path are fields of `CullRequest` with these defaults in
 
 ### 10.3 Output files
 
-| File                                 | Content                                                    |
-| ------------------------------------ | ---------------------------------------------------------- |
-| `apkg/french_1000_sentences.apkg`    | The culled deck with the output note type of section 17 and the input audio |
-| `apkg/french_1000_sentences.cull.csv`     | One row per input card: `kept`, `reason`, `targets`, `gain` |
-| `apkg/french_1000_sentences.coverage.csv` | One row per target: `word`, `rank`, `count`, `status`, `gloss` |
-| `apkg/french_1000_sentences.manifest.json` | Counts, parameters, frequency source, and hashes        |
+| File                                              | Content                                                    |
+| ------------------------------------------------- | ---------------------------------------------------------- |
+| `apkg/french_1000_core_sentences.apkg`            | The culled deck with the output note type of section 17 and the input audio |
+| `apkg/french_1000_core_sentences.cull.csv`        | One row per input card: `kept`, `reason`, `targets`, `gain` |
+| `apkg/french_1000_core_sentences.coverage.csv`    | One row per target: `word`, `rank`, `count`, `status`, `gloss` |
+| `apkg/french_1000_core_sentences.manifest.json`   | Counts, parameters, frequency source, and hashes        |
 
 The `.cull.csv` has these columns: `source`, `sentence`, `english`, `audio`,
 `kept`, `reason`, `targets`, `gain`, `hardest_rank`. The `source` is `swadesh`
@@ -564,7 +564,7 @@ note type name, the fields, and the deck name of the output (section 17.6).
 | D1        | `anki-3jm` | This spec and the analysis                            | `specs/french-1000-sentence-cull.md`     |
 | D2        | `anki-mvo` | APKG extract, frequency list, Tatoeba cache            | `data/french_frequency.tsv`              |
 | D3        | `anki-3ux` | Filter, gain, cap, similarity, order                  | kept card list                           |
-| D4        | `anki-mq7` | APKG writer, cull CSV, coverage CSV, manifest, gates  | `apkg/french_1000_sentences.apkg`        |
+| D4        | `anki-mq7` | APKG writer, cull CSV, coverage CSV, manifest, gates  | `apkg/french_1000_core_sentences.apkg`   |
 | D5        | `anki-7n2` | Tests, README, license check                          | release check                            |
 | D6        | `anki-c5g` | Swadesh reserve, merged writer, gate G14              | 206 / 207 Swadesh, 1,000 cards           |
 
@@ -842,9 +842,9 @@ must hold one row for every target of the build, 300 rows at the default
 
 ### 17.7 Migration
 
-- `apkg/french_1000_sentences.apkg` is rebuilt and committed with its CSV files
-  and its manifest. The note type name changes (ADR 0013). The Spanish cull has
-  no committed deck.
+- `apkg/french_1000_core_sentences.apkg` and
+  `apkg/spanish_1000_core_sentences.apkg` are rebuilt with their CSV files and
+  their manifests. The note type name changes (ADR 0013).
 - `manifest.source.model` holds the output name and `manifest.source.input_model`
   the input name. The manifest gains `counts.dropped_no_core`.
 - The deck title does not change, so Anki updates the deck in place. The note

@@ -120,10 +120,21 @@ class AnkiPackage:
         """
         self.apkg_path = apkg_path
         self.temp_dir: str | None = None
-        self.conn: sqlite3.Connection | None = None
+        self._conn: sqlite3.Connection | None = None
         self._modified: bool = False
         self._db_format: str | None = None  # 'anki2', 'anki21', or 'anki21b'
         self._db_path: str | None = None
+
+    @property
+    def conn(self) -> sqlite3.Connection:
+        """Give the open connection.
+
+        :raises RuntimeError: The package is not open.
+        :returns: The sqlite3 connection.
+        """
+        if self._conn is None:
+            raise RuntimeError("The package is not open.")
+        return self._conn
 
     def __enter__(self) -> "AnkiPackage":
         """Enter context manager, extract and open the APKG file.
@@ -138,9 +149,9 @@ class AnkiPackage:
         db_path = self._select_and_prepare_database()
         self._db_path = db_path
 
-        self.conn = sqlite3.connect(db_path)
-        self.conn.row_factory = sqlite3.Row
-        self.conn.create_collation(
+        self._conn = sqlite3.connect(db_path)
+        self._conn.row_factory = sqlite3.Row
+        self._conn.create_collation(
             "unicase",
             lambda a, b: (a.casefold() > b.casefold()) - (a.casefold() < b.casefold()),
         )
@@ -232,8 +243,9 @@ class AnkiPackage:
         :param exc_val: Exception value if raised.
         :param exc_tb: Exception traceback if raised.
         """
-        if self.conn:
-            self.conn.close()
+        if self._conn:
+            self._conn.close()
+            self._conn = None
 
         # Clean up temp directory (unless save() was called)
         if self.temp_dir and not self._modified:
@@ -611,6 +623,7 @@ class AnkiPackage:
         fields: Sequence[str],
         templates: Sequence[tuple[str, str]],
         css: str,
+        deck_id: int | None = None,
     ) -> str:
         """Copy a note type under a new id, with new fields, templates, and CSS.
 
@@ -622,6 +635,8 @@ class AnkiPackage:
         :param fields: Ordered field names of the new note type.
         :param templates: ``(qfmt, afmt)`` pair per card template.
         :param css: Styling of the new note type.
+        :param deck_id: Default deck of an ``anki2`` model, or None to keep the
+            source deck id.
         :raises NotImplementedError: The package is in the ``anki21`` format.
         :raises ValueError: The source model is not in the package.
         :returns: Model ID of the copy.
@@ -708,6 +723,7 @@ class AnkiPackage:
             css=css,
             sortf=sort_index,
             req=[[0, "any", [0]]],
+            did=deck_id if deck_id is not None else source.get("did", 1),
             mod=now,
             usn=-1,
         )
@@ -1596,9 +1612,9 @@ class AnkiPackage:
             output_path = self.apkg_path
 
         # Ensure database is closed before repackaging
-        if self.conn:
-            self.conn.close()
-            self.conn = None
+        if self._conn:
+            self._conn.close()
+            self._conn = None
 
         # For anki21b, recompress the database
         if self._db_format == "anki21b":
@@ -1616,8 +1632,8 @@ class AnkiPackage:
                     zip_ref.write(file_path, arcname)
 
         # Reopen connection if needed
-        self.conn = sqlite3.connect(self._db_path)
-        self.conn.row_factory = sqlite3.Row
+        self._conn = sqlite3.connect(self._db_path)
+        self._conn.row_factory = sqlite3.Row
 
         print(f"Saved changes to {output_path}")
 
