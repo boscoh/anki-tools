@@ -147,6 +147,26 @@ class AnkiPackage:
             raise RuntimeError("The package is not open.")
         return self._conn
 
+    def _open_temp_dir(self) -> str:
+        """Give the directory of the unpacked package.
+
+        :raises RuntimeError: The package is not open.
+        :returns: Path of the temporary directory.
+        """
+        if self.temp_dir is None:
+            raise RuntimeError("The package is not open.")
+        return self.temp_dir
+
+    def _open_db_path(self) -> str:
+        """Give the database file of the open package.
+
+        :raises RuntimeError: The package is not open.
+        :returns: Path of the database file.
+        """
+        if self._db_path is None:
+            raise RuntimeError("The package is not open.")
+        return self._db_path
+
     def __enter__(self) -> "AnkiPackage":
         """Enter context manager, extract and open the APKG file.
 
@@ -175,9 +195,10 @@ class AnkiPackage:
 
         :returns: Path to the database file to use.
         """
-        db_path_21b = os.path.join(self.temp_dir, "collection.anki21b")
-        db_path_21 = os.path.join(self.temp_dir, "collection.anki21")
-        db_path_2 = os.path.join(self.temp_dir, "collection.anki2")
+        temp_dir = self._open_temp_dir()
+        db_path_21b = os.path.join(temp_dir, "collection.anki21b")
+        db_path_21 = os.path.join(temp_dir, "collection.anki21")
+        db_path_2 = os.path.join(temp_dir, "collection.anki2")
 
         # Prefer anki21b (newest format) if available and zstd is installed
         if os.path.exists(db_path_21b) and os.path.getsize(db_path_21b) > 0:
@@ -187,7 +208,7 @@ class AnkiPackage:
                     "Install with: uv add zstandard"
                 )
             decompressed_path = os.path.join(
-                self.temp_dir, "collection_decompressed.db"
+                temp_dir, "collection_decompressed.db"
             )
             self._decompress_zstd(db_path_21b, decompressed_path)
             self._db_format = "anki21b"
@@ -1152,7 +1173,7 @@ class AnkiPackage:
             if audio_only and not filename.endswith((".mp3", ".wav", ".ogg")):
                 continue
 
-            src = os.path.join(self.temp_dir, file_id)
+            src = os.path.join(self._open_temp_dir(), file_id)
             if not os.path.exists(src):
                 continue
 
@@ -1591,7 +1612,7 @@ class AnkiPackage:
                     zip_ref.write(file_path, arcname)
 
         # Reopen connection if needed
-        self._conn = sqlite3.connect(self._db_path)
+        self._conn = sqlite3.connect(self._open_db_path())
         self._conn.row_factory = sqlite3.Row
 
         print(f"Saved changes to {output_path}")
@@ -1601,8 +1622,9 @@ class AnkiPackage:
 
         Writes collection.anki21b from collection_decompressed.db using zstd.
         """
-        decompressed_path = os.path.join(self.temp_dir, "collection_decompressed.db")
-        anki21b_path = os.path.join(self.temp_dir, "collection.anki21b")
+        temp_dir = self._open_temp_dir()
+        decompressed_path = os.path.join(temp_dir, "collection_decompressed.db")
+        anki21b_path = os.path.join(temp_dir, "collection.anki21b")
 
         with open(decompressed_path, "rb") as f:
             data = f.read()
