@@ -1,0 +1,60 @@
+{
+  "build_date": "2026-10-27T04:28:52+00:00",
+  "source": {
+    "input": "apkg/Spanish 9000 sentences with native audio.apkg",
+    "deck": "spanish_1000",
+    "model": "Spanish 1000 Core Sentences",
+    "input_model": "Spanish sentences cloze+"
+  },
+  "params": {
+    "max_cards": 1000,
+    "target_words": 300,
+    "max_uses": 4,
+    "exempt_top": 100,
+    "spoken_weight": 0.5,
+    "min_words": 3,
+    "max_words": 12,
+    "similarity": 0.67,
+    "order": "coverage",
+    "name": "spanish_1000"
+  },
+  "counts": {
+    "input": 9263,
+    "passed": 6421,
+    "cards": 747,
+    "frequency_cards": 573,
+    "reserve": 174,
+    "content": 1567,
+    "targets": 300,
+    "covered": 278,
+    "covered2": 168,
+    "swadesh_covered": 200,
+    "swadesh_total": 207,
+    "dropped_no_core": 253,
+    "bolded": 573,
+    "unbolded": 0
+  },
+  "frequency": {
+    "path": "data/spanish_frequency.tsv",
+    "spoken_weight": 0.5
+  },
+  "files": {
+    "cull_csv": "sha256:03d659cf7e41ab4ae766234e5a5a60ed1f8410a4076a91856e4fa38a5ee58001",
+    "coverage_csv": "sha256:de0d56d6dc068ee608dc91b8542a7dd9f7e6cc3eca9a16f8b770858ca2562749",
+    "input_apkg": "sha256:f67605459feb506bcbbb95830a356ff349c21c28e136c8efc3d82d253ec244e9"
+  },
+  "licenses": {
+    "tatoeba": "Tatoeba sentence text: CC BY 2.0 FR",
+    "wordfreq": "wordfreq list: Apache License 2.0",
+    "audio": "Input audio: license of the source deck",
+    "swadesh": "Swadesh word data: CC BY-SA 4.0"
+  },
+  "kept_order": "sha256:6a11065aa1fd3e50458723f37b91447fe221a441682b4d784826835e232eb56b",
+  "reserve_pack": "apkg/swadesh_spanish_sentences.apkg",
+  "swadesh_exceptions": [
+    "cola",
+    "corteza",
+    "coser",
+    "raíz"
+  ]
+}

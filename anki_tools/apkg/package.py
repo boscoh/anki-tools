@@ -728,6 +728,7 @@ class AnkiPackage:
             sortf=sort_index,
             req=[[0, "any", [0]]],
             did=deck_id if deck_id is not None else source.get("did", 1),
+            type=0,
             mod=now,
             usn=-1,
         )
@@ -767,7 +768,7 @@ class AnkiPackage:
             self._write_proto_string(3, css),
         ]
         for start, end, field_num in parsed["other_fields"]:
-            if field_num not in (1, 3):
+            if field_num not in (1, 2, 3):
                 parts.append(original[start:end])
         return b"".join(parts)
 

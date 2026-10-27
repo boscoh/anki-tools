@@ -172,7 +172,9 @@ def _write_anki21b(root: str, mapping: dict[str, str]) -> dict[str, str]:
         entries += _bytes_field(1, entry)
         kept[str(position)] = name
     with open(os.path.join(root, "media"), "wb") as handle:
-        handle.write(zstandard.ZstdCompressor().compress(entries))
+        handle.write(
+            zstandard.ZstdCompressor(write_content_size=False).compress(entries)
+        )
     return kept
 
 

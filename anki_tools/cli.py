@@ -476,6 +476,7 @@ def _run_core_command(
         output_path=output_path,
         core_words=words,
         options=options,
+        name=output_path.stem,
     )
     if profile.spoken_weight is not None:
         request = replace(request, spoken_weight=profile.spoken_weight)
@@ -627,6 +628,7 @@ def fr(
             input_path=apkg_path,
             output_path=output_path,
             no_reserve=not reserve,
+            name=output_path.stem,
         )
         if cards is not None:
             request = replace(request, max_cards=cards)
@@ -887,6 +889,7 @@ def es(
             input_path=apkg_path,
             output_path=output_path,
             no_reserve=not reserve,
+            name=output_path.stem,
         )
         if cards is not None:
             request = replace(request, max_cards=cards)

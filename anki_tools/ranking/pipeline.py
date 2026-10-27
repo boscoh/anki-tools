@@ -17,6 +17,8 @@ from anki_tools.ranking.rank import (
     extract_sentences,
     write_ranking_csv,
 )
+from anki_tools.apkg.package import AnkiPackage
+from anki_tools.ranking.coreflow import rename_deck
 from anki_tools.ranking.reorder import reorder_deck
 
 #: A reducer takes the ranked sentences and gives the kept sentences.
@@ -111,4 +113,7 @@ def run_ranked_deck(
         str(paths.ranking_path),
         remove_unranked=remove_unranked,
     )
+    with AnkiPackage(paths.output_path) as package:
+        rename_deck(package, paths.output_path.stem)
+        package.save(paths.output_path)
     return RankedDeck(paths, sentences, ranked, stats)
