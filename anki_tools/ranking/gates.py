@@ -128,7 +128,7 @@ def report(results: Sequence[GateResult]) -> int:
     :param results: Rows from :func:`run_gates`.
     :returns: The exit code of the table, 0 on a pass.
     """
-    return print_audit([tuple(result) for result in results])
+    return print_audit(results)
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:

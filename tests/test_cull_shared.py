@@ -20,6 +20,7 @@ import pytest
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking import assemble, coreflow, corelist, cullflow, cullgates
+from anki_tools.ranking.identity import DeckIdentity
 
 SENTENCES = [
     ("kat ser stor.", "cat is big."),
@@ -126,14 +127,15 @@ def test_a_second_profile_drives_every_output_value(tmp_path: Path) -> None:
         _profile(),
     )
 
+    title = DeckIdentity(output).title
     with AnkiPackage(output) as package:
         models = package.get_models()
         decks = {deck["name"] for deck in package.get_decks().values()}
         fields = [field["name"] for model in models.values() for field in model["flds"]]
         notes = [str(note["flds"]).split("\x1f") for note in package.get_notes()]
 
-    assert {model["name"] for model in models.values()} == {output.stem}
-    assert decks == {output.stem}
+    assert {model["name"] for model in models.values()} == {title}
+    assert decks == {title}
     assert fields == list(assemble.output_fields(_profile()))
     assert notes[0][1].startswith("<b>kat</b> ser")
     assert notes[0][2] == "cat is big."
@@ -141,9 +143,9 @@ def test_a_second_profile_drives_every_output_value(tmp_path: Path) -> None:
 
     manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
     assert manifest["counts"]["cards"] == 2
-    assert manifest["source"]["model"] == output.stem
+    assert manifest["source"]["model"] == title
     assert manifest["source"]["input_model"] == MODEL_NAME
-    assert manifest["source"]["deck"] == output.stem
+    assert manifest["source"]["deck"] == title
     assert manifest["licenses"] == {"data": "test license"}
     assert "reserve_pack" not in manifest
 
@@ -634,7 +636,9 @@ def test_the_cull_writes_the_output_note_type(tmp_path: Path) -> None:
         models = package.get_models()
         cards = package.get_cards()
 
-    assert [model["name"] for model in models.values()] == [output.stem]
+    assert [model["name"] for model in models.values()] == [
+        DeckIdentity(output).title
+    ]
     model = next(iter(models.values()))
     assert [field["name"] for field in model["flds"]] == [
         "Audio",

@@ -1,9 +1,9 @@
 {
-  "build_date": "2026-10-27T11:17:00+00:00",
+  "build_date": "2026-10-27T12:08:31+00:00",
   "source": {
     "input": "apkg/LTL Cantonese Deck Level 1 - Short.apkg",
-    "deck": "cantonese_core",
-    "model": "cantonese_core",
+    "deck": "Cantonese Core",
+    "model": "Cantonese Core",
     "input_model": "LTL Note Type - Cantonese"
   },
   "params": {
@@ -29,7 +29,7 @@
     "bold_target": true,
     "max_unchecked_sense": 0,
     "max_unranked": 0,
-    "name": "cantonese_core"
+    "name": "Cantonese Core"
   },
   "counts": {
     "cards": 126,

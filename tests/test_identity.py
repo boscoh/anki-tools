@@ -13,11 +13,17 @@ def test_the_default_output_names_one_stem_per_language_and_mode() -> None:
     assert default_output("spanish", "cull") == Path("apkg/spanish_1000.apkg")
 
 
-def test_the_title_and_the_note_type_take_the_output_stem() -> None:
+def test_the_title_and_the_note_type_are_the_title_case_of_the_stem() -> None:
     identity = DeckIdentity(Path("apkg/french_core.apkg"))
 
     assert identity.stem == "french_core"
-    assert identity.title == identity.model_name == "french_core"
+    assert identity.title == identity.model_name == "French Core"
+
+
+def test_the_title_keeps_a_number_part() -> None:
+    identity = DeckIdentity(Path("apkg/spanish_1000.apkg"))
+
+    assert identity.title == identity.model_name == "Spanish 1000"
 
 
 def test_the_side_files_take_the_output_stem() -> None:

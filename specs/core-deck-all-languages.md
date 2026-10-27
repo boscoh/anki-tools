@@ -685,16 +685,15 @@ missing field. When the field exists, every back shows the line.
 
 ### 14.3 The deck title and the note type name
 
-The rule: the deck title, the note type name, the output file stem, and the
-manifest `source.model` are one value. The output file stem is the source of
-truth (section 14.1). ADR 0015 replaces the naming rows of ADR 0001 and ADR
-0013.
+The rule: the deck title and the note type name are the title case of the
+output file stem. The stem names the output file and the side files, and it is
+the source of truth (section 14.1). ADR 0015 replaces the naming rows of ADR
+0001 and ADR 0013. ADR 0019 replaces the title row of ADR 0015.
 
 | Mode | Default output | Deck title | Note type |
 | --- | --- | --- | --- |
-| core | `apkg/french_core.apkg` | `french_core` | `french_core` |
-| cull | `apkg/french_1000.apkg` | `french_1000` | `french_1000` |
-
+| core | `apkg/french_core.apkg` | `French Core` | `French Core` |
+| cull | `apkg/french_1000.apkg` | `French 1000` | `French 1000` |
 - `--output <path>` sets the stem for every one of these names.
 - The core and cull flows create their note type, so its name is the deck
   title (ADR 0013).
@@ -1017,11 +1016,13 @@ The tests that must change:
 - The French core deck falls from 300 cards to 273, because 27 tail cards hold
   no core target (14.7). Replace the numbers of section 14.3 of
   `specs/core-word-small-deck.md` with the measured values.
-- Anki matches a deck by title and a note type by name. Both are now the
-  output file stem, so the title changes too. Anki makes a new deck and a new
-  note type, so a user who imports the new deck beside the old deck gets
-  duplicate cards. The release note must say: delete the old deck and the old
-  note type in Tools > Manage Note Types, or import into a fresh profile.
+- Anki matches a deck by title and a note type by name. The deck and the note
+  type both change name to the title case of the stem (ADR 0019), so a user who
+  imports the new deck beside the old deck gets duplicate cards. The release
+  note must say: to keep the review history, rename the old deck to the new
+  title in Anki before the import, then delete the old note type in Tools >
+  Manage Note Types. Otherwise delete the old deck and its note type, or import
+  into a fresh profile.
 - A note keeps its guid, so Anki matches the note and changes its note type on
   import. A cull import does not delete the notes that the cull drops. That
   limit holds today.

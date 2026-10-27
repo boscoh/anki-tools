@@ -1,9 +1,9 @@
 {
-  "build_date": "2026-10-27T11:16:16+00:00",
+  "build_date": "2026-10-27T12:08:26+00:00",
   "source": {
     "input": "apkg/Neri's Chinese Sents Part 2.apkg",
-    "deck": "mandarin_core",
-    "model": "mandarin_core",
+    "deck": "Mandarin Core",
+    "model": "Mandarin Core",
     "input_model": "0 2024 Sentences Deck"
   },
   "params": {
@@ -29,7 +29,7 @@
     "bold_target": true,
     "max_unchecked_sense": 0,
     "max_unranked": 0,
-    "name": "mandarin_core"
+    "name": "Mandarin Core"
   },
   "counts": {
     "cards": 147,

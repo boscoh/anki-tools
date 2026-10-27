@@ -1,12 +1,12 @@
 """One identity for every artifact name of an output package.
 
-The output file stem of a run is the source of truth. The deck title, the note
-type name, the manifest ``source.model`` value, and the side-file stems equal
-that stem, so a rename is one edit. This module is the only place that builds
-these names.
+The output file stem of a run is the source of truth. The deck title and the
+note type name are the title case of that stem, for example ``French Core``.
+The manifest ``source.model`` value and the side-file stems equal the stem, so
+a rename is one edit. This module is the only place that builds these names.
 
 The core flow and the cull flow cross the seam. The mode suffix table is the
-one default output stem per language and mode. ADR 0015 records the decision.
+one default output stem per language and mode. ADR 0019 records the decision.
 """
 
 from __future__ import annotations
@@ -51,13 +51,13 @@ class DeckIdentity:
 
     @property
     def title(self) -> str:
-        """Give the deck title, which equals the output file stem."""
-        return self.stem
+        """Give the deck title, the title case of the output file stem."""
+        return " ".join(part.capitalize() for part in self.stem.split("_"))
 
     @property
     def model_name(self) -> str:
         """Give the note type name, which equals the deck title."""
-        return self.stem
+        return self.title
 
     def side(self, suffix: str) -> Path:
         """Give one side file of the run, beside the output file.

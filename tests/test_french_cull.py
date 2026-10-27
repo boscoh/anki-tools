@@ -286,8 +286,8 @@ def test_write_deck_keeps_the_notes_and_their_media(tmp_path: Path) -> None:
     assert counts == {"notes": 2, "media": 2, "items": 2}
     assert len(notes) == 2
     assert media == {"a0.mp3", "a2.mp3"}
-    assert decks == {output.stem}
-    assert models == {output.stem}
+    assert decks == {DeckIdentity(output).title}
+    assert models == {DeckIdentity(output).title}
     assert [card.sentence for card in coreflow.read_output_deck(output)] == [
         DECK_SENTENCES[0],
         DECK_SENTENCES[2],
@@ -306,7 +306,7 @@ def test_write_deck_sets_the_swadesh_templates(tmp_path: Path) -> None:
     model = next(
         item
         for item in models.values()
-        if item.get("name") == output.stem
+        if item.get("name") == DeckIdentity(output).title
     )
     templates = [tuple(template[k] for k in ("qfmt", "afmt")) for template in model["tmpls"]]
 
@@ -365,7 +365,7 @@ def test_write_deck_removes_the_second_card_template(tmp_path: Path) -> None:
     model = next(
         item
         for item in models.values()
-        if item.get("name") == output.stem
+        if item.get("name") == DeckIdentity(output).title
     )
 
     assert [template["name"] for template in model["tmpls"]] == ["Card 1"]
@@ -599,7 +599,7 @@ def test_write_deck_inserts_the_reserve_card(tmp_path: Path) -> None:
 
     assert counts == {"notes": 3, "media": 3, "items": 3}
     assert media == {"a0.mp3", "a1.mp3", "tts_reserve.mp3"}
-    assert models == {output.stem}
+    assert models == {DeckIdentity(output).title}
     fields = [str(note["flds"]).split("\x1f") for note in notes]
     reserve_row = next(row for row in fields if "<b>Je</b>" in row[1])
     assert reserve_row[0] == "[sound:tts_reserve.mp3]"

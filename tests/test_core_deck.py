@@ -551,7 +551,9 @@ class TestCardDesign:
             models = package.get_models(include_templates=True)
             cards = package.get_cards()
 
-        assert [model["name"] for model in models.values()] == [output.stem]
+        assert [model["name"] for model in models.values()] == [
+            DeckIdentity(output).title
+        ]
         model = next(iter(models.values()))
         assert [field["name"] for field in model["flds"]] == list(
             assemble.output_fields(profile)
@@ -601,7 +603,7 @@ class TestCardDesign:
 
         assert list(models) != []
         model = next(iter(models.values()))
-        assert model["name"] == output.stem
+        assert model["name"] == DeckIdentity(output).title
         assert [field["name"] for field in model["flds"]] == [
             "Audio",
             "Sentence",

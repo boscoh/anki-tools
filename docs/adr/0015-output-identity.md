@@ -10,10 +10,11 @@ ADR 0001 named the artifacts, and ADR 0013 put the note type name equal to the
 deck title, but no code owned the whole scheme. This ADR makes one value the
 source of truth and gives it one module.
 
-Status: accepted. Supersedes the naming rows of ADR 0001 and ADR 0013. Their
-other decisions stand, in particular that a builder which creates the note type
-sets its name to the deck title, and that a builder which rewrites an existing
-deck keeps the input note type.
+Status: accepted. The naming rows of ADR 0001 and ADR 0013 are superseded, and
+their other decisions stand, in particular that a builder which creates the note
+type sets its name to the deck title, and that a builder which rewrites an
+existing deck keeps the input note type. ADR 0019 supersedes the title row of
+this ADR: the deck title and the note type name are the title case of the stem.
 
 ## Decision
 
@@ -22,9 +23,9 @@ The output file stem of a run is the source of truth.
 
 | Artifact | Value |
 | --- | --- |
-| Deck title | output file stem |
-| Note type name | output file stem |
-| `manifest.source.deck` and `manifest.source.model` | output file stem |
+| Deck title | output file stem in title case (ADR 0019) |
+| Note type name | the deck title |
+| `manifest.source.deck` and `manifest.source.model` | the deck title |
 | `.core.csv`, `.cull.csv`, `.coverage.csv`, `.manifest.json`, `.rank.csv` stems | output file stem |
 
 - `DeckIdentity(output_path)` gives the stem and the derived names. It also
