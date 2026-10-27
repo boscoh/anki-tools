@@ -753,8 +753,9 @@ class AnkiPackage:
     def _clone_notetype_config(self, source: bytes, css: str, sort_index: int) -> bytes:
         """Build the config of a cloned note type.
 
-        The sort index is protobuf field 1 and the CSS is field 3. A source
-        value that points at another field of the input note type cannot hold.
+        The kind is protobuf field 1, the sort index field 2, and the CSS field
+        3. The source kind stays, and the caller sets it. A source value that
+        points at another field of the input note type cannot hold.
 
         :param source: Config blob of the source note type.
         :param css: CSS of the new note type.
@@ -764,11 +765,11 @@ class AnkiPackage:
         parsed = self._parse_notetype_config(source)
         original = parsed["_original"]
         parts = [
-            bytes([1 << 3]) + self._write_varint(sort_index),
+            bytes([2 << 3]) + self._write_varint(sort_index),
             self._write_proto_string(3, css),
         ]
         for start, end, field_num in parsed["other_fields"]:
-            if field_num not in (1, 2, 3):
+            if field_num not in (2, 3):
                 parts.append(original[start:end])
         return b"".join(parts)
 
@@ -821,7 +822,7 @@ class AnkiPackage:
         """Set the kind of a note type. Kind 0 is the standard kind, 1 the cloze kind.
 
         The ``anki2`` model dict holds the kind in ``type``. The ``anki21b``
-        note type config holds the kind in protobuf field 2.
+        note type config holds the kind in protobuf field 1.
 
         :param model_id: Model ID.
         :param kind: Note type kind.
@@ -839,13 +840,13 @@ class AnkiPackage:
             parts: list[bytes] = []
             found = False
             for start, end, field_num in parsed["other_fields"]:
-                if field_num == 2:
-                    parts.append(bytes([2 << 3]) + self._write_varint(kind))
+                if field_num == 1:
+                    parts.append(bytes([1 << 3]) + self._write_varint(kind))
                     found = True
                 else:
                     parts.append(original[start:end])
             if not found:
-                parts.append(bytes([2 << 3]) + self._write_varint(kind))
+                parts.append(bytes([1 << 3]) + self._write_varint(kind))
             if parsed["css"]:
                 parts.append(self._write_proto_string(3, parsed["css"]))
             self.conn.execute(

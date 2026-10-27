@@ -124,4 +124,5 @@ def test_the_shape_holds_on_an_anki21b_fixture(tmp_path: Path) -> None:
         row = package.conn.execute(
             "SELECT config FROM notetypes WHERE name = ?", (shape.model_name,)
         ).fetchone()
-    assert _config_field(row["config"] or b"", 2) == 0
+    assert _config_field(row["config"] or b"", 1) == 0
+    assert _config_field(row["config"] or b"", 2) == 1
