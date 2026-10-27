@@ -1648,7 +1648,7 @@ class AnkiPackage:
         with open(decompressed_path, "rb") as f:
             data = f.read()
 
-        cctx = zstandard.ZstdCompressor()
+        cctx = zstandard.ZstdCompressor(write_content_size=False)
         compressed = cctx.compress(data)
 
         with open(anki21b_path, "wb") as f:
