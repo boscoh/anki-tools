@@ -20,6 +20,7 @@ import pytest
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking import coreflow, corelist, cullflow, cullgates
+from anki_tools.ranking.identity import DeckIdentity
 
 SENTENCES = [
     ("kat ser stor.", "cat is big."),
@@ -69,7 +70,6 @@ def _profile() -> cullflow.CullProfile:
         input_sentence_field="Text",
         input_english_field="Meaning",
         input_audio_field="Audio",
-        output_model_name=DECK_NAME,
         sense_path=Path("vocab/test_core_senses.tsv"),
         clean_sentence=str.strip,
         reserve_fields=lambda card: [
@@ -89,7 +89,6 @@ def _profile() -> cullflow.CullProfile:
         names_path=Path("vocab/test_names.txt"),
         tatoeba_path=Path("data/tatoeba/test_sentences.tsv"),
         wordfreq_lang="xx",
-        default_deck_name=DECK_NAME,
         licenses={"data": "test license"},
         target_coverage_gate=0.98,
         double_coverage_gate=0.95,
@@ -136,8 +135,8 @@ def test_a_second_profile_drives_every_output_value(tmp_path: Path) -> None:
         fields = [field["name"] for model in models.values() for field in model["flds"]]
         notes = [str(note["flds"]).split("\x1f") for note in package.get_notes()]
 
-    assert {model["name"] for model in models.values()} == {DECK_NAME}
-    assert decks == {DECK_NAME}
+    assert {model["name"] for model in models.values()} == {output.stem}
+    assert decks == {output.stem}
     assert fields == list(coreflow.output_fields(_profile()))
     assert run.cards == 2
     assert notes[0][1].startswith("<b>kat</b> ser")
@@ -145,9 +144,9 @@ def test_a_second_profile_drives_every_output_value(tmp_path: Path) -> None:
     assert notes[0][3] == "kat"
 
     manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
-    assert manifest["source"]["model"] == DECK_NAME
+    assert manifest["source"]["model"] == output.stem
     assert manifest["source"]["input_model"] == MODEL_NAME
-    assert manifest["source"]["deck"] == DECK_NAME
+    assert manifest["source"]["deck"] == output.stem
     assert manifest["licenses"] == {"data": "test license"}
     assert "reserve_pack" not in manifest
 
@@ -638,9 +637,7 @@ def test_the_cull_writes_the_output_note_type(tmp_path: Path) -> None:
         models = package.get_models()
         cards = package.get_cards()
 
-    assert [model["name"] for model in models.values()] == [
-        profile.output_model_name
-    ]
+    assert [model["name"] for model in models.values()] == [output.stem]
     model = next(iter(models.values()))
     assert [field["name"] for field in model["flds"]] == [
         "Audio",
@@ -715,10 +712,10 @@ def test_the_cull_keeps_the_due_of_a_kept_card(tmp_path: Path) -> None:
     assert len(_notes(output)) == 1
 
 
-def test_the_output_model_name_is_the_deck_name() -> None:
-    profile = _profile()
+def test_the_output_identity_names_the_deck_and_the_note_type() -> None:
+    identity = DeckIdentity(Path("apkg/test_two_sentences.apkg"))
 
-    assert profile.output_model_name == profile.default_deck_name
+    assert identity.title == identity.model_name == "test_two_sentences"
 
 
 def _add_spare_field(path: Path, name: str) -> None:

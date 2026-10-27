@@ -24,18 +24,15 @@ from anki_tools.languages.spanish.frequency import (
     load_frequency_es,
 )
 from anki_tools.languages.spanish.profile import (
-    EXTRA_CSS,
     INTERNAL_MARKS,
     MODEL_NAME as SWADESH_MODEL_NAME,
     QUOTE_MARKS,
     SWADESH_ROWS,
     TOKENIZER,
-    SPANISH,
     prepare_text,
 )
 from anki_tools.ranking import coreflow, corelist, cullflow
 from anki_tools.ranking.coreflow import InputCard
-from anki_tools.sentence_pack.pack import load_css
 from anki_tools.sentence_pack.tokens import load_model
 
 TATOEBA_PATH = Path("data/tatoeba/spa_sentences.tsv")
@@ -116,14 +113,6 @@ def read_cull_frequency(
     return cull_frequency_rows(load_frequency_es(frequency_path))
 
 
-def card_css(css_path: Path = CARD_CSS_PATH) -> str:
-    """Give the CSS of the culled deck.
-
-    :param css_path: Base CSS file of the card classes.
-    :returns: The base CSS and the Spanish pack classes.
-    """
-    return load_css(css_path, EXTRA_CSS)
-
 
 def _concept_forms(concept: str) -> set[str]:
     """Give the lemma and the text forms of one Swadesh concept.
@@ -150,29 +139,19 @@ def _reserve_fields(card: cullflow.ReserveCard) -> list[str]:
 
 read_reserve = partial(cullflow.load_reserve, model_name=SWADESH_MODEL_NAME)
 
-SPANISH_CULL_PROFILE = cullflow.CullProfile(
-    tokenize_texts=partial(
-        cullflow.tokenize_texts, model=TOKENIZER, lemma_map=base_lemma
-    ),
+SPANISH_CULL_PROFILE = core.SPANISH_LANGUAGE.cull(
     load_frequency=read_cull_frequency,
     frequency_ranks=cullflow.frequency_ranks,
     read_names=partial(cullflow.read_names, NAMES_PATH, optional=True),
+    clean_sentence=clean_sentence,
     concept_forms=_concept_forms,
     content_pos=corelist.CONTENT_POS,
     min_lemma_length=corelist.MIN_LEMMA_LENGTH,
     final_marks=FINAL_MARKS,
     quote_marks=QUOTE_MARKS,
     internal_marks=INTERNAL_MARKS,
-    input_model_name=core.MODEL_NAME,
-    input_sentence_field=core.SENTENCE_FIELD,
-    input_english_field=core.ENGLISH_FIELD,
-    input_audio_field=core.AUDIO_FIELD,
-    output_model_name=DEFAULT_DECK_NAME,
-    clean_sentence=clean_sentence,
     reserve_fields=_reserve_fields,
     templates=CARD_TEMPLATES,
-    card_css=card_css,
-    sense_path=core.SENSE_PATH,
     reserve_pack=SWADESH_PACK_PATH,
     reserve_model_name=SWADESH_MODEL_NAME,
     swadesh_total=SWADESH_TOTAL,
@@ -181,15 +160,7 @@ SPANISH_CULL_PROFILE = cullflow.CullProfile(
     names_path=NAMES_PATH,
     tatoeba_path=TATOEBA_PATH,
     wordfreq_lang="es",
-    default_deck_name=DEFAULT_DECK_NAME,
     licenses=LICENSES,
     target_coverage_gate=0.98,
     double_coverage_gate=0.95,
-    highlight=SPANISH.highlight,
-)
-
-write_cull_deck = partial(
-    coreflow.write_deck,
-    profile=SPANISH_CULL_PROFILE,
-    reserve_fields=_reserve_fields,
 )

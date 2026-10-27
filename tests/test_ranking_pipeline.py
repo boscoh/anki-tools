@@ -34,21 +34,14 @@ def paths(deck_path: Path, tmp_path: Path) -> RankPaths:
 
 
 class TestRankPaths:
-    def test_the_output_default_gets_the_reordered_name(self) -> None:
-        paths = rank_paths(NAME_ONLY)
-
-        assert paths.input_path == NAME_ONLY
-        assert paths.output_path == NAME_ONLY.parent / "deck_reordered.apkg"
-        assert paths.ranking_path == NAME_ONLY.parent / "deck.rank.csv"
-
-    def test_a_given_output_keeps_the_ranking_path(self, tmp_path: Path) -> None:
-        output = tmp_path / "custom.apkg"
+    def test_the_output_name_sets_the_ranking_path(self) -> None:
+        output = Path("apkg/french_reordered.apkg")
 
         paths = rank_paths(NAME_ONLY, output)
 
+        assert paths.input_path == NAME_ONLY
         assert paths.output_path == output
-        assert paths.ranking_path == NAME_ONLY.parent / "deck.rank.csv"
-
+        assert paths.ranking_path == Path("apkg/french_reordered.rank.csv")
 
 class TestRunRankedDeck:
     def test_the_pipeline_ranks_and_reorders(

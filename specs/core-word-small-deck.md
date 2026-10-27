@@ -11,6 +11,10 @@
 | Related | `docs/swadesh-sentence-flow.md` (guards and word table)  |
 | Issues  | epic `anki-eo6`; milestones E1 to E5 (section 12)        |
 
+The naming rows of this spec are superseded by `docs/adr/0015-output-identity.md`:
+the deck title, the note type name, and the side-file stems equal the output
+file stem.
+
 ## Contents
 
 1. [Summary](#1-summary)

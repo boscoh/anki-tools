@@ -43,13 +43,11 @@ class CoreProfile:
     :param input_sentence_field: Name of the sentence field of the input model.
     :param input_english_field: Name of the English field of the input model.
     :param input_audio_field: Name of the audio field of the input model.
-    :param output_model_name: Name of the output note model.
     :param templates: Card templates of the core deck.
     :param card_css: CSS of the core deck.
     :param min_units: Minimum word count of a card.
     :param max_units: Maximum word count of a card.
     :param default_options: Selection settings of the core cover.
-    :param deck_name: Name of the output deck.
     :param frequency_source: Label of the frequency source for the manifest.
     :param lemma_overrides: Lemma repair map of the lemmatizer artefacts,
         applied by :func:`scan` to the tokens of every card.
@@ -83,13 +81,11 @@ class CoreProfile:
     input_sentence_field: str
     input_english_field: str
     input_audio_field: str
-    output_model_name: str
     templates: tuple[tuple[str, str], ...]
     card_css: Callable[[], str]
     min_units: int
     max_units: int
     default_options: Any
-    deck_name: str
     frequency_source: str
     lemma_overrides: Mapping[str, str] = field(default_factory=dict)
     outside_set_ratio: float = 1.3

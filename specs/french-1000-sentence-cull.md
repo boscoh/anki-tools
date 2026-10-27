@@ -9,6 +9,10 @@
 | Related | `specs/french-swadesh-sentence-pack.md` (French tokenizer)     |
 | Issues  | epic `anki-ckn`; milestones D1 to D5 (section 13)              |
 
+The naming rows of this spec are superseded by `docs/adr/0015-output-identity.md`:
+the deck title, the note type name, and the side-file stems equal the output
+file stem.
+
 ## 1. Summary
 
 `apkg/6000_French_Sentences_w_Audio.apkg` holds 5,928 sentences with one audio

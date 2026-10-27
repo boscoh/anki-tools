@@ -12,11 +12,12 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any, Iterable, Sequence
 
 from anki_tools.languages.spanish.frequency import (
     FREQUENCY_PATH,
     SpanishFrequencyRow,
+    base_lemma,
     build_frequency_es,
     frequency_ranks_es,
     load_frequency_es,
@@ -32,9 +33,9 @@ from anki_tools.languages.spanish.profile import (
     prepare_text,
 )
 from anki_tools.languages.spanish.rank import SIMILARITY_THRESHOLD
-from anki_tools.ranking import coreflow
+from anki_tools.ranking import coreflow, cullflow
 from anki_tools.ranking.core import CoreOptions
-from anki_tools.ranking.scan import CoreProfile
+from anki_tools.ranking.deckprofile import LanguageDeckProfile
 from anki_tools.sentence_pack.pack import load_css
 from anki_tools.sentence_pack.tokens import tokenize
 
@@ -46,7 +47,6 @@ AUDIO_FIELD = "Audio"
 SENSE_PATH = Path("vocab/spanish_core_senses.tsv")
 LOAN_PATH = Path("vocab/spanish_loanwords.txt")
 
-DEFAULT_NAME = "Spanish Core Sentences"
 DEFAULT_CORE_WORDS = 50
 # The spaCy model gives two artefact lemmas: ``quier`` for ``quieres``, and
 # ``buen`` for ``buen`` and ``buena``.
@@ -113,6 +113,14 @@ def tokenize_deck(cards: Sequence[coreflow.InputCard]) -> list[list[tuple[str, s
     ]
 
 
+def tokenize_texts(texts: Iterable[str]) -> list[list[tuple[str, str]]]:
+    """Tokenize sentence texts with the Spanish lemmatizer of the cull.
+
+    :param texts: Sentence texts.
+    :returns: One list of ``(lemma, part of speech)`` pairs per text.
+    """
+    return cullflow.tokenize_texts(texts, model=TOKENIZER, lemma_map=base_lemma)
+
 def load_frequency() -> list[SpanishFrequencyRow]:
     """Give the Spanish frequency rows, and build the file when it is absent.
 
@@ -158,31 +166,34 @@ def card_css() -> str:
 
 
 
-SPANISH_CORE_PROFILE = CoreProfile(
+SPANISH_LANGUAGE = LanguageDeckProfile(
     load_input_deck=load_input_deck,
-    tokenize_deck=tokenize_deck,
+    tokenize_texts=tokenize_texts,
     load_frequency=load_frequency,
     frequency_ranks=frequency_ranks,
     read_names=read_names,
-    word_table=word_table,
-    sense_path=SENSE_PATH,
-    loan_path=LOAN_PATH,
-    has_orphan=SPANISH.has_orphan,
-    hits=SPANISH.hits,
-    sense_filter=SPANISH.sense_filter,
-    highlight=SPANISH.highlight,
-    lemma_key=str.casefold,
     input_model_name=MODEL_NAME,
     input_sentence_field=SENTENCE_FIELD,
     input_english_field=ENGLISH_FIELD,
     input_audio_field=AUDIO_FIELD,
-    output_model_name=DEFAULT_NAME,
-    templates=CORE_TEMPLATES,
+    clean_sentence=_sentence,
     card_css=card_css,
+    sense_path=SENSE_PATH,
+    highlight=SPANISH.highlight,
+)
+
+SPANISH_CORE_PROFILE = SPANISH_LANGUAGE.core(
+    tokenize_deck=tokenize_deck,
+    word_table=word_table,
+    loan_path=LOAN_PATH,
+    has_orphan=SPANISH.has_orphan,
+    hits=SPANISH.hits,
+    sense_filter=SPANISH.sense_filter,
+    lemma_key=str.casefold,
+    templates=CORE_TEMPLATES,
     min_units=MIN_UNITS,
     max_units=MAX_UNITS,
     default_options=DEFAULT_OPTIONS,
-    deck_name=DEFAULT_NAME,
     frequency_source=str(FREQUENCY_PATH),
     outside_set_ratio=1.3,
     outside_rare_ratio=0.1,

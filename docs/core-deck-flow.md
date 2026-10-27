@@ -248,18 +248,21 @@ then uses the lowest-position target that the card holds.
 
 | File                   | Content                                                 |
 | ---------------------- | ------------------------------------------------------- |
-| `<stem>_core.apkg`     | the deck: the kept cards in the order of K5             |
+| `<language>_core.apkg`     | the deck: the kept cards in the order of K5             |
 | `<stem>.core.csv`      | one row per input card: kept, pass, value, cost, reason |
 | `<stem>.coverage.csv`  | one row per target: key, word, gloss, quota, count      |
 | `<stem>.manifest.json` | params, counts, frequency source, file hashes           |
 | `<stem>.rank.csv`      | the intermediate ranking file of `reorder_deck`         |
 
-`default_output` gives `<stem>_core.apkg` next to the input file.
+`identity.default_output(language, "core")` gives `apkg/<language>_core.apkg`.
 
-The deck name comes from `profile.deck_name`. The writer clones the input note
-type under the name of `profile.output_model_name`, and the deck title is the
-same string. The output holds one note type, one field set, and one card
-template.
+Every name comes from the output file stem (`anki_tools/ranking/identity.py`):
+the deck title, the note type name, and the side-file stems. The deck title
+equals the note type name and `manifest.source.model`. The writer
+(`anki_tools/apkg/shape.py`) clones the input note type under that name, so
+the output holds one note type, one field set, and one card template. The
+assembler (`anki_tools/ranking/assemble.py`) writes the side files, the
+manifest, and the report.
 
 The writer deletes the notes that no kept card uses, and it deletes the media
 files that those notes hold. It deletes the card of a note that the first
@@ -273,7 +276,7 @@ the new note type, then deletes the input note type and every other note type.
 `reorder_deck` applies the order of the rank CSV to the output deck.
 
 The writer writes the assigned target inside a `<b>` tag in each sentence
-field. `fill_core_fields` writes `Core` and `CoreGloss` on each kept card. The
+field. `coreflow.note_values` writes `Core`, `CoreGloss`, and the bold sentence.
 assigned target gives the pair, or the held target of the lowest core position.
 A kept card that holds no core target is not written. Its CSV row holds
 `kept = 0` and `reason = no_core`, and the manifest counts it in
@@ -321,16 +324,22 @@ and one card per note.
 
 | Path                                            | Content                                    |
 | ----------------------------------------------- | ------------------------------------------ |
-| `anki_tools/ranking/coreflow.py`                | K0 to K6 flow, deck writer, manifest       |
+| `anki_tools/ranking/coreflow.py`                | K0 to K6 flow, output field values         |
 | `anki_tools/ranking/coregates.py`               | gates K1 to K21                            |
+| `anki_tools/ranking/gates.py`                   | gate runner, report, shared gates          |
+| `anki_tools/ranking/assemble.py`                | deck, side files, manifest, report         |
+| `anki_tools/ranking/identity.py`                | deck title, note type, side-file stems     |
+| `anki_tools/ranking/deckprofile.py`             | language facts, core view, cull view       |
+| `anki_tools/apkg/shape.py`                      | the written package shape                  |
 | `anki_tools/ranking/core.py`                    | value, cost, passes, assignment, order     |
 | `anki_tools/ranking/corelist.py`                | tier S and tier F target list, sense rows  |
 | `anki_tools/ranking/cardfilter.py`              | shared filter rules F1 to F9               |
 | `anki_tools/ranking/scan.py`                    | `CoreProfile` and the scan adapters        |
 | `anki_tools/ranking/reorder.py`                 | reorder the deck from the rank CSV         |
 | `anki_tools/ranking/duplicates.py`              | Jaccard value and the limit test           |
+| `anki_tools/ranking/fixrun.py`                  | the shared `fix` route                     |
 | `anki_tools/languages/<language>/core.py`       | one `CoreProfile` per language             |
-| `anki_tools/cli.py`                             | `_run_core_command` of `fix <lang> --core` |
+| `anki_tools/cli.py`                             | the `fix <lang> --core` command            |
 
 ## 10. Invariants
 

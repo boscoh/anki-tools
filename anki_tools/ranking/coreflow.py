@@ -1,39 +1,42 @@
 """Shared core deck flow: targets, filter, selection, and files.
 
 The module builds the core list of spec section 2, applies the rules of section
-3, runs the selection of section 4, orders the cards of section 6, writes the
-cards of section 8, and records the counts of section 9. A language package
+3, runs the selection of section 4, orders the cards of section 6, states the
+values of section 8, and records the counts of section 9. A language package
 supplies the :class:`anki_tools.ranking.scan.CoreProfile` adapters, and this
 module reads every language-specific value from it.
 
-The shared gates live in ``anki_tools/ranking/coregates.py``.
+The written package, the side files, the manifest, and the report come from the
+assembler in ``anki_tools/ranking/assemble.py``. The shared gates live in
+``anki_tools/ranking/coregates.py``.
 """
 
 from __future__ import annotations
 
 import csv
 import hashlib
-import json
 import re
-import time
-import uuid
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Collection, Mapping, Protocol, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
+from anki_tools.apkg.shape import (
+    OutputShape,
+    find_model_id,
+    find_only_model_id,
+)
+from anki_tools.ranking import assemble
 from anki_tools.ranking.cardfilter import _WORD_PATTERN, filter_cards
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
 from anki_tools.ranking.core import select as select_core
 from anki_tools.ranking.core import target_quotas
 from anki_tools.ranking.corelist import CONTENT_POS, CoreTarget, SenseWords, build_core_targets, build_targets
-from anki_tools.ranking.reorder import reorder_deck
+from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.ranking.scan import CoreProfile, scan
 from anki_tools.sentence_pack.audio import probe_duration
-from anki_tools.sentence_pack.audit import sha256_value
 from anki_tools.sentence_pack.english_sense import english_tokens
 
 AUDIO_PROBE_WORKERS = 8
@@ -116,7 +119,7 @@ def output_fields(profile: "DeckProfile") -> tuple[str, ...]:
 
 
 class DeckProfile(Protocol):
-    """Contract of :func:`write_deck`: the input names and the output shape."""
+    """Contract of the output values and the written note type."""
 
     @property
     def input_model_name(self) -> str:
@@ -136,11 +139,6 @@ class DeckProfile(Protocol):
     @property
     def input_audio_field(self) -> str:
         """Give the name of the input audio field."""
-        ...
-
-    @property
-    def output_model_name(self) -> str:
-        """Give the name of the output note type."""
         ...
 
     @property
@@ -175,7 +173,6 @@ class CoreRequest:
     :param sense_path: Sense file of the tier F targets, or None for the
         profile value.
     :param loan_path: Loan word list of rule C4, or None for the profile value.
-    :param name: Output deck name, or None for the profile value.
     :param bold_target: Bold the assigned target in the sentence.
     :param max_unchecked_sense: Unchecked targets that gate K16 accepts.
     :param max_unranked: Unranked tier F targets that gate K20 accepts.
@@ -190,7 +187,6 @@ class CoreRequest:
     spoken_weight: float = 0.5
     sense_path: Path | None = None
     loan_path: Path | None = None
-    name: str | None = None
     bold_target: bool = True
     max_unchecked_sense: int = 0
     max_unranked: int = 0
@@ -442,15 +438,6 @@ def filter_core_cards(
     return kept, reasons
 
 
-def default_output(apkg_path: Path) -> Path:
-    """Build the default output path of a core run.
-
-    :param apkg_path: Input APKG file.
-    :returns: ``<stem>_core.apkg`` beside the input.
-    """
-    path = Path(apkg_path)
-    return path.parent / f"{path.stem}_core.apkg"
-
 
 def size_check(quotas: dict[str, int], max_cards: int) -> None:
     """Stop a run that cannot give the quota its examples.
@@ -490,41 +477,6 @@ def outside_lemmas(
         )
     )
 
-
-def side_paths(output_path: Path) -> tuple[Path, Path, Path, Path]:
-    """Build the four side file paths of a core run.
-
-    :param output_path: Output APKG file.
-    :returns: The core CSV, the coverage CSV, the manifest, and the rank CSV.
-    """
-    path = Path(output_path)
-    stem = path.with_suffix("") if path.suffix else path
-    return (
-        Path(f"{stem}.core.csv"),
-        Path(f"{stem}.coverage.csv"),
-        Path(f"{stem}.manifest.json"),
-        Path(f"{stem}.rank.csv"),
-    )
-
-
-def write_rank_csv(
-    cards: Sequence[Any], ordered: Sequence[int], path: Path
-) -> None:
-    """Write the ranking CSV that ``reorder_deck`` reads.
-
-    :param cards: Input cards.
-    :param ordered: Kept cards in card order.
-    :param path: Output CSV file.
-    """
-    target = Path(path)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    with target.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.writer(handle)
-        writer.writerow(["rank", "note_id", "sentence", "kept"])
-        for rank, index in enumerate(ordered, start=1):
-            writer.writerow(
-                [rank, cards[index].note_id, cards[index].sentence, 1]
-            )
 
 
 def kept_order_hash(cards: Sequence[Any], ordered: Sequence[int]) -> str:
@@ -752,111 +704,6 @@ def manifest_counts(
     }
 
 
-def write_core_csv(rows: Sequence[dict[str, Any]], path: Path) -> None:
-    """Write the card CSV.
-
-    :param rows: Rows in card order.
-    :param path: Output CSV file.
-    """
-    _write_csv(CORE_COLUMNS, rows, path)
-
-
-def write_coverage_csv(rows: Sequence[dict[str, Any]], path: Path) -> None:
-    """Write the coverage CSV.
-
-    :param rows: One row per target.
-    :param path: Output CSV file.
-    """
-    _write_csv(COVERAGE_COLUMNS, rows, path)
-
-
-def _write_csv(
-    columns: Sequence[str], rows: Sequence[dict[str, Any]], path: Path
-) -> None:
-    """Write a CSV file with a fixed header."""
-    target = Path(path)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    with target.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(columns))
-        writer.writeheader()
-        for row in rows:
-            writer.writerow(row)
-
-
-def write_manifest(
-    path: Path,
-    *,
-    source: dict[str, Any],
-    params: dict[str, Any],
-    counts: dict[str, int],
-    frequency: dict[str, Any],
-    files: dict[str, str],
-    kept_order: str,
-    licenses: Mapping[str, str] | None = None,
-    reserve_pack: str = "",
-    swadesh_exceptions: Sequence[str] = (),
-) -> None:
-    """Write the manifest JSON of a deck run.
-
-    :param path: Output JSON file.
-    :param source: Input APKG path, deck name, and model name.
-    :param params: Options of the run.
-    :param counts: Card, lemma, and target counts.
-    :param frequency: Frequency source path and the spoken weight.
-    :param files: ``sha256:`` values of the output files.
-    :param kept_order: Hash of the kept sentences in their final order.
-    :param licenses: License text per data source, or None for no block.
-    :param reserve_pack: Reserve pack of the run, empty without a reserve.
-    :param swadesh_exceptions: Reserve concepts that no source sentence covers.
-    """
-    payload: dict[str, Any] = {
-        "build_date": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "source": source,
-        "params": params,
-        "counts": counts,
-        "frequency": frequency,
-        "files": files,
-    }
-    if licenses is not None:
-        payload["licenses"] = dict(licenses)
-    payload["kept_order"] = kept_order
-    if reserve_pack:
-        payload["reserve_pack"] = reserve_pack
-        payload["swadesh_exceptions"] = list(swadesh_exceptions)
-    target = Path(path)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(
-        json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
-    )
-
-
-def find_model_id(models: dict[str, dict], name: str) -> str:
-    """Find the id of a note model by name.
-
-    :param models: Models dict from :meth:`AnkiPackage.get_models`.
-    :param name: Model name.
-    :raises RuntimeError: No model has the name.
-    :returns: Model id as a string.
-    """
-    for model_id, model in models.items():
-        if model.get("name") == name:
-            return model_id
-    raise RuntimeError(f"The input APKG has no model {name!r}.")
-
-
-def find_only_model_id(models: dict[str, dict]) -> str:
-    """Find the id of the only note type of a package.
-
-    :param models: Models dict from :meth:`AnkiPackage.get_models`.
-    :raises RuntimeError: The package holds two or more note types.
-    :returns: Model id as a string.
-    """
-    if len(models) != 1:
-        raise RuntimeError(
-            f"The package holds {len(models)} note types, not one."
-        )
-    return next(iter(models))
 
 
 @dataclass(frozen=True)
@@ -945,75 +792,6 @@ def read_input_deck(
         return cards
 
 
-def rename_deck(package: AnkiPackage, deck_name: str) -> int:
-    """Rename the deck of the kept cards and delete the decks that stay empty.
-
-    :param package: Open package.
-    :param deck_name: New deck name.
-    :raises RuntimeError: The collection has no card.
-    :returns: The deck id of the renamed deck.
-    """
-    cards = package.get_cards()
-    counts = Counter(str(row["did"]) for row in cards)
-    if not counts:
-        raise RuntimeError("The collection has no card to place in a deck.")
-    main = int(counts.most_common(1)[0][0])
-    for row in cards:
-        if int(row["did"]) != main:
-            package.move_card(int(row["id"]), main)
-    package.set_deck_name(main, deck_name)
-    for deck_id in list(package.get_decks()):
-        if int(deck_id) != main:
-            package.delete_deck(int(deck_id))
-    return main
-
-
-RESERVE_TAGS = " swadesh "
-
-
-def insert_reserve_cards(
-    package: AnkiPackage,
-    reserve: Sequence[Any],
-    reserve_pack_path: Path,
-    deck_id: int,
-    model_id: str,
-    reserve_fields: Callable[[Any], Sequence[str]],
-) -> None:
-    """Insert the reserve notes and cards into an open package.
-
-    :param package: Open output package after the non-kept cards are deleted.
-    :param reserve: Reserve cards to insert.
-    :param reserve_pack_path: Pack with the reserve media files.
-    :param deck_id: Target deck id.
-    :param model_id: Model id of the output note type.
-    :param reserve_fields: Callable that gives the field values of one card.
-    :raises RuntimeError: A reserve audio file is not in the pack.
-    """
-    mod = int(time.time() * 1000)
-    with AnkiPackage(reserve_pack_path) as swadesh:
-        media_dir = swadesh.media_dir()
-        if media_dir is None:
-            raise RuntimeError("The reserve pack has no temporary directory.")
-        media = swadesh.get_media_mapping()
-        reverse = {name: key for key, name in media.items()}
-        for card in reserve:
-            key = reverse.get(card.audio)
-            if key is None:
-                raise RuntimeError(
-                    f"The reserve audio {card.audio} is not in {reserve_pack_path}."
-                )
-            package.add_media_file(Path(media_dir) / key, card.audio)
-    for card in reserve:
-        package.add_note_and_card(
-            reserve_fields(card),
-            model_id,
-            deck_id,
-            RESERVE_TAGS,
-            guid=str(uuid.uuid4()),
-            mod=mod,
-            sfld=card.sentence,
-        )
-
 
 def output_values(
     profile: DeckProfile,
@@ -1047,97 +825,68 @@ def output_values(
     return [values[name] for name in output_fields(profile)]
 
 
-def write_deck(
+def note_values(
     input_path: Path,
     cards: Sequence[Any],
     kept: Sequence[int],
-    output_path: Path,
-    deck_name: str,
     profile: DeckProfile,
+    core_values: Mapping[int, tuple[str, str]],
     *,
-    reserve: Sequence[Any] = (),
-    reserve_pack_path: Path | None = None,
-    reserve_fields: Callable[[Any], Sequence[str]] | None = None,
-) -> dict[str, int]:
-    """Write the kept cards to an APKG file with a note type of its own.
+    bold: bool = True,
+) -> tuple[dict[int, list[str]], int, int]:
+    """Give the output field values of every kept note.
 
-    The cards of every note that is not kept are deleted, and the media files
-    that no kept card uses are removed with them. The kept notes move to a
-    clone of the input note type, and every other note type goes, so the
-    output package holds one note type.
+    The values hold the core word, the gloss, and the bold text, so the written
+    note type is complete in one pass.
 
     :param input_path: Input APKG file.
     :param cards: Input cards.
     :param kept: Input indices of the kept cards.
-    :param output_path: Output APKG file.
-    :param deck_name: Name of the output deck.
     :param profile: Language hooks of the run.
-    :param reserve: Reserve cards to add to the output note type.
-    :param reserve_pack_path: Pack with the reserve media files.
-    :param reserve_fields: Callable that gives the field values of one reserve
-        card. A run with reserve cards needs it.
-    :raises RuntimeError: The output note count differs from the kept count.
-    :returns: Note, media, and card counts of the output.
+    :param core_values: Input index to ``(word, gloss)`` pair.
+    :param bold: Bold the core word in the sentence.
+    :returns: Note id to field values, the count of bolded notes, and the count
+        of the others.
     """
-    kept_notes = {cards[index].note_id for index in kept}
-    by_note = {cards[index].note_id: index for index in kept}
     names = output_fields(profile)
-    sort_index = names.index(OUTPUT_SENTENCE_FIELD)
-    target = Path(output_path)
-    target.parent.mkdir(parents=True, exist_ok=True)
+    word_index = names.index(OUTPUT_CORE_FIELD)
+    gloss_index = names.index(OUTPUT_GLOSS_FIELD)
+    sentence_index = names.index(OUTPUT_SENTENCE_FIELD)
+    highlight = profile.highlight
+    by_note = {cards[index].note_id: index for index in kept}
+    values: dict[int, list[str]] = {}
+    bolded = 0
     with AnkiPackage(input_path) as package:
-        doomed = [
-            int(row["id"])
-            for row in package.get_cards()
-            if int(row["nid"]) not in kept_notes
-        ]
-        if doomed:
-            package.delete_cards(doomed, cleanup_audio=False)
         models = package.get_models()
-        input_id = find_model_id(models, profile.input_model_name)
-        package.prune_extra_cards(input_id)
-        deck_id = rename_deck(package, deck_name)
-        output_id = package.clone_model(
-            input_id,
-            profile.output_model_name,
-            names,
-            deck_templates(profile),
-            profile.card_css(),
-            deck_id=deck_id,
-        )
-        input_names = [field["name"] for field in models[input_id]["flds"]]
+        input_names = [
+            field["name"]
+            for field in models[find_model_id(models, profile.input_model_name)]["flds"]
+        ]
         for row in package.get_notes():
             note_id = int(row["id"])
-            values = str(row["flds"]).split("\x1f")
-            package.update_note(
-                note_id,
-                output_values(profile, input_names, values, cards[by_note[note_id]].sentence),
-                output_id,
-                sort_index,
+            index = by_note.get(note_id)
+            if index is None:
+                continue
+            card = cards[index]
+            field_values = output_values(
+                profile,
+                input_names,
+                str(row["flds"]).split("\x1f"),
+                card.sentence,
             )
-        for model_id in list(models):
-            package.delete_model(model_id)
-        if reserve:
-            if reserve_pack_path is None or reserve_fields is None:
-                raise RuntimeError(
-                    "A run with reserve cards needs a pack path and fields."
-                )
-            deck_id = int(next(iter(package.get_decks())))
-            insert_reserve_cards(
-                package, reserve, reserve_pack_path, deck_id, output_id, reserve_fields
-            )
-        package.prune_media(package.used_media())
-        package.touch()
-        package.save(target)
-
-    expected = len(kept_notes) + len(reserve)
-    with AnkiPackage(target) as package:
-        notes = len(package.get_notes())
-        media = len(package.get_media_mapping())
-    if notes != expected:
-        raise RuntimeError(f"The output APKG has {notes} notes, not {expected}.")
-    return {"notes": notes, "media": media, "items": expected}
-
+            word, gloss = core_values.get(index, ("", ""))
+            field_values[word_index] = word
+            field_values[gloss_index] = gloss
+            if bold and highlight is not None and word:
+                marked = highlight(card.sentence, word)
+                field_values[sentence_index] = marked
+                bolded += int(marked != card.sentence)
+            values[note_id] = field_values
+    if not bold:
+        return values, 0, 0
+    if highlight is None:
+        return values, 0, len(values)
+    return values, bolded, len(values) - bolded
 
 def _media_probe_path(path: Path) -> Path:
     """Give a readable path for an audio file, decompressing zstd media."""
@@ -1345,68 +1094,6 @@ def coverage_glosses(rows: Sequence[Mapping[str, str]]) -> dict[str, str]:
     return glosses
 
 
-def fill_core_fields(
-    output_path: Path,
-    cards: Sequence[Any],
-    values: Mapping[int, tuple[str, str]],
-) -> int:
-    """Write the core word and the gloss of each kept note.
-
-    :param output_path: Output APKG file.
-    :param cards: Input cards.
-    :param values: Input index to ``(word, gloss)`` pair.
-    :raises RuntimeError: The package holds two or more note types.
-    :returns: The count of notes that the function fills.
-    """
-    with AnkiPackage(output_path) as package:
-        models = package.get_models()
-        model_id = find_only_model_id(models)
-        names = [field["name"] for field in models[model_id]["flds"]]
-        word_index = names.index(OUTPUT_CORE_FIELD)
-        gloss_index = names.index(OUTPUT_GLOSS_FIELD)
-        for index, (word, gloss) in values.items():
-            note_id = cards[index].note_id
-            package.update_note_field(note_id, word_index, word)
-            package.update_note_field(note_id, gloss_index, gloss)
-        package.touch()
-        package.save(output_path)
-    return len(values)
-
-
-def fill_bold(
-    output_path: Path,
-    cards: Sequence[Any],
-    words: Mapping[int, str],
-    highlight: Callable[[str, str], str] | None,
-) -> tuple[int, int]:
-    """Write the core word of each kept card in bold in the sentence.
-
-    :param output_path: Output APKG file.
-    :param cards: Input cards.
-    :param words: Input index to the core word of the card.
-    :param highlight: Language hook, or None when the language does not bold.
-    :raises RuntimeError: The package holds two or more note types.
-    :returns: The count of bolded cards and the count of the others.
-    """
-    if highlight is None:
-        return 0, len(words)
-    bolded = 0
-    with AnkiPackage(output_path) as package:
-        models = package.get_models()
-        model_id = find_only_model_id(models)
-        names = [entry["name"] for entry in models[model_id]["flds"]]
-        field_index = names.index(OUTPUT_SENTENCE_FIELD)
-        for index, word in words.items():
-            marked = highlight(cards[index].sentence, word)
-            if marked != cards[index].sentence:
-                package.update_note_field(
-                    cards[index].note_id, field_index, marked
-                )
-                bolded += 1
-        package.touch()
-        package.save(output_path)
-    return bolded, len(words) - bolded
-
 def run_core(request: CoreRequest, profile: CoreProfile) -> CoreRun:
     """Run stages K0 to K6 of the core mode and write the output files.
 
@@ -1422,7 +1109,7 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> CoreRun:
     max_units = request.max_units if request.max_units is not None else profile.max_units
     sense_path = request.sense_path or profile.sense_path
     loan_path = request.loan_path or profile.loan_path
-    name = request.name or profile.deck_name
+    identity = DeckIdentity(output_path)
 
     scanned = scan(profile, apkg_path, request.spoken_weight)
     cards = scanned.cards
@@ -1493,29 +1180,20 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> CoreRun:
     )
     ordered = result.order
     keys = core_keys(result, ordered, candidates, targets)
-    values = core_values(keys, targets)
+    core_words = core_values(keys, targets)
     kept = [index for index in ordered if index in keys]
     dropped = [index for index in ordered if index not in keys]
     reasons = list(reasons)
     for index in dropped:
         reasons[index] = NO_CORE_REASON
-    core_csv, coverage_csv, manifest_path, rank_csv = side_paths(output_path)
 
-    write_rank_csv(cards, kept, rank_csv)
-    temporary = output_path.with_name(output_path.stem + ".tmp.apkg")
-    write_deck(apkg_path, cards, kept, temporary, name, profile)
-    reorder_deck(str(temporary), str(output_path), str(rank_csv))
-    temporary.unlink(missing_ok=True)
-    fill_core_fields(output_path, cards, values)
-    bolded, unbolded = (
-        fill_bold(
-            output_path,
-            cards,
-            {index: values[index][0] for index in kept},
-            profile.highlight,
-        )
-        if request.bold_target
-        else (0, 0)
+    note_fields, bolded, unbolded = note_values(
+        apkg_path,
+        cards,
+        kept,
+        profile,
+        core_words,
+        bold=request.bold_target,
     )
 
     rows = card_rows(
@@ -1531,81 +1209,92 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> CoreRun:
     counts["sense_failures"] = sum(sense_failures.values())
     counts["sense_rows"] = sum(1 for target in targets if target.checked)
 
-    write_core_csv(rows, core_csv)
-    write_coverage_csv(coverage_rows, coverage_csv)
-    write_manifest(
-        manifest_path,
-        source={
-            "input": str(apkg_path),
-            "deck": name,
-            "model": profile.output_model_name,
-            "input_model": profile.input_model_name,
-        },
-        params={
-            "core_words": request.core_words,
-            "per_word": request.options.per_word,
-            "third_examples": request.options.third_examples,
-            "ubiquitous_share": request.options.ubiquitous_share,
-            "max_cards": request.options.max_cards,
-            "completion_cards": request.options.completion_cards,
-            "tail_cards": request.options.tail_cards,
-            "outside_budget": request.options.outside_budget,
-            "support_top": request.options.support_top,
-            "hard_top": request.options.hard_top,
-            "lambda_new": request.options.lambda_new,
-            "lambda_repeat": request.options.lambda_repeat,
-            "lambda_len": request.options.lambda_len,
-            "lambda_seed": request.options.lambda_seed,
-            "simple_units": request.options.simple_units,
-            "similarity": request.options.similarity,
-            "min_units": min_units,
-            "max_units": max_units,
-            "spoken_weight": request.spoken_weight,
-            "bold_target": request.bold_target,
-            "name": name,
-            "max_unchecked_sense": request.max_unchecked_sense,
-            "max_unranked": request.max_unranked,
-        },
-        counts=counts,
-        frequency={
-            "path": profile.frequency_source,
-            "spoken_weight": request.spoken_weight,
-        },
-        files={
-            "core_csv": sha256_value(core_csv),
-            "coverage_csv": sha256_value(coverage_csv),
-            "input_apkg": sha256_value(apkg_path),
-        },
-        kept_order=kept_order_hash(cards, kept),
-    )
+    filtered = Counter(reasons)
+    report: list[tuple[str | None, str]] = [
+        ("Input", str(apkg_path)),
+        ("Input cards", str(len(cards))),
+        ("Passed", str(len(passed))),
+    ]
+    report += [
+        (f"  Rejected {rule}", str(filtered[rule]))
+        for rule in FILTER_KEYS
+        if filtered[rule]
+    ]
+    report += [
+        ("Targets", str(len(targets))),
+        ("Quota total", str(sum(quotas.values()))),
+        ("Cards", str(len(kept))),
+        ("Covered once", str(counts["covered1"])),
+        ("Covered twice", str(counts["covered2"])),
+        ("Outside lemmas", str(counts["outside"])),
+        ("Rare outside", str(counts["outside_rare"])),
+        ("Unchecked", str(counts["unchecked"])),
+        ("Merged S rows", str(len(merged))),
+    ]
 
-    print(f"Input:            {apkg_path}")
-    print(f"Input cards:      {len(cards)}")
-    print(f"Passed:           {len(passed)}")
-    for rule in FILTER_KEYS:
-        count = sum(1 for reason in reasons if reason == rule)
-        if count:
-            print(f"  Rejected {rule}:   {count}")
-    print(f"Targets:          {len(targets)}")
-    print(f"Quota total:      {sum(quotas.values())}")
-    print(f"Cards:            {len(kept)}")
-    print(f"Covered once:     {counts['covered1']}")
-    print(f"Covered twice:    {counts['covered2']}")
-    print(f"Outside lemmas:   {counts['outside']}")
-    print(f"Rare outside:     {counts['outside_rare']}")
-    print(f"Unchecked:        {counts['unchecked']}")
-    print(f"Merged S rows:    {len(merged)}")
-    print()
-    print(f"wrote {output_path}")
-    print(f"wrote {core_csv}")
-    print(f"wrote {coverage_csv}")
-    print(f"wrote {manifest_path}")
+    files = assemble.write_run(
+        assemble.DeckRun(
+            identity=identity,
+            input_path=apkg_path,
+            shape=OutputShape(
+                deck_name=identity.title,
+                model_name=identity.model_name,
+                input_model_name=profile.input_model_name,
+                fields=output_fields(profile),
+                templates=deck_templates(profile),
+                css=profile.card_css(),
+            ),
+            values=note_fields,
+            card_table=assemble.SideTable("core.csv", CORE_COLUMNS, rows),
+            coverage_table=assemble.SideTable(
+                "coverage.csv", COVERAGE_COLUMNS, coverage_rows
+            ),
+            manifest=assemble.ManifestValues(
+                input_model=profile.input_model_name,
+                params={
+                    "core_words": request.core_words,
+                    "per_word": request.options.per_word,
+                    "third_examples": request.options.third_examples,
+                    "ubiquitous_share": request.options.ubiquitous_share,
+                    "max_cards": request.options.max_cards,
+                    "completion_cards": request.options.completion_cards,
+                    "tail_cards": request.options.tail_cards,
+                    "outside_budget": request.options.outside_budget,
+                    "support_top": request.options.support_top,
+                    "hard_top": request.options.hard_top,
+                    "lambda_new": request.options.lambda_new,
+                    "lambda_repeat": request.options.lambda_repeat,
+                    "lambda_len": request.options.lambda_len,
+                    "lambda_seed": request.options.lambda_seed,
+                    "simple_units": request.options.simple_units,
+                    "similarity": request.options.similarity,
+                    "min_units": min_units,
+                    "max_units": max_units,
+                    "spoken_weight": request.spoken_weight,
+                    "bold_target": request.bold_target,
+                    "max_unchecked_sense": request.max_unchecked_sense,
+                    "max_unranked": request.max_unranked,
+                },
+                counts=counts,
+                frequency={
+                    "path": profile.frequency_source,
+                    "spoken_weight": request.spoken_weight,
+                },
+                kept_order=kept_order_hash(cards, kept),
+            ),
+            report=report,
+            rank_rows=[
+                (rank, cards[index].note_id, cards[index].sentence, 1)
+                for rank, index in enumerate(kept, start=1)
+            ],
+        )
+    )
     run = CoreRun(
-        output_path=output_path,
-        core_csv=core_csv,
-        coverage_csv=coverage_csv,
-        manifest_path=manifest_path,
-        rank_csv=rank_csv,
+        output_path=files.output_path,
+        core_csv=files.card_csv,
+        coverage_csv=files.coverage_csv,
+        manifest_path=files.manifest_path,
+        rank_csv=files.rank_csv or identity.side("rank.csv"),
         cards=len(kept),
         targets=len(targets),
         covered1=counts["covered1"],

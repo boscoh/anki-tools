@@ -11,23 +11,16 @@ Usage: ``anki fix <lang> --select --check`` calls :func:`check_cull`.
 from __future__ import annotations
 
 import hashlib
-import json
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Sequence
+from typing import Any, Callable
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking.coreflow import (
     InputCard,
     deck_templates,
-    coverage_glosses,
     read_output,
-)
-from anki_tools.ranking.coregates import (
-    _read_csv,
-    core_word_problems,
-    output_model_problems,
 )
 from anki_tools.ranking.corelist import is_content
 from anki_tools.ranking.cullflow import (
@@ -38,32 +31,22 @@ from anki_tools.ranking.cullflow import (
     coverage_status,
     filter_reason,
     lemma_sets,
-    side_paths,
 )
-from anki_tools.sentence_pack.audit import print_audit, sha256_value
+from anki_tools.ranking.gates import (
+    Gate,
+    gate_core_word,
+    gate_identity,
+    gate_output_model,
+    read_csv,
+    read_json,
+    report,
+    run_gates,
+)
+from anki_tools.ranking.gates import sample as _sample
+from anki_tools.ranking.identity import DeckIdentity
+from anki_tools.sentence_pack.audit import sha256_value
 
-SAMPLE = 3
 CARD_CLASSES = ("sentence", "english", "hint")
-
-GateRow = tuple[str, bool, str]
-GateCheck = Callable[["CullFiles"], tuple[bool, str]]
-
-
-def _read_json(path: Path) -> dict[str, Any]:
-    """Read a JSON object file.
-
-    :param path: Input JSON file.
-    :raises ValueError: The file is not a JSON object.
-    :returns: The JSON object.
-    """
-    try:
-        data = json.loads(Path(path).read_text(encoding="utf-8"))
-    except json.JSONDecodeError as error:
-        raise ValueError(f"bad JSON in {path}: {error}") from error
-    if not isinstance(data, dict):
-        raise ValueError(f"expected an object in {path}")
-    return data
-
 
 @dataclass
 class CullFiles:
@@ -83,8 +66,8 @@ class CullFiles:
     def __post_init__(self) -> None:
         """Set the side paths and start an empty cache."""
         self.apkg_path = Path(self.apkg_path)
-        self.cull_csv, self.coverage_csv, self.manifest_path = side_paths(
-            self.apkg_path
+        self.cull_csv, self.coverage_csv, self.manifest_path = (
+            DeckIdentity(self.apkg_path).cull_sides()
         )
 
     def _load(self, name: str, loader: Callable[[], Any]) -> Any:
@@ -101,16 +84,15 @@ class CullFiles:
 
     def rows(self) -> list[dict[str, str]]:
         """Read the cull CSV rows."""
-        return self._load("rows", lambda: _read_csv(self.cull_csv))
+        return self._load("rows", lambda: read_csv(self.cull_csv))
 
     def coverage(self) -> list[dict[str, str]]:
         """Read the coverage CSV rows."""
-        return self._load("coverage", lambda: _read_csv(self.coverage_csv))
+        return self._load("coverage", lambda: read_csv(self.coverage_csv))
 
     def manifest(self) -> dict[str, Any]:
         """Read the manifest JSON object."""
-        return self._load("manifest", lambda: _read_json(self.manifest_path))
-
+        return self._load("manifest", lambda: read_json(self.manifest_path))
     def params(self) -> dict[str, Any]:
         """Read the run options of the manifest."""
         params = self.manifest().get("params", {})
@@ -138,6 +120,10 @@ class CullFiles:
             "tokens", lambda: self.profile.tokenize_texts(_sentences(self.output()))
         )
 
+    def fields(self) -> list[str]:
+        """Read the field names of the only note type."""
+        return self._load("fields", lambda: list(self.output()["fields"]))
+
 
 def _sentences(output: dict[str, Any]) -> list[str]:
     """Give the sentence of every card of the output deck."""
@@ -154,33 +140,6 @@ def cull_files(apkg_path: Path, profile: CullProfile) -> CullFiles:
     return CullFiles(apkg_path, profile)
 
 
-
-
-def run_gates(files: CullFiles) -> list[GateRow]:
-    """Run gates G1 to G17 of the spec on the written files.
-
-    :param files: Lazy reader for the output files.
-    :returns: One ``(gate, passed, message)`` row per gate.
-    """
-    results: list[GateRow] = []
-    for gate, check in GATES:
-        try:
-            passed, message = check(files)
-        except Exception as error:  # noqa: BLE001 - a gate reports read failures
-            passed, message = False, f"{type(error).__name__}: {error}"
-        results.append((gate, passed, message))
-    return results
-
-
-def _sample(items: Sequence[str], limit: int = SAMPLE) -> str:
-    """Join a bounded number of items and count the rest.
-
-    The core reader does not count the rest, so the cull keeps this form.
-    """
-    shown = ", ".join(items[:limit])
-    if len(items) > limit:
-        shown += f" (+{len(items) - limit} more)"
-    return shown
 
 
 def _kept_rows(files: CullFiles) -> list[dict[str, str]]:
@@ -360,19 +319,6 @@ def gate_media(files: CullFiles) -> tuple[bool, str]:
     return True, f"{len(media)} media files, all used by the kept cards"
 
 
-def gate_identity(files: CullFiles) -> tuple[bool, str]:
-    """G10: the deck name and the note type are the requested values."""
-    output = files.output()
-    name = str(files.params().get("name"))
-    model_name = files.profile.output_model_name
-    problems: list[str] = []
-    if output["decks"] != {name}:
-        problems.append(f"decks {sorted(map(str, output['decks']))}")
-    if output["note_models"] != {model_name}:
-        problems.append(f"models {sorted(map(str, output['note_models']))}")
-    if problems:
-        return False, f"expected {name!r} and {model_name!r}: {_sample(problems)}"
-    return True, f"deck {name!r} and model {model_name!r}"
 
 
 def gate_kept_order(files: CullFiles) -> tuple[bool, str]:
@@ -439,7 +385,7 @@ def gate_swadesh(files: CullFiles) -> tuple[bool, str]:
 def gate_card_templates(files: CullFiles) -> tuple[bool, str]:
     """G15: the deck model holds the Swadesh-style template and CSS."""
     output = files.output()
-    model_name = files.profile.output_model_name
+    model_name = str(files.manifest().get("source", {}).get("model"))
     templates = output["templates"].get(model_name, [])
     if not templates:
         return False, f"the model {model_name!r} has no card template"
@@ -460,40 +406,25 @@ def gate_card_templates(files: CullFiles) -> tuple[bool, str]:
     return True, f"{len(templates)} card template and the CSS classes match"
 
 
-def gate_output_model(files: CullFiles) -> tuple[bool, str]:
-    """G16: one note type, the output fields, and one card per note."""
-    problems = output_model_problems(files.output(), files.profile)
-    return not problems, f"issues {_sample(problems)}"
 
-
-def gate_core_word(files: CullFiles) -> tuple[bool, str]:
-    """G17: every note holds a core word and the coverage gloss of that word."""
-    problems, filled = core_word_problems(
-        files.notes(),
-        files.output()["fields"],
-        coverage_glosses(files.coverage()),
-    )
-    return not problems, f"{filled} core word(s), {len(problems)} bad: {_sample(problems)}"
-
-
-GATES: tuple[tuple[str, GateCheck], ...] = (
-    ("G1", gate_card_count),
-    ("G2", gate_use_cap),
-    ("G3", gate_target_coverage),
-    ("G4", gate_double_coverage),
-    ("G5", gate_filter),
-    ("G6", gate_similarity),
-    ("G7", gate_audio),
-    ("G8", gate_note_count),
-    ("G9", gate_media),
-    ("G10", gate_identity),
-    ("G11", gate_kept_order),
-    ("G12", gate_coverage_rows),
-    ("G13", gate_manifest_hashes),
-    ("G14", gate_swadesh),
-    ("G15", gate_card_templates),
-    ("G16", gate_output_model),
-    ("G17", gate_core_word),
+GATES: tuple[Gate, ...] = (
+    Gate("G1", gate_card_count),
+    Gate("G2", gate_use_cap),
+    Gate("G3", gate_target_coverage),
+    Gate("G4", gate_double_coverage),
+    Gate("G5", gate_filter),
+    Gate("G6", gate_similarity),
+    Gate("G7", gate_audio),
+    Gate("G8", gate_note_count),
+    Gate("G9", gate_media),
+    Gate("G10", gate_identity),
+    Gate("G11", gate_kept_order),
+    Gate("G12", gate_coverage_rows),
+    Gate("G13", gate_manifest_hashes),
+    Gate("G14", gate_swadesh),
+    Gate("G15", gate_card_templates),
+    Gate("G16", gate_output_model),
+    Gate("G17", gate_core_word),
 )
 
 
@@ -504,4 +435,4 @@ def check_cull(output_path: Path, profile: CullProfile) -> int:
     :param profile: Language hooks.
     :returns: The exit code of the gate table, 0 on a pass.
     """
-    return print_audit(run_gates(CullFiles(Path(output_path), profile)))
+    return report(run_gates(GATES, CullFiles(Path(output_path), profile)))

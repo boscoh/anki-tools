@@ -1,13 +1,14 @@
-"""Shared cull flow: profile, selection, reserve pack, files, and the run.
+"""Shared cull flow: profile, selection, reserve pack, and the run.
 
 The module filters the cards of a sentence deck, selects a greedy cover of the
 target words, orders the kept cards, inserts the reserve cards of a Swadesh
-pack, and writes the cull CSV, the coverage CSV, the manifest, and the deck. A
-language package supplies a :class:`CullProfile`, and this module reads every
-language value from it.
+pack, and states the values of the cull CSV, the coverage CSV, the manifest,
+and the deck. A language package supplies a :class:`CullProfile`, and this
+module reads every language value from it.
 
-The cull gates live in ``anki_tools/ranking/cullgates.py``. The deck writer
-stays in ``anki_tools/ranking/coreflow.py``, because the core flow shares it.
+The cull gates live in ``anki_tools/ranking/cullgates.py``. The written package,
+the side files, the manifest, and the report come from the assembler in
+``anki_tools/ranking/assemble.py``, which the core flow shares.
 
 See ``specs/french-1000-sentence-cull.md`` sections 4 to 9.
 """
@@ -34,7 +35,8 @@ from typing import (
 )
 
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.ranking import coreflow
+from anki_tools.apkg.shape import OutputShape
+from anki_tools.ranking import assemble, coreflow
 from anki_tools.ranking.cardfilter import (
     _WORD_PATTERN,
     english_rule,
@@ -42,12 +44,12 @@ from anki_tools.ranking.cardfilter import (
     pos_rule,
     script_rule,
 )
-from anki_tools.ranking.coreflow import InputCard, write_deck, write_manifest
+from anki_tools.ranking.coreflow import InputCard
+from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.ranking.corelist import UNRANKED_RANK, TargetWord, build_targets, is_content
 from anki_tools.ranking.cover import greedy_cover
 from anki_tools.ranking.coverage import write_rows
 from anki_tools.ranking.duplicates import at_limit
-from anki_tools.sentence_pack.audit import sha256_value
 from anki_tools.sentence_pack.guards import check_sentence_shape
 from anki_tools.sentence_pack.profile import LanguageProfile
 from anki_tools.sentence_pack.tokens import load_model
@@ -182,7 +184,6 @@ class CullProfile:
     :param input_sentence_field: Name of the sentence field of the input model.
     :param input_english_field: Name of the English field of the input model.
     :param input_audio_field: Name of the audio field of the input model.
-    :param output_model_name: Name of the output note model.
     :param sense_path: Sense file of the target words.
     :param romanization_source: Input field of the romanization line. The
         output field is ``Romanization``. None when the language has none.
@@ -198,7 +199,6 @@ class CullProfile:
     :param names_path: Name stoplist of the language.
     :param tatoeba_path: Tatoeba sentence file of the language.
     :param wordfreq_lang: ``wordfreq`` language code.
-    :param default_deck_name: Name of the output deck.
     :param licenses: License text per data source.
     :param target_coverage_gate: Gate share of the targets with one card.
     :param double_coverage_gate: Gate share of the targets with two cards.
@@ -220,7 +220,6 @@ class CullProfile:
     input_sentence_field: str
     input_english_field: str
     input_audio_field: str
-    output_model_name: str
     clean_sentence: Callable[[str], str]
     reserve_fields: Callable[[ReserveCard], Sequence[str]]
 
@@ -239,7 +238,6 @@ class CullProfile:
     tatoeba_path: Path
     wordfreq_lang: str
 
-    default_deck_name: str
     licenses: Mapping[str, str]
 
     target_coverage_gate: float
@@ -339,7 +337,6 @@ class CullRequest:
     :param max_words: Maximum word count of a card.
     :param similarity: Lemma Jaccard limit of a duplicate pair.
     :param order: ``coverage`` or ``input`` card order.
-    :param name: Output deck name, or None for the profile value.
     :param reserve_pack: Reserve pack of the run, or None for the profile value.
     :param no_reserve: Run the frequency cull without the reserve cards.
     """
@@ -355,7 +352,6 @@ class CullRequest:
     max_words: int = 12
     similarity: float = 0.67
     order: str = "coverage"
-    name: str | None = None
     reserve_pack: Path | None = None
     no_reserve: bool = False
 
@@ -937,29 +933,33 @@ def spoken_mass(rows: Sequence[FrequencyRow], lemmas: Collection[str]) -> float:
     return covered / total
 
 
-def default_output(apkg_path: Path) -> Path:
-    """Build the default output path of a cull run from the input name.
 
-    :param apkg_path: Input APKG file.
-    :returns: Path next to the input with the suffix ``_culled.apkg``.
+
+def cull_rows(
+    cards: Sequence[InputCard],
+    reasons: Sequence[str],
+    selection: SelectionResult,
+    ordered: Sequence[int],
+    reserve: Sequence[ReserveCard] = (),
+) -> list[dict[str, Any]]:
+    """Build one row per card: the reserve cards, the kept cards, then the rest.
+
+    :param cards: Input cards.
+    :param reasons: Filter reason per input index, empty for a passed card.
+    :param selection: Result of the selection.
+    :param ordered: Input indices of the kept cards in the final order.
+    :param reserve: Kept reserve cards, written first.
+    :returns: One row mapping per card.
     """
-    path = Path(apkg_path)
-    return path.with_name(f"{path.stem}_culled.apkg")
-
-
-def side_paths(output_path: Path) -> tuple[Path, Path, Path]:
-    """Build the three side file paths of an output APKG.
-
-    :param output_path: Output APKG file.
-    :returns: The cull CSV, the coverage CSV, and the manifest paths.
-    """
-    path = Path(output_path)
-    stem = path.with_suffix("") if path.suffix else path
-    return (
-        Path(f"{stem}.cull.csv"),
-        Path(f"{stem}.coverage.csv"),
-        Path(f"{stem}.manifest.json"),
-    )
+    kept = set(ordered)
+    rows = [_reserve_row(card) for card in reserve]
+    rows += [_cull_row(cards[index], True, "", selection, index) for index in ordered]
+    for index, card in enumerate(cards):
+        if index in kept:
+            continue
+        reason = reasons[index] or selection.reasons.get(index, "")
+        rows.append(_cull_row(card, False, reason, selection, index))
+    return rows
 
 
 def write_cull_csv(
@@ -970,7 +970,7 @@ def write_cull_csv(
     path: Path,
     reserve: Sequence[ReserveCard] = (),
 ) -> None:
-    """Write one row per card: the reserve cards, the kept cards, then the rest.
+    """Write the cull CSV.
 
     :param cards: Input cards.
     :param reasons: Filter reason per input index, empty for a passed card.
@@ -979,15 +979,7 @@ def write_cull_csv(
     :param path: Output CSV file.
     :param reserve: Kept reserve cards, written first.
     """
-    kept = set(ordered)
-    rows = [_reserve_row(card) for card in reserve]
-    rows += [_cull_row(cards[index], True, "", selection, index) for index in ordered]
-    for index, card in enumerate(cards):
-        if index in kept:
-            continue
-        reason = reasons[index] or selection.reasons.get(index, "")
-        rows.append(_cull_row(card, False, reason, selection, index))
-    write_rows(path, CULL_COLUMNS, rows)
+    write_rows(path, CULL_COLUMNS, cull_rows(cards, reasons, selection, ordered, reserve))
 
 
 def _reserve_row(card: ReserveCard) -> dict[str, Any]:
@@ -1038,18 +1030,17 @@ def _cull_row(
     }
 
 
-def write_coverage_csv(
+def coverage_rows(
     targets: Sequence[TargetWord],
     selection: SelectionResult,
-    path: Path,
     glosses: Mapping[str, str],
-) -> None:
-    """Write one row per target word: word, rank, count, status, gloss.
+) -> list[dict[str, Any]]:
+    """Build one row per target word: word, rank, count, status, gloss.
 
     :param targets: Target words in rank order.
     :param selection: Result of the selection.
-    :param path: Output CSV file.
     :param glosses: Lemma to the gloss of its sense row.
+    :returns: One row mapping per target word.
     """
     rows = []
     for target in targets:
@@ -1063,7 +1054,23 @@ def write_coverage_csv(
                 "gloss": glosses.get(target.lemma, ""),
             }
         )
-    write_rows(path, COVERAGE_COLUMNS, rows)
+    return rows
+
+
+def write_coverage_csv(
+    targets: Sequence[TargetWord],
+    selection: SelectionResult,
+    path: Path,
+    glosses: Mapping[str, str],
+) -> None:
+    """Write the coverage CSV.
+
+    :param targets: Target words in rank order.
+    :param selection: Result of the selection.
+    :param path: Output CSV file.
+    :param glosses: Lemma to the gloss of its sense row.
+    """
+    write_rows(path, COVERAGE_COLUMNS, coverage_rows(targets, selection, glosses))
 
 
 def coverage_status(count: int) -> str:
@@ -1134,7 +1141,6 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
     """
     apkg_path = Path(request.input_path)
     output_path = Path(request.output_path)
-    name = request.name or profile.default_deck_name
     reserve_pack = (
         request.reserve_pack if request.reserve_pack is not None else profile.reserve_pack
     )
@@ -1266,26 +1272,31 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
         swadesh_covered, swadesh_total = 0, profile.swadesh_total
     mass = spoken_mass(frequency, kept_lemmas)
 
-    print(f"Input:              {apkg_path}")
-    print(f"Input cards:        {len(cards)}")
-    print(f"Passed:             {len(passed)}")
-    for rule in FILTER_RULES:
-        print(f"  Rejected {rule}:       {rejected.get(rule, 0)}")
-    print(f"Targets:            {len(targets)}")
-    print(f"Content lemmas:     {content_lemmas}")
-    print(f"Reserve:            {len(reserve)}")
-    print(f"Swadesh:            {swadesh_covered}/{swadesh_total}")
-    print(f"Cards:              {len(kept) + len(reserve)}")
-    print(f"  Frequency cards:  {len(kept)}")
-    print(f"Distinct lemmas:    {len(kept_lemmas)}")
-    print(f"Covered targets:    {covered}")
-    print(f"Targets with 2:     {twice}")
-    print(f"Max uses frequency: {frequency_max}")
-    print(f"Max uses reserve:   {reserve_max}")
-    print(f"Max uses exempt:    {exempt_max}")
-    print(f"spoken_mass:        {mass:.3f}")
-    print()
-    print("First 10 kept cards")
+    report: list[tuple[str | None, str]] = [
+        ("Input", str(apkg_path)),
+        ("Input cards", str(len(cards))),
+        ("Passed", str(len(passed))),
+    ]
+    report += [
+        (f"  Rejected {rule}", str(rejected.get(rule, 0)))
+        for rule in FILTER_RULES
+    ]
+    report += [
+        ("Targets", str(len(targets))),
+        ("Content lemmas", str(content_lemmas)),
+        ("Reserve", str(len(reserve))),
+        ("Swadesh", f"{swadesh_covered}/{swadesh_total}"),
+        ("Cards", str(len(kept) + len(reserve))),
+        ("  Frequency cards", str(len(kept))),
+        ("Distinct lemmas", str(len(kept_lemmas))),
+        ("Covered targets", str(covered)),
+        ("Targets with 2", str(twice)),
+        ("Max uses frequency", str(frequency_max)),
+        ("Max uses reserve", str(reserve_max)),
+        ("Max uses exempt", str(exempt_max)),
+        ("spoken_mass", f"{mass:.3f}"),
+        (None, "First 10 kept cards"),
+    ]
     target_ranks = {target.lemma: target.rank for target in targets}
     for position, index in enumerate(kept[:10], start=1):
         card = cards[index]
@@ -1297,92 +1308,88 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
             },
             key=lambda lemma: target_ranks[lemma],
         )
-        print(f"{position:>2}. {card.sentence}")
-        print(f"    {card.english}")
-        print(f"    targets: {', '.join(hits)}")
+        report += [
+            (None, f"{position:>2}. {card.sentence}"),
+            (None, f"    {card.english}"),
+            (None, f"    targets: {', '.join(hits)}"),
+        ]
 
-    cull_csv, coverage_csv, manifest_path = side_paths(output_path)
-    write_cull_csv(cards, reasons, selection, kept, cull_csv, reserve=reserve)
-    write_coverage_csv(targets, selection, coverage_csv, glosses)
-    write_deck(
+    identity = DeckIdentity(output_path)
+    note_fields, bolded, unbolded = coreflow.note_values(
         apkg_path,
         cards,
         kept,
-        output_path,
-        name,
         profile,
-        reserve=reserve,
-        reserve_pack_path=reserve_pack,
-        reserve_fields=profile.reserve_fields,
+        values,
     )
-    coreflow.fill_core_fields(output_path, cards, values)
-    bolded, unbolded = coreflow.fill_bold(
-        output_path,
-        cards,
-        {index: values[index][0] for index in kept},
-        profile.highlight,
+    files = assemble.write_run(
+        assemble.DeckRun(
+            identity=identity,
+            input_path=apkg_path,
+            shape=OutputShape(
+                deck_name=identity.title,
+                model_name=identity.model_name,
+                input_model_name=profile.input_model_name,
+                fields=coreflow.output_fields(profile),
+                templates=coreflow.deck_templates(profile),
+                css=profile.card_css(),
+            ),
+            values=note_fields,
+            card_table=assemble.SideTable(
+                "cull.csv", CULL_COLUMNS, cull_rows(cards, reasons, selection, kept, reserve)
+            ),
+            coverage_table=assemble.SideTable(
+                "coverage.csv", COVERAGE_COLUMNS, coverage_rows(targets, selection, glosses)
+            ),
+            manifest=assemble.ManifestValues(
+                input_model=profile.input_model_name,
+                params={
+                    "max_cards": request.max_cards,
+                    "target_words": request.target_words,
+                    "max_uses": request.max_uses,
+                    "exempt_top": request.exempt_top,
+                    "spoken_weight": request.spoken_weight,
+                    "min_words": request.min_words,
+                    "max_words": request.max_words,
+                    "similarity": request.similarity,
+                    "order": request.order,
+                },
+                counts={
+                    "input": len(cards),
+                    "passed": len(passed),
+                    "cards": len(kept) + len(reserve),
+                    "frequency_cards": len(kept),
+                    "reserve": len(reserve),
+                    "content": len(kept_lemmas),
+                    "targets": len(targets),
+                    "covered": covered,
+                    "covered2": twice,
+                    "swadesh_covered": swadesh_covered,
+                    "swadesh_total": swadesh_total,
+                    "dropped_no_core": dropped_no_core,
+                    "bolded": bolded,
+                    "unbolded": unbolded,
+                },
+                frequency={
+                    "path": str(profile.frequency_path),
+                    "spoken_weight": request.spoken_weight,
+                },
+                kept_order=kept_order_hash(cards, kept, reserve=reserve),
+                licenses=profile.licenses,
+                reserve_pack=str(reserve_pack) if reserve else "",
+                swadesh_exceptions=profile.swadesh_exceptions if reserve else (),
+            ),
+            report=report,
+            reserve=reserve,
+            reserve_pack_path=reserve_pack,
+            reserve_values=profile.reserve_fields,
+        )
     )
-    kept_order = kept_order_hash(cards, kept, reserve=reserve)
-    write_manifest(
-        manifest_path,
-        source={
-            "input": str(apkg_path),
-            "deck": name,
-            "model": profile.output_model_name,
-            "input_model": profile.input_model_name,
-        },
-        params={
-            "max_cards": request.max_cards,
-            "target_words": request.target_words,
-            "max_uses": request.max_uses,
-            "exempt_top": request.exempt_top,
-            "spoken_weight": request.spoken_weight,
-            "min_words": request.min_words,
-            "max_words": request.max_words,
-            "similarity": request.similarity,
-            "order": request.order,
-            "name": name,
-        },
-        counts={
-            "input": len(cards),
-            "passed": len(passed),
-            "cards": len(kept) + len(reserve),
-            "frequency_cards": len(kept),
-            "reserve": len(reserve),
-            "content": len(kept_lemmas),
-            "targets": len(targets),
-            "covered": covered,
-            "covered2": twice,
-            "swadesh_covered": swadesh_covered,
-            "swadesh_total": swadesh_total,
-            "dropped_no_core": dropped_no_core,
-            "bolded": bolded,
-            "unbolded": unbolded,
-        },
-        frequency={
-            "path": str(profile.frequency_path),
-            "spoken_weight": request.spoken_weight,
-        },
-        files={
-            "cull_csv": sha256_value(cull_csv),
-            "coverage_csv": sha256_value(coverage_csv),
-            "input_apkg": sha256_value(apkg_path),
-        },
-        kept_order=kept_order,
-        licenses=profile.licenses,
-        reserve_pack=str(reserve_pack) if reserve else "",
-        swadesh_exceptions=profile.swadesh_exceptions if reserve else (),
-    )
-    print()
-    print(f"wrote {output_path}")
-    print(f"wrote {cull_csv}")
-    print(f"wrote {coverage_csv}")
-    print(f"wrote {manifest_path}")
     return CullRun(
-        output_path=output_path,
-        cull_csv=cull_csv,
-        coverage_csv=coverage_csv,
-        manifest_path=manifest_path,
+        output_path=files.output_path,
+        cull_csv=files.card_csv,
+        coverage_csv=files.coverage_csv,
+        manifest_path=files.manifest_path,
         cards=len(kept) + len(reserve),
         frequency_cards=len(kept),
         reserve=len(reserve),

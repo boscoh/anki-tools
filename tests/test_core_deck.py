@@ -16,18 +16,19 @@ from typing import Sequence
 import pytest
 
 from anki_tools.apkg.package import AnkiPackage
+from anki_tools.apkg.shape import OutputShape, write_package
 from anki_tools.languages.french import core, cull
 from anki_tools.ranking import coreflow, corelist
+from anki_tools.ranking.assemble import write_rank_csv
 from anki_tools.ranking.coreflow import (
     coverage_rows_of,
     InputCard,
     kept_order_hash,
     outside_lemmas,
     sense_match,
-    side_paths,
     size_check,
-    write_rank_csv,
 )
+from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.ranking.corelist import TargetWord, build_core_targets
 from anki_tools.ranking.core import (
     CoreCandidate,
@@ -416,7 +417,7 @@ class TestFiles:
         cards = [_card("A.", index=0), _card("B.", index=1)]
         path = tmp_path / "x.rank.csv"
 
-        write_rank_csv(cards, [1, 0], path)
+        write_rank_csv([(1, 1001, "B.", 1), (2, 1000, "A.", 1)], path)
         rows = list(csv.DictReader(path.open(encoding="utf-8")))
 
         assert [row["sentence"] for row in rows] == ["B.", "A."]
@@ -424,7 +425,7 @@ class TestFiles:
         assert kept_order_hash(cards, [1, 0]) == kept_order_hash(cards, [1, 0])
 
     def test_the_side_paths_hold_the_four_files(self, tmp_path: Path) -> None:
-        paths = side_paths(tmp_path / "deck.apkg")
+        paths = DeckIdentity(tmp_path / "deck.apkg").core_sides()
 
         assert [path.name for path in paths] == [
             "deck.core.csv",
@@ -433,8 +434,8 @@ class TestFiles:
             "deck.rank.csv",
         ]
 
-    def test_the_default_output_uses_the_core_suffix(self, tmp_path: Path) -> None:
-        assert coreflow.default_output(tmp_path / "deck.apkg").name == "deck_core.apkg"
+    def test_the_default_output_uses_the_language_and_the_mode(self) -> None:
+        assert default_output("french", "core").name == "french_core.apkg"
 
 
 def _tiny_deck(tmp_path: Path) -> Path:
@@ -563,9 +564,7 @@ class TestCardDesign:
             models = package.get_models(include_templates=True)
             cards = package.get_cards()
 
-        assert [model["name"] for model in models.values()] == [
-            profile.output_model_name
-        ]
+        assert [model["name"] for model in models.values()] == [output.stem]
         model = next(iter(models.values()))
         assert [field["name"] for field in model["flds"]] == list(
             coreflow.output_fields(profile)
@@ -575,6 +574,20 @@ class TestCardDesign:
         ] == [coreflow.deck_templates(profile)[0]]
         assert len(cards) == run.cards
         assert {int(row["ord"]) for row in cards} == {0}
+
+    def test_the_title_the_note_type_and_the_manifest_name_agree(
+        self, tmp_path: Path
+    ) -> None:
+        run, output, _profile = _run_core(tmp_path)
+        manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
+
+        with AnkiPackage(output) as package:
+            decks = {deck["name"] for deck in package.get_decks().values()}
+            models = {model["name"] for model in package.get_models().values()}
+
+        identity = DeckIdentity(output)
+        assert decks == models == {manifest["source"]["model"]}
+        assert manifest["source"]["model"] == identity.title
 
 
     def test_the_note_type_points_at_the_output_deck(self, tmp_path: Path) -> None:
@@ -588,15 +601,8 @@ class TestCardDesign:
 
         assert str(next(iter(models.values()))["did"]) in decks
     def test_the_model_gets_the_core_field_and_templates(self, tmp_path: Path) -> None:
-        source = _tiny_deck(tmp_path)
-        cards = cull.load_input_deck(source)
-        output = tmp_path / "core.apkg"
-        profile = core.FRENCH_CORE_PROFILE
+        _run, output, profile = _run_core(tmp_path)
 
-        coreflow.write_deck(source, cards, [0, 1], output, "Core Deck", profile)
-        filled = coreflow.fill_core_fields(
-            output, cards, {0: ("chat", "cat"), 1: ("chat", "cat")}
-        )
 
         with AnkiPackage(output) as package:
             models = package.get_models()
@@ -605,10 +611,9 @@ class TestCardDesign:
                 for row in package.get_notes()
             }
 
-        assert filled == 2
         assert list(models) != []
         model = next(iter(models.values()))
-        assert model["name"] == profile.output_model_name
+        assert model["name"] == output.stem
         assert [field["name"] for field in model["flds"]] == [
             "Audio",
             "Sentence",
@@ -616,14 +621,10 @@ class TestCardDesign:
             "Core",
             "CoreGloss",
         ]
-        assert notes[cards[0].note_id] == [
-            "[sound:a0.mp3]",
-            "Le chat dort.",
-            "The cat sleeps.",
-            "chat",
-            "cat",
-        ]
-        assert notes[cards[1].note_id][3:] == ["chat", "cat"]
+        assert [values[3:] for values in notes.values()] == [["chat", "cat"]]
+        values = next(iter(notes.values()))
+        assert values[0] == "[sound:a0.mp3]"
+        assert "<b>chat</b>" in values[1]
 
     def test_every_kept_note_holds_a_core_word_and_a_gloss(
         self, tmp_path: Path
@@ -674,7 +675,7 @@ class TestCardDesign:
 
     def test_the_gloss_gate_fails_on_a_wrong_gloss(self, tmp_path: Path) -> None:
         _run, output, profile = _run_core(tmp_path)
-        core_csv, coverage_csv, _manifest, _rank = side_paths(output)
+        core_csv, coverage_csv, _manifest, _rank = DeckIdentity(output).core_sides()
         coverage_csv.write_text(
             "key,word,gloss,tier,position,quota,count,status\n"
             "S1:chat,chat,dog,S,1,1,1,covered\n",
@@ -721,8 +722,23 @@ class TestCardDesign:
         before = _cards(source)
         output = tmp_path / "core.apkg"
 
-        counts = coreflow.write_deck(
-            source, cards, [0], output, "Core Deck", core.FRENCH_CORE_PROFILE
+        profile = core.FRENCH_CORE_PROFILE
+        identity = DeckIdentity(output)
+        note_fields, _bolded, _unbolded = coreflow.note_values(
+            source, cards, [0], profile, {}
+        )
+        counts = write_package(
+            source,
+            output,
+            OutputShape(
+                deck_name=identity.title,
+                model_name=identity.model_name,
+                input_model_name=profile.input_model_name,
+                fields=coreflow.output_fields(profile),
+                templates=coreflow.deck_templates(profile),
+                css=profile.card_css(),
+            ),
+            note_fields,
         )
 
         after = _cards(output)

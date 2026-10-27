@@ -87,7 +87,7 @@ CREATE TABLE templates (
 );
 CREATE TABLE notes (
     id integer primary key, mid integer, flds text, tags text,
-    mod integer, usn integer
+    mod integer, usn integer, sfld text, csum integer
 );
 CREATE TABLE cards (id integer primary key, nid integer, did integer, ord integer);
 CREATE TABLE decks (id integer primary key, name text);
@@ -118,7 +118,7 @@ def _anki21b_database(path: Path) -> None:
     )
     for index, sentence in enumerate(("Hola.", "Adios.")):
         connection.execute(
-            "INSERT INTO notes VALUES (?, ?, ?, '', 0, 0)",
+            "INSERT INTO notes VALUES (?, ?, ?, '', 0, 0, '', 0)",
             (
                 index + 1,
                 int(ANKI21B_NOTE_TYPE),

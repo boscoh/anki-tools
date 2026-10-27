@@ -817,6 +817,58 @@ class AnkiPackage:
         self.conn.commit()
         self._modified = True
 
+    def set_model_kind(self, model_id: str, kind: int = 0) -> None:
+        """Set the kind of a note type. Kind 0 is the standard kind, 1 the cloze kind.
+
+        The ``anki2`` model dict holds the kind in ``type``. The ``anki21b``
+        note type config holds the kind in protobuf field 2.
+
+        :param model_id: Model ID.
+        :param kind: Note type kind.
+        :raises NotImplementedError: The package is in the ``anki21`` format.
+        :raises ValueError: The model is absent.
+        """
+        if self._db_format == "anki21b":
+            row = self.conn.execute(
+                "SELECT config FROM notetypes WHERE id = ?", (int(model_id),)
+            ).fetchone()
+            if row is None:
+                raise ValueError(f"Model {model_id} not found")
+            parsed = self._parse_notetype_config(row["config"] or b"")
+            original = parsed["_original"]
+            parts: list[bytes] = []
+            found = False
+            for start, end, field_num in parsed["other_fields"]:
+                if field_num == 2:
+                    parts.append(bytes([2 << 3]) + self._write_varint(kind))
+                    found = True
+                else:
+                    parts.append(original[start:end])
+            if not found:
+                parts.append(bytes([2 << 3]) + self._write_varint(kind))
+            if parsed["css"]:
+                parts.append(self._write_proto_string(3, parsed["css"]))
+            self.conn.execute(
+                "UPDATE notetypes SET config = ? WHERE id = ?",
+                (b"".join(parts), int(model_id)),
+            )
+        elif self._db_format == "anki2":
+            models = json.loads(
+                self.conn.execute("SELECT models FROM col").fetchone()[0]
+            )
+            if model_id not in models:
+                raise ValueError(f"Model {model_id} not found")
+            models[model_id]["type"] = kind
+            self.conn.execute(
+                "UPDATE col SET models = ? WHERE id = 1", (json.dumps(models),)
+            )
+        else:
+            raise NotImplementedError(
+                f"set_model_kind needs the anki2 or anki21b format, not {self._db_format}"
+            )
+        self.conn.commit()
+        self._modified = True
+
     def update_note(
         self,
         note_id: int,
