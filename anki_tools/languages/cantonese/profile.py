@@ -33,6 +33,7 @@ from anki_tools.languages.mandarin.characters import (
     is_chinese_char,
     is_repeated_zh_sentence,
 )
+from anki_tools.sentence_pack.audit import run_pack_audit
 from anki_tools.sentence_pack.pack import (
     ATTRIBUTION_PATH,
     audio_license_source,
@@ -1261,41 +1262,15 @@ def cantonese_gates() -> tuple[tuple[str, Any], ...]:
     )
 
 
-def run_cantonese_audit(
-    *,
-    apkg_path: Path | None = None,
-    sentences_csv: Path = SENTENCES_PATH,
-    word_csv: Path = DEFAULT_CSV_PATH,
-    review_csv: Path = DEFAULT_REVIEW_PATH,
-    audio_dir: Path = AUDIO_DIR,
-    manifest_path: Path | None = None,
-    attribution_path: Path = ATTRIBUTION_PATH,
-) -> list[tuple[str, bool, str]]:
+def run_cantonese_audit(**paths: Path | None) -> list[tuple[str, bool, str]]:
     """Run the Cantonese quality gates G1 to G21.
 
-    :param apkg_path: APKG file of the pack.
-    :param sentences_csv: Sentence CSV with one row per card.
-    :param word_csv: Reviewed Swadesh word CSV.
-    :param review_csv: Word review CSV.
-    :param audio_dir: Directory with the MP3 files and ``index.csv``.
-    :param manifest_path: Manifest JSON file.
-    :param attribution_path: Attribution Markdown file.
+    :param paths: Input paths that replace the defaults of the profile.
     :returns: One ``(gate, passed, message)`` row per gate, G1 first.
     """
-    from anki_tools.sentence_pack.audit import AuditInputs, run_gates
-
-    inputs = AuditInputs(
-        CANTONESE,
-        apkg_path=apkg_path or CANTONESE.output_apkg,
-        sentences_csv=sentences_csv,
-        word_csv=word_csv,
-        review_csv=review_csv,
-        audio_dir=audio_dir,
-        manifest_path=manifest_path or CANTONESE.manifest_path,
-        attribution_path=attribution_path,
-        load_table=lambda csv_path: load_word_table(csv_path),
+    return run_pack_audit(
+        CANTONESE, cantonese_gates(), load_table=load_word_table, **paths
     )
-    return run_gates(cantonese_gates(), inputs, CANTONESE)
 
 
 __all__ = [

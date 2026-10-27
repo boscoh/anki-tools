@@ -20,7 +20,12 @@ from wordfreq import top_n_list, zipf_frequency
 
 from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
 from anki_tools.ranking.latin import latin_text_dedup_key, latin_word_similarity
-from anki_tools.sentence_pack.audit import AuditInputs, GateRow, sample
+from anki_tools.sentence_pack.audit import (
+    AuditInputs,
+    GateRow,
+    run_pack_audit,
+    sample,
+)
 from anki_tools.sentence_pack.pack import (
     ATTRIBUTION_PATH,
     attribution_lines,
@@ -1375,41 +1380,15 @@ def french_gates() -> tuple[tuple[str, Any], ...]:
     )
 
 
-def run_french_audit(
-    *,
-    apkg_path: Path | None = None,
-    sentences_csv: Path = SENTENCES_PATH,
-    word_csv: Path = WORD_CSV_PATH,
-    review_csv: Path = WORD_REVIEW_PATH,
-    audio_dir: Path = AUDIO_DIR,
-    manifest_path: Path | None = None,
-    attribution_path: Path = ATTRIBUTION_PATH,
-) -> list[GateRow]:
+def run_french_audit(**paths: Path | None) -> list[GateRow]:
     """Run the French quality gates G1 to G21.
 
-    :param apkg_path: APKG file of the pack.
-    :param sentences_csv: Sentence CSV with one row per card.
-    :param word_csv: Reviewed Swadesh word CSV.
-    :param review_csv: Word review CSV.
-    :param audio_dir: Directory with the MP3 files and ``index.csv``.
-    :param manifest_path: Manifest JSON file.
-    :param attribution_path: Attribution Markdown file.
+    :param paths: Input paths that replace the defaults of the profile.
     :returns: One ``(gate, passed, message)`` row per gate, G1 first.
     """
-    from anki_tools.sentence_pack.audit import run_gates
-
-    inputs = AuditInputs(
-        FRENCH,
-        apkg_path=apkg_path or FRENCH.output_apkg,
-        sentences_csv=sentences_csv,
-        word_csv=word_csv,
-        review_csv=review_csv,
-        audio_dir=audio_dir,
-        manifest_path=manifest_path or FRENCH.manifest_path,
-        attribution_path=attribution_path,
-        load_table=lambda csv_path: load_word_table(csv_path),
+    return run_pack_audit(
+        FRENCH, french_gates(), load_table=load_word_table, **paths
     )
-    return run_gates(french_gates(), inputs, FRENCH)
 
 
 __all__ = [

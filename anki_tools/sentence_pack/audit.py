@@ -3,7 +3,8 @@
 :func:`run_gates` reads the reviewed word table, the sentence CSV, the audio
 index, the APKG file, the manifest, and the attribution file. It returns one row
 per gate. :func:`print_audit` writes the gate table and gives the process exit
-code. The module only reads files.
+code. :func:`run_pack_audit` binds a profile and a gate list to the default
+paths of the profile. The module only reads files.
 """
 
 from __future__ import annotations
@@ -24,7 +25,11 @@ from anki_tools.sentence_pack.audio import (
     probe_duration,
 )
 from anki_tools.sentence_pack.english_sense import sense_mismatches
-from anki_tools.sentence_pack.pack import WORD_PREFIX, load_audio_index
+from anki_tools.sentence_pack.pack import (
+    ATTRIBUTION_PATH,
+    WORD_PREFIX,
+    load_audio_index,
+)
 from anki_tools.sentence_pack.guards import check_sentence_shape
 from anki_tools.sentence_pack.pool import (
     SCAFFOLD_SHAPE_KEYS,
@@ -764,6 +769,50 @@ def run_gates(
             passed, message = False, f"{type(error).__name__}: {error}"
         results.append((gate, passed, message))
     return results
+
+
+def run_pack_audit(
+    profile: LanguageProfile,
+    gates: Sequence[tuple[str, GateCheck]],
+    *,
+    apkg_path: Path | None = None,
+    sentences_csv: Path | None = None,
+    word_csv: Path | None = None,
+    review_csv: Path | None = None,
+    audio_dir: Path | None = None,
+    manifest_path: Path | None = None,
+    attribution_path: Path = ATTRIBUTION_PATH,
+    load_table: Callable[..., Sequence[WordRow]],
+    probe: Callable[[Path], float] = probe_duration,
+) -> list[GateRow]:
+    """Run the gates of one pack on the default paths of its profile.
+
+    :param profile: Language profile, which holds the default paths.
+    :param gates: Ordered gate names and checks.
+    :param apkg_path: APKG file of the pack, default the profile file.
+    :param sentences_csv: Sentence CSV, default the profile file.
+    :param word_csv: Reviewed word CSV, default the profile file.
+    :param review_csv: Word review CSV, default the profile file.
+    :param audio_dir: Audio directory, default the profile directory.
+    :param manifest_path: Manifest JSON, default the profile file.
+    :param attribution_path: Attribution Markdown file.
+    :param load_table: Callable that reads the reviewed word table.
+    :param probe: Function that reads the duration of a file.
+    :returns: One ``(gate, passed, message)`` row per gate.
+    """
+    inputs = AuditInputs(
+        profile,
+        apkg_path=apkg_path or profile.output_apkg,
+        sentences_csv=sentences_csv or profile.sentence_csv,
+        word_csv=word_csv or profile.word_csv,
+        review_csv=review_csv or profile.word_review_csv,
+        audio_dir=audio_dir or profile.audio_dir,
+        manifest_path=manifest_path or profile.manifest_path,
+        attribution_path=attribution_path,
+        load_table=load_table,
+        probe=probe,
+    )
+    return run_gates(gates, inputs, profile)
 
 
 def print_audit(results: Sequence[GateRow]) -> int:

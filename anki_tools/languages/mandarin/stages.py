@@ -68,7 +68,7 @@ from anki_tools.sentence_pack.audit import (
     gate_unique_tatoeba_ids,
     gate_word_audio,
     print_audit,
-    run_gates,
+    run_pack_audit,
     sample,
 )
 from anki_tools.sentence_pack.pack import (
@@ -556,39 +556,19 @@ GATES: tuple[tuple[str, GateCheck], ...] = (
 )
 
 
-def run_audit(
-    apkg_path: Path = OUTPUT_PATH,
-    sentences_csv: Path = SENTENCES_PATH,
-    word_csv: Path = WORD_CSV_PATH,
-    review_csv: Path = REVIEW_PATH,
-    audio_dir: Path = AUDIO_DIR,
-    manifest_path: Path = MANIFEST_PATH,
-    attribution_path: Path = ATTRIBUTION_PATH,
-) -> list[GateRow]:
+def run_audit(**paths: Path | None) -> list[GateRow]:
     """Run the quality gates G1 to G18.
 
-    :param apkg_path: APKG file of the pack.
-    :param sentences_csv: Sentence CSV with one row per card.
-    :param word_csv: Reviewed Swadesh word CSV.
-    :param review_csv: Word review CSV.
-    :param audio_dir: Directory with the MP3 files and ``index.csv``.
-    :param manifest_path: Manifest JSON file.
-    :param attribution_path: Attribution Markdown file.
+    :param paths: Input paths that replace the defaults of the profile.
     :returns: One ``(gate, passed, message)`` row per gate, G1 first.
     """
-    inputs = AuditInputs(
+    return run_pack_audit(
         MANDARIN,
-        apkg_path=apkg_path,
-        sentences_csv=sentences_csv,
-        word_csv=word_csv,
-        review_csv=review_csv,
-        audio_dir=audio_dir,
-        manifest_path=manifest_path,
-        attribution_path=attribution_path,
+        GATES,
         load_table=load_word_table,
         probe=probe_duration,
+        **paths,
     )
-    return run_gates(GATES, inputs, MANDARIN)
 
 
 __all__ = [
