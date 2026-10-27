@@ -476,11 +476,11 @@ spoken weight, and the bold flag. The defaults are in `core.py` and
 
 | File                                 | Content                                                     |
 | ------------------------------------ | ----------------------------------------------------------- |
-| `apkg/french_core_300.apkg`          | the kept cards in core order, with the output note type (section 15) and the input audio |
-| `apkg/french_core_300.core.csv`      | one row per input card: `note_id`, `index`, `sentence`, `english`, `audio`, `kept`, `pass`, `reason`, `targets`, `assigned`, `value`, `cost`, `units`, `new_lemmas`, `sense`, `bold` |
-| `apkg/french_core_300.coverage.csv`  | one row per target: `key`, `word`, `tier`, `position`, `quota`, `count`, `status` |
-| `apkg/french_core_300.manifest.json` | counts, options, frequency source, hashes                   |
-| `apkg/french_core_300.rank.csv`      | the ranking CSV of `reorder_deck`                           |
+| `apkg/french_core.apkg`          | the kept cards in core order, with the output note type (section 15) and the input audio |
+| `apkg/french_core.core.csv`      | one row per input card: `note_id`, `index`, `sentence`, `english`, `audio`, `kept`, `pass`, `reason`, `targets`, `assigned`, `value`, `cost`, `units`, `new_lemmas`, `sense`, `bold` |
+| `apkg/french_core.coverage.csv`  | one row per target: `key`, `word`, `tier`, `position`, `quota`, `count`, `status` |
+| `apkg/french_core.manifest.json` | counts, options, frequency source, hashes                   |
+| `apkg/french_core.rank.csv`      | the ranking CSV of `reorder_deck`                           |
 
 `status` is `covered`, `partial`, `absent`, `absent_sense`, or `unchecked`.
 
@@ -504,7 +504,7 @@ non-zero.
 | K6   | no kept pair reaches the similarity limit                            |
 | K7   | every kept card has a valid MP3 file                                 |
 | K8   | the note count equals the kept count and the manifest count, and the media files are exactly the kept files |
-| K9   | the deck name is `profile.deck_name` and the only note type name is `profile.output_model_name` |
+| K9   | the deck name and the only note type name equal `manifest.params.name` and `manifest.source.model` |
 | K10  | the kept order equals the recorded hash, and the CSV holds every kept card |
 | K11  | the coverage CSV has one row per target, the counts match the cards, and every status is valid |
 | K12  | the manifest hashes match the two CSVs                               |
@@ -542,7 +542,7 @@ file. Do not download a file.
 | Determinism | two runs give the same set and order                                           |
 | Budget      | a small `--core-max-cards` stops with a clear message                          |
 | APKG        | the kept notes, their media files, the templates, and the CSS                  |
-| Note type   | one note type named `profile.output_model_name` with the fields of section 15.2 |
+| Note type   | one note type named the output file stem with the fields of section 15.2 |
 | Note type   | every note holds one `Core` and one `CoreGloss` (K19)                           |
 | Note type   | a kept card with no core word is not written, and the manifest counts it        |
 | Note type   | a kept note keeps its note id and its card `due`                                |
@@ -686,7 +686,7 @@ to E5 are closed. Section 14.5 lists what remains.
 | `vocab/french_core_senses.tsv`              | 51 rows: the top 50 tier F words and `ne`                          |
 | `vocab/french_loanwords.txt`                | 28 words                                                           |
 | `tests/test_core_deck.py`                   | 31 tests                                                           |
-| `apkg/french_core_300.apkg`                 | 300 cards, all gates pass                                          |
+| `apkg/french_core.apkg`                 | 300 cards, all gates pass                                          |
 
 ### 14.2 Gates
 
@@ -766,14 +766,14 @@ the one cull deck of `specs/french-1000-sentence-cull.md`.
 `audio_field` to `input_model_name`, `input_sentence_field`,
 `input_english_field`, and `input_audio_field`. It drops `core_field` and
 `core_gloss_field` for the shared constants `OUTPUT_CORE_FIELD` and
-`OUTPUT_GLOSS_FIELD`. It adds `output_model_name` and
-`romanization_source: str | None = None`.
+`OUTPUT_GLOSS_FIELD`. It adds `romanization_source: str | None = None`.
 
 `CullProfile` takes the same four renames and the same new fields, plus
 `sense_path: Path`, the sense file of section 15.4.
 
-The four language `core.py` files set the new fields. The core `deck_name` and
-`output_model_name` hold the same string, and a test pins the pair.
+The four language `core.py` files set the scan hooks and the mode view. The
+identity module derives the deck title and the note type name from the output
+file stem (ADR 0015).
 
 ### 15.2 The field set
 

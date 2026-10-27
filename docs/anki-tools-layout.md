@@ -24,6 +24,8 @@ no language package.
 | Path                           | Content                                         |
 | ------------------------------ | ----------------------------------------------- |
 | `anki_tools/apkg/package.py`   | Read, write, and edit APKG files                |
+| `anki_tools/apkg/media.py`     | The media map of anki2 and anki21b              |
+| `anki_tools/apkg/shape.py`     | The output package shape and the format adapters |
 | `anki_tools/apkg/templates.py` | Template and CSS loaders, and `apply_templates` |
 
 ## 3. ranking
@@ -38,6 +40,11 @@ Shared ranking code only. No language data.
 | `anki_tools/ranking/cover.py`     | Generic greedy cover over items with changing gains   |
 | `anki_tools/ranking/core.py`      | Core-word value, cost, passes, and order              |
 | `anki_tools/ranking/pipeline.py`  | Shared extract, rank, write, and reorder stages       |
+| `anki_tools/ranking/identity.py`  | The output stem, deck title, note type, and side paths |
+| `anki_tools/ranking/assemble.py`  | The deck, the side files, the manifest, and the report |
+| `anki_tools/ranking/gates.py`     | The gate runner, the report, and the shared gates     |
+| `anki_tools/ranking/deckprofile.py` | One language deck profile with two mode views      |
+| `anki_tools/ranking/fixrun.py`    | The one route of the four fix commands                |
 | `anki_tools/ranking/cullflow.py`  | Cull flow behind the `CullProfile` seam               |
 | `anki_tools/ranking/cullgates.py` | Gates G1 to G17 of the cull deck                      |
 

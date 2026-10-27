@@ -429,7 +429,7 @@ parameter change, not a gate failure.
 
 ```bash
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
-    --output apkg/french_1000_core_sentences.apkg
+    --output apkg/french_1000.apkg
 ```
 
 ### 10.2 Options
@@ -438,8 +438,8 @@ uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
 | ------------ | ------------------- | -------------------------------------------- |
 | `--cards`    | 1000                | Card cap                                     |
 | `--reserve`  | on                  | Add the Swadesh reserve cards                |
-| `--output`   | from the input name | Output APKG                                  |
-| `--check`    | off                 | Run gates G1 to G15 on the output            |
+| `--output`   | `apkg/<language>_1000.apkg` | Output APKG                         |
+| `--check`    | off                 | Run gates G1 to G17 on the output            |
 | `--select`   | off                 | Run the cull instead of the rank and reorder |
 
 `max_uses` (4), `target_words` (300), `exempt_top` (100), the spoken
@@ -451,10 +451,10 @@ reserve pack path are fields of `CullRequest` with these defaults in
 
 | File                                              | Content                                                    |
 | ------------------------------------------------- | ---------------------------------------------------------- |
-| `apkg/french_1000_core_sentences.apkg`            | The culled deck with the output note type of section 17 and the input audio |
-| `apkg/french_1000_core_sentences.cull.csv`        | One row per input card: `kept`, `reason`, `targets`, `gain` |
-| `apkg/french_1000_core_sentences.coverage.csv`    | One row per target: `word`, `rank`, `count`, `status`, `gloss` |
-| `apkg/french_1000_core_sentences.manifest.json`   | Counts, parameters, frequency source, and hashes        |
+| `apkg/french_1000.apkg`            | The culled deck with the output note type of section 17 and the input audio |
+| `apkg/french_1000.cull.csv`        | One row per input card: `kept`, `reason`, `targets`, `gain` |
+| `apkg/french_1000.coverage.csv`    | One row per target: `word`, `rank`, `count`, `status`, `gloss` |
+| `apkg/french_1000.manifest.json`   | Counts, parameters, frequency source, and hashes        |
 
 The `.cull.csv` has these columns: `source`, `sentence`, `english`, `audio`,
 `kept`, `reason`, `targets`, `gain`, `hardest_rank`. The `source` is `swadesh`
@@ -502,7 +502,7 @@ the command with a non-zero exit code.
 | G7   | Every kept card has its input audio file, and the file is a valid MP3   |
 | G8   | The APKG note count equals the cull CSV `kept` count and the manifest   |
 | G9   | The APKG holds exactly the media files of the kept cards                |
-| G10  | The output deck name is `params.name`, and the only note type name is `profile.output_model_name` |
+| G10  | The output deck name is `params.name`, and the only note type name is `manifest.source.model` |
 | G11  | A second run gives the same kept set and the same order                 |
 | G12  | The coverage CSV has one row per target word                            |
 | G13  | The manifest hashes match the cull CSV and the coverage CSV             |
@@ -531,7 +531,7 @@ note type name, the fields, and the deck name of the output (section 17.6).
 | Order          | `hardest_rank` does not decrease                                      |
 | Determinism    | Two runs give the same card set and order                              |
 | APKG           | The output holds the kept notes and only their media files             |
-| Note type      | One note type named `profile.output_model_name` with the fields of section 17.2 |
+| Note type      | One note type named the output file stem, with the fields of section 17.2 |
 | Note type      | Every note holds a `Core` and a `CoreGloss`; a reserve card takes its pack gloss |
 | Note type      | A kept card keeps its card row and its `due` value                     |
 
@@ -568,7 +568,7 @@ note type name, the fields, and the deck name of the output (section 17.6).
 | D1        | `anki-3jm` | This spec and the analysis                            | `specs/french-1000-sentence-cull.md`     |
 | D2        | `anki-mvo` | APKG extract, frequency list, Tatoeba cache            | `data/french_frequency.tsv`              |
 | D3        | `anki-3ux` | Filter, gain, cap, similarity, order                  | kept card list                           |
-| D4        | `anki-mq7` | APKG writer, cull CSV, coverage CSV, manifest, gates  | `apkg/french_1000_core_sentences.apkg`   |
+| D4        | `anki-mq7` | APKG writer, cull CSV, coverage CSV, manifest, gates  | `apkg/french_1000.apkg`                  |
 | D5        | `anki-7n2` | Tests, README, license check                          | release check                            |
 | D6        | `anki-c5g` | Swadesh reserve, merged writer, gate G14              | 206 / 207 Swadesh, 1,000 cards           |
 
@@ -745,25 +745,23 @@ The cull writes a note type of its own. `anki fix fr --select` and `anki fix es
 
 `CullProfile` renames `model_name`, `sentence_field`, `english_field`, and
 `audio_field` to `input_model_name`, `input_sentence_field`,
-`input_english_field`, and `input_audio_field`. It adds `output_model_name`,
-`sense_path: Path`, and `romanization_source: str | None = None`.
+`input_english_field`, and `input_audio_field`. It adds `sense_path: Path` and
+`romanization_source: str | None = None`. The output identity comes from the
+identity module (ADR 0015).
 
 `reserve_fields` keeps its name and returns the five values in the field order
 of section 17.2: `Audio`, `Sentence`, `English`, `Core`, and `CoreGloss`.
 
-`languages/french/cull.py` and `languages/spanish/cull.py` set
-`output_model_name = DEFAULT_DECK_NAME` and `sense_path` to
-`vocab/<lang>_core_senses.tsv`.
-
+`languages/french/cull.py` and `languages/spanish/cull.py` set `sense_path`
+to `vocab/<lang>_core_senses.tsv`. The identity module derives the deck title
+and the note type name from the output file stem.
 ### 17.2 The field set
 
 | Language | Note type name | Fields |
-| --- | --- | --- |
-| fr | `French 1000 Core Sentences` | `Audio, Sentence, English, Core, CoreGloss` |
-| es | `Spanish 1000 Core Sentences` | `Audio, Sentence, English, Core, CoreGloss` |
+| fr | the output file stem | `Audio, Sentence, English, Core, CoreGloss` |
+| es | the output file stem | `Audio, Sentence, English, Core, CoreGloss` |
 
-The name is the deck title. ADR 0013 holds the rule, and a test pins
-`output_model_name == default_deck_name`.
+The note type name equals the output file stem. ADR 0015 holds the rule.
 
 The template tokens of `templates/french_cull/` and `templates/spanish_cull/`
 follow the table of section 14.2 of `specs/core-deck-all-languages.md`. The two
@@ -824,7 +822,7 @@ must hold one row for every target of the build, 300 rows at the default
 - G1 adds `counts.dropped_no_core` to the kept count, because a kept card
   without a core word leaves the deck (section 17.4).
 - G10 compares the deck name with `params.name` and the only note type name
-  with `profile.output_model_name`.
+  with `manifest.source.model`.
 - G15 checks the one template and the CSS classes of the one note type.
 - G16 is new: one note type, the fields of section 17.2 in order, one card per
   note, and `ord = 0` on that card.
@@ -837,7 +835,7 @@ must hold one row for every target of the build, 300 rows at the default
 
 | Area | Test |
 | --- | --- |
-| Note type | One note type named `profile.output_model_name` with the five fields, and the input note type is gone |
+| Note type | One note type named the output file stem with the five fields, and the input note type is gone |
 | Note type | A frequency card holds its top target lemma and the first sense as the gloss |
 | Note type | A reserve card holds the pack `Target` and `Gloss` values |
 | Note type | A kept card keeps its card id and its `due` value of 42 |
@@ -846,12 +844,11 @@ must hold one row for every target of the build, 300 rows at the default
 
 ### 17.7 Migration
 
-- `apkg/french_1000_core_sentences.apkg` and
-  `apkg/spanish_1000_core_sentences.apkg` are rebuilt with their CSV files and
-  their manifests. The note type name changes (ADR 0013).
+- `apkg/french_1000.apkg` and `apkg/spanish_1000.apkg` are rebuilt with
+  their CSV files and their manifests. The note type name changes (ADR 0015).
 - `manifest.source.model` holds the output name and `manifest.source.input_model`
   the input name. The manifest gains `counts.dropped_no_core`.
-- The deck title does not change, so Anki updates the deck in place. The note
-  type is new, so the user gets a duplicate note type until the old one goes.
+- The deck title changes, so Anki makes a new deck. The note type is new too,
+  so the user gets a duplicate deck and note type until the old ones go.
 - A cull import does not delete the notes that the cull drops. That limit holds
   today and this change does not fix it.

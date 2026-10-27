@@ -58,12 +58,12 @@ options: run `uv run anki fix <lang> --help`.
 `anki fix <lang>` has up to three modes. The four commands take the same
 options. The Applies to column shows the modes that read each option.
 
-| Language | Modes                                | Output                                          |
-| -------- | ------------------------------------ | ----------------------------------------------- |
-| `zh`     | rank (default), `--core`             | `_reordered.apkg`, `_core.apkg`                 |
-| `fr`     | rank (default), `--select`, `--core` | `_reordered.apkg`, `_culled.apkg`, `_core.apkg` |
-| `es`     | rank (default), `--select`, `--core` | `_reordered.apkg`, `_culled.apkg`, `_core.apkg` |
-| `yue`    | rank (default), `--core`             | `_reordered.apkg`, `_core.apkg`                 |
+| Language | Modes                                | Output                                                                                  |
+| -------- | ------------------------------------ | --------------------------------------------------------------------------------------- |
+| `zh`     | rank (default), `--core`             | `apkg/mandarin_reordered.apkg`, `apkg/mandarin_core.apkg`                               |
+| `fr`     | rank (default), `--select`, `--core` | `apkg/french_reordered.apkg`, `apkg/french_1000.apkg`, `apkg/french_core.apkg`          |
+| `es`     | rank (default), `--select`, `--core` | `apkg/spanish_reordered.apkg`, `apkg/spanish_1000.apkg`, `apkg/spanish_core.apkg`       |
+| `yue`    | rank (default), `--core`             | `apkg/cantonese_reordered.apkg`, `apkg/cantonese_core.apkg`                             |
 
 Each command has a default input, so a bare `anki fix <lang>` reads it:
 
@@ -81,7 +81,7 @@ The shared options:
 | Option            | Applies to           | Meaning                                      |
 | ----------------- | -------------------- | -------------------------------------------- |
 | `apkg-path`       | every mode           | input deck; each command has a default       |
-| `--output`        | every mode           | output deck; default `_reordered` or `_core` |
+| `--output`        | every mode           | output deck; default `apkg/<language>_<mode>.apkg` |
 | `--text-field`    | rank mode            | sentence field; the build infers the default |
 | `--select`        | `fr`, `es`           | run the cull instead of the rank and reorder |
 | `--reserve`       | `fr`, `es`           | add the Swadesh reserve cards (select mode)  |
@@ -367,15 +367,15 @@ words outside the core costs more, so the deck adds few other words.
 ```bash
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --core
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --core \
-    --output apkg/french_core_300.apkg --check
+    --output apkg/french_core.apkg --check
 ```
 
 The flags:
 
 - `--words` adds content lemmas in blended frequency order.
 - `--cards` sets the card cap.
-- `--output` sets the path. The default is `<input>_core.apkg`.
-- `--check` runs the gates K1 to K20 on the built deck.
+- `--output` sets the path. The default is `apkg/<language>_core.apkg`.
+- `--check` runs the gates K1 to K21 on the built deck.
 
 The core list starts with the reviewed Swadesh forms of the language. The
 selection is a greedy cover. Each card has a value from the target examples
@@ -387,7 +387,7 @@ The command writes the deck and four side files beside it:
 
 | Suffix           | Content                                                                           |
 | ---------------- | --------------------------------------------------------------------------------- |
-| `.apkg`          | the kept cards in core order, with the input model and audio                      |
+| `.apkg`          | the kept cards in core order, with the output note type and the input audio        |
 | `.core.csv`      | one row per input card: `kept`, `pass`, `reason`, `targets`, `assigned`           |
 | `.coverage.csv`  | one row per target: `key`, `word`, `tier`, `position`, `quota`, `count`, `status` |
 | `.manifest.json` | counts, options, frequency source, and hashes                                     |
@@ -398,9 +398,9 @@ A target `status` is `covered` for two or more cards, `partial` for one card,
 test, and `unchecked` when the target has no sense row.
 
 Each note has one card. The front shows only the play button. The back shows
-the play button, the sentence, the translation, and the core word. The model
-gains a `Core` field for the core word. The assigned target is bold in the
-sentence.
+the play button, the sentence, the translation, the core word, and the gloss.
+The output note type holds the `Core` and `CoreGloss` fields. Its name is the
+output file stem. The assigned target is bold in the sentence.
 
 ### French Core
 
@@ -441,8 +441,8 @@ cards, 43 have one, and 27 are `absent_sense`. All 20 gates pass.
 - Defaults: 50 tier F words, 300 cards, and 2 examples per word.
 - The sense rows are `vocab/mandarin_core_senses.tsv`. Rule C4 reads
   `vocab/mandarin_loanwords.txt`.
-- The deck keeps the input model, adds the `Core` and `CoreGloss` fields, and
-  bolds the assigned target.
+- The deck writes the output note type with the `Core` and `CoreGloss` fields
+  and bolds the assigned target.
 
 Measured result on 2026-10-24: 147 cards for 140 targets (90 Swadesh forms and
 50 tier F words). 96 of 117 coverable targets hold two cards, 106 cards hold
@@ -476,23 +476,23 @@ non-exempt word appears in more than 4 cards.
 
 ```bash
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
-    --output apkg/french_1000_core_sentences.apkg
+    --output apkg/french_1000.apkg
 
-# Run gates G1 to G15 on the written output
+# Run gates G1 to G17 on the written output
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
-    --output apkg/french_1000_core_sentences.apkg --check
+    --output apkg/french_1000.apkg --check
 ```
 
 The defaults build the measured deck. The tuning values, such as the spoken
 weight and the similarity limit, are fields of `CullRequest`.
 `specs/french-1000-sentence-cull.md` records them.
 
-| Path                                              | Content                                                     |
-| ------------------------------------------------- | ----------------------------------------------------------- |
-| `apkg/french_1000_core_sentences.apkg`            | the culled deck with the output note type, fields, and audio |
-| `apkg/french_1000_core_sentences.cull.csv`        | one row per input card: `kept`, `reason`, `targets`, `gain` |
-| `apkg/french_1000_core_sentences.coverage.csv`    | one row per target: `word`, `rank`, `count`, `status`       |
-| `apkg/french_1000_core_sentences.manifest.json`   | counts, parameters, frequency source, and hashes            |
+| Path                                | Content                                                     |
+| ----------------------------------- | ----------------------------------------------------------- |
+| `apkg/french_1000.apkg`              | the culled deck with the output note type, fields, and audio |
+| `apkg/french_1000.cull.csv`          | one row per input card: `kept`, `reason`, `targets`, `gain` |
+| `apkg/french_1000.coverage.csv`      | one row per target: `word`, `rank`, `count`, `status`       |
+| `apkg/french_1000.manifest.json`     | counts, parameters, frequency source, and hashes            |
 
 A target `status` is `covered` for two or more cards, `partial` for one card,
 and `absent` for no card.
@@ -502,7 +502,7 @@ card per Swadesh concept, with its audio. The frequency pass fills the rest of
 the 1,000 cards. `--no-reserve` runs the frequency cull alone. The reserve
 path is a `CullRequest` field.
 
-The cull keeps the audio files and the note model of the input deck. It does
+The cull writes the output note type and keeps the input audio files. It does
 not make new TTS files. The output deck holds one card for each note: the
 comprehension card with the audio on the front. The input deck has a second
 card direction, so the command removes that template and its cards. The deck
