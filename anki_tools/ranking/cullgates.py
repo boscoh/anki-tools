@@ -17,11 +17,8 @@ from pathlib import Path
 from typing import Any, Callable
 
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.ranking.coreflow import (
-    InputCard,
-    deck_templates,
-    read_output,
-)
+from anki_tools.ranking.assemble import deck_templates
+from anki_tools.ranking.coreflow import InputCard, read_output
 from anki_tools.ranking.corelist import is_content
 from anki_tools.ranking.cullflow import (
     FREQUENCY_SOURCE,

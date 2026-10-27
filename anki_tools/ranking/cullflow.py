@@ -35,7 +35,6 @@ from typing import (
 )
 
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.apkg.shape import OutputShape
 from anki_tools.ranking import assemble, coreflow
 from anki_tools.ranking.cardfilter import (
     _WORD_PATTERN,
@@ -45,11 +44,11 @@ from anki_tools.ranking.cardfilter import (
     script_rule,
 )
 from anki_tools.ranking.coreflow import InputCard
-from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.ranking.corelist import UNRANKED_RANK, TargetWord, build_targets, is_content
 from anki_tools.ranking.cover import greedy_cover
 from anki_tools.ranking.coverage import write_rows
 from anki_tools.ranking.duplicates import at_limit
+from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.sentence_pack.guards import check_sentence_shape
 from anki_tools.sentence_pack.profile import LanguageProfile
 from anki_tools.sentence_pack.tokens import load_model
@@ -354,30 +353,6 @@ class CullRequest:
     order: str = "coverage"
     reserve_pack: Path | None = None
     no_reserve: bool = False
-
-
-@dataclass(frozen=True)
-class CullRun:
-    """Written files and counts of one cull run.
-
-    :param output_path: Output APKG file.
-    :param cull_csv: Cull CSV file.
-    :param coverage_csv: Coverage CSV file.
-    :param manifest_path: Manifest JSON file.
-    :param cards: Count of kept cards, with the reserve cards.
-    :param frequency_cards: Count of kept input cards.
-    :param reserve: Count of kept reserve cards.
-    :param targets: Count of target words.
-    """
-
-    output_path: Path
-    cull_csv: Path
-    coverage_csv: Path
-    manifest_path: Path
-    cards: int
-    frequency_cards: int
-    reserve: int
-    targets: int
 
 
 def load_frequency(path: Path) -> list[FrequencyRow]:
@@ -1132,12 +1107,12 @@ def card_cores(
     return values
 
 
-def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
+def run_cull(request: CullRequest, profile: CullProfile) -> assemble.RunFiles:
     """Run stages C0 to C5 of the cull and write the four output files.
 
     :param request: Options of the run.
     :param profile: Language hooks.
-    :returns: The written paths and the counts of the run.
+    :returns: The written paths.
     """
     apkg_path = Path(request.input_path)
     output_path = Path(request.output_path)
@@ -1326,14 +1301,6 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
         assemble.DeckRun(
             identity=identity,
             input_path=apkg_path,
-            shape=OutputShape(
-                deck_name=identity.title,
-                model_name=identity.model_name,
-                input_model_name=profile.input_model_name,
-                fields=coreflow.output_fields(profile),
-                templates=coreflow.deck_templates(profile),
-                css=profile.card_css(),
-            ),
             values=note_fields,
             card_table=assemble.SideTable(
                 "cull.csv", CULL_COLUMNS, cull_rows(cards, reasons, selection, kept, reserve)
@@ -1383,18 +1350,10 @@ def run_cull(request: CullRequest, profile: CullProfile) -> CullRun:
             reserve=reserve,
             reserve_pack_path=reserve_pack,
             reserve_values=profile.reserve_fields,
-        )
+        ),
+        profile,
     )
-    return CullRun(
-        output_path=files.output_path,
-        cull_csv=files.card_csv,
-        coverage_csv=files.coverage_csv,
-        manifest_path=files.manifest_path,
-        cards=len(kept) + len(reserve),
-        frequency_cards=len(kept),
-        reserve=len(reserve),
-        targets=len(targets),
-    )
+    return files
 
 
 def build_frequency_cache(

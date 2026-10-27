@@ -297,5 +297,5 @@ MANDARIN_CORE_PROFILE = MANDARIN_LANGUAGE.core(
     frequency_source=str(FREQUENCY_PATH),
     outside_set_ratio=1.3,
     outside_rare_ratio=0.1,
-    finalize=lambda run: finalize_output(run.output_path, run.core_csv),
+    finalize=lambda run: finalize_output(run.output_path, run.card_csv),
 )

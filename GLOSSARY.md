@@ -66,10 +66,20 @@ stated fields, and one card per note. The code lives in
 _Avoid_: deck layout, package template
 
 **Deck assembler**:
-The module that writes the package, the side files, the manifest, and the
-report of one run. The core selection and the cull selection are its two
-adapters. The code lives in `anki_tools/ranking/assemble.py`.
+The module that states the output shape from the deck profile interface, then
+writes the package, the side files, the manifest, and the report of one run.
+The core selection and the cull selection are its two adapters, and each
+returns the written paths. The code lives in
+`anki_tools/ranking/assemble.py`. ADR 0018 records the interface.
 _Avoid_: writer, builder, exporter
+
+**Deck profile interface**:
+The eight members of a mode view that the deck assembler reads: the input
+model name, the three input field names, the romanization source, the
+templates, the highlight wrapper, and the card CSS. The core mode view and
+the cull mode view both satisfy it. The code lives in
+`anki_tools/ranking/assemble.py`.
+_Avoid_: profile protocol, writer contract
 
 **Gate table**:
 The runner, the report, and the shared gates of the core and cull modes. Each

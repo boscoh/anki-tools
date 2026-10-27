@@ -19,7 +19,7 @@ from types import SimpleNamespace
 import pytest
 
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.ranking import coreflow, corelist, cullflow, cullgates
+from anki_tools.ranking import assemble, coreflow, corelist, cullflow, cullgates
 from anki_tools.ranking.identity import DeckIdentity
 
 SENTENCES = [
@@ -137,13 +137,13 @@ def test_a_second_profile_drives_every_output_value(tmp_path: Path) -> None:
 
     assert {model["name"] for model in models.values()} == {output.stem}
     assert decks == {output.stem}
-    assert fields == list(coreflow.output_fields(_profile()))
-    assert run.cards == 2
+    assert fields == list(assemble.output_fields(_profile()))
     assert notes[0][1].startswith("<b>kat</b> ser")
     assert notes[0][2] == "cat is big."
     assert notes[0][3] == "kat"
 
     manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
+    assert manifest["counts"]["cards"] == 2
     assert manifest["source"]["model"] == output.stem
     assert manifest["source"]["input_model"] == MODEL_NAME
     assert manifest["source"]["deck"] == output.stem

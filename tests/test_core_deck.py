@@ -18,7 +18,7 @@ import pytest
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.shape import OutputShape, write_package
 from anki_tools.languages.french import core, cull
-from anki_tools.ranking import coreflow, corelist
+from anki_tools.ranking import assemble, coreflow, corelist
 from anki_tools.ranking.assemble import write_rank_csv
 from anki_tools.ranking.coreflow import (
     coverage_rows_of,
@@ -493,7 +493,7 @@ def _offline_profile(tmp_path: Path) -> CoreProfile:
     )
 
 
-def _run_core(tmp_path: Path) -> tuple[coreflow.CoreRun, Path, CoreProfile]:
+def _run_core(tmp_path: Path) -> tuple[assemble.RunFiles, Path, CoreProfile]:
     """Run the core mode on the tiny deck."""
     source = _tiny_deck(tmp_path)
     profile = _offline_profile(tmp_path)
@@ -567,12 +567,13 @@ class TestCardDesign:
         assert [model["name"] for model in models.values()] == [output.stem]
         model = next(iter(models.values()))
         assert [field["name"] for field in model["flds"]] == list(
-            coreflow.output_fields(profile)
+            assemble.output_fields(profile)
         )
         assert [
             (template["qfmt"], template["afmt"]) for template in model["tmpls"]
-        ] == [coreflow.deck_templates(profile)[0]]
-        assert len(cards) == run.cards
+        ] == [assemble.deck_templates(profile)[0]]
+        manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
+        assert len(cards) == manifest["counts"]["cards"]
         assert {int(row["ord"]) for row in cards} == {0}
 
     def test_the_title_the_note_type_and_the_manifest_name_agree(
@@ -693,7 +694,7 @@ class TestCardDesign:
         run, output, profile = _run_core(tmp_path)
 
         manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
-        with run.core_csv.open(encoding="utf-8", newline="") as handle:
+        with run.card_csv.open(encoding="utf-8", newline="") as handle:
             rows = list(csv.DictReader(handle))
         dropped = [row for row in rows if row["reason"] == "no_core"]
 
@@ -701,7 +702,7 @@ class TestCardDesign:
         assert len(dropped) == 1
         assert dropped[0]["kept"] == "0"
         assert "lapin" in dropped[0]["sentence"]
-        assert run.cards == 1
+        assert manifest["counts"]["cards"] == 1
         passed, message = coregates.gate_order(coregates.CoreFiles(output, profile))
         assert passed, message
         with AnkiPackage(output) as package:
@@ -734,8 +735,8 @@ class TestCardDesign:
                 deck_name=identity.title,
                 model_name=identity.model_name,
                 input_model_name=profile.input_model_name,
-                fields=coreflow.output_fields(profile),
-                templates=coreflow.deck_templates(profile),
+                fields=assemble.output_fields(profile),
+                templates=assemble.deck_templates(profile),
                 css=profile.card_css(),
             ),
             note_fields,

@@ -6,7 +6,7 @@ from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.shape import OutputShape, write_package
 from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.languages.cantonese import core
-from anki_tools.ranking import coreflow
+from anki_tools.ranking import assemble, coreflow
 
 
 def test_profile_holds_the_deck_paths():
@@ -57,8 +57,8 @@ def test_the_jyutping_field_survives_the_new_model(tmp_path) -> None:
             deck_name=identity.title,
             model_name=identity.model_name,
             input_model_name=profile.input_model_name,
-            fields=coreflow.output_fields(profile),
-            templates=coreflow.deck_templates(profile),
+            fields=assemble.output_fields(profile),
+            templates=assemble.deck_templates(profile),
             css=profile.card_css(),
         ),
         note_fields,

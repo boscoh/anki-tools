@@ -1,66 +1,126 @@
-"""One test of the assembled output, for the core mode and the cull mode."""
+"""Tests of the assembler: one run value, one writer, one stated shape."""
 
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable
 
-import pytest
-
-from anki_tools.ranking import coreflow, cullflow
+from anki_tools.apkg.package import AnkiPackage
+from anki_tools.ranking import assemble
 from anki_tools.ranking.identity import DeckIdentity
-from tests.test_core_deck import _offline_profile, _tiny_deck as core_deck
-from tests.test_cull_shared import _profile as cull_profile, _tiny_deck as cull_deck
+
+INPUT_MODEL = "Test Sentence"
+INPUT_FIELDS = ["Text", "Meaning", "Audio"]
 
 
-def _core_run(tmp_path: Path) -> tuple[coreflow.CoreRun, Path]:
-    source = core_deck(tmp_path)
-    profile = _offline_profile(tmp_path)
-    run = coreflow.run_core(
-        coreflow.CoreRequest(
-            input_path=source,
-            output_path=tmp_path / "core.apkg",
-            core_words=0,
-            options=profile.default_options,
-        ),
-        profile,
+@dataclass(frozen=True)
+class _StubProfile:
+    """The seven members that the writer reads from a language profile."""
+
+    @property
+    def input_model_name(self) -> str:
+        return INPUT_MODEL
+
+    @property
+    def input_sentence_field(self) -> str:
+        return "Text"
+
+    @property
+    def input_english_field(self) -> str:
+        return "Meaning"
+
+    @property
+    def input_audio_field(self) -> str:
+        return "Audio"
+
+    @property
+    def romanization_source(self) -> str | None:
+        return None
+
+    @property
+    def templates(self) -> tuple[tuple[str, str], ...]:
+        return (("{{Audio}}", "{{Audio}}<hr id=answer>{{Sentence}}"),)
+
+    @property
+    def highlight(self) -> Callable[[str, str], str] | None:
+        return None
+
+    def card_css(self) -> str:
+        return ".target { color: red; }"
+
+
+def _input_deck(tmp_path: Path) -> Path:
+    source = tmp_path / "input.apkg"
+    AnkiPackage.create(
+        source,
+        "Source Deck",
+        fields=INPUT_FIELDS,
+        cards=[
+            {"Text": "kat ser", "Meaning": "cat is big.", "Audio": ""},
+            {"Text": "hundo", "Meaning": "dog", "Audio": ""},
+        ],
+        model_name=INPUT_MODEL,
     )
-    return run, run.core_csv
+    return source
 
 
-def _cull_run(tmp_path: Path) -> tuple[cullflow.CullRun, Path]:
-    source = cull_deck(tmp_path)
-    run = cullflow.run_cull(
-        cullflow.CullRequest(
-            input_path=source,
-            output_path=tmp_path / "culled.apkg",
-            max_cards=2,
-            target_words=2,
-            min_words=2,
-            max_words=4,
-        ),
-        cull_profile(),
-    )
-    return run, run.cull_csv
-
-
-@pytest.mark.parametrize("run_mode", [_core_run, _cull_run], ids=["core", "cull"])
-def test_the_assembler_writes_one_report_and_one_identity(
-    tmp_path: Path, run_mode, capsys
+def test_the_writer_states_the_shape_from_the_profile(
+    tmp_path: Path, capsys
 ) -> None:
-    run, card_csv = run_mode(tmp_path)
+    source = _input_deck(tmp_path)
+    identity = DeckIdentity(tmp_path / "core.apkg")
+    with AnkiPackage(source) as package:
+        kept_id = int(next(iter(package.get_notes()))["id"])
 
-    manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
-    identity = DeckIdentity(run.output_path)
+    files = assemble.write_run(
+        assemble.DeckRun(
+            identity=identity,
+            input_path=source,
+            values={kept_id: ["", "kat ser", "cat is big.", "kat", "cat"]},
+            card_table=assemble.SideTable(
+                "core.csv", ("note_id", "kept"), [{"note_id": kept_id, "kept": "1"}]
+            ),
+            coverage_table=assemble.SideTable(
+                "coverage.csv", ("key", "status"), [{"key": "kat", "status": "covered"}]
+            ),
+            manifest=assemble.ManifestValues(
+                input_model=INPUT_MODEL,
+                params={"max_cards": 1},
+                counts={"cards": 1},
+                frequency={"path": "test", "spoken_weight": 0.5},
+                kept_order="hash",
+            ),
+            report=[("Cards", "1")],
+        ),
+        _StubProfile(),
+    )
+
+    manifest = json.loads(files.manifest_path.read_text(encoding="utf-8"))
+    with AnkiPackage(files.output_path) as package:
+        models = list(package.get_models().values())
+        fields = [field["name"] for model in models for field in model["flds"]]
+        templates = [
+            (template["qfmt"], template["afmt"])
+            for model in models
+            for template in model["tmpls"]
+        ]
     printed = capsys.readouterr().out
 
-    assert run.output_path.exists()
-    assert card_csv == identity.side(card_csv.name.removeprefix(f"{identity.stem}."))
-    assert run.coverage_csv == identity.side("coverage.csv")
-    assert manifest["source"]["model"] == identity.model_name
+    assert files.card_csv == identity.side("core.csv")
+    assert files.coverage_csv == identity.side("coverage.csv")
+    assert files.rank_csv is None
+    assert manifest["source"] == {
+        "input": str(source),
+        "deck": identity.title,
+        "model": identity.model_name,
+        "input_model": INPUT_MODEL,
+    }
     assert manifest["params"]["name"] == identity.title
-    assert f"{card_csv.name.split('.')[-2]}_csv" in manifest["files"]
-    assert f"wrote {run.output_path}" in printed
-    assert f"wrote {card_csv}" in printed
-    assert f"wrote {run.coverage_csv}" in printed
-    assert f"wrote {run.manifest_path}" in printed
+    assert manifest["files"]["core_csv"].startswith("sha256:")
+    assert [model["name"] for model in models] == [identity.title]
+    assert fields == ["Audio", "Sentence", "English", "Core", "CoreGloss"]
+    assert templates == list(_StubProfile().templates)
+    assert "Cards:" in printed
+    assert str(files.output_path) in printed

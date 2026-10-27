@@ -2,18 +2,19 @@
 
 The core selection and the cull selection are the two adapters across this
 seam. Each adapter states the values, the tables, and the report lines of its
-mode. This module holds the write order, the manifest schema, and the report
-layout once. The identity module names every artifact.
+mode. This module holds the output shape, the write order, the manifest schema,
+and the report layout once. The identity module names every artifact.
 """
 
 from __future__ import annotations
 
 import csv
 import json
+import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any, Callable, Mapping, Protocol, Sequence
 
 from anki_tools.apkg.shape import OutputShape, write_package
 from anki_tools.ranking.identity import DeckIdentity
@@ -22,6 +23,86 @@ from anki_tools.sentence_pack.audit import sha256_value
 
 #: Columns of the rank CSV that ``reorder_deck`` reads.
 RANK_COLUMNS = ("rank", "note_id", "sentence", "kept")
+
+#: Field names of the output note type, in order, without the romanization.
+OUTPUT_FIELDS: tuple[str, ...] = ("Audio", "Sentence", "English", "Core", "CoreGloss")
+OUTPUT_ROMANIZATION_FIELD = "Romanization"
+
+ROMANIZATION_BLOCK = re.compile(
+    r"\{\{#Romanization\}\}.*?\{\{/Romanization\}\}", re.DOTALL
+)
+
+
+class DeckProfile(Protocol):
+    """Contract of the output values and the written note type."""
+
+    @property
+    def input_model_name(self) -> str:
+        """Give the name of the input note type."""
+        ...
+
+    @property
+    def input_sentence_field(self) -> str:
+        """Give the name of the input sentence field."""
+        ...
+
+    @property
+    def input_english_field(self) -> str:
+        """Give the name of the input English field."""
+        ...
+
+    @property
+    def input_audio_field(self) -> str:
+        """Give the name of the input audio field."""
+        ...
+
+    @property
+    def romanization_source(self) -> str | None:
+        """Give the input field of the romanization line, or None."""
+        ...
+
+    @property
+    def templates(self) -> tuple[tuple[str, str], ...]:
+        """Give the card templates of the output."""
+        ...
+
+    @property
+    def highlight(self) -> Callable[[str, str], str] | None:
+        """Give the bold wrapper of the target tokens, or None."""
+        ...
+
+    def card_css(self) -> str:
+        """Give the CSS of the output note type."""
+        ...
+
+
+def deck_templates(profile: DeckProfile) -> tuple[tuple[str, str], ...]:
+    """Give the templates of a run, minus the romanization block when the
+    language has no romanization field.
+
+    :param profile: Language hooks of the run.
+    :returns: The template pairs of the output note type.
+    """
+    if profile.romanization_source is not None:
+        return tuple(profile.templates)
+    return tuple(
+        (qfmt, ROMANIZATION_BLOCK.sub("", afmt).strip())
+        for qfmt, afmt in profile.templates
+    )
+
+
+def output_fields(profile: DeckProfile) -> tuple[str, ...]:
+    """Give the output field names of a deck profile.
+
+    :param profile: Language hooks of the run.
+    :returns: ``Audio``, ``Sentence``, ``English``, the optional
+        ``Romanization``, ``Core``, and ``CoreGloss``.
+    """
+    names = [*OUTPUT_FIELDS[:3]]
+    if profile.romanization_source is not None:
+        names.append(OUTPUT_ROMANIZATION_FIELD)
+    names.extend(OUTPUT_FIELDS[3:])
+    return tuple(names)
 
 
 @dataclass(frozen=True)
@@ -73,7 +154,6 @@ class DeckRun:
 
     :param identity: Output name of the run.
     :param input_path: Input APKG file.
-    :param shape: Stated shape of the output package.
     :param values: Output field values of each kept note, keyed by note id.
     :param card_table: Card CSV of the mode.
     :param coverage_table: Coverage CSV of the mode.
@@ -90,7 +170,6 @@ class DeckRun:
 
     identity: DeckIdentity
     input_path: Path
-    shape: OutputShape
     values: Mapping[int, Sequence[str]]
     card_table: SideTable
     coverage_table: SideTable
@@ -120,14 +199,26 @@ class RunFiles:
     rank_csv: Path | None = None
 
 
-def write_run(run: DeckRun) -> RunFiles:
+def write_run(run: DeckRun, profile: DeckProfile) -> RunFiles:
     """Write the deck, the side files, the manifest, and the report of one run.
 
+    The output shape of the package comes from the output identity and the
+    language hooks, so a mode states only the values that it alone knows.
+
     :param run: Selected cards and stated values of the run.
+    :param profile: Language hooks of the run.
     :returns: The written paths.
     """
     identity = run.identity
     output = identity.output_path
+    shape = OutputShape(
+        deck_name=identity.title,
+        model_name=identity.model_name,
+        input_model_name=profile.input_model_name,
+        fields=output_fields(profile),
+        templates=deck_templates(profile),
+        css=profile.card_css(),
+    )
     card_csv = identity.side(run.card_table.suffix)
     coverage_csv = identity.side(run.coverage_table.suffix)
     manifest_path = identity.side("manifest.json")
@@ -140,11 +231,11 @@ def write_run(run: DeckRun) -> RunFiles:
     if rank_csv is not None:
         write_rank_csv(run.rank_rows or (), rank_csv)
         temporary = output.with_name(output.stem + ".tmp.apkg")
-        write_package(run.input_path, temporary, run.shape, run.values, **package_args)
+        write_package(run.input_path, temporary, shape, run.values, **package_args)
         reorder_deck(str(temporary), str(output), str(rank_csv))
         temporary.unlink(missing_ok=True)
     else:
-        write_package(run.input_path, output, run.shape, run.values, **package_args)
+        write_package(run.input_path, output, shape, run.values, **package_args)
     write_csv(run.card_table.columns, run.card_table.rows, card_csv)
     write_csv(run.coverage_table.columns, run.coverage_table.rows, coverage_csv)
     write_manifest(

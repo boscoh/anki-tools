@@ -20,15 +20,12 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Collection, Mapping, Protocol, Sequence
+from typing import Any, Callable, Collection, Mapping, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.apkg.shape import (
-    OutputShape,
-    find_model_id,
-    find_only_model_id,
-)
+from anki_tools.apkg.shape import find_model_id, find_only_model_id
 from anki_tools.ranking import assemble
+from anki_tools.ranking.assemble import DeckProfile, output_fields
 from anki_tools.ranking.cardfilter import _WORD_PATTERN, filter_cards
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
 from anki_tools.ranking.core import select as select_core
@@ -73,88 +70,14 @@ FILTER_KEYS = ("F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "C1", "C2",
 TARGET_SEPARATOR = "|"
 STATUSES = ("covered", "partial", "absent", "absent_sense", "unchecked")
 
-OUTPUT_FIELDS: tuple[str, ...] = ("Audio", "Sentence", "English", "Core", "CoreGloss")
 OUTPUT_AUDIO_FIELD = "Audio"
 OUTPUT_SENTENCE_FIELD = "Sentence"
 OUTPUT_ENGLISH_FIELD = "English"
-OUTPUT_ROMANIZATION_FIELD = "Romanization"
 OUTPUT_CORE_FIELD = "Core"
 OUTPUT_GLOSS_FIELD = "CoreGloss"
 
 #: Reason of a kept card that holds no core word, so the run does not write it.
 NO_CORE_REASON = "no_core"
-
-ROMANIZATION_BLOCK = re.compile(
-    r"\{\{#Romanization\}\}.*?\{\{/Romanization\}\}", re.DOTALL
-)
-
-
-def deck_templates(profile: "DeckProfile") -> tuple[tuple[str, str], ...]:
-    """Give the templates of a run, minus the romanization block when the
-    language has no romanization field.
-
-    :param profile: Language hooks of the run.
-    :returns: The template pairs of the output note type.
-    """
-    if profile.romanization_source is not None:
-        return tuple(profile.templates)
-    return tuple(
-        (qfmt, ROMANIZATION_BLOCK.sub("", afmt).strip())
-        for qfmt, afmt in profile.templates
-    )
-
-
-def output_fields(profile: "DeckProfile") -> tuple[str, ...]:
-    """Give the output field names of a deck profile.
-
-    :param profile: Language hooks of the run.
-    :returns: ``Audio``, ``Sentence``, ``English``, the optional
-        ``Romanization``, ``Core``, and ``CoreGloss``.
-    """
-    names = [*OUTPUT_FIELDS[:3]]
-    if profile.romanization_source is not None:
-        names.append(OUTPUT_ROMANIZATION_FIELD)
-    names.extend(OUTPUT_FIELDS[3:])
-    return tuple(names)
-
-
-class DeckProfile(Protocol):
-    """Contract of the output values and the written note type."""
-
-    @property
-    def input_model_name(self) -> str:
-        """Give the name of the input note type."""
-        ...
-
-    @property
-    def input_sentence_field(self) -> str:
-        """Give the name of the input sentence field."""
-        ...
-
-    @property
-    def input_english_field(self) -> str:
-        """Give the name of the input English field."""
-        ...
-
-    @property
-    def input_audio_field(self) -> str:
-        """Give the name of the input audio field."""
-        ...
-
-    @property
-    def romanization_source(self) -> str | None:
-        """Give the input field of the romanization line, or None."""
-        ...
-
-    @property
-    def templates(self) -> tuple[tuple[str, str], ...]:
-        """Give the card templates of the output."""
-        ...
-
-    def card_css(self) -> str:
-        """Give the CSS of the output note type."""
-        ...
-
 
 
 @dataclass(frozen=True)
@@ -190,32 +113,6 @@ class CoreRequest:
     bold_target: bool = True
     max_unchecked_sense: int = 0
     max_unranked: int = 0
-
-
-@dataclass
-class CoreRun:
-    """Written files and counts of one core run.
-
-    :param output_path: Output APKG file.
-    :param core_csv: Card CSV file.
-    :param coverage_csv: Coverage CSV file.
-    :param manifest_path: Manifest JSON file.
-    :param rank_csv: Ranking CSV of ``reorder_deck``.
-    :param cards: Count of kept cards.
-    :param targets: Count of targets that the input deck holds.
-    :param covered1: Targets with at least one card.
-    :param covered2: Targets with at least two cards.
-    """
-
-    output_path: Path
-    core_csv: Path
-    coverage_csv: Path
-    manifest_path: Path
-    rank_csv: Path
-    cards: int = 0
-    targets: int = 0
-    covered1: int = 0
-    covered2: int = 0
 
 
 def read_senses(path: Path) -> dict[str, SenseWords]:
@@ -821,7 +718,7 @@ def output_values(
         OUTPUT_GLOSS_FIELD: "",
     }
     if profile.romanization_source is not None:
-        values[OUTPUT_ROMANIZATION_FIELD] = value(profile.romanization_source)
+        values[assemble.OUTPUT_ROMANIZATION_FIELD] = value(profile.romanization_source)
     return [values[name] for name in output_fields(profile)]
 
 
@@ -1094,14 +991,14 @@ def coverage_glosses(rows: Sequence[Mapping[str, str]]) -> dict[str, str]:
     return glosses
 
 
-def run_core(request: CoreRequest, profile: CoreProfile) -> CoreRun:
+def run_core(request: CoreRequest, profile: CoreProfile) -> assemble.RunFiles:
     """Run stages K0 to K6 of the core mode and write the output files.
 
     :param request: Options of the run.
     :param profile: Language hooks.
     :raises ValueError: The input has no core target, or the budget cannot
         hold the quota.
-    :returns: The written paths and the counts of the run.
+    :returns: The written paths.
     """
     apkg_path = Path(request.input_path)
     output_path = Path(request.output_path)
@@ -1236,14 +1133,6 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> CoreRun:
         assemble.DeckRun(
             identity=identity,
             input_path=apkg_path,
-            shape=OutputShape(
-                deck_name=identity.title,
-                model_name=identity.model_name,
-                input_model_name=profile.input_model_name,
-                fields=output_fields(profile),
-                templates=deck_templates(profile),
-                css=profile.card_css(),
-            ),
             values=note_fields,
             card_table=assemble.SideTable("core.csv", CORE_COLUMNS, rows),
             coverage_table=assemble.SideTable(
@@ -1287,19 +1176,9 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> CoreRun:
                 (rank, cards[index].note_id, cards[index].sentence, 1)
                 for rank, index in enumerate(kept, start=1)
             ],
-        )
-    )
-    run = CoreRun(
-        output_path=files.output_path,
-        core_csv=files.card_csv,
-        coverage_csv=files.coverage_csv,
-        manifest_path=files.manifest_path,
-        rank_csv=files.rank_csv or identity.side("rank.csv"),
-        cards=len(kept),
-        targets=len(targets),
-        covered1=counts["covered1"],
-        covered2=counts["covered2"],
+        ),
+        profile,
     )
     if profile.finalize is not None:
-        profile.finalize(run)
-    return run
+        profile.finalize(files)
+    return files

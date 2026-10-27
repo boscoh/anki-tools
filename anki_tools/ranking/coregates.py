@@ -17,11 +17,11 @@ from pathlib import Path
 from typing import Any, Callable
 
 from anki_tools.apkg.package import AnkiPackage
+from anki_tools.ranking.assemble import deck_templates
 from anki_tools.ranking.coreflow import (
     OUTPUT_SENTENCE_FIELD,
     STATUSES,
     TARGET_SEPARATOR,
-    deck_templates,
     filter_core_cards,
     read_loanwords,
     read_output,

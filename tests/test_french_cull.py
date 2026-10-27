@@ -259,8 +259,8 @@ def _write_cull_deck(
             deck_name=identity.title,
             model_name=identity.model_name,
             input_model_name=profile.input_model_name,
-            fields=coreflow.output_fields(profile),
-            templates=coreflow.deck_templates(profile),
+            fields=assemble.output_fields(profile),
+            templates=assemble.deck_templates(profile),
             css=profile.card_css(),
         ),
         values,
@@ -311,7 +311,7 @@ def test_write_deck_sets_the_swadesh_templates(tmp_path: Path) -> None:
     templates = [tuple(template[k] for k in ("qfmt", "afmt")) for template in model["tmpls"]]
 
     assert templates == list(
-        coreflow.deck_templates(cull_fr.FRENCH_CULL_PROFILE)
+        assemble.deck_templates(cull_fr.FRENCH_CULL_PROFILE)
     )
     assert ".sentence" in model["css"]
     assert ".english" in model["css"]
@@ -477,14 +477,6 @@ def test_run_gates_passes_on_a_tiny_output(
         assemble.DeckRun(
             identity=identity,
             input_path=source,
-            shape=OutputShape(
-                deck_name=identity.title,
-                model_name=identity.model_name,
-                input_model_name=profile.input_model_name,
-                fields=coreflow.output_fields(profile),
-                templates=coreflow.deck_templates(profile),
-                css=profile.card_css(),
-            ),
             values=values,
             card_table=assemble.SideTable(
                 "cull.csv",
@@ -518,7 +510,8 @@ def test_run_gates_passes_on_a_tiny_output(
                 kept_order=cullflow.kept_order_hash(cards, ordered),
             ),
             report=(),
-        )
+        ),
+        profile,
     )
 
     monkeypatch.setattr(cullgates.CullFiles, "tokens", _fake_tokens)

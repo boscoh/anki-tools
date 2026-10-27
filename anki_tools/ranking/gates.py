@@ -17,12 +17,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Mapping, NamedTuple, Protocol, Sequence
 
+from anki_tools.ranking.assemble import output_fields
 from anki_tools.ranking.coreflow import (
     OUTPUT_CORE_FIELD,
     OUTPUT_GLOSS_FIELD,
     OUTPUT_SENTENCE_FIELD,
     coverage_glosses,
-    output_fields,
 )
 from anki_tools.sentence_pack.audit import print_audit
 
