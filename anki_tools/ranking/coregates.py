@@ -12,11 +12,12 @@ from __future__ import annotations
 
 import hashlib
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
-from anki_tools.apkg.package import AnkiPackage
+from anki_tools.gate_files import GateFileReader, read_notes
+
 from anki_tools.ranking.assemble import deck_templates
 from anki_tools.ranking.coreflow import (
     OUTPUT_SENTENCE_FIELD,
@@ -78,7 +79,7 @@ __all__ = [
 ]
 
 @dataclass
-class CoreFiles:
+class CoreFiles(GateFileReader):
     """Lazy reader for the four files of a core run.
 
     :param apkg_path: Output APKG file.
@@ -87,77 +88,28 @@ class CoreFiles:
 
     apkg_path: Path
     profile: CoreProfile
-    _cache: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        """Set the paths and start an empty cache."""
+        """Set the paths and the loader table."""
         self.apkg_path = Path(self.apkg_path)
         self.core_csv, self.coverage_csv, self.manifest_path, self.rank_csv = (
             DeckIdentity(self.apkg_path).core_sides()
         )
-
-    def _load(self, name: str, loader: Callable[[], Any]) -> Any:
-        """Load one value once and cache the value or the error."""
-        if name not in self._cache:
-            try:
-                self._cache[name] = (True, loader())
-            except Exception as error:  # noqa: BLE001 - cached for every gate
-                self._cache[name] = (False, error)
-        ok, value = self._cache[name]
-        if not ok:
-            raise value
-        return value
-
-    def rows(self) -> list[dict[str, str]]:
-        """Read the card CSV rows."""
-        return self._load("rows", lambda: read_csv(self.core_csv))
-
-    def coverage(self) -> list[dict[str, str]]:
-        """Read the coverage CSV rows."""
-        return self._load("coverage", lambda: read_csv(self.coverage_csv))
-
-    def manifest(self) -> dict[str, Any]:
-        """Read the manifest JSON."""
-        return self._load("manifest", lambda: read_json(self.manifest_path))
-
-    def params(self) -> dict[str, Any]:
-        """Read the run options of the manifest."""
-        params = self.manifest().get("params", {})
-        return dict(params)
-
-    def rank_rows(self) -> list[dict[str, str]]:
-        """Read the rank CSV rows."""
-        return self._load("rank", lambda: read_csv(self.rank_csv))
-
-    def output(self) -> dict[str, Any]:
-        """Read the output APKG and probe its audio."""
-        return self._load("output", lambda: read_output(self.apkg_path))
-
-    def tokens(self) -> list[list[tuple[str, str]]]:
-        """Tokenize the sentences of the output deck."""
-        return self._load(
-            "tokens", lambda: self.profile.tokenize_deck(self.output()["cards"])
+        super().__init__(
+            {
+                "rows": lambda: read_csv(self.core_csv),
+                "coverage": lambda: read_csv(self.coverage_csv),
+                "manifest": lambda: read_json(self.manifest_path),
+                "rank": lambda: read_csv(self.rank_csv),
+                "output": lambda: read_output(self.apkg_path),
+                "notes": lambda: read_notes(self.apkg_path),
+                "fields": lambda: list(self.output()["fields"]),
+                "media": lambda: set(self.output()["media"]),
+                "tokens": lambda: self.profile.tokenize_deck(
+                    self.output()["cards"]
+                ),
+            }
         )
-
-    def notes(self) -> dict[int, list[str]]:
-        """Read the note fields of the output deck, keyed by note id."""
-
-        def load() -> dict[int, list[str]]:
-            with AnkiPackage(self.apkg_path) as package:
-                return {
-                    int(row["id"]): str(row["flds"]).split("\x1f")
-                    for row in package.get_notes()
-                }
-
-        return self._load("notes", load)
-
-    def fields(self) -> list[str]:
-        """Read the field names of the only note type."""
-        return self._load("fields", lambda: list(self.output()["fields"]))
-
-    def media(self) -> set[str]:
-        """Read the media file names of the output deck."""
-        return self._load("media", lambda: set(self.output()["media"]))
 
 
 

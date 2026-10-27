@@ -83,7 +83,9 @@ _Avoid_: profile protocol, writer contract
 
 **Gate table**:
 The runner, the report, and the shared gates of the core and cull modes. Each
-mode supplies a file reader. The code lives in `anki_tools/ranking/gates.py`.
+mode supplies a loader table to one lazy file reader. The runner, the report,
+and the shared gates live in `anki_tools/ranking/gates.py`. The reader lives in
+`anki_tools/gate_files.py`.
 _Avoid_: audit list, check list
 
 **Language deck profile**:

@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
+import pytest
+
+from anki_tools.gate_files import GateFileReader
 from anki_tools.ranking import assemble, gates
 
 
@@ -53,6 +57,38 @@ def test_the_runner_reports_a_gate_that_cannot_read_a_file() -> None:
         ("K2", True),
     ]
     assert "bad file" in results[0].message
+
+
+
+def test_a_missing_file_fails_only_the_gates_that_read_it(tmp_path: Path) -> None:
+    coverage = tmp_path / "coverage.csv"
+    coverage.write_text("word\nchat\n", encoding="utf-8")
+    files = GateFileReader(
+        {
+            "rows": lambda: gates.read_csv(tmp_path / "rows.csv"),
+            "coverage": lambda: gates.read_csv(coverage),
+        }
+    )
+    results = gates.run_gates(
+        [
+            gates.Gate("K1", lambda reader: (bool(reader.rows()), "rows")),
+            gates.Gate("K2", lambda reader: (bool(reader.coverage()), "coverage")),
+        ],
+        files,
+    )
+
+    assert [(result.name, result.passed) for result in results] == [
+        ("K1", False),
+        ("K2", True),
+    ]
+    assert "rows.csv" in results[0].message
+
+    with pytest.raises(FileNotFoundError) as first:
+        files.rows()
+    with pytest.raises(FileNotFoundError) as second:
+        files.rows()
+
+    assert first.value is second.value
 
 
 def test_the_report_prints_one_table(capsys) -> None:

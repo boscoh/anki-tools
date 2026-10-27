@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any, Callable, Iterable, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
+from anki_tools.gate_files import GateFileReader
 from anki_tools.sentence_pack.audio import (
     AUDIO_INDEX_NAME,
     MAX_DURATION_S,
@@ -50,7 +51,7 @@ GateRow = tuple[str, bool, str]
 GateCheck = Callable[["AuditInputs", LanguageProfile], tuple[bool, str]]
 
 
-class AuditInputs:
+class AuditInputs(GateFileReader):
     """Lazy reader for the files that the gates share.
 
     A read error is cached and re-raised for each gate that needs the file, so
@@ -94,57 +95,38 @@ class AuditInputs:
         self.attribution_path = Path(attribution_path)
         self.load_table = load_table
         self.probe = probe
-        self._cache: dict[str, tuple[bool, Any]] = {}
-
-    def _load(self, name: str, loader: Callable[[], Any]) -> Any:
-        if name not in self._cache:
-            try:
-                self._cache[name] = (True, loader())
-            except Exception as error:  # noqa: BLE001 - cached for every gate
-                self._cache[name] = (False, error)
-        ok, value = self._cache[name]
-        if not ok:
-            raise value
-        return value
+        super().__init__(
+            {
+                "table": lambda: list(self.load_table(csv_path=self.word_csv)),
+                "rows": lambda: read_rows(self.sentences_csv),
+                "index": lambda: load_audio_index(
+                    self.audio_dir / AUDIO_INDEX_NAME
+                ),
+                "manifest": lambda: read_json(self.manifest_path),
+                "apkg": lambda: read_apkg(self.apkg_path),
+            }
+        )
 
     def table(self) -> list[Any]:
         """Read the word table.
 
         :returns: One word form per reviewed form.
         """
-        return self._load(
-            "table", lambda: list(self.load_table(csv_path=self.word_csv))
-        )
-
-    def rows(self) -> list[dict[str, str]]:
-        """Read the sentence CSV rows.
-
-        :returns: One mapping per card row.
-        """
-        return self._load("rows", lambda: read_rows(self.sentences_csv))
+        return self._load("table")
 
     def index(self):
         """Read the audio index.
 
         :returns: The sentence and word file maps of the audio cache.
         """
-        return self._load(
-            "index", lambda: load_audio_index(self.audio_dir / AUDIO_INDEX_NAME)
-        )
-
-    def manifest(self) -> dict[str, Any]:
-        """Read the manifest JSON file.
-
-        :returns: The manifest mapping.
-        """
-        return self._load("manifest", lambda: read_json(self.manifest_path))
+        return self._load("index")
 
     def apkg(self) -> dict[str, Any]:
         """Open the APKG file and summarize it.
 
         :returns: Note count, models, and media file names.
         """
-        return self._load("apkg", lambda: read_apkg(self.apkg_path))
+        return self._load("apkg")
 
 
 def read_rows(path: Path) -> list[dict[str, str]]:
