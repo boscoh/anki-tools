@@ -731,7 +731,8 @@ package from scratch cannot keep a card id, and genanki writes new card rows.
 `coreflow.write_deck` does these steps, in this order, in one package:
 
 1. Delete the cards of every note that the run does not keep
-   (`delete_cards(doomed, cleanup_audio=True)`).
+   (`delete_cards(doomed, cleanup_audio=False)`). The media files stay until
+   step 8.
 2. `package.prune_extra_cards(input_model_id)`: for each note, delete every card
    except the one with the lowest `ord`, and set `ord = 0` on the card that
    stays. The French input holds two cards per note (11,856 cards for 5,928
@@ -747,8 +748,12 @@ package from scratch cannot keep a card id, and genanki writes new card rows.
    is already 0 from step 2, so the card belongs to the single template.
 6. `package.delete_model(model_id)` for the input model and for every other
    model of the package.
-7. Insert the reserve notes into `new_id` when the run holds reserve cards.
-8. `package.save(output_path)`.
+7. Insert the reserve notes into `new_id` when the run holds reserve cards. The
+   reserve media files enter the package with `add_media_file`, and that call
+   does not write the map.
+8. `package.prune_media(package.used_media())`: delete every media file that no
+   note references and write the media map one time.
+9. `package.save(output_path)`.
 
 `output_values(profile, input_names, input_values, sentence)` gives the values
 in the `output_fields(profile)` order: `Audio` from `input_audio_field`,
@@ -844,6 +849,9 @@ Format limits:
   `prune_extra_cards` works on all three formats.
 - The output keeps the format of the input. `anki21b` in gives `anki21b` out,
   with the zstd collection and the zstd media. `anki2` in gives `anki2` out.
+  An `anki21b` media map holds no key, so `anki_tools/apkg/media.py` renumbers
+  the kept media files to `0..n-1` and writes the protobuf entries in that
+  order. A note field holds the media file name, not the archive name.
 - `add_model_field` loses its last caller with `_write_core_model`. Delete it
   and its test. `remove_model_template` and `_trim_templates` lose their
   callers too, so delete them together.
