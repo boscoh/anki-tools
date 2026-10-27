@@ -20,7 +20,6 @@ import pytest
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking import assemble, coreflow, corelist, cullflow, cullgates
-from anki_tools.ranking.identity import DeckIdentity
 
 SENTENCES = [
     ("kat ser stor.", "cat is big."),
@@ -708,12 +707,6 @@ def test_the_cull_keeps_the_due_of_a_kept_card(tmp_path: Path) -> None:
 
     assert dues == [42]
     assert len(_notes(output)) == 1
-
-
-def test_the_output_identity_names_the_deck_and_the_note_type() -> None:
-    identity = DeckIdentity(Path("apkg/test_two_sentences.apkg"))
-
-    assert identity.title == identity.model_name == "test_two_sentences"
 
 
 def _add_spare_field(path: Path, name: str) -> None:

@@ -2,8 +2,7 @@
 
 The module holds the sentence data class, the frequency tables, the download
 helpers, the similarity engine, the ranking CSV writer, and the stratified
-reduction. It also holds :func:`rank_character_based`, the score driver that
-a character-based language calls with its own metrics.
+reduction.
 
 The module holds no language data and imports no language package. The word
 metrics of a language live in ``anki_tools/languages/<lang>/rank.py``, and the
@@ -22,11 +21,6 @@ from typing import Callable, Sequence
 from wordfreq import iter_wordlist
 
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.ranking.latin import (
-    complexity_score_latin,
-    frequency_score_latin,
-    latin_word_similarity,
-)
 
 # =============================================================================
 # Data Classes
@@ -304,166 +298,6 @@ def structural_score(
 # =============================================================================
 # Phase 5: Ranking and Output
 # =============================================================================
-
-
-def rank_character_based(
-    sentences: list[Sentence],
-    weights: dict[str, float],
-    *,
-    complexity: Callable[[str], float],
-    frequency: Callable[[str, FrequencyData], float],
-    penalties: Callable[
-        [list[Sentence]], tuple[list[float], list[int | None], list[str | None]]
-    ],
-    preprocess: Callable[[list[Sentence]], None] | None = None,
-    freq_loader: Callable[[], FrequencyData],
-    repeated_filter: Callable[[str], bool] | None = None,
-) -> list[Sentence]:
-    """Rank sentences with the scores of one language.
-
-    The caller gives the word metrics of its language, so the driver holds no
-    language data. Mandarin and Cantonese use it.
-
-    :param sentences: Sentences to rank.
-    :param weights: Weights of complexity, frequency, and similarity_penalty.
-    :param complexity: Complexity score of one sentence, 0 to 100.
-    :param frequency: Frequency score of one sentence, 0 to 100.
-    :param penalties: Similarity penalties of the ranked sentences.
-    :param preprocess: Optional preprocessing, for example the traditional
-        conversion and the romanization of the Cantonese pipeline.
-    :param freq_loader: Frequency data loader of the language.
-    :param repeated_filter: Test that marks a sentence with a repeated pattern.
-        Repeating sentences are dropped before the scores are computed.
-    :returns: The same list, sorted by final score, best first.
-    """
-    if preprocess:
-        preprocess(sentences)
-
-    if repeated_filter is not None:
-        before = len(sentences)
-        sentences = [s for s in sentences if not repeated_filter(s.text)]
-        removed = before - len(sentences)
-        if removed:
-            print(f"Filtered {removed} repeated-pattern sentences")
-
-    freq_data = freq_loader()
-
-    print("Calculating complexity scores...")
-    for sent in sentences:
-        sent.complexity_score = complexity(sent.text)
-
-    print("Calculating frequency scores...")
-    for sent in sentences:
-        sent.frequency_score = frequency(sent.text, freq_data)
-
-    for sent in sentences:
-        sent.final_score = (
-            sent.frequency_score * weights["frequency"]
-            + (100 - sent.complexity_score) * weights["complexity"]
-        )
-
-    sentences.sort(key=lambda s: s.final_score, reverse=True)
-
-    print("Calculating similarity penalties...")
-    (
-        penalty_values,
-        similar_to_rank_indices,
-        similar_to_rank_texts,
-    ) = penalties(sentences)
-    for sent, penalty, similar_to_rank, sim_text in zip(
-        sentences, penalty_values, similar_to_rank_indices, similar_to_rank_texts
-    ):
-        sent.similarity_penalty = penalty
-        sent.similar_to_rank = similar_to_rank
-        sent.similar_to_text = sim_text
-
-    for sent in sentences:
-        sent.final_score = (
-            sent.frequency_score * weights["frequency"]
-            + (100 - sent.complexity_score) * weights["complexity"]
-            - sent.similarity_penalty * weights["similarity_penalty"]
-        )
-
-    sentences.sort(key=lambda s: s.final_score, reverse=True)
-
-    return sentences
-
-
-#: Default weights of a word-based language: structural, frequency, similarity.
-WORD_WEIGHTS = {"structural": 0.35, "frequency": 0.45, "similarity_penalty": 0.2}
-
-
-def rank_word_based(
-    sentences: list[Sentence],
-    weights: dict[str, float],
-    *,
-    grammar: Callable[[str], float],
-    freq_loader: Callable[[], FrequencyData],
-    structural_blend: float = STRUCTURAL_COMPLEXITY_BLEND,
-) -> list[Sentence]:
-    """Rank the sentences of a word-based Latin-script language.
-
-    The structural term blends the complexity score and the grammar score, so
-    the two correlated measures count once. The caller gives the grammar score
-    and the frequency loader of its language. The Latin-script word metrics and
-    the similarity engine are shared.
-
-    :param sentences: Sentences to rank.
-    :param weights: Weights of structural, frequency, and similarity_penalty.
-    :param grammar: Grammar score of one sentence, 0 to 100.
-    :param freq_loader: Frequency data loader of the language.
-    :param structural_blend: Share of the complexity term in the structural
-        score.
-    :returns: The same list, sorted by final score, best first.
-    """
-    freq_data = freq_loader()
-
-    print("Calculating complexity scores...")
-    for sent in sentences:
-        sent.complexity_score = complexity_score_latin(sent.text)
-
-    print("Calculating frequency scores...")
-    for sent in sentences:
-        sent.frequency_score = frequency_score_latin(sent.text, freq_data.word_freq)
-
-    print("Calculating grammar scores...")
-    for sent in sentences:
-        sent.grammar_score = grammar(sent.text)
-
-    for sent in sentences:
-        structural = structural_score(
-            sent.complexity_score, sent.grammar_score, structural_blend
-        )
-        sent.final_score = (
-            sent.frequency_score * weights["frequency"]
-            + (100 - structural) * weights["structural"]
-        )
-
-    sentences.sort(key=lambda s: s.final_score, reverse=True)
-
-    print("Calculating similarity penalties...")
-    penalties, similar_to_rank_indices, similar_to_texts = (
-        compute_similarity_penalties(sentences, latin_word_similarity)
-    )
-    for sent, penalty, similar_to_rank, sim_text in zip(
-        sentences, penalties, similar_to_rank_indices, similar_to_texts
-    ):
-        sent.similarity_penalty = penalty
-        sent.similar_to_rank = similar_to_rank
-        sent.similar_to_text = sim_text
-
-    for sent in sentences:
-        structural = structural_score(
-            sent.complexity_score, sent.grammar_score, structural_blend
-        )
-        sent.final_score = (
-            sent.frequency_score * weights["frequency"]
-            + (100 - structural) * weights["structural"]
-            - sent.similarity_penalty * weights["similarity_penalty"]
-        )
-
-    sentences.sort(key=lambda s: s.final_score, reverse=True)
-    return sentences
 
 
 def _open_for_write(output_path: str):

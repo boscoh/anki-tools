@@ -1,5 +1,7 @@
 """Tests for the shared CC-Canto character-link script."""
 
+import pytest
+
 from anki_tools.languages.cantonese.profile import CANTONESE
 from anki_tools.languages.mandarin.profile import MANDARIN
 from anki_tools.apkg.templates import CHAR_LINKS_PATH, load_char_links
@@ -16,12 +18,8 @@ def test_missing_file_gives_empty_script(tmp_path) -> None:
     assert load_char_links(tmp_path / "absent.html") == ""
 
 
-def test_mandarin_profile_uses_the_script() -> None:
-    assert MANDARIN.char_links is True
-    assert "char-links" in MANDARIN.back_template
+@pytest.mark.parametrize("profile", [MANDARIN, CANTONESE])
+def test_the_profile_uses_the_script(profile) -> None:
+    assert profile.char_links is True
+    assert "char-links" in profile.back_template
     assert CHAR_LINKS_PATH.exists()
-
-
-def test_cantonese_profile_uses_the_script() -> None:
-    assert CANTONESE.char_links is True
-    assert "char-links" in CANTONESE.back_template

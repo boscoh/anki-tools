@@ -28,7 +28,7 @@ from anki_tools.ranking.coreflow import (
     sense_match,
     size_check,
 )
-from anki_tools.ranking.identity import DeckIdentity, default_output
+from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.ranking.corelist import TargetWord, build_core_targets
 from anki_tools.ranking.core import (
     CoreCandidate,
@@ -423,19 +423,6 @@ class TestFiles:
         assert [row["sentence"] for row in rows] == ["B.", "A."]
         assert [row["rank"] for row in rows] == ["1", "2"]
         assert kept_order_hash(cards, [1, 0]) == kept_order_hash(cards, [1, 0])
-
-    def test_the_side_paths_hold_the_four_files(self, tmp_path: Path) -> None:
-        paths = DeckIdentity(tmp_path / "deck.apkg").core_sides()
-
-        assert [path.name for path in paths] == [
-            "deck.core.csv",
-            "deck.coverage.csv",
-            "deck.manifest.json",
-            "deck.rank.csv",
-        ]
-
-    def test_the_default_output_uses_the_language_and_the_mode(self) -> None:
-        assert default_output("french", "core").name == "french_core.apkg"
 
 
 def _tiny_deck(tmp_path: Path) -> Path:

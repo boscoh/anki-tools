@@ -546,7 +546,7 @@ uv run pytest tests/test_apkg_package.py -v                # one file
 uv run pytest tests/ --cov=anki_tools --cov-report=term-missing
 ```
 
-The suite holds 404 tests. They cover the package API, the deck gates, and the
+The suite holds 394 tests. They cover the package API, the deck gates, and the
 language pack rules. A test that needs a large input file or
 a cache skips when the file is absent. The tests build their own small APKG
 files, so the repository holds no deck binary.

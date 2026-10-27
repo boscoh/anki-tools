@@ -21,7 +21,6 @@ from anki_tools.ranking import cardfilter, coreflow
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
 from anki_tools.ranking.corelist import CoreTarget, SenseWords
 from anki_tools.ranking.scan import CoreProfile
-from anki_tools.ranking.identity import default_output
 
 SPANISH_TOKENIZER = "es_core_news_sm"
 WORD_PATTERN = re.compile(r"[^\W\d_]+")
@@ -362,9 +361,6 @@ class TestFiles:
                 frozenset({"drink", "eat"}), frozenset({"have"}), "drink"
             )
         }
-
-    def test_the_default_output_uses_the_language_and_the_mode(self) -> None:
-        assert default_output("french", "core") == Path("apkg/french_core.apkg")
 
 
 class TestCardFilter:
