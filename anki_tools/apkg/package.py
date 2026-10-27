@@ -36,10 +36,11 @@ Legacy: JSON object mapping file ID strings to filenames
 Anki21b: zstd-compressed protobuf with repeated MediaEntry messages
     Entry order = file ID (0, 1, 2, ...)
     Each entry contains filename, file size, and SHA1 hash
+
+The module :mod:`anki_tools.apkg.media` reads and writes the media map.
 """
 
 import hashlib
-import io
 import json
 import os
 import random
@@ -51,6 +52,8 @@ import time
 import zipfile
 from pathlib import Path
 from typing import Any, Mapping, Sequence
+
+from anki_tools.apkg import media
 
 try:
     import genanki
@@ -124,6 +127,7 @@ class AnkiPackage:
         self._modified: bool = False
         self._db_format: str | None = None  # 'anki2', 'anki21', or 'anki21b'
         self._db_path: str | None = None
+        self.media_map: dict[str, str] | None = None
 
     @property
     def conn(self) -> sqlite3.Connection:
@@ -1004,122 +1008,26 @@ class AnkiPackage:
         }
 
     def get_media_mapping(self) -> dict[str, str]:
-        """
-        Get mapping of file IDs to filenames from the media file.
+        """Give the media map of the package.
 
-        :returns: Dict mapping numeric file IDs (as strings) to actual filenames.
-            Example: ``{"0": "audio.mp3", "1": "image.png"}``.
-            Returns empty dict if media file doesn't exist or can't be parsed.
+        :returns: Archive file name to media file name mapping, for example
+            ``{"0": "audio.mp3"}``. An unreadable or absent map gives {}.
 
         .. note::
-            Media file formats differ:
-            - Legacy (anki2/anki21): Plain JSON text
-            - Anki21b: zstd-compressed protobuf
-
-            The numeric file IDs correspond to files named ``0``, ``1``, ``2``, etc.
-            in the APKG archive root.
+            ``anki2`` and ``anki21`` hold JSON. ``anki21b`` holds a zstd frame
+            of a protobuf message, so its keys are the entry order.
         """
-        media_path = os.path.join(self.temp_dir, "media")
-        if not os.path.exists(media_path):
-            return {}
+        return media.read(self)
 
-        with open(media_path, "rb") as f:
-            content = f.read()
+    def prune_media(self, used: set[str]) -> None:
+        """Delete every media file whose name is not in ``used``.
 
-        # Zstd magic: 0x28 0xB5 0x2F 0xFD (little-endian 0xFD2FB528)
-        ZSTD_MAGIC = b"\x28\xb5\x2f\xfd"
-        if content[:4] == ZSTD_MAGIC:
-            if not HAS_ZSTD:
-                return {}
+        One pass reads the map, removes the files, and writes the map one time.
+        For ``anki21b``, the kept files take the archive names ``0..n-1``.
 
-            dctx = zstandard.ZstdDecompressor()
-            # Use stream_reader because content size may not be in frame header
-            with dctx.stream_reader(io.BytesIO(content)) as reader:
-                content = reader.read()
-
-        # Try JSON first (legacy format: {"0": "file.mp3", ...})
-        try:
-            return json.loads(content.decode("utf-8"))
-        except (UnicodeDecodeError, json.JSONDecodeError):
-            pass
-
-        # Try protobuf (anki21b: decompressed content is binary protobuf)
-        try:
-            return self._parse_media_protobuf(content)
-        except Exception:
-            pass
-
-        return {}
-
-    def _parse_media_protobuf(self, data: bytes) -> dict[str, str]:
+        :param used: Media file names that a note still references.
         """
-        Parse media mapping from protobuf format used in anki21b.
-
-        :param data: Decompressed protobuf binary data.
-        :returns: Dict mapping file ID strings to filenames.
-
-        The file is zstd-compressed, then contains repeated protobuf messages.
-        Entry order (0, 1, 2, ...) corresponds to media file IDs in the APKG.
-
-        Protobuf wire format (each entry ~85 bytes)::
-
-            0x0a <varint:msg_len>           # outer message, field 1, wire type 2
-                0x0a <varint:str_len> <filename>  # field 1: filename (string)
-                0x10 <varint:size>                # field 2: file size in bytes
-                0x1a <20 bytes>                   # field 3: SHA1 hash (20 bytes)
-
-        .. note::
-            Field 2 values are NOT unique (multiple files can have same size),
-            so we use entry order as the file ID, not field 2.
-        """
-        mapping = {}
-        pos = 0
-        entry_idx = 0
-
-        while pos < len(data):
-            if pos >= len(data):
-                break
-
-            tag = data[pos]
-            pos += 1
-
-            if tag != 0x0A:
-                break
-
-            msg_len, pos = self._read_varint(data, pos)
-            if msg_len == 0:
-                break
-
-            msg_end = pos + msg_len
-            filename = None
-
-            while pos < msg_end:
-                inner_tag = data[pos]
-                pos += 1
-
-                field_num = inner_tag >> 3
-                wire_type = inner_tag & 0x07
-
-                if field_num == 1 and wire_type == 2:
-                    str_len, pos = self._read_varint(data, pos)
-                    filename = data[pos : pos + str_len].decode("utf-8")
-                    pos += str_len
-                elif wire_type == 2:
-                    skip_len, pos = self._read_varint(data, pos)
-                    pos += skip_len
-                elif wire_type == 0:
-                    _, pos = self._read_varint(data, pos)
-                else:
-                    pos = msg_end
-                    break
-
-            if filename is not None:
-                mapping[str(entry_idx)] = filename
-
-            pos = msg_end
-            entry_idx += 1
-
-        return mapping
+        media.prune(self, used)
 
     def _read_varint(self, data: bytes, pos: int) -> tuple[int, int]:
         """
@@ -1202,6 +1110,9 @@ class AnkiPackage:
         """
         Add a media file (audio/image) to the APKG package.
 
+        The map is written when the package saves, so a run that adds many
+        files writes the map one time.
+
         :param file_path: Path to the file to add.
         :param filename: Filename to use in the package (defaults to basename).
         :returns: The filename that can be used in card fields (e.g., ``"audio.mp3"``).
@@ -1212,31 +1123,7 @@ class AnkiPackage:
             filename = pkg.add_media_file("/path/to/audio.mp3")
             pkg._add_audio_to_card(note_id, 0, filename)
         """
-        if not os.path.exists(file_path):
-            raise FileNotFoundError(f"File not found: {file_path}")
-
-        if filename is None:
-            filename = os.path.basename(file_path)
-
-        # Get current media mapping
-        mapping = self.get_media_mapping()
-
-        # Find next available ID
-        existing_ids = [int(k) for k in mapping.keys() if k.isdigit()]
-        next_id = max(existing_ids) + 1 if existing_ids else 0
-
-        # Copy file to temp directory with the ID
-        dest_path = os.path.join(self.temp_dir, str(next_id))
-        shutil.copy2(file_path, dest_path)
-
-        # Update media mapping
-        mapping[str(next_id)] = filename
-        media_path = os.path.join(self.temp_dir, "media")
-        with open(media_path, "w", encoding="utf-8") as f:
-            json.dump(mapping, f, ensure_ascii=False)
-
-        self._modified = True
-        return filename
+        return media.add(self, file_path, filename)
 
     def update_note_field(self, note_id: int, field_index: int, new_value: str) -> None:
         """
@@ -1456,40 +1343,27 @@ class AnkiPackage:
         count = cursor.fetchone()[0]
         return count > 0
 
+    def used_media(self) -> set[str]:
+        """Give the media file names that a note references.
+
+        :returns: The file names of the ``[sound:...]`` tags of every note.
+        """
+        names: set[str] = set()
+        for row in self.get_notes():
+            names.update(re.findall(r"\[sound:(.*?)\]", str(row["flds"])))
+        return names
+
     def delete_media_file(self, audio_filename: str) -> bool:
         """
         Delete a media file from the APKG package.
 
+        The map is written when the package saves, so a bulk run writes it one
+        time. Use :meth:`prune_media` to delete many files in one pass.
+
         :param audio_filename: The audio filename to delete.
         :returns: True if file was deleted, False if not found.
         """
-        mapping = self.get_media_mapping()
-
-        # Find the file ID for this filename
-        file_id = None
-        for fid, fname in mapping.items():
-            if fname == audio_filename:
-                file_id = fid
-                break
-
-        if file_id is None:
-            return False
-
-        # Remove from mapping
-        del mapping[file_id]
-
-        # Delete the actual file
-        file_path = os.path.join(self.temp_dir, file_id)
-        if os.path.exists(file_path):
-            os.remove(file_path)
-
-        # Update media mapping
-        media_path = os.path.join(self.temp_dir, "media")
-        with open(media_path, "w", encoding="utf-8") as f:
-            json.dump(mapping, f, ensure_ascii=False)
-
-        self._modified = True
-        return True
+        return media.delete(self, audio_filename)
 
     def delete_card(self, card_id: int, cleanup_audio: bool = True) -> dict:
         """
@@ -1585,13 +1459,12 @@ class AnkiPackage:
         self.conn.commit()
         self._modified = True
 
-        # Clean up unused audio files after all deletions
         if cleanup_audio:
-            mapping = self.get_media_mapping()
-            for audio_filename in list(mapping.values()):
-                if not self.is_audio_file_used(audio_filename):
-                    if self.delete_media_file(audio_filename):
-                        results["audio_files_deleted"].append(audio_filename)
+            used = self.used_media()
+            doomed = set(media.read(self).values()) - used
+            if doomed:
+                media.prune(self, used)
+                results["audio_files_deleted"] = sorted(doomed)
 
         return results
 
@@ -1603,7 +1476,8 @@ class AnkiPackage:
             If None, overwrites the original file.
 
         .. note::
-            For anki21b format, the database is recompressed with zstd.
+            For anki21b format, the database is recompressed with zstd. The
+            media map is written in the format of the package.
         """
         if not self._modified:
             return
@@ -1615,6 +1489,9 @@ class AnkiPackage:
         if self._conn:
             self._conn.close()
             self._conn = None
+
+        if self.media_map is not None:
+            media.write(self, self.media_map)
 
         # For anki21b, recompress the database
         if self._db_format == "anki21b":

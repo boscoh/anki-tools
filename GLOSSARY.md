@@ -26,6 +26,13 @@ _Avoid_: column, attribute
 The card layout and the CSS that style it.
 _Avoid_: skin, theme
 
+**Media map**:
+The archive entry `media` that gives one archive file name for each media file
+name. An `anki2` package holds JSON. An `anki21b` package holds a zstd frame of a
+protobuf message, and the entry order is the file id. The code lives in
+`anki_tools/apkg/media.py`.
+_Avoid_: media index, media listing
+
 ## Decks
 
 **Vocabulary deck**:
