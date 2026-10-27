@@ -57,11 +57,11 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089872842,1568,Esa carne es de pollo.,That meat is chicken.,Tatoeba arh sentence EngID 418859 SpaID 338835.mp3,1,depth,,S63:carne,S63:carne,0.0283,0.0300,5,0,0,0
 1548089876234,4954,No puedes ser un donante de sangre.,You cannot be a blood donor.,Tatoeba arh sentence EngID 866427 SpaID 1563204.mp3,1,seed,,S64:sangre,S64:sangre,0.1480,0.1800,7,1,0,0
 1548089873617,2338,¿Alguna vez te has roto un hueso?,Have you ever broken a bone?,Tatoeba arh sentence EngID 953291 SpaID 2138210.mp3,1,seed,,S65:hueso,S65:hueso,0.1554,0.1000,7,1,0,0
-1548089879768,8488,Quiero teñirme el pelo de rojo.,I want to dye my hair red.,Tatoeba arh sentence EngID 5147480 SpaID 5147601.mp3,1,seed,,F:querer|S172:rojo|S71:pelo,S71:pelo,0.2666,0.3000,6,1,0,0
+1548089879768,8488,Quiero teñirme el pelo de rojo.,I want to dye my hair red.,Tatoeba arh sentence EngID 5147480 SpaID 5147601.mp3,1,seed,,S172:rojo|S71:pelo,S71:pelo,0.2666,0.3000,6,1,0,0
 1548089871744,474,¿Has perdido la cabeza?,Have you lost your mind?,Tatoeba arh sentence EngID 68956505854707277 SpaID 505853.mp3,1,seed,,S72:cabeza,S72:cabeza,0.1516,0.1000,4,0,0,0
 1548089875974,4694,¿Las hormigas tienen orejas?,Do ants have ears?,Tatoeba arh sentence EngID 1848295 SpaID 1848293.mp3,1,seed,,S73:oreja,S73:oreja,0.1430,0.1800,4,1,0,0
 1548089872985,1709,Lo vi con mis propios ojos.,I saw it with my own eyes.,Tatoeba arh sentence EngID 254819 SpaID 356683.mp3,1,seed,,S101:ver|S203:con|S74:ojo,S74:ojo,0.4408,0.0000,6,0,0,0
-1548089875732,4452,Te sangra la nariz.,Your nose is bleeding.,Tatoeba arh sentence EngID 68973 SpaID 543452.mp3,1,seed,,S75:nariz,S75:nariz,0.1421,0.1800,4,1,0,0
+1548089879331,8051,Quiero rascarme la nariz.,I want to scratch my nose.,Tatoeba arh sentence EngID 1205633 SpaID 1367733.mp3,1,seed,,F:querer|S117:rascar|S75:nariz,S75:nariz,0.2753,0.3000,4,1,0,0
 1548089873190,1914,No es de buena educación hablar con la boca llena.,It's not polite to speak with your mouth full.,Tatoeba arh sentence EngID 240537 SpaID 1615961.mp3,1,completion,,S76:boca,S76:boca,-0.1842,0.2400,10,1,0,0
 1548089876851,5571,¿Las tortugas tienen dientes?,Do turtles have teeth?,Tatoeba arh sentence EngID 1356594 SpaID 974946.mp3,1,seed,,S77:diente,S77:diente,0.1411,0.1800,4,1,0,0
 1548089872469,1199,A ver su lengua.,Let me see your tongue.,Tatoeba arh sentence EngID 272646 SpaID 1654697.mp3,1,seed,,S78:lengua,S78:lengua,0.1586,0.0000,4,0,0,0
@@ -98,7 +98,8 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089875602,4322,Nunca he volado en avión.,I've never flown in an airplane.,Tatoeba arh sentence EngID 261428 SpaID 720477.mp3,1,completion,,S120:volar,S120:volar,-0.0494,0.1000,5,1,0,0
 1548089875870,4590,Ella habló mientras caminaba.,She talked as she walked.,Tatoeba arh sentence EngID 388595 SpaID 358465.mp3,1,seed,,F:hablar|S121:caminar,S121:caminar,0.1443,0.0000,4,0,0,0
 1548089873750,2470,Le dije que viniera.,I told him to come.,Tatoeba arh sentence EngID 260501 SpaID 1100757.mp3,1,depth,,S122:venir|S140:decir,S122:venir,0.0994,0.0000,4,0,0,0
-1548089880066,8786,Me senté sobre el bordillo.,I sat on the curb.,Tatoeba arh sentence EngID 5858401 SpaID 5982451.mp3,1,seed,,S124:sentarse,S124:sentarse,0.1036,0.4000,5,2,0,0
+1548089874980,3700,¿Podría acostarme en el sofá?,May I lie on the sofa?,Tatoeba arh sentence EngID 43245 SpaID 669689.mp3,1,seed,,S123:acostarse,S123:acostarse,0.1078,0.3600,5,2,0,0
+1548089874267,2987,No me importaba sentarme solo.,I didn't mind sitting by myself.,Tatoeba arh sentence EngID 6738461 SpaID 6739331.mp3,1,seed,,S124:sentarse,S124:sentarse,0.1156,0.2800,5,2,0,0
 1548089879863,8583,Ella giró el picaporte despacio.,She turned the doorknob slowly.,Tatoeba arh sentence EngID 312386 SpaID 1361218.mp3,1,seed,,S126:girar,S126:girar,0.0951,0.4800,5,2,0,0
 1548089872366,1096,Yo lo dejo caer.,I let it fall.,Tatoeba arh sentence EngID 2238535 SpaID 4603202.mp3,1,depth,,S127:caer,S127:caer,0.0500,0.0000,4,0,0,0
 1548089871683,413,Él dio la vida por el país.,He gave his life for his country.,Tatoeba arh sentence EngID 296421 SpaID 344038.mp3,1,seed,,F:vida|S128:dar,S128:dar,0.2591,0.1000,7,1,0,0
@@ -178,6 +179,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089871519,249,Es sólo un niño.,He is but a child.,Tatoeba arh sentence EngID 33043292784858583 SpaID 633246.mp3,1,depth,,F:sólo|S39:niño,F:sólo,0.1106,0.0000,4,0,0,0
 1548089871378,108,Espera aquí un poco.,Wait here for a while.,Tatoeba arh sentence EngID 53434 SpaID 758546.mp3,1,depth,,F:esperar,F:esperar,0.0448,0.0000,4,0,0,0
 1548089871350,80,Siento lo de antes.,Sorry about before.,Tatoeba arh sentence EngID 1124639 SpaID 1415641.mp3,1,depth,,F:antes|F:sentir,F:sentir,0.0887,0.0000,4,0,0,0
+1548089871382,112,Eso es otra cosa.,That is another matter.,Tatoeba arh sentence EngID 42114496203 SpaID 1651414.mp3,1,depth,,S21:otro,F:cosa,0.0785,0.0000,4,0,0,0
 1548089871402,132,Yo sé tu nombre.,I know your name.,Tatoeba arh sentence EngID 16887 SpaID 395877.mp3,1,depth,,S207:nombre,S1:yo,0.0455,0.0000,4,0,0,0
 1548089872503,1233,¿Quién es aquella mujer?,Who is that woman?,Tatoeba arh sentence EngID 68238 SpaID 346648.mp3,1,depth,,S36:mujer,S11:quién,0.0672,0.0000,4,0,0,0
 1548089873094,1818,Tengo las manos pequeñas.,I have small hands.,Tatoeba arh sentence EngID 2794283 SpaID 3229859.mp3,1,depth,,S32:pequeño|S83:mano,S32:pequeño,0.1241,0.0000,4,0,0,0
@@ -200,8 +202,8 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089874507,3227,Él usaba zapatos viejos.,He wore old shoes.,Tatoeba arh sentence EngID 296126 SpaID 2311783.mp3,1,completion,,S184:viejo,S3:él,-0.0835,0.1300,4,1,0,0
 1548089874561,3281,¿Cuándo voy a cobrar?,When do I get paid?,Tatoeba arh sentence EngID 3737713 SpaID 5147817.mp3,1,completion,,S14:cuándo,S14:cuándo,-0.0904,0.1800,4,1,0,0
 1548089874881,3601,Es una mala inversión.,It's a bad investment.,Tatoeba arh sentence EngID 3518542 SpaID 3519004.mp3,1,completion,,S186:malo,S186:malo,-0.1336,0.1800,4,1,0,0
+1548089875732,4452,Te sangra la nariz.,Your nose is bleeding.,Tatoeba arh sentence EngID 68973 SpaID 543452.mp3,1,completion,,S75:nariz,S75:nariz,-0.1240,0.1800,4,1,0,0
 1548089875780,4500,Las montañas son preciosas.,The mountains are beautiful.,Tatoeba arh sentence EngID 2543432 SpaID 5854073.mp3,1,completion,,S171:montaña,S171:montaña,-0.0529,0.1000,4,1,0,0
-1548089875926,4646,Me pica la nariz.,My nose is itchy.,Tatoeba arh sentence EngID 318193 SpaID 1328405.mp3,1,completion,,S75:nariz,S75:nariz,-0.1240,0.1800,4,1,0,0
 1548089876533,5253,Marchamos bajo la lluvia.,We marched in the rain.,Tatoeba arh sentence EngID 5043048 SpaID 5046906.mp3,1,completion,,S151:lluvia,S151:lluvia,-0.1317,0.1800,4,1,0,0
 1548089876602,5322,Mira a la pizarra.,Look at the blackboard.,Tatoeba arh sentence EngID 241500 SpaID 1552886.mp3,1,completion,,F:mirar,S201:a,-0.1357,0.1800,4,1,0,0
 1548089876807,5527,Caminamos otras cien yardas.,We walked another hundred yards.,Tatoeba arh sentence EngID 248354 SpaID 1685721.mp3,1,completion,,S121:caminar,S21:otro,-0.1295,0.1800,4,1,0,0
@@ -226,7 +228,6 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089871606,336,Es la última persona que quiero ver.,He is the last man I want to see.,Tatoeba arh sentence EngID 297264 SpaID 958344.mp3,1,completion,,S38:persona,S38:persona,-0.0338,0.1000,7,1,0,0
 1548089874130,2850,Ese niño tiró una piedra al perro.,That child threw a stone at the dog.,Tatoeba arh sentence EngID 47487 SpaID 963976.mp3,1,completion,,S156:piedra,S8:ese,-0.0520,0.1000,7,1,0,0
 1548089876086,4806,El cartero fue mordido por ese perro.,The postman was bitten by that dog.,Tatoeba arh sentence EngID 324560 SpaID 962640.mp3,1,completion,,S94:morder,S8:ese,-0.1267,0.1800,7,1,0,0
-1548089876046,4766,Nos sentamos en un banco en el parque.,We sat on a bench in the park.,Tatoeba arh sentence EngID 22993 SpaID 1733439.mp3,1,completion,,S124:sentarse,S124:sentarse,-0.1298,0.1800,8,1,0,0
 1548089877037,5757,Tardó cinco minutos en llegar a la estación.,It took five minutes to get to the station.,Tatoeba arh sentence EngID 26014 SpaID 346061.mp3,1,completion,,S26:cinco,S26:cinco,-0.1864,0.2600,8,1,0,0
 1548089873386,2108,El oro es mucho más pesado que el agua.,Gold is far heavier than water.,Tatoeba arh sentence EngID 18583 SpaID 339125.mp3,1,completion,,S31:pesado,S31:pesado,-0.0700,0.1400,9,1,0,0
 1548089874014,2734,A él no le dan ningún miedo las serpientes.,He's not at all afraid of snakes.,Tatoeba arh sentence EngID 292669 SpaID 521907.mp3,1,completion,,S49:serpiente,S3:él,-0.0780,0.1400,9,1,0,0
@@ -238,11 +239,12 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089877307,6027,Su lengua materna es el francés.,French is his mother tongue.,Tatoeba arh sentence EngID 460259 SpaID 1116512.mp3,1,completion,,S78:lengua,S78:lengua,-0.4245,0.4800,6,2,0,0
 1548089878177,6897,"A menudo, los perros entierran huesos.",Dogs often bury bones.,Tatoeba arh sentence EngID 239178 SpaID 580964.mp3,1,completion,,S65:hueso,S47:perro,-0.3021,0.3600,6,2,0,0
 1548089874136,2856,El vidrio se hace a partir de arena.,Glass is made from sand.,Tatoeba arh sentence EngID 63527 SpaID 2032084.mp3,1,completion,,S157:arena,S157:arena,-0.2521,0.3000,8,2,0,0
+1548089876046,4766,Nos sentamos en un banco en el parque.,We sat on a bench in the park.,Tatoeba arh sentence EngID 22993 SpaID 1733439.mp3,1,completion,,S124:sentarse,S124:sentarse,-0.1998,0.2500,8,2,0,0
 1548089879001,7721,"Si no estuviera enfermo, me uniría a vosotros.","If I weren't sick, I'd join you.",Tatoeba arh sentence EngID 1446073 SpaID 2529567.mp3,1,completion,,S5:vosotros,S5:vosotros,-0.1946,0.3300,8,2,0,0
 1548089880266,8986,El viento de proa soplaba contra la vela.,The headwind blew against the sail.,Tatoeba arh sentence EngID 2863859 SpaID 5664053.mp3,1,completion,,S98:soplar,S98:soplar,-0.4472,0.5000,8,2,0,0
 1548089878545,7265,Gira el pomo y abre la puerta.,Turn the knob and open the door.,Tatoeba arh sentence EngID 35749 SpaID 1333708.mp3,1,completion,,S126:girar,S126:girar,-0.4499,0.5000,7,3,0,0
+1548089880242,8962,Ella le ayudó a atarse la corbata.,She helped him tie his tie.,Tatoeba arh sentence EngID 887203 SpaID 892163.mp3,1,completion,,S137:atar,S137:atar,-0.4108,0.4600,7,3,0,0
 1548089877558,6278,Hay una necesidad urgente de donaciones de sangre.,There is an urgent need for blood donations.,Tatoeba arh sentence EngID 903689 SpaID 1696219.mp3,1,completion,,S64:sangre,S64:sangre,-0.5019,0.5600,8,3,0,0
-1548089871382,112,Eso es otra cosa.,That is another matter.,Tatoeba arh sentence EngID 42114496203 SpaID 1651414.mp3,1,depth,,S21:otro,F:cosa,0.0785,0.0000,4,0,0,0
 1548089874322,3042,¿Habrás terminado para entonces?,Can you finish by then?,Tatoeba arh sentence EngID 3327768 SpaID 3564902.mp3,1,seed,,F:entonces,F:entonces,0.1176,0.1000,4,1,0,0
 1548089879469,8189,Pintamos la casa de verde.,We painted the house green.,Tatoeba arh sentence EngID 248069 SpaID 1631427.mp3,1,completion,,S173:verde,F:casa,-0.1330,0.1800,5,1,0,0
 1548089871407,137,Debe de ser verdad.,It has to be true.,Tatoeba arh sentence EngID 420831506898 SpaID 1240437.mp3,1,depth,,F:verdad,F:verdad,0.0446,0.0000,4,0,0,0
@@ -724,7 +726,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089871773,503,¿Te sientes mal?,Do you feel sick?,Tatoeba arh sentence EngID 20295 SpaID 963989.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089871774,504,Deberíamos haber tenido más cuidado.,We should have been more careful.,Tatoeba arh sentence EngID 262876 SpaID 618515.mp3,0,,max_cards,F:más|F:tener,,0.0000,0.0000,5,0,0,0
 1548089871775,505,Haz lo que quieras.,Do as you want.,Tatoeba arh sentence EngID 17188 SpaID 339265.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
-1548089871776,506,Tengo algo que decirte.,I have something to tell you.,Tatoeba arh sentence EngID 17430 SpaID 578901.mp3,0,,max_cards,F:tener,,0.0000,0.0000,4,0,0,0
+1548089871776,506,Tengo algo que decirte.,I have something to tell you.,Tatoeba arh sentence EngID 17430 SpaID 578901.mp3,0,,max_cards,F:tener|S140:decir,,0.0000,0.0000,4,0,0,0
 1548089871778,508,Estoy con un fuerte dolor de cabeza.,I have a bad headache.,Tatoeba arh sentence EngID 34727 SpaID 1295093.mp3,0,,max_cards,,,0.0000,0.0000,7,0,0,0
 1548089871779,509,¿Quién es tu profesor?,Who is your teacher?,Tatoeba arh sentence EngID 17660 SpaID 512411.mp3,0,,max_cards,S11:quién,,0.0000,0.0000,4,0,0,0
 1548089871780,510,¿De quién es esta habitación?,Whose room is this?,Tatoeba arh sentence EngID 55514 SpaID 686927.mp3,0,,max_cards,S11:quién,,0.0000,0.0000,5,0,0,0
@@ -830,7 +832,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089871884,614,Tom no podía sentir nada.,Tom couldn't feel a thing.,Tatoeba arh sentence EngID 1095124 SpaID 2209748.mp3,0,,F8,,,0.0000,0.0000,5,0,0,0
 1548089871885,615,Tú tenías razón.,You were right.,Tatoeba arh sentence EngID 1163505 SpaID 1163575.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089871886,616,No pude ver nada.,I could not see anything.,Tatoeba arh sentence EngID 24810 SpaID 1622138.mp3,0,,max_cards,S101:ver|S16:no,,0.0000,0.0000,4,0,0,0
-1548089871887,617,Tuve que darle una oportunidad.,I had to give it a shot.,Tatoeba arh sentence EngID 2331805 SpaID 4392396.mp3,0,,max_cards,F:tener,,0.0000,0.0000,5,0,0,0
+1548089871887,617,Tuve que darle una oportunidad.,I had to give it a shot.,Tatoeba arh sentence EngID 2331805 SpaID 4392396.mp3,0,,max_cards,F:tener|S128:dar,,0.0000,0.0000,5,0,0,0
 1548089871888,618,Él tiene una voz fuerte.,He has a loud voice.,Tatoeba arh sentence EngID 286988 SpaID 3862144.mp3,0,,max_cards,F:tener|S3:él,,0.0000,0.0000,5,0,0,0
 1548089871889,619,Me encontré con una amiga.,I met a friend.,Tatoeba arh sentence EngID 262062 SpaID 2607398.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
 1548089871891,621,Tengo mala vista.,I have weak sight.,Tatoeba arh sentence EngID 258064263379694526 SpaID 329872.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
@@ -1095,7 +1097,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089872167,897,Apenas podía trabajar.,I was barely able to work.,Tatoeba arh sentence EngID 33276 SpaID 1702964.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089872168,898,Puedes leer este libro.,You can read this book.,Tatoeba arh sentence EngID 5680870068 SpaID 586578.mp3,0,,max_cards,S7:este,,0.0000,0.0000,4,0,0,0
 1548089872169,899,¿Tienes hermanos?,Do you have any brothers?,Tatoeba arh sentence EngID 711271556507 SpaID 1562917.mp3,0,,F2,,,0.0000,0.0000,2,0,0,0
-1548089872170,900,¿Puedes darme algo de dinero?,Can you give me some money?,Tatoeba arh sentence EngID 33571497723 SpaID 761880.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
+1548089872170,900,¿Puedes darme algo de dinero?,Can you give me some money?,Tatoeba arh sentence EngID 33571497723 SpaID 761880.mp3,0,,max_cards,S128:dar,,0.0000,0.0000,5,0,0,0
 1548089872171,901,Debemos mantener la calma.,We must keep calm.,Tatoeba arh sentence EngID 325191 SpaID 1307633.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1548089872172,902,¿Es suyo?,Is it yours?,Tatoeba arh sentence EngID 42344 SpaID 867063.mp3,0,,F2,,,0.0000,0.0000,2,0,0,0
 1548089872173,903,Sé que eres rico.,I know you are rich.,Tatoeba arh sentence EngID 17881 SpaID 1319972.mp3,0,,max_cards,S103:saber,,0.0000,0.0000,4,0,0,0
@@ -1137,7 +1139,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089872212,942,Soy un héroe.,I'm a hero.,Tatoeba arh sentence EngID 25509 SpaID 919034.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089872213,943,Tengo fe en ti.,I have faith in you.,Tatoeba arh sentence EngID 1345046 SpaID 1345062.mp3,0,,max_cards,F:tener|S202:en,,0.0000,0.0000,4,0,0,0
 1548089872214,944,No soy capaz de encontrar lo que quiero.,I can't find what I want.,Tatoeba arh sentence EngID 497210 SpaID 1615987.mp3,0,,max_cards,F:querer|S16:no,,0.0000,0.0000,8,0,0,0
-1548089872215,945,Mi tío viene a verme de vez en cuando.,My uncle comes to see me from time to time.,Tatoeba arh sentence EngID 250249 SpaID 966746.mp3,0,,max_cards,F:vez|S122:venir,,0.0000,0.0000,9,0,0,0
+1548089872215,945,Mi tío viene a verme de vez en cuando.,My uncle comes to see me from time to time.,Tatoeba arh sentence EngID 250249 SpaID 966746.mp3,0,,max_cards,F:vez|S101:ver|S122:venir,,0.0000,0.0000,9,0,0,0
 1548089872216,946,Quiero algo frío para beber.,I want something cold to drink.,Tatoeba arh sentence EngID 25013 SpaID 970935.mp3,0,,max_cards,F:querer|S181:frío|S92:beber,,0.0000,0.0000,5,0,0,0
 1548089872217,947,La velocidad no lo es todo.,Speed isn't everything.,Tatoeba arh sentence EngID 2249998 SpaID 3390004.mp3,0,,max_cards,S16:no|S17:todo,,0.0000,0.0000,6,0,0,0
 1548089872218,948,Tengo un regalo que darte.,I have a nice present to give you.,Tatoeba arh sentence EngID 17569 SpaID 1244156.mp3,0,,max_cards,F:tener,,0.0000,0.0000,5,0,0,0
@@ -1642,7 +1644,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089872745,1473,Parece lluvia.,It looks like rain.,Tatoeba arh sentence EngID 26783 SpaID 853544.mp3,0,,F2,,,0.0000,0.0000,2,0,0,0
 1548089872746,1474,Estoy siempre de mal humor.,I'm always moody.,Tatoeba arh sentence EngID 66060 SpaID 965132.mp3,0,,max_cards,F:siempre,,0.0000,0.0000,5,0,0,0
 1548089872747,1475,Su sombrero se veía gracioso.,Her hat looked funny.,Tatoeba arh sentence EngID 63592 SpaID 1790635.mp3,0,,max_cards,S101:ver,,0.0000,0.0000,5,0,0,0
-1548089872748,1476,Hay tantas cosas que quiero decirte.,There's so much I want to say to you.,Tatoeba arh sentence EngID 2591270 SpaID 2667239.mp3,0,,max_cards,F:querer,,0.0000,0.0000,6,0,0,0
+1548089872748,1476,Hay tantas cosas que quiero decirte.,There's so much I want to say to you.,Tatoeba arh sentence EngID 2591270 SpaID 2667239.mp3,0,,max_cards,F:querer|S140:decir,,0.0000,0.0000,6,0,0,0
 1548089872749,1477,Me cuesta respirar.,I have difficulty breathing.,Tatoeba arh sentence EngID 239891 SpaID 712046.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089872750,1478,Es tu turno de cantar.,It's your turn to sing.,Tatoeba arh sentence EngID 70788 SpaID 564524.mp3,0,,max_cards,S141:cantar,,0.0000,0.0000,5,0,0,0
 1548089872751,1479,Trabajas muy duro.,You work too hard.,Tatoeba arh sentence EngID 15877 SpaID 726469.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
@@ -1658,7 +1660,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089872761,1489,Me sentía solo.,I felt lonely.,Tatoeba arh sentence EngID 2573106667154 SpaID 970800.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089872762,1490,¿Cuál fue el resultado?,What was the result?,Tatoeba arh sentence EngID 1283171 SpaID 1535517.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1548089872763,1491,No puedo trabajar contigo ahí parado.,I can't work with you stood there.,Tatoeba arh sentence EngID 18011 SpaID 7480847.mp3,0,,max_cards,S10:ahí|S16:no,,0.0000,0.0000,6,0,0,0
-1548089872764,1492,No olvides verme mañana por la mañana.,Don't forget to see me tomorrow morning.,Tatoeba arh sentence EngID 323202 SpaID 1593138.mp3,0,,max_cards,S16:no,,0.0000,0.0000,7,0,0,0
+1548089872764,1492,No olvides verme mañana por la mañana.,Don't forget to see me tomorrow morning.,Tatoeba arh sentence EngID 323202 SpaID 1593138.mp3,0,,max_cards,S101:ver|S16:no,,0.0000,0.0000,7,0,0,0
 1548089872765,1493,Es inútil esperar que él venga.,It's useless waiting for him to come.,Tatoeba arh sentence EngID 284314 SpaID 346538.mp3,0,,max_cards,F:esperar|S122:venir|S3:él,,0.0000,0.0000,6,0,0,0
 1548089872766,1494,¿Qué acabas de decir?,What did you just say?,Tatoeba arh sentence EngID 1542551 SpaID 1711128.mp3,0,,max_cards,S12:qué|S140:decir,,0.0000,0.0000,4,0,0,0
 1548089872767,1495,No tiene nada de ciencia.,There's nothing to it.,Tatoeba arh sentence EngID 1523674 SpaID 4463196.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
@@ -1675,7 +1677,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089872778,1506,Él pidió disculpas.,He made an apology.,Tatoeba arh sentence EngID 293446 SpaID 2099957.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089872779,1507,¿A qué hora empieza el espectáculo?,When does the show start?,Tatoeba arh sentence EngID 268292 SpaID 726449.mp3,0,,max_cards,,,0.0000,0.0000,6,0,0,0
 1548089872780,1508,La conocí en Francia.,I got acquainted with her in France.,Tatoeba arh sentence EngID 2555255277672 SpaID 1288256.mp3,0,,F8,,,0.0000,0.0000,4,0,0,0
-1548089872781,1509,Tenemos que decirles una cosa.,We have to tell them something.,Tatoeba arh sentence EngID 2064867 SpaID 3277405.mp3,0,,max_cards,F:cosa|F:tener,,0.0000,0.0000,5,0,0,0
+1548089872781,1509,Tenemos que decirles una cosa.,We have to tell them something.,Tatoeba arh sentence EngID 2064867 SpaID 3277405.mp3,0,,max_cards,F:cosa|F:tener|S140:decir,,0.0000,0.0000,5,0,0,0
 1548089872782,1510,Tienes muy buen aspecto.,You're looking very well.,Tatoeba arh sentence EngID 698471935382 SpaID 329733.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1548089872783,1511,Él se hizo famoso.,He became famous.,Tatoeba arh sentence EngID 496933 SpaID 1229954.mp3,0,,max_cards,S3:él,,0.0000,0.0000,4,0,0,0
 1548089872784,1512,¡Relájate!,Take it easy!,Tatoeba arh sentence EngID 2033515082631734890 SpaID 1742474.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
@@ -2774,7 +2776,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089873922,2642,La caridad comienza en casa.,Charity begins at home.,Tatoeba arh sentence EngID 28714 SpaID 1069630.mp3,0,,max_cards,F:casa,,0.0000,0.0000,5,0,0,0
 1548089873923,2643,He tenido suerte de encontrar una buena niñera.,I was lucky that I was able to find a good babysitter.,Tatoeba arh sentence EngID 325824 SpaID 2047081.mp3,0,,max_cards,,,0.0000,0.0000,8,0,0,0
 1548089873924,2644,Tom es la media naranja de Mary.,Tom is Mary's significant other.,Tatoeba arh sentence EngID 1028535 SpaID 5854122.mp3,0,,F8,,,0.0000,0.0000,7,0,0,0
-1548089873925,2645,No puedes matarnos a todos.,You can't kill us all.,Tatoeba arh sentence EngID 1952048 SpaID 2118794.mp3,0,,max_cards,S16:no|S17:todo,,0.0000,0.0000,5,0,0,0
+1548089873925,2645,No puedes matarnos a todos.,You can't kill us all.,Tatoeba arh sentence EngID 1952048 SpaID 2118794.mp3,0,,max_cards,S110:matar|S16:no|S17:todo,,0.0000,0.0000,5,0,0,0
 1548089873926,2646,Espérame despierto.,Wait up.,Tatoeba arh sentence EngID 2954108 SpaID 5769228.mp3,0,,F2,,,0.0000,0.0000,2,0,0,0
 1548089873927,2647,Puedo enseñarte a manejar.,I can teach you how to drive.,Tatoeba arh sentence EngID 386690 SpaID 1251172.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1548089873928,2648,La leche se cortó.,The milk went sour.,Tatoeba arh sentence EngID 32226 SpaID 1362241.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
@@ -3101,7 +3103,6 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089874263,2983,Era como en un cuento de hadas.,It was like a fairytale.,Tatoeba arh sentence EngID 4541190 SpaID 4553991.mp3,0,,max_cards,,,0.0000,0.0000,7,0,0,0
 1548089874264,2984,Podemos curar algunos tipos de cáncer.,We can cure some types of cancer.,Tatoeba arh sentence EngID 63426 SpaID 1138819.mp3,0,,max_cards,S19:alguno,,0.0000,0.0000,6,0,0,0
 1548089874266,2986,Nadie más ofreció su ayuda.,Nobody else offered to help.,Tatoeba arh sentence EngID 25933 SpaID 921468.mp3,0,,max_cards,F:más,,0.0000,0.0000,5,0,0,0
-1548089874267,2987,No me importaba sentarme solo.,I didn't mind sitting by myself.,Tatoeba arh sentence EngID 6738461 SpaID 6739331.mp3,0,,max_cards,S16:no,,0.0000,0.0000,5,0,0,0
 1548089874268,2988,No conozco con certeza dónde nací.,I don't know exactly where I was born.,Tatoeba arh sentence EngID 6823639 SpaID 6823755.mp3,0,,F8,,,0.0000,0.0000,6,0,0,0
 1548089874269,2989,A ella le gustan los vestidos azules.,She likes blue dresses.,Tatoeba arh sentence EngID 315375 SpaID 704382.mp3,0,,max_cards,F:gustar,,0.0000,0.0000,7,0,0,0
 1548089874270,2990,¿Eso es un submarino?,Is that a submarine?,Tatoeba arh sentence EngID 4494913 SpaID 4718916.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
@@ -3791,7 +3792,6 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089874977,3697,Él no demuestra su edad.,He doesn't look his age.,Tatoeba arh sentence EngID 2309 SpaID 6626640.mp3,0,,max_cards,S16:no|S3:él,,0.0000,0.0000,5,0,0,0
 1548089874978,3698,Déjelo ahí.,Leave it there.,Tatoeba arh sentence EngID 41894 SpaID 2401529.mp3,0,,F2,,,0.0000,0.0000,2,0,0,0
 1548089874979,3699,¿Tiene alguna habitación más barata?,Do you have any cheaper rooms?,Tatoeba arh sentence EngID 570238 SpaID 570240.mp3,0,,max_cards,F:tener|S19:alguno,,0.0000,0.0000,5,0,0,0
-1548089874980,3700,¿Podría acostarme en el sofá?,May I lie on the sofa?,Tatoeba arh sentence EngID 43245 SpaID 669689.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
 1548089874981,3701,¿Qué sentiste?,What did you feel?,Tatoeba arh sentence EngID 2648245 SpaID 4572352.mp3,0,,F2,,,0.0000,0.0000,2,0,0,0
 1548089874982,3702,El plomo es un metal.,Lead is a metal.,Tatoeba arh sentence EngID 1335021 SpaID 977469.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
 1548089874983,3703,No me lo perdería por nada.,I wouldn't miss it for anything.,Tatoeba arh sentence EngID 4600663 SpaID 4600677.mp3,0,,max_cards,S16:no,,0.0000,0.0000,6,0,0,0
@@ -3842,7 +3842,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089875028,3748,Tom le dijo a Mary que John la andaba buscando.,Tom told Mary that John was looking for her.,Tatoeba arh sentence EngID 4500741 SpaID 5799435.mp3,0,,F8,,,0.0000,0.0000,10,0,0,0
 1548089875029,3749,Salvé al gato.,I rescued the cat.,Tatoeba arh sentence EngID 1779792 SpaID 4772102.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089875030,3750,No quiero recordarlo.,I don't want to remember.,Tatoeba arh sentence EngID 2033133 SpaID 2033182.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
-1548089875031,3751,¿Te molestaría decirme de qué se trata esto?,Would you mind telling me what this is about?,Tatoeba arh sentence EngID 2049699 SpaID 2866032.mp3,0,,max_cards,S12:qué,,0.0000,0.0000,8,0,0,0
+1548089875031,3751,¿Te molestaría decirme de qué se trata esto?,Would you mind telling me what this is about?,Tatoeba arh sentence EngID 2049699 SpaID 2866032.mp3,0,,max_cards,S12:qué|S140:decir,,0.0000,0.0000,8,0,0,0
 1548089875032,3752,No llamará ningún vendedor.,No salesmen will call.,Tatoeba arh sentence EngID 6583808 SpaID 6586340.mp3,0,,max_cards,F:llamar|S16:no,,0.0000,0.0000,4,0,0,0
 1548089875033,3753,No me puedo creer que dijeras eso.,I can't believe you said that.,Tatoeba arh sentence EngID 1950920 SpaID 2223488.mp3,0,,max_cards,F:creer|S16:no,,0.0000,0.0000,7,0,0,0
 1548089875034,3754,Tom creció en Australia.,Tom grew up in Australia.,Tatoeba arh sentence EngID 3171427 SpaID 3195930.mp3,0,,F8,,,0.0000,0.0000,4,0,0,0
@@ -4724,6 +4724,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089875923,4643,Me agradas.,I like you.,Tatoeba arh sentence EngID 410751 SpaID 3805592.mp3,0,,F2,,,0.0000,0.0000,2,0,0,0
 1548089875924,4644,Él retiró todo lo que dijo.,He took back everything he said.,Tatoeba arh sentence EngID 296097 SpaID 1331710.mp3,0,,max_cards,S140:decir|S17:todo|S3:él,,0.0000,0.0000,6,0,0,0
 1548089875925,4645,Aquí tienes un breve resumen.,Here is a brief explanation.,Tatoeba arh sentence EngID 4665807 SpaID 7256795.mp3,0,,max_cards,S9:aquí,,0.0000,0.0000,5,0,0,0
+1548089875926,4646,Me pica la nariz.,My nose is itchy.,Tatoeba arh sentence EngID 318193 SpaID 1328405.mp3,0,,max_cards,S75:nariz,,0.0000,0.0000,4,0,0,0
 1548089875927,4647,Me ofrecí de voluntario.,I volunteered.,Tatoeba arh sentence EngID 2111792 SpaID 4526800.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1548089875928,4648,¿Cuál es el mejor regalo de Navidad que has obtenido jamás?,What's the best Christmas present you've ever gotten?,Tatoeba arh sentence EngID 5705313 SpaID 5706080.mp3,0,,F2,,,0.0000,0.0000,11,0,0,0
 1548089875929,4649,Nos mudamos a Nueva York el otoño pasado.,We moved to New York last fall.,Tatoeba arh sentence EngID 19431 SpaID 520560.mp3,0,,F8,,,0.0000,0.0000,8,0,0,0
@@ -5218,7 +5219,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089876436,5156,Comemos pescado crudo.,We eat fish raw.,Tatoeba arh sentence EngID 23047 SpaID 855591.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089876437,5157,¿Cortaste el papel?,Did you cut the paper?,Tatoeba arh sentence EngID 16591 SpaID 862804.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089876438,5158,Anoche comimos demasiado.,We ate way too much last night.,Tatoeba arh sentence EngID 1830511 SpaID 1831988.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
-1548089876439,5159,Ella le vio comerse un sándwich.,She saw him eating a sandwich.,Tatoeba arh sentence EngID 887369 SpaID 1330666.mp3,0,,max_cards,S101:ver,,0.0000,0.0000,6,0,0,0
+1548089876439,5159,Ella le vio comerse un sándwich.,She saw him eating a sandwich.,Tatoeba arh sentence EngID 887369 SpaID 1330666.mp3,0,,max_cards,S101:ver|S93:comer,,0.0000,0.0000,6,0,0,0
 1548089876440,5160,Mi hermano se ha puesto chulo.,Mi hermano se ha puesto gallito.,Tatoeba arh sentence EngID 1248547 SpaID 1248572.mp3,0,,max_cards,,,0.0000,0.0000,6,0,0,0
 1548089876441,5161,Nosotros lo averiguaremos.,We'll find out.,Tatoeba arh sentence EngID 2241576 SpaID 4993004.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089876442,5162,La variedad es la salsa de la vida.,Variety is the spice of life.,Tatoeba arh sentence EngID 1040743 SpaID 5854085.mp3,0,,max_cards,F:vida,,0.0000,0.0000,8,0,0,0
@@ -5537,7 +5538,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089876763,5483,¿Quién quiere festejar?,Who wants to party?,Tatoeba arh sentence EngID 2011460 SpaID 3389889.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089876764,5484,A ella le gustan las faldas cortas.,She likes short skirts.,Tatoeba arh sentence EngID 315750 SpaID 1202251.mp3,0,,max_cards,F:gustar|S33:corto,,0.0000,0.0000,7,0,0,0
 1548089876765,5485,Nosotros estudiamos música.,We study music.,Tatoeba arh sentence EngID 247742 SpaID 506944.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
-1548089876766,5486,Acabo de cortarme un dedo.,I just cut my finger.,Tatoeba arh sentence EngID 246249 SpaID 1036071.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
+1548089876766,5486,Acabo de cortarme un dedo.,I just cut my finger.,Tatoeba arh sentence EngID 246249 SpaID 1036071.mp3,0,,max_cards,S114:cortar,,0.0000,0.0000,5,0,0,0
 1548089876767,5487,Contacte a mi hijo.,Contact my son.,Tatoeba arh sentence EngID 2245226 SpaID 4325359.mp3,0,,F8,,,0.0000,0.0000,4,0,0,0
 1548089876768,5488,No cometas errores.,Don't make a mistake.,Tatoeba arh sentence EngID 20872 SpaID 5048646.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089876769,5489,Eso es el colmo.,That's the last straw.,Tatoeba arh sentence EngID 1359485 SpaID 1606335.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
@@ -5809,7 +5810,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089877041,5761,Toma un poco de ponche.,Have some eggnog.,Tatoeba arh sentence EngID 2245544 SpaID 6607888.mp3,0,,max_cards,F:tomar,,0.0000,0.0000,5,0,0,0
 1548089877042,5762,¡Nadie puede pararme!,Nobody can stop me!,Tatoeba arh sentence EngID 276525 SpaID 1332432.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089877043,5763,Échale una ojeada a mi bolso mientras compro un billete.,Keep an eye on my bag while I buy a ticket.,Tatoeba arh sentence EngID 272489 SpaID 5854159.mp3,0,,max_cards,,,0.0000,0.0000,10,0,0,0
-1548089877044,5764,¿Puedo darle lechuga a mi perro?,Is it OK to feed my dog lettuce?,Tatoeba arh sentence EngID 898538 SpaID 1136067.mp3,0,,max_cards,S47:perro,,0.0000,0.0000,6,0,0,0
+1548089877044,5764,¿Puedo darle lechuga a mi perro?,Is it OK to feed my dog lettuce?,Tatoeba arh sentence EngID 898538 SpaID 1136067.mp3,0,,max_cards,S128:dar|S47:perro,,0.0000,0.0000,6,0,0,0
 1548089877045,5765,Eres irresistible.,You're irresistible.,Tatoeba arh sentence EngID 1823 SpaID 2932.mp3,0,,F2,,,0.0000,0.0000,2,0,0,0
 1548089877046,5766,No quiero involucrarme.,I don't want to get involved.,Tatoeba arh sentence EngID 1832125 SpaID 1833976.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089877047,5767,El heno es para los caballos.,Hay is for horses.,Tatoeba arh sentence EngID 1349601 SpaID 1715735.mp3,0,,max_cards,,,0.0000,0.0000,6,0,0,0
@@ -6018,7 +6019,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089877255,5975,No pierdas los estribos.,Don't lose your temper.,Tatoeba arh sentence EngID 319855 SpaID 1278038.mp3,0,,max_cards,S16:no,,0.0000,0.0000,4,0,0,0
 1548089877256,5976,Estaba dándome un baño cuando me llamaste.,I was taking a bath when you called me.,Tatoeba arh sentence EngID 71344 SpaID 1563211.mp3,0,,max_cards,,,0.0000,0.0000,7,0,0,0
 1548089877257,5977,Atacarán.,They'll attack.,Tatoeba arh sentence EngID 2111350 SpaID 4183451.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
-1548089877258,5978,No tuve los arrestos para decirle la verdad.,I didn't have the courage to tell her the truth.,Tatoeba arh sentence EngID 394623 SpaID 1616223.mp3,0,,max_cards,F:tener|F:verdad|S16:no,,0.0000,0.0000,8,0,0,0
+1548089877258,5978,No tuve los arrestos para decirle la verdad.,I didn't have the courage to tell her the truth.,Tatoeba arh sentence EngID 394623 SpaID 1616223.mp3,0,,max_cards,F:tener|F:verdad|S140:decir|S16:no,,0.0000,0.0000,8,0,0,0
 1548089877259,5979,Aprendimos inglés.,We learned English.,Tatoeba arh sentence EngID 1743501 SpaID 2217542.mp3,0,,F2,,,0.0000,0.0000,2,0,0,0
 1548089877260,5980,¿Puedes trepar al árbol?,Can you climb the tree?,Tatoeba arh sentence EngID 43808 SpaID 1441513.mp3,0,,max_cards,S51:árbol,,0.0000,0.0000,4,0,0,0
 1548089877261,5981,Él es muy tacaño.,He is very stingy with his money.,Tatoeba arh sentence EngID 292056 SpaID 1435645.mp3,0,,max_cards,S3:él,,0.0000,0.0000,4,0,0,0
@@ -6075,7 +6076,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089877313,6033,El hotel se incendió.,The hotel was burned down.,Tatoeba arh sentence EngID 33391 SpaID 989438.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1548089877314,6034,¿Puedes identificarlo?,Can you identify that?,Tatoeba arh sentence EngID 3327773 SpaID 5568876.mp3,0,,F2,,,0.0000,0.0000,2,0,0,0
 1548089877315,6035,Este lugar es escalofriante.,This place is creepy.,Tatoeba arh sentence EngID 1898069 SpaID 1922692.mp3,0,,max_cards,S7:este,,0.0000,0.0000,4,0,0,0
-1548089877316,6036,Me alegro enormemente de verle.,I'm very pleased to meet you.,Tatoeba arh sentence EngID 63905 SpaID 339983.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
+1548089877316,6036,Me alegro enormemente de verle.,I'm very pleased to meet you.,Tatoeba arh sentence EngID 63905 SpaID 339983.mp3,0,,max_cards,S101:ver,,0.0000,0.0000,5,0,0,0
 1548089877317,6037,Consuela a Tom.,Comfort Tom.,Tatoeba arh sentence EngID 2111927 SpaID 2117400.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089877318,6038,Comprenderás luego.,You'll understand later.,Tatoeba arh sentence EngID 3823146 SpaID 3876803.mp3,0,,F2,,,0.0000,0.0000,2,0,0,0
 1548089877319,6039,La explicación de Tom era demasiado compleja.,Tom's explanation was too complex.,Tatoeba arh sentence EngID 680553 SpaID 841902.mp3,0,,F8,,,0.0000,0.0000,7,0,0,0
@@ -6668,7 +6669,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089877916,6636,Puede que te equivoques.,You may be wrong.,Tatoeba arh sentence EngID 5008941 SpaID 5011963.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1548089877917,6637,El avión todavía no ha despegado.,The plane still hasn't taken off.,Tatoeba arh sentence EngID 2268445 SpaID 2268446.mp3,0,,max_cards,S16:no,,0.0000,0.0000,6,0,0,0
 1548089877918,6638,¿Cuánto costaron?,How much did they cost?,Tatoeba arh sentence EngID 2912567 SpaID 4791921.mp3,0,,F2,,,0.0000,0.0000,2,0,0,0
-1548089877919,6639,Esta sopa está muy salada como para comerla.,This soup is too salty to eat.,Tatoeba arh sentence EngID 60994 SpaID 5137806.mp3,0,,max_cards,,,0.0000,0.0000,8,0,0,0
+1548089877919,6639,Esta sopa está muy salada como para comerla.,This soup is too salty to eat.,Tatoeba arh sentence EngID 60994 SpaID 5137806.mp3,0,,max_cards,S93:comer,,0.0000,0.0000,8,0,0,0
 1548089877920,6640,Soy codicioso.,I'm greedy.,Tatoeba arh sentence EngID 2202912 SpaID 3791805.mp3,0,,F2,,,0.0000,0.0000,2,0,0,0
 1548089877921,6641,Deja de chillar.,Stop screaming.,Tatoeba arh sentence EngID 2246807 SpaID 4557686.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089877922,6642,Compré un cactus.,I bought a cactus.,Tatoeba arh sentence EngID 2898163 SpaID 2222890.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
@@ -6690,7 +6691,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089877939,6659,Estas uvas están maduras.,These grapes are ripe.,Tatoeba arh sentence EngID 57385 SpaID 1715795.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1548089877940,6660,¿Cómo te gustaría que te llamaran?,What would you like to be called?,Tatoeba arh sentence EngID 37567 SpaID 1359615.mp3,0,,max_cards,F:gustar|F:llamar,,0.0000,0.0000,6,0,0,0
 1548089877941,6661,He comprado una botella de cerveza en la licorería.,I bought a bottle of beer at the liquor store.,Tatoeba arh sentence EngID 266122 SpaID 1626606.mp3,0,,max_cards,,,0.0000,0.0000,9,0,0,0
-1548089877942,6662,Este auto necesita lavarse.,This car needs washing.,Tatoeba arh sentence EngID 58709 SpaID 1396912.mp3,0,,max_cards,F:necesitar|S7:este,,0.0000,0.0000,4,0,0,0
+1548089877942,6662,Este auto necesita lavarse.,This car needs washing.,Tatoeba arh sentence EngID 58709 SpaID 1396912.mp3,0,,max_cards,F:necesitar|S132:lavar|S7:este,,0.0000,0.0000,4,0,0,0
 1548089877943,6663,Ya no estoy inspirada.,I'm not inspired anymore.,Tatoeba arh sentence EngID 2043 SpaID 752375.mp3,0,,max_cards,F:ya|S16:no,,0.0000,0.0000,4,0,0,0
 1548089877944,6664,Tengo mucho hipo.,I hiccup a lot.,Tatoeba arh sentence EngID 53088 SpaID 1279985.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089877945,6665,Ahora sería mejor que nos fuésemos a casa.,We'd better go home now.,Tatoeba arh sentence EngID 41710 SpaID 562119.mp3,0,,max_cards,F:ahora|F:casa|F:mejor,,0.0000,0.0000,8,0,0,0
@@ -6911,7 +6912,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089878161,6881,La gasolina es utilizada como combustible.,Gasoline is used for fuel.,Tatoeba arh sentence EngID 63714 SpaID 342956.mp3,0,,max_cards,,,0.0000,0.0000,6,0,0,0
 1548089878162,6882,Significas mucho para mí.,You mean a lot to me.,Tatoeba arh sentence EngID 139825 SpaID 1097554.mp3,0,,C1,,,0.0000,0.0000,4,0,0,0
 1548089878163,6883,Me dio el sarampión.,I came down with measles.,Tatoeba arh sentence EngID 2266896 SpaID 2266897.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
-1548089878164,6884,¿Puede decirme mi saldo?,Could you tell me my balance?,Tatoeba arh sentence EngID 245207 SpaID 1144469.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
+1548089878164,6884,¿Puede decirme mi saldo?,Could you tell me my balance?,Tatoeba arh sentence EngID 245207 SpaID 1144469.mp3,0,,max_cards,S140:decir,,0.0000,0.0000,4,0,0,0
 1548089878165,6885,Me reuní con él varias veces.,I met him several times.,Tatoeba arh sentence EngID 258917 SpaID 6071611.mp3,0,,max_cards,F:vez|S3:él,,0.0000,0.0000,6,0,0,0
 1548089878166,6886,Creo que recibiremos un montón de propuestas.,I think we'll get a lot of proposals.,Tatoeba arh sentence EngID 7134757 SpaID 7134951.mp3,0,,max_cards,F:creer,,0.0000,0.0000,7,0,0,0
 1548089878167,6887,"Aun a riesgo de parecer presuntuoso, me gustaría hacer un comentario.","At the risk of sounding too forward, I'd like to make a comment.",Tatoeba arh sentence EngID 243576 SpaID 5630588.mp3,0,,F1,,,0.0000,0.0000,11,0,0,0
@@ -7813,7 +7814,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089879076,7796,¿Es una pregunta capciosa?,Is this a trick question?,Tatoeba arh sentence EngID 3142816 SpaID 4158810.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1548089879077,7797,Oí esa canción cantada en francés.,I heard the song sung in French.,Tatoeba arh sentence EngID 254253 SpaID 1435593.mp3,0,,max_cards,S202:en,,0.0000,0.0000,6,0,0,0
 1548089879078,7798,Benditas sean las manos que lo hicieron posible.,My compliments to the hands that made this possible.,Tatoeba arh sentence EngID 628217 SpaID 628278.mp3,0,,F8,,,0.0000,0.0000,8,0,0,0
-1548089879079,7799,Sería mejor no beberlo.,It would be better not to drink that.,Tatoeba arh sentence EngID 6823671 SpaID 6823744.mp3,0,,max_cards,F:mejor|S16:no,,0.0000,0.0000,4,0,0,0
+1548089879079,7799,Sería mejor no beberlo.,It would be better not to drink that.,Tatoeba arh sentence EngID 6823671 SpaID 6823744.mp3,0,,max_cards,F:mejor|S16:no|S92:beber,,0.0000,0.0000,4,0,0,0
 1548089879080,7800,Avancemos.,Let's go on.,Tatoeba arh sentence EngID 10907652007914 SpaID 4948001.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
 1548089879081,7801,No necesitas apresurarte.,You have no need to hurry.,Tatoeba arh sentence EngID 16207 SpaID 1372076.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089879082,7802,Almorcé apresuradamente.,I ate a hasty lunch.,Tatoeba arh sentence EngID 256851 SpaID 559935.mp3,0,,F2,,,0.0000,0.0000,2,0,0,0
@@ -8062,7 +8063,6 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089879328,8048,Ellos renunciaron al plan.,They abandoned the plan.,Tatoeba arh sentence EngID 305742 SpaID 7011920.mp3,0,,max_cards,S6:ellos,,0.0000,0.0000,4,0,0,0
 1548089879329,8049,Rellene los huecos.,Fill in the blanks.,Tatoeba arh sentence EngID 18177 SpaID 1101400.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089879330,8050,Nuestra casa fue reconstruida completamente.,Our house was entirely rebuilt.,Tatoeba arh sentence EngID 4777566 SpaID 5663839.mp3,0,,max_cards,F:casa,,0.0000,0.0000,5,0,0,0
-1548089879331,8051,Quiero rascarme la nariz.,I want to scratch my nose.,Tatoeba arh sentence EngID 1205633 SpaID 1367733.mp3,0,,max_cards,F:querer|S75:nariz,,0.0000,0.0000,4,0,0,0
 1548089879332,8052,Eres muy posesivo.,You're very possessive.,Tatoeba arh sentence EngID 5938897 SpaID 7256742.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089879333,8053,Ponedlo donde queráis.,Put it where you like.,Tatoeba arh sentence EngID 240670 SpaID 1442659.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089879334,8054,Tomás se sentó pacientemente.,Tom sat patiently.,Tatoeba arh sentence EngID 2237646 SpaID 5140819.mp3,0,,F8,,,0.0000,0.0000,4,0,0,0
@@ -8791,6 +8791,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089880063,8783,Tom está hiperventilando.,Tom is hyperventilating.,Tatoeba arh sentence EngID 5854426 SpaID 5854925.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089880064,8784,Dispense usted que le interrumpa.,Pardon me for interrupting you.,Tatoeba arh sentence EngID 2267637 SpaID 2267638.mp3,0,,F8,,,0.0000,0.0000,5,0,0,0
 1548089880065,8785,Mándemelos.,Send them to me.,Tatoeba arh sentence EngID 2267711 SpaID 2267712.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
+1548089880066,8786,Me senté sobre el bordillo.,I sat on the curb.,Tatoeba arh sentence EngID 5858401 SpaID 5982451.mp3,0,,max_cards,S124:sentarse,,0.0000,0.0000,5,0,0,0
 1548089880067,8787,Soy muy desmañado.,I'm very clumsy.,Tatoeba arh sentence EngID 5858410 SpaID 5873871.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089880068,8788,Concrétese al tema.,Stick to the subject.,Tatoeba arh sentence EngID 2267771 SpaID 2267772.mp3,0,,F2,,,0.0000,0.0000,3,0,0,0
 1548089880069,8789,Os dije que os fuerais a casa. ¿Por qué seguís aquí?,I told you guys to go home. Why are you still here?,Tatoeba arh sentence EngID 953664 SpaID 966581.mp3,0,,F2,,,0.0000,0.0000,11,0,0,0
@@ -8964,7 +8965,6 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089880239,8959,Encontramos todos los árboles inclinados por la fuerza del viento.,We found all the trees leaning by the wind strength.,Tatoeba arh sentence EngID 6634956 SpaID 5629146.mp3,0,,max_cards,S163:viento|S17:todo|S51:árbol,,0.0000,0.0000,10,0,0,0
 1548089880240,8960,Este resumen es demasiado escueto; hay que desarrollarlo más para que sea comprensible.,This summary is too succinct; it needs further elaboration to make it understandable.,Tatoeba arh sentence EngID 6634957 SpaID 5629578.mp3,0,,F1,,,0.0000,0.0000,13,0,0,0
 1548089880241,8961,"Fingen ser unos santurrones, pero en realidad son hipócritas e infames.","They pretend to be sanctimonious but, in fact, they are hypocrite and despicable.",Tatoeba arh sentence EngID 6634958 SpaID 5629582.mp3,0,,F1,,,0.0000,0.0000,11,0,0,0
-1548089880242,8962,Ella le ayudó a atarse la corbata.,She helped him tie his tie.,Tatoeba arh sentence EngID 887203 SpaID 892163.mp3,0,,max_cards,,,0.0000,0.0000,7,0,0,0
 1548089880243,8963,"Los hechos son palmarios, nadie puede negarlos.","The facts are plain, nobody can deny them.",Tatoeba arh sentence EngID 6634960 SpaID 5629585.mp3,0,,max_cards,F:hecho,,0.0000,0.0000,7,0,0,0
 1548089880244,8964,"Pese a lo aparatoso del accidente, los pasajeros resultaron incólumes y salieron por su propio pie.","Despite the dramatic accident, the passengers were unhurt and walked out unharmed.",Tatoeba arh sentence EngID 6634961 SpaID 5629586.mp3,0,,F2,,,0.0000,0.0000,16,0,0,0
 1548089880245,8965,"El guiñol es un espectáculo con títeres o marionetas, especialmente dirigido a los niños, que ahora se ve poco.","Guiñol is a puppet show, especially aimed at children, which nowadays is seldomly seen.",Tatoeba arh sentence EngID 6634962 SpaID 5629588.mp3,0,,F1,,,0.0000,0.0000,19,0,0,0
@@ -9258,7 +9258,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1548089880536,9256,Apóyame.,Be supportive.,Tatoeba arh sentence EngID 2111952 SpaID 4557514.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
 1548089880537,9257,Quisiera que tradujeras esto al francés.,I'd like you to translate this into French.,Tatoeba arh sentence EngID 2451235 SpaID 3706054.mp3,0,,max_cards,,,0.0000,0.0000,6,0,0,0
 1548089880538,9258,Desistamos.,Let's quit.,Tatoeba arh sentence EngID 2007938 SpaID 2009017.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
-1548089880539,9259,¿Puedes cantarnos una canción en francés?,Would you sing us a song in French?,Tatoeba arh sentence EngID 2451365 SpaID 2482342.mp3,0,,max_cards,S202:en,,0.0000,0.0000,6,0,0,0
+1548089880539,9259,¿Puedes cantarnos una canción en francés?,Would you sing us a song in French?,Tatoeba arh sentence EngID 2451365 SpaID 2482342.mp3,0,,max_cards,S141:cantar|S202:en,,0.0000,0.0000,6,0,0,0
 1548089880540,9260,Besémonos.,Let's kiss.,Tatoeba arh sentence EngID 2007939 SpaID 2009022.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
 1548089880541,9261,Ella había nacido en el Toboso.,She was born in El Toboso.,Tatoeba arh sentence EngID 7633828 SpaID 5947103.mp3,0,,F8,,,0.0000,0.0000,6,0,0,0
 1548089880542,9262,Exigo un reembolso de mi dinero.,I demand a refund.,Tatoeba arh sentence EngID 2313720 SpaID 3953850.mp3,0,,F8,,,0.0000,0.0000,6,0,0,0

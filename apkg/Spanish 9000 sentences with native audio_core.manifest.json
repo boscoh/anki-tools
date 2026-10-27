@@ -1,5 +1,5 @@
 {
-  "build_date": "2026-10-26T23:48:50+00:00",
+  "build_date": "2026-10-27T00:12:57+00:00",
   "source": {
     "input": "apkg/Spanish 9000 sentences with native audio.apkg",
     "deck": "Spanish Core Sentences",
@@ -32,37 +32,37 @@
     "max_unranked": 0
   },
   "counts": {
-    "cards": 265,
-    "targets": 226,
+    "cards": 267,
+    "targets": 227,
     "absent": 0,
-    "absent_sense": 6,
+    "absent_sense": 5,
     "unchecked": 0,
     "unranked": 0,
-    "covered1": 220,
-    "covered2": 198,
-    "full": 198,
-    "outside": 177,
+    "covered1": 222,
+    "covered2": 199,
+    "full": 199,
+    "outside": 183,
     "outside_rare": 11,
     "tail_words": 0,
-    "sense_rows": 226,
+    "sense_rows": 227,
     "dropped_no_core": 0,
-    "bolded": 265,
+    "bolded": 267,
     "unbolded": 0,
     "name_hits": 0,
     "loan_hits": 0,
     "rows": 9263,
     "rejected_c3": 0,
     "rejected_c4": 0,
-    "sense_failures": 2506
+    "sense_failures": 2511
   },
   "frequency": {
     "path": "data/spanish_frequency.tsv",
     "spoken_weight": 0.5
   },
   "files": {
-    "core_csv": "sha256:98ff21d10bfb93afb4550ea499e592346d336825761f60344ffac8de5cef0a00",
-    "coverage_csv": "sha256:97c6863980872248560ec3ccb5df20fefbca83f66746d8400331f3566b75e671",
+    "core_csv": "sha256:06864fba039c9c682fcc776e13ebefd972e68014dbe4fd8f8181cec664ffbff6",
+    "coverage_csv": "sha256:d0eba39c17899278031d501d8c253233266d7e8d98a0d109736c6023ee29ccd2",
     "input_apkg": "sha256:f67605459feb506bcbbb95830a356ff349c21c28e136c8efc3d82d253ec244e9"
   },
-  "kept_order": "sha256:0cbd860e51cfb45df0ca0ce62558630ed3b1c12625458229a1fee4f9610b2fa0"
+  "kept_order": "sha256:0657afff1725ff86c317286d33dabce74b318fed99a755ae684afad90067efbb"
 }

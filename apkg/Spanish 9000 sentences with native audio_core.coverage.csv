@@ -97,12 +97,13 @@ S112:cazar,cazar,to hunt,S,112,2,1,partial
 S113:golpear,golpear,to hit,S,113,2,2,covered
 S114:cortar,cortar,to cut,S,114,2,2,covered
 S115:dividir,dividir,to split,S,115,2,2,covered
+S117:rascar,rascar,to scratch,S,117,2,1,partial
 S118:cavar,cavar,to dig,S,118,2,2,covered
 S119:nadar,nadar,to swim,S,119,2,2,covered
 S120:volar,volar,to fly,S,120,2,2,covered
 S121:caminar,caminar,to walk,S,121,2,2,covered
 S122:venir,venir,to come,S,122,2,2,covered
-S123:acostarse,acostarse,to lie down,S,123,2,0,absent_sense
+S123:acostarse,acostarse,to lie down,S,123,2,1,partial
 S124:sentarse,sentarse,to sit,S,124,2,2,covered
 S126:girar,girar,to turn (intransitive),S,126,2,2,covered
 S127:caer,caer,to fall,S,127,2,2,covered
@@ -112,7 +113,7 @@ S133:limpiar,limpiar,to wipe,S,133,2,0,absent_sense
 S134:tirar de,tirar de,to pull,S,134,2,0,absent_sense
 S135:empujar,empujar,to push,S,135,2,2,covered
 S136:lanzar,lanzar,to throw,S,136,2,1,partial
-S137:atar,atar,to tie,S,137,2,1,partial
+S137:atar,atar,to tie,S,137,2,2,covered
 S138:coser,coser,to sew,S,138,2,2,covered
 S139:contar,contar,to count,S,139,2,2,covered
 S140:decir,decir,to say,S,140,2,2,covered
