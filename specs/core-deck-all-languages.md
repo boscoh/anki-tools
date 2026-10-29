@@ -619,7 +619,7 @@ in both.
 | 1 | `Audio` | the input audio field text, `[sound:<file>]`, verbatim | `front.html` and `back.html` of the mode |
 | 2 | `Sentence` | `InputCard.sentence`, the clean plain text; `fill_bold` writes the core word in bold | `back.html`, K15, G5, G17 |
 | 3 | `English` | the input English field text, verbatim; the pack English for a reserve card | `back.html` |
-| 4 | `Romanization` | the input field named by `profile.romanization_source`, verbatim; absent when the source is None | `back.html` of every mode |
+| 4 | `Romanization` | the input field named by `profile.romanization_source`, verbatim; absent when the source is None; Cantonese writes the jyutping of `Sentence` instead | `back.html` of every mode |
 | 5 | `Core` | the target form of the card (14.7) | `back.html`, K19, G17 |
 | 6 | `CoreGloss` | the English gloss of `Core` (14.7) | `back.html`, K19, G17 |
 
@@ -635,7 +635,9 @@ Rules:
   `romanization_source = "Sentence (Latin)"` and Cantonese sets
   `romanization_source = "Jyutping"`. The flow adds the field and copies the
   input value. A language with no romanization leaves the source None, so the
-  field and the card line are absent.
+  field and the card line are absent. The LTL deck labels Yale as `Jyutping`,
+  so `cantonese.core.finalize_output` writes the jyutping of the sentence over
+  the copied value and reports the count.
 - `Eng Audio` is not an output field, because no template reads it. The
   `Eng Audio` branch of `cantonese.core.finalize_output` and its media delete
   go away with the field.
@@ -676,11 +678,11 @@ backs gain this line.
 
 The CSS comes from `profile.card_css()`, the value of `templates/shared/card.css`
 plus the language layer, as today. K14 and G15 check it.
-The romanization is one shared rule, not one rule per language. A new language
-sets `romanization_source` to the input field that holds the reading. The flow
-adds `Romanization` to the field set. When the source is None, the flow removes
-the block from the template, because Anki rejects a template that names a
-missing field. When the field exists, every back shows the line.
+The romanization field is one shared rule, not one rule per language. A new
+language sets `romanization_source` to the input field that holds the reading.
+The flow adds `Romanization` to the field set. When the source is None, the
+flow removes the block from the template, because Anki rejects a template that
+names a missing field. When the field exists, every back shows the line.
 
 
 ### 14.3 The deck title and the note type name

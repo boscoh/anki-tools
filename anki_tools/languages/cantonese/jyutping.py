@@ -52,7 +52,7 @@ def get_jyutping(text: str) -> str:
     if not HAS_TOJYUTPING:
         return ""
     try:
-        clean_text = re.sub(r'[！？。，、：；"""（）]', "", text)
+        clean_text = re.sub(r'[！？。，、：；"""（）!?.,;:]', "", text)
         if not clean_text:
             return ""
         result = ToJyutping.get_jyutping_text(clean_text)

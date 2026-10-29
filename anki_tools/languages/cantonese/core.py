@@ -35,8 +35,9 @@ from anki_tools.languages.cantonese.profile import (
     han_tokens,
     load_word_table,
     prepare_text,
+    sentence_jyutping,
 )
-from anki_tools.ranking import coreflow
+from anki_tools.ranking import assemble, coreflow
 from anki_tools.ranking.core import CoreOptions
 from anki_tools.ranking.deckprofile import LanguageDeckProfile
 from anki_tools.sentence_pack.pack import load_css
@@ -179,6 +180,9 @@ def finalize_output(output_path: Path, core_csv: Path) -> int:
     The flow writes bold text, but a card without an assigned target keeps the
     input sentence, and the shared rules read an ASCII final mark.
 
+    The flow also copies the input ``Jyutping`` field, and the LTL deck holds
+    Yale there. The function writes the jyutping of the sentence instead.
+
     :param output_path: Output APKG file.
     :param core_csv: Card CSV of the run.
     :returns: The count of rewritten notes.
@@ -192,11 +196,13 @@ def finalize_output(output_path: Path, core_csv: Path) -> int:
     if not rows:
         return 0
     written = 0
+    replaced = 0
     with AnkiPackage(output_path) as package:
         models = package.get_models()
         model_id = coreflow.find_only_model_id(models)
         names = [field["name"] for field in models[model_id]["flds"]]
         sentence_index = names.index(coreflow.OUTPUT_SENTENCE_FIELD)
+        romanization_index = names.index(assemble.OUTPUT_ROMANIZATION_FIELD)
         for note in package.get_notes():
             note_id = int(note["id"])
             sentence = rows.get(note_id)
@@ -208,9 +214,17 @@ def finalize_output(output_path: Path, core_csv: Path) -> int:
             if "<b>" not in text and _BOLD_PATTERN.sub("", text) != sentence:
                 package.update_note_field(note_id, sentence_index, sentence)
                 changed = True
+            reading = sentence_jyutping(_BOLD_PATTERN.sub("", sentence))
+            if reading and values[romanization_index] != reading:
+                package.update_note_field(note_id, romanization_index, reading)
+                replaced += 1
             written += int(changed)
         package.touch()
         package.save(output_path)
+    print(
+        f"Romanization: {replaced} of {len(rows)} values replaced "
+        "(input Jyutping field holds another scheme)"
+    )
     return written
 
 CANTONESE_LANGUAGE = LanguageDeckProfile(
