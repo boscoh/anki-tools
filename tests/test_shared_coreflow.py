@@ -312,7 +312,7 @@ class TestManifestCounts:
         )
 
         assert counts["cards"] == 2
-        assert counts["targets"] == 2
+        assert counts["targets"] == 1
         assert counts["covered1"] == 1
         assert counts["covered2"] == 0
         assert counts["full"] == 0

@@ -314,6 +314,33 @@ class TestFilter:
         assert passed == []
         assert reasons[0] == "C4"
 
+    def test_c4_rejects_a_han_loan_word_as_a_span(self) -> None:
+        cards = [_card("我想喝咖啡?", english="I want coffee.")]
+        tokens = [[("我", "PRON"), ("想", "VERB"), ("喝", "VERB"), ("咖啡", "NOUN")]]
+
+        passed, reasons = _filter(cards, tokens, [], ["咖啡"])
+
+        assert passed == []
+        assert reasons[0] == "C4"
+
+    def test_c4_keeps_a_han_sentence_without_a_loan_word(self) -> None:
+        cards = [_card("我想喝茶?", english="I want tea.")]
+        tokens = [[("我", "PRON"), ("想", "VERB"), ("喝", "VERB"), ("茶", "NOUN")]]
+
+        passed, reasons = _filter(cards, tokens, [], ["咖啡"])
+
+        assert passed == [0]
+        assert reasons[0] == ""
+
+    def test_c3_rejects_a_han_name_as_a_span(self) -> None:
+        cards = [_card("我爱北京?", english="I love Beijing.")]
+        tokens = [[("我", "PRON"), ("爱", "VERB"), ("北京", "NOUN")]]
+
+        passed, reasons = _filter(cards, tokens, ["北京"])
+
+        assert passed == []
+        assert reasons[0] == "C3"
+
     def test_c5_rejects_a_card_without_audio(self) -> None:
         cards = [_card("Le chat mange.", audio="missing.mp3")]
         tokens = [[("le", "DET"), ("chat", "NOUN"), ("manger", "VERB")]]
@@ -424,6 +451,66 @@ class TestFiles:
         assert [row["sentence"] for row in rows] == ["B.", "A."]
         assert [row["rank"] for row in rows] == ["1", "2"]
         assert kept_order_hash(cards, [1, 0]) == kept_order_hash(cards, [1, 0])
+
+
+class TestBoldColumn:
+    def test_the_card_csv_holds_a_bold_row_and_a_plain_row(
+        self, tmp_path: Path
+    ) -> None:
+        run, _output, _profile = _run_core(tmp_path)
+
+        with run.sides["core.csv"].open(encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+
+        assert {(row["kept"], row["bold"]) for row in rows} == {
+            ("1", "1"),
+            ("0", "0"),
+        }
+
+
+def _absent_core(tmp_path: Path) -> tuple[deck_writer.RunFiles, Path, CoreProfile]:
+    """Run the tiny deck with one tier S target that no card holds."""
+    source = _tiny_deck(tmp_path)
+    profile = replace(
+        _offline_profile(tmp_path),
+        word_table=lambda: [(1, "chat", "cat"), (2, "fromage", "cheese")],
+    )
+    output = tmp_path / "core.apkg"
+    run = coreflow.run_core(
+        coreflow.CoreRequest(
+            input_path=source,
+            output_path=output,
+            core_words=0,
+            max_cards=profile.default_options.max_cards,
+        ),
+        profile,
+    )
+    return run, output, profile
+
+
+class TestCoverageFile:
+    def test_an_absent_target_gets_a_coverage_row(self, tmp_path: Path) -> None:
+        run, _output, _profile = _absent_core(tmp_path)
+
+        with run.sides["coverage.csv"].open(encoding="utf-8", newline="") as handle:
+            rows = {row["word"]: row for row in csv.DictReader(handle)}
+        manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
+
+        assert rows["fromage"]["status"] == "absent"
+        assert rows["fromage"]["count"] == "0"
+        assert manifest["counts"]["absent"] == 1
+        assert manifest["counts"]["targets"] == len(rows) - 1
+
+    def test_the_cover_gates_skip_the_absent_target(self, tmp_path: Path) -> None:
+        _run, output, profile = _absent_core(tmp_path)
+        files = coregates.CoreFiles(output, profile)
+
+        passed, message = coregates.gate_covered1(files)
+        _ok, share = coregates.gate_covered2(files)
+
+        assert passed, message
+        assert message == "covered 1 of 1"
+        assert share == "two cards for 0 of 1 (0.000)"
 
 
 def _tiny_deck(tmp_path: Path) -> Path:

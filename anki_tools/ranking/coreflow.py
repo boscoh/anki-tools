@@ -70,6 +70,7 @@ COVERAGE_COLUMNS: tuple[str, ...] = (
 FILTER_KEYS = ("F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "C1", "C2", "C3", "C4", "C5")
 TARGET_SEPARATOR = "|"
 STATUSES = ("covered", "partial", "absent", "absent_sense", "unchecked")
+UNCOVERABLE_STATUSES: frozenset[str] = frozenset({"absent", "absent_sense"})
 
 OUTPUT_AUDIO_FIELD = "Audio"
 OUTPUT_SENTENCE_FIELD = "Sentence"
@@ -252,20 +253,27 @@ def _has_predicate(tokens: Sequence[tuple[str, str]]) -> bool:
     return any(pos in {"VERB", "AUX", "ADJ"} for _lemma, pos in tokens)
 
 
-def _holds_name(sentence: str, names: Collection[str]) -> bool:
-    """Give rule C3: a whole word of the name list occurs in the sentence."""
-    words = {word.casefold() for word in _WORD_PATTERN.findall(sentence)}
-    return any(name.casefold() in words for name in names)
+_HAN_PATTERN = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
 
 
-def _holds_loanword(sentence: str, loanwords: Collection[str]) -> bool:
-    """Give rule C4: a loan word occurs in the sentence."""
-    words = {word.casefold() for word in _WORD_PATTERN.findall(sentence)}
-    for loan in loanwords:
-        parts = [
-            part.casefold() for part in _WORD_PATTERN.findall(loan)
-        ]
-        if parts and all(part in words for part in parts):
+def _holds_word(sentence: str, words: Collection[str]) -> bool:
+    """Tell when one word of the list occurs in the sentence.
+
+    A Latin word matches a whole token of the sentence. A word with a Han
+    character matches as a character span, because the word pattern gives one
+    token for a whole Han run.
+
+    :param sentence: Prepared sentence text.
+    :param words: Name list of rule C3 or loan word list of rule C4.
+    :returns: True when one word of the list occurs in the sentence.
+    """
+    tokens = {token.casefold() for token in _WORD_PATTERN.findall(sentence)}
+    text = sentence.casefold()
+    for word in words:
+        parts = [part.casefold() for part in _WORD_PATTERN.findall(word)]
+        if parts and all(part in tokens for part in parts):
+            return True
+        if _HAN_PATTERN.search(word) and word.casefold() in text:
             return True
     return False
 
@@ -308,9 +316,9 @@ def filter_core_cards(
             reasons[index] = "C1"
         elif has_orphan(card.sentence):
             reasons[index] = "C2"
-        elif _holds_name(card.sentence, names):
+        elif _holds_word(card.sentence, names):
             reasons[index] = "C3"
-        elif _holds_loanword(card.sentence, loanwords):
+        elif _holds_word(card.sentence, loanwords):
             reasons[index] = "C4"
         elif not card.audio or card.audio not in media:
             reasons[index] = "C5"
@@ -387,6 +395,7 @@ def card_rows(
     reasons: Sequence[str],
     *,
     assigned: Mapping[int, str],
+    bolded: Collection[int] = (),
 ) -> list[dict[str, Any]]:
     """Build the card CSV rows in card order.
 
@@ -398,6 +407,7 @@ def card_rows(
     :param targets: Core list.
     :param reasons: Filter reason per input index.
     :param assigned: Target key of each kept card.
+    :param bolded: Input indices of the kept cards whose sentence holds bold text.
     :returns: One row per kept card, then one row per other input card.
     """
     by_key = {target.key: target for target in targets}
@@ -425,6 +435,7 @@ def card_rows(
                 "cost": f"{result.cost.get(index, 0.0):.4f}",
                 "new_lemmas": len(new),
                 "sense": unchecked,
+                "bold": int(index in bolded),
             }
         )
     kept = set(ordered)
@@ -560,7 +571,7 @@ def manifest_counts(
     statuses = Counter(row["status"] for row in coverage)
     return {
         "cards": len(ordered),
-        "targets": len(coverage),
+        "targets": len(coverage) - statuses["absent"],
         "absent": statuses["absent"],
         "absent_sense": statuses["absent_sense"],
         "unchecked": statuses["unchecked"],
@@ -1033,6 +1044,7 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
     hits, sense_failures, present = core_hits(
         cards, tokens, passed, targets, profile
     )
+    pool_targets = targets
     targets = [target for target in targets if present.get(target.key, False)]
     if not targets:
         raise ValueError("No core target occurs in a candidate card.")
@@ -1080,11 +1092,18 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
         core_words,
         bold=True,
     )
+    bold_slot = output_fields(profile).index(OUTPUT_SENTENCE_FIELD)
+    bolded_indexes = {
+        index
+        for index in kept
+        if note_fields[cards[index].note_id][bold_slot] != cards[index].sentence
+    }
 
     rows = card_rows(
-        cards, tokens, result, kept, candidates, targets, reasons, assigned=keys
+        cards, tokens, result, kept, candidates, targets, reasons,
+        assigned=keys, bolded=bolded_indexes,
     )
-    coverage_rows = coverage_rows_of(targets, result, present, quotas)
+    coverage_rows = coverage_rows_of(pool_targets, result, present, quotas)
     counts = manifest_counts(
         rows, coverage_rows, result, candidates, kept, ranks, options,
         bolded=bolded, unbolded=unbolded, dropped_no_core=len(dropped),

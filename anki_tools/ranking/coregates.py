@@ -23,6 +23,7 @@ from anki_tools.ranking.coreflow import (
     OUTPUT_SENTENCE_FIELD,
     STATUSES,
     TARGET_SEPARATOR,
+    UNCOVERABLE_STATUSES,
     filter_core_cards,
     read_loanwords,
     read_output,
@@ -136,7 +137,7 @@ def gate_covered1(files: CoreFiles) -> tuple[bool, str]:
     """K2: every coverable target has a card."""
     coverage = files.coverage()
     covered = sum(1 for row in coverage if int(row["count"]) >= 1)
-    targets = sum(1 for row in coverage if row["status"] != "absent_sense")
+    targets = sum(1 for row in coverage if row["status"] not in UNCOVERABLE_STATUSES)
     ok = covered == targets
     return ok, f"covered {covered} of {targets}"
 
@@ -151,7 +152,7 @@ def gate_covered2(files: CoreFiles) -> tuple[bool, str]:
     """
     coverage = files.coverage()
     covered = sum(1 for row in coverage if int(row["count"]) >= 2)
-    targets = sum(1 for row in coverage if row["status"] != "absent_sense")
+    targets = sum(1 for row in coverage if row["status"] not in UNCOVERABLE_STATUSES)
     share = covered / targets if targets else 0.0
     return True, f"two cards for {covered} of {targets} ({share:.3f})"
 
