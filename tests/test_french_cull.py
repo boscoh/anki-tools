@@ -427,10 +427,10 @@ def test_coverage_gates_read_the_profile_values(tmp_path: Path) -> None:
         ],
     )
 
-    passed, message = cullgates.gate_target_coverage(files)
-    twice_passed, twice_message = cullgates.gate_double_coverage(files)
+    passed, message = cullgates.gate_coverage_once(files)
+    twice_passed, twice_message = cullgates.gate_coverage_twice(files)
     french = cullgates.cull_files(tmp_path / "gated.apkg", cull_fr.FRENCH_CULL_PROFILE)
-    french_passed, french_message = cullgates.gate_target_coverage(french)
+    french_passed, french_message = cullgates.gate_coverage_once(french)
 
     assert passed is True
     assert message == "3/4 targets covered (0.750, gate 0.7)"

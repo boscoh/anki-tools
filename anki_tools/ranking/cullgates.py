@@ -107,7 +107,7 @@ def _exempt_lemmas(files: CullFiles) -> set[str]:
     return {row["word"] for row in files.coverage()[:top]}
 
 
-def gate_card_count(files: CullFiles) -> tuple[bool, str]:
+def gate_card_cap(files: CullFiles) -> tuple[bool, str]:
     """G1: the card count is the cap, or the pool has no more cards.
 
     A kept card that holds no core word leaves the deck, so the count before
@@ -163,7 +163,7 @@ def gate_use_cap(files: CullFiles) -> tuple[bool, str]:
     return True, f"max {most} uses outside the exempt {len(exempt)}"
 
 
-def gate_target_coverage(files: CullFiles) -> tuple[bool, str]:
+def gate_coverage_once(files: CullFiles) -> tuple[bool, str]:
     """G3: target coverage reaches the gate share."""
     rows = files.coverage()
     covered = sum(1 for row in rows if int(row.get("count", 0)) >= 1)
@@ -174,7 +174,7 @@ def gate_target_coverage(files: CullFiles) -> tuple[bool, str]:
     return bool(rows) and share >= gate, message
 
 
-def gate_double_coverage(files: CullFiles) -> tuple[bool, str]:
+def gate_coverage_twice(files: CullFiles) -> tuple[bool, str]:
     """G4: the share of targets with two cards reaches the gate share."""
     rows = files.coverage()
     twice = sum(1 for row in rows if int(row.get("count", 0)) >= 2)
@@ -185,7 +185,7 @@ def gate_double_coverage(files: CullFiles) -> tuple[bool, str]:
     return bool(rows) and share >= gate, message
 
 
-def gate_filter(files: CullFiles) -> tuple[bool, str]:
+def gate_filter_recheck(files: CullFiles) -> tuple[bool, str]:
     """G5: every kept card passes the filter rules."""
     min_words = int(files.params().get("min_words", 0))
     max_words = int(files.params().get("max_words", 0))
@@ -252,7 +252,7 @@ def gate_kept_order(files: CullFiles) -> tuple[bool, str]:
     """G11: the kept set and order match the manifest of the run."""
     return _gate_kept_order(files, files.rows())
 
-def gate_coverage_rows(files: CullFiles) -> tuple[bool, str]:
+def gate_coverage_shape(files: CullFiles) -> tuple[bool, str]:
     """G12: the coverage CSV has one row per target word."""
     rows = files.coverage()
     wanted = int(files.params().get("target_words", 0))
@@ -303,18 +303,18 @@ def gate_card_templates(files: CullFiles) -> tuple[bool, str]:
 
 
 GATES: tuple[Gate, ...] = (
-    Gate("G1", gate_card_count),
+    Gate("G1", gate_card_cap),
     Gate("G2", gate_use_cap),
-    Gate("G3", gate_target_coverage),
-    Gate("G4", gate_double_coverage),
-    Gate("G5", gate_filter),
+    Gate("G3", gate_coverage_once),
+    Gate("G4", gate_coverage_twice),
+    Gate("G5", gate_filter_recheck),
     Gate("G6", gate_similarity),
     Gate("G7", gate_audio),
     Gate("G8", gate_note_count),
     Gate("G9", gate_media),
     Gate("G10", gate_identity),
     Gate("G11", gate_kept_order),
-    Gate("G12", gate_coverage_rows),
+    Gate("G12", gate_coverage_shape),
     Gate("G13", gate_manifest_hashes),
     Gate("G14", gate_swadesh),
     Gate("G15", gate_card_templates),

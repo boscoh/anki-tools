@@ -781,7 +781,7 @@ def test_gate_core_word_reports_an_empty_core(tmp_path: Path) -> None:
     assert "no core word" in failed_message
 
 
-def test_gate_card_count_counts_the_no_core_drop() -> None:
+def test_gate_card_cap_counts_the_no_core_drop() -> None:
     def files(kept: int, dropped: int) -> SimpleNamespace:
         return SimpleNamespace(
             rows=lambda: [{"kept": "1"}] * kept,
@@ -791,9 +791,9 @@ def test_gate_card_count_counts_the_no_core_drop() -> None:
             },
         )
 
-    passed, message = cullgates.gate_card_count(files(924, 76))
+    passed, message = cullgates.gate_card_cap(files(924, 76))
     assert passed, message
 
-    passed, message = cullgates.gate_card_count(files(923, 76))
+    passed, message = cullgates.gate_card_cap(files(923, 76))
     assert not passed
     assert "923 kept + 76 dropped" in message

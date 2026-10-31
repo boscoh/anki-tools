@@ -554,7 +554,7 @@ def gate_apkg(
     return True, f"{info['notes']} notes with model {model_name!r}"
 
 
-def gate_proper_sentences(
+def gate_filter_recheck(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
     """Gate G14: core and scaffold cards pass the complete-sentence rules.
@@ -807,7 +807,7 @@ GENERIC_GATES: tuple[tuple[str, GateCheck], ...] = (
     ("G10", gate_coverage),
     ("G11", gate_manifest_counts),
     ("G13", gate_apkg),
-    ("G14", gate_proper_sentences),
+    ("G14", gate_filter_recheck),
     ("G15", gate_review_file),
     ("G16", gate_word_audio),
     ("G18", gate_no_native_audio),

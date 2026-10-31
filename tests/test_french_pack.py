@@ -12,7 +12,7 @@ from anki_tools.sentence_pack import audio, pack, pool, select
 from anki_tools.sentence_pack.audit import (
     AuditInputs,
     gate_noun_gender,
-    gate_proper_sentences,
+    gate_filter_recheck,
 )
 from anki_tools.sentence_pack.guards import check_sentence_shape
 from anki_tools.languages.french import profile as french
@@ -398,12 +398,12 @@ def test_scaffold_cards_take_the_g14_exemption(tmp_path: Path) -> None:
         }
     ]
     inputs = _audit_inputs(tmp_path, table, rows)
-    passed, message = gate_proper_sentences(inputs, french.FRENCH)
+    passed, message = gate_filter_recheck(inputs, french.FRENCH)
     assert passed, message
 
     core = [dict(rows[0], tier="core")]
     inputs = _audit_inputs(tmp_path, table, core)
-    passed, message = gate_proper_sentences(inputs, french.FRENCH)
+    passed, message = gate_filter_recheck(inputs, french.FRENCH)
     assert not passed
     assert "F6" in message
 

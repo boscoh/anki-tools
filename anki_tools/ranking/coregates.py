@@ -62,16 +62,16 @@ __all__ = [
     "gate_card_count",
     "gate_core_word",
     "gate_counts",
-    "gate_coverage",
-    "gate_covered1",
-    "gate_filter",
+    "gate_coverage_agreement",
+    "gate_covered_targets",
+    "gate_filter_recheck",
     "gate_hashes",
-    "gate_hit",
+    "gate_target_in_sentence",
     "gate_identity",
     "gate_order",
     "gate_outside",
     "gate_output_model",
-    "gate_sense",
+    "gate_unchecked_sense",
     "gate_similarity",
     "gate_tail",
     "gate_templates",
@@ -134,7 +134,7 @@ def gate_card_count(files: CoreFiles) -> tuple[bool, str]:
     return ok, f"manifest {counts['cards']}, CSV {len(kept)}, APKG {cards}"
 
 
-def gate_covered1(files: CoreFiles) -> tuple[bool, str]:
+def gate_covered_targets(files: CoreFiles) -> tuple[bool, str]:
     """K2: every coverable target has a card."""
     coverage = files.coverage()
     covered = sum(1 for row in coverage if int(row["count"]) >= 1)
@@ -158,7 +158,7 @@ def gate_outside(files: CoreFiles) -> tuple[bool, str]:
     )
 
 
-def gate_filter(files: CoreFiles) -> tuple[bool, str]:
+def gate_filter_recheck(files: CoreFiles) -> tuple[bool, str]:
     """K5: every kept card passes F1 to F9 and C1 to C5."""
     output = files.output()
     cards = output["cards"]
@@ -219,7 +219,7 @@ def _key_of(row: dict[str, str]) -> str:
     return row["key"]
 
 
-def gate_coverage(files: CoreFiles) -> tuple[bool, str]:
+def gate_coverage_agreement(files: CoreFiles) -> tuple[bool, str]:
     """K11: the coverage CSV agrees with the card CSV."""
     coverage = files.coverage()
     kept = _kept(files)
@@ -251,7 +251,7 @@ def gate_hashes(files: CoreFiles) -> tuple[bool, str]:
     file_keys = {"core_csv": files.core_csv, "coverage_csv": files.coverage_csv}
     return _gate_manifest_hashes(files, file_keys)
 
-def gate_hit(files: CoreFiles) -> tuple[bool, str]:
+def gate_target_in_sentence(files: CoreFiles) -> tuple[bool, str]:
     """K13: each card holds the form or lemma of its targets."""
     coverage = files.coverage()
     form = {_key_of(row): (row["tier"], row["word"]) for row in coverage}
@@ -360,7 +360,7 @@ def gate_core_word(files: CoreFiles) -> tuple[bool, str]:
     message = f"{filled} core word(s), {bolded} bold card(s), {len(problems)} bad"
     return not problems, f"{message}: {_sample(problems)}"
 
-def gate_sense(files: CoreFiles) -> tuple[bool, str]:
+def gate_unchecked_sense(files: CoreFiles) -> tuple[bool, str]:
     """K16: the unchecked targets stay inside the limit."""
     coverage = files.coverage()
     unchecked = sum(1 for row in coverage if row["status"] == "unchecked")
@@ -388,19 +388,19 @@ def gate_tail(files: CoreFiles) -> tuple[bool, str]:
 
 GATES: tuple[Gate, ...] = (
     Gate("K1", gate_card_count),
-    Gate("K2", gate_covered1),
+    Gate("K2", gate_covered_targets),
     Gate("K4", gate_outside),
-    Gate("K5", gate_filter),
+    Gate("K5", gate_filter_recheck),
     Gate("K6", gate_similarity),
     Gate("K7", gate_audio),
     Gate("K8", gate_counts),
     Gate("K9", gate_identity),
     Gate("K10", gate_order),
-    Gate("K11", gate_coverage),
+    Gate("K11", gate_coverage_agreement),
     Gate("K12", gate_hashes),
-    Gate("K13", gate_hit),
+    Gate("K13", gate_target_in_sentence),
     Gate("K14", gate_templates),
-    Gate("K16", gate_sense),
+    Gate("K16", gate_unchecked_sense),
     Gate("K18", gate_tail),
     Gate("K19", gate_core_word),
     Gate("K20", gate_unranked),

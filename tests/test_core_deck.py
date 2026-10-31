@@ -505,7 +505,7 @@ class TestCoverageFile:
         _run, output, profile = _absent_core(tmp_path)
         files = coregates.CoreFiles(output, profile)
 
-        passed, message = coregates.gate_covered1(files)
+        passed, message = coregates.gate_covered_targets(files)
 
         assert passed, message
         assert message == "covered 1 of 1"
