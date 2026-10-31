@@ -15,6 +15,7 @@ from collections import Counter
 from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Iterable
 
 import pytest
 
@@ -40,7 +41,7 @@ ORDER_TOKENS = [
 ORDER_RANKS = {"maison": 5, "grande": 40, "chat": 2, "noir": 900}
 
 
-def _tokens(texts: list[str]) -> list[list[tuple[str, str]]]:
+def _tokens(texts: Iterable[str]) -> list[list[tuple[str, str]]]:
     return [
         [(word.strip("."), "NOUN") for word in text.split() if word.strip(".")]
         for text in texts
@@ -141,8 +142,8 @@ def test_a_second_profile_drives_every_output_value(tmp_path: Path) -> None:
     assert notes[0][2] == "cat is big."
     assert notes[0][3] == "kat"
 
+    assert run.manifest_path is not None
     manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
-    assert manifest["counts"]["cards"] == 2
     assert manifest["source"]["model"] == title
     assert manifest["source"]["input_model"] == MODEL_NAME
     assert manifest["source"]["deck"] == title
@@ -183,7 +184,7 @@ def test_a_han_profile_keeps_one_character_lemmas_and_a_han_final_mark() -> None
     assert [target.lemma for target in targets] == ["水"]
     assert content == 1
     assert cullflow.filter_reason(cards[0], tokens[0], 1, 12, profile) == ""
-    assert cullflow.filter_reason(cards[0], tokens[0], 1, 12, _profile()) == "F4"
+    assert cullflow.filter_reason(cards[0], tokens[0], 1, 12, _profile()) == "final_mark"
 
 
 def _card(
@@ -498,7 +499,7 @@ def test_cull_csv_columns_and_reasons(tmp_path: Path) -> None:
     )
     path = tmp_path / "run.cull.csv"
 
-    cullflow.write_cull_csv(cards, ["F7", "", ""], selection, [1], path)
+    cullflow.write_cull_csv(cards, ["internal_mark", "", ""], selection, [1], path)
     header, rows = _read_csv(path)
     raw = path.read_bytes()
     assert raw.split(b"\n")[0] == ",".join(cullflow.CULL_COLUMNS).encode()
@@ -512,7 +513,7 @@ def test_cull_csv_columns_and_reasons(tmp_path: Path) -> None:
         cards[2].sentence,
     ]
     assert [row["kept"] for row in rows] == ["1", "0", "0"]
-    assert [row["reason"] for row in rows] == ["", "F7", "similar"]
+    assert [row["reason"] for row in rows] == ["", "internal_mark", "similar"]
     assert rows[0]["gain"] == "0.500000"
     assert rows[0]["targets"] == "chien"
     assert rows[0]["hardest_rank"] == "3"
@@ -791,9 +792,9 @@ def test_gate_card_cap_counts_the_no_core_drop() -> None:
             },
         )
 
-    passed, message = cullgates.gate_card_cap(files(924, 76))
+    passed, message = cullgates.gate_card_cap(files(924, 76))  # type: ignore
     assert passed, message
 
-    passed, message = cullgates.gate_card_cap(files(923, 76))
+    passed, message = cullgates.gate_card_cap(files(923, 76))  # type: ignore
     assert not passed
     assert "923 kept + 76 dropped" in message

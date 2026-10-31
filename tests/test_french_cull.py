@@ -128,19 +128,24 @@ class TestNames:
 @pytest.mark.parametrize(
     ("rule", "sentence", "english", "tokens"),
     [
-        ("F1", "Le chat mange vite.", "Hi", BASE_TOKENS),
-        ("F2", "Chat mange.", ENGLISH, [("chat", "NOUN"), ("mange", "VERB")]),
-        ("F3", "Le chat a 3 ans.", ENGLISH, BASE_TOKENS),
-        ("F3", "Le chat [noir] mange.", ENGLISH, BASE_TOKENS),
-        ("F3", "Voir www.exemple.fr.", ENGLISH, BASE_TOKENS),
-        ("F3", "Le chat mange...", ENGLISH, BASE_TOKENS),
-        ("F4", "Le chat mange vite", ENGLISH, BASE_TOKENS),
-        ("F5", "Le chat mange. Le chien dort.", ENGLISH, BASE_TOKENS),
-        ("F6", "Le chat « mange » vite.", ENGLISH, BASE_TOKENS),
-        ("F6", "— Le chat mange vite.", ENGLISH, BASE_TOKENS),
-        ("F7", "Le chat, le chien, et l'oiseau mangent.", ENGLISH, BASE_TOKENS),
+        ("english_words", "Le chat mange vite.", "Hi", BASE_TOKENS),
+        ("length_window", "Chat mange.", ENGLISH, [("chat", "NOUN"), ("mange", "VERB")]),
+        ("digit_marks", "Le chat a 3 ans.", ENGLISH, BASE_TOKENS),
+        ("digit_marks", "Le chat [noir] mange.", ENGLISH, BASE_TOKENS),
+        ("digit_marks", "Voir www.exemple.fr.", ENGLISH, BASE_TOKENS),
+        ("digit_marks", "Le chat mange...", ENGLISH, BASE_TOKENS),
+        ("final_mark", "Le chat mange vite", ENGLISH, BASE_TOKENS),
+        ("one_final_mark", "Le chat mange. Le chien dort.", ENGLISH, BASE_TOKENS),
+        ("quote", "Le chat « mange » vite.", ENGLISH, BASE_TOKENS),
+        ("quote", "— Le chat mange vite.", ENGLISH, BASE_TOKENS),
         (
-            "F8",
+            "internal_mark",
+            "Le chat, le chien, et l'oiseau mangent.",
+            ENGLISH,
+            BASE_TOKENS,
+        ),
+        (
+            "propn",
             "Paris est une ville.",
             ENGLISH,
             [("paris", "PROPN"), ("etre", "AUX"), ("ville", "NOUN")],
@@ -187,7 +192,7 @@ def test_filter_cards_rejects_a_duplicate_text() -> None:
     )
 
     assert passed == [0, 1]
-    assert reasons == ["", "", "F9"]
+    assert reasons == ["", "", "unique"]
 
 
 

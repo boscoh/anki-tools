@@ -303,7 +303,7 @@ class TestFilter:
         passed, reasons = _filter(cards, tokens, ["tom"])
 
         assert passed == []
-        assert reasons[0] in {"C3", "F8"}
+        assert reasons[0] in {"C3", "propn"}
 
     def test_c4_rejects_a_loan_word(self) -> None:
         cards = [_card("Le week-end est court.")]
@@ -494,6 +494,7 @@ class TestCoverageFile:
 
         with run.sides["coverage.csv"].open(encoding="utf-8", newline="") as handle:
             rows = {row["word"]: row for row in csv.DictReader(handle)}
+        assert run.manifest_path is not None
         manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
 
         assert rows["fromage"]["status"] == "absent"
@@ -657,6 +658,7 @@ class TestCardDesign:
         assert [
             (template["qfmt"], template["afmt"]) for template in model["tmpls"]
         ] == [assemble.deck_templates(profile)[0]]
+        assert run.manifest_path is not None
         manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
         assert len(cards) == manifest["counts"]["cards"]
         assert {int(row["ord"]) for row in cards} == {0}
@@ -665,6 +667,7 @@ class TestCardDesign:
         self, tmp_path: Path
     ) -> None:
         run, output, _profile = _run_core(tmp_path)
+        assert run.manifest_path is not None
         manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
 
         with AnkiPackage(output) as package:
@@ -687,7 +690,7 @@ class TestCardDesign:
 
         assert str(next(iter(models.values()))["did"]) in decks
     def test_the_model_gets_the_core_field_and_templates(self, tmp_path: Path) -> None:
-        _run, output, profile = _run_core(tmp_path)
+        _run, output, _profile = _run_core(tmp_path)
 
 
         with AnkiPackage(output) as package:
@@ -781,7 +784,7 @@ class TestCardDesign:
 
     def test_the_gloss_gate_fails_on_a_wrong_gloss(self, tmp_path: Path) -> None:
         _run, output, profile = _run_core(tmp_path)
-        core_csv, coverage_csv, _manifest, _rank = DeckIdentity(output).core_sides()
+        _core_csv, coverage_csv, _manifest, _rank = DeckIdentity(output).core_sides()
         coverage_csv.write_text(
             "key,word,gloss,tier,position,quota,count,status\n"
             "S1:chat,chat,dog,S,1,1,1,covered\n",
@@ -808,6 +811,7 @@ class TestCardDesign:
     ) -> None:
         run, output, profile = _run_core(tmp_path)
 
+        assert run.manifest_path is not None
         manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
         with run.sides["core.csv"].open(encoding="utf-8", newline="") as handle:
             rows = list(csv.DictReader(handle))

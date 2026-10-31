@@ -1,10 +1,11 @@
-"""Shared card filter rules F1 to F9 of the sentence decks.
+"""Shared card filter rules of the sentence decks.
 
 The rules are the Latin default. The cull reads its mark rules and its length
 window from the sentence shape guard with the values of the language profile;
-this module holds the pieces that the cull shares: the English window F1, the
-script rule F3, the proper-noun rule F8, and the F9 dedupe of
-:func:`filter_cards`. The core flow applies the Latin rules as they stand.
+this module holds the pieces that the cull shares: the English window
+``english_words``, the ``digit_marks`` rule, the ``propn`` rule, and the
+``unique`` dedupe of :func:`filter_cards`. The core flow applies the Latin
+rules as they stand.
 """
 
 from __future__ import annotations
@@ -35,13 +36,13 @@ def filter_cards(
     *,
     card_rule: Callable[..., str] | None = None,
 ) -> tuple[list[int], list[str]]:
-    """Apply the filter rules F1 to F9.
+    """Apply the shared filter rules.
 
     :param cards: Input cards.
     :param tokens: Lemma and part of speech per card.
     :param min_words: Minimum word count of a card.
     :param max_words: Maximum word count of a card.
-    :param card_rule: Rule function of one card, the Latin rules F1 to F8 of
+    :param card_rule: Rule function of one card, the shared rules of
         :func:`_filter_reason` when absent.
     :raises ValueError: The card list and the token list have different sizes.
     :returns: The input indices of the passed cards, and the reason per input
@@ -60,7 +61,7 @@ def filter_cards(
             reasons[index] = reason
             continue
         if card.sentence in seen:
-            reasons[index] = "F9"
+            reasons[index] = "unique"
             continue
         seen.add(card.sentence)
         passed.append(index)
@@ -73,50 +74,51 @@ def _filter_reason(
     min_words: int,
     max_words: int,
 ) -> str:
-    """Give the first failed filter rule of one card.
+    """Give the first failed shared filter rule of one card.
 
     :param card: Input card.
     :param card_tokens: Lemma and part of speech of the card sentence.
     :param min_words: Minimum word count of a card.
     :param max_words: Maximum word count of a card.
-    :returns: The rule name ``F1`` to ``F8``, or the empty string on a pass.
+    :returns: The rule id from ``english_words`` to ``propn``, or the empty
+        string on a pass.
     """
     reason = english_rule(card)
     if reason:
         return reason
     if not min_words <= len(card_tokens) <= max_words:
-        return "F2"
+        return "length_window"
     sentence = card.sentence
     reason = script_rule(sentence)
     if reason:
         return reason
     if not sentence.endswith(tuple(FINAL_MARKS)):
-        return "F4"
+        return "final_mark"
     if sum(1 for char in sentence if char in FINAL_MARKS) != 1:
-        return "F5"
+        return "one_final_mark"
     if set(sentence) & QUOTE_MARKS or sentence[:1] in DIALOGUE_DASHES:
-        return "F6"
+        return "quote"
     if sum(1 for char in sentence if char in INTERNAL_MARKS) > 1:
-        return "F7"
+        return "internal_mark"
     return pos_rule(card_tokens)
 
 
 def english_rule(card: Any) -> str:
-    """Give filter F1: the English word window.
+    """Give filter ``english_words``: the English word window.
 
     :param card: Input card.
-    :returns: ``F1``, or the empty string on a pass.
+    :returns: ``english_words``, or the empty string on a pass.
     """
     if MIN_ENGLISH_WORDS <= len(card.english.split()) <= MAX_ENGLISH_WORDS:
         return ""
-    return "F1"
+    return "english_words"
 
 
 def script_rule(sentence: str) -> str:
-    """Give filter F3: no digit, bracket, link, or ellipsis.
+    """Give filter ``digit_marks``: no digit, bracket, link, or ellipsis.
 
     :param sentence: Prepared sentence text.
-    :returns: ``F3``, or the empty string on a pass.
+    :returns: ``digit_marks``, or the empty string on a pass.
     """
     lower = sentence.lower()
     if (
@@ -125,16 +127,16 @@ def script_rule(sentence: str) -> str:
         or any(mark in lower for mark in URL_MARKS)
         or any(mark in sentence for mark in ELLIPSIS_MARKS)
     ):
-        return "F3"
+        return "digit_marks"
     return ""
 
 
 def pos_rule(card_tokens: Sequence[tuple[str, str]]) -> str:
-    """Give filter F8: no proper noun.
+    """Give filter ``propn``: no proper noun.
 
     :param card_tokens: Lemma and part of speech of the card sentence.
-    :returns: ``F8``, or the empty string on a pass.
+    :returns: ``propn``, or the empty string on a pass.
     """
     if any(pos == "PROPN" for _lemma, pos in card_tokens):
-        return "F8"
+        return "propn"
     return ""

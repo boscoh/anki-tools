@@ -17,6 +17,60 @@ Each flow owns its gate ids (ADR 0027). Pack `G5` is the one-time target check.
 Cull `G5` is the filter recheck. A doc row, a report line, and an issue must
 name the flow with the id.
 
+One table shows the four flows at a glance:
+
+| Flow            | Command                              | Gate table               | Filter table         |
+| --------------- | ------------------------------------ | ------------------------ | -------------------- |
+| Sentence pack   | `anki swadesh pack <lang>`           | G1 to G21, 18 to 20 rows | 14 rule ids          |
+| Cull deck       | `anki fix <lang> <input> --select`   | G1 to G17                | 9 rule ids           |
+| Core deck       | `anki fix <lang> <input> --core`     | K1 to K21, 18 rows       | 9 rule ids, C1 to C5 |
+| Vocabulary deck | `anki swadesh vocab <lang>`          | none                     | none                 |
+
+The filter column lives in `docs/filters.md`.
+
+The reverse direction reads each check as a row and each flow as a column.
+
+| Layer  | Check                     | Sentence pack                    | Cull deck                         | Core deck                         | Vocabulary deck |
+| ------ | ------------------------- | -------------------------------- | --------------------------------- | --------------------------------- | --------------- |
+| gate   | `gate_word_table`         | G1                               | -                                 | -                                 | -               |
+| gate   | `gate_filter_recheck`     | G14                              | G5                                | K5                                | -               |
+| gate   | `gate_similarity`         | -                                | G6                                | K6                                | -               |
+| gate   | `gate_audio`              | -                                | G7                                | K7                                | -               |
+| gate   | `gate_counts`             | -                                | G8                                | K8                                | -               |
+| gate   | `gate_identity`           | -                                | G10                               | K9                                | -               |
+| gate   | `gate_kept_order`         | -                                | G11                               | K10                               | -               |
+| gate   | `gate_manifest_hashes`    | -                                | G13                               | K12                               | -               |
+| gate   | `gate_templates`          | -                                | G15                               | K14                               | -               |
+| gate   | `gate_core_word`          | -                                | G17                               | K19                               | -               |
+| gate   | `gate_output_model`       | -                                | G16                               | K21                               | -               |
+| gate   | `gate_attribution`        | G12 (Fr Es El Yue)               | -                                 | -                                 | -               |
+| gate   | `gate_no_sense_mismatch`  | G21 (Fr Es Yue) G20 (El) G18 (zh) | -                                 | -                                 | -               |
+| gate   | `gate_typography`         | G17 (Fr Es)                      | -                                 | -                                 | -               |
+| gate   | `gate_no_blocked_license` | G18 (Fr Es)                      | -                                 | -                                 | -               |
+| gate   | `gate_no_false_friend`    | G17 (zh) G20 (Yue)               | -                                 | -                                 | -               |
+| gate   | `gate_script`             | G9 (Yue) G17 (El)                | -                                 | -                                 | -               |
+| filter | `english_link`            | yes                              | -                                 | -                                 | -               |
+| filter | `length_window`           | yes                              | yes                               | yes                               | -               |
+| filter | `script`                  | yes                              | -                                 | -                                 | -               |
+| filter | `repeat`                  | yes                              | -                                 | -                                 | -               |
+| filter | `final_mark`              | yes                              | yes                               | yes                               | -               |
+| filter | `one_final_mark`          | yes                              | yes                               | yes                               | -               |
+| filter | `quote`                   | yes                              | yes                               | yes                               | -               |
+| filter | `internal_mark`           | yes                              | yes                               | yes                               | -               |
+| filter | `predicate`               | yes                              | -                                 | -                                 | -               |
+| filter | `orphan`                  | yes                              | -                                 | -                                 | -               |
+| filter | `english_words`           | yes                              | yes                               | yes                               | -               |
+| filter | `unique`                  | yes                              | yes                               | yes                               | -               |
+| filter | `unknown`                 | yes                              | -                                 | -                                 | -               |
+| filter | `sense`                   | yes                              | -                                 | -                                 | -               |
+| filter | `digit_marks`             | -                                | yes                               | yes                               | -               |
+| filter | `propn`                   | -                                | yes                               | yes                               | -               |
+| filter | C1 to C5                  | -                                | -                                 | yes                               | -               |
+
+Language codes: Fr French, Es Spanish, El Greek, Yue Cantonese, zh Mandarin.
+A filter id names one check in every flow that runs it. Each flow keeps its own
+order. `docs/filters.md` §2 holds the meaning of each id and the order of each flow.
+
 ## 2. The gate contract
 
 `anki_tools/gates.py` holds the contract. It sits below `ranking` and
@@ -104,7 +158,7 @@ cull G3, cull G4, and core K2. They stay separate.
   `K6` use the lemma Jaccard value.
 - The pack manifest has a second shape. `sentence_pack/pack.py` writes it, and
   `G11` reads it. The rank manifest comes from `ranking/assemble.py`.
-- Cull `G5` exempts `F8` for a reserve card. No pack rule tests a name, and
+- Cull `G5` exempts `propn` for a reserve card. No pack rule tests a name, and
   `G14` needs those cards.
 - Core `K1` checks a three-way count agreement. Cull `G1` checks the cap or the
   pool end. The two functions stay separate.

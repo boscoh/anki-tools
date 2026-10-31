@@ -23,13 +23,15 @@ def test_guard_table_matches_the_filter_order() -> None:
 
 
 def test_scaffold_keys_skip_the_relaxed_filters() -> None:
-    assert pool.SCAFFOLD_SHAPE_KEYS == frozenset({"F2", "F3", "F4", "F5", "F7"})
-    assert pool.SCAFFOLD_SHAPE_FAILURES == frozenset({"F6", "F8"})
+    assert pool.SCAFFOLD_SHAPE_KEYS == frozenset(
+        {"length_window", "script", "repeat", "final_mark", "quote"}
+    )
+    assert pool.SCAFFOLD_SHAPE_FAILURES == frozenset({"one_final_mark", "internal_mark"})
 
 
 def test_record_pass_counts_every_guard_before_the_failure() -> None:
     counts = dict.fromkeys(pool.FILTER_KEYS, 0)
-    pool.record_pass(counts, "F5")
+    pool.record_pass(counts, "final_mark")
     assert set(pool.FILTER_KEYS[:4]) == {key for key, value in counts.items() if value}
     counts = dict.fromkeys(pool.FILTER_KEYS, 0)
     pool.record_pass(counts, None)
@@ -38,15 +40,16 @@ def test_record_pass_counts_every_guard_before_the_failure() -> None:
 
 def test_shape_failure_applies_only_the_requested_keys() -> None:
     sentence = "我要喝水"
-    assert check_sentence_shape(sentence, MANDARIN, 4, 7) == "F5"
+    assert check_sentence_shape(sentence, MANDARIN, 4, 7) == "final_mark"
     assert (
         pool.shape_failure(
             sentence, MANDARIN, 4, 7, keys=pool.SCAFFOLD_SHAPE_KEYS
         )
-        == "F5"
+        == "final_mark"
     )
     assert (
-        pool.shape_failure(sentence, MANDARIN, 4, 7, keys=frozenset({"F3"})) is None
+        pool.shape_failure(sentence, MANDARIN, 4, 7, keys=frozenset({"script"}))
+        is None
     )
 
 
@@ -102,10 +105,10 @@ def test_false_friend_hook_is_set_for_the_chinese_packs() -> None:
 
 def test_gate_no_false_friend_uses_the_profile_hook() -> None:
     bad = FakeInputs([{"sentence": "聽日係我生日。", "target": "聽"}], [])
-    passed, _ = audit.gate_no_false_friend(bad, CANTONESE)
+    passed, _ = audit.gate_no_false_friend(bad, CANTONESE)  # type: ignore[arg-type]
     assert not passed
     good = FakeInputs([{"sentence": "我聽音樂。", "target": "聽"}], [])
-    passed, _ = audit.gate_no_false_friend(good, CANTONESE)
+    passed, _ = audit.gate_no_false_friend(good, CANTONESE)  # type: ignore[arg-type]
     assert passed
 
 
@@ -121,7 +124,7 @@ def test_gate_no_sense_mismatch_uses_the_profile_filter() -> None:
         ],
         table,
     )
-    passed, _ = audit.gate_no_sense_mismatch(bad, CANTONESE)
+    passed, _ = audit.gate_no_sense_mismatch(bad, CANTONESE)  # type: ignore[arg-type]
     assert not passed
     good = FakeInputs(
         [
@@ -133,5 +136,5 @@ def test_gate_no_sense_mismatch_uses_the_profile_filter() -> None:
         ],
         table,
     )
-    passed, _ = audit.gate_no_sense_mismatch(good, CANTONESE)
+    passed, _ = audit.gate_no_sense_mismatch(good, CANTONESE)  # type: ignore[arg-type]
     assert passed

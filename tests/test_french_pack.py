@@ -224,7 +224,7 @@ def test_unknown_word_filter_with_lemma_matching() -> None:
 
 
 def test_proper_sentence_filters_f2_to_f10() -> None:
-    assert check_sentence_shape("Le chien.", french.FRENCH, 4, 10) == "F2"
+    assert check_sentence_shape("Le chien.", french.FRENCH, 4, 10) == "length_window"
     assert check_sentence_shape("Le chien mange vite.", french.FRENCH, 4, 10) is None
     assert (
         check_sentence_shape(
@@ -234,20 +234,20 @@ def test_proper_sentence_filters_f2_to_f10() -> None:
     )
     assert (
         check_sentence_shape("Le chien mange 42 fois ici.", french.FRENCH, 4, 10)
-        == "F3"
+        == "script"
     )
-    assert check_sentence_shape("Oui oui oui oui.", french.FRENCH, 4, 10) == "F4"
-    assert check_sentence_shape("Le chien mange vite", french.FRENCH, 4, 10) == "F5"
+    assert check_sentence_shape("Oui oui oui oui.", french.FRENCH, 4, 10) == "repeat"
+    assert check_sentence_shape("Le chien mange vite", french.FRENCH, 4, 10) == "final_mark"
     assert (
         check_sentence_shape("Le chien mange. Il aboie.", french.FRENCH, 4, 10)
-        == "F6"
+        == "one_final_mark"
     )
     assert (
-        check_sentence_shape('Il dit "oui" au chien.', french.FRENCH, 4, 10) == "F7"
+        check_sentence_shape('Il dit "oui" au chien.', french.FRENCH, 4, 10) == "quote"
     )
     assert (
         check_sentence_shape("Le chien, le chat, l'oiseau.", french.FRENCH, 4, 10)
-        == "F8"
+        == "internal_mark"
     )
     assert french.has_predicate("Le chien mange vite.") is True
     assert french.has_predicate("Trois chiens.") is False
@@ -313,14 +313,14 @@ def test_pool_uses_the_french_filters(tmp_path: Path) -> None:
     texts = {candidate.sentence for candidate in candidates}
 
     assert texts == {"Je voudrais un verre d'eau.", "Le chien mange vite, il aboie."}
-    assert counts["F1"] == 7
-    assert counts["F2"] == 6
-    assert counts["F3"] == 5
-    assert counts["F7"] == 4
-    assert counts["F8"] == 3
-    assert counts["F10"] == 2
-    assert counts["F11"] == 2
-    assert counts["F12"] == 2
+    assert counts["english_link"] == 7
+    assert counts["length_window"] == 6
+    assert counts["script"] == 5
+    assert counts["quote"] == 4
+    assert counts["internal_mark"] == 3
+    assert counts["orphan"] == 2
+    assert counts["english_words"] == 2
+    assert counts["unique"] == 2
     assert report["forms_with_core_candidate"] == 2
     assert report["pool_candidates"] == 2
 
@@ -404,7 +404,7 @@ def test_scaffold_cards_take_the_g14_exemption(tmp_path: Path) -> None:
     inputs = _audit_inputs(tmp_path, table, core)
     passed, message = gate_filter_recheck(inputs, french.FRENCH)
     assert not passed
-    assert "F6" in message
+    assert "one_final_mark" in message
 
 
 def test_gate_19_rejects_a_discontinuous_target_without_both_parts(

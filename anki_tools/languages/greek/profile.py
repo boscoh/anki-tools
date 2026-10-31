@@ -372,7 +372,7 @@ def unit_count(sentence: str) -> int:
 
 
 def script_ok(sentence: str) -> bool:
-    """Check filter F3: Greek letters only, no Latin letter and no digit.
+    """Check filter script: Greek letters only, no Latin letter and no digit.
 
     :param sentence: Greek sentence.
     :returns: True when the sentence passes.
@@ -381,7 +381,7 @@ def script_ok(sentence: str) -> bool:
 
 
 def has_orphan(sentence: str) -> bool:
-    """Check filter F10: a sentence-initial conjunction with no comma.
+    """Check filter orphan: a sentence-initial conjunction with no comma.
 
     :param sentence: Greek sentence.
     :returns: True when the leading conjunction has no main clause.
@@ -582,7 +582,7 @@ def count_unknown(sentence: str, known: Collection[str]) -> int:
 
 
 def has_predicate(sentence: str) -> bool:
-    """Check filter F9: a finite verb, the marker fallback, or a word-list verb.
+    """Check filter predicate: a finite verb, the marker fallback, or a word-list verb.
 
     :param sentence: Greek sentence.
     :returns: True when the sentence has a finite verb.

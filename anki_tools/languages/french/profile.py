@@ -328,7 +328,7 @@ def unit_count(sentence: str) -> int:
 
 
 def script_ok(sentence: str) -> bool:
-    """Check filter F3: Latin letters and no digit.
+    """Check filter script: Latin letters and no digit.
 
     :param sentence: Prepared French sentence.
     :returns: True when every letter is a French Latin letter and no digit exists.
@@ -342,7 +342,7 @@ def script_ok(sentence: str) -> bool:
 
 
 def is_repeated_sentence(sentence: str) -> bool:
-    """Check filter F4: the word sequence is a repetition of a shorter one.
+    """Check filter repeat: the word sequence is a repetition of a shorter one.
 
     :param sentence: Prepared French sentence.
     :returns: True for text such as ``Oui oui oui.``.
@@ -358,7 +358,7 @@ def is_repeated_sentence(sentence: str) -> bool:
 
 
 def has_orphan(sentence: str) -> bool:
-    """Check filter F10: a sentence-initial conjunction with no comma.
+    """Check filter orphan: a sentence-initial conjunction with no comma.
 
     :param sentence: Prepared French sentence.
     :returns: True when the leading conjunction has no main clause.
@@ -673,7 +673,7 @@ def count_unknown(sentence: str, known: Collection[str]) -> int:
 
 
 def has_predicate(sentence: str) -> bool:
-    """Check filter F9: a finite verb, a marker, or a word-list verb.
+    """Check filter predicate: a finite verb, a marker, or a word-list verb.
 
     :param sentence: Prepared French sentence.
     :returns: True when the sentence has a finite verb.

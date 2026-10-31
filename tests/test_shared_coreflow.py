@@ -376,7 +376,7 @@ class TestCardFilter:
         )
 
         assert passed == []
-        assert reasons[0] == "F1"
+        assert reasons[0] == "english_words"
 
     def test_f2_rejects_a_card_outside_the_window(self) -> None:
         passed, reasons = cardfilter.filter_cards(
@@ -384,7 +384,7 @@ class TestCardFilter:
         )
 
         assert passed == []
-        assert reasons[0] == "F2"
+        assert reasons[0] == "length_window"
 
     def test_f3_rejects_a_digit(self) -> None:
         passed, reasons = cardfilter.filter_cards(
@@ -392,7 +392,7 @@ class TestCardFilter:
         )
 
         assert passed == []
-        assert reasons[0] == "F3"
+        assert reasons[0] == "digit_marks"
 
     def test_f4_rejects_a_missing_final_mark(self) -> None:
         passed, reasons = cardfilter.filter_cards(
@@ -400,7 +400,7 @@ class TestCardFilter:
         )
 
         assert passed == []
-        assert reasons[0] == "F4"
+        assert reasons[0] == "final_mark"
 
     def test_f5_rejects_two_final_marks(self) -> None:
         passed, reasons = cardfilter.filter_cards(
@@ -408,7 +408,7 @@ class TestCardFilter:
         )
 
         assert passed == []
-        assert reasons[0] == "F5"
+        assert reasons[0] == "one_final_mark"
 
     def test_f6_rejects_a_quote_mark(self) -> None:
         passed, reasons = cardfilter.filter_cards(
@@ -416,7 +416,7 @@ class TestCardFilter:
         )
 
         assert passed == []
-        assert reasons[0] == "F6"
+        assert reasons[0] == "quote"
 
     def test_f7_rejects_two_internal_marks(self) -> None:
         passed, reasons = cardfilter.filter_cards(
@@ -424,7 +424,7 @@ class TestCardFilter:
         )
 
         assert passed == []
-        assert reasons[0] == "F7"
+        assert reasons[0] == "internal_mark"
 
     def test_f8_rejects_a_proper_noun(self) -> None:
         tokens = [("parís", "PROPN"), ("ser", "VERB"), ("grande", "ADJ")]
@@ -434,7 +434,7 @@ class TestCardFilter:
         )
 
         assert passed == []
-        assert reasons[0] == "F8"
+        assert reasons[0] == "propn"
 
     def test_f9_rejects_a_duplicate_sentence(self) -> None:
         cards = [_card(), _card(index=1)]
@@ -442,7 +442,7 @@ class TestCardFilter:
         passed, reasons = cardfilter.filter_cards(cards, [FILTER_TOKENS] * 2)
 
         assert passed == [0]
-        assert reasons[1] == "F9"
+        assert reasons[1] == "unique"
 
     def test_a_size_mismatch_raises(self) -> None:
         with pytest.raises(ValueError, match="differ in size"):

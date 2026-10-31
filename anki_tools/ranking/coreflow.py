@@ -67,7 +67,22 @@ COVERAGE_COLUMNS: tuple[str, ...] = (
     "count",
     "status",
 )
-FILTER_KEYS = ("F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "C1", "C2", "C3", "C4", "C5")
+FILTER_KEYS = (
+    "english_words",
+    "length_window",
+    "digit_marks",
+    "final_mark",
+    "one_final_mark",
+    "quote",
+    "internal_mark",
+    "propn",
+    "unique",
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "C5",
+)
 TARGET_SEPARATOR = "|"
 STATUSES = ("covered", "partial", "absent", "absent_sense", "unchecked")
 UNCOVERABLE_STATUSES: frozenset[str] = frozenset({"absent", "absent_sense"})
@@ -289,7 +304,7 @@ def filter_core_cards(
     min_units: int,
     max_units: int,
 ) -> tuple[list[int], list[str]]:
-    """Apply rules F1 to F9 and C1 to C5 to the cards.
+    """Apply the shared filter rules and C1 to C5 to the cards.
 
     :param cards: Input cards.
     :param tokens: Lemma and part of speech per card.

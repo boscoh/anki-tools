@@ -228,9 +228,9 @@ def core_problem(sentence: str, profile: LanguageProfile) -> str | None:
     if key is not None:
         return f"{key} failed"
     if not profile.has_predicate(sentence):
-        return "F9 predicate tag"
+        return "predicate tag"
     if profile.has_orphan(sentence):
-        return "F10 orphan conjunction"
+        return "orphan conjunction"
     return None
 
 
@@ -248,17 +248,17 @@ def scaffold_problem(sentence: str, profile: LanguageProfile) -> str | None:
         profile.max_units,
         keys=SCAFFOLD_SHAPE_KEYS,
     )
-    if key == "F2":
+    if key == "length_window":
         return (
-            f"F2 length {profile.unit_count(sentence)} outside "
+            f"length_window length {profile.unit_count(sentence)} outside "
             f"{profile.fallback_min_units} to {profile.max_units}"
         )
     if key is not None:
         return f"{key} failed"
     if not profile.has_predicate(sentence):
-        return "F9 predicate tag"
+        return "predicate tag"
     if profile.has_orphan(sentence):
-        return "F10 orphan conjunction"
+        return "orphan conjunction"
     return None
 
 

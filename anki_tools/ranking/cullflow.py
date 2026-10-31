@@ -62,13 +62,21 @@ SMALL_COUNT = 5
 UNRANKED_ORDER = 1_000_000
 TATOEBA_BATCH = 1000
 TOKENIZE_BATCH = 256
-FILTER_RULES = ("F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9")
+FILTER_RULES = (
+    "english_words",
+    "length_window",
+    "digit_marks",
+    "final_mark",
+    "one_final_mark",
+    "quote",
+    "internal_mark",
+    "propn",
+    "unique",
+)
 EXEMPT_GAIN = 0.1
 
-# The shape guard names the mark rules F5 to F8. The cull keeps the names of the
-# shared card filter, where F4 to F7 are the mark rules.
-MARK_RULES = {"F5": "F4", "F6": "F5", "F7": "F6", "F8": "F7"}
-LENGTH_RULES = ("F2",)
+MARK_RULES = ("final_mark", "one_final_mark", "quote", "internal_mark")
+LENGTH_RULES = ("length_window",)
 
 RESERVE_SENTENCE_FIELD = "Sentence"
 RESERVE_ENGLISH_FIELD = "English"
@@ -277,7 +285,7 @@ def filter_reason(
     max_words: int,
     profile: CullProfile,
 ) -> str:
-    """Give the first failed filter rule F1 to F8 of one card of the cull.
+    """Give the first failed filter rule of one card of the cull.
 
     The English window, the script rule, and the proper-noun rule come from the
     shared card filter. The length window and the mark rules come from the
@@ -288,7 +296,8 @@ def filter_reason(
     :param min_words: Minimum token count of a card.
     :param max_words: Maximum token count of a card.
     :param profile: Language hooks.
-    :returns: The rule name ``F1`` to ``F8``, or the empty string on a pass.
+    :returns: The rule id from ``english_words`` to ``propn``, or the empty
+        string on a pass.
     """
     reason = english_rule(card)
     if reason:
@@ -314,7 +323,7 @@ def filter_reason(
         card.sentence, guard_profile, min_words, max_words, keys=MARK_RULES
     )
     if reason:
-        return MARK_RULES[reason]
+        return reason
     return pos_rule(card_tokens)
 
 

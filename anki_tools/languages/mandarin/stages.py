@@ -176,12 +176,12 @@ def mandarin_candidate_pool(
 def mandarin_shape_failure(
     sentence: str, min_han: int = 4, max_han: int = 7, *, final_mark: bool = True
 ) -> str | None:
-    """Apply filters F2 to F8 to one Mandarin sentence.
+    """Apply filters length_window to internal_mark to one Mandarin sentence.
 
     :param sentence: Simplified Chinese sentence.
     :param min_han: Minimum Han character count.
     :param max_han: Maximum Han character count.
-    :param final_mark: Apply filters F5 and F6 (the final-mark rules).
+    :param final_mark: Apply filters final_mark and one_final_mark (the final-mark rules).
     :returns: The first failed filter key, or None when all filters pass.
     """
     return shared_guards.check_sentence_shape(

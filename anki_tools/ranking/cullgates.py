@@ -202,19 +202,20 @@ def gate_filter_recheck(files: CullFiles) -> tuple[bool, str]:
             index=0,
         )
         reason = filter_reason(card, card_tokens, min_words, max_words, files.profile)
-        # A reserve card is exempt from F8, and no pack rule replaces that
-        # check: no pack rule tests a name. 8 of the 194 French reserve cards
-        # hold a PROPN token, and G14 needs every reserve concept.
-        if reason == "F8" and row.get("source") == SWADESH_SOURCE:
+        # A reserve card is exempt from the propn rule, and no pack rule
+        # replaces that check: no pack rule tests a name. 8 of the 194 French
+        # reserve cards hold a PROPN token, and G14 needs every reserve
+        # concept.
+        if reason == "propn" and row.get("source") == SWADESH_SOURCE:
             reason = ""
         if not reason and card.sentence in seen:
-            reason = "F9"
+            reason = "unique"
         seen.add(card.sentence)
         if reason:
             problems.append(f"{reason} {card.sentence[:40]}")
     if problems:
         return False, f"{len(problems)} kept card(s) fail: {_sample(problems)}"
-    return True, f"{len(rows)} kept cards pass F1 to F9"
+    return True, f"{len(rows)} kept cards pass the shared filter rules"
 
 
 def gate_similarity(files: CullFiles) -> tuple[bool, str]:

@@ -746,7 +746,7 @@ def single_hits(sentence: str, forms: Iterable[str]) -> dict[str, int]:
 
 
 def has_predicate(sentence: str) -> bool:
-    """Check filter F9: jieba tags at least one token as ``v*`` or ``a*``.
+    """Check filter predicate: jieba tags at least one token as ``v*`` or ``a*``.
 
     :param sentence: Simplified Chinese sentence.
     :returns: True when the sentence has a predicate tag.
@@ -755,7 +755,7 @@ def has_predicate(sentence: str) -> bool:
 
 
 def has_orphan_conjunction(sentence: str) -> bool:
-    """Check filter F10: a sentence-initial conjunction with no comma.
+    """Check filter orphan: a sentence-initial conjunction with no comma.
 
     :param sentence: Simplified Chinese sentence.
     :returns: True when the leading conjunction has no main clause.

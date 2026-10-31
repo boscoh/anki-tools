@@ -12,7 +12,7 @@ Two guards use the scan helpers:
    rule, because 我 and 我哋 are different concepts.
 
 The shape predicate :func:`check_sentence_shape` is also here. It applies the
-filters F2 to F8 with the profile that the caller gives, so a language package
+shape guards with the profile that the caller gives, so a language package
 does not import another language package for it.
 """
 
@@ -76,15 +76,15 @@ def check_sentence_shape(
     final_mark: bool = True,
     keys: Collection[str] = (),
 ) -> str | None:
-    """Apply filters F2 to F8 to one sentence.
+    """Apply the shape guards to one sentence.
 
     :param sentence: Prepared sentence text.
     :param profile: Language profile of the language package.
     :param min_units: Minimum unit count of the window.
     :param max_units: Maximum unit count of the window.
-    :param final_mark: Apply filters F5 and F6 (the final-mark rules).
+    :param final_mark: Apply the ``final_mark`` and ``one_final_mark`` guards.
     :param keys: Guard keys to apply, empty for every key.
-    :returns: The first failed filter key, or None when all filters pass.
+    :returns: The first failed guard key, or None when all guards pass.
     """
     return shape_failure(
         sentence, profile, min_units, max_units, final_mark=final_mark, keys=keys

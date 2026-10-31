@@ -10,7 +10,7 @@ live in ``vocab/cantonese_core_senses.tsv``. The generic logic lives in
 A Cantonese sentence has no part-of-speech tagger, so every Han token gets the
 constant tag ``TOKEN_POS``. The tag is a content tag and passes rule C1.
 
-The shared filter F4 reads an ASCII final mark. The adapter gives the final
+The shared filter final_mark reads an ASCII final mark. The adapter gives the final
 mark of a sentence its ASCII form and writes that text back to the kept notes.
 The model also has an unused English sound field, which the output note type
 does not carry.
@@ -87,7 +87,7 @@ def _sentence(field_value: str) -> str:
 
     The function drops the bold tags that a previous core run wrote, prepares
     the Traditional text, and gives the final mark the ASCII form, because the
-    shared filter F4 accepts only ``.``, ``?``, and ``!``.
+    shared filter final_mark accepts only ``.``, ``?``, and ``!``.
 
     :param field_value: Raw value of the sentence field.
     :returns: Traditional text with an ASCII final mark.

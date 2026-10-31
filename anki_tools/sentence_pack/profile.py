@@ -62,10 +62,10 @@ class LanguageProfile:
     :param preferred_min_units: First word count of the preferred range.
     :param preferred_max_units: Last word count of the preferred range.
     :param final_marks: Accepted sentence-final marks.
-    :param internal_marks: Internal punctuation marks of filter F8.
-    :param quote_marks: Quotation marks and dialogue dashes of filter F7.
+    :param internal_marks: Internal punctuation marks of filter internal_mark.
+    :param quote_marks: Quotation marks and dialogue dashes of filter quote.
     :param comma_marks: Marks that rescue a sentence-initial conjunction.
-    :param orphan_conjunctions: Sentence-initial conjunctions of filter F10.
+    :param orphan_conjunctions: Sentence-initial conjunctions of filter orphan.
     :param wordfreq_lang: `wordfreq` language code.
     :param tokenizer: spaCy model name, empty when the language has no model.
     :param native_audio: True when a native Tatoeba tier exists.
@@ -82,17 +82,17 @@ class LanguageProfile:
     :param coverage_min: Minimum core coverage of gate G10.
     :param prepare_text: Hook that normalizes a raw sentence.
     :param unit_count: Hook that counts the words of a sentence.
-    :param script_ok: Hook for filter F3, the script test.
-    :param is_repeated: Hook for filter F4, the repeated-pattern test.
-    :param has_predicate: Hook for filter F9, the predicate test.
-    :param has_orphan: Hook for filter F10, the orphan-conjunction test.
+    :param script_ok: Hook for filter script, the script test.
+    :param is_repeated: Hook for filter repeat, the repeated-pattern test.
+    :param has_predicate: Hook for filter predicate, the predicate test.
+    :param has_orphan: Hook for filter orphan, the orphan-conjunction test.
     :param hits: Hook that counts the one-time target forms of a sentence.
     :param match_count: Hook that counts the target matches of a sentence.
     :param candidate_length: Hook that gives the unit length of a card.
     :param count_unknown: Hook that counts the tokens outside the known set.
     :param zipf_words: Hook that gives the words of the mean Zipf value.
     :param similarity: Hook for the word-set Jaccard value.
-    :param dedupe_key: Hook for the exact dedupe key of filter F12.
+    :param dedupe_key: Hook for the exact dedupe key of filter unique.
     :param similarity_keys: Hook that buckets sentences for the Jaccard guard.
     :param form_text: Hook that gives the card target string of a form.
     :param form_positions: Hook that gives each form its index and variant rank.
@@ -194,7 +194,7 @@ class LanguageProfile:
         return self.candidate_length(candidate)
 
     def english_bounds(self) -> tuple[int, int]:
-        """Give the accepted English word-count window of filter F11.
+        """Give the accepted English word-count window of filter english_words.
 
         :returns: Minimum and maximum English word count.
         """

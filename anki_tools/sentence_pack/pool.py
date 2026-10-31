@@ -1,11 +1,12 @@
 """Candidate sentence pool (stage S2).
 
-The pool applies filters F1 to F12, the unknown-token budget, and the English
-sense test in order. The guard tables give the order, and each report count is
-the number of sentences that pass the guard. A sentence that fails no filter
-becomes a candidate for the lowest-index word it covers. With ``fallback``, a
-sentence in the wider window that fails only F6 or F8 becomes a scaffold
-candidate for a word that has no core candidate.
+The pool applies the ordered guards, from ``english_link`` through ``unique``,
+then the unknown-token budget and the English sense test. The guard tables give
+the order, and each report count is the number of sentences that pass the
+guard. A sentence that fails no guard becomes a candidate for the lowest-index
+word it covers. With ``fallback``, a sentence in the wider window that fails
+only ``one_final_mark`` or ``internal_mark`` becomes a scaffold candidate for a
+word that has no core candidate.
 """
 
 from __future__ import annotations
@@ -29,34 +30,34 @@ from anki_tools.sentence_pack.tatoeba import (
 from wordfreq import zipf_frequency
 
 FILTER_KEYS = [
-    "F1",
-    "F2",
-    "F3",
-    "F4",
-    "F5",
-    "F6",
-    "F7",
-    "F8",
-    "F9",
-    "F10",
-    "F11",
-    "F12",
+    "english_link",
+    "length_window",
+    "script",
+    "repeat",
+    "final_mark",
+    "one_final_mark",
+    "quote",
+    "internal_mark",
+    "predicate",
+    "orphan",
+    "english_words",
+    "unique",
     "unknown",
     "sense",
 ]
 FILTER_NAMES = {
-    "F1": "english link",
-    "F2": "length window",
-    "F3": "script",
-    "F4": "no repeated pattern",
-    "F5": "final mark",
-    "F6": "one final mark",
-    "F7": "no quotation mark",
-    "F8": "at most one internal mark",
-    "F9": "predicate",
-    "F10": "no orphan conjunction",
-    "F11": "english word count",
-    "F12": "unique text",
+    "english_link": "english link",
+    "length_window": "length window",
+    "script": "script",
+    "repeat": "no repeated pattern",
+    "final_mark": "final mark",
+    "one_final_mark": "one final mark",
+    "quote": "no quotation mark",
+    "internal_mark": "at most one internal mark",
+    "predicate": "predicate",
+    "orphan": "no orphan conjunction",
+    "english_words": "english word count",
+    "unique": "unique text",
     "unknown": "unknown token budget",
     "sense": "english sense",
 }
@@ -105,7 +106,7 @@ def filter_names(profile: LanguageProfile) -> dict[str, str]:
     :returns: Mapping from filter key to a short name.
     """
     names = dict(FILTER_NAMES)
-    names["F2"] = f"{profile.unit_name} length window"
+    names["length_window"] = f"{profile.unit_name} length window"
     return names
 
 
@@ -121,14 +122,14 @@ def count_marks(sentence: str, marks: str) -> int:
 
 @dataclass(frozen=True)
 class ShapeInput:
-    """Measured values of the F2 to F8 shape guards.
+    """Measured values of the shape guards.
 
     :param sentence: Prepared sentence text.
     :param profile: Language profile.
     :param unit_len: Word or character count of the sentence.
     :param min_units: Minimum unit count of the window.
     :param max_units: Maximum unit count of the window.
-    :param final_mark: Apply filters F5 and F6 (the final-mark rules).
+    :param final_mark: Apply the ``final_mark`` and ``one_final_mark`` guards.
     """
 
     sentence: str
@@ -172,15 +173,15 @@ def _passes_internal_marks(item: ShapeInput) -> bool:
 
 
 SHAPE_GUARDS: tuple[tuple[str, Callable[[ShapeInput], bool]], ...] = (
-    ("F2", _passes_length),
-    ("F3", _passes_script),
-    ("F4", _passes_repeat),
-    ("F5", _passes_final_mark),
-    ("F6", _passes_one_final_mark),
-    ("F7", _passes_quote),
-    ("F8", _passes_internal_marks),
+    ("length_window", _passes_length),
+    ("script", _passes_script),
+    ("repeat", _passes_repeat),
+    ("final_mark", _passes_final_mark),
+    ("one_final_mark", _passes_one_final_mark),
+    ("quote", _passes_quote),
+    ("internal_mark", _passes_internal_marks),
 )
-SCAFFOLD_SHAPE_FAILURES = frozenset(("F6", "F8"))
+SCAFFOLD_SHAPE_FAILURES = frozenset(("one_final_mark", "internal_mark"))
 SCAFFOLD_SHAPE_KEYS = frozenset(
     key for key, _ in SHAPE_GUARDS if key not in SCAFFOLD_SHAPE_FAILURES
 )
@@ -195,15 +196,15 @@ def shape_failure(
     final_mark: bool = True,
     keys: Collection[str] = (),
 ) -> str | None:
-    """Give the first failed guard of filters F2 to F8.
+    """Give the first failed shape guard.
 
     :param sentence: Prepared sentence text.
     :param profile: Language profile.
     :param min_units: Minimum unit count of the window.
     :param max_units: Maximum unit count of the window.
-    :param final_mark: Apply filters F5 and F6 (the final-mark rules).
+    :param final_mark: Apply the ``final_mark`` and ``one_final_mark`` guards.
     :param keys: Guard keys to apply, empty for every key.
-    :returns: The first failed filter key, or None when the guards pass.
+    :returns: The first failed guard key, or None when the guards pass.
     """
     data = ShapeInput(
         sentence=sentence,
@@ -223,7 +224,7 @@ def shape_failure(
 
 @dataclass(frozen=True)
 class FactInput:
-    """Measured values of the F9 to sense guards.
+    """Measured values of the fact guards.
 
     :param predicate: True when the sentence has a predicate tag.
     :param orphan: True when the sentence starts with an orphan conjunction.
@@ -273,10 +274,10 @@ def _passes_sense(item: FactInput) -> bool:
 
 
 FACT_GUARDS: tuple[tuple[str, Callable[[FactInput], bool]], ...] = (
-    ("F9", _passes_predicate),
-    ("F10", _passes_orphan),
-    ("F11", _passes_english),
-    ("F12", _passes_unique),
+    ("predicate", _passes_predicate),
+    ("orphan", _passes_orphan),
+    ("english_words", _passes_english),
+    ("unique", _passes_unique),
     ("unknown", _passes_unknown),
     ("sense", _passes_sense),
 )
@@ -284,7 +285,7 @@ SCAFFOLD_SKIP_GUARDS = frozenset(("sense",))
 
 
 def fact_failure(data: FactInput, *, skip: Collection[str] = ()) -> str | None:
-    """Give the first failed guard of filters F9 to sense.
+    """Give the first failed fact guard.
 
     :param data: Measured values of the sentence.
     :param skip: Guard keys to leave out.
@@ -300,7 +301,8 @@ def exceeds_max_units(sentence: str, max_units: int) -> bool:
     """Check without a model that a sentence is longer than the length window.
 
     Each whitespace chunk with a letter or digit gives at least one word or
-    character unit. A count above the maximum guarantees a filter F2 failure.
+    character unit. A count above the maximum guarantees a ``length_window``
+    failure.
 
     :param sentence: Prepared sentence text.
     :param max_units: Maximum unit count of the window.
@@ -513,7 +515,7 @@ def build_candidate_pool(
         english_id, english_text = pair
         sentence = prepared[sentence_id]
         if exceeds_max_units(sentence, max_units):
-            record_pass(counts, "F2")
+            record_pass(counts, "length_window")
             continue
         unit_len = profile.unit_count(sentence)
         shape = shape_failure(sentence, profile, min_units, max_units)

@@ -7,8 +7,8 @@ language name.
 
 The sentence text uses Traditional characters. :func:`prepare_text` converts a
 simplified Tatoeba row to Traditional, and the word table uses Traditional
-forms too. A Cantonese sentence has no part-of-speech tagger, so filters F9 and
-F10 always pass. ``specs/cantonese-swadesh-sentence-pack.md`` records that
+forms too. A Cantonese sentence has no part-of-speech tagger, so filters predicate and
+orphan always pass. ``specs/cantonese-swadesh-sentence-pack.md`` records that
 decision.
 """
 
@@ -687,7 +687,7 @@ def highlight(sentence: str, form: str) -> str:
 
 
 def has_predicate(_sentence: str) -> bool:
-    """Filter F9 is off, because jieba has no Cantonese tagger.
+    """Filter predicate is off, because jieba has no Cantonese tagger.
 
     :param sentence: Traditional Cantonese sentence.
     :returns: Always True.
@@ -696,7 +696,7 @@ def has_predicate(_sentence: str) -> bool:
 
 
 def has_orphan_conjunction(_sentence: str) -> bool:
-    """Filter F10 is off, because no Cantonese rule tested it.
+    """Filter orphan is off, because no Cantonese rule tested it.
 
     :param sentence: Traditional Cantonese sentence.
     :returns: Always False.
@@ -727,7 +727,7 @@ def zipf_words(sentence: str) -> list[str]:
 
 
 def script_ok(sentence: str) -> bool:
-    """Check filter F3: no Latin letter and no digit.
+    """Check filter script: no Latin letter and no digit.
 
     :param sentence: Traditional Cantonese sentence.
     :returns: True when the sentence has no Latin letter or digit.
@@ -763,7 +763,7 @@ def form_positions(table: Sequence[WordForm]) -> dict[str, tuple[int, int]]:
 
 
 def known_words(word_table: Sequence[WordForm]) -> set[str]:
-    """Build the known word set of filter F11.
+    """Build the known word set of filter english_words.
 
     The set holds the Swadesh forms and the most frequent ``wordfreq`` Chinese
     words in Traditional characters.

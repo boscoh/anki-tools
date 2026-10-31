@@ -159,7 +159,7 @@ class TestSentenceShape:
 
     def test_length_window_stops_at_seven(self) -> None:
         assert mandarin_shape_failure("我们今天去学校。") is None
-        assert mandarin_shape_failure("我们今天要去学校。") == "F2"
+        assert mandarin_shape_failure("我们今天要去学校。") == "length_window"
         assert mandarin_shape_failure("我们今天要去学校。", max_han=8) is None
 
     def test_profile_window_is_four_to_seven(self) -> None:
@@ -168,21 +168,21 @@ class TestSentenceShape:
     @pytest.mark.parametrize(
         ("sentence", "expected"),
         [
-            ("我喝水。", "F2"),
-            ("我要喝水我要喝水我要喝水。", "F2"),
-            ("我要喝水ABCD。", "F3"),
-            ("走走走走。", "F4"),
-            ("我要喝水", "F5"),
-            ("我要喝水。。", "F6"),
-            ("他说“我要喝水”。", "F7"),
-            ("我，要，喝水。", "F8"),
+            ("我喝水。", "length_window"),
+            ("我要喝水我要喝水我要喝水。", "length_window"),
+            ("我要喝水ABCD。", "script"),
+            ("走走走走。", "repeat"),
+            ("我要喝水", "final_mark"),
+            ("我要喝水。。", "one_final_mark"),
+            ("他说“我要喝水”。", "quote"),
+            ("我，要，喝水。", "internal_mark"),
         ],
     )
     def test_rejects_in_order(self, sentence: str, expected: str) -> None:
         assert mandarin_shape_failure(sentence) == expected
 
     def test_fallback_window_accepts_short_sentence(self) -> None:
-        assert mandarin_shape_failure("火灭了。") == "F2"
+        assert mandarin_shape_failure("火灭了。") == "length_window"
         assert mandarin_shape_failure("火灭了。", min_han=3) is None
 
     def test_predicate_and_conjunction(self) -> None:
@@ -265,18 +265,18 @@ class TestCandidatePool:
         pool, report = mandarin_candidate_pool(pool_table, data_dir=pool_data)
         counts = report["counts"]
         assert report["total_linked"] == 14
-        assert counts["F1"] == 13
-        assert counts["F2"] == 12
-        assert counts["F3"] == 11
-        assert counts["F4"] == 10
-        assert counts["F5"] == 9
-        assert counts["F6"] == 8
-        assert counts["F7"] == 7
-        assert counts["F8"] == 6
-        assert counts["F9"] == 5
-        assert counts["F10"] == 4
-        assert counts["F11"] == 3
-        assert counts["F12"] == 2
+        assert counts["english_link"] == 13
+        assert counts["length_window"] == 12
+        assert counts["script"] == 11
+        assert counts["repeat"] == 10
+        assert counts["final_mark"] == 9
+        assert counts["one_final_mark"] == 8
+        assert counts["quote"] == 7
+        assert counts["internal_mark"] == 6
+        assert counts["predicate"] == 5
+        assert counts["orphan"] == 4
+        assert counts["english_words"] == 3
+        assert counts["unique"] == 2
         assert report["pool_candidates"] == len(pool)
         assert report["core_sentences"] == len(pool)
 
@@ -321,10 +321,10 @@ class TestCandidatePool:
         with_audio = _candidate(audio_id=7)
         without_audio = _candidate()
 
-        assert shared_parts(with_audio, profile(True))[1] == 0
-        assert shared_parts(without_audio, profile(True))[1] == 1
-        assert shared_parts(with_audio, profile(False))[1] == 0
-        assert shared_parts(without_audio, profile(False))[1] == 0
+        assert shared_parts(with_audio, profile(True))[1] == 0  # type: ignore[arg-type]
+        assert shared_parts(without_audio, profile(True))[1] == 1  # type: ignore[arg-type]
+        assert shared_parts(with_audio, profile(False))[1] == 0  # type: ignore[arg-type]
+        assert shared_parts(without_audio, profile(False))[1] == 0  # type: ignore[arg-type]
 
     def test_unknown_budget(self, pool_table: list[WordForm], pool_data: Path) -> None:
         _, strict = mandarin_candidate_pool(pool_table, data_dir=pool_data, max_unknown=0)

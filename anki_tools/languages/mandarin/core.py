@@ -29,7 +29,7 @@ The audio of the deck is machine speech from Google TTS on all 5009 notes, and
 the model holds no native recording. The manifest and ``ATTRIBUTION.md`` must
 name the engine before the deck ships.
 
-The shared filter F4 reads an ASCII final mark. The adapter gives the final mark
+The shared filter final_mark reads an ASCII final mark. The adapter gives the final mark
 of a sentence its ASCII form and appends one when the text has none, then
 writes that text back to the kept notes.
 
@@ -114,7 +114,7 @@ def _sentence(field_value: str) -> str:
 
     The function drops the bold tags that a previous core run wrote, converts
     the text to Simplified Chinese, and gives the final mark the ASCII form.
-    The shared filter F4 accepts only ``.``, ``?``, and ``!``, and most
+    The shared filter final_mark accepts only ``.``, ``?``, and ``!``, and most
     sentences of the deck end in no mark at all, so a text with no ASCII final
     mark gets a full stop.
 

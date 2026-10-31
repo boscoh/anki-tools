@@ -159,7 +159,7 @@ def gate_outside(files: CoreFiles) -> tuple[bool, str]:
 
 
 def gate_filter_recheck(files: CoreFiles) -> tuple[bool, str]:
-    """K5: every kept card passes F1 to F9 and C1 to C5."""
+    """K5: every kept card passes the shared filter rules and C1 to C5."""
     output = files.output()
     cards = output["cards"]
     profile = files.profile
