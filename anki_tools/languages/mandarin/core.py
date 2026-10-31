@@ -68,7 +68,7 @@ from anki_tools.languages.mandarin.profile import (
 from anki_tools.ranking import coreflow
 from anki_tools.ranking.core import CoreOptions
 from anki_tools.ranking.deckprofile import LanguageDeckProfile
-from anki_tools.sentence_pack.pack import load_css
+from anki_tools.apkg.templates import load_css
 
 MODEL_NAME = "0 2024 Sentences Deck"
 SENTENCE_FIELD = "Sentence"

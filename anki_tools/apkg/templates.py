@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Sequence
 
 from anki_tools.apkg.package import AnkiPackage
 
@@ -45,8 +47,7 @@ def load_css_layers(*paths: Path) -> str:
     :param paths: CSS files, the shared sheet first.
     :returns: The joined CSS text, empty when every file is absent.
     """
-    parts = [text for text in (load_optional_text(path) for path in paths) if text]
-    return "\n".join(parts)
+    return join_css(*(load_optional_text(path) for path in paths))
 
 
 def load_char_links(path: Path = CHAR_LINKS_PATH) -> str:
@@ -56,6 +57,89 @@ def load_char_links(path: Path = CHAR_LINKS_PATH) -> str:
     :returns: The script text, or an empty string when the file is absent.
     """
     return load_optional_text(path)
+
+
+def join_css(*layers: str) -> str:
+    """Join the CSS texts in order. A later rule overrides an earlier rule.
+
+    :param layers: CSS texts, the shared sheet first.
+    :returns: The joined CSS text, empty when every layer is empty.
+    """
+    return "\n".join(layer for layer in layers if layer)
+
+
+def load_css(css_path: Path, extra_css: str = "") -> str:
+    """Read one CSS file and add the extra classes after it.
+
+    :param css_path: Base CSS file. A missing file gives only the extra text.
+    :param extra_css: CSS classes of the deck.
+    :returns: Base CSS followed by the extra classes.
+    """
+    return join_css(load_optional_text(css_path), extra_css)
+
+
+@dataclass(frozen=True)
+class TemplateSpec:
+    """The text and the switches of one note type.
+
+    :param front: Front template text.
+    :param back: Back template text.
+    :param css_layers: CSS texts in order, the shared sheet first.
+    :param fields: Field names of the note type.
+    :param char_links: True to add the Han character-link script.
+    :param optional_blocks: Block names that the note type drops when the
+        field is absent.
+    """
+
+    front: str
+    back: str
+    css_layers: Sequence[str] = ()
+    fields: Sequence[str] = ()
+    char_links: bool = False
+    optional_blocks: Sequence[str] = ()
+
+
+@dataclass(frozen=True)
+class TemplatePair:
+    """The template pair and the CSS of one note type.
+
+    :param front: Front template text.
+    :param back: Back template text.
+    :param css: Joined CSS text.
+    """
+
+    front: str
+    back: str
+    css: str
+
+
+def drop_block(text: str, name: str) -> str:
+    """Remove one optional block from a template.
+
+    :param text: Template text.
+    :param name: Block name, for example ``Romanization``.
+    :returns: The template without the block.
+    """
+    tag = re.escape(name)
+    pattern = r"\{\{#" + tag + r"\}\}.*?\{\{/" + tag + r"\}\}"
+    return re.sub(pattern, "", text, flags=re.DOTALL).strip()
+
+
+def assemble_templates(spec: TemplateSpec) -> TemplatePair:
+    """Build the template pair and the CSS of one note type.
+
+    :param spec: Text and switches of the note type.
+    :returns: The final templates and the joined CSS.
+    """
+    back = spec.back
+    for name in spec.optional_blocks:
+        if name not in spec.fields:
+            back = drop_block(back, name)
+    if spec.char_links:
+        script = load_char_links()
+        if script:
+            back = f"{back}\n{script}"
+    return TemplatePair(front=spec.front, back=back, css=join_css(*spec.css_layers))
 
 
 def extract_template_fields(template: str) -> set[str]:

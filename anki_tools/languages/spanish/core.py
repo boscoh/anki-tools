@@ -35,7 +35,7 @@ from anki_tools.languages.spanish.profile import (
 from anki_tools.ranking import coreflow, cullflow
 from anki_tools.ranking.core import CoreOptions
 from anki_tools.ranking.deckprofile import LanguageDeckProfile
-from anki_tools.sentence_pack.pack import load_css
+from anki_tools.apkg.templates import load_css
 from anki_tools.sentence_pack.tokens import tokenize
 
 MODEL_NAME = "Spanish sentences cloze+"

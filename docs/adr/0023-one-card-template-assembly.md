@@ -41,15 +41,17 @@ joined CSS.
 - The vocab class table stays in the vocab adapter. That adapter builds the back
   text from the fields, then calls the module.
 - `pack.load_css`, `assemble.ROMANIZATION_BLOCK`, and `assemble.deck_templates`
-  are deleted. The file readers `load_text`, `load_optional_text`,
-  `load_css_layers`, and `load_char_links` stay in `templates.py`, because the
+  are deleted. `load_css` moves into `templates.py`, because the five language
+  profiles use it to state their card CSS. The file readers `load_text`,
+  `load_optional_text`, and `load_char_links` stay there too, because the
   callers still use them.
 
 ## Consequences
 
 One module states the block rule, the script rule, and the CSS join, so the
-vocab deck and the sentence pack cannot drift from the fix routes. Two rules
-earn two tests, and both live in `tests/test_card_templates.py`.
+vocab deck and the sentence pack cannot drift from the fix routes. Four tests
+hold the rules in `tests/test_card_templates.py`: the block rule, its keep case,
+the script switch, and the layer order.
 
 The seam is real: three routes cross it. The interface is one record and one
 function, and the implementation holds the three rules.

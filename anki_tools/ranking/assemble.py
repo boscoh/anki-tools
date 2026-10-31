@@ -10,13 +10,13 @@ from __future__ import annotations
 
 import csv
 import json
-import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping, Protocol, Sequence
 
 from anki_tools.apkg.shape import OutputShape, write_package
+from anki_tools.apkg.templates import TemplateSpec, assemble_templates
 from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.ranking.reorder import reorder_deck
 from anki_tools.sentence_pack.audit import sha256_value
@@ -27,10 +27,6 @@ RANK_COLUMNS = ("rank", "note_id", "sentence", "kept")
 #: Field names of the output note type, in order, without the romanization.
 OUTPUT_FIELDS: tuple[str, ...] = ("Audio", "Sentence", "English", "Core", "CoreGloss")
 OUTPUT_ROMANIZATION_FIELD = "Romanization"
-
-ROMANIZATION_BLOCK = re.compile(
-    r"\{\{#Romanization\}\}.*?\{\{/Romanization\}\}", re.DOTALL
-)
 
 
 class DeckProfile(Protocol):
@@ -83,12 +79,19 @@ def deck_templates(profile: DeckProfile) -> tuple[tuple[str, str], ...]:
     :param profile: Language hooks of the run.
     :returns: The template pairs of the output note type.
     """
-    if profile.romanization_source is not None:
-        return tuple(profile.templates)
-    return tuple(
-        (qfmt, ROMANIZATION_BLOCK.sub("", afmt).strip())
-        for qfmt, afmt in profile.templates
-    )
+    fields = output_fields(profile)
+    pairs: list[tuple[str, str]] = []
+    for qfmt, afmt in profile.templates:
+        pair = assemble_templates(
+            TemplateSpec(
+                front=qfmt,
+                back=afmt,
+                fields=fields,
+                optional_blocks=("Romanization",),
+            )
+        )
+        pairs.append((pair.front, pair.back))
+    return tuple(pairs)
 
 
 def output_fields(profile: DeckProfile) -> tuple[str, ...]:

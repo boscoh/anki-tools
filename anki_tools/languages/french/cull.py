@@ -26,7 +26,7 @@ from anki_tools.languages.french.profile import (
 from anki_tools.ranking import coreflow, corelist, cullflow
 from anki_tools.ranking.coreflow import InputCard
 from anki_tools.ranking.deckprofile import LanguageDeckProfile
-from anki_tools.sentence_pack.pack import load_css
+from anki_tools.apkg.templates import load_css
 from anki_tools.sentence_pack.tokens import load_model
 
 FREQUENCY_PATH = Path("data/french_frequency.tsv")

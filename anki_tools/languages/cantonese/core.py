@@ -40,7 +40,7 @@ from anki_tools.languages.cantonese.profile import (
 from anki_tools.ranking import assemble, coreflow
 from anki_tools.ranking.core import CoreOptions
 from anki_tools.ranking.deckprofile import LanguageDeckProfile
-from anki_tools.sentence_pack.pack import load_css
+from anki_tools.apkg.templates import load_css
 
 MODEL_NAME = "LTL Note Type - Cantonese"
 SENTENCE_FIELD = "Front"

@@ -7,6 +7,8 @@ from anki_tools.apkg.templates import (
     DEFAULT_TEMPLATE_DIR,
     SHARED_CSS_PATH,
     TEMPLATES_DIR,
+    TemplateSpec,
+    assemble_templates,
     apply_field_mapping,
     apply_templates,
     find_best_match,
@@ -189,3 +191,52 @@ def test_the_mapper_takes_the_nearest_field_name() -> None:
     assert apply_field_mapping("{{Translation}}", {"Translation": "English"}) == (
         "{{English}}"
     )
+
+
+ROMANIZED_BACK = (
+    "{{Audio}}<hr id=answer>{{Sentence}}"
+    "{{#Romanization}}<div>{{Romanization}}</div>{{/Romanization}}"
+)
+
+
+def test_the_assembly_drops_a_block_that_has_no_field() -> None:
+    pair = assemble_templates(
+        TemplateSpec(
+            front="{{Audio}}",
+            back=ROMANIZED_BACK,
+            fields=("Audio", "Sentence"),
+            optional_blocks=("Romanization",),
+        )
+    )
+
+    assert "Romanization" not in pair.back
+    assert pair.back.endswith("{{Sentence}}")
+
+
+def test_the_assembly_keeps_a_block_that_has_a_field() -> None:
+    pair = assemble_templates(
+        TemplateSpec(
+            front="{{Audio}}",
+            back=ROMANIZED_BACK,
+            fields=("Audio", "Sentence", "Romanization"),
+            optional_blocks=("Romanization",),
+        )
+    )
+
+    assert "{{Romanization}}" in pair.back
+
+
+def test_the_assembly_adds_the_script_only_when_the_switch_is_on() -> None:
+    off = assemble_templates(TemplateSpec(front="f", back="b"))
+    on = assemble_templates(TemplateSpec(front="f", back="b", char_links=True))
+
+    assert off.back == "b"
+    assert on.back == f"b\n{load_char_links()}"
+
+
+def test_the_assembly_joins_the_css_layers_in_order() -> None:
+    pair = assemble_templates(
+        TemplateSpec(front="f", back="b", css_layers=(".card {}", ".target {}"))
+    )
+
+    assert pair.css == ".card {}\n.target {}"

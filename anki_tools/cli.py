@@ -48,9 +48,10 @@ from anki_tools.apkg.templates import (
     DEFAULT_FRONT_PATH,
     SHARED_CSS_PATH,
     TEMPLATES_DIR,
+    TemplateSpec,
     apply_templates,
-    load_char_links,
-    load_css_layers,
+    assemble_templates,
+    load_optional_text,
     load_text,
 )
 
@@ -681,7 +682,10 @@ def _build_layout(config: dict, entries: list[dict]) -> _BuildLayout:
     back_template = load_text(TEMPLATES_DIR / "vocab" / "back.html")
 
     language_css_path = TEMPLATES_DIR / "vocab" / config["language"].lower() / "card.css"
-    css_content = load_css_layers(SHARED_CSS_PATH, language_css_path)
+    css_layers = (
+        load_optional_text(SHARED_CSS_PATH),
+        load_optional_text(language_css_path),
+    )
 
     csv_fields = (
         [k for k in entries[0].keys() if k != "audio_filename"] if entries else []
@@ -689,7 +693,6 @@ def _build_layout(config: dict, entries: list[dict]) -> _BuildLayout:
     content_order = _content_field_order(csv_fields, config["audio_field_name"])
     fields = content_order + ["audio"]
 
-    char_click_script = load_char_links()
 
     cjk_fields = {"characters", "hanzi", "cantonese", "mandarin", "chinese"}
     field_parts: list[str] = []
@@ -704,16 +707,23 @@ def _build_layout(config: dict, entries: list[dict]) -> _BuildLayout:
         else:
             classes = "target"
         field_parts.append(f"<div class='{classes}'>{{{{{field}}}}}</div>")
-    if char_click_script:
-        field_parts.append(char_click_script)
     answer_format = back_template.replace("{{fields}}", "\n".join(field_parts))
+    templates = assemble_templates(
+        TemplateSpec(
+            front=front_template,
+            back=answer_format,
+            css_layers=css_layers,
+            fields=fields,
+            char_links=True,
+        )
+    )
 
     return _BuildLayout(
         fields=fields,
         content_order=content_order,
-        front_template=front_template,
-        answer_format=answer_format,
-        css_content=css_content,
+        front_template=templates.front,
+        answer_format=templates.back,
+        css_content=templates.css,
         css_path=language_css_path,
     )
 

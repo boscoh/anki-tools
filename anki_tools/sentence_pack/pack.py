@@ -29,7 +29,12 @@ from anki_tools.sentence_pack.profile import (
     WordRow,
     excluded_forms,
 )
-from anki_tools.apkg.templates import SHARED_CSS_PATH, load_char_links
+from anki_tools.apkg.templates import (
+    SHARED_CSS_PATH,
+    TemplateSpec,
+    assemble_templates,
+    load_optional_text,
+)
 
 CSS_PATH = SHARED_CSS_PATH
 CHECKSUMS_PATH = Path("data/tatoeba/checksums.json")
@@ -166,17 +171,6 @@ def media_paths(filenames: Iterable[str], audio_dir: Path) -> list[str]:
     """
     return [str((Path(audio_dir) / name).resolve()) for name in sorted(set(filenames))]
 
-
-def load_css(css_path: Path = CSS_PATH, extra_css: str = "") -> str:
-    """Build the card CSS from the shared sheet and the pack classes.
-
-    :param css_path: Base CSS file. A missing file gives only the pack classes.
-    :param extra_css: CSS classes of the language pack.
-    :returns: Base CSS followed by the pack classes.
-    """
-    css_path = Path(css_path)
-    base = css_path.read_text(encoding="utf-8") if css_path.exists() else ""
-    return f"{base.rstrip()}\n{extra_css.lstrip()}"
 
 
 def audio_license_source(tsv_path: Path) -> dict[str, int]:
@@ -497,10 +491,15 @@ def build_pack(
     by_target = {profile.form_text(form): form for form in table}
     rows = read_rows(csv_path)
     index = load_audio_index(audio_dir / "index.csv")
-    back_template = profile.back_template
-    script = load_char_links() if profile.char_links else ""
-    if script:
-        back_template = f"{back_template}\n{script}"
+    templates = assemble_templates(
+        TemplateSpec(
+            front=profile.front_template,
+            back=profile.back_template,
+            css_layers=(load_optional_text(css_path), profile.extra_css),
+            fields=profile.fields,
+            char_links=profile.char_links,
+        )
+    )
 
     used: list[tuple[WordRow, dict[str, str], dict[str, Any]]] = []
     skipped = 0
@@ -547,9 +546,9 @@ def build_pack(
         cards=[card for _, _, card in used],
         media_files=media,
         model_name=profile.model_name,
-        question_format=profile.front_template,
-        answer_format=back_template,
-        css=load_css(css_path, profile.extra_css),
+        question_format=templates.front,
+        answer_format=templates.back,
+        css=templates.css,
         sort_field_index=profile.sort_field_index,
         deck_description=profile.deck_description,
     )

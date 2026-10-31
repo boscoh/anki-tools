@@ -41,6 +41,7 @@ from anki_tools.languages.mandarin.profile import (
     write_sentence_csv,
     write_sentence_review_csv,
 )
+from anki_tools.apkg.templates import load_css as load_css_file
 from anki_tools.languages.mandarin.characters import get_chinese_chars
 from anki_tools.sentence_pack import audio as shared_audio
 from anki_tools.sentence_pack import guards as shared_guards
@@ -442,7 +443,7 @@ def load_css(css_path: Path = CSS_PATH) -> str:
     :param css_path: Base CSS file.
     :returns: Base CSS followed by the pack classes.
     """
-    return shared_pack.load_css(css_path, EXTRA_CSS)
+    return load_css_file(css_path, EXTRA_CSS)
 
 
 def build_pack(
