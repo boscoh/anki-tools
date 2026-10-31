@@ -11,7 +11,6 @@ from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.sentence_pack import audio, pack, pool, select
 from anki_tools.sentence_pack.audit import (
     AuditInputs,
-    gate_noun_gender,
     gate_filter_recheck,
 )
 from anki_tools.sentence_pack.guards import check_sentence_shape
@@ -429,27 +428,6 @@ def test_gate_19_rejects_a_discontinuous_target_without_both_parts(
     passed, _ = french.gate_discontinuous(inputs, french.FRENCH)
     assert not passed
 
-
-def test_gate_20_reports_the_noun_gender_count(tmp_path: Path) -> None:
-    table = [_form(150, "water", "eau", "f"), _form(151, "rain", "pluie")]
-    rows = [
-        {
-            "target": "eau",
-            "sentence": "Je voudrais de l'eau.",
-            "english": "I would like water.",
-            "tier": "core",
-        }
-    ]
-    inputs = _audit_inputs(tmp_path, table, rows, {"noun_gender_missing": 1})
-    passed, message = gate_noun_gender(inputs, french.FRENCH)
-    assert passed
-    assert "pluie" in message
-
-    full = [_form(150, "water", "eau", "f"), _form(151, "rain", "pluie", "f")]
-    inputs = _audit_inputs(tmp_path, full, rows, {"noun_gender_missing": 0})
-    passed, message = gate_noun_gender(inputs, french.FRENCH)
-    assert passed
-    assert "2 noun row(s)" in message
 
 
 def test_manifest_counts(tmp_path: Path) -> None:

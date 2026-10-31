@@ -2,7 +2,7 @@
 
 | Field   | Value                                                                   |
 | ------- | ----------------------------------------------------------------------- |
-| Status  | Proposed                                                                |
+| Status  | Phase 1 and the consolidation done; pack G1 and step 7 open             |
 | Date    | 2026-11-01                                                              |
 | Owner   | anki-tools                                                              |
 | Related | `docs/gate-inventory.md`, `docs/gate-filter-comparison.md`, `anki-3fc9` |
@@ -66,9 +66,10 @@ below both packages.
 
 ## 4. Gate inventory across the flows
 
-The four deck builders hold 59 gate table rows and about 77 gate functions.
-About 21 functions are copies of another function. Some rows only report and
-cannot fail.
+The four deck builders held 59 gate table rows and about 77 gate functions.
+About 21 functions were copies of another function. Some rows only reported
+and could not fail. This table gives the state before phase 2. Section 7.1
+gives the final state.
 
 | Family            | What the gate checks                       | Flows and ids                                           |
 | ----------------- | ------------------------------------------ | ------------------------------------------------------- |
@@ -161,60 +162,53 @@ row order are the same. The report text and the exit code are the same.
 
 ### 7.1 Actions
 
-| Gate or copy              | Action                   | Result                                                    | Risk                               |
-| ------------------------- | ------------------------ | --------------------------------------------------------- | ---------------------------------- |
-| pack G1 ×5                | consolidate              | one `gate_word_table`                                     | low                                |
-| pack G12 ×4               | consolidate              | one `gate_attribution`                                    | low                                |
-| pack G9 ×3                | consolidate              | one `gate_word_boundary`                                  | low                                |
-| pack G17 ×2               | consolidate              | one `gate_typography`                                     | low                                |
-| pack G18 ×2 (FR, ES)      | consolidate              | one `gate_no_blocked_license`                             | low                                |
-| pack G20 ×2 (FR, ES)      | consolidate, then remove | one `gate_noun_gender`, then move the count to the report | low                                |
-| pack G18 + Greek G18      | consolidate              | one `gate_no_native_audio`                                | low                                |
-| pack G3 + G19 + Greek G19 | consolidate              | one `gate_targets_in_table`; keep G3, drop G19            | low                                |
-| pack G5 + G9              | consolidate              | one `gate_target_once`; keep G5, drop G9 on FR, ES, EL    | low                                |
-| pack G13                  | supersede                | `gate_output_model`, after the one output reader          | high                               |
-| cull G6 + core K6         | consolidate              | one `gate_similarity`                                     | low                                |
-| cull G13 + core K12       | consolidate              | one `gate_manifest_hashes`                                | low                                |
-| cull G15 + core K14       | consolidate              | one `gate_templates`                                      | low                                |
-| cull G8 + core K8         | consolidate              | one `gate_counts`                                         | low                                |
-| cull G11 + core K10       | consolidate              | one `gate_kept_order`                                     | low                                |
-| cull G7 + core K7         | consolidate              | one `gate_audio`                                          | medium: the core can start to fail |
-| core K15                  | remove                   | merge the bold target into K19                            | low                                |
-| core K3                   | remove                   | move the share to the report                              | low                                |
-| core K17                  | remove                   | move the counts to the report                             | low                                |
-| core K1 + K8              | optional merge           | one `gate_counts`, then one row                           | medium: the id table changes       |
+Phase 1 and the consolidation are done, except pack G1. The final decisions:
 
-No gate is marked deprecated today. A superseded gate is the mechanism for a
-deprecation. Keep the id, point it at the shared check, then remove the row
-when the table shrinks.
+- pack G3 checks the table form and the shared form. The French G19
+  `gate_discontinuous` and the Spanish G19 `gate_pair_parts` stay. Greek and
+  Cantonese G19 are gone.
+- pack G5 checks the target once. G9 stays only as the Cantonese script check
+  and the Mandarin pinyin check.
+- pack G20 is gone. The count stays in the manifest as `noun_gender_missing`.
+- core K3, K15, and K17 are gone. Their values are in the core report:
+  Covered twice, Rejected names, and Rejected loan words.
+- K1 and K8 are not merged. The two functions stay separate.
+- The renames in section 7.2 are done.
+- pack G13 stays until the one output reader lands. Then it uses `gate_output_model`.
+- pack G1 is open. Five modules define `gate_word_table`. The French and
+  Spanish `check_word_table` take no `csv_path`, so the shared check needs a
+  profile hook.
+
+A removed row leaves the table. Its value moves to the report, or the check
+joins a shared function behind a kept id.
 
 ### 7.2 Renames
 
-The function name changes. The gate id and the check do not.
+The renames are done. The function name changed. The gate id and the check
+did not. The functions that belong to a removed row are deleted, not renamed:
+`gate_covered2`, `gate_bold`, `gate_names`, `gate_no_native`, and `gate_targets`.
 
 | Current                 | Proposed                  | Flow             |
 | ----------------------- | ------------------------- | ---------------- |
 | `gate_covered1`         | `gate_covered_targets`    | core K2          |
-| `gate_covered2`         | `gate_coverage_twice`     | core K3          |
 | `gate_hit`              | `gate_target_in_sentence` | core K13         |
 | `gate_sense`            | `gate_unchecked_sense`    | core K16         |
-| `gate_names`            | `gate_name_report`        | core K17         |
 | `gate_card_count`       | `gate_card_cap`           | cull G1          |
 | `gate_filter`           | `gate_filter_recheck`     | cull G5, core K5 |
 | `gate_proper_sentences` | `gate_filter_recheck`     | pack G14         |
 | `gate_target_coverage`  | `gate_coverage_once`      | cull G3          |
 | `gate_double_coverage`  | `gate_coverage_twice`     | cull G4          |
-| `gate_no_native`        | `gate_no_native_audio`    | Greek G18        |
 | `gate_coverage`         | `gate_coverage_agreement` | core K11         |
 | `gate_coverage_rows`    | `gate_coverage_shape`     | cull G12         |
 
-Cull G12 and core K11 have close names today, but the checks differ. The new
-names state the difference.
+Cull G12 and core K11 had close names, but the checks differ. The new names
+state the difference.
 
 ### 7.3 What stays different
 
-- The gate table per flow. The pack has 18 to 21 gates per language. The cull
-  has G1 to G17. The core has K1 to K21. The vocabulary deck has no gate table.
+- The gate table per flow. The pack has 18 to 20 gates per language. The cull
+  has G1 to G17. The core has K1 to K21, 18 rows. The vocabulary deck has no
+  gate table.
 - The gate ids. ADR 0027.
 - The pack check signature `(inputs, profile)`. A `check(files)` form would
   touch about 60 pack functions and gains nothing. Do it only when a pack check
@@ -222,7 +216,7 @@ names state the difference.
 - The pack reader `AuditInputs` keeps its own accessors: `table`, `index`,
   `apkg`, and `attribution_path`.
 - Cull G1 checks the cap or the pool end. Core K1 checks a three-way
-  agreement. Keep two functions unless the optional K1 and K8 merge lands.
+  agreement. The two functions stay separate.
 
 ### 7.4 Behavior
 
@@ -234,8 +228,8 @@ and core K7 become one check. The cull check reads the media map. The core can
 start to fail where it did not.
 
 The report text changes for the removed rows and the renamed functions. The
-gate table loses three rows: core K3, core K17, and pack G20. It can lose one
-more when K15 merges into K19.
+core table loses K3, K15, and K17. The pack table loses G20. The core report
+prints Covered twice, Rejected names, and Rejected loan words.
 
 ### 7.5 Verification
 
@@ -262,18 +256,19 @@ the expected result.
 
 ## 8. Order
 
-| Step | Work                        | Behavior                                 | Risk          |
-| ---- | --------------------------- | ---------------------------------------- | ------------- |
-| 1    | the runner and the row type | none                                     | low           |
-| 2    | the eight language copies   | none                                     | low           |
-| 3    | the six rank pairs          | none, except the core audio check        | low to medium |
-| 4    | the superseded pack checks  | none, except G13 after the output reader | medium        |
-| 5    | the renames                 | none                                     | low           |
-| 6    | the report-only removals    | report and table length                  | low           |
-| 7    | the one output reader       | pack G13 changes                         | high          |
+| Step | Work                        | Behavior                                 | Risk          | Status |
+| ---- | --------------------------- | ---------------------------------------- | ------------- | ------ |
+| 1    | the runner and the row type | none                                     | low           | done   |
+| 2    | the eight language copies   | none                                     | low           | open   |
+| 3    | the six rank pairs          | none, except the core audio check        | low to medium | done   |
+| 4    | the superseded pack checks  | none, except G13 after the output reader | medium        | open   |
+| 5    | the renames                 | none                                     | low           | done   |
+| 6    | the report-only removals    | report and table length                  | low           | done   |
+| 7    | the one output reader       | pack G13 changes                         | high          | open   |
 
-Step 1 is tracked by `anki-3fc9`. Steps 2 to 6 remove about 21 function
-definitions and three rows. Step 7 is separate work.
+Step 1 is tracked by `anki-3fc9`. Steps 1, 3, 5, and 6 are done. Step 4 is
+open only for pack G13; G3 and G5 are done. Step 2 is open because of pack G1.
+Step 7 is open and is separate work.
 
 ## 9. References
 

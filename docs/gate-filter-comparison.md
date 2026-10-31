@@ -7,9 +7,9 @@ One builder has no gate table:
 
 | Flow | Command | Gate table | Filter table |
 | --- | --- | --- | --- |
-| Sentence pack | `anki swadesh pack <lang>` | G1 to G21 | F1 to F12, `unknown`, `sense` |
+| Sentence pack | `anki swadesh pack <lang>` | G1 to G21, 18 to 20 rows | F1 to F12, `unknown`, `sense` |
 | Cull deck | `anki fix <lang> <input> --select` | G1 to G17 | F1 to F9 |
-| Core deck | `anki fix <lang> <input> --core` | K1 to K21 | F1 to F9, C1 to C5 |
+| Core deck | `anki fix <lang> <input> --core` | K1 to K21, 18 rows | F1 to F9, C1 to C5 |
 | Vocabulary deck | `anki swadesh vocab <lang>` | none | none |
 
 A **filter** rejects a sentence or a card before selection. The pack code calls
@@ -21,7 +21,7 @@ records the overlap. For example, pack `F8` is the internal-mark rule and rank
 `F8` is the name rule. Pack `G5` tests a one-time target and cull `G5`
 re-runs the filters.
 
-The claims below match the code at commit `3fbeae8`.
+The claims below match the code after phase 1 and phase 2 tiers 1 to 6.
 
 ## 2. Filters
 
@@ -93,9 +93,9 @@ C5 in `filter_core_cards`. The core stores the first failed rule as the card
 
 | Flow | Table | Ids | Scope | Thresholds |
 | --- | --- | --- | --- | --- |
-| Sentence pack | `sentence_pack/audit.py` plus the language module | G1 to G21, 18 to 21 gates per language | source word table, review CSV, sentence CSV, audio directory, attribution file, output APKG, manifest | `coverage_min`, for example 0.70 Cantonese to 0.95 French |
+| Sentence pack | `sentence_pack/audit.py` plus the language module | G1 to G21, 18 to 20 gates per language | source word table, review CSV, sentence CSV, audio directory, attribution file, output APKG, manifest | `coverage_min`, for example 0.70 Cantonese to 0.95 French |
 | Cull deck | `ranking/cullgates.py` | G1 to G17 | output APKG, cull CSV, coverage CSV, manifest | `target_coverage_gate` 0.98, `double_coverage_gate` 0.95, `max_uses`, `max_cards` |
-| Core deck | `ranking/coregates.py` | K1 to K21 | output APKG, core CSV, coverage CSV, rank CSV, manifest | `outside_set_ratio`, `outside_rare_ratio`, `max_unchecked_sense`, `max_unranked` |
+| Core deck | `ranking/coregates.py` | K1 to K21, 18 rows | output APKG, core CSV, coverage CSV, rank CSV, manifest | `outside_set_ratio`, `outside_rare_ratio`, `max_unchecked_sense`, `max_unranked` |
 | Vocabulary deck | none | - | - | - |
 
 ### 3.2 Shared code
@@ -122,15 +122,21 @@ table. Section 3.4 gives the interface, and section 5.1 gives the change.
 
 - The pack gates read input artifacts. The cull and core gates read the output
   APKG, the output CSVs, and the manifest.
-- The pack gate list is not fixed. Mandarin stops at G18, Greek at G20, and
+- The pack gate list is not fixed. Mandarin stops at G18. Greek stops at G20.
   French, Spanish, and Cantonese reach G21 with different gates at G17 to G21,
-  for example typography, noun gender, jyutping, and false friend.
+  for example typography, jyutping, discontinuous target, and false friend.
+  G19 exists only in French and Spanish. Greek and Cantonese G19 are gone.
 - The pack G14 re-applies the shape guards and F9 to F10 only. The cull G5
   re-applies F1 to F9. The core K5 re-applies F1 to F9 and C1 to C5.
 - The cull G5 exempts F8 for a reserve card. A Swadesh pack has no name rule,
-  and G14 needs those cards (`ranking/cullgates.py`, `gate_filter`).
-- The core K3 and K17 report only. They do not fail. Every pack and cull gate
-  can fail.
+  and G14 needs those cards (`ranking/cullgates.py`, `gate_filter_recheck`).
+- The core rows K3, K15, and K17 are gone. Their values are report lines:
+  Covered twice, Rejected names, and Rejected loan words. The bold target of
+  K15 is part of K19. Every pack, cull, and core gate can fail.
+- The remaining gaps: pack G19 covers the target parts only in French and
+  Spanish. Pack G3 covers the table form and the shared form, not the target
+  parts. Pack G9 covers the script only in Cantonese and the pinyin only in
+  Mandarin. The noun gender count `noun_gender_missing` is a manifest value.
 - The pack manifest has a second shape. `sentence_pack/pack.py` writes it, and
   G11 reads it. The cull and core manifests come from
   `ranking/assemble.py`.
@@ -232,6 +238,8 @@ code must stay the same.
 
 **Verdict**: do it. This is the gate harmonization: one seam and four tables.
 
+**Status**: done. See `specs/gate-layer.md`.
+
 ### 5.2 L2: one rule record schema
 
 **Change**: add one `Rule` record, for example `(key, name, test)`. Build
@@ -321,7 +329,7 @@ separate sets and make the accidental differences go away.
 
 ## 6. Recommended order
 
-The gate harmonization comes first, because it changes no deck:
+The gate harmonization is done. It changed no deck:
 
 1. **L1: one gate runner**. Small, no behavior change. Tracked by
    `anki-3fc9`. ADR 0021 records the one file reader. This step adds the one
@@ -332,6 +340,7 @@ The gate harmonization comes first, because it changes no deck:
 
 Record one ADR for L3, because it changes the `CoreProfile` interface. ADR
 0027 stays in force for the ids.
+
 ## 7. Verification
 
 Run the focused tests first:

@@ -42,7 +42,6 @@ from anki_tools.sentence_pack.pool import (
 )
 from anki_tools.sentence_pack.profile import (
     LanguageProfile,
-    NOUN_INDICES,
     WordRow,
     duplicate_limit,
 )
@@ -743,28 +742,6 @@ def gate_no_blocked_license(
     if blocked:
         return False, f"{len(blocked)} card(s) use a blocked license: {sample(blocked)}"
     return True, "no card uses a CC BY-NC 4.0 or empty-license recording"
-
-
-def gate_noun_gender(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Gate G20: report the noun rows with an empty gender.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text. A reported count is not a failure.
-    """
-    nouns = [
-        form for form in inputs.table() if form.swadesh_index in NOUN_INDICES
-    ]
-    empty = sorted(profile.form_text(form) for form in nouns if not form.gender)
-    counted = inputs.manifest().get("noun_gender_missing")
-    if empty:
-        return True, (
-            f"{len(empty)} of {len(nouns)} noun row(s) have no gender: "
-            f"{sample(empty)}"
-        )
-    return True, f"{len(nouns)} noun row(s) have a gender (manifest {counted})"
 
 
 def gate_attribution(

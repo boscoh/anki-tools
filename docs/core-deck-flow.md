@@ -23,7 +23,8 @@ One command runs the stages in order: `anki fix <language> --core`. The
 | K5    | order   | K4                                        | card order, assigned target per card        |
 | K6    | write   | K0, K4, K5                                | APKG and four side files                    |
 
-The gates K1 to K21 run after K6.
+The gates K1 to K21 run after K6. The table holds 18 rows: K3, K15, and K17
+are gone.
 
 The `--cards` and `--words` values change the tier F target count and the
 card cap. The other `CoreRequest` fields keep their defaults.
@@ -248,7 +249,7 @@ then uses the lowest-position target that the card holds.
 
 | File                   | Content                                                 |
 | ---------------------- | ------------------------------------------------------- |
-| `<language>_core.apkg`     | the deck: the kept cards in the order of K5             |
+| `<language>_core.apkg` | the deck: the kept cards in the order of K5             |
 | `<stem>.core.csv`      | one row per input card: kept, pass, value, cost, reason |
 | `<stem>.coverage.csv`  | one row per target: key, word, gloss, quota, count      |
 | `<stem>.manifest.json` | params, counts, frequency source, file hashes           |
@@ -302,22 +303,20 @@ The coverage status of a target is one of these values:
 | Group      | Gates           | Checks                                                |
 | ---------- | --------------- | ----------------------------------------------------- |
 | size       | K1, K4          | card count, outside set and rare outside words        |
-| coverage   | K2, K3, K11     | covered targets, two-card share, coverage CSV         |
-| rules      | K5, K6, K17     | F1 to F9 and C1 to C5, similarity, the rejected counts |
+| coverage   | K2, K11         | covered targets, coverage CSV                         |
+| rules      | K5, K6          | F1 to F9 and C1 to C5, similarity                     |
 | files      | K7, K8, K12     | audio files, counts, manifest hashes                  |
 | identity   | K9, K10         | deck name, note type, kept order                      |
-| cards      | K13, K14, K15   | target in the text, templates and CSS, bold core word |
+| cards      | K13, K14        | target in the text, templates and CSS                 |
 | sense      | K16, K19, K20   | unchecked target, core word and gloss, unranked word  |
 | shape      | K18             | each tail card brings a new content lemma             |
 | note type  | K21             | one note type, the output fields, one card per note   |
 
-K3 reports the share of targets with two cards. It does not fail.
+The build report holds the values of K3, K15, and K17: Covered twice, Rejected
+names, and Rejected loan words. A report line does not fail the run.
 
-K17 reports the C3 name rejects and the C4 loan word rejects. It does not fail,
-because K5 holds every kept card to both rules.
-
-K14 checks the templates and the CSS of the language profile. K15 checks that
-every kept note holds a bold core word. K19 checks that every note holds a
+K14 checks the templates and the CSS of the language profile. K19 checks that
+every note holds a
 `Core`, a `CoreGloss`, and a bold core word, that the gloss is the coverage
 gloss of the core word, and
 that the gloss has no comma. K21 checks the single note type, the field set,
@@ -328,7 +327,7 @@ and one card per note.
 | Path                                            | Content                                    |
 | ----------------------------------------------- | ------------------------------------------ |
 | `anki_tools/ranking/coreflow.py`                | K0 to K6 flow, output field values         |
-| `anki_tools/ranking/coregates.py`               | gates K1 to K21                            |
+| `anki_tools/ranking/coregates.py`               | gates K1 to K21, 18 rows                   |
 | `anki_tools/gates.py`                           | gate value, row, runner, reader contract   |
 | `anki_tools/ranking/gates.py`                   | report, shared gates                       |
 | `anki_tools/ranking/assemble.py`                | deck, side files, manifest, report         |

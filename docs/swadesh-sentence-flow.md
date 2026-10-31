@@ -70,6 +70,7 @@ S5  APKG, manifest, attribution
 The S5 builder writes a card only when its sentence holds the target in bold.
 A row that cannot is skipped and counted in `counts.no_target`. The audit gate
 G5 still reports the missing match in the source CSV.
+
 ## 3. S2 guard chain
 
 The pool walks the linked sentences in Tatoeba id order. Then it appends the
@@ -250,12 +251,14 @@ merges some forms into a longer token. So 水 counts inside 喝水.
 | Mandarin  | G17               | G18                |
 | Cantonese | G20               | G21                |
 | French    | none              | G21                |
+| Spanish   | none              | G21                |
 | Greek     | none              | G20                |
 
 The shared English sense gate and the shared false-friend gate live in
-`anki_tools/sentence_pack/audit.py`. The word table gate, the boundary gate,
-the attribution gate, and the other language gates live in the language
-module. The gate table of the language lists them in gate number order.
+`anki_tools/sentence_pack/audit.py`. The word table gate, the attribution gate,
+the typography gate, the license gate, and the other language gates live in
+`audit.py` or the language module. The gate table of the language lists them in
+gate number order.
 
 ## 6. Audit gates
 
@@ -264,7 +267,8 @@ The audit reads the output files only. The gates fall in these groups:
 | Group          | Gates              | Checks                                              |
 | -------------- | ------------------ | --------------------------------------------------- |
 | word table     | G1, G2, G15        | row count, index, label, review status              |
-| cards          | G3 to G6, G14, G19 | target, id, match count, similarity, sentence shape |
+| cards          | G3 to G6, G14      | target, id, match count, similarity, sentence shape |
+| target parts   | G19 in FR and ES   | a multi-word target keeps both parts                |
 | audio          | G7, G8, G16        | sentence file, word file, media count               |
 | manifest       | G11, G13           | counts, hashes, APKG note count                     |
 | coverage       | G10                | core coverage against `coverage_min`                |
@@ -272,6 +276,11 @@ The audit reads the output files only. The gates fall in these groups:
 | attribution    | G12                | author names                                        |
 
 A language pack can add a gate. For example, Cantonese adds G20 and G21.
+G19 is the French `gate_discontinuous` and the Spanish `gate_pair_parts`, so
+Greek and Cantonese have no G19. G9 is the Cantonese script check and the
+Mandarin pinyin check, so French, Spanish, and Greek have no G9. G20 is the
+Greek sense gate and the Cantonese false-friend gate; French and Spanish have
+no G20.
 
 ## 7. File map
 
