@@ -7,7 +7,7 @@ One builder has no gate table:
 
 | Flow | Command | Gate table | Filter table |
 | --- | --- | --- | --- |
-| Sentence pack | `anki swadesh pack <lang>` | G1 to G21, 18 to 20 rows | F1 to F12, `unknown`, `sense` |
+| Sentence pack | `anki swadesh pack <lang>` | G1 to G21, 18 to 20 rows per language | F1 to F12, `unknown`, `sense` |
 | Cull deck | `anki fix <lang> <input> --select` | G1 to G17 | F1 to F9 |
 | Core deck | `anki fix <lang> <input> --core` | K1 to K21, 18 rows | F1 to F9, C1 to C5 |
 | Vocabulary deck | `anki swadesh vocab <lang>` | none | none |
@@ -21,7 +21,8 @@ records the overlap. For example, pack `F8` is the internal-mark rule and rank
 `F8` is the name rule. Pack `G5` tests a one-time target and cull `G5`
 re-runs the filters.
 
-The claims below match the code after phase 1 and phase 2 tiers 1 to 6.
+The claims below match the code after phase 1 and phase 2, except pack G1
+and the one output reader. Section 3.5 lists them.
 
 ## 2. Filters
 
@@ -91,12 +92,28 @@ C5 in `filter_core_cards`. The core stores the first failed rule as the card
 
 ### 3.1 Gate tables
 
-| Flow | Table | Ids | Scope | Thresholds |
-| --- | --- | --- | --- | --- |
-| Sentence pack | `sentence_pack/audit.py` plus the language module | G1 to G21, 18 to 20 gates per language | source word table, review CSV, sentence CSV, audio directory, attribution file, output APKG, manifest | `coverage_min`, for example 0.70 Cantonese to 0.95 French |
-| Cull deck | `ranking/cullgates.py` | G1 to G17 | output APKG, cull CSV, coverage CSV, manifest | `target_coverage_gate` 0.98, `double_coverage_gate` 0.95, `max_uses`, `max_cards` |
-| Core deck | `ranking/coregates.py` | K1 to K21, 18 rows | output APKG, core CSV, coverage CSV, rank CSV, manifest | `outside_set_ratio`, `outside_rare_ratio`, `max_unchecked_sense`, `max_unranked` |
-| Vocabulary deck | none | - | - | - |
+Each workflow owns a table. The pack table differs by language. A removed row
+leaves a gap in the numbering.
+
+| Workflow                          | Active rows                        | Count |
+| --------------------------------- | ---------------------------------- | ----- |
+| Sentence pack, French and Spanish | G1 to G8, G10 to G19, G21          | 19    |
+| Sentence pack, Greek              | G1 to G8, G10 to G18, G20          | 18    |
+| Sentence pack, Mandarin           | G1 to G18                          | 18    |
+| Sentence pack, Cantonese          | G1 to G18, G20, G21                | 20    |
+| Cull deck                         | G1 to G17                          | 17    |
+| Core deck                         | K1, K2, K4 to K14, K16, K18 to K21 | 18    |
+| Vocabulary deck                   | none                               | 0     |
+
+The pack rows mean different checks in different languages. Section 3.3 gives
+the language tail.
+
+| Workflow        | Table                                             | Scope                                                                                                 | Thresholds                                                                        |
+| --------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Sentence pack   | `sentence_pack/audit.py` plus the language module | source word table, review CSV, sentence CSV, audio directory, attribution file, output APKG, manifest | `coverage_min`, for example 0.70 Cantonese to 0.95 French                         |
+| Cull deck       | `ranking/cullgates.py`                            | output APKG, cull CSV, coverage CSV, manifest                                                         | `target_coverage_gate` 0.98, `double_coverage_gate` 0.95, `max_uses`, `max_cards` |
+| Core deck       | `ranking/coregates.py`                            | output APKG, core CSV, coverage CSV, rank CSV, manifest                                               | `outside_set_ratio`, `outside_rare_ratio`, `max_unchecked_sense`, `max_unranked`  |
+| Vocabulary deck | none                                              | -                                                                                                     | -                                                                                 |
 
 ### 3.2 Shared code
 
@@ -173,6 +190,40 @@ its own table.
 
 The pack declares `(name, check)` tuples and `as_gates` wraps them, so the pack
 supplies the profile through the reader. Section 5.1 records the change.
+
+### 3.5 Gate refactor status
+
+The gate refactor in `specs/gate-layer.md` is done, except two items.
+
+| Item                                                            | State     |
+| --------------------------------------------------------------- | --------- |
+| One value, one row, one runner in `anki_tools/gates.py`         | done      |
+| The pack `as_gates` adapter                                     | done      |
+| The language copies (G12, G17, G18, G19, G3/G19, G5/G9)         | done      |
+| The rank pairs (G6/K6, G7/K7, G8/K8, G11/K10, G13/K12, G15/K14) | done      |
+| The report-only rows (K3, K15, K17, pack G20)                   | done      |
+| The function renames                                            | done      |
+| Pack G1: five `gate_word_table` copies                          | open      |
+| One output reader, then pack G13 uses `gate_output_model`       | open      |
+| The optional K1 and K8 merge                                    | not doing |
+
+What was done:
+
+- The pack, the cull, and the core run one gate value and one runner.
+- The shared checks moved to `sentence_pack/audit.py` and `ranking/gates.py`.
+- The report-only rows left the gate table. Their values are report lines or
+  manifest values.
+- The function names state the check.
+
+What is left:
+
+- Pack G1 needs a profile hook for the CSV path, then one
+  `gate_word_table`. Tracked by `anki-ujvj`.
+- One output reader. Then pack G13 uses `gate_output_model`, and the pack
+  shares the audio and template checks. Tracked by `anki-ujvj`.
+
+The filter work is separate. The rule order and the core mark source are not
+part of the gate refactor.
 
 ## 4. Why the flows differ
 
