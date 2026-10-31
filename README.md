@@ -34,6 +34,8 @@ Related documents:
 - `docs/swadesh-sentence-flow.md`, `docs/vocab-deck-flow.md`,
   `docs/core-deck-flow.md`, `docs/cull-deck-flow.md` - stage order of each
   deck builder.
+- `docs/gate-filter-comparison.md` - how the flows differ, and the cost of one
+  rule set.
 
 ## Quick Start
 
