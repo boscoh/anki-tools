@@ -17,10 +17,12 @@ from pathlib import Path
 #: Directory of the default output files.
 OUTPUT_DIR = Path("apkg")
 
-#: Suffix of the default output stem, per mode.
-MODE_SUFFIX: dict[str, str] = {
-    "core": "core",
-    "cull": "1000",
+#: Default output stem per mode. The language fills the ``{language}`` slot.
+MODE_STEM: dict[str, str] = {
+    "core": "{language}_core",
+    "cull": "{language}_1000",
+    "pack": "swadesh_sentences_{language}",
+    "vocab": "swadesh_vocab_{language}",
 }
 
 
@@ -28,11 +30,14 @@ def default_output(language: str, mode: str) -> Path:
     """Give the default output file of one language and mode.
 
     :param language: Canonical language name, for example ``french``.
-    :param mode: ``core`` or ``cull``.
+    :param mode: ``core``, ``cull``, ``pack``, or ``vocab``.
     :raises KeyError: The mode holds no default stem.
-    :returns: ``apkg/<language>_<mode suffix>.apkg``.
+    :returns: The default output file of the mode:
+        ``apkg/<language>_core.apkg``, ``apkg/<language>_1000.apkg``,
+        ``apkg/swadesh_sentences_<language>.apkg``, or
+        ``apkg/swadesh_vocab_<language>.apkg``.
     """
-    return OUTPUT_DIR / f"{language}_{MODE_SUFFIX[mode]}.apkg"
+    return OUTPUT_DIR / f"{MODE_STEM[mode].format(language=language)}.apkg"
 
 
 @dataclass(frozen=True)
