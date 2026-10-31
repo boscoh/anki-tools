@@ -45,7 +45,8 @@ _Avoid_: notetype blob, model config
 **Vocabulary deck**:
 The deck with one card per Swadesh concept, its form, and its audio. The
 `anki swadesh vocab` command builds it from an `english-<lang>.csv` file and an
-audio directory, for example `apkg/swadesh_mandarin.apkg`.
+audio directory, for example `apkg/swadesh_mandarin.apkg`. The code lives in
+`anki_tools/swadesh_vocab.py`.
 _Avoid_: word deck, word list deck
 
 **Core deck**:
@@ -66,19 +67,43 @@ The one name that a written package and its side files share. ADR 0015 records
 the rule.
 _Avoid_: deck identity, artifact name
 
+**Manifest**:
+The JSON side file of a written package. It records the input file, the deck
+title and the note type name, the options, the counts, and the `sha256` of the
+input and of each side file. The gates read the counts and the hashes from it,
+and compare `source.deck` and `source.model` with the package. The core and cull
+routes write it in `anki_tools/ranking/assemble.py`; the sentence pack writes a
+second shape in `anki_tools/sentence_pack/pack.py`. ADR 0018 records the fix
+shape.
+_Avoid_: build record, sidecar, report
+
 **Output package shape**:
 The invariant of a written package: one deck, one standard note type with the
 stated fields, and one card per note. The code lives in
 `anki_tools/apkg/shape.py`.
 _Avoid_: deck layout, package template
 
+**Deck writer**:
+The one module that writes an output package: the note type shape, the card
+values, the media, the side tables, the manifest, and the report of one run.
+Two adapters sit behind it: write a new package, and edit an input package. The
+code lives in `anki_tools/apkg/deck_writer.py`. ADR 0024 records the interface.
+_Avoid_: builder, exporter, packager
+
+**Card template assembly**:
+The one module that turns the front text, the back text, the CSS layers, the
+field names, a character-link switch, and the blocks to strip into the template
+pair and the CSS of one note type. The code lives in
+`anki_tools/apkg/templates.py`. ADR 0023 records the interface.
+_Avoid_: template builder, card layout
+
 **Deck assembler**:
-The module that states the output shape from the deck profile interface, then
-writes the package, the side files, the manifest, and the report of one run.
-The core selection and the cull selection are its two adapters, and each
-returns the written paths. The code lives in
-`anki_tools/ranking/assemble.py`. ADR 0018 records the interface.
-_Avoid_: writer, builder, exporter
+The fix-run adapter over the deck writer. It states the output shape from the
+deck profile interface, and the side tables, the manifest values, and the
+report lines of one fix run. The core selection and the cull selection are its
+two adapters. The code lives in `anki_tools/ranking/assemble.py`. ADR 0018
+records the interface.
+_Avoid_: builder, exporter
 
 **Deck profile interface**:
 The eight members of a mode view that the deck assembler reads: the input
