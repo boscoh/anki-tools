@@ -1,5 +1,5 @@
 {
-  "build_date": "2026-10-31T10:17:56+00:00",
+  "build_date": "2026-10-31T23:36:35+00:00",
   "source": {
     "input": "apkg/Neri's Chinese Sents Part 2.apkg",
     "deck": "Mandarin Core",
@@ -48,8 +48,6 @@
     "dropped_no_core": 0,
     "bolded": 147,
     "unbolded": 0,
-    "name_hits": 0,
-    "loan_hits": 0,
     "rows": 5009,
     "rejected_c3": 1,
     "rejected_c4": 0,
@@ -60,7 +58,7 @@
     "spoken_weight": 0.5
   },
   "files": {
-    "core_csv": "sha256:9af84de2105fe146d6536c563b92785f7d3315e2b325267b4bc2e10eda1d85c2",
+    "core_csv": "sha256:4c705336d0b581e5ff6dabbdf6ed04fdc25283f24a0e250a937d1f9b649a7f2c",
     "coverage_csv": "sha256:df96292912e3e44ff7eaa4bad7bb5001cc3f2710e0d5d7a6e93245887b9ba9d3",
     "input_apkg": "sha256:e7c99d9f7e176d108652f810388575438b514d9aedec806d9d09a88e71b1b3f1"
   },

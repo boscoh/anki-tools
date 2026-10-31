@@ -1,145 +1,145 @@
 note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cost,units,new_lemmas,sense,bold
-1621761270303,966,你做咩唔同我講呀?,"""Why didn't you tell me?""",azure-0afcdbb4-bbf71c01-a2cad882-ba3aa582-92a4beb1.mp3,1,seed,,S140:講|S16:唔|S1:我|S2:你,S1:我,1.9756,0.4000,5,4,0,0
-1621761270156,819,你啲頭髮長得濟.,Your hair is too long.,azure-aa5fadd3-f83e7671-788e58ec-1310f133-6068eb52.mp3,1,seed,,S28:長|S2:你|S71:頭髮,S2:你,0.3379,0.3000,5,1,0,0
-1621761269414,77,佢幫我哋.,He helps us.,azure-c6a6efdc-2620fa4d-8ccdc18a-be5f63d1-9bfb17d9-d0fa3fdb98dffec75fa401a82f3d66a1787960a0.mp3,1,seed,,S3:佢|S4:我哋,S3:佢,0.9207,0.1000,3,1,0,0
-1621761270257,920,我哋兩個都好驚.,Both of us were scared.,azure-60365312-a6cc6367-4b5e20cb-bb3b6d80-61998b37.mp3,1,seed,,S106:驚|S23:兩|S4:我哋,S4:我哋,0.3564,0.1000,5,1,0,0
-1621761270252,915,你哋而家喺邊?,Where are you guys now?,azure-c806b784-610d6136-d78570aa-aea8a7c7-5cc3fce9.mp3,1,seed,,S5:你哋,S5:你哋,0.3669,0.2000,4,2,0,0
-1621761269888,551,佢哋唔食肉.,"""They don't eat meat.""",azure-1abafd61-feaaac9e-402db58c-3f396845-b7448faf-42481825eeeb5db4f25661dad5ca38bc35a553e8.mp3,1,seed,,S16:唔|S63:肉|S6:佢哋|S93:食,S6:佢哋,0.6574,0.1800,3,1,0,0
-1621761269671,334,呢個女仔邊個嚟㗎?,Who is this girl?,azure-1cbc3ddf-a292f633-45b625ab-71d9cce8-53a73c7b.mp3,1,seed,,S11:邊個|S7:呢個,S7:呢個,0.6023,0.1000,4,1,0,0
-1621761270294,957,嗰隻貓定係狗嚟㗎?,Is that a cat or a dog?,azure-16060ab5-6d50ee39-b27f0964-9f524767-831827d9.mp3,1,seed,,S47:狗|S8:嗰,S8:嗰,0.4565,0.3800,6,3,0,0
-1621761269701,364,呢度有啲水.,"""Here's some water.""",azure-a2fdec8c-40ecf40a-5a045e41-ae685379-6d57859f.mp3,1,seed,,S150:水|S19:啲|S9:呢度,S9:呢度,0.6606,0.1000,4,1,0,0
-1621761269738,401,佢一定要去嗰度.,She must go there.,azure-503bb990-1b05e611-104f98b1-f22db0b9-beb69ea7.mp3,1,seed,,S10:嗰度,S10:嗰度,0.2591,0.3000,5,3,0,0
-1621761270197,860,你係同邊個一齊嚟㗎?,Who did you come with?,azure-fbc4b63c-2098f1ce-329bfb0a-c53baff5-ec525bf7.mp3,1,seed,,S11:邊個|S122:嚟|S203:同,S11:邊個,0.2544,0.2000,6,2,0,0
-1621761269583,246,發生乜嘢事呀?,"""What's happened?""",azure-eb9d674d-f47dc5b0-cc3500e0-ef16c529-8aa1eb26.mp3,1,seed,,S12:乜嘢,S12:乜嘢,0.2202,0.2300,4,2,0,0
-1621761269843,506,我喺邊度可以買到?,Where can I buy it?,azure-d94e0407-4756655d-81f5f3ad-04693bcb-e9894465.mp3,1,seed,,S13:邊度,S13:邊度,0.2346,0.2800,5,2,0,0
-1621761269785,448,幾時開始㗎?,When will it begin?,azure-723f5e72-d8ef773a-b602a863-25d6cdff-e250338d-82e7ab147ba0c456c7aeb1c215ebca27d8613a7c.mp3,1,seed,,S14:幾時,S14:幾時,0.2460,0.1000,2,1,0,0
-1621761270163,826,你可以點樣幫到我?,How could you help me?,azure-7f57fe17-9f31d03d-474757e3-3638e47b-cecf51cf.mp3,1,seed,,S15:點樣,S15:點樣,0.2020,0.2100,5,1,0,0
-1621761269772,435,唔好掟石頭.,"""Don't throw stones.""",azure-06f35462-4857b1d4-1e84a654-37679234-40875dc8.mp3,1,seed,,S136:掟|S156:石,S16:唔,0.2680,0.1000,4,1,0,0
-1621761270239,902,我又飲多咗喇.,I drank too much again.,azure-e8f0f758-f8641103-253ffe2a-9cf59afa-74c49163.mp3,1,seed,,S18:多|S92:飲,S18:多,0.3583,0.3000,6,3,0,0
-1621761269465,128,講啲嘢啦.,Say something.,azure-ea2aebbf-e7f57ad1-1d20d13a-10936d65-3625e5a2.mp3,1,completion,,S19:啲,S19:啲,-0.0490,0.1300,4,2,0,0
-1621761270155,818,你應該食少啲煙.,You should smoke less.,azure-915d4508-2f3278cf-04606a8c-58b49aea-37e416d8.mp3,1,seed,,S166:煙|S20:少,S20:少,0.3351,0.2800,5,2,0,0
-1621761269936,599,我淨係得一個心願.,I have but one wish.,azure-d74bee36-8c052694-1e7960b8-5085c41a-a3e7b703.mp3,1,seed,,S22:一,S22:一,0.1731,0.4800,5,4,0,0
-1621761269576,239,佢打咗我兩下.,He hit me twice.,azure-d238db23-1fd61e46-32a99d7f-29d9453f-c1594f9a.mp3,1,completion,,S113:打|S23:兩,S23:兩,-0.0024,0.1300,6,1,0,0
-1621761270249,912,盛惠三歐羅吖.,"""That'll be three euros.""",azure-eea45ae2-01b70e80-0d268abc-d04cd56c-694454df.mp3,1,seed,,S24:三,S24:三,0.1693,0.4600,4,3,0,0
-1621761269692,355,佢好大波.,She has big boobs.,azure-25a7ec8b-3444ff95-3019ff42-1517f9eb-f07cdec9.mp3,1,seed,,S27:大,S27:大,0.1900,0.1800,3,1,0,0
-1621761270328,991,越重越好.,"The heavier, the better.",azure-6d5bd115-de5302d1-3fd565f9-c6b62d12-50a315a9.mp3,1,seed,,S185:好|S31:重,S31:重,0.2926,0.4000,3,2,0,0
-1621761269485,148,太細喇.,"""It's too small.""",azure-aaa9c1bc-f0b5bb8d-d33cea98-5e5a3d62-b67aefed.mp3,1,seed,,S32:細,S32:細,0.1502,0.2100,2,1,0,0
-1621761270232,895,個女人好靚.,The woman is beautiful.,azure-281aefb0-311de2e3-73303ab1-b1b7eee7-7ae4bdf8.mp3,1,seed,,S36:女人,S36:女人,0.1440,0.2100,3,2,0,0
-1621761269499,162,個男人好老.,The man is old.,azure-986759b3-21ebc182-4408a9b5-82cef899-fe48ab4e.mp3,1,seed,,S184:老|S37:男人,S37:男人,0.3133,0.1000,4,0,0,0
-1621761270061,724,啲細路真係大得好快.,Kids grow up so fast.,azure-6e7c00a5-49c0243f-eb510afc-25c1fef7-cf08aef9.mp3,1,seed,,S39:細路,S39:細路,0.1299,0.3100,6,2,0,0
-1621761269585,248,帶埋你老婆嚟吖.,Bring your wife.,azure-5c7369f0-022d3df9-e2a51b3c-34f13255-4ddbbf11.mp3,1,seed,,S40:老婆,S40:老婆,0.1367,0.2300,6,2,0,0
-1621761270012,675,你阿爸喺邊呀?,Where is your father?,azure-06cb1ab5-ad4b62a2-fdfd6f63-7732a4a5-ecacc8dd.mp3,1,seed,,S43:阿爸,S43:阿爸,0.1652,0.1800,4,1,0,0
-1621761270334,997,佢唔食生魚.,"""He doesn't eat raw fish.""",azure-ce673207-be24ce71-e8cf8dc1-ab290b88-a145b54f.mp3,1,seed,,S45:魚|S93:食,S45:魚,0.1710,0.1000,5,1,0,0
-1621761269759,422,係咪所有雀仔都識飛㗎?,Can all birds fly?,azure-07db34b7-6c52b06c-971dcc8e-787f1d59-539d6101.mp3,1,seed,,S120:飛|S17:都|S46:雀,S46:雀,0.3983,0.5600,5,4,0,0
-1621761269841,504,Tom 有三隻狗.,Tom has three dogs.,azure-76e8c86e-749af896-7617c471-366486bf-b71433a9.mp3,1,depth,,S24:三|S47:狗,S47:狗,0.0780,0.0600,4,0,0,0
-1621761270209,872,佢驚蛇.,He is afraid of snakes.,azure-f102b85d-212a49fd-d04b5fdd-b305d85d-7fa97f74.mp3,1,seed,,S106:驚|S49:蛇,S49:蛇,0.1772,0.0000,3,0,0,0
-1621761269618,281,佢好憎昆蟲.,He hates insects.,azure-590c7ac5-e9466c80-53ab8d1e-fd582f81-b59df62c.mp3,1,seed,,S50:蟲,S50:蟲,0.1403,0.3600,3,2,0,0
-1621761269752,415,有咩生果係紅色㗎?,What fruit is red?,azure-eb429208-fea65a28-b2bb9e25-7853fcff-cad87345.mp3,1,seed,,S172:紅|S54:生果,S54:生果,0.2195,0.3400,5,2,0,0
-1621761269955,618,牛食草.,Cattle feed on grass.,azure-becf2fa3-10cd684b-1c4ac0e2-f80aac93-d0b69606.mp3,1,seed,,S60:草,S60:草,0.1386,0.3000,2,1,0,0
-1621761269570,233,你食唔食肉㗎?,Do you eat meat?,azure-f3cca222-8e275f82-bf50a0cd-831d5b7d-32be71d6.mp3,1,depth,,S63:肉,S63:肉,0.0283,0.0300,4,0,0,0
-1621761269968,631,佢唔鍾意蛋.,"""He doesn't like eggs.""",azure-95673672-f94d2542-cae1388b-d0159372-76bb78cc.mp3,1,seed,,S67:蛋,S67:蛋,0.1543,0.1000,4,1,0,0
-1621761269491,154,因住撞頭.,Mind your head.,azure-5d2d7070-29894fc3-f9674007-e5e3e6be-dbd08a15.mp3,1,seed,,S72:頭,S72:頭,0.1136,0.4800,2,2,0,0
-1621761269709,372,望住我對眼.,Look into my eyes.,azure-abd1e9f9-2078c4a7-d0b6f5c3-689b44e7-52ddc770.mp3,1,seed,,S74:眼,S74:眼,0.1405,0.2000,4,2,0,0
-1621761269626,289,我個鼻好痕.,My nose is itchy.,azure-7d3ea792-4c69ebe3-87b8bb40-c6472796-2e7c892d.mp3,1,seed,,S75:鼻,S75:鼻,0.1121,0.2100,3,2,0,0
-1621761269606,269,去刷牙啦.,Brush your teeth.,azure-7c6ca6a3-5041020c-9d52fbd6-ff9c720b-19f3301b.mp3,1,seed,,S77:牙,S77:牙,0.1011,0.3100,3,1,0,0
-1621761269861,524,放低手!,Put your hands down!,azure-dec4544f-7f5e3864-7f8cf45e-8d0f37a8-cc8d7aaa.mp3,1,seed,,S83:手,S83:手,0.1384,0.1800,2,1,0,0
-1621761270296,959,我個肚喺度咕咕叫.,My stomach is growling.,azure-5e81b4b6-4e6f82a4-3c101c44-b01937e4-2eae1d72.mp3,1,seed,,S85:肚,S85:肚,0.0676,0.3400,6,3,0,0
-1621761269997,660,我請你飲嘢吖.,"""I'll buy you a drink.""",azure-74f0c007-67fe0a4c-83d1df15-f08c25aa-8769d9ce.mp3,1,completion,,S92:飲,S92:飲,-0.1065,0.1600,6,1,0,0
-1621761270034,697,Tom食得好少.,Tom eats very little.,azure-4979ff2f-07476fb0-1b96cc83-5970f4f9-09797ecd.mp3,1,completion,,S20:少,S93:食,-0.2803,0.3600,2,2,0,0
-1621761270322,985,我想嘔.,I feel like throwing up.,azure-dfa24b0a-0feda89e-dde473a1-692d4534-a7c3b6c0.mp3,1,seed,,S97:嘔,S97:嘔,0.1332,0.1800,2,1,0,0
-1621761270233,896,大家都喺到笑.,Everybody was laughing.,azure-fc1120ce-df3f7f07-a6839974-27c2a731-ef300822.mp3,1,seed,,S100:笑|S17:都,S100:笑,0.1302,0.2000,5,2,0,0
-1621761269464,127,俾我睇嚇.,Let me see it.,azure-34378eea-2612d9c4-c5e95c07-1e232115-3f9cf6fb.mp3,1,seed,,S101:睇,S101:睇,0.1219,0.2800,4,2,0,0
-1621761270221,884,聽講佢死咗.,"""I heard that he'd died.""",azure-5fde679f-0a1a64c1-ce04bb4c-119c0478-81af7131.mp3,1,seed,,S102:聽|S109:死|S3:佢,S102:聽,0.2670,0.0300,5,0,0,0
-1621761270172,835,冇人知道真相係點.,No one knows the fact.,azure-24036017-252da521-b2dae610-cee873f5-6812ea20.mp3,1,seed,,S103:知道,S103:知道,0.0812,0.4100,6,3,0,0
-1621761269916,579,你點解咁諗嘅?,Why do you think so?,azure-11270acd-dd5e75dc-38ed311c-4ddc8bf8-b6d93481.mp3,1,seed,,S104:諗,S104:諗,0.1189,0.3000,5,3,0,0
-1621761269907,570,我瞓覺好易醒.,"""I'm a light sleeper.""",azure-533352a5-837d5269-8dc6c400-8d8b9547-07a53521.mp3,1,seed,,S107:瞓覺,S107:瞓覺,0.1120,0.3600,4,2,0,0
-1621761269420,83,我會生存落去.,I will live.,azure-33ad12c9-b9228131-81144c0e-9d842c23-91d060d8.mp3,1,seed,,S108:生存,S108:生存,0.1278,0.2000,3,2,0,0
-1621761269350,13,死開!,Go away!,azure-8afb4f2d-602b0248-f8e310cf-76d6b6bc-a9882cd5.mp3,1,completion,,S109:死,S109:死,-0.0484,0.1000,2,1,0,0
-1621761270117,780,佢哋嘗試殺我.,They tried to kill me.,azure-4334240a-0112dca0-2e1c1cdb-2d5d17d0-442633cd.mp3,1,seed,,S110:殺,S110:殺,0.1292,0.1800,4,1,0,0
-1621761269347,10,打我吖.,Hit me.,azure-373a25a2-40a3e56b-76b9b420-fc4c3e56-451951ae.mp3,1,seed,,S113:打,S113:打,0.1164,0.0300,3,0,0,0
-1621761270229,892,佢學緊游水.,"""She's learning to swim.""",azure-da0f20a5-9475f78b-fba0cd24-c4668899-fe17c947.mp3,1,seed,,S119:游水,S119:游水,0.1148,0.3000,3,1,0,0
-1621761269938,601,如果我識飛就好喇!,If only I could fly!,azure-c2202287-5c61474d-8832636c-76a8369b-48b33e49.mp3,1,seed,,S120:飛|S205:如果,S120:飛,0.0521,0.2400,6,2,0,0
-1621761270173,836,哦，呢度你行得到?,"Oh, you can walk here?",azure-5f2018ef-e91d08cc-12a17e81-c4ed4c22-23b31dd1.mp3,1,seed,,S121:行|S9:呢度,S121:行,0.1243,0.2000,5,2,0,0
-1621761269363,26,過嚟!,Come here!,azure-d0edaaba-eb7e5e1a-1f35977c-5f4fa7c9-fd373d3c.mp3,1,depth,,S122:嚟,S122:嚟,0.0204,0.0300,2,1,0,0
-1621761269685,348,我坐唔定.,"""I can't sit still.""",azure-499b8ade-fced484d-03fb950e-8ea2c324-99bdd938.mp3,1,seed,,S124:坐,S124:坐,0.1336,0.1000,4,1,0,0
-1621761270181,844,企喺度嗰個邊個嚟?,Who is standing there?,azure-9c4eb326-db8c92cc-462481db-9a0bfc9c-64799db6.mp3,1,seed,,S125:企,S125:企,0.1033,0.1300,7,0,0,0
-1621761269558,221,揸住支蠟燭.,Hold the candle.,azure-c1f8ee82-c4874ef2-00162882-7e785f03-75591ec2.mp3,1,seed,,S129:揸,S129:揸,0.0964,0.4600,4,3,0,0
-1621761269761,424,你啱.,"""You're quite right.""",azure-b992adb0-2201d64b-753f7ece-f10e6008-7c1d0bb7.mp3,1,depth,,S196:啱,S2:你,0.0459,0.0000,2,0,0,0
-1621761269403,66,我哋係男人.,We are men.,azure-dab8f32e-544542ef-acee585e-f4f826dd-aa4702eb.mp3,1,depth,,S37:男人,S4:我哋,0.0367,0.0300,3,0,0,0
-1621761270101,764,太陽落緊山.,The sun is going down.,azure-69bc7890-ad6c60d5-73d7809a-439e8784-d521794c.mp3,1,depth,,S147:太陽,S147:太陽,0.0185,0.0300,3,1,0,0
-1621761269686,349,我殺咗佢.,I have killed him.,azure-e0f4744e-68a4ef76-7ee345d1-3fdce392-7694fef3.mp3,1,depth,,S110:殺,S1:我,0.0215,0.0300,4,0,0,0
-1621761269697,360,俾嗰本書我.,Give me that book.,azure-e6a9964a-8e45b27b-2f956e2a-cdf74005-8253dd6f.mp3,1,depth,,S8:嗰,S1:我,0.0504,0.0600,4,1,0,0
-1621761269769,432,你唔坐呀?,"""Won't you sit down?""",azure-d47c6afe-739003ee-6c52945c-5e86fdc8-c813c018.mp3,1,depth,,S124:坐,S2:你,0.0202,0.0300,4,0,0,0
-1621761269771,434,唔好笑佢啦.,"""Don't laugh at him.""",azure-21e5abb5-2821601d-c034a7ce-8a55c516-ea691ae0-65e181c5d4c7f59dd1600dbd5e244938c5983e39.mp3,1,completion,,S100:笑,S3:佢,-0.0074,0.0600,4,0,0,0
-1621761270088,751,唔好企咁埋.,"""Don't stand too close.""",azure-d54e5310-9ae33b21-947da461-2a214b8d-cf01a547.mp3,1,completion,,S125:企,S16:唔,-0.0398,0.0900,4,0,0,0
-1621761269562,225,我都係咁諗.,"I think so, too.",azure-fad999c2-2d5aa9d2-701523ac-ecb1c6dc-ef68ddfe.mp3,1,completion,,S104:諗,S1:我,-0.0079,0.0600,5,0,0,0
-1621761269829,492,佢哋住喺邊度呀?,Where do they live?,azure-4783aa72-d0411943-5b23f50e-ffe08dc7-97291539.mp3,1,depth,,S13:邊度,S6:佢哋,0.0319,0.0600,5,0,0,0
-1621761269674,337,嗰個女人係邊個嚟㗎?,Who is the woman?,azure-384fb358-bbda9175-4d04b4d9-5e60b33e-a3fb7104.mp3,1,depth,,S36:女人,S11:邊個,0.0072,0.0600,6,0,0,0
-1621761269742,405,你隻貓係黑色嘅.,Your cat is black.,azure-8c9363ee-b7eb2955-06060e02-8805fafc-ac6de8b4.mp3,1,completion,,S176:黑,S2:你,-0.1031,0.1500,6,1,0,0
-1621761270284,947,佢住喺我屋企附近.,He lives near my house.,azure-9a2a0cac-fa302999-44ec97be-4f1bad94-f4a585d7.mp3,1,completion,,S197:近,S1:我,-0.0441,0.0900,6,2,0,0
-1621761269427,90,太大喇.,"""It's too big.""",azure-99c6c6b5-a322b5cd-2eb1de2a-5376e2e9-7340d9fe.mp3,1,completion,,S27:大,S27:大,-0.1372,0.2100,2,1,0,0
-1621761269691,354,唱歌好易.,"""It's easy to sing.""",azure-f3ce54bb-5d07a249-bb4525be-33d11510-3155f13d.mp3,1,completion,,S141:唱,S141:唱,-0.1610,0.2100,2,1,0,0
-1621761269357,20,嘩，雪呀!,"Ah, snow!",azure-2ba21b18-87ae0062-2e502f9d-79fdebb8-b64bf2eb.mp3,1,completion,,S164:雪,S164:雪,-0.0825,0.1300,3,1,0,0
-1621761269822,485,喺LA冇人行㗎.,Nobody walks in LA.,azure-88a22c69-9db21324-fafccefe-6a71cfb0-e58ad334.mp3,1,completion,,S121:行,S121:行,-0.1595,0.2100,3,1,0,0
-1621761270224,887,開始落雨喇.,It has started to rain.,azure-f5801698-a52ace0c-b9b90af6-13e7a6f1-eaf758a2.mp3,1,completion,,S151:雨,S151:雨,-0.1917,0.2400,3,1,0,0
-1621761269617,280,你哋唔攰咩?,"""Aren't you tired?""",azure-3c72b244-e692c5d4-fadcb828-9cc4b2d9-a61419d1.mp3,1,completion,,S5:你哋,S5:你哋,-0.0746,0.2100,4,1,0,0
-1621761269729,392,呢個袋邊個架?,Whose bag is this?,azure-bc432d82-9e5ce7f4-c7d88ae0-8d31c300-544ec4b5.mp3,1,completion,,S7:呢個,S7:呢個,-0.0933,0.2100,4,2,0,0
-1621761270110,773,我要去瞓覺喇.,I have to go to sleep.,azure-613abf91-3b22b47e-c7a26f16-fcacaf04-80637020.mp3,1,completion,,S107:瞓覺,S1:我,-0.1082,0.1600,4,1,0,0
-1621761269904,567,我有好多朋友.,I have many friends.,azure-1cf41d73-2db25614-df1b051e-d58be063-860a242b.mp3,1,completion,,S18:多,S1:我,-0.0476,0.1300,5,1,0,0
-1621761270010,673,佢個真名係咩?,"""What's his real name?""",azure-b37f635d-8ce1c88c-fc79eda7-71542019-95fc72da.mp3,1,completion,,S207:名,S3:佢,-0.2245,0.2700,5,1,0,0
-1621761270124,787,你幾時返嚟呀?,When will you be back?,azure-85bb9996-0021129b-b9b4bf73-824f8d4a-ab4ec74b.mp3,1,completion,,S14:幾時,S2:你,-0.0404,0.1300,5,1,0,0
-1621761270148,811,佢哋買咗架新車.,They bought a new car.,azure-f07d0825-7d21ca64-15e2190e-517c4039-1e949500.mp3,1,completion,,S183:新,S6:佢哋,-0.2235,0.2700,5,2,0,0
-1621761270305,968,佢阿爸係咪醫生嚟㗎?,Is his father a doctor?,azure-077b3f8d-489b529f-b406ec28-453dd443-369a1b4f.mp3,1,completion,,S43:阿爸,S3:佢,-0.1459,0.2100,5,1,0,0
-1621761269660,323,你買咗啲乜嘢呀?,What did you buy?,azure-5ff1d31b-6816c103-c2103e4a-222d71b6-3b9d7921.mp3,1,completion,,S12:乜嘢,S2:你,-0.0654,0.1600,6,0,0,0
-1621761270267,930,今日天氣幾凍㗎.,"""It's rather cold today.""",azure-642098e2-c5b9b188-46573542-4459586c-bdaa9773.mp3,1,completion,,S181:凍,S181:凍,-0.2634,0.3100,4,3,0,0
-1621761270243,906,我同佢握咗手.,I shook hands with her.,azure-7abb1f06-a54f112a-c061e55a-b610a680-e79b721e.mp3,1,completion,,S83:手,S1:我,-0.2552,0.3100,5,2,0,0
-1621761269818,481,我咩都聽唔到喎.,"""I've heard nothing.""",azure-692bcb0a-cffa7ec4-86f7d167-9d52696b-85692b10.mp3,1,completion,,S102:聽,S1:我,-0.1777,0.2300,6,2,0,0
-1621761269842,505,我哋喺度睇緊電視.,We are watching TV.,azure-e82cd690-2408b31e-fd77eec5-a694a401-cb45169d.mp3,1,completion,,S101:睇,S4:我哋,-0.1775,0.2300,6,2,0,0
-1621761270244,907,我洗緊碗而家.,"""I'm washing the dishes.""",azure-0fab9455-333a7bf5-7e81e465-45c3f520-36185af8.mp3,1,seed,,S132:洗,S132:洗,0.0817,0.3300,4,1,0,0
-1621761270297,960,講畀我聽你喺邊呀?,"Tell me, where are you?",azure-da0acaf0-91a068dc-0b27b689-0ebd76f3-dcc317bc.mp3,1,depth,,S140:講,S140:講,0.0190,0.0300,7,0,0,0
-1621761269723,386,佢唱女高音架.,She sings soprano.,azure-0d264d8f-8e72b431-ed2fc610-2c98b237-542e1c32.mp3,1,seed,,S141:唱,S141:唱,0.1019,0.3800,5,2,0,0
-1621761269636,299,太陽喺邊到?,Where is the sun?,azure-35fec7f3-365f5ce7-d4fd1d70-8ca34eaa-9c2a9154.mp3,1,seed,,S147:太陽,S147:太陽,0.1207,0.1800,3,1,0,0
-1621761269706,369,我想飲水呀.,I want some water.,azure-1418ed41-e85e8cc9-b02573d6-0ed75eec-c1f51199.mp3,1,completion,,S150:水,S150:水,-0.1916,0.2400,3,1,0,0
-1621761269768,431,仲落緊雨.,"""It's still raining.""",azure-9622f0b7-f2bac1f9-89529dd3-8b1a7b80-460c1c45.mp3,1,seed,,S151:雨,S151:雨,0.0980,0.1300,3,1,0,0
-1621761270323,986,小心落石!,Beware of falling rocks!,azure-c4c8eb46-fa16954c-5ae5201d-3d82d945-d8e3143a.mp3,1,completion,,S156:石,S156:石,-0.2320,0.2800,3,2,0,0
-1621761270275,938,隻雀喺個天空度.,The bird is in the sky.,azure-1abbee6e-42d6c617-4c37805d-534aeb22-3db4b1f4-d3ed7bc3faf659fa0682aa06c02aa3f0e65b7a72.mp3,1,seed,,S162:天|S46:雀,S162:天,0.0281,0.2700,6,1,0,0
-1621761269426,89,落緊雪.,"""It's snowing.""",azure-468371e7-986483d2-c06cd734-3f71dc85-ea431386.mp3,1,seed,,S164:雪,S164:雪,0.1178,0.1800,2,0,0,0
-1621761270186,849,唔好喺冰上面跣親呀.,"""Don't slip on the ice.""",azure-582e5bf4-516a9f9a-5331b664-9f5642db-13c3e9d1.mp3,1,seed,,S165:冰,S165:冰,0.0476,0.6100,6,3,0,0
-1621761269681,344,佢唔食煙.,He does not smoke.,azure-13069bce-248fd89e-d5bc3567-ddbd0e06-e77c6038.mp3,1,depth,,S166:煙,S166:煙,0.0474,0.0000,4,0,0,0
-1621761269602,265,我個喉嚨好似比火燒噉.,My throat burns.,azure-dd59d73f-0e4168d5-3793b4ce-43432fb0-aed479fd.mp3,1,seed,,S167:火|S169:燒,S167:火,0.1922,0.7800,5,4,0,0
-1621761269488,151,過馬路啦.,Cross the road.,azure-ec60e1ad-f2d65901-25b33c08-c47419a7-56d75e02.mp3,1,seed,,S170:路,S170:路,0.0768,0.3100,3,1,0,0
-1621761269582,245,本書係紅色嘅.,The book is red.,azure-9efaa3e7-770732e9-504e3dc5-a4a2478f-ecf5236d.mp3,1,completion,,S172:紅,S172:紅,-0.0729,0.1200,4,0,0,0
-1621761269804,467,本書係黃色嘅.,The book is yellow.,azure-dfbaf276-e210418b-20b7441e-3fc07cf2-1c6b75ab.mp3,1,seed,,S174:黃,S174:黃,0.0382,0.4200,5,1,0,0
-1621761270277,940,隻馬唔係白色㗎.,The horse is not white.,azure-16ba61a4-a0f9adee-bcebbf72-00dd5f2b-854090e1.mp3,1,seed,,S175:白,S175:白,0.0661,0.4100,4,3,0,0
-1621761270146,809,黑色嗰個係我嘅.,The black one is mine.,azure-e37375dc-739402f3-50e6cf11-ceaf3d41-cac6fe49.mp3,1,seed,,S176:黑,S176:黑,0.0259,0.2700,6,0,0,0
-1621761270230,893,過咗十年喇!,Ten years have gone by.,azure-305334a4-aface790-70f50293-81be8171-0de0dcb1.mp3,1,seed,,S179:年,S179:年,0.0255,0.2700,4,1,0,0
-1621761269539,202,今日幾暖.,"""It's warm today.""",azure-bcd0078d-74def48b-5b8dc9c7-ac8a2eb3-1a18ac77.mp3,1,seed,,S180:暖,S180:暖,0.0733,0.3300,2,1,0,0
-1621761269538,201,今日好凍.,"""It's cold today.""",azure-89b7382d-3a294036-56424bc5-cc7d1b6c-4ea0b3f8.mp3,1,seed,,S181:凍,S181:凍,0.1052,0.2800,2,1,0,0
-1621761269638,301,你係咪新嚟㗎?,Are you new here?,azure-9b21d615-a8e6bd0f-c6de28cd-0c0b4119-8038253b-9be134975428be3084282f9d86f27b0d72be1b9a.mp3,1,seed,,S183:新,S183:新,0.1029,0.0300,4,0,0,0
-1621761270326,989,好近㗎咋!,Right around the corner!,azure-f09200b4-73d16558-30cedaaa-cd566aac-7624b5ff.mp3,1,completion,,S185:好,S185:好,-0.0536,0.1000,3,1,0,0
-1621761269627,290,我對襪濕咗.,My socks are wet.,azure-9d3b7e5a-431de891-a5a1fe56-3b2a1054-7d85eb57.mp3,1,seed,,S194:濕,S194:濕,0.0715,0.3300,4,1,0,0
-1621761269486,149,佢哋啱.,They are right.,azure-da4f5559-26a1d90a-d9fb5deb-ebef2a87-8a06453c.mp3,1,seed,,S196:啱|S6:佢哋,S196:啱,0.1312,0.0000,2,0,0,0
-1621761270176,839,車站就喺呢度附近.,The station is nearby.,azure-856a20b1-1a58ccea-d1ddf053-380e6843-2b0dc290.mp3,1,seed,,S197:近,S197:近,0.0931,0.3800,5,1,0,0
-1621761269434,97,我喺屋企.,I am at home.,azure-588817c0-b7785f26-4a49343d-3edd20d3-22c16ad9.mp3,1,seed,,S201:喺,S201:喺,0.1206,0.1000,3,0,0,0
-1621761270158,821,同我哋一齊食晏啦.,Come to lunch with us.,azure-51d3182a-fc120906-cb28da2d-edaccd40-3f8cb7de-a2e54ed43e4c3984b4a0cdb89dfe3bfd9065ce48.mp3,1,completion,,S203:同,S203:同,-0.1944,0.2400,5,1,0,0
-1621761269755,418,我唔記得咗佢叫咩名.,I forgot his name.,azure-99ac5c7d-6d29b05e-48463de2-497f0096-92afae01.mp3,1,seed,,S207:名,S207:名,0.0299,0.1900,7,1,0,0
-1621761269461,124,屌你老母.,Fuck your mom.,azure-5b9aed95-3a2bc1f0-0be949cd-5f10f0a5-09990679.mp3,1,seed,,S42:老母,S42:老母,0.1196,0.1000,3,1,0,0
-1621761269986,649,佢心口好多毛.,He has a hairy chest.,azure-cb098a59-41dd6d34-08017fad-0544e5c8-daeda81b.mp3,1,seed,,S89:心口,S89:心口,0.1114,0.1800,5,1,0,0
-1621761269336,0,死!,Die!,azure-68209d36-d731f509-358ed0f8-bcfb6d1f-ff8675d0.mp3,0,,F1,,,0.0000,0.0000,1,0,0,0
-1621761269337,1,拜拜!,Bye!,azure-826d18a3-5b488685-90f89e1f-d61ee163-ce280f59.mp3,0,,F1,,,0.0000,0.0000,1,0,0,0
-1621761269338,2,點解?,Why?,azure-363d2888-d827f7c0-d76dafa8-c233202c-4ed8829f.mp3,0,,F1,,,0.0000,0.0000,1,0,0,0
-1621761269339,3,救命!,Help!,azure-f6058285-417ce495-4b258e3e-aea017fc-8af3f027.mp3,0,,F1,,,0.0000,0.0000,1,0,0,0
-1621761269340,4,睇嚇!,Look!,azure-51f68e73-f0bc7289-7f8b047c-b864eb48-232e33a2.mp3,0,,F1,,,0.0000,0.0000,2,0,0,0
-1621761269341,5,係食物呀!,Food!,azure-749de768-d562b1c3-adb48efd-92b42fad-da138a45.mp3,0,,F1,,,0.0000,0.0000,3,0,0,0
-1621761269342,6,乞嚏!,Achoo!,azure-e13e5934-be39a21c-5bd7a4a0-b9407c13-c9f55e18-1e14bc1cf52b65619407e70a37bf0118b93f177c.mp3,0,,F1,,,0.0000,0.0000,1,0,0,0
-1621761269344,7,邊度?,Where?,azure-0c88269c-0e76a5df-17aaee02-0b867046-32ea232e.mp3,0,,F1,,,0.0000,0.0000,1,0,0,0
-1621761269345,8,開始啦.,Begin.,azure-9163e82f-afafd732-5ad0e6f6-62fe7113-9d3d568f.mp3,0,,F1,,,0.0000,0.0000,2,0,0,0
-1621761269346,9,開始!,Action!,azure-a748fe93-af499b9b-eb1d1dae-54a14ec4-403bb004.mp3,0,,F1,,,0.0000,0.0000,1,0,0,0
+1621761270303,966,你做咩唔同我講呀?,"""Why didn't you tell me?""",azure-0afcdbb4-bbf71c01-a2cad882-ba3aa582-92a4beb1.mp3,1,seed,,S140:講|S16:唔|S1:我|S2:你,S1:我,1.9756,0.4000,5,4,0,1
+1621761270156,819,你啲頭髮長得濟.,Your hair is too long.,azure-aa5fadd3-f83e7671-788e58ec-1310f133-6068eb52.mp3,1,seed,,S28:長|S2:你|S71:頭髮,S2:你,0.3379,0.3000,5,1,0,1
+1621761269414,77,佢幫我哋.,He helps us.,azure-c6a6efdc-2620fa4d-8ccdc18a-be5f63d1-9bfb17d9-d0fa3fdb98dffec75fa401a82f3d66a1787960a0.mp3,1,seed,,S3:佢|S4:我哋,S3:佢,0.9207,0.1000,3,1,0,1
+1621761270257,920,我哋兩個都好驚.,Both of us were scared.,azure-60365312-a6cc6367-4b5e20cb-bb3b6d80-61998b37.mp3,1,seed,,S106:驚|S23:兩|S4:我哋,S4:我哋,0.3564,0.1000,5,1,0,1
+1621761270252,915,你哋而家喺邊?,Where are you guys now?,azure-c806b784-610d6136-d78570aa-aea8a7c7-5cc3fce9.mp3,1,seed,,S5:你哋,S5:你哋,0.3669,0.2000,4,2,0,1
+1621761269888,551,佢哋唔食肉.,"""They don't eat meat.""",azure-1abafd61-feaaac9e-402db58c-3f396845-b7448faf-42481825eeeb5db4f25661dad5ca38bc35a553e8.mp3,1,seed,,S16:唔|S63:肉|S6:佢哋|S93:食,S6:佢哋,0.6574,0.1800,3,1,0,1
+1621761269671,334,呢個女仔邊個嚟㗎?,Who is this girl?,azure-1cbc3ddf-a292f633-45b625ab-71d9cce8-53a73c7b.mp3,1,seed,,S11:邊個|S7:呢個,S7:呢個,0.6023,0.1000,4,1,0,1
+1621761270294,957,嗰隻貓定係狗嚟㗎?,Is that a cat or a dog?,azure-16060ab5-6d50ee39-b27f0964-9f524767-831827d9.mp3,1,seed,,S47:狗|S8:嗰,S8:嗰,0.4565,0.3800,6,3,0,1
+1621761269701,364,呢度有啲水.,"""Here's some water.""",azure-a2fdec8c-40ecf40a-5a045e41-ae685379-6d57859f.mp3,1,seed,,S150:水|S19:啲|S9:呢度,S9:呢度,0.6606,0.1000,4,1,0,1
+1621761269738,401,佢一定要去嗰度.,She must go there.,azure-503bb990-1b05e611-104f98b1-f22db0b9-beb69ea7.mp3,1,seed,,S10:嗰度,S10:嗰度,0.2591,0.3000,5,3,0,1
+1621761270197,860,你係同邊個一齊嚟㗎?,Who did you come with?,azure-fbc4b63c-2098f1ce-329bfb0a-c53baff5-ec525bf7.mp3,1,seed,,S11:邊個|S122:嚟|S203:同,S11:邊個,0.2544,0.2000,6,2,0,1
+1621761269583,246,發生乜嘢事呀?,"""What's happened?""",azure-eb9d674d-f47dc5b0-cc3500e0-ef16c529-8aa1eb26.mp3,1,seed,,S12:乜嘢,S12:乜嘢,0.2202,0.2300,4,2,0,1
+1621761269843,506,我喺邊度可以買到?,Where can I buy it?,azure-d94e0407-4756655d-81f5f3ad-04693bcb-e9894465.mp3,1,seed,,S13:邊度,S13:邊度,0.2346,0.2800,5,2,0,1
+1621761269785,448,幾時開始㗎?,When will it begin?,azure-723f5e72-d8ef773a-b602a863-25d6cdff-e250338d-82e7ab147ba0c456c7aeb1c215ebca27d8613a7c.mp3,1,seed,,S14:幾時,S14:幾時,0.2460,0.1000,2,1,0,1
+1621761270163,826,你可以點樣幫到我?,How could you help me?,azure-7f57fe17-9f31d03d-474757e3-3638e47b-cecf51cf.mp3,1,seed,,S15:點樣,S15:點樣,0.2020,0.2100,5,1,0,1
+1621761269772,435,唔好掟石頭.,"""Don't throw stones.""",azure-06f35462-4857b1d4-1e84a654-37679234-40875dc8.mp3,1,seed,,S136:掟|S156:石,S16:唔,0.2680,0.1000,4,1,0,1
+1621761270239,902,我又飲多咗喇.,I drank too much again.,azure-e8f0f758-f8641103-253ffe2a-9cf59afa-74c49163.mp3,1,seed,,S18:多|S92:飲,S18:多,0.3583,0.3000,6,3,0,1
+1621761269465,128,講啲嘢啦.,Say something.,azure-ea2aebbf-e7f57ad1-1d20d13a-10936d65-3625e5a2.mp3,1,completion,,S19:啲,S19:啲,-0.0490,0.1300,4,2,0,1
+1621761270155,818,你應該食少啲煙.,You should smoke less.,azure-915d4508-2f3278cf-04606a8c-58b49aea-37e416d8.mp3,1,seed,,S166:煙|S20:少,S20:少,0.3351,0.2800,5,2,0,1
+1621761269936,599,我淨係得一個心願.,I have but one wish.,azure-d74bee36-8c052694-1e7960b8-5085c41a-a3e7b703.mp3,1,seed,,S22:一,S22:一,0.1731,0.4800,5,4,0,1
+1621761269576,239,佢打咗我兩下.,He hit me twice.,azure-d238db23-1fd61e46-32a99d7f-29d9453f-c1594f9a.mp3,1,completion,,S113:打|S23:兩,S23:兩,-0.0024,0.1300,6,1,0,1
+1621761270249,912,盛惠三歐羅吖.,"""That'll be three euros.""",azure-eea45ae2-01b70e80-0d268abc-d04cd56c-694454df.mp3,1,seed,,S24:三,S24:三,0.1693,0.4600,4,3,0,1
+1621761269692,355,佢好大波.,She has big boobs.,azure-25a7ec8b-3444ff95-3019ff42-1517f9eb-f07cdec9.mp3,1,seed,,S27:大,S27:大,0.1900,0.1800,3,1,0,1
+1621761270328,991,越重越好.,"The heavier, the better.",azure-6d5bd115-de5302d1-3fd565f9-c6b62d12-50a315a9.mp3,1,seed,,S185:好|S31:重,S31:重,0.2926,0.4000,3,2,0,1
+1621761269485,148,太細喇.,"""It's too small.""",azure-aaa9c1bc-f0b5bb8d-d33cea98-5e5a3d62-b67aefed.mp3,1,seed,,S32:細,S32:細,0.1502,0.2100,2,1,0,1
+1621761270232,895,個女人好靚.,The woman is beautiful.,azure-281aefb0-311de2e3-73303ab1-b1b7eee7-7ae4bdf8.mp3,1,seed,,S36:女人,S36:女人,0.1440,0.2100,3,2,0,1
+1621761269499,162,個男人好老.,The man is old.,azure-986759b3-21ebc182-4408a9b5-82cef899-fe48ab4e.mp3,1,seed,,S184:老|S37:男人,S37:男人,0.3133,0.1000,4,0,0,1
+1621761270061,724,啲細路真係大得好快.,Kids grow up so fast.,azure-6e7c00a5-49c0243f-eb510afc-25c1fef7-cf08aef9.mp3,1,seed,,S39:細路,S39:細路,0.1299,0.3100,6,2,0,1
+1621761269585,248,帶埋你老婆嚟吖.,Bring your wife.,azure-5c7369f0-022d3df9-e2a51b3c-34f13255-4ddbbf11.mp3,1,seed,,S40:老婆,S40:老婆,0.1367,0.2300,6,2,0,1
+1621761270012,675,你阿爸喺邊呀?,Where is your father?,azure-06cb1ab5-ad4b62a2-fdfd6f63-7732a4a5-ecacc8dd.mp3,1,seed,,S43:阿爸,S43:阿爸,0.1652,0.1800,4,1,0,1
+1621761270334,997,佢唔食生魚.,"""He doesn't eat raw fish.""",azure-ce673207-be24ce71-e8cf8dc1-ab290b88-a145b54f.mp3,1,seed,,S45:魚|S93:食,S45:魚,0.1710,0.1000,5,1,0,1
+1621761269759,422,係咪所有雀仔都識飛㗎?,Can all birds fly?,azure-07db34b7-6c52b06c-971dcc8e-787f1d59-539d6101.mp3,1,seed,,S120:飛|S17:都|S46:雀,S46:雀,0.3983,0.5600,5,4,0,1
+1621761269841,504,Tom 有三隻狗.,Tom has three dogs.,azure-76e8c86e-749af896-7617c471-366486bf-b71433a9.mp3,1,depth,,S24:三|S47:狗,S47:狗,0.0780,0.0600,4,0,0,1
+1621761270209,872,佢驚蛇.,He is afraid of snakes.,azure-f102b85d-212a49fd-d04b5fdd-b305d85d-7fa97f74.mp3,1,seed,,S106:驚|S49:蛇,S49:蛇,0.1772,0.0000,3,0,0,1
+1621761269618,281,佢好憎昆蟲.,He hates insects.,azure-590c7ac5-e9466c80-53ab8d1e-fd582f81-b59df62c.mp3,1,seed,,S50:蟲,S50:蟲,0.1403,0.3600,3,2,0,1
+1621761269752,415,有咩生果係紅色㗎?,What fruit is red?,azure-eb429208-fea65a28-b2bb9e25-7853fcff-cad87345.mp3,1,seed,,S172:紅|S54:生果,S54:生果,0.2195,0.3400,5,2,0,1
+1621761269955,618,牛食草.,Cattle feed on grass.,azure-becf2fa3-10cd684b-1c4ac0e2-f80aac93-d0b69606.mp3,1,seed,,S60:草,S60:草,0.1386,0.3000,2,1,0,1
+1621761269570,233,你食唔食肉㗎?,Do you eat meat?,azure-f3cca222-8e275f82-bf50a0cd-831d5b7d-32be71d6.mp3,1,depth,,S63:肉,S63:肉,0.0283,0.0300,4,0,0,1
+1621761269968,631,佢唔鍾意蛋.,"""He doesn't like eggs.""",azure-95673672-f94d2542-cae1388b-d0159372-76bb78cc.mp3,1,seed,,S67:蛋,S67:蛋,0.1543,0.1000,4,1,0,1
+1621761269491,154,因住撞頭.,Mind your head.,azure-5d2d7070-29894fc3-f9674007-e5e3e6be-dbd08a15.mp3,1,seed,,S72:頭,S72:頭,0.1136,0.4800,2,2,0,1
+1621761269709,372,望住我對眼.,Look into my eyes.,azure-abd1e9f9-2078c4a7-d0b6f5c3-689b44e7-52ddc770.mp3,1,seed,,S74:眼,S74:眼,0.1405,0.2000,4,2,0,1
+1621761269626,289,我個鼻好痕.,My nose is itchy.,azure-7d3ea792-4c69ebe3-87b8bb40-c6472796-2e7c892d.mp3,1,seed,,S75:鼻,S75:鼻,0.1121,0.2100,3,2,0,1
+1621761269606,269,去刷牙啦.,Brush your teeth.,azure-7c6ca6a3-5041020c-9d52fbd6-ff9c720b-19f3301b.mp3,1,seed,,S77:牙,S77:牙,0.1011,0.3100,3,1,0,1
+1621761269861,524,放低手!,Put your hands down!,azure-dec4544f-7f5e3864-7f8cf45e-8d0f37a8-cc8d7aaa.mp3,1,seed,,S83:手,S83:手,0.1384,0.1800,2,1,0,1
+1621761270296,959,我個肚喺度咕咕叫.,My stomach is growling.,azure-5e81b4b6-4e6f82a4-3c101c44-b01937e4-2eae1d72.mp3,1,seed,,S85:肚,S85:肚,0.0676,0.3400,6,3,0,1
+1621761269997,660,我請你飲嘢吖.,"""I'll buy you a drink.""",azure-74f0c007-67fe0a4c-83d1df15-f08c25aa-8769d9ce.mp3,1,completion,,S92:飲,S92:飲,-0.1065,0.1600,6,1,0,1
+1621761270034,697,Tom食得好少.,Tom eats very little.,azure-4979ff2f-07476fb0-1b96cc83-5970f4f9-09797ecd.mp3,1,completion,,S20:少,S93:食,-0.2803,0.3600,2,2,0,1
+1621761270322,985,我想嘔.,I feel like throwing up.,azure-dfa24b0a-0feda89e-dde473a1-692d4534-a7c3b6c0.mp3,1,seed,,S97:嘔,S97:嘔,0.1332,0.1800,2,1,0,1
+1621761270233,896,大家都喺到笑.,Everybody was laughing.,azure-fc1120ce-df3f7f07-a6839974-27c2a731-ef300822.mp3,1,seed,,S100:笑|S17:都,S100:笑,0.1302,0.2000,5,2,0,1
+1621761269464,127,俾我睇嚇.,Let me see it.,azure-34378eea-2612d9c4-c5e95c07-1e232115-3f9cf6fb.mp3,1,seed,,S101:睇,S101:睇,0.1219,0.2800,4,2,0,1
+1621761270221,884,聽講佢死咗.,"""I heard that he'd died.""",azure-5fde679f-0a1a64c1-ce04bb4c-119c0478-81af7131.mp3,1,seed,,S102:聽|S109:死|S3:佢,S102:聽,0.2670,0.0300,5,0,0,1
+1621761270172,835,冇人知道真相係點.,No one knows the fact.,azure-24036017-252da521-b2dae610-cee873f5-6812ea20.mp3,1,seed,,S103:知道,S103:知道,0.0812,0.4100,6,3,0,1
+1621761269916,579,你點解咁諗嘅?,Why do you think so?,azure-11270acd-dd5e75dc-38ed311c-4ddc8bf8-b6d93481.mp3,1,seed,,S104:諗,S104:諗,0.1189,0.3000,5,3,0,1
+1621761269907,570,我瞓覺好易醒.,"""I'm a light sleeper.""",azure-533352a5-837d5269-8dc6c400-8d8b9547-07a53521.mp3,1,seed,,S107:瞓覺,S107:瞓覺,0.1120,0.3600,4,2,0,1
+1621761269420,83,我會生存落去.,I will live.,azure-33ad12c9-b9228131-81144c0e-9d842c23-91d060d8.mp3,1,seed,,S108:生存,S108:生存,0.1278,0.2000,3,2,0,1
+1621761269350,13,死開!,Go away!,azure-8afb4f2d-602b0248-f8e310cf-76d6b6bc-a9882cd5.mp3,1,completion,,S109:死,S109:死,-0.0484,0.1000,2,1,0,1
+1621761270117,780,佢哋嘗試殺我.,They tried to kill me.,azure-4334240a-0112dca0-2e1c1cdb-2d5d17d0-442633cd.mp3,1,seed,,S110:殺,S110:殺,0.1292,0.1800,4,1,0,1
+1621761269347,10,打我吖.,Hit me.,azure-373a25a2-40a3e56b-76b9b420-fc4c3e56-451951ae.mp3,1,seed,,S113:打,S113:打,0.1164,0.0300,3,0,0,1
+1621761270229,892,佢學緊游水.,"""She's learning to swim.""",azure-da0f20a5-9475f78b-fba0cd24-c4668899-fe17c947.mp3,1,seed,,S119:游水,S119:游水,0.1148,0.3000,3,1,0,1
+1621761269938,601,如果我識飛就好喇!,If only I could fly!,azure-c2202287-5c61474d-8832636c-76a8369b-48b33e49.mp3,1,seed,,S120:飛|S205:如果,S120:飛,0.0521,0.2400,6,2,0,1
+1621761270173,836,哦，呢度你行得到?,"Oh, you can walk here?",azure-5f2018ef-e91d08cc-12a17e81-c4ed4c22-23b31dd1.mp3,1,seed,,S121:行|S9:呢度,S121:行,0.1243,0.2000,5,2,0,1
+1621761269363,26,過嚟!,Come here!,azure-d0edaaba-eb7e5e1a-1f35977c-5f4fa7c9-fd373d3c.mp3,1,depth,,S122:嚟,S122:嚟,0.0204,0.0300,2,1,0,1
+1621761269685,348,我坐唔定.,"""I can't sit still.""",azure-499b8ade-fced484d-03fb950e-8ea2c324-99bdd938.mp3,1,seed,,S124:坐,S124:坐,0.1336,0.1000,4,1,0,1
+1621761270181,844,企喺度嗰個邊個嚟?,Who is standing there?,azure-9c4eb326-db8c92cc-462481db-9a0bfc9c-64799db6.mp3,1,seed,,S125:企,S125:企,0.1033,0.1300,7,0,0,1
+1621761269558,221,揸住支蠟燭.,Hold the candle.,azure-c1f8ee82-c4874ef2-00162882-7e785f03-75591ec2.mp3,1,seed,,S129:揸,S129:揸,0.0964,0.4600,4,3,0,1
+1621761269761,424,你啱.,"""You're quite right.""",azure-b992adb0-2201d64b-753f7ece-f10e6008-7c1d0bb7.mp3,1,depth,,S196:啱,S2:你,0.0459,0.0000,2,0,0,1
+1621761269403,66,我哋係男人.,We are men.,azure-dab8f32e-544542ef-acee585e-f4f826dd-aa4702eb.mp3,1,depth,,S37:男人,S4:我哋,0.0367,0.0300,3,0,0,1
+1621761270101,764,太陽落緊山.,The sun is going down.,azure-69bc7890-ad6c60d5-73d7809a-439e8784-d521794c.mp3,1,depth,,S147:太陽,S147:太陽,0.0185,0.0300,3,1,0,1
+1621761269686,349,我殺咗佢.,I have killed him.,azure-e0f4744e-68a4ef76-7ee345d1-3fdce392-7694fef3.mp3,1,depth,,S110:殺,S1:我,0.0215,0.0300,4,0,0,1
+1621761269697,360,俾嗰本書我.,Give me that book.,azure-e6a9964a-8e45b27b-2f956e2a-cdf74005-8253dd6f.mp3,1,depth,,S8:嗰,S1:我,0.0504,0.0600,4,1,0,1
+1621761269769,432,你唔坐呀?,"""Won't you sit down?""",azure-d47c6afe-739003ee-6c52945c-5e86fdc8-c813c018.mp3,1,depth,,S124:坐,S2:你,0.0202,0.0300,4,0,0,1
+1621761269771,434,唔好笑佢啦.,"""Don't laugh at him.""",azure-21e5abb5-2821601d-c034a7ce-8a55c516-ea691ae0-65e181c5d4c7f59dd1600dbd5e244938c5983e39.mp3,1,completion,,S100:笑,S3:佢,-0.0074,0.0600,4,0,0,1
+1621761270088,751,唔好企咁埋.,"""Don't stand too close.""",azure-d54e5310-9ae33b21-947da461-2a214b8d-cf01a547.mp3,1,completion,,S125:企,S16:唔,-0.0398,0.0900,4,0,0,1
+1621761269562,225,我都係咁諗.,"I think so, too.",azure-fad999c2-2d5aa9d2-701523ac-ecb1c6dc-ef68ddfe.mp3,1,completion,,S104:諗,S1:我,-0.0079,0.0600,5,0,0,1
+1621761269829,492,佢哋住喺邊度呀?,Where do they live?,azure-4783aa72-d0411943-5b23f50e-ffe08dc7-97291539.mp3,1,depth,,S13:邊度,S6:佢哋,0.0319,0.0600,5,0,0,1
+1621761269674,337,嗰個女人係邊個嚟㗎?,Who is the woman?,azure-384fb358-bbda9175-4d04b4d9-5e60b33e-a3fb7104.mp3,1,depth,,S36:女人,S11:邊個,0.0072,0.0600,6,0,0,1
+1621761269742,405,你隻貓係黑色嘅.,Your cat is black.,azure-8c9363ee-b7eb2955-06060e02-8805fafc-ac6de8b4.mp3,1,completion,,S176:黑,S2:你,-0.1031,0.1500,6,1,0,1
+1621761270284,947,佢住喺我屋企附近.,He lives near my house.,azure-9a2a0cac-fa302999-44ec97be-4f1bad94-f4a585d7.mp3,1,completion,,S197:近,S1:我,-0.0441,0.0900,6,2,0,1
+1621761269427,90,太大喇.,"""It's too big.""",azure-99c6c6b5-a322b5cd-2eb1de2a-5376e2e9-7340d9fe.mp3,1,completion,,S27:大,S27:大,-0.1372,0.2100,2,1,0,1
+1621761269691,354,唱歌好易.,"""It's easy to sing.""",azure-f3ce54bb-5d07a249-bb4525be-33d11510-3155f13d.mp3,1,completion,,S141:唱,S141:唱,-0.1610,0.2100,2,1,0,1
+1621761269357,20,嘩，雪呀!,"Ah, snow!",azure-2ba21b18-87ae0062-2e502f9d-79fdebb8-b64bf2eb.mp3,1,completion,,S164:雪,S164:雪,-0.0825,0.1300,3,1,0,1
+1621761269822,485,喺LA冇人行㗎.,Nobody walks in LA.,azure-88a22c69-9db21324-fafccefe-6a71cfb0-e58ad334.mp3,1,completion,,S121:行,S121:行,-0.1595,0.2100,3,1,0,1
+1621761270224,887,開始落雨喇.,It has started to rain.,azure-f5801698-a52ace0c-b9b90af6-13e7a6f1-eaf758a2.mp3,1,completion,,S151:雨,S151:雨,-0.1917,0.2400,3,1,0,1
+1621761269617,280,你哋唔攰咩?,"""Aren't you tired?""",azure-3c72b244-e692c5d4-fadcb828-9cc4b2d9-a61419d1.mp3,1,completion,,S5:你哋,S5:你哋,-0.0746,0.2100,4,1,0,1
+1621761269729,392,呢個袋邊個架?,Whose bag is this?,azure-bc432d82-9e5ce7f4-c7d88ae0-8d31c300-544ec4b5.mp3,1,completion,,S7:呢個,S7:呢個,-0.0933,0.2100,4,2,0,1
+1621761270110,773,我要去瞓覺喇.,I have to go to sleep.,azure-613abf91-3b22b47e-c7a26f16-fcacaf04-80637020.mp3,1,completion,,S107:瞓覺,S1:我,-0.1082,0.1600,4,1,0,1
+1621761269904,567,我有好多朋友.,I have many friends.,azure-1cf41d73-2db25614-df1b051e-d58be063-860a242b.mp3,1,completion,,S18:多,S1:我,-0.0476,0.1300,5,1,0,1
+1621761270010,673,佢個真名係咩?,"""What's his real name?""",azure-b37f635d-8ce1c88c-fc79eda7-71542019-95fc72da.mp3,1,completion,,S207:名,S3:佢,-0.2245,0.2700,5,1,0,1
+1621761270124,787,你幾時返嚟呀?,When will you be back?,azure-85bb9996-0021129b-b9b4bf73-824f8d4a-ab4ec74b.mp3,1,completion,,S14:幾時,S2:你,-0.0404,0.1300,5,1,0,1
+1621761270148,811,佢哋買咗架新車.,They bought a new car.,azure-f07d0825-7d21ca64-15e2190e-517c4039-1e949500.mp3,1,completion,,S183:新,S6:佢哋,-0.2235,0.2700,5,2,0,1
+1621761270305,968,佢阿爸係咪醫生嚟㗎?,Is his father a doctor?,azure-077b3f8d-489b529f-b406ec28-453dd443-369a1b4f.mp3,1,completion,,S43:阿爸,S3:佢,-0.1459,0.2100,5,1,0,1
+1621761269660,323,你買咗啲乜嘢呀?,What did you buy?,azure-5ff1d31b-6816c103-c2103e4a-222d71b6-3b9d7921.mp3,1,completion,,S12:乜嘢,S2:你,-0.0654,0.1600,6,0,0,1
+1621761270267,930,今日天氣幾凍㗎.,"""It's rather cold today.""",azure-642098e2-c5b9b188-46573542-4459586c-bdaa9773.mp3,1,completion,,S181:凍,S181:凍,-0.2634,0.3100,4,3,0,1
+1621761270243,906,我同佢握咗手.,I shook hands with her.,azure-7abb1f06-a54f112a-c061e55a-b610a680-e79b721e.mp3,1,completion,,S83:手,S1:我,-0.2552,0.3100,5,2,0,1
+1621761269818,481,我咩都聽唔到喎.,"""I've heard nothing.""",azure-692bcb0a-cffa7ec4-86f7d167-9d52696b-85692b10.mp3,1,completion,,S102:聽,S1:我,-0.1777,0.2300,6,2,0,1
+1621761269842,505,我哋喺度睇緊電視.,We are watching TV.,azure-e82cd690-2408b31e-fd77eec5-a694a401-cb45169d.mp3,1,completion,,S101:睇,S4:我哋,-0.1775,0.2300,6,2,0,1
+1621761270244,907,我洗緊碗而家.,"""I'm washing the dishes.""",azure-0fab9455-333a7bf5-7e81e465-45c3f520-36185af8.mp3,1,seed,,S132:洗,S132:洗,0.0817,0.3300,4,1,0,1
+1621761270297,960,講畀我聽你喺邊呀?,"Tell me, where are you?",azure-da0acaf0-91a068dc-0b27b689-0ebd76f3-dcc317bc.mp3,1,depth,,S140:講,S140:講,0.0190,0.0300,7,0,0,1
+1621761269723,386,佢唱女高音架.,She sings soprano.,azure-0d264d8f-8e72b431-ed2fc610-2c98b237-542e1c32.mp3,1,seed,,S141:唱,S141:唱,0.1019,0.3800,5,2,0,1
+1621761269636,299,太陽喺邊到?,Where is the sun?,azure-35fec7f3-365f5ce7-d4fd1d70-8ca34eaa-9c2a9154.mp3,1,seed,,S147:太陽,S147:太陽,0.1207,0.1800,3,1,0,1
+1621761269706,369,我想飲水呀.,I want some water.,azure-1418ed41-e85e8cc9-b02573d6-0ed75eec-c1f51199.mp3,1,completion,,S150:水,S150:水,-0.1916,0.2400,3,1,0,1
+1621761269768,431,仲落緊雨.,"""It's still raining.""",azure-9622f0b7-f2bac1f9-89529dd3-8b1a7b80-460c1c45.mp3,1,seed,,S151:雨,S151:雨,0.0980,0.1300,3,1,0,1
+1621761270323,986,小心落石!,Beware of falling rocks!,azure-c4c8eb46-fa16954c-5ae5201d-3d82d945-d8e3143a.mp3,1,completion,,S156:石,S156:石,-0.2320,0.2800,3,2,0,1
+1621761270275,938,隻雀喺個天空度.,The bird is in the sky.,azure-1abbee6e-42d6c617-4c37805d-534aeb22-3db4b1f4-d3ed7bc3faf659fa0682aa06c02aa3f0e65b7a72.mp3,1,seed,,S162:天|S46:雀,S162:天,0.0281,0.2700,6,1,0,1
+1621761269426,89,落緊雪.,"""It's snowing.""",azure-468371e7-986483d2-c06cd734-3f71dc85-ea431386.mp3,1,seed,,S164:雪,S164:雪,0.1178,0.1800,2,0,0,1
+1621761270186,849,唔好喺冰上面跣親呀.,"""Don't slip on the ice.""",azure-582e5bf4-516a9f9a-5331b664-9f5642db-13c3e9d1.mp3,1,seed,,S165:冰,S165:冰,0.0476,0.6100,6,3,0,1
+1621761269681,344,佢唔食煙.,He does not smoke.,azure-13069bce-248fd89e-d5bc3567-ddbd0e06-e77c6038.mp3,1,depth,,S166:煙,S166:煙,0.0474,0.0000,4,0,0,1
+1621761269602,265,我個喉嚨好似比火燒噉.,My throat burns.,azure-dd59d73f-0e4168d5-3793b4ce-43432fb0-aed479fd.mp3,1,seed,,S167:火|S169:燒,S167:火,0.1922,0.7800,5,4,0,1
+1621761269488,151,過馬路啦.,Cross the road.,azure-ec60e1ad-f2d65901-25b33c08-c47419a7-56d75e02.mp3,1,seed,,S170:路,S170:路,0.0768,0.3100,3,1,0,1
+1621761269582,245,本書係紅色嘅.,The book is red.,azure-9efaa3e7-770732e9-504e3dc5-a4a2478f-ecf5236d.mp3,1,completion,,S172:紅,S172:紅,-0.0729,0.1200,4,0,0,1
+1621761269804,467,本書係黃色嘅.,The book is yellow.,azure-dfbaf276-e210418b-20b7441e-3fc07cf2-1c6b75ab.mp3,1,seed,,S174:黃,S174:黃,0.0382,0.4200,5,1,0,1
+1621761270277,940,隻馬唔係白色㗎.,The horse is not white.,azure-16ba61a4-a0f9adee-bcebbf72-00dd5f2b-854090e1.mp3,1,seed,,S175:白,S175:白,0.0661,0.4100,4,3,0,1
+1621761270146,809,黑色嗰個係我嘅.,The black one is mine.,azure-e37375dc-739402f3-50e6cf11-ceaf3d41-cac6fe49.mp3,1,seed,,S176:黑,S176:黑,0.0259,0.2700,6,0,0,1
+1621761270230,893,過咗十年喇!,Ten years have gone by.,azure-305334a4-aface790-70f50293-81be8171-0de0dcb1.mp3,1,seed,,S179:年,S179:年,0.0255,0.2700,4,1,0,1
+1621761269539,202,今日幾暖.,"""It's warm today.""",azure-bcd0078d-74def48b-5b8dc9c7-ac8a2eb3-1a18ac77.mp3,1,seed,,S180:暖,S180:暖,0.0733,0.3300,2,1,0,1
+1621761269538,201,今日好凍.,"""It's cold today.""",azure-89b7382d-3a294036-56424bc5-cc7d1b6c-4ea0b3f8.mp3,1,seed,,S181:凍,S181:凍,0.1052,0.2800,2,1,0,1
+1621761269638,301,你係咪新嚟㗎?,Are you new here?,azure-9b21d615-a8e6bd0f-c6de28cd-0c0b4119-8038253b-9be134975428be3084282f9d86f27b0d72be1b9a.mp3,1,seed,,S183:新,S183:新,0.1029,0.0300,4,0,0,1
+1621761270326,989,好近㗎咋!,Right around the corner!,azure-f09200b4-73d16558-30cedaaa-cd566aac-7624b5ff.mp3,1,completion,,S185:好,S185:好,-0.0536,0.1000,3,1,0,1
+1621761269627,290,我對襪濕咗.,My socks are wet.,azure-9d3b7e5a-431de891-a5a1fe56-3b2a1054-7d85eb57.mp3,1,seed,,S194:濕,S194:濕,0.0715,0.3300,4,1,0,1
+1621761269486,149,佢哋啱.,They are right.,azure-da4f5559-26a1d90a-d9fb5deb-ebef2a87-8a06453c.mp3,1,seed,,S196:啱|S6:佢哋,S196:啱,0.1312,0.0000,2,0,0,1
+1621761270176,839,車站就喺呢度附近.,The station is nearby.,azure-856a20b1-1a58ccea-d1ddf053-380e6843-2b0dc290.mp3,1,seed,,S197:近,S197:近,0.0931,0.3800,5,1,0,1
+1621761269434,97,我喺屋企.,I am at home.,azure-588817c0-b7785f26-4a49343d-3edd20d3-22c16ad9.mp3,1,seed,,S201:喺,S201:喺,0.1206,0.1000,3,0,0,1
+1621761270158,821,同我哋一齊食晏啦.,Come to lunch with us.,azure-51d3182a-fc120906-cb28da2d-edaccd40-3f8cb7de-a2e54ed43e4c3984b4a0cdb89dfe3bfd9065ce48.mp3,1,completion,,S203:同,S203:同,-0.1944,0.2400,5,1,0,1
+1621761269755,418,我唔記得咗佢叫咩名.,I forgot his name.,azure-99ac5c7d-6d29b05e-48463de2-497f0096-92afae01.mp3,1,seed,,S207:名,S207:名,0.0299,0.1900,7,1,0,1
+1621761269461,124,屌你老母.,Fuck your mom.,azure-5b9aed95-3a2bc1f0-0be949cd-5f10f0a5-09990679.mp3,1,seed,,S42:老母,S42:老母,0.1196,0.1000,3,1,0,1
+1621761269986,649,佢心口好多毛.,He has a hairy chest.,azure-cb098a59-41dd6d34-08017fad-0544e5c8-daeda81b.mp3,1,seed,,S89:心口,S89:心口,0.1114,0.1800,5,1,0,1
+1621761269336,0,死!,Die!,azure-68209d36-d731f509-358ed0f8-bcfb6d1f-ff8675d0.mp3,0,,english_words,,,0.0000,0.0000,1,0,0,0
+1621761269337,1,拜拜!,Bye!,azure-826d18a3-5b488685-90f89e1f-d61ee163-ce280f59.mp3,0,,english_words,,,0.0000,0.0000,1,0,0,0
+1621761269338,2,點解?,Why?,azure-363d2888-d827f7c0-d76dafa8-c233202c-4ed8829f.mp3,0,,english_words,,,0.0000,0.0000,1,0,0,0
+1621761269339,3,救命!,Help!,azure-f6058285-417ce495-4b258e3e-aea017fc-8af3f027.mp3,0,,english_words,,,0.0000,0.0000,1,0,0,0
+1621761269340,4,睇嚇!,Look!,azure-51f68e73-f0bc7289-7f8b047c-b864eb48-232e33a2.mp3,0,,english_words,,,0.0000,0.0000,2,0,0,0
+1621761269341,5,係食物呀!,Food!,azure-749de768-d562b1c3-adb48efd-92b42fad-da138a45.mp3,0,,english_words,,,0.0000,0.0000,3,0,0,0
+1621761269342,6,乞嚏!,Achoo!,azure-e13e5934-be39a21c-5bd7a4a0-b9407c13-c9f55e18-1e14bc1cf52b65619407e70a37bf0118b93f177c.mp3,0,,english_words,,,0.0000,0.0000,1,0,0,0
+1621761269344,7,邊度?,Where?,azure-0c88269c-0e76a5df-17aaee02-0b867046-32ea232e.mp3,0,,english_words,,,0.0000,0.0000,1,0,0,0
+1621761269345,8,開始啦.,Begin.,azure-9163e82f-afafd732-5ad0e6f6-62fe7113-9d3d568f.mp3,0,,english_words,,,0.0000,0.0000,2,0,0,0
+1621761269346,9,開始!,Action!,azure-a748fe93-af499b9b-eb1d1dae-54a14ec4-403bb004.mp3,0,,english_words,,,0.0000,0.0000,1,0,0,0
 1621761269348,11,點解係我?,Why me?,azure-2b979f8b-0efc0be0-4f96011e-b750597c-4ac4eb5c.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
-1621761269349,12,加油!,Come on!,azure-3f35345c-e097ae41-5bcbebec-f533558f-3511f96f.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
+1621761269349,12,加油!,Come on!,azure-3f35345c-e097ae41-5bcbebec-f533558f-3511f96f.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
 1621761269351,14,我笑咗.,"""I lol'd.""",azure-aba96991-e85bf452-51987745-a4cd8c79-81cace2c.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
 1621761269352,15,我係基佬.,"""I'm gay.""",azure-926e3075-4298af96-950bae90-c4173219-a7280549.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
-1621761269353,16,我明.,I get it.,azure-1ce38fd5-7a334d79-c2c8107f-57730286-18d3e783.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
+1621761269353,16,我明.,I get it.,azure-1ce38fd5-7a334d79-c2c8107f-57730286-18d3e783.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
 1621761269354,17,死開啦!,Get lost!,azure-13c7e4cc-e74fd9be-92cd3d1c-326d041b-8831f916.mp3,0,,max_cards,,,0.0000,0.0000,2,0,0,0
 1621761269355,18,做得好!,Good job!,azure-3b472914-d1727873-91b52732-7b4aceb6-e8286646.mp3,0,,max_cards,S185:好,,0.0000,0.0000,3,0,0,0
 1621761269356,19,我喺度.,"""I'm here.""",azure-4d650173-bd6f6e31-5621efae-3dac24ea-054001f3.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
@@ -148,12 +148,12 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269360,23,死撚開啦你!,Fuck off!,azure-7be0e470-5c796417-68dd5d64-cca9e5e9-36ffbc0e.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
 1621761269361,24,咁係邊個呀?,Then who?,azure-f1bc3433-8a961ff8-e9123ea8-063cba29-34117d08.mp3,0,,max_cards,S11:邊個,,0.0000,0.0000,4,0,0,0
 1621761269362,25,你先.,After you.,azure-c50bd8b4-1475afe0-d6e834d4-e1eaa81f-835895b9.mp3,0,,max_cards,S2:你,,0.0000,0.0000,2,0,0,0
-1621761269364,27,多謝.,Thank you!,azure-bb2e4bd8-740bc591-291bac04-8268b018-4e52e19c.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
+1621761269364,27,多謝.,Thank you!,azure-bb2e4bd8-740bc591-291bac04-8268b018-4e52e19c.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
 1621761269365,28,算吧啦.,Forget it.,azure-b28c9dc7-0ab1a78f-be48c736-8d92e853-a890e865.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761269366,29,去馬啦!,Go for it!,azure-a66ab5d3-60598bdc-66aa4a20-d8603e66-6a33ac7a-bf0aef9f7209062316264aa041e08a627bbcf2cb.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761269367,30,我好嬲.,"""I'm angry.""",azure-b87574c8-5f62a613-7f471f7d-b5490152-3a9f2a59-a0ec2a6ad3844cfd609ad9c3fd55b5471c8e430e.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
-1621761269368,31,擺明啦.,Obviously.,azure-f4d44c75-91c837e6-88d71d1c-4b89fe89-39146322.mp3,0,,F1,,,0.0000,0.0000,2,0,0,0
-1621761269369,32,坐定定.,Sit still.,azure-bbe42ffb-adf8c446-fb60374c-20409640-c7790a01.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
+1621761269368,31,擺明啦.,Obviously.,azure-f4d44c75-91c837e6-88d71d1c-4b89fe89-39146322.mp3,0,,english_words,,,0.0000,0.0000,2,0,0,0
+1621761269369,32,坐定定.,Sit still.,azure-bbe42ffb-adf8c446-fb60374c-20409640-c7790a01.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
 1621761269370,33,到咗未?,There yet?,azure-0b32f5ab-cdb3233c-1c9c8b77-e79e58ad-b5059251.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761269371,34,揀我哋啦!,Choose us!,azure-d0a9f50c-0c68dbfe-73f262b3-2b96b8b2-8946d669.mp3,0,,max_cards,S4:我哋,,0.0000,0.0000,3,0,0,0
 1621761269372,35,唔好喊啦.,"""Don't cry.""",azure-31f10f8b-6a28258f-a5b15590-c0c70f0f-658e1a41.mp3,0,,max_cards,S16:唔,,0.0000,0.0000,3,0,0,0
@@ -163,9 +163,9 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269376,39,我準備好喇.,"""I'm ready.""",azure-593466b3-e6b8ba57-6ff6027b-deeb5170-a93a9103-f3a550647ba4f0c63c106f250b2225aed887d78e.mp3,0,,max_cards,S1:我,,0.0000,0.0000,4,0,0,0
 1621761269377,40,我係邊個㗎?,What am I?,azure-fdb8d799-7617551e-91b98aca-830027e1-568171de.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
 1621761269378,41,我可唔可以喊呀?,Can I cry?,azure-4aa7d130-36815edb-ed9654c8-4268a237-b5026471.mp3,0,,max_cards,S1:我,,0.0000,0.0000,6,0,0,0
-1621761269379,42,咪鬱.,"""Don't move.""",azure-8a9a4019-d1c7ae9f-0009ff63-c181a386-1af761d0.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
-1621761269380,43,重要.,It matters.,azure-a145292f-8482ca6e-37f73e10-7ff983d8-e07cf23d.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
-1621761269381,44,試嚇.,Try it out.,azure-4ee8767d-25ffd0ce-76b8b10e-fbf7789e-04e56270.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
+1621761269379,42,咪鬱.,"""Don't move.""",azure-8a9a4019-d1c7ae9f-0009ff63-c181a386-1af761d0.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
+1621761269380,43,重要.,It matters.,azure-a145292f-8482ca6e-37f73e10-7ff983d8-e07cf23d.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
+1621761269381,44,試嚇.,Try it out.,azure-4ee8767d-25ffd0ce-76b8b10e-fbf7789e-04e56270.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
 1621761269382,45,咪玩啦.,Be serious.,azure-029c62e3-ea01a2d7-3dda9f97-1dc7d953-6fcca3b2.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761269383,46,信我啦!,Believe me!,azure-50dcb74c-54514229-0e5eabe2-5f5ee126-3342f469-1b3af0de0274317301a534f4d20f434c4855c635.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
 1621761269384,47,入嚟啦!,Come on in!,azure-730a5889-fae9e231-66c5d642-11eb077a-ca76d8c9-cb9bd09cb6594ff663e5187380ddaeaf23ccd2d2.mp3,0,,max_cards,S122:嚟,,0.0000,0.0000,3,0,0,0
@@ -173,8 +173,8 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269386,49,我好攰.,I am tired.,azure-f3abf2a8-b356abd7-d4f43c9e-17065b50-05871a97.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
 1621761269387,50,我識佢.,I know him.,azure-bb8ba1f2-aa0e1105-389ca8c9-c1dcf6fd-5776bb18.mp3,0,,max_cards,S1:我|S3:佢,,0.0000,0.0000,2,0,0,0
 1621761269388,51,我愛你.,I love you.,azure-7c16b5e9-d2543d30-41bfec0f-55d86c09-313182f1.mp3,0,,max_cards,S1:我|S2:你,,0.0000,0.0000,2,0,0,0
-1621761269389,52,好大風.,"""It's windy.""",azure-6f0ef211-a6b58ee6-9c0870f3-7a2ba9cd-58a75dd2.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
-1621761269390,53,冇問題.,No problem.,azure-cb163dca-0e716f2d-abb28109-ab7c5353-d50f9c90.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
+1621761269389,52,好大風.,"""It's windy.""",azure-6f0ef211-a6b58ee6-9c0870f3-7a2ba9cd-58a75dd2.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
+1621761269390,53,冇問題.,No problem.,azure-cb163dca-0e716f2d-abb28109-ab7c5353-d50f9c90.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
 1621761269391,54,夠鐘喇.,Time is up.,azure-aa42db75-e992082c-d9dbddd4-d9e87dc4-2a1f6fc6.mp3,0,,max_cards,,,0.0000,0.0000,2,0,0,0
 1621761269392,55,攰死人喇!,I am tired!,azure-d2c79f31-868659ca-47c78ea3-db420bd0-0efc98d3.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1621761269393,56,我好肚餓.,"""I'm hungry!""",azure-ea7df3e0-f5f82101-80837392-5967dd22-9eb0388d.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
@@ -191,7 +191,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269405,68,返工返成點呀?,"""How's work?""",azure-992ba3bd-b55845c8-7c0db338-a7df1d6b-1a575a49-52bdded0afb58b2fcce045dbadb477481a977c1f.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761269406,69,係唔係免費㗎?,Is it free?,azure-9dcc5123-747391ae-3c8f8b09-5bee4f98-875462fa.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761269407,70,俾我死咗去算啦.,Let me die.,azure-304392c7-cbf94544-cf99c7a3-351aec0a-984f3f82.mp3,0,,max_cards,S109:死|S1:我,,0.0000,0.0000,7,0,0,0
-1621761269408,71,可以話係，亦都可以話唔係.,Yes and no.,azure-e575ba57-a6f3bfb5-9c2b59b3-743ea060-89481bdb.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
+1621761269408,71,可以話係，亦都可以話唔係.,Yes and no.,azure-e575ba57-a6f3bfb5-9c2b59b3-743ea060-89481bdb.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
 1621761269409,72,你點呀?,How are you?,azure-350a5aec-dba0320a-de1a2e8c-7ac9f35f-f042e33e.mp3,0,,max_cards,S2:你,,0.0000,0.0000,2,0,0,0
 1621761269410,73,請留步.,Please stay.,azure-c24b3fdd-019beabb-daf781f6-1277e4e3-32b17ae1.mp3,0,,max_cards,,,0.0000,0.0000,2,0,0,0
 1621761269411,74,放咗佢!,Release him!,azure-5841979b-cc9a04ac-5de9fad7-1e2acc63-cb6af7dd.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,3,0,0,0
@@ -202,7 +202,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269417,80,佢企咗起身.,He stood up.,azure-8b8255dd-6fcb401a-3fb13810-77b5528f-ace1bde7.mp3,0,,max_cards,S125:企|S3:佢,,0.0000,0.0000,4,0,0,0
 1621761269418,81,我鐘意蛋糕.,I love cake.,azure-1b10a6b8-59fcb766-1e35e9c1-914f0839-0e7d9cdd.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
 1621761269419,82,我哋做運動.,We exercise.,azure-0a8ad46b-2c53f444-85319786-d33491a8-df214d61.mp3,0,,max_cards,S4:我哋,,0.0000,0.0000,3,0,0,0
-1621761269421,84,早晨.,Good morning!,azure-25f3e0c4-37b7bab6-d178fdb4-7ebfbed4-72d2c1fc.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
+1621761269421,84,早晨.,Good morning!,azure-25f3e0c4-37b7bab6-d178fdb4-7ebfbed4-72d2c1fc.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
 1621761269422,85,嘥曬!,What a waste!,azure-9bbf8161-a4bd8127-f04b31f8-8b54fc1c-342b3e11.mp3,0,,max_cards,,,0.0000,0.0000,2,0,0,0
 1621761269423,86,棄船呀!,Abandon ship!,azure-0c849089-4ccbdafb-071fcb2b-f7c9d71a-55365a3c.mp3,0,,max_cards,,,0.0000,0.0000,2,0,0,0
 1621761269424,87,賣曬喇!,All sold out!,azure-7bc987e6-96f12614-c6d2cc59-c33a31bc-3d955e73.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
@@ -223,7 +223,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269442,105,我係潮州人.,I am Teochew.,azure-cb7e93e4-2b67ca68-6983fd00-cd39254a-bae61016.mp3,0,,max_cards,S1:我,,0.0000,0.0000,4,0,0,0
 1621761269443,106,我唔會輸嘅!,"""I won't lose!""",azure-b9890d8a-b4fb91ad-9e56b5f9-47dcdab8-09644189.mp3,0,,max_cards,S16:唔|S1:我,,0.0000,0.0000,4,0,0,0
 1621761269444,107,多謝曬你呀.,Thanks a lot.,azure-bf8c1ad0-b352c02a-0e8d48ea-28a4abd0-820d1435.mp3,0,,max_cards,S18:多,,0.0000,0.0000,4,0,0,0
-1621761269445,108,Tom尖叫.,Tom screamed.,azure-fe2e19d2-6590e707-41d592dc-724a7b73-77aa2136.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
+1621761269445,108,Tom尖叫.,Tom screamed.,azure-fe2e19d2-6590e707-41d592dc-724a7b73-77aa2136.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
 1621761269446,109,你講得冇錯.,"""You're right.""",azure-68e0c802-745093a6-e0aefe07-fe9640ea-a16038f3-72ea5fe9e2b1b8af6782fe90dedd30b3b11a4f7e.mp3,0,,max_cards,S2:你,,0.0000,0.0000,3,0,0,0
 1621761269447,110,唔好唔開心啦.,"""Don't be sad.""",azure-791fccbc-b842c812-2f247c1f-782a66c2-24bde0c2.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1621761269448,111,講多啲俾我聽.,Tell me more.,azure-0dbe7ee2-5e93bfa8-b69f0c75-ef9ec361-d669ec6e.mp3,0,,max_cards,S140:講|S18:多|S1:我,,0.0000,0.0000,5,0,0,0
@@ -231,7 +231,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269450,113,歡迎你返嚟呀!,Welcome back!,azure-47321f5e-674b57bb-65a20d3e-55d0eac9-4b4c3779.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
 1621761269451,114,我而家好唔得閒.,"""I'm busy now.""",azure-69cc678c-2011785b-d2de9335-2f70c2d2-2bbf48f0.mp3,0,,max_cards,S1:我,,0.0000,0.0000,5,0,0,0
 1621761269452,115,我幾鍾意過 Tony.,I liked Tony.,azure-b1a6860b-cfa02e28-b18aa96b-3c5528f5-d19ca68c.mp3,0,,max_cards,S1:我,,0.0000,0.0000,4,0,0,0
-1621761269453,116,你唔出聲冇人當你啞㗎喎.,Just shut up.,azure-850f98d6-6c793808-88c36ee6-ed12cbf8-64ca5e9f.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
+1621761269453,116,你唔出聲冇人當你啞㗎喎.,Just shut up.,azure-850f98d6-6c793808-88c36ee6-ed12cbf8-64ca5e9f.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
 1621761269454,117,佢冷親.,He has a cold.,azure-ffcc22a2-13eac928-dac72330-effba964-97a8cc61.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,2,0,0,0
 1621761269455,118,佢賣車.,He sells cars.,azure-16f946a0-b3ecfc5c-d3109c45-6cd88548-1775dc73.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,3,0,0,0
 1621761269456,119,我想喊.,I want to cry.,azure-a79dfa60-7e7ce53a-a1ec9c12-c5f6153d-5d2fab45.mp3,0,,max_cards,S1:我,,0.0000,0.0000,2,0,0,0
@@ -292,14 +292,14 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269519,182,佢叫醒咗阿Tom.,He woke Tom up.,azure-bd1c2a70-a467610f-73d52210-9996bc97-25955c4a.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,4,0,0,0
 1621761269520,183,我整喊咗阿Tom.,I made Tom cry.,azure-724edbe7-653642df-356328fc-6b962b0c-1b68b711.mp3,0,,max_cards,S1:我,,0.0000,0.0000,4,0,0,0
 1621761269521,184,唔好喺呢度跑嚟跑去.,"""Don't run here.""",azure-14c8d089-73888070-3a828e40-41c51ffd-6be8d4cd.mp3,0,,max_cards,S122:嚟|S16:唔|S9:呢度,,0.0000,0.0000,7,0,0,0
-1621761269522,185,我覺得所有嘢都係整定嘅.,"""I'm a fatalist.""",azure-884dd853-f1bbf1ba-c5d108f5-400f67d6-ea223d8a.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
+1621761269522,185,我覺得所有嘢都係整定嘅.,"""I'm a fatalist.""",azure-884dd853-f1bbf1ba-c5d108f5-400f67d6-ea223d8a.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
 1621761269523,186,唔好驚!,"""Don't be afraid.""",azure-05137f51-477de812-228bef05-03e8b112-ce87fffd.mp3,0,,max_cards,S106:驚|S16:唔,,0.0000,0.0000,2,0,0,0
-1621761269524,187,正仆街!,"""Fuckin' asshole!""",azure-0d097a14-d3314697-f78a401c-f68c5713-6b5b8c43.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
+1621761269524,187,正仆街!,"""Fuckin' asshole!""",azure-0d097a14-d3314697-f78a401c-f68c5713-6b5b8c43.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
 1621761269525,188,入返去.,Get back inside.,azure-acbc378c-92c7281c-c29c4c2a-f0967ecb-9efe7e12.mp3,0,,max_cards,,,0.0000,0.0000,2,0,0,0
-1621761269526,189,我幫你講,"""I'm telling you.""",azure-a38aa853-2a792b67-26e1caac-276c4a5f-b83dc730-8cdd92458834b96ca9feccfe8425f2b4bb14e1c5.mp3,0,,F4,,,0.0000,0.0000,3,0,0,0
+1621761269526,189,我幫你講,"""I'm telling you.""",azure-a38aa853-2a792b67-26e1caac-276c4a5f-b83dc730-8cdd92458834b96ca9feccfe8425f2b4bb14e1c5.mp3,0,,final_mark,,,0.0000,0.0000,3,0,0,0
 1621761269527,190,我飽喇.,"""I've had enough.""",azure-fb440b94-a878036c-bf73bb7f-84cd1e82-4241343e.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
 1621761269528,191,好夜喇.,It is very late.,azure-cad48265-7017d11b-7482170e-2fef1665-7e027fa9.mp3,0,,max_cards,,,0.0000,0.0000,2,0,0,0
-1621761269529,192,擘大口!,Open your mouth!,azure-91bc110e-3c9116ce-c9157772-df9dc45b-f1795d8d.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
+1621761269529,192,擘大口!,Open your mouth!,azure-91bc110e-3c9116ce-c9157772-df9dc45b-f1795d8d.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
 1621761269530,193,冇用嘅.,"""That won't work.""",azure-2f9f7359-0ea65a75-27926491-5340349d-ae822e7b.mp3,0,,max_cards,,,0.0000,0.0000,2,0,0,0
 1621761269531,194,電話響.,The phone rings.,azure-f4f43a9b-193e728e-722084a0-d3d4aedb-1ce51c66.mp3,0,,max_cards,,,0.0000,0.0000,2,0,0,0
 1621761269532,195,搞咩呀?,"""What's going on?""",azure-de4eab43-c6dd4e3c-f47c7b48-50846712-60b3c011.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
@@ -369,7 +369,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269607,270,死撚開啦!,Get the fuck out!,azure-f0d912f0-6e8ef4c5-820a951e-2bcde389-16cd1dcb.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1621761269608,271,等我一陣.,Hold on a second.,azure-6f53793b-1dbc3d5d-bb7dba9f-0ddb7292-a12c9a4e.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761269609,272,嗰個幾錢?,How much is that?,azure-6b39f3c1-8436f19a-893a158b-bb9f8f35-73e1f1e9.mp3,0,,max_cards,S8:嗰,,0.0000,0.0000,3,0,0,0
-1621761269610,273,我仲未知.,"""I don't know yet.""",azure-377f9139-2656f4e2-beb049e8-83c08ba2-6ab3ba20.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
+1621761269610,273,我仲未知.,"""I don't know yet.""",azure-377f9139-2656f4e2-beb049e8-83c08ba2-6ab3ba20.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
 1621761269611,274,好撚熱呀.,"""It's fucking hot.""",azure-5e8a187c-ab518e28-03c6a5c2-a3b0e5af-4acbd3b7.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761269612,275,佢嚟緊喇.,"""She's on her way.""",azure-ab97a0ed-e459af84-cc4cec58-9bea8f58-fbecf0d4.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,4,0,0,0
 1621761269613,276,收撚皮啦.,Shut the fuck up.,azure-5cefbfeb-c6d3332d-483edbcf-a556390c-b4ec674f.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
@@ -419,7 +419,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269664,327,我開心到彈咗起身.,I jumped for joy.,azure-8c4b2703-2832f8c1-143d3908-2ad7ec7d-ce4ea867-382ae7e3222a58799ec971120d9db39defcf4e3d.mp3,0,,max_cards,S1:我,,0.0000,0.0000,5,0,0,0
 1621761269665,328,我咪講咗對唔住囉.,"""I said I'm sorry.""",azure-bf813084-0615fb21-9be362c9-836f0999-54ea922c.mp3,0,,max_cards,S140:講|S1:我,,0.0000,0.0000,4,0,0,0
 1621761269666,329,好心你FF少陣啦.,Stop fantasizing.,azure-338b4095-b7513b9d-de3d0ad7-56ea0c96-400c1638.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
-1621761269667,330,呢度係839號房.,This is Room 839.,azure-831ebcbd-41213165-6fc46735-69805929-51061351.mp3,0,,F3,,,0.0000,0.0000,3,0,0,0
+1621761269667,330,呢度係839號房.,This is Room 839.,azure-831ebcbd-41213165-6fc46735-69805929-51061351.mp3,0,,digit_marks,,,0.0000,0.0000,3,0,0,0
 1621761269668,331,阿Tom跑得好快.,Tom can run fast.,azure-ed1c3275-57f1b558-65c33dd4-61db91aa-b98471f4.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1621761269669,332,阿Tom係個學生.,Tom is a student.,azure-500139ac-2bd9859e-5f68b571-dc0ce619-56082f81.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1621761269670,333,我哋好鍾意傾偈㗎.,We enjoy talking.,azure-7fa77d66-9c6dd5c1-8c427c16-0ed990d6-2f3e09e9.mp3,0,,max_cards,S4:我哋,,0.0000,0.0000,4,0,0,0
@@ -452,7 +452,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269707,370,我個頭好暈.,"""I'm feeling dizzy.""",azure-0a405057-7142ef06-cb2a1334-ac946a1e-f24a1a99.mp3,0,,max_cards,S1:我,,0.0000,0.0000,2,0,0,0
 1621761269708,371,佢喺張檯度.,"""It's on the table.""",azure-719efd0a-94cf7315-869de8f2-cedca26c-15559752.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,5,0,0,0
 1621761269710,373,佢開始唱歌.,She began to sing.,azure-3fa15389-cabfad69-d1635d84-bb75f911-9f56c28b.mp3,0,,max_cards,S141:唱|S3:佢,,0.0000,0.0000,3,0,0,0
-1621761269711,374,你叫乜嘢名呀,What is your name?,azure-b4e3c86e-879f3961-ea52047a-c80c4924-40e2b669.mp3,0,,F4,,,0.0000,0.0000,5,0,0,0
+1621761269711,374,你叫乜嘢名呀,What is your name?,azure-b4e3c86e-879f3961-ea52047a-c80c4924-40e2b669.mp3,0,,final_mark,,,0.0000,0.0000,5,0,0,0
 1621761269712,375,嘩！咁抵？!,"""Wow! That's cheap!""",azure-06fdc3bb-eb314568-ec71f274-1f0ebf0c-dc0fcdd8.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761269713,376,你要趕喇喎.,You have to hurry.,azure-2b24b1be-615051cd-47f77f3a-b4eaf181-dccd72ee.mp3,0,,max_cards,S2:你,,0.0000,0.0000,5,0,0,0
 1621761269714,377,佢好有影響力.,He is influential.,azure-f342d27d-497f9299-824f72fc-7be4baa8-f2fa6c52.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,5,0,0,0
@@ -512,7 +512,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269780,443,就快三點喇.,It is almost three.,azure-a7ae8bdd-28023ad0-b85ab736-6a25278c-f089f16c.mp3,0,,max_cards,S24:三,,0.0000,0.0000,3,0,0,0
 1621761269781,444,我唔肚餓呀.,"""No, I'm not hungry.""",azure-5ba230fe-45867aea-72eb8594-239c2328-ad94864f.mp3,0,,max_cards,S16:唔|S1:我,,0.0000,0.0000,4,0,0,0
 1621761269782,445,嗰男仔跳緊.,The boy is jumping.,azure-ccc62bae-ae9157ff-9119c3b6-b30f7c4b-307c1199.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
-1621761269783,446,Tom未到.,"""Tom isn't here yet.""",azure-43a1a78a-0f522847-1b737078-880a4bbc-89cb0b79-443da8db68d979b077df5118025d29c78375683e.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
+1621761269783,446,Tom未到.,"""Tom isn't here yet.""",azure-43a1a78a-0f522847-1b737078-880a4bbc-89cb0b79-443da8db68d979b077df5118025d29c78375683e.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
 1621761269784,447,我哋要搵佢.,We need to find it.,azure-3973ed75-1d2bc300-982a4d29-3dc53d79-919dfc84.mp3,0,,max_cards,S3:佢|S4:我哋,,0.0000,0.0000,4,0,0,0
 1621761269786,449,佢屋企喺邊?,Where does he live?,azure-34ba7d12-f8d79227-b2e6620f-02983ecb-ba9e3a28.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,4,0,0,0
 1621761269787,450,你做咩喊呀?,Why are you crying?,azure-dc7f6e8f-9e328647-3ea4b671-78ba3e7e-028ac578.mp3,0,,max_cards,S2:你,,0.0000,0.0000,4,0,0,0
@@ -529,7 +529,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269798,461,我唔係魔術師.,"""I'm not a magician.""",azure-bddee6d4-41f7595a-ad09cd18-5f3d0817-458de995.mp3,0,,max_cards,S16:唔|S1:我,,0.0000,0.0000,4,0,0,0
 1621761269799,462,我阿哥好有錢.,My brother is rich.,azure-e3033578-c58ded05-11c11057-bb3e218d-82ca64f2.mp3,0,,max_cards,S1:我,,0.0000,0.0000,4,0,0,0
 1621761269800,463,唔該唱首歌啦.,Please sing a song.,azure-10571592-ceea2ee5-2d62be34-baf3c016-b5561f35.mp3,0,,max_cards,S141:唱,,0.0000,0.0000,3,0,0,0
-1621761269801,464,森美又遲到喇.,Sami is late again.,azure-bd04cc70-02a4d0b3-3359e963-b1e4ba57-ad10f4ac.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
+1621761269801,464,森美又遲到喇.,Sami is late again.,azure-bd04cc70-02a4d0b3-3359e963-b1e4ba57-ad10f4ac.mp3,0,,C3,,,0.0000,0.0000,4,0,0,0
 1621761269802,465,滑雪好好玩㗎.,Skiing is very fun.,azure-4b9bf2c3-07eae536-76a831ff-a4cf8f41-9362a0e0.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1621761269803,466,冇可能係真嘅.,"""That can't be true.""",azure-c7fd2054-ccf09552-6e77373f-48c3873e-455353dc.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
 1621761269805,468,架車撞咗埋牆.,The car hit a wall.,azure-766becb7-62450aa1-64ee34dd-6d4829db-652d81a7.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
@@ -567,7 +567,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269840,503,我哋間舖頭好大間.,Our store is large.,azure-3f7c5a54-f1d9af70-a43912dc-161cc8ef-7dbb8736-0c664767294054c045f0777549556a1d83c8a517.mp3,0,,max_cards,S27:大|S4:我哋,,0.0000,0.0000,5,0,0,0
 1621761269844,507,你可唔可以靜少少啫?,Can you keep quiet?,azure-3beb2798-74e81fe5-c24f1e55-0e2b8fc7-d02a34c3.mp3,0,,max_cards,S2:你,,0.0000,0.0000,7,0,0,0
 1621761269845,508,你鍾唔鍾意大自然㗎?,Do you love nature?,azure-702498de-fb517f12-4e258f65-133e400f-0cafa19e.mp3,0,,max_cards,S2:你,,0.0000,0.0000,5,0,0,0
-1621761269846,509,你聞唔聞到有浸煙味?,Do you smell smoke?,azure-85169a88-2d1d790d-b0594ce0-6d888b6a-866a1c7a.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
+1621761269846,509,你聞唔聞到有浸煙味?,Do you smell smoke?,azure-85169a88-2d1d790d-b0594ce0-6d888b6a-866a1c7a.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
 1621761269847,510,Hamisi想要糖.,Hamisi wants sugar.,azure-8d0d1ff0-3bee9c88-36aa87f8-096fcef0-e27e2cad.mp3,0,,max_cards,,,0.0000,0.0000,2,0,0,0
 1621761269848,511,佢喺度打緊哥爾夫球.,He is playing golf.,azure-238f8f6d-2a3c57d6-44398a06-95ff1c2c-21bfadff.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,5,0,0,0
 1621761269849,512,我杯啫喱雪極都唔瓊.,"""My jelly won't set.""",azure-53a2972c-5fe337f5-78655035-61b638c2-fd85f292.mp3,0,,max_cards,S16:唔|S1:我,,0.0000,0.0000,7,0,0,0
@@ -577,10 +577,10 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269853,516,唔該你八點叫我起身吖.,Get me up at eight.,azure-160c5063-933505b1-8a67046a-2d1263ce-452c98fc.mp3,0,,max_cards,S1:我,,0.0000,0.0000,7,0,0,0
 1621761269854,517,我連企都唔係好企得穩.,I can barely stand.,azure-9de3ee8e-905b7fd9-290af971-37c1e3b5-1f586c39.mp3,0,,max_cards,S1:我,,0.0000,0.0000,7,0,0,0
 1621761269855,518,阿Tom，你喺邊度呀?,"Tom, where are you?",azure-c7b8f7c0-8911ac6f-334dc69f-28d80ed3-73797291.mp3,0,,max_cards,S13:邊度|S2:你,,0.0000,0.0000,5,0,0,0
-1621761269856,519,我哋兩個都咁高咁大喇.,"""We're both so tall!""",azure-465053fd-d08a7a99-20b23ee2-efb838de-23b55c8e.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
+1621761269856,519,我哋兩個都咁高咁大喇.,"""We're both so tall!""",azure-465053fd-d08a7a99-20b23ee2-efb838de-23b55c8e.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
 1621761269857,520,我淨係見過佢一次咁大把.,I saw him but once.,azure-d4919931-e196a004-1f9ab796-b060d958-4f697cf3.mp3,0,,max_cards,S1:我|S3:佢,,0.0000,0.0000,7,0,0,0
 1621761269858,521,我哋真係好掛住阿Tom.,We really miss Tom.,azure-b07ffaad-aa747cc2-baa14cbd-542d60bf-31d9d389-9bbcf23adffc16565a30413835c344b94aeceb50.mp3,0,,max_cards,S4:我哋,,0.0000,0.0000,5,0,0,0
-1621761269859,522,盲喇.,"Get a room, you two.",azure-b7bde915-0dbdb169-09e8fc1a-5f74dc21-293854d5.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
+1621761269859,522,盲喇.,"Get a room, you two.",azure-b7bde915-0dbdb169-09e8fc1a-5f74dc21-293854d5.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
 1621761269860,523,我唔明.,I do not understand.,azure-781e4cdb-1c307878-a4e0759d-70089878-8e36d8d3.mp3,0,,max_cards,S16:唔|S1:我,,0.0000,0.0000,3,0,0,0
 1621761269862,525,我都想知!,I also want to know!,azure-cd44c3c8-f4ab8d53-43b00db8-75e0f318-18977f1e.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
 1621761269863,526,我要行喇.,I must be on my way.,azure-9ef60f6c-7ac05dac-7012f913-335a0666-17a43b66.mp3,0,,max_cards,S1:我,,0.0000,0.0000,2,0,0,0
@@ -603,7 +603,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269880,543,我口渴到死.,"""I'm dying of thirst.""",azure-e0de4e5b-5b4cb07c-0f002cf3-4dce6012-2ccf402e-c12bd41a70b5aade0c07809eefb206efe080ca47.mp3,0,,max_cards,S109:死|S1:我,,0.0000,0.0000,4,0,0,0
 1621761269881,544,我仲讀緊書.,"""I'm still in school.""",azure-004cc6ca-0426ced9-7b1a28a0-1e01bb31-bd84ef0c.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
 1621761269882,545,咪一樣嘅嘢.,"""It's the same thing.""",azure-60117786-7aade733-194e16c5-5910e8c1-389eba66.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
-1621761269883,546,蕾拉長大緊.,Layla is growing up.,azure-f760cd7a-3d493c0c-0bbef7c2-d5e96c09-8d57c70e-1f17853ba70814bd4734baffe8e45aaf2799cb65.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
+1621761269883,546,蕾拉長大緊.,Layla is growing up.,azure-f760cd7a-3d493c0c-0bbef7c2-d5e96c09-8d57c70e-1f17853ba70814bd4734baffe8e45aaf2799cb65.mp3,0,,C3,,,0.0000,0.0000,3,0,0,0
 1621761269884,547,我阿妹好靚.,My sister is pretty.,azure-cba55abb-599191dd-4210d68a-98d5f5f0-bbd09017-7629502f5f6d567f8b159c490ee1d903025819f3.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
 1621761269885,548,到你開波喇.,"""Now it's your serve.""",azure-cf61213b-24e537dd-bc45a61a-df4ec61e-3e467d93.mp3,0,,max_cards,S2:你,,0.0000,0.0000,4,0,0,0
 1621761269886,549,估估嚇㗎咋.,"""That's just a guess.""",azure-61424a53-34dc5ba9-982bdb5c-de90ecec-ea8ad0f4.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
@@ -679,7 +679,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269963,626,隨便食吖.,Please help yourself.,azure-61828441-23183994-15ea04cc-71b86231-96bfe1ba.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761269964,627,食蕉啦你!,Shut up! Go eat shit!,azure-cdc7f220-4f903c71-a11cf1d6-9165c796-7acabe2f.mp3,0,,max_cards,S93:食,,0.0000,0.0000,3,0,0,0
 1621761269965,628,電話響呀!,The phone is ringing!,azure-0ecb9c0e-5acc5ce1-ce99765e-f1dbe920-35b6814b.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
-1621761269966,629,海納百川.,Welcome to Wikipedia.,azure-4ac9c7a2-5345e75a-17d85dc3-b0906305-c5536af5.mp3,0,,F2,,,0.0000,0.0000,1,0,0,0
+1621761269966,629,海納百川.,Welcome to Wikipedia.,azure-4ac9c7a2-5345e75a-17d85dc3-b0906305-c5536af5.mp3,0,,length_window,,,0.0000,0.0000,1,0,0,0
 1621761269967,630,搞咩呀你?,What happened to you?,azure-29e2fbdf-d09d7290-0ae43dd3-8a6ace66-8adbae43.mp3,0,,max_cards,S2:你,,0.0000,0.0000,4,0,0,0
 1621761269969,632,佢話佢會嚟.,He says he will come.,azure-1d03fab7-f1e832b5-eef4d124-4223a97f-0b125438.mp3,0,,max_cards,S122:嚟,,0.0000,0.0000,5,0,0,0
 1621761269970,633,佢好想成功.,He wanted to succeed.,azure-edc91c48-b3d1649b-5e18764e-b0234f47-8a692caa.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,4,0,0,0
@@ -710,8 +710,8 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269996,659,我覺得你驚咗.,I think you panicked.,azure-00d2462a-2c854f43-f6eabbcc-2f179d48-fa40dcf0.mp3,0,,max_cards,S1:我|S2:你,,0.0000,0.0000,5,0,0,0
 1621761269998,661,份工唔易做㗎.,"""It's a difficult job.""",azure-0f0be35f-9e14661c-6707f342-2ed621a9-65a58429.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1621761269999,662,呢樣唔係小事.,"""It's no small matter.""",azure-94bab16a-982fc915-dc8273db-b4148bae-96de28d4.mp3,0,,max_cards,S16:唔,,0.0000,0.0000,3,0,0,0
-1621761270000,663,蕾拉好唔開心.,Layla was very upset.,azure-810a533c-21d0485e-92ea6275-bcb1db2c-c9ae5132.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
-1621761270001,664,蕾拉返咗屋企.,Layla went back home.,azure-3eae60cf-f93185c7-e95687f8-e9946b7d-a45668aa.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
+1621761270000,663,蕾拉好唔開心.,Layla was very upset.,azure-810a533c-21d0485e-92ea6275-bcb1db2c-c9ae5132.mp3,0,,C3,,,0.0000,0.0000,5,0,0,0
+1621761270001,664,蕾拉返咗屋企.,Layla went back home.,azure-3eae60cf-f93185c7-e95687f8-e9946b7d-a45668aa.mp3,0,,C3,,,0.0000,0.0000,5,0,0,0
 1621761270002,665,我呀妹係護士.,My sister is a nurse.,azure-7fad8a98-7357eb18-a9e1de83-4b12386a-10595b64.mp3,0,,max_cards,S1:我,,0.0000,0.0000,5,0,0,0
 1621761270003,666,冇人會傷害你.,No one will hurt you.,azure-74ef1f7b-25553dec-98b2d5c9-cd05f3e1-3ddce58d.mp3,0,,max_cards,S2:你,,0.0000,0.0000,4,0,0,0
 1621761270004,667,抵抗係無用嘅.,Resistance is futile.,azure-6b37c5f3-cdcd1ff0-001f5fae-3ddb603b-76fc119c.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
@@ -737,7 +737,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761270026,689,俾幾分鐘時間我.,I need a few minutes.,azure-e348f9eb-d82a8271-92b88ce5-4f4b7232-e164b8ff.mp3,0,,max_cards,S1:我,,0.0000,0.0000,5,0,0,0
 1621761270027,690,我要好好噉讀書.,I need to study well.,azure-7f220456-57fc3dde-c8a5c517-e9531fd4-2eeac522.mp3,0,,max_cards,S1:我,,0.0000,0.0000,5,0,0,0
 1621761270028,691,我覺得好大壓力.,"""I'm feeling stressed.""",azure-bd5484c3-d86aa5b6-4aad11bc-aee41ea6-7d43afe7.mp3,0,,max_cards,S1:我,,0.0000,0.0000,5,0,0,0
-1621761270029,692,蕾拉好有責任感.,Layla is responsible.,azure-e157e847-8366b719-e5d636a4-be5a87e1-8272e60e.mp3,0,,max_cards,,,0.0000,0.0000,6,0,0,0
+1621761270029,692,蕾拉好有責任感.,Layla is responsible.,azure-e157e847-8366b719-e5d636a4-be5a87e1-8272e60e.mp3,0,,C3,,,0.0000,0.0000,6,0,0,0
 1621761270030,693,我送你返屋企啦.,Let me take you home.,azure-73d13c20-f48acae6-20651e06-a8d8313f-d4af38c0.mp3,0,,max_cards,S1:我|S2:你,,0.0000,0.0000,6,0,0,0
 1621761270031,694,我哋今晚出街吖?,"""Let's go out tonight?""",azure-1a05383e-66ec68f2-8bb78fbf-24cca5bc-3225eb2a.mp3,0,,max_cards,S4:我哋,,0.0000,0.0000,4,0,0,0
 1621761270032,695,哦，我而家明喇.,"Oh, now I understand.",azure-0832b59d-a2f304ae-c0737504-81d7373c-14c838f1.mp3,0,,max_cards,S1:我,,0.0000,0.0000,4,0,0,0
@@ -766,7 +766,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761270056,719,佢好快就會返嚟㗎喇.,He will be back soon.,azure-1489ccb0-d71bcb31-87672dbc-b9264f0f-edd4f374.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,6,0,0,0
 1621761270057,720,我打爛咗你個煙灰缸.,I broke your ashtray.,azure-f24d9a3d-fa61fc7b-4fe14211-69609965-035cf9f9.mp3,0,,max_cards,S1:我|S2:你,,0.0000,0.0000,6,0,0,0
 1621761270058,721,我途中撞到阿Tom.,I met Tom on the way.,azure-24dfbb26-89dd28fa-2764f49d-8ee6ac98-0d064eb5.mp3,0,,max_cards,S1:我,,0.0000,0.0000,5,0,0,0
-1621761270059,722,我一定要搵啲嘢嚟講.,I must say something.,azure-9236a9e0-4eed189e-6fe2ddcd-e618432c-e2a4e81f.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
+1621761270059,722,我一定要搵啲嘢嚟講.,I must say something.,azure-9236a9e0-4eed189e-6fe2ddcd-e618432c-e2a4e81f.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
 1621761270060,723,佢係咪的士司機嚟㗎?,Is she a taxi driver?,azure-58024f1b-ed682e5a-815abe10-47ef07f7-f6fd6763-ad1376a8c14b30556c29abd92e4e9d0565975753.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,5,0,0,0
 1621761270062,725,佢朝頭早七點起咗身.,She gets up at seven.,azure-127f3ece-5166fd9c-33cfcf17-1a98219e-bdaf8831.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,6,0,0,0
 1621761270063,726,呢道門點鎖都鎖唔到.,"""This door won't lock.""",azure-9d6457bd-79114379-c50949f2-e82c65d2-46788014.mp3,0,,max_cards,S16:唔,,0.0000,0.0000,5,0,0,0
@@ -775,10 +775,10 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761270066,729,你介唔介意我開電視呀?,Can I turn on the TV?,azure-55472fae-3c0520a9-2280a4da-5a2caf1a-db7d3b2d.mp3,0,,max_cards,S1:我,,0.0000,0.0000,6,0,0,0
 1621761270067,730,你識唔識講意大利文㗎?,Do you speak Italian?,azure-2dd219f8-7058261f-9c4632ca-b17bae00-b428bf84.mp3,0,,max_cards,S2:你,,0.0000,0.0000,4,0,0,0
 1621761270068,731,我哋搭的士去啦，好冇?,"""Let's go by taxi, OK?""",azure-b518e167-1ff22570-011f2f43-60442267-4505c4a4.mp3,0,,max_cards,S4:我哋,,0.0000,0.0000,7,0,0,0
-1621761270069,732,「邊個呀？」「我呀。」,"""Who is it? """"It's me.""""""",azure-4e10b075-313bc7be-b6b060e3-674b5bd8-8ec45e70.mp3,0,,F4,,,0.0000,0.0000,4,0,0,0
-1621761270070,733,你係一個好有耐性嘅人.,"""You're a patient man.""",azure-d7cfcf75-60de0813-adfed58f-7116d2fe-6c5a9959.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
-1621761270071,734,我可唔可以借呢張CD呀?,May I borrow this CD?,azure-79532b72-b5eba6cf-65c21361-832c043f-75aa07f3.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
-1621761270072,735,你出賣咗我。你點解要咁做呀?,You betrayed me. Why?,azure-8d5219cd-c625577f-6fdacb85-be15e60d-b9c65c04.mp3,0,,F2,,,0.0000,0.0000,10,0,0,0
+1621761270069,732,「邊個呀？」「我呀。」,"""Who is it? """"It's me.""""""",azure-4e10b075-313bc7be-b6b060e3-674b5bd8-8ec45e70.mp3,0,,final_mark,,,0.0000,0.0000,4,0,0,0
+1621761270070,733,你係一個好有耐性嘅人.,"""You're a patient man.""",azure-d7cfcf75-60de0813-adfed58f-7116d2fe-6c5a9959.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
+1621761270071,734,我可唔可以借呢張CD呀?,May I borrow this CD?,azure-79532b72-b5eba6cf-65c21361-832c043f-75aa07f3.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
+1621761270072,735,你出賣咗我。你點解要咁做呀?,You betrayed me. Why?,azure-8d5219cd-c625577f-6fdacb85-be15e60d-b9c65c04.mp3,0,,length_window,,,0.0000,0.0000,10,0,0,0
 1621761270073,736,阿 Susan 煮嘢食好叻㗎.,Susan is a good cook.,azure-37284ec9-d322a126-9f21c284-3cdf4f7d-697be57d.mp3,0,,max_cards,S185:好,,0.0000,0.0000,5,0,0,0
 1621761270074,737,我冇飛.,"""I don't have a ticket.""",azure-d4c537c6-db6ceff9-8fa8d89b-f0973c0f-436dfaba.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
 1621761270075,738,其實我知.,"Actually, I know that.",azure-5b88ef04-97e019a1-46707760-4acc7ac8-1824a53f.mp3,0,,max_cards,S1:我,,0.0000,0.0000,2,0,0,0
@@ -789,12 +789,12 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761270080,743,你好靚呀.,How beautiful you are!,azure-2880ee75-a8620b8e-634bcce4-e8b39337-26c0857d.mp3,0,,max_cards,S2:你,,0.0000,0.0000,3,0,0,0
 1621761270081,744,有幾難呀?,How difficult is that?,azure-53820aea-bc441910-5b2eb2e7-3d7319c2-bce2f8b3.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761270082,745,仲好貴添.,"It was expensive, too.",azure-6c916100-c776020e-61ba3cff-9efa31ea-90311448.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
-1621761270083,746,蕾拉想走.,Layla wanted to leave.,azure-e1ce5075-c0c87e61-85e5e063-6b899185-7744fa4b.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
+1621761270083,746,蕾拉想走.,Layla wanted to leave.,azure-e1ce5075-c0c87e61-85e5e063-6b899185-7744fa4b.mp3,0,,C3,,,0.0000,0.0000,4,0,0,0
 1621761270084,747,唔出奇吖.,"""That's not surprising.""",azure-12f35002-4b433286-13b87287-a02da714-2fed6984.mp3,0,,max_cards,S16:唔,,0.0000,0.0000,3,0,0,0
 1621761270085,748,你做得對.,"""You're doing it right.""",azure-45530f37-c0956306-5119894b-f578a027-57f0bb96.mp3,0,,max_cards,S2:你,,0.0000,0.0000,4,0,0,0
 1621761270086,749,你高過我.,"""You're taller than me.""",azure-fa2276cb-4a01fd17-a9a84856-a27d9790-b8243c22.mp3,0,,max_cards,S1:我|S2:你,,0.0000,0.0000,3,0,0,0
 1621761270087,750,你係咪嚟㗎?,Are you coming or not?,azure-2e3f0cfc-f19f4888-a8e39154-c4782590-bce7d792.mp3,0,,max_cards,S122:嚟|S2:你,,0.0000,0.0000,3,0,0,0
-1621761270089,752,蘇嗎人要曬!,Everyone wants it all!,azure-5a223489-6cf9549d-84c6092c-13fbd85b-05795ff4.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
+1621761270089,752,蘇嗎人要曬!,Everyone wants it all!,azure-5a223489-6cf9549d-84c6092c-13fbd85b-05795ff4.mp3,0,,C3,,,0.0000,0.0000,5,0,0,0
 1621761270090,753,考試加油呀!,Good luck on the exam!,azure-b0f55e2c-c41d57db-f26282be-75c79a7e-9b6c910e.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761270091,754,佢應該買樓.,He should buy a house.,azure-b0dac0b8-622dd09b-359ff304-cce37c28-7218b489.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,3,0,0,0
 1621761270092,755,佢身體好弱.,His health is fragile.,azure-fa2c9a3f-bbe4b534-f0868a36-a6e4f8f9-fce1d8d5.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,3,0,0,0
@@ -844,7 +844,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761270140,803,嗰啲材料好唔好?,Is that material good?,azure-72f09a4f-faee9aee-03a71eb1-71a1442e-60bfef35.mp3,0,,max_cards,S8:嗰,,0.0000,0.0000,5,0,0,0
 1621761270141,804,呢把遮係咪你㗎?,Is this your umbrella?,azure-29152b61-8eff6c11-318db4df-bf239864-3bc50cd7.mp3,0,,max_cards,S2:你,,0.0000,0.0000,5,0,0,0
 1621761270142,805,你隻錶準唔準㗎?,Is your watch correct?,azure-1ce970b0-4bd780f6-f0d00f5a-cd04810f-260a69e9.mp3,0,,max_cards,S2:你,,0.0000,0.0000,5,0,0,0
-1621761270143,806,蕾拉又肥又樣衰.,Layla is fat and ugly.,azure-207d5d0a-7d067541-dd133412-036dfa57-e67a8b30.mp3,0,,max_cards,,,0.0000,0.0000,6,0,0,0
+1621761270143,806,蕾拉又肥又樣衰.,Layla is fat and ugly.,azure-207d5d0a-7d067541-dd133412-036dfa57-e67a8b30.mp3,0,,C3,,,0.0000,0.0000,6,0,0,0
 1621761270144,807,佢游水遊得好叻.,She is a good swimmer.,azure-df3874eb-53ff3e4c-a7a28a6f-a9598e24-293e2476-ebe7093c79aa1f945de85b4a0bc03bce330fa65f.mp3,0,,outside_budget,S119:游水|S185:好|S3:佢,,0.0000,0.0000,5,0,0,0
 1621761270145,808,首先，你要有樣.,Step 1: Be attractive.,azure-a1267a07-d71ef804-4bfd6bb4-5aa39385-633c692a.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1621761270147,810,隻貓食咗隻老鼠.,The cat ate the mouse.,azure-d8ea7cc0-4defba82-06e2d417-c381f65d-6eb0ca4e.mp3,0,,max_cards,S93:食,,0.0000,0.0000,5,0,0,0
@@ -853,14 +853,14 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761270151,814,份論文幾時交呀?,When is the paper due?,azure-fdf7dd01-0ae070ef-93400fde-77a5a9fe-298e42ba.mp3,0,,max_cards,S14:幾時,,0.0000,0.0000,4,0,0,0
 1621761270152,815,邊度有得買書呀?,Where can I buy books?,azure-657814e2-da4326ab-f12a07c6-afe60d97-0205eb06.mp3,0,,max_cards,S13:邊度,,0.0000,0.0000,5,0,0,0
 1621761270153,816,點解你唔眼瞓嘅?,"""Why aren't you sleepy?""",azure-915fffb9-c6089ab7-f7cfcdfd-c88164c6-44f7d990.mp3,0,,max_cards,S16:唔|S2:你,,0.0000,0.0000,6,0,0,0
-1621761270154,817,點解森美唔嚟嘅?,"""Why isn't Sami coming?""",azure-8101202e-fa6d708d-2a219e3f-44cd7c26-2476eba4.mp3,0,,max_cards,S122:嚟|S16:唔,,0.0000,0.0000,5,0,0,0
+1621761270154,817,點解森美唔嚟嘅?,"""Why isn't Sami coming?""",azure-8101202e-fa6d708d-2a219e3f-44cd7c26-2476eba4.mp3,0,,C3,,,0.0000,0.0000,5,0,0,0
 1621761270157,820,你識唔識講英文㗎?,Can you speak English?,azure-f3c2a638-72e22865-5e92a63a-8875128d-a1daa161.mp3,0,,max_cards,S2:你,,0.0000,0.0000,4,0,0,0
 1621761270159,822,唔好唔記得我哋呀!,"""Don't forget about us!""",azure-c3ea7de7-cb17fe8e-3b99dece-63d9036e-caeb21be.mp3,0,,max_cards,S4:我哋,,0.0000,0.0000,4,0,0,0
 1621761270160,823,講就容易，做就難.,Easier said than done.,azure-6eb26499-b96e9681-0e8ad851-0919ad29-24caca59.mp3,0,,max_cards,S140:講,,0.0000,0.0000,6,0,0,0
 1621761270161,824,我想要多少少茶呀.,Give me some more tea.,azure-3591f542-fc00b997-2d211be0-4fad6ec9-f31d947f.mp3,0,,max_cards,S18:多|S1:我,,0.0000,0.0000,6,0,0,0
 1621761270162,825,佢領養咗嗰個孤兒.,He adopted the orphan.,azure-e3976d87-119f1f4d-85963a08-633418c3-48e063cc.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,6,0,0,0
 1621761270164,827,呢張梳化幾多錢呀?,How much is this sofa?,azure-1d1115ab-f2716001-975b980f-535256af-1ae87e59.mp3,0,,max_cards,S18:多,,0.0000,0.0000,6,0,0,0
-1621761270165,828,我唔識講康納達話.,"""I can't speak Kannada.""",azure-e744054c-1956038f-a13bee80-bc155297-ccfa7080.mp3,0,,max_cards,S16:唔|S1:我,,0.0000,0.0000,5,0,0,0
+1621761270165,828,我唔識講康納達話.,"""I can't speak Kannada.""",azure-e744054c-1956038f-a13bee80-bc155297-ccfa7080.mp3,0,,C3,,,0.0000,0.0000,5,0,0,0
 1621761270166,829,我唔識講西班牙文.,"""I don't speak Spanish.""",azure-487c0804-b11b2302-99a7b693-c5e4c276-19da280d.mp3,0,,max_cards,S16:唔|S1:我,,0.0000,0.0000,5,0,0,0
 1621761270167,830,我俾咗我個地址佢.,I gave him my address.,azure-639e0e09-42121879-aa972dc4-619d25f9-e84c59a3.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,6,0,0,0
 1621761270168,831,我好鍾意同你講嘢.,I love talking to you.,azure-835303ca-d8da6357-b168937b-e7516879-5c70952a.mp3,0,,max_cards,S1:我|S2:你,,0.0000,0.0000,6,0,0,0
@@ -878,26 +878,26 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761270184,847,你係咪真係鍾意我㗎?,Do you really love me?,azure-1aeb6a3a-0b873283-55460968-bf586b57-3fb2b487.mp3,0,,max_cards,S1:我|S2:你,,0.0000,0.0000,5,0,0,0
 1621761270185,848,唔好喊啦。我愛你呀.,"""Don't cry. I love you.""",azure-047a4d2c-eb2bf684-eb5588d6-0125c624-8820216c.mp3,0,,max_cards,S16:唔|S1:我|S2:你,,0.0000,0.0000,6,0,0,0
 1621761270187,850,估下今日我撞到邊個!,Guess who I met today!,azure-8ca56bcb-7dac2b25-41239fc8-11891817-2182cce6.mp3,0,,max_cards,S11:邊個|S1:我,,0.0000,0.0000,6,0,0,0
-1621761270188,851,我買咗部新嘅剃鬚刨.,I bought a new shaver.,azure-e0e9a6ff-4381599c-10583bd2-14a1af55-4c3f418b.mp3,0,,F2,,,0.0000,0.0000,9,0,0,0
-1621761270189,852,我隻錶唔知擺咗去邊.,"""I can't find my watch.""",azure-400f8c1e-deab440c-b8031d1b-b436e85b-d03d5735.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
-1621761270190,853,我打乞嗤打到停唔到.,"""I can't stop sneezing.""",azure-8dc11ad7-568ea966-18aefea7-a475aae8-ef84b6e0.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
+1621761270188,851,我買咗部新嘅剃鬚刨.,I bought a new shaver.,azure-e0e9a6ff-4381599c-10583bd2-14a1af55-4c3f418b.mp3,0,,length_window,,,0.0000,0.0000,9,0,0,0
+1621761270189,852,我隻錶唔知擺咗去邊.,"""I can't find my watch.""",azure-400f8c1e-deab440c-b8031d1b-b436e85b-d03d5735.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
+1621761270190,853,我打乞嗤打到停唔到.,"""I can't stop sneezing.""",azure-8dc11ad7-568ea966-18aefea7-a475aae8-ef84b6e0.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
 1621761270191,854,我永遠都唔會忘記你.,"""I'll never forget you.""",azure-d36da9eb-ebc3a93e-521acc4f-0ecd88c6-4293635e.mp3,0,,max_cards,S16:唔|S1:我|S2:你,,0.0000,0.0000,7,0,0,0
 1621761270192,855,呢到可唔可以唱歌㗎?,Is it OK to sing here?,azure-bb63bc72-8774fe4e-124a59d2-e939f6eb-4edcbc71.mp3,0,,max_cards,S141:唱,,0.0000,0.0000,6,0,0,0
 1621761270193,856,嗰份報紙係咪今日㗎?,"""Is that today's paper?""",azure-2c1da64d-108b23a9-9736990d-6f3dc5f3-2e6ceecf.mp3,0,,max_cards,S8:嗰,,0.0000,0.0000,5,0,0,0
 1621761270194,857,呢個只不過係個藉口.,"""That's just an excuse.""",azure-f9638f8a-e0451362-81e33533-31bbf12f-aad9fe01.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
 1621761270195,858,阿Tom喺度睇緊書.,Tom is reading a book.,azure-2489b172-4c13804f-4774c5f9-7bd68207-ca01f45f.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
-1621761270196,859,你喺嗰度做咗啲咩呀?,What did you do there?,azure-b73965b8-f669d6ee-8c864052-12712108-063f2f49.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
+1621761270196,859,你喺嗰度做咗啲咩呀?,What did you do there?,azure-b73965b8-f669d6ee-8c864052-12712108-063f2f49.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
 1621761270198,861,唔好自己一個行返屋企.,"""Don't walk home alone.""",azure-2cbc72a6-5bb0f291-286017f2-70058931-2ec61ef8.mp3,0,,max_cards,S121:行|S16:唔,,0.0000,0.0000,5,0,0,0
 1621761270199,862,我同阿Tom都幾熟嚇.,I know Tom quite well.,azure-ddcb2dc1-205d2ed6-826184d0-6d5288c9-aaccfc9e.mp3,0,,max_cards,S1:我,,0.0000,0.0000,5,0,0,0
-1621761270200,863,如果我早啲知道就好喇.,"""I wish I'd known that.""",azure-2678e9d8-00ef9e75-804b7194-3caa175d-159f0a1d.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
-1621761270201,864,呢件事搞到佢冇咗份工.,That cost him his job.,azure-3c974a6b-b0e6ed0e-63ea4529-a8cafdcf-fbfb8136.mp3,0,,F2,,,0.0000,0.0000,9,0,0,0
-1621761270202,865,呢支羹係愛嚟俾茶用嘅.,This spoon is for tea.,azure-e3e25023-08dd0371-bad0a6c2-91ff3077-16f61045.mp3,0,,F2,,,0.0000,0.0000,9,0,0,0
-1621761270203,866,第十臺喺度播緊啲咩呀?,What is on Channel 10?,azure-6e6c4bd8-43747419-b208eca1-ab6334ec-1b941bec.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
-1621761270204,867,頭先餐飯啱唔啱你嘅口味?,Did you like the meal?,azure-49adcf55-7413b596-ab65c441-e8294432-5cd633f0.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
+1621761270200,863,如果我早啲知道就好喇.,"""I wish I'd known that.""",azure-2678e9d8-00ef9e75-804b7194-3caa175d-159f0a1d.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
+1621761270201,864,呢件事搞到佢冇咗份工.,That cost him his job.,azure-3c974a6b-b0e6ed0e-63ea4529-a8cafdcf-fbfb8136.mp3,0,,length_window,,,0.0000,0.0000,9,0,0,0
+1621761270202,865,呢支羹係愛嚟俾茶用嘅.,This spoon is for tea.,azure-e3e25023-08dd0371-bad0a6c2-91ff3077-16f61045.mp3,0,,length_window,,,0.0000,0.0000,9,0,0,0
+1621761270203,866,第十臺喺度播緊啲咩呀?,What is on Channel 10?,azure-6e6c4bd8-43747419-b208eca1-ab6334ec-1b941bec.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
+1621761270204,867,頭先餐飯啱唔啱你嘅口味?,Did you like the meal?,azure-49adcf55-7413b596-ab65c441-e8294432-5cd633f0.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
 1621761270205,868,希望你講嘅嘢唔係真㗎啦.,I wish you were wrong.,azure-49af4b8a-140ac2fd-37fc69d5-9f26fc2a-e47c82f0.mp3,0,,max_cards,S2:你,,0.0000,0.0000,7,0,0,0
 1621761270206,869,Linda好鍾意朱古力.,Linda loves chocolate.,azure-e140a2b7-9991ffa8-4b622d6d-a265b66e-1243e86d.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761270207,870,「咪嘈啦！」佢細細聲噉講.,"Shut up, he whispered.",azure-8855d0a9-01c1d65b-b6389645-02921621-ddd64d15.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,7,0,0,0
-1621761270208,871,我哋幫隻貓改咗個名，叫做 Mimi.,We named the cat Mimi.,azure-d398a853-95288f9d-1a4b965e-c04ffbe9-9d7d1b70.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
+1621761270208,871,我哋幫隻貓改咗個名，叫做 Mimi.,We named the cat Mimi.,azure-d398a853-95288f9d-1a4b965e-c04ffbe9-9d7d1b70.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
 1621761270210,873,我得嘅.,"""I can do this, can't I?""",azure-3d5e3346-d1aa6bcf-f20bf808-ed851495-59d8bfcc.mp3,0,,max_cards,S1:我,,0.0000,0.0000,2,0,0,0
 1621761270211,874,我失眠.,"""I can't sleep at night.""",azure-01777955-d4f337f3-7364718a-0ef38f0d-0b45ab2f.mp3,0,,max_cards,S1:我,,0.0000,0.0000,2,0,0,0
 1621761270212,875,我識用.,I know how to use this.,azure-242027e5-9f74be17-fe771c56-40960446-14a57d97.mp3,0,,max_cards,S1:我,,0.0000,0.0000,2,0,0,0
@@ -911,7 +911,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761270220,883,我喊咗成晚.,I cried all night long.,azure-86b729a4-a957e9c0-a1e0c82f-0cc926ea-6bab53cb.mp3,0,,max_cards,S1:我,,0.0000,0.0000,4,0,0,0
 1621761270222,885,我想你坐低.,I want you to sit down.,azure-a99e9558-0c58950a-d7238a1c-e096bb1e-cf43f145.mp3,0,,max_cards,S124:坐|S1:我|S2:你,,0.0000,0.0000,3,0,0,0
 1621761270223,886,我冇嬲過你.,I was never mad at you.,azure-64d4ec27-0fe1b6d4-e72ed536-92d84386-6e7fb2a4.mp3,0,,max_cards,S1:我|S2:你,,0.0000,0.0000,4,0,0,0
-1621761270225,888,蕾拉脫咗險.,Layla is out of danger.,azure-7c963f96-c66b415d-76d89850-3579071f-10511697.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
+1621761270225,888,蕾拉脫咗險.,Layla is out of danger.,azure-7c963f96-c66b415d-76d89850-3579071f-10511697.mp3,0,,C3,,,0.0000,0.0000,5,0,0,0
 1621761270226,889,小心揸車呀.,Please drive carefully.,azure-322a8f1e-805fdd9e-69fb7fae-589b03ca-b9a9a465.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761270227,890,佢開美容院.,She runs a beauty shop.,azure-10c6e10d-c0ae7290-31c32fbb-6e53229b-bedf4feb.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,4,0,0,0
 1621761270228,891,佢喊咗成晚.,She wept all the night.,azure-bba24a73-b6ece82f-23016f01-5bbd8164-23cdf8f7.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,4,0,0,0
@@ -925,8 +925,8 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761270241,904,我好鐘意音樂.,I like music very much.,azure-2498c739-e4723ee0-5f329f37-9a851c6f-2f23581f.mp3,0,,max_cards,S1:我,,0.0000,0.0000,4,0,0,0
 1621761270242,905,我好似發燒呀.,I seem to have a fever.,azure-9989c95e-19b8abcc-fe2f8b66-dde8e76e-4fcf420a.mp3,0,,max_cards,S1:我,,0.0000,0.0000,4,0,0,0
 1621761270245,908,唔係我哋做㗎.,"""It's not us who did it.""",azure-ebc5a1f2-02f5d260-110700ac-b45cecb3-18e7882d.mp3,0,,max_cards,S16:唔|S4:我哋,,0.0000,0.0000,3,0,0,0
-1621761270246,909,蕾拉想返屋企.,Layla wants to go home.,azure-6d9488de-53e7811b-3ba25379-377224a0-8c5d06fd.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
-1621761270247,910,蕾拉瞓得好稔.,Layla was sound asleep.,azure-432b47bb-964f93cc-8b861a96-519c5ade-7e367286.mp3,0,,max_cards,S185:好,,0.0000,0.0000,6,0,0,0
+1621761270246,909,蕾拉想返屋企.,Layla wants to go home.,azure-6d9488de-53e7811b-3ba25379-377224a0-8c5d06fd.mp3,0,,C3,,,0.0000,0.0000,4,0,0,0
+1621761270247,910,蕾拉瞓得好稔.,Layla was sound asleep.,azure-432b47bb-964f93cc-8b861a96-519c5ade-7e367286.mp3,0,,C3,,,0.0000,0.0000,6,0,0,0
 1621761270248,911,佢感動到喊咗.,She was moved to tears.,azure-4f6cfbe8-76c3bbb9-7333ca11-9aad4f72-95237fcd-3414d53bf99d2d7bef70f07fcf8d5bbda58caccf.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,5,0,0,0
 1621761270250,913,呢粒蘋果好酸.,This apple tastes sour.,azure-6a617fa0-d82b4458-8d8a4b98-3d7df682-97fd410e.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1621761270251,914,呢支筆係我㗎.,This pen belongs to me.,azure-678f8da2-31ee5e9c-428c9304-90bec265-6c2d8e7b.mp3,0,,max_cards,S1:我,,0.0000,0.0000,4,0,0,0
@@ -948,9 +948,9 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761270270,933,我英文唔係好好.,My English is not good.,azure-76a0ac29-a4ef0f9d-1815d108-1d79d84f-ac8c9a13.mp3,0,,max_cards,S16:唔|S1:我,,0.0000,0.0000,5,0,0,0
 1621761270271,934,冇人會再聽㗎喇.,No one listens anymore.,azure-fab2bed7-eb8f4745-90d7e6d1-f39724f3-f7fe13bf.mp3,0,,max_cards,S102:聽,,0.0000,0.0000,5,0,0,0
 1621761270272,935,唔該你唔好煩我.,"""Please don't bother me.""",azure-3c734004-a4a3b20b-b0578366-68d5be04-6313da1f.mp3,0,,max_cards,S1:我,,0.0000,0.0000,5,0,0,0
-1621761270273,936,森美想要多啲錢.,Sami wanted more money.,azure-206d47ab-26ff55c3-1833b317-e3d515ac-6e1fd0c5.mp3,0,,max_cards,S18:多,,0.0000,0.0000,5,0,0,0
+1621761270273,936,森美想要多啲錢.,Sami wanted more money.,azure-206d47ab-26ff55c3-1833b317-e3d515ac-6e1fd0c5.mp3,0,,C3,,,0.0000,0.0000,5,0,0,0
 1621761270274,937,你真係講得好啱.,"""That's absolutely true.""",azure-091cceb6-5d3ced96-fb17d8e9-6a4925d0-412dd0d0.mp3,0,,max_cards,S196:啱,,0.0000,0.0000,5,0,0,0
-1621761270276,939,個細路好大聲噉喊,The child cried loudly.,azure-f1d96b9c-5d287301-48622e16-29ba62db-c87f7933.mp3,0,,F4,,,0.0000,0.0000,6,0,0,0
+1621761270276,939,個細路好大聲噉喊,The child cried loudly.,azure-f1d96b9c-5d287301-48622e16-29ba62db-c87f7933.mp3,0,,final_mark,,,0.0000,0.0000,6,0,0,0
 1621761270278,941,邊度有得買磚呀?,Where can I buy bricks?,azure-fd273bd7-7c16a832-bddd040d-f0c55f68-0ca2ea6b.mp3,0,,max_cards,S13:邊度,,0.0000,0.0000,5,0,0,0
 1621761270279,942,嗰本簿係邊個㗎?,Whose notebook is that?,azure-fe237c24-b6a47c14-21c59dc4-57e6ce8e-930b42be.mp3,0,,max_cards,S11:邊個|S8:嗰,,0.0000,0.0000,4,0,0,0
 1621761270280,943,你玩得開唔開心呀?,Did you enjoy yourself?,azure-0c4cfc29-fb0b4df5-964ebb81-ba3797b9-14b631cc.mp3,0,,max_cards,S2:你,,0.0000,0.0000,7,0,0,0
@@ -966,29 +966,29 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761270291,954,我好鍾意嗰間餐廳.,I love that restaurant.,azure-9f5da358-13c6596f-e5516356-9ae9aa43-c0df8609.mp3,0,,max_cards,S1:我|S8:嗰,,0.0000,0.0000,6,0,0,0
 1621761270292,955,我覺得啱啱幾好吖.,I thought it went well.,azure-5bd7e907-01a2a36c-2c6849ba-7e1f2cf4-4a4dcfca.mp3,0,,max_cards,S185:好|S1:我,,0.0000,0.0000,5,0,0,0
 1621761270293,956,我唔係初哥嚟㗎喇.,"""I'm no longer a rookie.""",azure-bf284d2a-db267b58-447d9074-5044e0d6-12a269d3.mp3,0,,max_cards,S16:唔|S1:我,,0.0000,0.0000,5,0,0,0
-1621761270295,958,蕾拉好努力咁工作.,Layla worked very hard.,azure-bb3ff4f4-68a39564-5fe0372a-7cdbdd0c-9374e81b.mp3,0,,max_cards,,,0.0000,0.0000,6,0,0,0
+1621761270295,958,蕾拉好努力咁工作.,Layla worked very hard.,azure-bb3ff4f4-68a39564-5fe0372a-7cdbdd0c-9374e81b.mp3,0,,C3,,,0.0000,0.0000,6,0,0,0
 1621761270298,961,Tom望落幾後生.,Tom looks pretty young.,azure-66a5e5a5-641b070d-ffb69565-8750f589-79c27f44.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761270299,962,我哋可以即刻喐手.,We can do it right now.,azure-9384521b-72b33f69-2068b2be-47221d47-7ec32b0b.mp3,0,,max_cards,S4:我哋,,0.0000,0.0000,5,0,0,0
 1621761270300,963,邊度有得買咖啡呀?,Where can I buy coffee?,azure-bc90e718-02abd46d-f0d5b315-f03f6c29-64a04fad.mp3,0,,max_cards,S13:邊度,,0.0000,0.0000,6,0,0,0
 1621761270301,964,邊度有得買零食呀?,Where can I buy snacks?,azure-8ad0b760-8f259311-c45a12d8-08b73e79-9466aab2.mp3,0,,max_cards,S13:邊度,,0.0000,0.0000,6,0,0,0
 1621761270302,965,邊度有得買郵票呀?,Where can I buy stamps?,azure-e4a73444-758c266a-7f71bc9d-2139aeec-e0d8dd8c.mp3,0,,max_cards,S13:邊度,,0.0000,0.0000,6,0,0,0
-1621761270304,967,我嗰陣喺度睇緊電視.,I was watching TV then.,azure-9af51f9e-60a7e1ed-8166c733-3aec016e-10c6d06c.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
+1621761270304,967,我嗰陣喺度睇緊電視.,I was watching TV then.,azure-9af51f9e-60a7e1ed-8166c733-3aec016e-10c6d06c.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
 1621761270306,969,我今日好高興認識你.,Nice to meet you today.,azure-d8dace43-ca14dfc7-e670a897-cebead7a-f85cdb88.mp3,0,,max_cards,S2:你,,0.0000,0.0000,6,0,0,0
 1621761270307,970,啲銷售率跌到好犀利.,The sales are slipping.,azure-5dee0523-c9e96d88-9d3922ae-4d5bf4c4-ae9be849.mp3,0,,max_cards,,,0.0000,0.0000,6,0,0,0
 1621761270308,971,呢支匙羹係飲湯用嘅.,This spoon is for soup.,azure-2e3df074-3db81596-0e0f252a-3921749b-468491ee.mp3,0,,max_cards,,,0.0000,0.0000,7,0,0,0
-1621761270309,972,你可唔可以帶我去呀?,Will you take me there?,azure-c33141ca-70614d03-aa737f0f-6b16903f-dac760f2.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
+1621761270309,972,你可唔可以帶我去呀?,Will you take me there?,azure-c33141ca-70614d03-aa737f0f-6b16903f-dac760f2.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
 1621761270310,973,我叫你點做，你就點做.,Do as I told you to do.,azure-791d4aab-7987de5e-1f492f13-1366bd5b-e60648e0.mp3,0,,max_cards,S1:我,,0.0000,0.0000,7,0,0,0
-1621761270311,974,我真係好想去巴黎睇嚇.,"""I'm dying to see Paris.""",azure-4d6c2965-0ce2f7df-c1d6bdf6-f4a561b6-bf028a96.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
-1621761270312,975,吽喺屋企一啲都唔好玩.,"""Staying home isn't fun.""",azure-9da3caaa-f50e980d-9e14d379-62454779-2f27ea55.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
+1621761270311,974,我真係好想去巴黎睇嚇.,"""I'm dying to see Paris.""",azure-4d6c2965-0ce2f7df-c1d6bdf6-f4a561b6-bf028a96.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
+1621761270312,975,吽喺屋企一啲都唔好玩.,"""Staying home isn't fun.""",azure-9da3caaa-f50e980d-9e14d379-62454779-2f27ea55.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
 1621761270313,976,我哋會唔會準時去到㗎?,Will we arrive on time?,azure-5ec4348a-74ca1b56-d1cd5340-eabfa0b1-f66f0234.mp3,0,,max_cards,S4:我哋,,0.0000,0.0000,7,0,0,0
 1621761270314,977,生日快樂，Muriel!,"Happy birthday, Muriel!",azure-65695b19-a2f28645-22439f13-d3d24f2c-29142534.mp3,0,,max_cards,,,0.0000,0.0000,2,0,0,0
 1621761270315,978,好熱呀，我就嚟頂唔順喇.,"""I can't stand the heat.""",azure-e3be413f-7f1be001-bccd2e1d-a65d9a99-1928406e.mp3,0,,max_cards,S16:唔|S1:我,,0.0000,0.0000,7,0,0,0
 1621761270316,979,我鍾意飲牛奶多過飲果汁.,I prefer milk to juice.,azure-d818354a-cf8fe5f1-2d6eef29-f1865931-3861e3f2-1f713b6f785784b46b276fc52d7637a6dd3f00c8.mp3,0,,max_cards,S1:我,,0.0000,0.0000,7,0,0,0
-1621761270317,980,咩話？我聽唔到你講咩呀.,"""What? I can't hear you.""",azure-3f9694ba-a9a22406-d5e237b5-5724e388-818cb8dd.mp3,0,,F2,,,0.0000,0.0000,8,0,0,0
-1621761270318,981,呢啲咁嘅事都唔係未發生過.,"""It's not unprecedented.""",azure-4ce06865-8b78a82c-e7629df3-864b05bd-1c7422bc-43faebcde08b44942d6e1ea687826d718446aa1c.mp3,0,,F2,,,0.0000,0.0000,10,0,0,0
-1621761270319,982,“一齊得唔得呀？” “得。”,"""Can I join you? """"Sure.""""""",azure-69dcfa9e-39a6d31d-ce4c6ce0-bc36ed44-6beffe94.mp3,0,,F4,,,0.0000,0.0000,6,0,0,0
-1621761270320,983,我可唔可以借你架單車嚟用嚇呀?,May I borrow your bike?,azure-16db14a7-e0a47606-284b44c6-9218193e-1aa12e34.mp3,0,,F2,,,0.0000,0.0000,11,0,0,0
-1621761270321,984,我唔係俾人炒魷魚，係自己劈炮唔撈嘅.,"""I wasn't fired. I quit.""",azure-cad7195d-a8d6a141-98ce9b88-6b5af91a-da5b0da3.mp3,0,,F2,,,0.0000,0.0000,10,0,0,0
+1621761270317,980,咩話？我聽唔到你講咩呀.,"""What? I can't hear you.""",azure-3f9694ba-a9a22406-d5e237b5-5724e388-818cb8dd.mp3,0,,length_window,,,0.0000,0.0000,8,0,0,0
+1621761270318,981,呢啲咁嘅事都唔係未發生過.,"""It's not unprecedented.""",azure-4ce06865-8b78a82c-e7629df3-864b05bd-1c7422bc-43faebcde08b44942d6e1ea687826d718446aa1c.mp3,0,,length_window,,,0.0000,0.0000,10,0,0,0
+1621761270319,982,“一齊得唔得呀？” “得。”,"""Can I join you? """"Sure.""""""",azure-69dcfa9e-39a6d31d-ce4c6ce0-bc36ed44-6beffe94.mp3,0,,final_mark,,,0.0000,0.0000,6,0,0,0
+1621761270320,983,我可唔可以借你架單車嚟用嚇呀?,May I borrow your bike?,azure-16db14a7-e0a47606-284b44c6-9218193e-1aa12e34.mp3,0,,length_window,,,0.0000,0.0000,11,0,0,0
+1621761270321,984,我唔係俾人炒魷魚，係自己劈炮唔撈嘅.,"""I wasn't fired. I quit.""",azure-cad7195d-a8d6a141-98ce9b88-6b5af91a-da5b0da3.mp3,0,,length_window,,,0.0000,0.0000,10,0,0,0
 1621761270324,987,你認真㗎?,Do you really mean that?,azure-18c7fdd5-f951e860-b51459b0-cb6bafa2-eb0c3308.mp3,0,,max_cards,S2:你,,0.0000,0.0000,2,0,0,0
 1621761270325,988,我唔怕死.,"""I'm not afraid of dying.""",azure-1df0473f-9c09630d-49ec5f16-ced93b70-f3854902.mp3,0,,max_cards,S109:死|S16:唔|S1:我,,0.0000,0.0000,4,0,0,0
 1621761270327,990,佢做得啱.,She did the right thing.,azure-2c2b172e-9828c638-bebec2e0-060cd63e-90df8bd2.mp3,0,,max_cards,S196:啱|S3:佢,,0.0000,0.0000,4,0,0,0

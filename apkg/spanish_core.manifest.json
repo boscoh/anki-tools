@@ -1,5 +1,5 @@
 {
-  "build_date": "2026-10-27T12:08:00+00:00",
+  "build_date": "2026-10-31T23:36:27+00:00",
   "source": {
     "input": "apkg/Spanish 9000 sentences with native audio.apkg",
     "deck": "Spanish Core",
@@ -34,13 +34,13 @@
   "counts": {
     "cards": 267,
     "targets": 227,
-    "absent": 0,
+    "absent": 30,
     "absent_sense": 5,
     "unchecked": 0,
     "unranked": 0,
     "covered1": 222,
     "covered2": 199,
-    "full": 199,
+    "full": 229,
     "outside": 183,
     "outside_rare": 11,
     "tail_words": 0,
@@ -48,8 +48,6 @@
     "dropped_no_core": 0,
     "bolded": 267,
     "unbolded": 0,
-    "name_hits": 0,
-    "loan_hits": 0,
     "rows": 9263,
     "rejected_c3": 0,
     "rejected_c4": 0,
@@ -60,8 +58,8 @@
     "spoken_weight": 0.5
   },
   "files": {
-    "core_csv": "sha256:06864fba039c9c682fcc776e13ebefd972e68014dbe4fd8f8181cec664ffbff6",
-    "coverage_csv": "sha256:d0eba39c17899278031d501d8c253233266d7e8d98a0d109736c6023ee29ccd2",
+    "core_csv": "sha256:44d3ec0fd7eea89e5cd69ef7dfa0b039134935835c7bb0a57cb16dde04a98912",
+    "coverage_csv": "sha256:b1fcf9d851c29b6f6dca15c489ce6ee90d89d349ee7419b7253dc0adcc41803c",
     "input_apkg": "sha256:f67605459feb506bcbbb95830a356ff349c21c28e136c8efc3d82d253ec244e9"
   },
   "kept_order": "sha256:0657afff1725ff86c317286d33dabce74b318fed99a755ae684afad90067efbb"
