@@ -1,7 +1,7 @@
 {
   "deck": "Swadesh Sentences Spanish",
   "model": "Swadesh Sentences Spanish",
-  "build_date": "2026-10-27",
+  "build_date": "2026-10-31",
   "source_dump_date": "2026-10-22",
   "counts": {
     "words": 207,
@@ -25,7 +25,7 @@
   "noun_gender_missing": 0,
   "files": {
     "source_csv": "sha256:a2f45656f247b601e10542ca723a0e47741fcd377fa3c8282a1272a3074e3900",
-    "sentences_csv": "sha256:7530759895baa2c4844eeedbf074c69eefddb2f99476383b9eebea41956f77c6"
+    "sentences_csv": "sha256:ddec3d7bcadd2e50d0cb7cae281d6dcb5f54a40d1cb885cbb4cc7c4eca6aa141"
   },
   "licenses": [
     {
