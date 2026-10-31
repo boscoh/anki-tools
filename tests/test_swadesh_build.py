@@ -1,10 +1,13 @@
 """Tests for the Swadesh deck build helpers."""
 
+import csv
 from pathlib import Path
 
 import pytest
 
 from anki_tools import cli, swadesh_vocab
+from anki_tools.apkg.package import AnkiPackage
+from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.swadesh_vocab import _content_field_order, _prune_outdated_audio
 from anki_tools.languages.cantonese.profile import CANTONESE
 from anki_tools.sentence_pack import tatoeba as sentence_tatoeba
@@ -114,3 +117,37 @@ def test_fetch_language_uses_the_profile_code(
     assert any(name.startswith("yue_") for name in captured[0])
     assert any(name.startswith("eng_") for name in captured[0])
     assert not any(name.startswith("cmn_") for name in captured[0])
+
+
+def test_the_vocab_deck_holds_a_card_and_audio_for_every_csv_row(
+    tmp_path: Path,
+) -> None:
+    csv_path = tmp_path / "english-french.csv"
+    csv_path.write_text(
+        "english,french\ncat,chat\ndog,chien\n", encoding="utf-8"
+    )
+    audio_dir = tmp_path / "audio"
+    audio_dir.mkdir()
+    for name in ("chat.mp3", "chien.mp3"):
+        (audio_dir / name).write_bytes(b"")
+    config = {
+        "language": "French",
+        "vocab_file": str(csv_path),
+        "audio_dir": str(audio_dir),
+        "identity": DeckIdentity(tmp_path / "vocab.apkg"),
+        "audio_field_name": "french",
+    }
+
+    entries = swadesh_vocab._parse_vocab_entries(config)
+    layout = swadesh_vocab._build_layout(config, entries)
+    files = swadesh_vocab._pack_apkg(config, entries, layout, prune=True)
+
+    assert files is not None
+    with csv_path.open(encoding="utf-8", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    with AnkiPackage(files.output_path) as package:
+        notes = package.get_notes()
+        media = set(package.get_media_mapping().values())
+
+    assert len(notes) == len(rows)
+    assert media == {entry["audio_filename"] for entry in entries}

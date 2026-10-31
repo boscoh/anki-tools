@@ -13,6 +13,10 @@ lives in one directory only.
 | `anki_tools/preview.py`      | Build the browser preview of the card templates  |
 | `anki_tools/preview_apkg.py` | Build the browser preview of a package's cards   |
 
+`anki preview` writes one HTML page and no package. The preview flow therefore
+has no audit and no gate table. It renders templates and packages; it writes no
+artifact that a gate could read.
+
 `cli.py` also holds the deck field-name aliases that each `fix` command
 passes to `extract_sentences`. A field name of one language stays in the
 command, not in the shared module.

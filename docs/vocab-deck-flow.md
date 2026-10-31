@@ -28,7 +28,9 @@ The stage names are labels of this document. One builder, `_build_apkg`,
 runs the stages inline.
 
 The vocabulary deck has no gate table and no manifest. The `anki swadesh
-audit` command serves the sentence packs only.
+audit` command serves the sentence packs only. The check is a test, not a gate:
+`tests/test_swadesh_build.py` builds a deck and compares the card count with the
+CSV row count and the media set with the audio names.
 
 ## 2. Flow diagram
 
@@ -190,6 +192,8 @@ uv run anki inspect audio apkg/swadesh_vocab_mandarin.apkg
 
 A card count that differs from the row count of the CSV is a defect. So is an
 audio file that is absent from the media set of the APKG.
+
+That comparison lives in `tests/test_swadesh_build.py`, so no gate table is needed.
 
 ## 9. File map
 
