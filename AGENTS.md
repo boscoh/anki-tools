@@ -38,8 +38,7 @@ diff, run `/ponytail-review`.
 
 ## File Edits
 
-Do not edit files with a Python script, `sed`, `awk`, `perl`, or a heredoc. Use `replace` and `insert`, which check anchors and support undo. Use `write` for a new file or a complete rewrite only.
-
+The global instructions cover this.
 
 ## Issue Tracking (Beads)
 
