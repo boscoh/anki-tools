@@ -390,4 +390,4 @@ def check_cull(output_path: Path, profile: CullProfile) -> int:
     :param profile: Language hooks.
     :returns: The exit code of the gate table, 0 on a pass.
     """
-    return report(run_gates(GATES, CullFiles(Path(output_path), profile)))
+    return report(run_gates(GATES, CullFiles(Path(output_path), profile)), "Cull deck")

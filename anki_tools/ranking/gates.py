@@ -122,13 +122,14 @@ def run_gates(gates: Sequence[Gate], files: GateFiles) -> list[GateResult]:
     return results
 
 
-def report(results: Sequence[GateResult]) -> int:
+def report(results: Sequence[GateResult], title: str = "") -> int:
     """Print the gate table.
 
     :param results: Rows from :func:`run_gates`.
+    :param title: Flow name of the table.
     :returns: The exit code of the table, 0 on a pass.
     """
-    return print_audit(results)
+    return print_audit(results, title)
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:

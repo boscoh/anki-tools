@@ -654,7 +654,7 @@ def audit(
             f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
         )
         return
-    code = print_gate_table(entry.audit())
+    code = print_gate_table(entry.audit(), "Swadesh sentence pack")
     if code:
         raise SystemExit(code)
 

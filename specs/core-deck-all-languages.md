@@ -454,6 +454,8 @@ rows of `一样` and `计划` now start with `same` and `plan`, because the deck
 gave those words in that sense.
 
 ```text
+Core deck
+
 Gate  Result  Detail
 ----  ------  --------------------------------------------------------------------------------------------------------------
 K1    PASS    manifest 147, CSV 147, APKG 147

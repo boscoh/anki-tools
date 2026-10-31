@@ -480,4 +480,4 @@ def check_core(output_path: Path, profile: CoreProfile) -> int:
     :param profile: Language hooks.
     :returns: The exit code of the gate table, 0 on a pass.
     """
-    return report(run_gates(GATES, CoreFiles(Path(output_path), profile)))
+    return report(run_gates(GATES, CoreFiles(Path(output_path), profile)), "Core deck")

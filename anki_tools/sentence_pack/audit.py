@@ -794,12 +794,17 @@ def run_pack_audit(
     return run_gates(gates, inputs, profile)
 
 
-def print_audit(results: Sequence[GateRow]) -> int:
+def print_audit(results: Sequence[GateRow], title: str = "") -> int:
     """Print the gate table.
 
     :param results: Rows from :func:`run_gates`.
+    :param title: Flow name of the table, printed above it. ADR 0027 records
+        why an id alone does not name the flow.
     :returns: 0 when every gate passes, else 1.
     """
+    if title:
+        print(title)
+        print()
     print(f"{'Gate':<4}  {'Result':<6}  Detail")
     print(f"{'-' * 4}  {'-' * 6}  {'-' * DETAIL_WIDTH}")
     for gate, passed, message in results:
