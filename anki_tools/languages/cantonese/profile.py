@@ -1121,34 +1121,6 @@ def gate_word_table(
     return True, f"{concepts} concepts, {len(table)} forms"
 
 
-def gate_attribution(
-    inputs: Any,
-    _profile: LanguageProfile,
-) -> tuple[bool, str]:
-    """Cantonese gate G12: the Cantonese section names every sentence author.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    path = inputs.attribution_path
-    if not path.is_file():
-        return False, f"attribution file missing: {path}"
-    text = path.read_text(encoding="utf-8")
-    authors = {
-        row.get("tatoeba_author", "").strip() or "unknown" for row in inputs.rows()
-    }
-    problems: list[str] = []
-    if "## Cantonese pack" not in text:
-        problems.append("no '## Cantonese pack' section")
-    missing = sorted(author for author in authors if author not in text)
-    if missing:
-        problems.append(f"{len(missing)} author(s) missing: {', '.join(missing[:3])}")
-    if problems:
-        return False, " | ".join(problems)
-    return True, f"{len(authors)} author(s) named in the Cantonese section"
-
-
 def gate_script(inputs: Any, _profile: LanguageProfile) -> tuple[bool, str]:
     """Cantonese gate G9: no card holds a Latin letter or a digit.
 
@@ -1214,6 +1186,7 @@ def cantonese_gates() -> tuple[tuple[str, Any], ...]:
     """
     from anki_tools.sentence_pack.audit import (
         gate_apkg,
+        gate_attribution,
         gate_coverage,
         gate_manifest_counts,
         gate_media_count,

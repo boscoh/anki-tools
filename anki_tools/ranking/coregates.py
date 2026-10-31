@@ -10,7 +10,6 @@ Usage: ``anki fix <lang> --core --check`` calls :func:`check_core`.
 
 from __future__ import annotations
 
-import hashlib
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
@@ -18,7 +17,7 @@ from typing import Any
 
 from anki_tools.gate_files import GateFileReader, read_notes
 
-from anki_tools.ranking.assemble import deck_templates
+from anki_tools.ranking.core import SIMILARITY_LIMIT
 from anki_tools.ranking.coreflow import (
     OUTPUT_SENTENCE_FIELD,
     STATUSES,
@@ -33,9 +32,15 @@ from anki_tools.ranking.gates import (
     Gate,
     GateResult,
     core_word_problems,
+    gate_audio as _gate_audio,
+    gate_counts as _gate_counts,
     gate_core_word,
     gate_identity,
+    gate_kept_order as _gate_kept_order,
+    gate_manifest_hashes as _gate_manifest_hashes,
     gate_output_model,
+    gate_similarity as _gate_similarity,
+    gate_templates as _gate_templates,
     output_model_problems,
     read_csv,
     read_json,
@@ -45,7 +50,6 @@ from anki_tools.ranking.gates import (
 from anki_tools.ranking.gates import sample as _sample
 from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.ranking.scan import CoreProfile
-from anki_tools.sentence_pack.audit import sha256_value
 
 __all__ = [
     "CoreFiles",
@@ -208,63 +212,24 @@ def gate_filter(files: CoreFiles) -> tuple[bool, str]:
 def gate_similarity(files: CoreFiles) -> tuple[bool, str]:
     """K6: no kept pair reaches the lemma Jaccard limit."""
     sets = [
-        frozenset(lemma for lemma, pos in card_tokens if pos in CONTENT_POS)
+        {lemma for lemma, pos in card_tokens if pos in CONTENT_POS}
         for card_tokens in files.tokens()
     ]
-    shared: dict[str, list[int]] = {}
-    for index, lemmas in enumerate(sets):
-        for lemma in lemmas:
-            shared.setdefault(lemma, []).append(index)
-    for index, lemmas in enumerate(sets):
-        buckets = {
-            other for lemma in lemmas for other in shared[lemma] if other != index
-        }
-        for other in buckets:
-            union = len(lemmas | sets[other])
-            if union and len(lemmas & sets[other]) / union >= 0.67:
-                return False, f"pair {index} and {other} reaches the limit"
-    return True, "no pair reaches the limit"
-
+    return _gate_similarity(files, sets, SIMILARITY_LIMIT)
 
 def gate_audio(files: CoreFiles) -> tuple[bool, str]:
     """K7: every kept card has a valid MP3 file."""
-    output = files.output()
-    audio = output["audio"]
-    missing = [
-        card.audio
-        for card in output["cards"]
-        if not card.audio or audio.get(card.audio) is None
-    ]
-    return not missing, f"{len(missing)} card(s) without audio: {_sample(missing)}"
-
+    return _gate_audio(files)
 
 def gate_counts(files: CoreFiles) -> tuple[bool, str]:
-    """K8: note, media, and manifest counts agree."""
-    counts = files.manifest()["counts"]
-    output = files.output()
-    kept = _kept(files)
-    audio = {card.audio for card in output["cards"] if card.audio}
-    notes = output["notes"]
-    media = files.media()
-    ok = (
-        notes == len(kept) == counts["cards"]
-        and media == audio
-    )
-    return ok, f"notes {notes}, CSV {len(kept)}, media {len(media)} of {len(audio)}"
-
+    """K8: the note, media, and manifest counts agree."""
+    return _gate_counts(files, check_media=True)
 
 
 
 def gate_order(files: CoreFiles) -> tuple[bool, str]:
     """K10: the kept order is the recorded order."""
-    rank_rows = files.rank_rows()
-    sentences = [row["sentence"] for row in rank_rows]
-    text = "\n".join(sentences)
-    digest = "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
-    recorded = files.manifest()["kept_order"]
-    ok = digest == recorded and len(rank_rows) == len(_kept(files))
-    return ok, f"{len(rank_rows)} rows, order {'matches' if ok else 'differs'}"
-
+    return _gate_kept_order(files, files.rank_rows())
 
 def _key_of(row: dict[str, str]) -> str:
     """Give the target key of a coverage row."""
@@ -300,13 +265,8 @@ def gate_coverage(files: CoreFiles) -> tuple[bool, str]:
 
 def gate_hashes(files: CoreFiles) -> tuple[bool, str]:
     """K12: the manifest hashes match the two CSV files."""
-    recorded = files.manifest()["files"]
-    ok = (
-        recorded.get("core_csv") == sha256_value(files.core_csv)
-        and recorded.get("coverage_csv") == sha256_value(files.coverage_csv)
-    )
-    return ok, "hashes match" if ok else "hash mismatch"
-
+    file_keys = {"core_csv": files.core_csv, "coverage_csv": files.coverage_csv}
+    return _gate_manifest_hashes(files, file_keys)
 
 def gate_hit(files: CoreFiles) -> tuple[bool, str]:
     """K13: each card holds the form or lemma of its targets."""
@@ -345,22 +305,13 @@ def gate_hit(files: CoreFiles) -> tuple[bool, str]:
 
 def gate_templates(files: CoreFiles) -> tuple[bool, str]:
     """K14: the templates are the core templates and the CSS is the cull CSS."""
-    output = files.output()
-    used = [name for name in output["note_models"] if name]
-    templates = [output["templates"].get(name, []) for name in used]
-    css = [output["css"].get(name, "") for name in used]
-    expected = [list(pair) for pair in deck_templates(files.profile)]
-    ok_templates = all(
-        [list(pair) for pair in value] == expected for value in templates
-    )
-    wanted_css = files.profile.card_css()
-    ok_css = all(value == wanted_css for value in css)
-    return ok_templates and ok_css, (
-        f"{len(used)} model(s) "
-        f"{'match' if ok_templates else 'differ'}, "
-        f"CSS {'match' if ok_css else 'differ'}"
-    )
+    wanted = files.profile.card_css()
 
+    def css_problems(css: str) -> list[str]:
+        """Report a CSS value that is not the profile CSS."""
+        return [] if css == wanted else ["the CSS is not the profile CSS"]
+
+    return _gate_templates(files, css_problems)
 
 def _strip_bold(text: str) -> str:
     """Remove the bold markup of a field value."""

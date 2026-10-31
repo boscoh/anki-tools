@@ -31,7 +31,12 @@ from anki_tools.sentence_pack.pack import (
     attribution_lines,
     write_attribution_section,
 )
-from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
+from anki_tools.sentence_pack.profile import (
+    LanguageProfile,
+    NOUN_INDICES,
+    make_sense_filter,
+    register,
+)
 from anki_tools.sentence_pack.tokens import Token, TokenCache, has_finite_verb, tokenize
 
 from anki_tools.sentence_pack.word_table import (
@@ -127,15 +132,6 @@ ELIDED_CLITICS = (
 FRENCH_LETTERS = frozenset("abcdefghijklmnopqrstuvwxyzàâäçéèêëîïôöùûüÿœæ")
 
 SPACE_CHARS = ("\u202f", "\u00a0")
-NOUN_INDICES = frozenset(
-    {
-        36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53,
-        54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71,
-        72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
-        90, 91, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
-        160, 161, 162, 163, 164, 165, 166, 167, 168, 170, 171, 177, 178, 179, 207,
-    }
-)  # fmt: skip
 
 SENTENCE_FIELDS = [
     "target",
@@ -1175,108 +1171,6 @@ def gate_word_table(
     return True, f"{concepts} concepts, {len(table)} forms"
 
 
-def gate_word_boundary(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """French gate G9: no card matches the target inside a longer word.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    rows = inputs.rows()
-    bad = [
-        f"{row['target']} in {row['sentence']}"
-        for row in rows
-        if token_matches(row["sentence"], row["target"]) != 1
-    ]
-    if bad:
-        return False, f"{len(bad)} card(s) match inside a longer word: {sample(bad)}"
-    return True, f"{len(rows)} cards match a whole token"
-
-
-def gate_attribution(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """French gate G12: the French section names every sentence author.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    path = inputs.attribution_path
-    if not path.is_file():
-        return False, f"attribution file missing: {path}"
-    text = path.read_text(encoding="utf-8")
-    problems: list[str] = []
-    if "## French pack" not in text:
-        problems.append("no '## French pack' section")
-    authors = {
-        row.get("tatoeba_author", "").strip() or "unknown" for row in inputs.rows()
-    }
-    missing = sorted(author for author in authors if author not in text)
-    if missing:
-        problems.append(f"{len(missing)} author(s) missing: {sample(missing)}")
-    if problems:
-        return False, sample(problems)
-    return True, f"{len(authors)} author(s) named in the French section"
-
-
-def gate_typography(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """French gate G17: no card field holds a no-break space and all text is NFC.
-
-    ``text_original`` keeps the raw sentence, so only the card fields are read.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    table = inputs.table()
-    glosses = {form.french: glossary(form) for form in table}
-    bad: list[str] = []
-    for row in inputs.rows():
-        fields = {
-            "sentence": row.get("sentence", ""),
-            "english": row.get("english", ""),
-            "target": row.get("target", ""),
-            "gloss": glosses.get(row.get("target", ""), ""),
-        }
-        for name, value in fields.items():
-            if any(char in value for char in SPACE_CHARS):
-                bad.append(f"{name}={value}: no-break space")
-            elif unicodedata.normalize("NFC", value) != value:
-                bad.append(f"{name}={value}: not NFC")
-    if bad:
-        return False, f"{len(bad)} card field(s) fail the typography: {sample(bad)}"
-    return True, f"{len(inputs.rows())} cards hold NFC text with normal spaces"
-
-
-def gate_no_blocked_license(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """French gate G18: a public pack has no card with a blocked recording.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    manifest = inputs.manifest()
-    pack_license = manifest.get("pack_license", "public")
-    if pack_license != "public":
-        return True, f"pack license is {pack_license}, so no recording is blocked"
-    blocked = [
-        row["sentence"]
-        for row in inputs.rows()
-        if row.get("audio_source") == "native"
-        and row.get("audio_license", "").strip() in ("", "CC BY-NC 4.0")
-    ]
-    if blocked:
-        return False, f"{len(blocked)} card(s) use a blocked license: {sample(blocked)}"
-    return True, "no card uses a CC BY-NC 4.0 or empty-license recording"
-
-
 def gate_discontinuous(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
@@ -1300,33 +1194,6 @@ def gate_discontinuous(
         return False, f"{len(bad)} card(s) lose a part: {sample(bad)}"
     return True, f"{checked} discontinuous card(s) keep both parts"
 
-
-def gate_noun_gender(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """French gate G20: report the noun rows with an empty gender.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text. A reported count is not a failure.
-    """
-    table = inputs.table()
-    nouns = [
-        form
-        for form in table
-        if form.swadesh_index in NOUN_INDICES
-    ]
-    empty = sorted(form.french for form in nouns if not form.gender)
-    report = inputs.manifest()
-    counted = report.get("noun_gender_missing")
-    if empty:
-        return True, (
-            f"{len(empty)} of {len(nouns)} noun row(s) have no gender: "
-            f"{sample(empty)}"
-        )
-    return True, f"{len(nouns)} noun row(s) have a gender (manifest {counted})"
-
-
 def french_gates() -> tuple[tuple[str, Any], ...]:
     """Give the ordered gate list G1 to G21 of the French pack.
 
@@ -1334,19 +1201,24 @@ def french_gates() -> tuple[tuple[str, Any], ...]:
     """
     from anki_tools.sentence_pack.audit import (
         gate_apkg,
+        gate_attribution,
         gate_coverage,
         gate_manifest_counts,
         gate_media_count,
+        gate_no_blocked_license,
         gate_no_sense_mismatch,
+        gate_noun_gender,
         gate_proper_sentences,
         gate_review_file,
         gate_sentence_audio,
         gate_similarity,
         gate_target_once,
         gate_targets_in_table,
+        gate_typography,
         gate_unique_forms,
         gate_unique_tatoeba_ids,
         gate_word_audio,
+        gate_word_boundary,
     )
 
     return (
@@ -1388,7 +1260,6 @@ def run_french_audit(**paths: Path | None) -> list[GateResult]:
 __all__ = [
     "FRENCH",
     "Candidate",
-    "NOUN_INDICES",
     "WordForm",
     "check_word_table",
     "clean_term",

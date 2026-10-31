@@ -9,7 +9,11 @@ from pathlib import Path
 
 from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.sentence_pack import audio, pack, pool, select
-from anki_tools.sentence_pack.audit import AuditInputs, gate_proper_sentences
+from anki_tools.sentence_pack.audit import (
+    AuditInputs,
+    gate_noun_gender,
+    gate_proper_sentences,
+)
 from anki_tools.sentence_pack.guards import check_sentence_shape
 from anki_tools.languages.french import profile as french
 
@@ -437,13 +441,13 @@ def test_gate_20_reports_the_noun_gender_count(tmp_path: Path) -> None:
         }
     ]
     inputs = _audit_inputs(tmp_path, table, rows, {"noun_gender_missing": 1})
-    passed, message = french.gate_noun_gender(inputs, french.FRENCH)
+    passed, message = gate_noun_gender(inputs, french.FRENCH)
     assert passed
     assert "pluie" in message
 
     full = [_form(150, "water", "eau", "f"), _form(151, "rain", "pluie", "f")]
     inputs = _audit_inputs(tmp_path, full, rows, {"noun_gender_missing": 0})
-    passed, message = french.gate_noun_gender(inputs, french.FRENCH)
+    passed, message = gate_noun_gender(inputs, french.FRENCH)
     assert passed
     assert "2 noun row(s)" in message
 

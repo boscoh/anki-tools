@@ -20,7 +20,6 @@ from wordfreq import top_n_list, zipf_frequency
 
 from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
 from anki_tools.languages.spanish.lemma import base_lemma
-from anki_tools.languages.french.profile import NOUN_INDICES
 from anki_tools.sentence_pack.word_table import (
     check_form_labels,
     check_missing_indices,
@@ -55,7 +54,12 @@ from anki_tools.sentence_pack.pack import (
     attribution_lines,
     write_attribution_section,
 )
-from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
+from anki_tools.sentence_pack.profile import (
+    LanguageProfile,
+    NOUN_INDICES,
+    make_sense_filter,
+    register,
+)
 from anki_tools.sentence_pack.tokens import Token, TokenCache, has_finite_verb, tokenize
 
 WORD_CSV_PATH = Path("vocab/spanish_words.csv")
@@ -1151,106 +1155,6 @@ def gate_word_table(
     return True, f"{concepts} concepts, {len(table)} forms"
 
 
-def gate_word_boundary(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Spanish gate G9: each card matches its target exactly one time.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    rows = inputs.rows()
-    bad = [
-        f"{row['target']} in {row['sentence']}"
-        for row in rows
-        if token_matches(row["sentence"], row["target"]) != 1
-    ]
-    if bad:
-        return False, f"{len(bad)} card(s) fail the single match: {sample(bad)}"
-    return True, f"{len(rows)} cards match a whole token"
-
-
-def gate_attribution(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Spanish gate G12: the Spanish section names every sentence author.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    path = inputs.attribution_path
-    if not path.is_file():
-        return False, f"attribution file missing: {path}"
-    text = path.read_text(encoding="utf-8")
-    problems: list[str] = []
-    if "## Spanish pack" not in text:
-        problems.append("no '## Spanish pack' section")
-    authors = {
-        row.get("tatoeba_author", "").strip() or "unknown" for row in inputs.rows()
-    }
-    missing = sorted(author for author in authors if author not in text)
-    if missing:
-        problems.append(f"{len(missing)} author(s) missing: {sample(missing)}")
-    if problems:
-        return False, sample(problems)
-    return True, f"{len(authors)} author(s) named in the Spanish section"
-
-
-def gate_typography(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Spanish gate G17: no card field holds a no-break space and all text is NFC.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    table = inputs.table()
-    glosses = {form.spanish: glossary(form) for form in table}
-    bad: list[str] = []
-    for row in inputs.rows():
-        fields = {
-            "sentence": row.get("sentence", ""),
-            "english": row.get("english", ""),
-            "target": row.get("target", ""),
-            "gloss": glosses.get(row.get("target", ""), ""),
-        }
-        for name, value in fields.items():
-            if any(char in value for char in SPACE_CHARS):
-                bad.append(f"{name}={value}: no-break space")
-            elif unicodedata.normalize("NFC", value) != value:
-                bad.append(f"{name}={value}: not NFC")
-    if bad:
-        return False, f"{len(bad)} card field(s) fail the typography: {sample(bad)}"
-    return True, f"{len(inputs.rows())} cards hold NFC text with normal spaces"
-
-
-def gate_no_blocked_license(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Spanish gate G18: a public pack has no card with a blocked recording.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    manifest = inputs.manifest()
-    pack_license = manifest.get("pack_license", "public")
-    if pack_license != "public":
-        return True, f"pack license is {pack_license}, so no recording is blocked"
-    blocked = [
-        row["sentence"]
-        for row in inputs.rows()
-        if row.get("audio_source") == "native"
-        and row.get("audio_license", "").strip() in ("", "CC BY-NC 4.0")
-    ]
-    if blocked:
-        return False, f"{len(blocked)} card(s) use a blocked license: {sample(blocked)}"
-    return True, "no card uses a CC BY-NC 4.0 or empty-license recording"
-
-
 def gate_pair_parts(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
@@ -1301,19 +1205,24 @@ def spanish_gates() -> tuple[tuple[str, Any], ...]:
     """
     from anki_tools.sentence_pack.audit import (
         gate_apkg,
+        gate_attribution,
         gate_coverage,
         gate_manifest_counts,
         gate_media_count,
+        gate_no_blocked_license,
         gate_no_sense_mismatch,
+        gate_noun_gender,
         gate_proper_sentences,
         gate_review_file,
         gate_sentence_audio,
         gate_similarity,
         gate_target_once,
         gate_targets_in_table,
+        gate_typography,
         gate_unique_forms,
         gate_unique_tatoeba_ids,
         gate_word_audio,
+        gate_word_boundary,
     )
 
     return (

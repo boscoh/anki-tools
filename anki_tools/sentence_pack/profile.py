@@ -12,6 +12,16 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Collection, Iterable, Protocol, Sequence
 
+#: Swadesh concept indices of the nouns, the rows where gate G20 reports a gender.
+NOUN_INDICES = frozenset(
+    {
+        36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53,
+        54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71,
+        72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
+        90, 91, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
+        160, 161, 162, 163, 164, 165, 166, 167, 168, 170, 171, 177, 178, 179, 207,
+    }
+)  # fmt: skip
 
 class WordRow(Protocol):
     """A row of a reviewed Swadesh word table."""

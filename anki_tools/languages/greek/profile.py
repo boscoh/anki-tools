@@ -1016,53 +1016,6 @@ def gate_word_table(
     return True, f"{concepts} concepts, {len(table)} forms"
 
 
-def gate_word_boundary(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Greek gate G9: no card matches the target inside a longer word.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    rows = inputs.rows()
-    bad: list[str] = []
-    for row in rows:
-        target = row["target"]
-        if token_matches(row["sentence"], target) != 1:
-            bad.append(f"{target} in {row['sentence']}")
-    if bad:
-        return False, f"{len(bad)} card(s) match inside a longer word: {sample(bad)}"
-    return True, f"{len(rows)} cards match a whole token"
-
-
-def gate_attribution(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Greek gate G12: the Greek section names every sentence author.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    path = inputs.attribution_path
-    if not path.is_file():
-        return False, f"attribution file missing: {path}"
-    text = path.read_text(encoding="utf-8")
-    problems: list[str] = []
-    if "## Greek pack" not in text:
-        problems.append("no '## Greek pack' section")
-    authors = {
-        row.get("tatoeba_author", "").strip() or "unknown" for row in inputs.rows()
-    }
-    missing = sorted(author for author in authors if author not in text)
-    if missing:
-        problems.append(f"{len(missing)} author(s) missing: {sample(missing)}")
-    if problems:
-        return False, sample(problems)
-    return True, f"{len(authors)} author(s) named in the Greek section"
-
-
 def gate_script(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
@@ -1086,48 +1039,6 @@ def gate_script(
         return False, f"{len(bad)} card field(s) fail the script rules: {sample(bad)}"
     return True, f"{len(rows)} cards hold monotonic NFC text"
 
-
-def gate_no_native(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Greek gate G18: no card uses the native audio source.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    native = [
-        row["sentence"] for row in inputs.rows() if row.get("audio_source") == "native"
-    ]
-    if native:
-        return False, f"{len(native)} card(s) use native audio: {sample(native)}"
-    return True, "no card uses native audio"
-
-
-def gate_targets(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Greek gate G19: every target is a table form and is not shared.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    table = inputs.table()
-    forms = {form.greek for form in table}
-    shared = {form.greek for form in table if form.variant == "shared"}
-    rows = inputs.rows()
-    problems: list[str] = []
-    for target in sorted({row["target"] for row in rows}):
-        if target not in forms:
-            problems.append(f"{target} is not in the word table")
-        elif target in shared:
-            problems.append(f"{target} is a shared form")
-    if problems:
-        return False, f"{len(problems)} target(s) invalid: {sample(problems)}"
-    return True, f"{len(rows)} card targets are table forms with a card"
-
-
 def greek_gates() -> tuple[tuple[str, Any], ...]:
     """Give the ordered gate list G1 to G20 of the Greek pack.
 
@@ -1135,9 +1046,11 @@ def greek_gates() -> tuple[tuple[str, Any], ...]:
     """
     from anki_tools.sentence_pack.audit import (
         gate_apkg,
+        gate_attribution,
         gate_coverage,
         gate_manifest_counts,
         gate_media_count,
+        gate_no_native_audio,
         gate_no_sense_mismatch,
         gate_proper_sentences,
         gate_review_file,
@@ -1149,6 +1062,7 @@ def greek_gates() -> tuple[tuple[str, Any], ...]:
         gate_unique_forms,
         gate_unique_tatoeba_ids,
         gate_word_audio,
+        gate_word_boundary,
     )
 
     return (
@@ -1169,7 +1083,7 @@ def greek_gates() -> tuple[tuple[str, Any], ...]:
         ("G15", gate_review_file),
         ("G16", gate_word_audio),
         ("G17", gate_script),
-        ("G18", gate_no_native),
+        ("G18", gate_no_native_audio),
         ("G19", gate_target_in_table),
         ("G20", gate_no_sense_mismatch),
     )

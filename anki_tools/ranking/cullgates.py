@@ -10,7 +10,6 @@ Usage: ``anki fix <lang> --select --check`` calls :func:`check_cull`.
 
 from __future__ import annotations
 
-import hashlib
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
@@ -18,23 +17,27 @@ from typing import Any
 
 from anki_tools.gate_files import GateFileReader, read_notes
 
-from anki_tools.ranking.assemble import deck_templates
 from anki_tools.ranking.coreflow import InputCard, read_output
 from anki_tools.ranking.corelist import is_content
 from anki_tools.ranking.cullflow import (
     FREQUENCY_SOURCE,
     SWADESH_SOURCE,
     CullProfile,
-    _is_similar,
     coverage_status,
     filter_reason,
     lemma_sets,
 )
 from anki_tools.ranking.gates import (
     Gate,
+    gate_audio as _gate_audio,
+    gate_counts as _gate_counts,
     gate_core_word,
     gate_identity,
+    gate_kept_order as _gate_kept_order,
+    gate_manifest_hashes as _gate_manifest_hashes,
     gate_output_model,
+    gate_similarity as _gate_similarity,
+    gate_templates as _gate_templates,
     read_csv,
     read_json,
     report,
@@ -42,7 +45,6 @@ from anki_tools.ranking.gates import (
 )
 from anki_tools.ranking.gates import sample as _sample
 from anki_tools.ranking.identity import DeckIdentity
-from anki_tools.sentence_pack.audit import sha256_value
 
 CARD_CLASSES = ("sentence", "english", "hint")
 
@@ -218,46 +220,16 @@ def gate_filter(files: CullFiles) -> tuple[bool, str]:
 def gate_similarity(files: CullFiles) -> tuple[bool, str]:
     """G6: no kept card pair reaches the lemma Jaccard limit."""
     limit = float(files.params().get("similarity", 0.67))
-    cards = files.output()["cards"]
     sets = lemma_sets(files.tokens(), files.profile.content_pos)
-    shared: dict[str, list[int]] = {}
-    problems: list[str] = []
-    for index, lemma_set in enumerate(sets):
-        if _is_similar(lemma_set, sets, shared, limit):
-            problems.append(cards[index].sentence[:40])
-        for lemma in lemma_set:
-            shared.setdefault(lemma, []).append(index)
-    if problems:
-        return False, f"{len(problems)} duplicate card(s): {_sample(problems)}"
-    return True, f"{len(sets)} kept cards below the Jaccard limit {limit}"
-
+    return _gate_similarity(files, sets, limit)
 
 def gate_audio(files: CullFiles) -> tuple[bool, str]:
     """G7: every kept card has a valid MP3 file."""
-    output = files.output()
-    media = output["media"]
-    durations = output["audio"]
-    problems: list[str] = []
-    for card in output["cards"]:
-        if not card.audio:
-            problems.append(f"no sound: {card.sentence[:30]}")
-        elif card.audio not in media:
-            problems.append(f"missing media: {card.audio}")
-        elif not durations.get(card.audio):
-            problems.append(f"bad MP3: {card.audio}")
-    if problems:
-        return False, f"{len(problems)} card(s): {_sample(problems)}"
-    return True, f"{len(output['cards'])} cards have a valid MP3 file"
-
+    return _gate_audio(files)
 
 def gate_note_count(files: CullFiles) -> tuple[bool, str]:
     """G8: the note count matches the CSV and the manifest."""
-    notes = int(files.output()["notes"])
-    kept = len(_kept_rows(files))
-    cards = int(files.manifest().get("counts", {}).get("cards", 0))
-    message = f"{notes} notes, {kept} kept rows, manifest {cards}"
-    return notes == kept == cards, message
-
+    return _gate_counts(files)
 
 def gate_media(files: CullFiles) -> tuple[bool, str]:
     """G9: the APKG holds exactly the media files of the kept cards."""
@@ -278,17 +250,7 @@ def gate_media(files: CullFiles) -> tuple[bool, str]:
 
 def gate_kept_order(files: CullFiles) -> tuple[bool, str]:
     """G11: the kept set and order match the manifest of the run."""
-    rows = files.rows()
-    kept = _kept_rows(files)
-    if rows[: len(kept)] != kept:
-        return False, "the kept rows are not the first rows of the cull CSV"
-    text = "\n".join(row["sentence"] for row in kept)
-    digest = f"sha256:{hashlib.sha256(text.encode('utf-8')).hexdigest()}"
-    expected = files.manifest().get("kept_order")
-    if digest != expected:
-        return False, f"kept order {digest} is not the manifest {expected}"
-    return True, f"{len(kept)} kept cards in the manifest order"
-
+    return _gate_kept_order(files, files.rows())
 
 def gate_coverage_rows(files: CullFiles) -> tuple[bool, str]:
     """G12: the coverage CSV has one row per target word."""
@@ -311,19 +273,8 @@ def gate_coverage_rows(files: CullFiles) -> tuple[bool, str]:
 
 def gate_manifest_hashes(files: CullFiles) -> tuple[bool, str]:
     """G13: the manifest hashes match the two CSV files."""
-    recorded = files.manifest().get("files", {})
-    problems: list[str] = []
-    for key, path in (
-        ("cull_csv", files.cull_csv),
-        ("coverage_csv", files.coverage_csv),
-    ):
-        actual = sha256_value(path)
-        if recorded.get(key) != actual:
-            problems.append(f"{key} manifest {recorded.get(key)} != {actual}")
-    if problems:
-        return False, f"{len(problems)} hash(es) differ: {_sample(problems)}"
-    return True, "2 file hashes match"
-
+    file_keys = {"cull_csv": files.cull_csv, "coverage_csv": files.coverage_csv}
+    return _gate_manifest_hashes(files, file_keys)
 
 def gate_swadesh(files: CullFiles) -> tuple[bool, str]:
     """G14: the merged deck covers the Swadesh concepts, minus the exceptions."""
@@ -337,29 +288,18 @@ def gate_swadesh(files: CullFiles) -> tuple[bool, str]:
     return True, f"Swadesh {covered}/{total}, {len(exceptions)} exception(s)"
 
 
+def _css_class_problems(css: str) -> list[str]:
+    """Report the card classes that the CSS does not declare."""
+    return [
+        f"the CSS has no .{name} class"
+        for name in CARD_CLASSES
+        if f".{name}" not in css
+    ]
+
+
 def gate_card_templates(files: CullFiles) -> tuple[bool, str]:
     """G15: the deck model holds the Swadesh-style template and CSS."""
-    output = files.output()
-    model_name = str(files.manifest().get("source", {}).get("model"))
-    templates = output["templates"].get(model_name, [])
-    if not templates:
-        return False, f"the model {model_name!r} has no card template"
-    expected = list(deck_templates(files.profile))
-    problems = [
-        f"card {index + 1} is {qfmt!r} / {afmt!r}"
-        for index, (qfmt, afmt) in enumerate(templates)
-        if index >= len(expected) or (qfmt, afmt) != expected[index]
-    ]
-    if len(templates) != len(expected):
-        problems.append(f"{len(templates)} templates, not {len(expected)}")
-    css = output["css"].get(model_name, "")
-    for name in CARD_CLASSES:
-        if f".{name}" not in css:
-            problems.append(f"the CSS has no .{name} class")
-    if problems:
-        return False, f"{len(problems)} template problem(s): {_sample(problems)}"
-    return True, f"{len(templates)} card template and the CSS classes match"
-
+    return _gate_templates(files, _css_class_problems)
 
 
 GATES: tuple[Gate, ...] = (

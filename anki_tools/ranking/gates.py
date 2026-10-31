@@ -13,19 +13,21 @@ modes print one table.
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import AbstractSet, Any, Callable, Mapping, Sequence
 
 from anki_tools.gates import Gate, GateFiles, GateResult, run_gates  # noqa: F401
-from anki_tools.ranking.assemble import output_fields
+from anki_tools.ranking.assemble import deck_templates, output_fields
 from anki_tools.ranking.coreflow import (
     OUTPUT_CORE_FIELD,
     OUTPUT_GLOSS_FIELD,
     OUTPUT_SENTENCE_FIELD,
     coverage_glosses,
 )
-from anki_tools.sentence_pack.audit import print_audit
+from anki_tools.ranking.duplicates import at_limit
+from anki_tools.sentence_pack.audit import print_audit, sha256_value
 
 #: Items of a failure message before the rest become a count.
 SAMPLE = 3
@@ -182,3 +184,133 @@ def gate_core_word(files: GateFiles) -> tuple[bool, str]:
         files.notes(), files.fields(), coverage_glosses(files.coverage())
     )
     return not problems, f"{filled} core word(s), {len(problems)} bad: {sample(problems)}"
+
+
+def gate_audio(files: GateFiles) -> tuple[bool, str]:
+    """G7 and K7: every card has a valid MP3 file.
+
+    The check reads the media map, so it finds a card whose audio name is
+    absent from the package or whose MP3 is silent.
+    """
+    output = files.output()
+    media = output["media"]
+    durations = output["audio"]
+    problems: list[str] = []
+    for card in output["cards"]:
+        if not card.audio:
+            problems.append(f"no sound: {card.sentence[:30]}")
+        elif card.audio not in media:
+            problems.append(f"missing media: {card.audio}")
+        elif not durations.get(card.audio):
+            problems.append(f"bad MP3: {card.audio}")
+    if problems:
+        return False, f"{len(problems)} card(s): {sample(problems)}"
+    return True, f"{len(output['cards'])} cards have a valid MP3 file"
+
+
+def gate_counts(files: GateFiles, check_media: bool = False) -> tuple[bool, str]:
+    """G8 and K8: the note count matches the CSV and the manifest.
+
+    :param files: Reader of the output files.
+    :param check_media: Also require the media set to equal the card audio.
+    """
+    output = files.output()
+    cards = int(files.manifest().get("counts", {}).get("cards", 0))
+    kept = [row for row in files.rows() if row.get("kept") == "1"]
+    notes = int(output["notes"])
+    ok = notes == len(kept) == cards
+    message = f"{notes} notes, {len(kept)} kept rows, manifest {cards}"
+    if not check_media:
+        return ok, message
+    audio = {card.audio for card in output["cards"] if card.audio}
+    media = set(output["media"])
+    ok = ok and media == audio
+    return ok, f"{message}, media {len(media)} of {len(audio)}"
+
+
+def gate_kept_order(
+    files: GateFiles, rows: Sequence[Mapping[str, str]]
+) -> tuple[bool, str]:
+    """G11 and K10: the kept set and order match the manifest of the run.
+
+    :param files: Reader of the output files.
+    :param rows: Ordered rows of the flow. The cull passes the cull CSV rows
+        and the core passes the rank rows.
+    """
+    kept = [row for row in rows if row.get("kept") == "1"]
+    if rows[: len(kept)] != kept:
+        return False, "the kept rows are not the first rows of the cull CSV"
+    text = "\n".join(row["sentence"] for row in kept)
+    digest = f"sha256:{hashlib.sha256(text.encode('utf-8')).hexdigest()}"
+    expected = files.manifest().get("kept_order")
+    if digest != expected:
+        return False, f"kept order {digest} is not the manifest {expected}"
+    csv_kept = [row for row in files.rows() if row.get("kept") == "1"]
+    if len(kept) != len(csv_kept):
+        return False, f"{len(kept)} row(s) in order, {len(csv_kept)} kept rows"
+    return True, f"{len(kept)} kept cards in the manifest order"
+
+
+def gate_manifest_hashes(
+    files: GateFiles, file_keys: Mapping[str, Path]
+) -> tuple[bool, str]:
+    """G13 and K12: the manifest hashes match the side files.
+
+    :param files: Reader of the output files.
+    :param file_keys: Manifest key to side file, in the check order.
+    """
+    recorded = files.manifest().get("files", {})
+    problems: list[str] = []
+    for key, path in file_keys.items():
+        actual = sha256_value(path)
+        if recorded.get(key) != actual:
+            problems.append(f"{key} manifest {recorded.get(key)} != {actual}")
+    if problems:
+        return False, f"{len(problems)} hash(es) differ: {sample(problems)}"
+    return True, f"{len(file_keys)} file hashes match"
+
+
+def gate_similarity(
+    files: GateFiles, sets: Sequence[AbstractSet[str]], limit: float
+) -> tuple[bool, str]:
+    """G6 and K6: no kept card pair reaches the lemma Jaccard limit.
+
+    :param files: Reader of the output files.
+    :param sets: Content lemmas of every card, in card order.
+    :param limit: Lemma Jaccard limit of a duplicate pair.
+    """
+    cards = files.output()["cards"]
+    seen: dict[str, list[int]] = {}
+    problems: list[str] = []
+    for index, lemmas in enumerate(sets):
+        others = {other for lemma in lemmas for other in seen.get(lemma, ())}
+        if any(at_limit(lemmas, sets[other], limit) for other in others):
+            problems.append(cards[index].sentence[:40])
+        for lemma in lemmas:
+            seen.setdefault(lemma, []).append(index)
+    if problems:
+        return False, f"{len(problems)} duplicate card(s): {sample(problems)}"
+    return True, f"{len(sets)} kept cards below the Jaccard limit {limit}"
+
+
+def gate_templates(
+    files: GateFiles, css_problems: Callable[[str], list[str]]
+) -> tuple[bool, str]:
+    """G15 and K14: the deck model holds the card templates and the CSS."""
+    output = files.output()
+    model_name = str(files.manifest().get("source", {}).get("model"))
+    templates = output["templates"].get(model_name, [])
+    if not templates:
+        return False, f"the model {model_name!r} has no card template"
+    expected = list(deck_templates(files.profile))
+    problems = [
+        f"card {index + 1} is {qfmt!r} / {afmt!r}"
+        for index, (qfmt, afmt) in enumerate(templates)
+        if index >= len(expected) or (qfmt, afmt) != expected[index]
+    ]
+    if len(templates) != len(expected):
+        problems.append(f"{len(templates)} templates, not {len(expected)}")
+    problems.extend(css_problems(output["css"].get(model_name, "")))
+    if problems:
+        return False, f"{len(problems)} template problem(s): {sample(problems)}"
+    return True, f"{len(templates)} card template and the CSS classes match"
