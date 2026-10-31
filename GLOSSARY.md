@@ -157,10 +157,24 @@ A test that rejects a sentence early, for example the sentence shape or the
 missing English link. The guards run in one fixed order.
 _Avoid_: filter, check
 
+**Rule key**:
+The `F` number of one card rule in the pack guard table or in the ranking filter
+table. The two tables number from `F1` and differ: pack `F8` is the internal mark
+rule, and rank `F8` is the name rule. `MARK_RULES` in `ranking/cullflow.py`
+gives the map. ADR 0027 records it.
+_Avoid_: filter name, rule number
+
 **Gate**:
 An audit check on the built files, for example `G4`. A gate reports a fault in the
 output. It does not reject a sentence.
 _Avoid_: guard, test
+
+**Gate id namespace**:
+The set of gate ids that one flow owns. The pack audit holds `G1` to `G21`, the
+cull deck holds `G1` to `G17`, and the core deck holds `K1` to `K21`. A number
+alone does not identify a check, so a doc row or a message names the flow.
+ADR 0027 records the owner tables.
+_Avoid_: gate number, bare gate id
 
 **Frame**:
 A manual sentence with Tatoeba id 0. It fills a concept that has no good Tatoeba
