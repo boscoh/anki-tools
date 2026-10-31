@@ -36,10 +36,19 @@ write_deck(job: DeckWrite) -> RunFiles
 - `sides: Sequence[SideTable]` — zero or more CSV tables
 - `manifest: Mapping | None` — the payload without `files`; the writer adds the
   hashes
-- `report: Sequence[tuple[str | None, str]]` — the printed lines
+- `manifest_files: Mapping[str, Path]` — the files to hash into the payload
 
 `RunFiles` holds `output_path`, `manifest_path`, and `sides: Mapping[str, Path]`
 keyed by suffix, for example `"core.csv"`.
+
+`write_sides(job)` is the second function: it writes the side CSVs and the
+manifest. `write_deck` calls it, and so does a caller that writes the package in
+two steps: the core mode that reorders the deck writes the package to a
+temporary file, reorders it, then writes the sides and the manifest beside the
+final file.
+
+The writer prints nothing. `print_run(lines, files)` prints the report lines
+and the written paths, and the caller decides when to call it.
 
 Two adapters sit behind the seam:
 
@@ -61,9 +70,9 @@ One caller of `AnkiPackage.create` and one caller of `shape.write_package`. One
 card record and one media record, so the two package writers cannot disagree
 about them.
 
-The interface is one record and one function. The implementation holds the two
-package writers, the media copy, the side tables, the manifest, and the report.
-Three routes and their tests cross the seam.
+The interface is three functions over one record. The implementation holds the
+two package writers, the media copy, the side tables, and the manifest. Three
+routes and their tests cross the seam.
 
 `RunFiles.card_csv` becomes `RunFiles.sides["core.csv"]`. The two call sites are
 `mandarin/core.py:298` and `cantonese/core.py:259`.
@@ -83,3 +92,7 @@ the edit adapter can map names to positions in one place.
 The writer names the artifacts. A rename would then edit one module, but the
 five Swadesh profiles still hold four name values each, which ADR 0015 already
 forbids. Move the naming into the writer when those values are gone.
+
+A `report` field on `DeckWrite` so the writer prints. The core mode prints its
+paths after the reorder, so the writer would print a path that it is about to
+replace. The caller decides when to print.

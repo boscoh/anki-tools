@@ -10,13 +10,13 @@ paths of the profile. The module only reads files.
 from __future__ import annotations
 
 import csv
-import hashlib
 import json
 import re
 from collections import Counter
 from pathlib import Path
 from typing import Any, Callable, Iterable, Sequence
 
+from anki_tools.apkg.deck_writer import sha256_value
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.gate_files import GateFileReader
 from anki_tools.sentence_pack.audio import (
@@ -177,14 +177,6 @@ def read_apkg(path: Path) -> dict[str, Any]:
     return {"notes": len(notes), "models": models, "media": media}
 
 
-def sha256_value(path: Path) -> str:
-    """Build the manifest hash value of a file.
-
-    :param path: File to hash.
-    :returns: ``sha256:`` followed by the hex digest.
-    """
-    digest = hashlib.sha256(Path(path).read_bytes()).hexdigest()
-    return f"sha256:{digest}"
 
 
 def sample(items: Iterable[str], limit: int = FAILURE_SAMPLE) -> str:

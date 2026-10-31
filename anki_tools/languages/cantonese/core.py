@@ -256,5 +256,5 @@ CANTONESE_CORE_PROFILE = CANTONESE_LANGUAGE.core(
     max_units=MAX_UNITS,
     default_options=DEFAULT_OPTIONS,
     frequency_source="Cifu and Apple Daily blend",
-    finalize=lambda run: finalize_output(run.output_path, run.card_csv),
+    finalize=lambda run: finalize_output(run.output_path, run.sides["core.csv"]),
 )

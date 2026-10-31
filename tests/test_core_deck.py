@@ -15,6 +15,7 @@ from typing import Sequence
 
 import pytest
 
+from anki_tools.apkg import deck_writer
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.shape import OutputShape, write_package
 from anki_tools.languages.french import core, cull
@@ -480,7 +481,7 @@ def _offline_profile(tmp_path: Path) -> CoreProfile:
     )
 
 
-def _run_core(tmp_path: Path) -> tuple[assemble.RunFiles, Path, CoreProfile]:
+def _run_core(tmp_path: Path) -> tuple[deck_writer.RunFiles, Path, CoreProfile]:
     """Run the core mode on the tiny deck."""
     source = _tiny_deck(tmp_path)
     profile = _offline_profile(tmp_path)
@@ -683,7 +684,7 @@ class TestCardDesign:
         run, output, profile = _run_core(tmp_path)
 
         manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
-        with run.card_csv.open(encoding="utf-8", newline="") as handle:
+        with run.sides["core.csv"].open(encoding="utf-8", newline="") as handle:
             rows = list(csv.DictReader(handle))
         dropped = [row for row in rows if row["reason"] == "no_core"]
 

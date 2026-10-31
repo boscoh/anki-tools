@@ -34,6 +34,7 @@ from typing import (
     cast,
 )
 
+from anki_tools.apkg import deck_writer
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking import assemble, coreflow
 from anki_tools.ranking.cardfilter import (
@@ -1093,7 +1094,7 @@ def card_cores(
     return values
 
 
-def run_cull(request: CullRequest, profile: CullProfile) -> assemble.RunFiles:
+def run_cull(request: CullRequest, profile: CullProfile) -> deck_writer.RunFiles:
     """Run stages C0 to C5 of the cull and write the four output files.
 
     :param request: Options of the run.
@@ -1286,10 +1287,10 @@ def run_cull(request: CullRequest, profile: CullProfile) -> assemble.RunFiles:
             identity=identity,
             input_path=apkg_path,
             values=note_fields,
-            card_table=assemble.SideTable(
+            card_table=deck_writer.SideTable(
                 "cull.csv", CULL_COLUMNS, cull_rows(cards, reasons, selection, kept, reserve)
             ),
-            coverage_table=assemble.SideTable(
+            coverage_table=deck_writer.SideTable(
                 "coverage.csv", COVERAGE_COLUMNS, coverage_rows(targets, selection, glosses)
             ),
             manifest=assemble.ManifestValues(

@@ -22,6 +22,7 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Callable, Collection, Mapping, Sequence
 
+from anki_tools.apkg import deck_writer
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.shape import find_model_id, find_only_model_id
 from anki_tools.ranking import assemble
@@ -975,7 +976,7 @@ def coverage_glosses(rows: Sequence[Mapping[str, str]]) -> dict[str, str]:
     return glosses
 
 
-def run_core(request: CoreRequest, profile: CoreProfile) -> assemble.RunFiles:
+def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles:
     """Run stages K0 to K6 of the core mode and write the output files.
 
     :param request: Options of the run.
@@ -1121,8 +1122,8 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> assemble.RunFiles:
             identity=identity,
             input_path=apkg_path,
             values=note_fields,
-            card_table=assemble.SideTable("core.csv", CORE_COLUMNS, rows),
-            coverage_table=assemble.SideTable(
+            card_table=deck_writer.SideTable("core.csv", CORE_COLUMNS, rows),
+            coverage_table=deck_writer.SideTable(
                 "coverage.csv", COVERAGE_COLUMNS, coverage_rows
             ),
             manifest=assemble.ManifestValues(

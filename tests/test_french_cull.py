@@ -17,6 +17,7 @@ from typing import Collection
 
 import pytest
 
+from anki_tools.apkg import deck_writer
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.shape import OutputShape, write_package
 from anki_tools.languages.french import cull as cull_fr
@@ -478,12 +479,12 @@ def test_run_gates_passes_on_a_tiny_output(
             identity=identity,
             input_path=source,
             values=values,
-            card_table=assemble.SideTable(
+            card_table=deck_writer.SideTable(
                 "cull.csv",
                 cullflow.CULL_COLUMNS,
                 cullflow.cull_rows(cards, ["", "", ""], selection, ordered),
             ),
-            coverage_table=assemble.SideTable(
+            coverage_table=deck_writer.SideTable(
                 "coverage.csv",
                 cullflow.COVERAGE_COLUMNS,
                 cullflow.coverage_rows(

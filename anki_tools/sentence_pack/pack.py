@@ -9,7 +9,6 @@ in word order.
 from __future__ import annotations
 
 import csv
-import hashlib
 import json
 import re
 from collections import Counter, defaultdict
@@ -18,7 +17,8 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Callable, Iterable, Sequence
 
-from anki_tools.apkg.package import AnkiPackage
+from anki_tools.apkg import deck_writer
+from anki_tools.apkg.deck_writer import sha256_value
 from anki_tools.sentence_pack.audio import (
     NATIVE_LICENSE_BLOCK,
     PRIVATE_PACK,
@@ -294,15 +294,6 @@ def source_dump_date(checksums_path: Path = CHECKSUMS_PATH) -> str:
     return max(stamps) if stamps else ""
 
 
-def sha256_value(path: Path) -> str:
-    """Build the manifest hash value of a file.
-
-    :param path: File to hash.
-    :returns: ``sha256:`` followed by the hex digest.
-    """
-    return f"sha256:{hashlib.sha256(Path(path).read_bytes()).hexdigest()}"
-
-
 def read_rows(path: Path) -> list[dict[str, str]]:
     """Read a CSV file into row mappings.
 
@@ -538,21 +529,6 @@ def build_pack(
         if not Path(path).exists():
             raise FileNotFoundError(f"media file not found: {path}")
 
-    output.parent.mkdir(parents=True, exist_ok=True)
-    AnkiPackage.create(
-        output,
-        profile.deck_name,
-        fields=list(profile.fields),
-        cards=[card for _, _, card in used],
-        media_files=media,
-        model_name=profile.model_name,
-        question_format=templates.front,
-        answer_format=templates.back,
-        css=templates.css,
-        sort_field_index=profile.sort_field_index,
-        deck_description=profile.deck_description,
-    )
-
     packed_rows = [row for _, row, _ in used]
     manifest = build_manifest(
         profile,
@@ -564,9 +540,33 @@ def build_pack(
         pack_license=pack_license,
     )
     manifest["counts"]["no_target"] = no_target
-    manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    manifest_path.write_text(
-        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    files = deck_writer.write_deck(
+        deck_writer.DeckWrite(
+            output_path=output,
+            shape=deck_writer.NoteTypeShape(
+                deck_name=profile.deck_name,
+                model_name=profile.model_name,
+                fields=profile.fields,
+                templates=((templates.front, templates.back),),
+                css=templates.css,
+                sort_field_index=profile.sort_field_index,
+                deck_description=profile.deck_description,
+            ),
+            cards=[
+                deck_writer.Card(
+                    values={k: v for k, v in card.items() if k != "tags"},
+                    tags=card.get("tags", []),
+                )
+                for _, _, card in used
+            ],
+            media=[
+                deck_writer.MediaFile(Path(path), Path(path).name)
+                for path in media
+            ],
+            manifest=manifest,
+            manifest_path=manifest_path,
+            manifest_files={"source_csv": word_csv, "sentences_csv": csv_path},
+        )
     )
     profile.attribution(
         packed_rows,
@@ -576,8 +576,8 @@ def build_pack(
     )
 
     return {
-        "output": str(output),
-        "manifest_path": str(manifest_path),
+        "output": str(files.output_path),
+        "manifest_path": str(files.manifest_path),
         "media_count": len(media),
         "skipped": skipped,
         "no_target": no_target,

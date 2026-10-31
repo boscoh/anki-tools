@@ -9,17 +9,15 @@ and the report layout once. The identity module names every artifact.
 from __future__ import annotations
 
 import csv
-import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping, Protocol, Sequence
 
-from anki_tools.apkg.shape import OutputShape, write_package
+from anki_tools.apkg import deck_writer
 from anki_tools.apkg.templates import TemplateSpec, assemble_templates
 from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.ranking.reorder import reorder_deck
-from anki_tools.sentence_pack.audit import sha256_value
 
 #: Columns of the rank CSV that ``reorder_deck`` reads.
 RANK_COLUMNS = ("rank", "note_id", "sentence", "kept")
@@ -108,24 +106,6 @@ def output_fields(profile: DeckProfile) -> tuple[str, ...]:
     return tuple(names)
 
 
-@dataclass(frozen=True)
-class SideTable:
-    """One side CSV of a run.
-
-    :param suffix: File suffix after the output stem, for example ``core.csv``.
-    :param columns: Column names, in file order.
-    :param rows: One row mapping per line.
-    """
-
-    suffix: str
-    columns: tuple[str, ...]
-    rows: Sequence[Mapping[str, Any]]
-
-    @property
-    def label(self) -> str:
-        """Give the manifest key of the file, for example ``core_csv``."""
-        return f"{self.suffix.split('.')[0]}_csv"
-
 
 @dataclass(frozen=True)
 class ManifestValues:
@@ -174,8 +154,8 @@ class DeckRun:
     identity: DeckIdentity
     input_path: Path
     values: Mapping[int, Sequence[str]]
-    card_table: SideTable
-    coverage_table: SideTable
+    card_table: deck_writer.SideTable
+    coverage_table: deck_writer.SideTable
     manifest: ManifestValues
     report: Sequence[tuple[str | None, str]]
     rank_rows: Sequence[tuple[int, int, str, int]] | None = None
@@ -184,75 +164,96 @@ class DeckRun:
     reserve_values: Callable[[Any], Sequence[str]] | None = None
 
 
-@dataclass(frozen=True)
-class RunFiles:
-    """The four files that the assembler writes.
-
-    :param output_path: Output APKG file.
-    :param card_csv: Card CSV file.
-    :param coverage_csv: Coverage CSV file.
-    :param manifest_path: Manifest JSON file.
-    :param rank_csv: Rank CSV file of a run that reorders, else None.
-    """
-
-    output_path: Path
-    card_csv: Path
-    coverage_csv: Path
-    manifest_path: Path
-    rank_csv: Path | None = None
-
-
-def write_run(run: DeckRun, profile: DeckProfile) -> RunFiles:
+def write_run(run: DeckRun, profile: DeckProfile) -> deck_writer.RunFiles:
     """Write the deck, the side files, the manifest, and the report of one run.
 
     The output shape of the package comes from the output identity and the
-    language hooks, so a mode states only the values that it alone knows.
+    language hooks, so a mode states only the values that it alone knows. The
+    core mode and the cull mode state a DeckRun, and this function is their
+    adapter over the deck writer.
 
     :param run: Selected cards and stated values of the run.
     :param profile: Language hooks of the run.
     :returns: The written paths.
     """
     identity = run.identity
-    output = identity.output_path
-    shape = OutputShape(
+    fields = output_fields(profile)
+    shape = deck_writer.NoteTypeShape(
         deck_name=identity.title,
         model_name=identity.model_name,
-        input_model_name=profile.input_model_name,
-        fields=output_fields(profile),
+        fields=fields,
         templates=deck_templates(profile),
         css=profile.card_css(),
+        input_model_name=profile.input_model_name,
     )
-    card_csv = identity.side(run.card_table.suffix)
-    coverage_csv = identity.side(run.coverage_table.suffix)
-    manifest_path = identity.side("manifest.json")
-    rank_csv = identity.side("rank.csv") if run.rank_rows is not None else None
-    package_args: dict[str, Any] = {
-        "reserve": run.reserve,
-        "reserve_pack_path": run.reserve_pack_path,
-        "reserve_values": run.reserve_values,
-    }
-    if rank_csv is not None:
-        write_rank_csv(run.rank_rows or (), rank_csv)
-        temporary = output.with_name(output.stem + ".tmp.apkg")
-        write_package(run.input_path, temporary, shape, run.values, **package_args)
-        reorder_deck(str(temporary), str(output), str(rank_csv))
-        temporary.unlink(missing_ok=True)
-    else:
-        write_package(run.input_path, output, shape, run.values, **package_args)
-    write_csv(run.card_table.columns, run.card_table.rows, card_csv)
-    write_csv(run.coverage_table.columns, run.coverage_table.rows, coverage_csv)
-    write_manifest(
-        manifest_path,
-        run,
-        files={
-            run.card_table.label: sha256_value(card_csv),
-            run.coverage_table.label: sha256_value(coverage_csv),
-            "input_apkg": sha256_value(run.input_path),
+    job = deck_writer.DeckWrite(
+        output_path=identity.output_path,
+        input_path=run.input_path,
+        shape=shape,
+        cards=[
+            deck_writer.Card(values=dict(zip(fields, values)), note_id=note_id)
+            for note_id, values in run.values.items()
+        ],
+        sides=(run.card_table, run.coverage_table),
+        manifest=manifest_payload(run),
+        manifest_path=identity.side("manifest.json"),
+        manifest_files={
+            run.card_table.label: identity.side(run.card_table.suffix),
+            run.coverage_table.label: identity.side(run.coverage_table.suffix),
+            "input_apkg": run.input_path,
         },
+        reserve=_reserve(run),
     )
-    files = RunFiles(output, card_csv, coverage_csv, manifest_path, rank_csv)
-    print_report(run.report, files)
+    files = _write_reordered(job, run)
+    deck_writer.print_run(run.report, files)
     return files
+
+
+def _reserve(run: DeckRun) -> deck_writer.ReserveCards | None:
+    """Give the reserve block of a run, or None when the run has none.
+
+    :param run: Selected cards and stated values of the run.
+    :raises RuntimeError: The run has reserve cards but no pack path or no
+        value callable.
+    """
+    if not run.reserve:
+        return None
+    if run.reserve_pack_path is None or run.reserve_values is None:
+        raise RuntimeError(
+            "A run with reserve cards needs a pack path and values."
+        )
+    return deck_writer.ReserveCards(
+        cards=run.reserve,
+        pack_path=run.reserve_pack_path,
+        values=run.reserve_values,
+    )
+
+
+def _write_reordered(
+    job: deck_writer.DeckWrite, run: DeckRun
+) -> deck_writer.RunFiles:
+    """Write the run, then reorder the deck when the run states a rank table.
+
+    :param job: Stated write of the run.
+    :param run: Selected cards and stated values of the run.
+    :returns: The written paths.
+    """
+    if run.rank_rows is None:
+        return deck_writer.write_deck(job)
+    rank_csv = run.identity.side("rank.csv")
+    write_rank_csv(run.rank_rows, rank_csv)
+    temporary = job.output_path.with_name(job.output_path.stem + ".tmp.apkg")
+    deck_writer.write_deck(
+        replace(job, output_path=temporary, sides=(), manifest=None)
+    )
+    reorder_deck(str(temporary), str(job.output_path), str(rank_csv))
+    temporary.unlink(missing_ok=True)
+    sides = deck_writer.write_sides(job)
+    return deck_writer.RunFiles(
+        output_path=job.output_path,
+        manifest_path=job.manifest_path,
+        sides=sides,
+    )
 
 
 def write_rank_csv(rows: Sequence[tuple[int, int, str, int]], path: Path) -> None:
@@ -270,30 +271,13 @@ def write_rank_csv(rows: Sequence[tuple[int, int, str, int]], path: Path) -> Non
             writer.writerow(row)
 
 
-def write_csv(
-    columns: Sequence[str], rows: Sequence[Mapping[str, Any]], path: Path
-) -> None:
-    """Write a CSV file with a fixed header.
 
-    :param columns: Column names, in file order.
-    :param rows: One row mapping per line.
-    :param path: Output CSV file.
-    """
-    target = Path(path)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    with target.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(columns))
-        writer.writeheader()
-        for row in rows:
-            writer.writerow(row)
-
-
-def manifest_payload(run: DeckRun, files: Mapping[str, str]) -> dict[str, Any]:
+def manifest_payload(run: DeckRun) -> dict[str, Any]:
     """Give the manifest payload of a run, in its stated key order.
 
     :param run: Selected cards and stated values of the run.
-    :param files: ``sha256:`` values of the output files.
-    :returns: The manifest object.
+    :returns: The manifest object, with an empty ``files`` block that the deck
+        writer fills.
     """
     identity = run.identity
     values = run.manifest
@@ -308,7 +292,7 @@ def manifest_payload(run: DeckRun, files: Mapping[str, str]) -> dict[str, Any]:
         "params": {**values.params, "name": identity.title},
         "counts": dict(values.counts),
         "frequency": dict(values.frequency),
-        "files": dict(files),
+        "files": {},
     }
     if values.licenses is not None:
         payload["licenses"] = dict(values.licenses)
@@ -319,34 +303,4 @@ def manifest_payload(run: DeckRun, files: Mapping[str, str]) -> dict[str, Any]:
     return payload
 
 
-def write_manifest(path: Path, run: DeckRun, files: Mapping[str, str]) -> None:
-    """Write the manifest JSON of a run.
 
-    :param path: Output JSON file.
-    :param run: Selected cards and stated values of the run.
-    :param files: ``sha256:`` values of the output files.
-    """
-    target = Path(path)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(
-        json.dumps(manifest_payload(run, files), indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
-    )
-
-
-def print_report(lines: Sequence[tuple[str | None, str]], files: RunFiles) -> None:
-    """Print the summary of a run and the files that it wrote.
-
-    :param lines: Report lines of the mode.
-    :param files: The written paths.
-    """
-    for label, value in lines:
-        if label is None:
-            print(value)
-        else:
-            print(f"{label + ':':<21}{value}")
-    print()
-    print(f"wrote {files.output_path}")
-    print(f"wrote {files.card_csv}")
-    print(f"wrote {files.coverage_csv}")
-    print(f"wrote {files.manifest_path}")

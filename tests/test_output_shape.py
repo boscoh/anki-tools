@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+from anki_tools.apkg import deck_writer
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.shape import OutputShape, write_package
 from anki_tools.ranking.identity import DeckIdentity
@@ -129,3 +130,61 @@ def test_the_shape_holds_on_an_anki21b_fixture(tmp_path: Path) -> None:
     assert _config_field(row["config"] or b"", 1) == 0
     assert _config_field(row["config"] or b"", 2) == 1
     assert model["kind"] == 0
+
+
+def test_the_new_package_adapter_states_the_same_shape(tmp_path: Path) -> None:
+    output = tmp_path / "new.apkg"
+    files = deck_writer.write_deck(
+        deck_writer.DeckWrite(
+            output_path=output,
+            shape=deck_writer.NoteTypeShape(
+                deck_name="New Deck",
+                model_name="New Deck",
+                fields=FIELDS,
+                templates=TEMPLATES,
+                css=CSS,
+            ),
+            cards=[
+                deck_writer.Card(
+                    values={
+                        "Audio": "[sound:a.mp3]",
+                        "Sentence": "Le chat dort.",
+                        "English": "The cat sleeps.",
+                        "Core": "chat",
+                        "CoreGloss": "cat",
+                    }
+                )
+            ],
+        )
+    )
+
+    assert files.output_path == output
+    with AnkiPackage(output) as package:
+        model = next(iter(package.get_models(include_templates=True).values()))
+        cards = package.get_cards()
+    assert [field["name"] for field in model["flds"]] == list(FIELDS)
+    assert [(t["qfmt"], t["afmt"]) for t in model["tmpls"]] == list(TEMPLATES)
+    assert len(cards) == 1
+
+
+def test_the_edit_adapter_rejects_media(tmp_path: Path) -> None:
+    source = tmp_path / "input.apkg"
+    shutil.copy(build_contract_deck(tmp_path), source)
+
+    with pytest.raises(ValueError, match="media"):
+        deck_writer.write_deck(
+            deck_writer.DeckWrite(
+                output_path=tmp_path / "out.apkg",
+                input_path=source,
+                shape=deck_writer.NoteTypeShape(
+                    deck_name="Edited",
+                    model_name="Edited",
+                    fields=FIELDS,
+                    templates=TEMPLATES,
+                    css=CSS,
+                    input_model_name=ANKI2_INPUT_MODEL,
+                ),
+                cards=[],
+                media=[deck_writer.MediaFile(source, "a.mp3")],
+            )
+        )

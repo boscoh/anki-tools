@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from anki_tools import cli
-from anki_tools.cli import _content_field_order, _prune_outdated_audio
+from anki_tools import cli, swadesh_vocab
+from anki_tools.swadesh_vocab import _content_field_order, _prune_outdated_audio
 from anki_tools.languages.cantonese.profile import CANTONESE
 from anki_tools.sentence_pack import tatoeba as sentence_tatoeba
 
@@ -64,15 +64,19 @@ def test_content_field_order_keeps_the_transliteration() -> None:
 def test_vocab_deck_and_model_names(monkeypatch: pytest.MonkeyPatch) -> None:
     captured: dict[str, str] = {}
     monkeypatch.setattr(
-        cli, "_parse_vocab_entries", lambda _config: [{"english": "I", "french": "je"}]
+        swadesh_vocab,
+        "_parse_vocab_entries",
+        lambda _config: [{"english": "I", "french": "je"}],
     )
-    monkeypatch.setattr(cli, "_generate_audio_files", lambda *_args: None)
-    monkeypatch.setattr(cli, "_build_layout", lambda *_args: object())
+    monkeypatch.setattr(swadesh_vocab, "_generate_audio_files", lambda *_args: None)
+    monkeypatch.setattr(swadesh_vocab, "_build_layout", lambda *_args: object())
     monkeypatch.setattr(
-        cli, "_pack_apkg", lambda config, *_args: captured.update(config)
+        swadesh_vocab,
+        "_pack_apkg",
+        lambda config, *_args: captured.update(config),
     )
 
-    cli._build_apkg("french")
+    swadesh_vocab.build_vocab_deck("french")
 
     assert captured["deck_name"] == "Swadesh French Vocabulary"
     assert captured["model_name"] == "Swadesh French Vocabulary"

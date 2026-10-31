@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
 
+from anki_tools.apkg import deck_writer
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking import assemble
 from anki_tools.ranking.identity import DeckIdentity
@@ -79,10 +80,10 @@ def test_the_writer_states_the_shape_from_the_profile(
             identity=identity,
             input_path=source,
             values={kept_id: ["", "kat ser", "cat is big.", "kat", "cat"]},
-            card_table=assemble.SideTable(
+            card_table=deck_writer.SideTable(
                 "core.csv", ("note_id", "kept"), [{"note_id": kept_id, "kept": "1"}]
             ),
-            coverage_table=assemble.SideTable(
+            coverage_table=deck_writer.SideTable(
                 "coverage.csv", ("key", "status"), [{"key": "kat", "status": "covered"}]
             ),
             manifest=assemble.ManifestValues(
@@ -108,9 +109,9 @@ def test_the_writer_states_the_shape_from_the_profile(
         ]
     printed = capsys.readouterr().out
 
-    assert files.card_csv == identity.side("core.csv")
-    assert files.coverage_csv == identity.side("coverage.csv")
-    assert files.rank_csv is None
+    assert files.sides["core.csv"] == identity.side("core.csv")
+    assert files.sides["coverage.csv"] == identity.side("coverage.csv")
+    assert "rank.csv" not in files.sides
     assert manifest["source"] == {
         "input": str(source),
         "deck": identity.title,
