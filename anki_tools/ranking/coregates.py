@@ -23,6 +23,7 @@ from anki_tools.ranking.coreflow import (
     STATUSES,
     TARGET_SEPARATOR,
     UNCOVERABLE_STATUSES,
+    coverage_glosses,
     filter_core_cards,
     read_loanwords,
     read_output,
@@ -34,7 +35,6 @@ from anki_tools.ranking.gates import (
     core_word_problems,
     gate_audio as _gate_audio,
     gate_counts as _gate_counts,
-    gate_core_word,
     gate_identity,
     gate_kept_order as _gate_kept_order,
     gate_manifest_hashes as _gate_manifest_hashes,
@@ -59,18 +59,15 @@ __all__ = [
     "check_core",
     "core_word_problems",
     "gate_audio",
-    "gate_bold",
     "gate_card_count",
     "gate_core_word",
     "gate_counts",
     "gate_coverage",
     "gate_covered1",
-    "gate_covered2",
     "gate_filter",
     "gate_hashes",
     "gate_hit",
     "gate_identity",
-    "gate_names",
     "gate_order",
     "gate_outside",
     "gate_output_model",
@@ -145,20 +142,6 @@ def gate_covered1(files: CoreFiles) -> tuple[bool, str]:
     ok = covered == targets
     return ok, f"covered {covered} of {targets}"
 
-
-def gate_covered2(files: CoreFiles) -> tuple[bool, str]:
-    """K3: report the share of coverable targets with two cards.
-
-    The share measures the input deck, not the build. A target needs a card
-    whose English holds the gloss, and a small deck cannot supply two. The
-    selection takes as many as the pool allows, so the gate reports the share
-    and does not fail on it.
-    """
-    coverage = files.coverage()
-    covered = sum(1 for row in coverage if int(row["count"]) >= 2)
-    targets = sum(1 for row in coverage if row["status"] not in UNCOVERABLE_STATUSES)
-    share = covered / targets if targets else 0.0
-    return True, f"two cards for {covered} of {targets} ({share:.3f})"
 
 
 def gate_outside(files: CoreFiles) -> tuple[bool, str]:
@@ -327,8 +310,12 @@ def _bold_text(text: str) -> str:
     return text[start + 3 : end]
 
 
-def gate_bold(files: CoreFiles) -> tuple[bool, str]:
-    """K15: the bold text is the assigned target, inside the sentence."""
+def _bold_target_problems(files: CoreFiles) -> tuple[list[str], int]:
+    """Give the bold-target problems of the kept notes and the bold count.
+
+    :param files: Reader of the output files.
+    :returns: One problem line per fault, and the count of notes with a bold.
+    """
     manifest = files.manifest()
     params = manifest["params"]
     notes = files.notes()
@@ -360,8 +347,18 @@ def gate_bold(files: CoreFiles) -> tuple[bool, str]:
         and bolded + manifest["counts"].get("unbolded", 0) != len(_kept(files))
     ):
         bad.append("bold count")
-    return not bad, f"{bolded} bold card(s), issues {_sample(bad)}"
+    return bad, bolded
 
+
+def gate_core_word(files: CoreFiles) -> tuple[bool, str]:
+    """K19: every note holds a core word, its coverage gloss, and the bold target."""
+    problems, filled = core_word_problems(
+        files.notes(), files.fields(), coverage_glosses(files.coverage())
+    )
+    bold_problems, bolded = _bold_target_problems(files)
+    problems += bold_problems
+    message = f"{filled} core word(s), {bolded} bold card(s), {len(problems)} bad"
+    return not problems, f"{message}: {_sample(problems)}"
 
 def gate_sense(files: CoreFiles) -> tuple[bool, str]:
     """K16: the unchecked targets stay inside the limit."""
@@ -378,16 +375,6 @@ def gate_unranked(files: CoreFiles) -> tuple[bool, str]:
     return count <= limit, f"{count} unranked, limit {limit}"
 
 
-def gate_names(files: CoreFiles) -> tuple[bool, str]:
-    """K17: report the rejected name and loan word cards.
-
-    The gate reports only. K5 holds the kept cards to rules C3 and C4.
-    """
-    counts = files.manifest()["counts"]
-    names = int(counts.get("rejected_c3", 0))
-    loans = int(counts.get("rejected_c4", 0))
-    return True, f"rejected {names} name card(s), {loans} loan word card(s)"
-
 
 def gate_tail(files: CoreFiles) -> tuple[bool, str]:
     """K18: every tail card brings a new content lemma."""
@@ -402,7 +389,6 @@ def gate_tail(files: CoreFiles) -> tuple[bool, str]:
 GATES: tuple[Gate, ...] = (
     Gate("K1", gate_card_count),
     Gate("K2", gate_covered1),
-    Gate("K3", gate_covered2),
     Gate("K4", gate_outside),
     Gate("K5", gate_filter),
     Gate("K6", gate_similarity),
@@ -414,9 +400,7 @@ GATES: tuple[Gate, ...] = (
     Gate("K12", gate_hashes),
     Gate("K13", gate_hit),
     Gate("K14", gate_templates),
-    Gate("K15", gate_bold),
     Gate("K16", gate_sense),
-    Gate("K17", gate_names),
     Gate("K18", gate_tail),
     Gate("K19", gate_core_word),
     Gate("K20", gate_unranked),

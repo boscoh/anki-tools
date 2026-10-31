@@ -501,16 +501,24 @@ class TestCoverageFile:
         assert manifest["counts"]["absent"] == 1
         assert manifest["counts"]["targets"] == len(rows) - 1
 
-    def test_the_cover_gates_skip_the_absent_target(self, tmp_path: Path) -> None:
+    def test_the_cover_gate_skips_the_absent_target(self, tmp_path: Path) -> None:
         _run, output, profile = _absent_core(tmp_path)
         files = coregates.CoreFiles(output, profile)
 
         passed, message = coregates.gate_covered1(files)
-        _ok, share = coregates.gate_covered2(files)
 
         assert passed, message
         assert message == "covered 1 of 1"
-        assert share == "two cards for 0 of 1 (0.000)"
+
+    def test_the_report_shows_the_two_card_share(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        _absent_core(tmp_path)
+
+        shown = capsys.readouterr().out
+
+        assert "Covered twice:" in shown
+        assert "0 of 1 (0.000)" in shown
 
 
 def _tiny_deck(tmp_path: Path) -> Path:
@@ -738,6 +746,26 @@ class TestCardDesign:
             "<b>" in values[sentence_index] for values in notes.values()
         )
 
+    def test_the_core_word_gate_fails_on_a_bold_without_a_target(
+        self, tmp_path: Path
+    ) -> None:
+        _run, output, profile = _run_core(tmp_path)
+        core_csv, _coverage, _manifest, _rank = DeckIdentity(output).core_sides()
+        with core_csv.open(encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            names = list(reader.fieldnames or [])
+            rows = list(reader)
+        rows[0]["assigned"] = ""
+        with core_csv.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=names)
+            writer.writeheader()
+            writer.writerows(rows)
+
+        passed, message = gate_core_word(coregates.CoreFiles(output, profile))
+
+        assert not passed
+        assert "bold without a target" in message
+
     def test_the_gloss_gate_fails_on_a_missing_gloss(self, tmp_path: Path) -> None:
         _run, output, profile = _run_core(tmp_path)
         with AnkiPackage(output) as package:
@@ -765,19 +793,15 @@ class TestCardDesign:
         assert not passed
         assert "is not the coverage gloss" in message
 
-    def test_the_name_gate_reports_the_rejected_name_count(
-        self, tmp_path: Path
+    def test_the_report_shows_the_rejected_name_counts(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
     ) -> None:
-        _run, output, profile = _run_core(tmp_path)
-        _core, _coverage, manifest_path, _rank = DeckIdentity(output).core_sides()
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        manifest["counts"]["rejected_c3"] = 1
-        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        _run_core(tmp_path)
 
-        passed, message = coregates.gate_names(coregates.CoreFiles(output, profile))
+        shown = capsys.readouterr().out
 
-        assert passed
-        assert "1 name card(s)" in message
+        assert "Rejected names:" in shown
+        assert "Rejected loan words:" in shown
 
     def test_a_kept_card_without_a_core_word_leaves_the_deck(
         self, tmp_path: Path

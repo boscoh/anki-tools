@@ -1196,7 +1196,6 @@ def cantonese_gates() -> tuple[tuple[str, Any], ...]:
         gate_review_file,
         gate_sentence_audio,
         gate_similarity,
-        gate_target_in_table,
         gate_target_once,
         gate_targets_in_table,
         gate_unique_forms,
@@ -1223,7 +1222,6 @@ def cantonese_gates() -> tuple[tuple[str, Any], ...]:
         ("G16", gate_word_audio),
         ("G17", gate_jyutping),
         ("G18", gate_native_license),
-        ("G19", gate_target_in_table),
         ("G20", gate_no_false_friend),
         ("G21", gate_no_sense_mismatch),
     )

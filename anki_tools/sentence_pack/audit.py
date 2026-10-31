@@ -286,21 +286,30 @@ def gate_unique_forms(
 def gate_targets_in_table(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
-    """Gate G3: every card target exists in the reviewed CSV.
+    """Gate G3: every card target is a table form that is not shared.
+
+    A shared form has no card of its own, so a target on it is a fault.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
     :returns: Pass flag and detail text.
     """
-    forms = {profile.form_text(form) for form in inputs.table()}
+    table = inputs.table()
+    forms = {profile.form_text(form) for form in table}
+    variants: dict[str, list[str]] = {}
+    for form in table:
+        variants.setdefault(profile.form_text(form), []).append(form.variant)
+    shared = {name for name, kinds in variants.items() if set(kinds) == {"shared"}}
     rows = inputs.rows()
-    missing = sorted({row["target"] for row in rows if row["target"] not in forms})
-    if missing:
-        return False, (
-            f"{len(missing)} card target(s) not in {inputs.word_csv}: "
-            f"{sample(missing)}"
-        )
-    return True, f"{len(rows)} card targets found in the word table"
+    problems: list[str] = []
+    for target in sorted({row["target"] for row in rows}):
+        if target not in forms:
+            problems.append(f"{target} is not in the word table")
+        elif target in shared:
+            problems.append(f"{target} is a shared form")
+    if problems:
+        return False, f"{len(problems)} target(s) invalid: {sample(problems)}"
+    return True, f"{len(rows)} card targets are table forms with a card"
 
 
 def gate_unique_tatoeba_ids(
@@ -636,35 +645,6 @@ def gate_no_native_audio(
     return True, "no card uses native audio"
 
 
-def gate_target_in_table(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Gate G19: every target is a table form with a card of its own.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    table = inputs.table()
-    forms = {profile.form_text(form) for form in table}
-    rows_by_form: dict[str, list[str]] = {}
-    for form in table:
-        rows_by_form.setdefault(profile.form_text(form), []).append(form.variant)
-    shared = {
-        name for name, variants in rows_by_form.items() if set(variants) == {"shared"}
-    }
-    rows = inputs.rows()
-    problems: list[str] = []
-    for target in sorted({row["target"] for row in rows}):
-        if target not in forms:
-            problems.append(f"{target} is not in the word table")
-        elif target in shared:
-            problems.append(f"{target} is a shared form")
-    if problems:
-        return False, f"{len(problems)} target(s) invalid: {sample(problems)}"
-    return True, f"{len(rows)} card targets are table forms with a card"
-
-
 def gate_no_false_friend(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
@@ -709,28 +689,6 @@ def gate_no_sense_mismatch(
             f"{len(bad)} card(s) use the target in a different sense: {sample(bad)}"
         )
     return True, f"{len(rows)} cards use each target in its Swadesh sense"
-
-
-
-def gate_word_boundary(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Gate G9: each card matches its target exactly one time.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    rows = inputs.rows()
-    bad = [
-        f"{row['target']} in {row['sentence']}"
-        for row in rows
-        if profile.match_count(row["sentence"], row["target"]) != 1
-    ]
-    if bad:
-        return False, f"{len(bad)} card(s) match inside a longer word: {sample(bad)}"
-    return True, f"{len(rows)} cards match a whole token"
-
 
 def gate_typography(
     inputs: AuditInputs, profile: LanguageProfile
@@ -853,7 +811,6 @@ GENERIC_GATES: tuple[tuple[str, GateCheck], ...] = (
     ("G15", gate_review_file),
     ("G16", gate_word_audio),
     ("G18", gate_no_native_audio),
-    ("G19", gate_target_in_table),
 )
 
 

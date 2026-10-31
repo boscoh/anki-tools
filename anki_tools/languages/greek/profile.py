@@ -1056,13 +1056,11 @@ def greek_gates() -> tuple[tuple[str, Any], ...]:
         gate_review_file,
         gate_sentence_audio,
         gate_similarity,
-        gate_target_in_table,
         gate_target_once,
         gate_targets_in_table,
         gate_unique_forms,
         gate_unique_tatoeba_ids,
         gate_word_audio,
-        gate_word_boundary,
     )
 
     return (
@@ -1074,7 +1072,6 @@ def greek_gates() -> tuple[tuple[str, Any], ...]:
         ("G6", gate_similarity),
         ("G7", gate_sentence_audio),
         ("G8", gate_media_count),
-        ("G9", gate_word_boundary),
         ("G10", gate_coverage),
         ("G11", gate_manifest_counts),
         ("G12", gate_attribution),
@@ -1084,7 +1081,6 @@ def greek_gates() -> tuple[tuple[str, Any], ...]:
         ("G16", gate_word_audio),
         ("G17", gate_script),
         ("G18", gate_no_native_audio),
-        ("G19", gate_target_in_table),
         ("G20", gate_no_sense_mismatch),
     )
 

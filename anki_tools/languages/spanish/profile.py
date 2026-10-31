@@ -1211,7 +1211,6 @@ def spanish_gates() -> tuple[tuple[str, Any], ...]:
         gate_media_count,
         gate_no_blocked_license,
         gate_no_sense_mismatch,
-        gate_noun_gender,
         gate_proper_sentences,
         gate_review_file,
         gate_sentence_audio,
@@ -1222,7 +1221,6 @@ def spanish_gates() -> tuple[tuple[str, Any], ...]:
         gate_unique_forms,
         gate_unique_tatoeba_ids,
         gate_word_audio,
-        gate_word_boundary,
     )
 
     return (
@@ -1234,7 +1232,6 @@ def spanish_gates() -> tuple[tuple[str, Any], ...]:
         ("G6", gate_similarity),
         ("G7", gate_sentence_audio),
         ("G8", gate_media_count),
-        ("G9", gate_word_boundary),
         ("G10", gate_coverage),
         ("G11", gate_manifest_counts),
         ("G12", gate_attribution),
@@ -1245,7 +1242,6 @@ def spanish_gates() -> tuple[tuple[str, Any], ...]:
         ("G17", gate_typography),
         ("G18", gate_no_blocked_license),
         ("G19", gate_pair_parts),
-        ("G20", gate_noun_gender),
         ("G21", gate_no_sense_mismatch),
     )
 

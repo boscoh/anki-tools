@@ -1120,14 +1120,20 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
     report += [
         (f"  Rejected {rule}", str(filtered[rule]))
         for rule in FILTER_KEYS
-        if filtered[rule]
+        if filtered[rule] and rule not in ("C3", "C4")
     ]
+    coverable = sum(
+        1 for row in coverage_rows if row["status"] not in UNCOVERABLE_STATUSES
+    )
+    share = counts["covered2"] / coverable if coverable else 0.0
     report += [
+        ("Rejected names", str(counts["rejected_c3"])),
+        ("Rejected loan words", str(counts["rejected_c4"])),
         ("Targets", str(len(targets))),
         ("Quota total", str(sum(quotas.values()))),
         ("Cards", str(len(kept))),
         ("Covered once", str(counts["covered1"])),
-        ("Covered twice", str(counts["covered2"])),
+        ("Covered twice", f"{counts['covered2']} of {coverable} ({share:.3f})"),
         ("Outside lemmas", str(counts["outside"])),
         ("Rare outside", str(counts["outside_rare"])),
         ("Unchecked", str(counts["unchecked"])),
