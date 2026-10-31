@@ -1,0 +1,7 @@
+# Names removed from the target list of the Mandarin core deck.
+# One name per line, lowercase. See specs/core-deck-all-languages.md section 8.
+# The deck holds no Latin name and almost no Chinese personal name: a scan of
+# the 5009 notes of "Neri's Chinese Sents Part 2.apkg" found 希德 (Sid) twice
+# and no other name. Rule C3 matches a Han name as a character span, so a name
+# with no occurrence costs nothing.
+希德

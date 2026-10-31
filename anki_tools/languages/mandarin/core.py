@@ -65,7 +65,7 @@ from anki_tools.languages.mandarin.profile import (
     load_word_table,
     tokens_with_pos,
 )
-from anki_tools.ranking import coreflow
+from anki_tools.ranking import coreflow, cullflow
 from anki_tools.ranking.core import CoreOptions
 from anki_tools.ranking.deckprofile import LanguageDeckProfile
 from anki_tools.apkg.templates import load_css
@@ -77,6 +77,7 @@ AUDIO_FIELD = "[a]"
 
 SENSE_PATH = Path("vocab/mandarin_core_senses.tsv")
 LOAN_PATH = Path("vocab/mandarin_loanwords.txt")
+NAMES_PATH = Path("vocab/mandarin_names.txt")
 
 # The reviewed tier F word count of the deck. Every row of
 # vocab/mandarin_core_senses.tsv holds a sense, so the 50 targets are checked.
@@ -209,8 +210,11 @@ def frequency_ranks(
 
 
 def read_names() -> set[str]:
-    """Give an empty Mandarin name stoplist."""
-    return set()
+    """Read the Mandarin name stoplist of rule C3.
+
+    :returns: Names from the file, empty when the file is missing.
+    """
+    return cullflow.read_names(NAMES_PATH, optional=True)
 
 
 def word_table() -> list[tuple[int, str, str]]:

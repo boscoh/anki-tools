@@ -7,6 +7,7 @@ S3:它,它,he/she/it/they (singular),S,5,2,2,covered
 S4:我们,我们,we,S,6,2,2,covered
 S5:你们,你们,you (plural),S,7,2,2,covered
 S6:他们,他们,they (plural),S,8,2,2,covered
+S6:她们,她们,they (plural),S,9,0,0,absent
 S7:这,这,this,S,10,2,2,covered
 S8:那,那,that,S,11,2,2,covered
 S9:这里,这里,here,S,12,2,2,covered
@@ -17,77 +18,197 @@ S13:哪里,哪里,where,S,16,2,2,covered
 S14:什么时候,什么时候,when,S,17,2,2,covered
 S15:怎么,怎么,how,S,18,2,2,covered
 S16:不,不,not,S,19,2,2,covered
+S17:所有,所有,all,S,20,0,0,absent
 S18:多,多,many,S,21,2,2,covered
+S19:一些,一些,some,S,22,0,0,absent
 S20:少,少,few,S,23,2,0,absent_sense
+S21:其他,其他,other,S,24,0,0,absent
 S22:一,一,one,S,25,2,2,covered
+S23:二,二,two,S,26,0,0,absent
 S24:三,三,three,S,27,2,1,partial
+S25:四,四,four,S,28,0,0,absent
+S26:五,五,five,S,29,0,0,absent
 S27:大,大,big,S,30,2,2,covered
 S28:长,长,long,S,31,2,0,absent_sense
+S29:宽,宽,wide,S,32,0,0,absent
+S30:厚,厚,thick,S,33,0,0,absent
 S31:重,重,heavy,S,34,2,0,absent_sense
 S32:小,小,small,S,35,2,0,absent_sense
+S33:短,短,short,S,36,0,0,absent
+S34:窄,窄,narrow,S,37,0,0,absent
+S35:薄,薄,thin,S,38,0,0,absent
+S36:女人,女人,woman,S,39,0,0,absent
+S37:男人,男人,man,S,40,0,0,absent
 S38:人,人,human being,S,41,2,1,partial
 S39:孩子,孩子,child,S,42,2,2,covered
 S40:妻子,妻子,wife,S,43,2,1,partial
+S41:丈夫,丈夫,husband,S,44,0,0,absent
 S42:妈妈,妈妈,mother,S,45,2,2,covered
 S43:爸爸,爸爸,father,S,46,2,2,covered
+S44:动物,动物,animal,S,47,0,0,absent
+S45:鱼,鱼,fish,S,48,0,0,absent
+S46:鸟,鸟,bird,S,49,0,0,absent
+S47:狗,狗,dog,S,50,0,0,absent
+S48:虱子,虱子,louse,S,51,0,0,absent
+S49:蛇,蛇,snake,S,52,0,0,absent
+S50:虫子,虫子,worm,S,53,0,0,absent
+S51:树,树,tree,S,54,0,0,absent
+S52:森林,森林,forest,S,55,0,0,absent
+S53:棍子,棍子,stick,S,56,0,0,absent
+S54:水果,水果,fruit,S,57,0,0,absent
+S55:种子,种子,seed,S,58,0,0,absent
+S56:叶子,叶子,leaf,S,59,0,0,absent
+S57:根,根,root,S,60,0,0,absent
+S58:树皮,树皮,tree bark,S,61,0,0,absent
+S59:花,花,flower,S,62,0,0,absent
+S60:草,草,grass,S,63,0,0,absent
+S61:绳子,绳子,rope,S,64,0,0,absent
+S62:皮肤,皮肤,skin,S,65,0,0,absent
+S63:肉,肉,meat,S,66,0,0,absent
 S64:血,血,blood,S,67,2,1,partial
+S65:骨头,骨头,bone,S,68,0,0,absent
+S66:脂肪,脂肪,fat (noun),S,69,0,0,absent
 S67:蛋,蛋,egg,S,70,2,0,absent_sense
+S68:角,角,horn,S,71,0,0,absent
+S69:尾巴,尾巴,tail,S,72,0,0,absent
+S70:羽毛,羽毛,feather,S,73,0,0,absent
+S71:头发,头发,hair,S,74,0,0,absent
+S72:头,头,head,S,75,0,0,absent
+S73:耳朵,耳朵,ear,S,76,0,0,absent
 S74:眼睛,眼睛,eye,S,77,2,2,covered
+S75:鼻子,鼻子,nose,S,78,0,0,absent
 S76:嘴,嘴,mouth,S,79,2,1,partial
+S77:牙齿,牙齿,tooth,S,80,0,0,absent
+S78:舌头,舌头,tongue,S,81,0,0,absent
+S79:指甲,指甲,fingernail,S,82,0,0,absent
+S80:脚,脚,foot,S,83,0,0,absent
+S81:腿,腿,leg,S,84,0,0,absent
+S82:膝盖,膝盖,knee,S,85,0,0,absent
 S83:手,手,hand,S,86,2,2,covered
+S84:翅膀,翅膀,wing,S,87,0,0,absent
+S85:肚子,肚子,belly,S,88,0,0,absent
+S86:肠子,肠子,guts,S,89,0,0,absent
+S87:脖子,脖子,neck,S,90,0,0,absent
+S88:背,背,back,S,91,0,0,absent
+S89:乳房,乳房,breast,S,92,0,0,absent
 S90:心,心,heart,S,93,2,0,absent_sense
+S91:肝,肝,liver,S,94,0,0,absent
 S92:喝,喝,to drink,S,95,2,2,covered
 S93:吃,吃,to eat,S,96,2,2,covered
+S94:咬,咬,to bite,S,97,0,0,absent
 S95:吸,吸,to suck,S,98,2,0,absent_sense
 S96:吐,吐,to spit,S,99,2,0,absent_sense
+S97:呕吐,呕吐,to vomit,S,100,0,0,absent
+S98:吹,吹,to blow,S,101,0,0,absent
 S99:呼吸,呼吸,to breathe,S,102,2,2,covered
 S100:笑,笑,to laugh,S,103,2,2,covered
 S101:看,看,to see,S,104,2,2,covered
 S102:听,听,to hear,S,105,2,2,covered
 S103:知道,知道,to know,S,106,2,2,covered
 S104:想,想,to think,S,107,2,2,covered
+S105:闻,闻,to smell,S,108,0,0,absent
 S106:怕,怕,to fear,S,109,2,2,covered
 S107:睡觉,睡觉,to sleep,S,110,2,2,covered
 S108:活,活,to live,S,111,2,1,partial
 S109:死,死,to die,S,112,2,2,covered
 S110:杀,杀,to kill,S,113,2,2,covered
+S111:打架,打架,to fight,S,114,0,0,absent
+S112:打猎,打猎,to hunt,S,115,0,0,absent
 S113:打,打,to hit,S,116,2,2,covered
+S114:切,切,to cut,S,117,0,0,absent
+S115:分开,分开,to split,S,118,0,0,absent
+S116:刺,刺,to stab,S,119,0,0,absent
+S117:抓,抓,to scratch,S,120,0,0,absent
+S118:挖,挖,to dig,S,121,0,0,absent
 S119:游泳,游泳,to swim,S,122,2,1,partial
+S120:飞,飞,to fly,S,123,0,0,absent
 S121:走,走,to walk,S,124,2,0,absent_sense
 S122:来,来,to come,S,125,2,2,covered
+S123:躺,躺,to lie down,S,126,0,0,absent
 S124:坐,坐,to sit,S,127,2,2,covered
 S125:站,站,to stand,S,128,2,0,absent_sense
 S126:转,转,to turn (intransitive),S,129,2,2,covered
 S127:掉,掉,to fall,S,130,2,0,absent_sense
 S128:给,给,to give,S,131,2,2,covered
 S129:拿,拿,to hold,S,132,2,2,covered
+S130:挤,挤,to squeeze,S,133,0,0,absent
+S131:揉,揉,to rub,S,134,0,0,absent
+S132:洗,洗,to wash,S,135,0,0,absent
 S133:擦,擦,to wipe,S,136,2,0,absent_sense
+S134:拉,拉,to pull,S,137,0,0,absent
+S135:推,推,to push,S,138,0,0,absent
+S136:扔,扔,to throw,S,139,0,0,absent
+S137:绑,绑,to tie,S,140,0,0,absent
+S138:缝,缝,to sew,S,141,0,0,absent
 S139:数,数,to count,S,142,2,1,partial
 S140:说,说,to say,S,143,2,2,covered
+S141:唱,唱,to sing,S,144,0,0,absent
 S142:玩,玩,to play,S,145,2,2,covered
+S143:浮,浮,to float,S,146,0,0,absent
 S144:流,流,to flow,S,147,2,0,absent_sense
+S145:冻,冻,to freeze,S,148,0,0,absent
+S146:肿,肿,to swell,S,149,0,0,absent
+S147:太阳,太阳,sun,S,150,0,0,absent
+S148:月亮,月亮,moon,S,151,0,0,absent
+S149:星星,星星,star,S,152,0,0,absent
+S150:水,水,water,S,153,0,0,absent
+S151:雨,雨,rain,S,154,0,0,absent
+S152:河,河,river,S,155,0,0,absent
+S153:湖,湖,lake,S,156,0,0,absent
+S154:海,海,sea,S,157,0,0,absent
+S155:盐,盐,salt,S,158,0,0,absent
+S156:石头,石头,stone,S,159,0,0,absent
+S157:沙,沙,sand,S,160,0,0,absent
+S158:灰尘,灰尘,dust,S,161,0,0,absent
+S159:土,土,earth,S,162,0,0,absent
+S160:云,云,cloud,S,163,0,0,absent
+S161:雾,雾,fog,S,164,0,0,absent
 S162:天,天,sky,S,165,2,0,absent_sense
+S163:风,风,wind,S,166,0,0,absent
+S164:雪,雪,snow,S,167,0,0,absent
+S165:冰,冰,ice,S,168,0,0,absent
 S166:烟,烟,smoke,S,169,2,0,absent_sense
 S167:火,火,fire,S,170,2,2,covered
+S168:灰,灰,ash,S,171,0,0,absent
 S169:烧,烧,to burn,S,172,2,1,partial
+S170:路,路,road,S,173,0,0,absent
+S171:山,山,mountain,S,174,0,0,absent
+S172:红,红,red,S,175,0,0,absent
+S173:绿,绿,green,S,176,0,0,absent
+S174:黄,黄,yellow,S,177,0,0,absent
 S175:白,白,white,S,178,2,0,absent_sense
+S176:黑,黑,black,S,179,0,0,absent
 S177:晚上,晚上,night,S,180,2,0,absent_sense
+S178:白天,白天,day,S,181,0,0,absent
 S179:年,年,year,S,182,2,0,absent_sense
+S180:暖和,暖和,warm,S,183,0,0,absent
 S181:冷,冷,cold,S,184,2,2,covered
+S182:满,满,full,S,185,0,0,absent
 S183:新,新,new,S,186,2,1,partial
 S184:老,老,old,S,187,2,1,partial
+S184:旧,旧,old,S,188,0,0,absent
 S185:好,好,good,S,189,2,2,covered
 S186:坏,坏,bad,S,190,2,0,absent_sense
+S187:烂,烂,rotten,S,191,0,0,absent
+S188:脏,脏,dirty,S,192,0,0,absent
 S189:直,直,straight,S,193,2,0,absent_sense
+S190:圆,圆,round,S,194,0,0,absent
+S191:锋利,锋利,sharp,S,195,0,0,absent
+S192:钝,钝,dull,S,196,0,0,absent
+S193:滑,滑,smooth,S,197,0,0,absent
+S194:湿,湿,wet,S,198,0,0,absent
 S195:干,干,dry,S,199,2,0,absent_sense
 S196:对,对,correct,S,200,2,2,covered
 S197:近,近,near,S,201,2,2,covered
 S198:远,远,far,S,202,2,1,partial
+S199:右,右,right,S,203,0,0,absent
+S200:左,左,left,S,204,0,0,absent
 S201:在,在,at,S,205,2,1,partial
 S202:里,里,in,S,206,2,0,absent_sense
 S203:跟,跟,with,S,207,2,2,covered
 S204:和,和,and,S,208,2,0,absent_sense
 S205:如果,如果,if,S,209,2,2,covered
+S206:因为,因为,because,S,210,0,0,absent
 S207:名字,名字,name,S,211,2,2,covered
 F:没有,没有,no,F,212,2,2,covered
 F:这个,这个,this,F,213,2,2,covered

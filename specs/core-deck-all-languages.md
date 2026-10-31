@@ -228,6 +228,12 @@ Every language also needs a deck with a usable English field. The French deck
 has one. The Spanish deck at `apkg/Spanish 9000 sentences with native audio.apkg`
 has one. Check the other decks before a build.
 
+Rule C3 reads the name stoplist of its language: `vocab/french_names.txt`
+holds 202 names, `vocab/cantonese_names.tsv` holds 5, and
+`vocab/mandarin_names.txt` holds 1. `vocab/mandarin_names.txt` is small
+because the Mandarin deck holds almost no personal name: a scan of its 5009
+notes found 希德 (Sid) twice and no other. Spanish has no name list yet.
+
 ### 8.1 Frequency source
 
 | Language | Primary                | Fallback                    | License                   |
