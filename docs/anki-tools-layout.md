@@ -12,6 +12,7 @@ lives in one directory only.
 | `anki_tools/cache.py`        | Download a file into the cache                   |
 | `anki_tools/preview.py`      | Build the browser preview of the card templates  |
 | `anki_tools/preview_apkg.py` | Build the browser preview of a package's cards   |
+| `anki_tools/gates.py`        | The gate contract below both packages            |
 
 `anki preview` writes one HTML page and no package. The preview flow therefore
 has no audit and no gate table. It renders templates and packages; it writes no
@@ -45,7 +46,7 @@ Shared ranking code only. No language data.
 | `anki_tools/ranking/core.py`      | Core-word value, cost, passes, and order              |
 | `anki_tools/ranking/identity.py`  | The output stem, deck title, note type, and side paths |
 | `anki_tools/ranking/assemble.py`  | The deck, the side files, the manifest, and the report |
-| `anki_tools/ranking/gates.py`     | The gate runner, the report, and the shared gates     |
+| `anki_tools/ranking/gates.py`     | The report and the shared checks                      |
 | `anki_tools/ranking/deckprofile.py` | One language deck profile with two mode views      |
 | `anki_tools/ranking/fixrun.py`    | The one route of the four fix commands                |
 | `anki_tools/ranking/cullflow.py`  | Cull flow behind the `CullProfile` seam               |
@@ -114,6 +115,8 @@ audio directory.
   holds language code.
 - `sentence_pack` and `ranking` hold the shared stages and the shared scores.
   They import no language package.
+- `gates.py` holds the gate contract below both packages. It imports neither
+  `ranking` nor `sentence_pack`, so either package can import it.
 - `apkg` holds the file model and the template resources. It imports no
   language package.
 - `cache.py` holds the download helper that fills the XDG cache. It imports

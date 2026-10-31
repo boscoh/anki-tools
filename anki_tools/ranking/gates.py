@@ -1,7 +1,8 @@
 """One gate table for the core and cull modes.
 
-The runner, the report, and the shared gates live here. Each mode supplies a
-file reader, so :class:`anki_tools.ranking.coregates.CoreFiles` and
+The gate value, the runner, and the file reader contract live in
+:mod:`anki_tools.gates`. The report and the shared checks live here. Each mode
+supplies a file reader, so :class:`anki_tools.ranking.coregates.CoreFiles` and
 :class:`anki_tools.ranking.cullgates.CullFiles` are the two adapters across the
 seam. A gate never writes a file. The gate numbers stay stable.
 
@@ -13,10 +14,10 @@ from __future__ import annotations
 
 import csv
 import json
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Mapping, NamedTuple, Protocol, Sequence
+from typing import Any, Mapping, Sequence
 
+from anki_tools.gates import Gate, GateFiles, GateResult, run_gates  # noqa: F401
 from anki_tools.ranking.assemble import output_fields
 from anki_tools.ranking.coreflow import (
     OUTPUT_CORE_FIELD,
@@ -28,98 +29,6 @@ from anki_tools.sentence_pack.audit import print_audit
 
 #: Items of a failure message before the rest become a count.
 SAMPLE = 3
-
-
-class GateResult(NamedTuple):
-    """Result of one gate.
-
-    :param name: Gate label, for example ``K1``.
-    :param passed: True when the gate accepts the files.
-    :param message: Detail line of the gate table.
-    """
-
-    name: str
-    passed: bool
-    message: str
-
-
-class GateFiles(Protocol):
-    """Contract of the file reader that the gates read.
-
-    A read error is cached and re-raised for each gate that needs the file.
-    """
-
-    @property
-    def profile(self) -> Any:
-        """Give the language hooks of the run."""
-        ...
-
-    def rows(self) -> list[dict[str, str]]:
-        """Read the card CSV rows."""
-        ...
-
-    def coverage(self) -> list[dict[str, str]]:
-        """Read the coverage CSV rows."""
-        ...
-
-    def manifest(self) -> dict[str, Any]:
-        """Read the manifest object."""
-        ...
-
-    def params(self) -> dict[str, Any]:
-        """Read the run options of the manifest."""
-        ...
-
-    def output(self) -> dict[str, Any]:
-        """Read the output APKG."""
-        ...
-
-    def notes(self) -> dict[int, list[str]]:
-        """Read the note fields of the output deck, keyed by note id."""
-        ...
-
-    def fields(self) -> list[str]:
-        """Read the field names of the only note type."""
-        ...
-
-
-@dataclass(frozen=True)
-class Gate:
-    """One gate value built from a ``(passed, message)`` check function.
-
-    :param name: Gate label, for example ``K1``.
-    :param check: Check that gives ``(passed, message)`` for the files.
-    """
-
-    name: str
-    check: Callable[[Any], tuple[bool, str]]
-
-    def result(self, files: GateFiles) -> GateResult:
-        """Run the check and wrap the result with the gate name.
-
-        :param files: Lazy reader of the output files.
-        :returns: The result of the gate.
-        """
-        passed, message = self.check(files)
-        return GateResult(self.name, passed, message)
-
-
-def run_gates(gates: Sequence[Gate], files: GateFiles) -> list[GateResult]:
-    """Run every gate and catch the error of a gate that cannot read a file.
-
-    :param gates: Gate table of the mode.
-    :param files: Lazy reader of the output files.
-    :returns: One result per gate.
-    """
-    results: list[GateResult] = []
-    for gate in gates:
-        try:
-            results.append(gate.result(files))
-        except Exception as error:  # noqa: BLE001 - a gate reports the error
-            results.append(
-                GateResult(gate.name, False, f"{type(error).__name__}: {error}")
-            )
-    return results
 
 
 def report(results: Sequence[GateResult], title: str = "") -> int:

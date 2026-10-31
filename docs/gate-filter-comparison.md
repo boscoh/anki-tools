@@ -104,18 +104,19 @@ The gate seam is already shared in part:
 
 | Code | Role |
 | --- | --- |
-| `ranking/gates.py` | `Gate`, `GateResult`, `GateFiles`, `run_gates`, `report`, and the shared checks |
+| `anki_tools/gates.py` | `Gate`, `GateResult`, `GateFiles`, and `run_gates` |
 | `gate_files.py` | `GateFileReader`, the lazy reader with the cached error |
-| `sentence_pack/audit.py` | `AuditInputs`, `print_audit`, shared pack checks |
+| `ranking/gates.py` | `report` and the shared checks |
+| `sentence_pack/audit.py` | `AuditInputs`, `as_gates`, `print_audit`, shared pack checks |
 | `ranking/cullgates.py` | `CullFiles` |
 | `ranking/coregates.py` | `CoreFiles` |
 
 `AuditInputs`, `CullFiles`, and `CoreFiles` all extend `GateFileReader`. All
 three flows print through `print_audit`, and each report prints a flow title.
 
-The pack keeps its own `run_gates` and its `(name, check)` tuple type. The cull
-and the core use `ranking.gates.run_gates` and `Gate` values. Section 3.4 gives
-the target interface, and section 5.1 gives the change.
+Every flow runs `anki_tools.gates.run_gates`. The pack keeps its `(name, check)`
+tuple type and its `(inputs, profile)` check form, so `as_gates` wraps the pack
+table. Section 3.4 gives the interface, and section 5.1 gives the change.
 
 ### 3.3 Differences
 
@@ -139,16 +140,17 @@ the target interface, and section 5.1 gives the change.
 
 ### 3.4 The harmonized gate interface
 
-The gate seam has five parts. The report and the reader are already shared.
-The runner and the row type are shared by the cull and the core only.
+The gate seam has four parts in `anki_tools/gates.py`, below `ranking` and
+`sentence_pack`. The report lives in `ranking/gates.py`. Every flow uses the
+one runner.
 
 | Part | Name | Location | Shared by |
 | --- | --- | --- | --- |
-| Gate value | `Gate(name, check)` | `ranking/gates.py` | cull, core |
-| Row | `GateResult(name, passed, message)` | `ranking/gates.py` | cull, core |
-| Runner | `run_gates(gates, files)` | `ranking/gates.py` | cull, core |
+| Gate value | `Gate(name, check)` | `anki_tools/gates.py` | pack, cull, core |
+| Row | `GateResult(name, passed, message)` | `anki_tools/gates.py` | pack, cull, core |
+| Runner | `run_gates(gates, files)` | `anki_tools/gates.py` | pack, cull, core |
 | Report | `report(results, title)` | `ranking/gates.py` | pack, cull, core |
-| Reader | `GateFiles` and `GateFileReader` | `ranking/gates.py`, `gate_files.py` | pack, cull, core |
+| Reader | `GateFiles` and `GateFileReader` | `anki_tools/gates.py`, `gate_files.py` | pack, cull, core |
 
 Each flow supplies three items: a gate table, a file reader, and a title.
 
@@ -163,8 +165,8 @@ The gate ids and the gate sets stay per flow. ADR 0027 records why. The
 harmonized parts are the runner, the row type, and the report. Each flow keeps
 its own table.
 
-One item is not yet shared: the pack declares `(name, check)` tuples and runs
-its own loop. Section 5.1 removes the second loop.
+The pack declares `(name, check)` tuples and `as_gates` wraps them, so the pack
+supplies the profile through the reader. Section 5.1 records the change.
 
 ## 4. Why the flows differ
 
@@ -375,5 +377,6 @@ from L1, L2, or L4 is a defect.
 | `anki_tools/ranking/coreflow.py` | `FILTER_KEYS`, `filter_core_cards` |
 | `anki_tools/ranking/cullgates.py` | cull gates G1 to G17 |
 | `anki_tools/ranking/coregates.py` | core gates K1 to K21 |
-| `anki_tools/ranking/gates.py` | gate type, runner, report, shared checks |
+| `anki_tools/gates.py` | the gate value, the row, the runner, and the reader contract |
+| `anki_tools/ranking/gates.py` | the report and the shared checks |
 | `anki_tools/gate_files.py` | the one lazy file reader |

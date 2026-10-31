@@ -33,6 +33,7 @@ from anki_tools.languages.mandarin.characters import (
     is_chinese_char,
     is_repeated_zh_sentence,
 )
+from anki_tools.gates import GateResult
 from anki_tools.sentence_pack.audit import run_pack_audit
 from anki_tools.sentence_pack.pack import (
     ATTRIBUTION_PATH,
@@ -1255,7 +1256,7 @@ def cantonese_gates() -> tuple[tuple[str, Any], ...]:
     )
 
 
-def run_cantonese_audit(**paths: Path | None) -> list[tuple[str, bool, str]]:
+def run_cantonese_audit(**paths: Path | None) -> list[GateResult]:
     """Run the Cantonese quality gates G1 to G21.
 
     :param paths: Input paths that replace the defaults of the profile.

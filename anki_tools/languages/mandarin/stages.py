@@ -44,6 +44,7 @@ from anki_tools.languages.mandarin.profile import (
     write_sentence_review_csv,
 )
 from anki_tools.languages.mandarin.characters import get_chinese_chars
+from anki_tools.gates import GateResult
 from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.sentence_pack import audio as shared_audio
 from anki_tools.sentence_pack import guards as shared_guards
@@ -54,7 +55,6 @@ from anki_tools.sentence_pack import tatoeba
 from anki_tools.sentence_pack.audio import AUDIO_INDEX_NAME, probe_duration
 from anki_tools.sentence_pack.audit import (
     AuditInputs,
-    GateRow,
     gate_apkg,
     gate_coverage,
     gate_manifest_counts,
@@ -377,7 +377,7 @@ GATES: tuple[tuple[str, GateCheck], ...] = (
 )
 
 
-def run_audit(**paths: Path | None) -> list[GateRow]:
+def run_audit(**paths: Path | None) -> list[GateResult]:
     """Run the quality gates G1 to G18.
 
     :param paths: Input paths that replace the defaults of the profile.

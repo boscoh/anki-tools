@@ -18,10 +18,10 @@ from typing import Any, Collection, Iterable, Sequence
 from wordfreq import zipf_frequency
 
 from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
+from anki_tools.gates import GateResult
 from anki_tools.languages.greek.rank import greek_text_dedup_key, word_similarity_el
 from anki_tools.sentence_pack.audit import (
     AuditInputs,
-    GateRow,
     run_pack_audit,
     sample,
 )
@@ -1175,7 +1175,7 @@ def greek_gates() -> tuple[tuple[str, Any], ...]:
     )
 
 
-def run_greek_audit(**paths: Path | None) -> list[GateRow]:
+def run_greek_audit(**paths: Path | None) -> list[GateResult]:
     """Run the Greek quality gates G1 to G20.
 
     :param paths: Input paths that replace the defaults of the profile.

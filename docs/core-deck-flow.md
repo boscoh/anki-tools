@@ -329,7 +329,8 @@ and one card per note.
 | ----------------------------------------------- | ------------------------------------------ |
 | `anki_tools/ranking/coreflow.py`                | K0 to K6 flow, output field values         |
 | `anki_tools/ranking/coregates.py`               | gates K1 to K21                            |
-| `anki_tools/ranking/gates.py`                   | gate runner, report, shared gates          |
+| `anki_tools/gates.py`                           | gate value, row, runner, reader contract   |
+| `anki_tools/ranking/gates.py`                   | report, shared gates                       |
 | `anki_tools/ranking/assemble.py`                | deck, side files, manifest, report         |
 | `anki_tools/ranking/identity.py`                | deck title, note type, side-file stems     |
 | `anki_tools/ranking/deckprofile.py`             | language facts, core view, cull view       |

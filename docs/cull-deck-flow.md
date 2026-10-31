@@ -303,7 +303,8 @@ not fail G1.
 | ----------------------------------------- | ---------------------------------------------- |
 | `anki_tools/ranking/cullflow.py`          | C0 to C5 flow, profile, selection, values      |
 | `anki_tools/ranking/cullgates.py`         | gates G1 to G17                                |
-| `anki_tools/ranking/gates.py`             | gate runner, report, shared gates              |
+| `anki_tools/gates.py`                     | gate value, row, runner, reader contract       |
+| `anki_tools/ranking/gates.py`             | report, shared gates                           |
 | `anki_tools/ranking/assemble.py`          | deck, side files, manifest, report             |
 | `anki_tools/ranking/identity.py`          | deck title, note type, side-file stems         |
 | `anki_tools/ranking/deckprofile.py`       | language facts, core view, cull view           |

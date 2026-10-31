@@ -1,7 +1,7 @@
 """One lazy reader for the files that the gates read.
 
 The gate table reads its files through
-:class:`anki_tools.ranking.gates.GateFiles`, which documents each accessor. This
+:class:`anki_tools.gates.GateFiles`, which documents each accessor. This
 module holds the one implementation, so the cached error lives in one place.
 Each mode supplies a loader table, which maps an accessor name to the callable
 that reads the file.
@@ -36,7 +36,7 @@ class GateFileReader:
     """Read each gate file once and cache the value or the error.
 
     The accessors are the ones of
-    :class:`anki_tools.ranking.gates.GateFiles`. Each mode sets ``profile`` to
+    :class:`anki_tools.gates.GateFiles`. Each mode sets ``profile`` to
     its language hooks and supplies the loader table.
 
     :param loaders: Table from accessor name to the callable that reads it.

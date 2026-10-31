@@ -1,10 +1,11 @@
 """Quality gates of a Swadesh sentence pack.
 
-:func:`run_gates` reads the reviewed word table, the sentence CSV, the audio
-index, the APKG file, the manifest, and the attribution file. It returns one row
-per gate. :func:`print_audit` writes the gate table and gives the process exit
-code. :func:`run_pack_audit` binds a profile and a gate list to the default
-paths of the profile. The module only reads files.
+:func:`as_gates` wraps the pack gate table as :class:`anki_tools.gates.Gate`
+values, so the pack runs :func:`anki_tools.gates.run_gates`. The checks read the
+reviewed word table, the sentence CSV, the audio index, the APKG file, the
+manifest, and the attribution file. :func:`print_audit` writes the gate table
+and gives the process exit code. :func:`run_pack_audit` binds a profile and a
+gate list to the default paths of the profile. The module only reads files.
 """
 
 from __future__ import annotations
@@ -19,6 +20,7 @@ from typing import Any, Callable, Iterable, Sequence
 from anki_tools.apkg.deck_writer import sha256_value
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.gate_files import GateFileReader
+from anki_tools.gates import Gate, GateResult, run_gates
 from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.sentence_pack.audio import (
     AUDIO_INDEX_NAME,
@@ -48,7 +50,6 @@ LATIN_OR_DIGIT = re.compile(r"[A-Za-z0-9０-９]")
 FAILURE_SAMPLE = 3
 DETAIL_WIDTH = 110
 
-GateRow = tuple[str, bool, str]
 GateCheck = Callable[["AuditInputs", LanguageProfile], tuple[bool, str]]
 
 
@@ -725,26 +726,16 @@ GENERIC_GATES: tuple[tuple[str, GateCheck], ...] = (
 )
 
 
-def run_gates(
-    gates: Sequence[tuple[str, GateCheck]],
-    inputs: AuditInputs,
-    profile: LanguageProfile,
-) -> list[GateRow]:
-    """Run a gate list and collect one row per gate.
+def as_gates(gates: Sequence[tuple[str, GateCheck]]) -> tuple[Gate, ...]:
+    """Wrap the pack gate table as gate values.
 
-    :param gates: Ordered gate names and checks.
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: One ``(gate, passed, message)`` row per gate.
+    :param gates: Ordered gate names and pack checks.
+    :returns: One gate per name, with the profile of the reader.
     """
-    results: list[GateRow] = []
-    for gate, check in gates:
-        try:
-            passed, message = check(inputs, profile)
-        except Exception as error:  # noqa: BLE001 - a gate reports read failures
-            passed, message = False, f"{type(error).__name__}: {error}"
-        results.append((gate, passed, message))
-    return results
+    return tuple(
+        Gate(name, lambda files, check=check: check(files, files.profile))
+        for name, check in gates
+    )
 
 
 def run_pack_audit(
@@ -760,7 +751,7 @@ def run_pack_audit(
     attribution_path: Path = ATTRIBUTION_PATH,
     load_table: Callable[..., Sequence[WordRow]],
     probe: Callable[[Path], float] = probe_duration,
-) -> list[GateRow]:
+) -> list[GateResult]:
     """Run the gates of one pack on the default paths of the pack.
 
     :param profile: Language profile of the pack.
@@ -774,7 +765,7 @@ def run_pack_audit(
     :param attribution_path: Attribution Markdown file.
     :param load_table: Callable that reads the reviewed word table.
     :param probe: Function that reads the duration of a file.
-    :returns: One ``(gate, passed, message)`` row per gate.
+    :returns: One result per gate.
     """
     identity = DeckIdentity(
         apkg_path if apkg_path is not None else default_output(profile.name, "pack")
@@ -791,10 +782,10 @@ def run_pack_audit(
         load_table=load_table,
         probe=probe,
     )
-    return run_gates(gates, inputs, profile)
+    return run_gates(as_gates(gates), inputs)
 
 
-def print_audit(results: Sequence[GateRow], title: str = "") -> int:
+def print_audit(results: Sequence[GateResult], title: str = "") -> int:
     """Print the gate table.
 
     :param results: Rows from :func:`run_gates`.

@@ -28,3 +28,11 @@ The cached-error rule has one implementation and one test,
 `gates.py` that `audit.py` imports closes that cycle and fails on the partially
 started module. The module above both packages breaks the cycle and holds no
 language package, so `tests/test_language_layout.py` stays green.
+
+## Amendment
+
+`anki_tools/gates.py` now holds the gate contract: `Gate`, `GateResult`,
+`GateFiles`, and `run_gates`. `ranking.gates` and `sentence_pack.audit` import
+those names. `GateFileReader` in `gate_files.py` implements the `GateFiles`
+accessors of the new module. The boundary and the reasons do not change, so
+this record still covers the decision.

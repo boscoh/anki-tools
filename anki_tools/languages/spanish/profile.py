@@ -43,10 +43,10 @@ from anki_tools.sentence_pack.wiktionary import (
     parse_module_terms,
     read_module_terms,
 )
+from anki_tools.gates import GateResult
 from anki_tools.ranking.latin import latin_text_dedup_key, latin_word_similarity
 from anki_tools.sentence_pack.audit import (
     AuditInputs,
-    GateRow,
     run_pack_audit,
     sample,
 )
@@ -1341,7 +1341,7 @@ def spanish_gates() -> tuple[tuple[str, Any], ...]:
     )
 
 
-def run_spanish_audit(**paths: Path | None) -> list[GateRow]:
+def run_spanish_audit(**paths: Path | None) -> list[GateResult]:
     """Run the Spanish quality gates G1 to G21.
 
     :param paths: Input paths that replace the defaults of the profile.
