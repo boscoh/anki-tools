@@ -386,7 +386,7 @@ with a non-zero exit code.
 | G11  | The manifest counts and hashes match the files                                 |
 | G12  | The `## Cantonese pack` section names every sentence author                    |
 | G13  | The APKG opens and its note count matches the CSV                              |
-| G14  | Every card passes the proper-sentence rules                                    |
+| G14  | Every card passes the complete-sentence rules                                |
 | G15  | The word review file has no `open` row                                         |
 | G16  | Every card target has a valid word MP3                                         |
 | G17  | Every card has a jyutping reading                                              |

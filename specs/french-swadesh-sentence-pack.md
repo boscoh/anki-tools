@@ -332,9 +332,9 @@ Measured effect of the filters:
 | ---------------------------- | --------- |
 | Linked sentences, any length | 378,865   |
 | F1 to F8, no predicate test  | 282,635   |
-| F1 to F12 (the proper set)   | 247,090   |
+| F1 to F12 (the full set)     | 247,090   |
 
-### 7.1 Definition of a proper sentence
+### 7.1 Definition of a complete sentence
 
 A card sentence must read as one complete statement. These rules enforce that
 requirement:

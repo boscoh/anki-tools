@@ -495,7 +495,7 @@ the command with a non-zero exit code.
 | G2   | No non-exempt content lemma is in more than `--max-uses` kept cards     |
 | G3   | Target coverage is at least 0.98 of `--target-words` (measured 0.997)   |
 | G4   | At least 0.95 of the targets have 2 cards (measured 0.963)              |
-| G5   | Every kept card passes the filter rules. The reserve cards skip the name rule F8, because the Swadesh pack already validated them. |
+| G5   | Every kept card passes the filter rules. The reserve cards skip the name rule F8 as a deliberate exemption: no Swadesh pack rule tests a name, and 8 of the 194 kept French reserve cards hold a `PROPN` token. |
 | G6   | No kept card pair reaches the lemma Jaccard limit                       |
 | G7   | Every kept card has its input audio file, and the file is a valid MP3   |
 | G8   | The APKG note count equals the cull CSV `kept` count and the manifest   |

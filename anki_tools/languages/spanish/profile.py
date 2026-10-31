@@ -1,7 +1,7 @@
 """Spanish language pack of the shared sentence pipeline.
 
 The module holds the Spanish word table reader, the Tatoeba module reader, the
-lemma-aware form-key matcher, the proper-sentence rules, and the Spanish
+lemma-aware form-key matcher, the complete-sentence rules, and the Spanish
 language profile. Spanish inflects, so a form matches by token surface or by
 token lemma. The lemmatizer gives a wrong lemma for some pronouns, so the
 pronoun forms match by surface only. A reflexive infinitive such as

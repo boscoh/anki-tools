@@ -1,7 +1,7 @@
 """French language pack of the shared sentence pipeline.
 
 The module holds the French word table reader, the Tatoeba module reader, the
-elision-aware form-key matcher, the proper-sentence rules, and the French
+elision-aware form-key matcher, the complete-sentence rules, and the French
 language profile. French inflects, so a form matches by token surface or by
 token lemma. The lemmatizer gives a wrong lemma for a bare noun (``pluie``
 gives ``plui``), so the key set also holds the head-word lemma of a carrier

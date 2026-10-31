@@ -212,7 +212,7 @@ def coverage_ratio(inputs: AuditInputs) -> tuple[int, int, float]:
 
 
 def core_problem(sentence: str, profile: LanguageProfile) -> str | None:
-    """Give the first proper-sentence failure of a core card.
+    """Give the first complete-sentence failure of a core card.
 
     :param sentence: Card sentence.
     :param profile: Language profile.
@@ -231,7 +231,7 @@ def core_problem(sentence: str, profile: LanguageProfile) -> str | None:
 
 
 def scaffold_problem(sentence: str, profile: LanguageProfile) -> str | None:
-    """Give the first proper-sentence failure of a scaffold card.
+    """Give the first complete-sentence failure of a scaffold card.
 
     :param sentence: Card sentence.
     :param profile: Language profile.
@@ -543,7 +543,7 @@ def gate_apkg(
 def gate_proper_sentences(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
-    """Gate G14: core and scaffold cards pass the proper-sentence rules.
+    """Gate G14: core and scaffold cards pass the complete-sentence rules.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -561,10 +561,10 @@ def gate_proper_sentences(
             failures.append(f"{sentence}: {problem}")
     if failures:
         return False, (
-            f"{len(failures)} card(s) fail the proper-sentence rules: "
+            f"{len(failures)} card(s) fail the complete-sentence rules: "
             f"{sample(failures)}"
         )
-    return True, f"{len(rows)} cards pass the proper-sentence rules"
+    return True, f"{len(rows)} cards pass the complete-sentence rules"
 
 
 def gate_review_file(

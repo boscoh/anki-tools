@@ -281,7 +281,7 @@ Filter rules, applied in order:
 `v*` means a tag that starts with `v` (`v`, `vn`). `a*` means a tag that
 starts with `a` (`a`, `ad`, `an`).
 
-### 7.1 Definition of a proper sentence
+### 7.1 Definition of a complete sentence
 
 A card sentence must read as one complete statement. These rules enforce
 that requirement:
@@ -300,13 +300,13 @@ that requirement:
 - No orphan conjunction. A sentence that starts with 因为, 所以, 但是, 可是,
   而且, 然后, 不过, or 虽然 and has no comma lacks its main clause.
 
-Measured effect of the proper-sentence filters on the linked Mandarin pool:
+Measured effect of the complete-sentence filters on the linked Mandarin pool:
 
 | Filter set                   | Pool size |
 | ---------------------------- | --------- |
 | Linked sentences, any length | 66,257    |
 | F1 to F8, no predicate test  | 21,311    |
-| F1 to F10 (the proper set)   | 17,805    |
+| F1 to F10 (the full set)     | 17,805    |
 
 The 4 to 7 window removes fragments and still yields 17,805 sentences.
 Of the 211 Swadesh forms, 200 have a core candidate.
@@ -756,7 +756,7 @@ Add unit tests in `tests/test_mandarin_pack.py` for:
 | Native audio license unclear (5,742 empty, 84 CC BY-NC) | Cannot distribute          | Default TTS, opt-in native tier, skip NC when public |
 | Tatoeba text has traditional forms                      | Mixed script deck          | OpenCC conversion, keep original text for checks     |
 | jieba segmentation errors                               | Wrong target match         | User dictionary, exact substring check, review CSV   |
-| Swadesh tail has no proper sentence                     | Missing core words         | Fallback window, scaffold tier, manual frame         |
+| Swadesh tail has no eligible sentence                    | Missing core words         | Fallback window, scaffold tier, manual frame         |
 | Strict length rule drops a natural short                | Fewer cards per word       | Fallback window 3 to 7, scaffold tier, review CSV    |
 | edge-tts is an unofficial endpoint                      | Voice service can break    | Retry, gTTS fallback, cached audio                   |
 | Tatoeba rate limits and slow downloads                  | Build time                 | 1 request per second, cache, resume                  |

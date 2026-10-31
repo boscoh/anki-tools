@@ -283,8 +283,10 @@ exceptions.
 G3 fails below `target_coverage_gate`, 0.98 for French and Spanish. G4 fails
 below `double_coverage_gate`, 0.95. The profile holds both values.
 
-G5 skips F8 for a reserve card, because the Swadesh pack already checked that
-sentence. G14 needs the Swadesh count minus the exceptions of the profile, for
+G5 skips F8 for a reserve card. This is a deliberate exemption, not a second
+check: no Swadesh pack rule tests a name, and 8 of the 194 kept French reserve
+cards hold a `PROPN` token. G14 needs those cards, and it needs the Swadesh
+count minus the exceptions of the profile, for
 example `intestins` in French. G15 needs the template set of the profile and
 each card class in the CSS. G16 checks the single note type, the field set, and
 one card per note. G17 checks that every note holds a `Core`, a `CoreGloss`,

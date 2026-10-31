@@ -355,7 +355,7 @@ The probe also measured other windows:
 The window 4 to 10 keeps 18,190 sentences. A wider window adds 2,919 sentences
 at 3 to 10, but most of them are fragments of three words.
 
-### 7.1 Definition of a proper sentence
+### 7.1 Definition of a complete sentence
 
 A card sentence must read as one complete statement. These rules enforce that
 requirement:
