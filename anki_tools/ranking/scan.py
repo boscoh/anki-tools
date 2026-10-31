@@ -47,6 +47,9 @@ class CoreProfile:
     :param card_css: CSS of the core deck.
     :param min_units: Minimum word count of a card.
     :param max_units: Maximum word count of a card.
+    :param final_marks: Accepted sentence-final marks of the language.
+    :param quote_marks: Quotation marks and dialogue dashes of the language.
+    :param internal_marks: Internal punctuation marks of the language.
     :param default_options: Selection settings of the core cover.
     :param frequency_source: Label of the frequency source for the manifest.
     :param lemma_overrides: Lemma repair map of the lemmatizer artefacts,
@@ -83,6 +86,9 @@ class CoreProfile:
     card_css: Callable[[], str]
     min_units: int
     max_units: int
+    final_marks: str
+    quote_marks: str
+    internal_marks: str
     default_options: Any
     frequency_source: str
     lemma_overrides: Mapping[str, str] = field(default_factory=dict)

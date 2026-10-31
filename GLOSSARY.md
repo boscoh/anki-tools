@@ -161,7 +161,7 @@ _Avoid_: filter, check
 **Rule key**:
 The `F` number of one card rule in the pack guard table or in the ranking filter
 table. The two tables number from `F1` and differ: pack `F8` is the internal mark
-rule, and rank `F8` is the name rule. `MARK_RULES` in `ranking/cullflow.py`
+rule, and rank `F8` is the name rule. `MARK_RULES` in `ranking/cardfilter.py`
 gives the map. ADR 0027 records it.
 _Avoid_: filter name, rule number
 

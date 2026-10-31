@@ -31,7 +31,6 @@ from typing import (
     Iterator,
     Mapping,
     Sequence,
-    cast,
 )
 
 from anki_tools.apkg import deck_writer
@@ -39,10 +38,8 @@ from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking import assemble, coreflow
 from anki_tools.ranking.cardfilter import (
     _WORD_PATTERN,
-    english_rule,
     filter_cards,
-    pos_rule,
-    script_rule,
+    filter_reason,
 )
 from anki_tools.ranking.coreflow import InputCard
 from anki_tools.ranking.corelist import UNRANKED_RANK, TargetWord, build_targets, is_content
@@ -50,8 +47,6 @@ from anki_tools.ranking.cover import greedy_cover
 from anki_tools.ranking.coverage import write_rows
 from anki_tools.ranking.duplicates import at_limit
 from anki_tools.ranking.identity import DeckIdentity
-from anki_tools.sentence_pack.guards import check_sentence_shape
-from anki_tools.sentence_pack.profile import LanguageProfile
 from anki_tools.sentence_pack.tokens import load_model
 
 DEFAULT_MAX_CARDS = 1000
@@ -75,8 +70,6 @@ FILTER_RULES = (
 )
 EXEMPT_GAIN = 0.1
 
-MARK_RULES = ("final_mark", "one_final_mark", "quote", "internal_mark")
-LENGTH_RULES = ("length_window",)
 
 RESERVE_SENTENCE_FIELD = "Sentence"
 RESERVE_ENGLISH_FIELD = "English"
@@ -250,81 +243,6 @@ class CullProfile:
     romanization_source: str | None = None
     highlight: Callable[[str, str], str] | None = None
 
-
-@dataclass(frozen=True)
-class CardShape:
-    """Shape-guard values of one card of the cull.
-
-    The cull measures the length window with the tokenizer output, so the unit
-    count comes from the card and not from the sentence text.
-
-    :param units: Token count of the card sentence.
-    :param final_marks: Accepted sentence-final marks of the language.
-    :param quote_marks: Quotation marks and dialogue dashes of the language.
-    :param internal_marks: Internal punctuation marks of the language.
-    """
-
-    units: int
-    final_marks: str
-    quote_marks: str
-    internal_marks: str
-
-    def unit_count(self, sentence: str) -> int:
-        """Give the token count of the card.
-
-        :param sentence: Prepared sentence text.
-        :returns: The token count of the card.
-        """
-        return self.units
-
-
-def filter_reason(
-    card: InputCard,
-    card_tokens: Sequence[tuple[str, str]],
-    min_words: int,
-    max_words: int,
-    profile: CullProfile,
-) -> str:
-    """Give the first failed filter rule of one card of the cull.
-
-    The English window, the script rule, and the proper-noun rule come from the
-    shared card filter. The length window and the mark rules come from the
-    sentence shape guard, so the marks are the marks of the language profile.
-
-    :param card: Input card.
-    :param card_tokens: Lemma and part of speech of the card sentence.
-    :param min_words: Minimum token count of a card.
-    :param max_words: Maximum token count of a card.
-    :param profile: Language hooks.
-    :returns: The rule id from ``english_words`` to ``propn``, or the empty
-        string on a pass.
-    """
-    reason = english_rule(card)
-    if reason:
-        return reason
-    shape = CardShape(
-        len(card_tokens),
-        profile.final_marks,
-        profile.quote_marks,
-        profile.internal_marks,
-    )
-    # The cull passes only the length key and the mark keys, so the adapter
-    # gives those values and not the rest of a language profile.
-    guard_profile = cast(LanguageProfile, shape)
-    reason = check_sentence_shape(
-        card.sentence, guard_profile, min_words, max_words, keys=LENGTH_RULES
-    )
-    if reason:
-        return reason
-    reason = script_rule(card.sentence)
-    if reason:
-        return reason
-    reason = check_sentence_shape(
-        card.sentence, guard_profile, min_words, max_words, keys=MARK_RULES
-    )
-    if reason:
-        return reason
-    return pos_rule(card_tokens)
 
 
 @dataclass(frozen=True)

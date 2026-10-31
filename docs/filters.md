@@ -58,23 +58,24 @@ The cull runs one list in `filter_reason`: `english_words`, `length_window`,
 `digit_marks`, the mark rules, `propn`, then `unique`. The mark rules come from
 `check_sentence_shape`, and `MARK_RULES` holds their ids.
 
-The core runs `filter_cards` with the Latin rule function, then C1 to C5 in
-`filter_core_cards`.
+The core runs `filter_cards` with `filter_reason`, the function of the cull, then
+C1 to C5 in `filter_core_cards`.
 
 The cull and the core store the first failed rule as the card `reason`. The
 pack records a pass count for every guard before the first failure.
 
 ## 4. Differences
 
-- `length_window` is in all three flows. The pack measures the text and
-  the rank flows count tokens.
+- `length_window` is in all three flows. It is a filter, not a gate. The test is
+  one function: `_passes_length` in `sentence_pack/pool.py`. The pack counts
+  units with `profile.unit_count`. The cull and the core pass the token count
+  through `CardShape.unit_count` in `filter_reason`.
 - A scaffold sentence may fail `one_final_mark` or `internal_mark`, and it skips
   the `sense` guard (`SCAFFOLD_SHAPE_FAILURES`, `SCAFFOLD_SKIP_GUARDS`).
-- The pack and the cull take the marks from the language profile. The core
-  takes the Latin mark constants of `ranking/cardfilter.py`, because
-  `CoreProfile` holds no mark fields. The Mandarin and Cantonese core adapters
-  convert the final mark of each sentence to ASCII in `_sentence`. That
-  conversion is a deck style choice.
+- The pack, the cull, and the core take the marks from the language profile. The
+  Mandarin and Cantonese core adapters convert the final mark of each sentence to
+  ASCII in `_sentence`. That conversion is a deck style choice. A full-width
+  mark inside the sentence stays, so a second final mark fails `one_final_mark`.
 - `MARK_RULES` lists the four mark ids that the cull takes from the pack shape
   guard. The pack has no `propn` rule. The cull has no `english_link`,
   `script`, `repeat`, `predicate`, `orphan`, `unknown`, or `sense` rule.
@@ -87,18 +88,19 @@ pack records a pass count for every guard before the first failure.
 | Level | Change                                | Behavior                                       | Verdict                                        |
 | ----- | ------------------------------------- | ---------------------------------------------- | ---------------------------------------------- |
 | L2    | one rule record, `(key, name, test)`  | none                                           | deferred; do it when a third consumer needs it |
-| L3    | one mark source for the core          | a core card can keep a language mark           | do it, tracked by `anki-0d3d`                  |
+| L3    | one mark source for the core          | a core card can keep a language mark           | done, `anki-0d3d`, ADR 0028                    |
 | L4    | one manifest shape                    | an old pack manifest fails G11 until a rebuild | deferred to the next pack rebuild              |
 | L5    | one rule key namespace                | none                                           | rejected, ADR 0027                             |
 | L6    | one identical rule set for every flow | a different accepted set                       | rejected, the two jobs differ                  |
+| L7    | `length_window` to the gate layer     | none                                           | rejected, a gate never rejects a sentence      |
 
-L3 adds `final_marks`, `quote_marks`, and `internal_marks` to `CoreProfile`. It
-moves `CardShape` and `filter_reason` to `ranking/cardfilter.py`, and
-`filter_reason` takes a mark set. The cull and the core then call one function
+L3 added `final_marks`, `quote_marks`, and `internal_marks` to `CoreProfile`. It
+moved `CardShape` and `filter_reason` to `ranking/cardfilter.py`, and
+`filter_reason` takes a mark set. The cull and the core now call one function
 with their own marks and their own token counts.
 
-L3 changes the kept set of a core deck, so rebuild the four core decks and
-record the card counts in ADR 0028.
+L3 changed the passed set of the Cantonese core deck. ADR 0028 records the
+card counts.
 
 ## 6. Verification
 
@@ -110,7 +112,7 @@ uv run pytest tests/test_cull_shared.py tests/test_french_cull.py \
 ```
 
 Then rebuild the affected decks and compare the kept count with the count before
-the change. A changed count is the expected result of L3.
+the change. L3 changed one count (ADR 0028).
 
 ## 7. References
 
@@ -123,6 +125,6 @@ the change. A changed count is the expected result of L3.
 | `docs/core-deck-flow.md`              | the core rule order                           |
 | `anki_tools/sentence_pack/pool.py`    | `FILTER_KEYS`, `SHAPE_GUARDS`, `FACT_GUARDS`  |
 | `anki_tools/sentence_pack/guards.py`  | `check_sentence_shape`                        |
-| `anki_tools/ranking/cardfilter.py`    | `filter_cards`, the Latin mark constants      |
-| `anki_tools/ranking/cullflow.py`      | `FILTER_RULES`, `MARK_RULES`, `filter_reason` |
+| `anki_tools/ranking/cardfilter.py`    | `filter_cards`, `filter_reason`, `MARK_RULES` |
+| `anki_tools/ranking/cullflow.py`      | `FILTER_RULES`                                |
 | `anki_tools/ranking/coreflow.py`      | `FILTER_KEYS`, `filter_core_cards`            |

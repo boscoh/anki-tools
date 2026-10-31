@@ -1,6 +1,6 @@
 """Tests that pin the pack, cull, and core rule ids to one semantic set."""
 
-from anki_tools.ranking import coreflow, cullflow
+from anki_tools.ranking import cardfilter, coreflow, cullflow
 from anki_tools.sentence_pack import pool
 
 PACK_KEYS = (
@@ -53,5 +53,5 @@ def test_the_guard_tables_cover_the_pack_keys_after_english_link() -> None:
 
 def test_the_cull_mark_keys_are_the_pack_mark_keys() -> None:
     pack_mark_keys = {"final_mark", "one_final_mark", "quote", "internal_mark"}
-    assert set(cullflow.MARK_RULES) == pack_mark_keys
-    assert cullflow.LENGTH_RULES == ("length_window",)
+    assert set(cardfilter.MARK_RULES) == pack_mark_keys
+    assert cardfilter.LENGTH_RULES == ("length_window",)

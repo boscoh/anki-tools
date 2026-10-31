@@ -19,6 +19,7 @@ import re
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, replace
+from functools import partial
 from pathlib import Path
 from typing import Any, Callable, Collection, Mapping, Sequence
 
@@ -27,7 +28,12 @@ from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.shape import find_model_id, find_only_model_id
 from anki_tools.ranking import assemble
 from anki_tools.ranking.assemble import DeckProfile, output_fields
-from anki_tools.ranking.cardfilter import _WORD_PATTERN, filter_cards
+from anki_tools.ranking.cardfilter import (
+    _WORD_PATTERN,
+    Marks,
+    filter_cards,
+    filter_reason,
+)
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
 from anki_tools.ranking.core import select as select_core
 from anki_tools.ranking.core import target_quotas
@@ -303,6 +309,7 @@ def filter_core_cards(
     *,
     min_units: int,
     max_units: int,
+    marks: Marks,
 ) -> tuple[list[int], list[str]]:
     """Apply the shared filter rules and C1 to C5 to the cards.
 
@@ -314,6 +321,7 @@ def filter_core_cards(
     :param has_orphan: Language hook of rule C2.
     :param min_units: First unit count of the window.
     :param max_units: Last unit count of the window.
+    :param marks: Mark sets of the language profile.
     :raises ValueError: The card list and the token list differ in size.
     :returns: The input indices that pass, and the reason per input index. A
         passed card has the empty string as its reason.
@@ -321,7 +329,11 @@ def filter_core_cards(
     if len(cards) != len(tokens):
         raise ValueError("The card list and the token list differ in size.")
     passed, cull_reasons = filter_cards(
-        cards, tokens, min_words=min_units, max_words=max_units
+        cards,
+        tokens,
+        min_words=min_units,
+        max_words=max_units,
+        card_rule=partial(filter_reason, profile=marks),
     )
     reasons = list(cull_reasons)
     kept: list[int] = []
@@ -1053,6 +1065,7 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
         profile.has_orphan,
         min_units=min_units,
         max_units=max_units,
+        marks=profile,
     )
     hits, sense_failures, present = core_hits(
         cards, tokens, passed, targets, profile

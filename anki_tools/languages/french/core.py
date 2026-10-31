@@ -50,6 +50,9 @@ FRENCH_CORE_PROFILE = cull.FRENCH_LANGUAGE.core(
     templates=CORE_TEMPLATES,
     min_units=MIN_UNITS,
     max_units=MAX_UNITS,
+    final_marks=FRENCH.final_marks,
+    quote_marks=FRENCH.quote_marks,
+    internal_marks=FRENCH.internal_marks,
     default_options=DEFAULT_OPTIONS,
     frequency_source=str(cull.FREQUENCY_PATH),
 )

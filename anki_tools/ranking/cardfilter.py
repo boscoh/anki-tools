@@ -1,26 +1,27 @@
 """Shared card filter rules of the sentence decks.
 
-The rules are the Latin default. The cull reads its mark rules and its length
-window from the sentence shape guard with the values of the language profile;
-this module holds the pieces that the cull shares: the English window
+The cull and the core read their mark rules and their length window from the
+sentence shape guard with the values of the language profile. This module
+holds :func:`filter_reason`, which joins the two with the English window
 ``english_words``, the ``digit_marks`` rule, the ``propn`` rule, and the
-``unique`` dedupe of :func:`filter_cards`. The core flow applies the Latin
-rules as they stand.
+``unique`` dedupe of :func:`filter_cards`.
 """
 
 from __future__ import annotations
 
 import re
-from typing import Any, Callable, Sequence
+from dataclasses import dataclass
+from typing import Any, Callable, Protocol, Sequence, cast
+
+from anki_tools.sentence_pack.guards import check_sentence_shape
+from anki_tools.sentence_pack.profile import LanguageProfile
 
 MIN_ENGLISH_WORDS = 2
 MAX_ENGLISH_WORDS = 12
 
-FINAL_MARKS = frozenset(".?!")
+MARK_RULES = ("final_mark", "one_final_mark", "quote", "internal_mark")
+LENGTH_RULES = ("length_window",)
 BRACKET_MARKS = frozenset("[]{}<>")
-QUOTE_MARKS = frozenset('"«»“”')
-DIALOGUE_DASHES = frozenset("-–—")
-INTERNAL_MARKS = ",;:"
 ELLIPSIS_MARKS = ("...", "…")
 URL_MARKS = ("http", "www.")
 
@@ -34,7 +35,7 @@ def filter_cards(
     min_words: int = 3,
     max_words: int = 12,
     *,
-    card_rule: Callable[..., str] | None = None,
+    card_rule: Callable[..., str],
 ) -> tuple[list[int], list[str]]:
     """Apply the shared filter rules.
 
@@ -42,21 +43,20 @@ def filter_cards(
     :param tokens: Lemma and part of speech per card.
     :param min_words: Minimum word count of a card.
     :param max_words: Maximum word count of a card.
-    :param card_rule: Rule function of one card, the shared rules of
-        :func:`_filter_reason` when absent.
+    :param card_rule: Rule function of one card, :func:`filter_reason` with the
+        marks of the language.
     :raises ValueError: The card list and the token list have different sizes.
     :returns: The input indices of the passed cards, and the reason per input
         index. A passed card has the empty string as its reason.
     """
     if len(cards) != len(tokens):
         raise ValueError("The card list and the token list differ in size.")
-    rule = _filter_reason if card_rule is None else card_rule
 
     reasons = [""] * len(cards)
     passed: list[int] = []
     seen: set[str] = set()
     for index, card in enumerate(cards):
-        reason = rule(card, tokens[index], min_words, max_words)
+        reason = card_rule(card, tokens[index], min_words, max_words)
         if reason:
             reasons[index] = reason
             continue
@@ -68,38 +68,92 @@ def filter_cards(
     return passed, reasons
 
 
-def _filter_reason(
+class Marks(Protocol):
+    """The mark sets of a language, as the cull profile and the core profile hold them."""
+
+    @property
+    def final_marks(self) -> str: ...
+
+    @property
+    def quote_marks(self) -> str: ...
+
+    @property
+    def internal_marks(self) -> str: ...
+
+
+@dataclass(frozen=True)
+class CardShape:
+    """Shape-guard values of one card.
+
+    The rank flows measure the length window with the tokenizer output, so the
+    unit count comes from the card and not from the sentence text.
+
+    :param units: Token count of the card sentence.
+    :param final_marks: Accepted sentence-final marks of the language.
+    :param quote_marks: Quotation marks and dialogue dashes of the language.
+    :param internal_marks: Internal punctuation marks of the language.
+    """
+
+    units: int
+    final_marks: str
+    quote_marks: str
+    internal_marks: str
+
+    def unit_count(self, sentence: str) -> int:
+        """Give the token count of the card.
+
+        :param sentence: Prepared sentence text.
+        :returns: The token count of the card.
+        """
+        return self.units
+
+
+def filter_reason(
     card: Any,
     card_tokens: Sequence[tuple[str, str]],
     min_words: int,
     max_words: int,
+    profile: Marks,
 ) -> str:
-    """Give the first failed shared filter rule of one card.
+    """Give the first failed filter rule of one card of the cull or the core.
+
+    The English window, the script rule, and the proper-noun rule come from this
+    module. The length window and the mark rules come from the sentence shape
+    guard, so the marks are the marks of the language profile.
 
     :param card: Input card.
     :param card_tokens: Lemma and part of speech of the card sentence.
-    :param min_words: Minimum word count of a card.
-    :param max_words: Maximum word count of a card.
+    :param min_words: Minimum token count of a card.
+    :param max_words: Maximum token count of a card.
+    :param profile: Mark sets of the language.
     :returns: The rule id from ``english_words`` to ``propn``, or the empty
         string on a pass.
     """
     reason = english_rule(card)
     if reason:
         return reason
-    if not min_words <= len(card_tokens) <= max_words:
-        return "length_window"
-    sentence = card.sentence
-    reason = script_rule(sentence)
+    shape = CardShape(
+        len(card_tokens),
+        profile.final_marks,
+        profile.quote_marks,
+        profile.internal_marks,
+    )
+    # The rank flows pass only the length key and the mark keys, so the adapter
+    # gives those values and not the rest of a language profile.
+    guard_profile = cast(LanguageProfile, shape)
+    reason = check_sentence_shape(
+        card.sentence, guard_profile, min_words, max_words, keys=LENGTH_RULES
+    )
     if reason:
         return reason
-    if not sentence.endswith(tuple(FINAL_MARKS)):
-        return "final_mark"
-    if sum(1 for char in sentence if char in FINAL_MARKS) != 1:
-        return "one_final_mark"
-    if set(sentence) & QUOTE_MARKS or sentence[:1] in DIALOGUE_DASHES:
-        return "quote"
-    if sum(1 for char in sentence if char in INTERNAL_MARKS) > 1:
-        return "internal_mark"
+    reason = script_rule(card.sentence)
+    if reason:
+        return reason
+    reason = check_sentence_shape(
+        card.sentence, guard_profile, min_words, max_words, keys=MARK_RULES
+    )
+    if reason:
+        return reason
     return pos_rule(card_tokens)
 
 
