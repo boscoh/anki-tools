@@ -1,4 +1,4 @@
-"""Shared gates G1 to G15 of the cull deck.
+"""Shared gates G1 to G17 of the cull deck.
 
 The gates read the output APKG, the two CSV files, and the manifest. A gate
 never writes a file. A language package supplies a

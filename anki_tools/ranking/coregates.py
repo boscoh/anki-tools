@@ -1,4 +1,4 @@
-"""Shared gates K1 to K20 of the core deck.
+"""Shared gates K1 to K21 of the core deck.
 
 The gates read the output APKG, the two CSV files, and the manifest. A gate
 never writes a file. A language package supplies the

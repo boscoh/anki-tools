@@ -21,6 +21,8 @@ records the overlap. For example, pack `F8` is the internal-mark rule and rank
 `F8` is the name rule. Pack `G5` tests a one-time target and cull `G5`
 re-runs the filters.
 
+The claims below match the code at commit `3fbeae8`.
+
 ## 2. Filters
 
 ### 2.1 Rule table
@@ -112,7 +114,8 @@ The gate seam is already shared in part:
 three flows print through `print_audit`, and each report prints a flow title.
 
 The pack keeps its own `run_gates` and its `(name, check)` tuple type. The cull
-and the core use `ranking.gates.run_gates` and `Gate` values.
+and the core use `ranking.gates.run_gates` and `Gate` values. Section 3.4 gives
+the target interface, and section 5.1 gives the change.
 
 ### 3.3 Differences
 
@@ -133,6 +136,35 @@ and the core use `ranking.gates.run_gates` and `Gate` values.
 - The pack similarity gate G6 uses `profile.similarity` on the sentence text.
   The cull G6 and core K6 use the lemma Jaccard value with the content parts of
   speech. The three checks do not compare the same property.
+
+### 3.4 The harmonized gate interface
+
+The gate seam has five parts. The report and the reader are already shared.
+The runner and the row type are shared by the cull and the core only.
+
+| Part | Name | Location | Shared by |
+| --- | --- | --- | --- |
+| Gate value | `Gate(name, check)` | `ranking/gates.py` | cull, core |
+| Row | `GateResult(name, passed, message)` | `ranking/gates.py` | cull, core |
+| Runner | `run_gates(gates, files)` | `ranking/gates.py` | cull, core |
+| Report | `report(results, title)` | `ranking/gates.py` | pack, cull, core |
+| Reader | `GateFiles` and `GateFileReader` | `ranking/gates.py`, `gate_files.py` | pack, cull, core |
+
+Each flow supplies three items: a gate table, a file reader, and a title.
+
+| Flow | Gate table | File reader | Title |
+| --- | --- | --- | --- |
+| Sentence pack | the language tuple plus `GENERIC_GATES` | `AuditInputs` | `Swadesh sentence pack` |
+| Cull deck | `GATES` in `ranking/cullgates.py` | `CullFiles` | `Cull deck` |
+| Core deck | `GATES` in `ranking/coregates.py` | `CoreFiles` | `Core deck` |
+| Vocabulary deck | none | none | none |
+
+The gate ids and the gate sets stay per flow. ADR 0027 records why. The
+harmonized parts are the runner, the row type, and the report. Each flow keeps
+its own table.
+
+One item is not yet shared: the pack declares `(name, check)` tuples and runs
+its own loop. Section 5.1 removes the second loop.
 
 ## 4. Why the flows differ
 
@@ -167,8 +199,10 @@ the accidental items are worth a change.
 
 ### 5.1 L1: one gate runner
 
-**Change**: make the pack gate table a list of `Gate` values and delete the
-second `run_gates`. A small closure passes `files.profile` to the pack check:
+**Change**: every flow declares its gates as `Gate` values and calls
+`ranking.gates.run_gates`. Delete the second `run_gates` in
+`sentence_pack/audit.py`, and replace `GateRow` with `GateResult`. A small
+adapter converts the present pack table:
 
 ```python
 def as_gates(gates: Sequence[tuple[str, GateCheck]]) -> tuple[Gate, ...]:
@@ -178,12 +212,23 @@ def as_gates(gates: Sequence[tuple[str, GateCheck]]) -> tuple[Gate, ...]:
     )
 ```
 
-**Files**: `sentence_pack/audit.py`, the language audit wrappers, and
+**Result**: one runner, one row type, one report. Section 3.4 lists the three
+items that each flow supplies.
+
+**Residue**: the pack checks keep the `(inputs, profile)` form, and the
+adapter supplies the profile. A full `check(files)` form would touch about 60
+pack check functions and gain nothing. Do it only when a pack check must
+serve another flow.
+
+**Files**: `sentence_pack/audit.py`, the five language audit wrappers, and
 `ranking/gates.py` for the shared type.
 
-**Cost**: about 30 lines. **Behavior**: none. The report is already shared.
+**Cost**: about 30 lines. **Behavior**: none. The report text and the exit
+code must stay the same.
 
-**Verdict**: do it. It removes a duplicate runner and leaves one gate type.
+**Test**: `uv run pytest tests/test_gates.py tests/test_mandarin_audit.py`.
+
+**Verdict**: do it. This is the gate harmonization: one seam and four tables.
 
 ### 5.2 L2: one rule record schema
 
@@ -274,21 +319,24 @@ separate sets and make the accidental differences go away.
 
 ## 6. Recommended order
 
-1. **L1: one gate runner**. Small, no behavior change.
-   Tracked by `anki-3fc9`.
-2. **L3: one mark source**. Medium, one clear win, one rebuild.
-   Tracked by `anki-0d3d`.
+The gate harmonization comes first, because it changes no deck:
+
+1. **L1: one gate runner**. Small, no behavior change. Tracked by
+   `anki-3fc9`. ADR 0021 records the one file reader. This step adds the one
+   runner and needs no new seam.
+2. **L3: one mark source**. Medium, one clear win, one rebuild. This is a
+   filter change, not a gate change. Tracked by `anki-0d3d`.
 3. **Stop**. L2 and L4 are optional. L5 and L6 are out.
 
-Record one ADR for L3, because it changes the `CoreProfile` interface. ADR 0027
-stays in force for the ids.
-
+Record one ADR for L3, because it changes the `CoreProfile` interface. ADR
+0027 stays in force for the ids.
 ## 7. Verification
 
 Run the focused tests first:
 
 ```bash
 uv run pytest tests/test_gate_id_map.py tests/test_gates.py \
+  tests/test_mandarin_audit.py \
   tests/test_core_deck.py tests/test_shared_coreflow.py \
   tests/test_mandarin_core.py tests/test_cantonese_core.py \
   tests/test_cull_shared.py tests/test_french_cull.py \
