@@ -303,7 +303,7 @@ The coverage status of a target is one of these values:
 | ---------- | --------------- | ----------------------------------------------------- |
 | size       | K1, K4          | card count, outside set and rare outside words        |
 | coverage   | K2, K3, K11     | covered targets, two-card share, coverage CSV         |
-| rules      | K5, K6, K17     | F1 to F9 and C1 to C5, similarity, name and loan word |
+| rules      | K5, K6, K17     | F1 to F9 and C1 to C5, similarity, the rejected counts |
 | files      | K7, K8, K12     | audio files, counts, manifest hashes                  |
 | identity   | K9, K10         | deck name, note type, kept order                      |
 | cards      | K13, K14, K15   | target in the text, templates and CSS, bold core word |
@@ -312,6 +312,9 @@ The coverage status of a target is one of these values:
 | note type  | K21             | one note type, the output fields, one card per note   |
 
 K3 reports the share of targets with two cards. It does not fail.
+
+K17 reports the C3 name rejects and the C4 loan word rejects. It does not fail,
+because K5 holds every kept card to both rules.
 
 K14 checks the templates and the CSS of the language profile. K15 checks that
 every kept note holds a bold core word. K19 checks that every note holds a

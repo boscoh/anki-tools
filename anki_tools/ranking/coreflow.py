@@ -590,8 +590,6 @@ def manifest_counts(
         "dropped_no_core": dropped_no_core,
         "bolded": bolded,
         "unbolded": unbolded,
-        "name_hits": 0,
-        "loan_hits": 0,
         "rows": len(rows),
     }
 

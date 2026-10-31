@@ -472,7 +472,7 @@ K13   PASS    0 bad hit(s):
 K14   PASS    1 model(s) match, CSS match
 K15   PASS    106 bold card(s), issues
 K16   PASS    0 unchecked, limit 0
-K17   PASS    name hits 0, loan hits 0
+K17   PASS    rejected 1 name card(s), 0 loan word card(s)
 K18   PASS    0 tail card(s), 0 without a new lemma
 K19   PASS    147 core word(s), 0 bad:
 K20   PASS    0 unranked, limit 0

@@ -167,7 +167,7 @@ every rule.
   `tomber`. A language without a `PROPN` tag uses the substring test of the
   yue selector instead.
 - C4 is a whole word match, so `stop` does not reject `stopover`. The list is
-  optional; gate K17 reports the count.
+  optional; gate K17 reports the rejected count and does not fail on it.
 - C5 makes this an audio deck. All 5,928 cards of the French input have
   audio, so C5 removes 0 cards. A card without audio is not a candidate.
 
@@ -512,7 +512,7 @@ non-zero.
 | K14  | the templates equal `CORE_TEMPLATES` and the CSS equals `card_css()` |
 | K15  | every kept card holds a bold core word, and the CSV holds plain text  |
 | K16  | every target with a card has a sense row, or the unchecked count is within `--max-unchecked-sense` |
-| K17  | no kept card holds a name or a loan word, and the manifest gives both counts |
+| K17  | informational: reports the C3 name rejects and the C4 loan word rejects; K5 holds the kept cards to both |
 | K18  | every tail card brings at least one new content lemma                 |
 | K19  | every note holds a non-empty `Core` and `CoreGloss`, and the gloss is a coverage gloss of that word |
 | K20  | the unranked tier F count is within `--max-unranked`                  |
@@ -710,7 +710,7 @@ to E5 are closed. Section 14.5 lists what remains.
 | K14  | the templates equal `CORE_TEMPLATES` and the CSS equals the cull CSS              |
 | K15  | every kept card holds the bold core word; the CSV holds plain text                |
 | K16  | 0 unchecked targets                                                               |
-| K17  | 0 names and 0 loan words in the kept cards                                        |
+| K17  | report only: 25 rejected name cards and 32 rejected loan word cards               |
 | K18  | every tail card brings a new content lemma                                        |
 | K19  | every note holds a `Core` and a `CoreGloss` (section 15)                          |
 | K20  | 0 unranked tier F targets                                                         |

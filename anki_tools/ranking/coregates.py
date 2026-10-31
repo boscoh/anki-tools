@@ -428,13 +428,14 @@ def gate_unranked(files: CoreFiles) -> tuple[bool, str]:
 
 
 def gate_names(files: CoreFiles) -> tuple[bool, str]:
-    """K17: no kept card holds a name or a loan word."""
+    """K17: report the rejected name and loan word cards.
+
+    The gate reports only. K5 holds the kept cards to rules C3 and C4.
+    """
     counts = files.manifest()["counts"]
-    ok = counts.get("name_hits", 0) == 0 and counts.get("loan_hits", 0) == 0
-    return ok, (
-        f"name hits {counts.get('name_hits', 0)}, "
-        f"loan hits {counts.get('loan_hits', 0)}"
-    )
+    names = int(counts.get("rejected_c3", 0))
+    loans = int(counts.get("rejected_c4", 0))
+    return True, f"rejected {names} name card(s), {loans} loan word card(s)"
 
 
 def gate_tail(files: CoreFiles) -> tuple[bool, str]:

@@ -765,6 +765,20 @@ class TestCardDesign:
         assert not passed
         assert "is not the coverage gloss" in message
 
+    def test_the_name_gate_reports_the_rejected_name_count(
+        self, tmp_path: Path
+    ) -> None:
+        _run, output, profile = _run_core(tmp_path)
+        _core, _coverage, manifest_path, _rank = DeckIdentity(output).core_sides()
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["counts"]["rejected_c3"] = 1
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+        passed, message = coregates.gate_names(coregates.CoreFiles(output, profile))
+
+        assert passed
+        assert "1 name card(s)" in message
+
     def test_a_kept_card_without_a_core_word_leaves_the_deck(
         self, tmp_path: Path
     ) -> None:
