@@ -246,7 +246,6 @@ def _build_layout(config: dict, entries: list[dict]) -> _BuildLayout:
             back=answer_format,
             css_layers=css_layers,
             fields=fields,
-            char_links=True,
         )
     )
 

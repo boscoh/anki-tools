@@ -59,6 +59,18 @@ def load_char_links(path: Path = CHAR_LINKS_PATH) -> str:
     return load_optional_text(path)
 
 
+def add_char_links(back: str) -> str:
+    """Append the character-link script when the back text holds the hook.
+
+    :param back: Back template text.
+    :returns: The back text, with the script appended.
+    """
+    script = load_char_links()
+    if script and "char-links" in back:
+        return f"{back.rstrip()}\n{script}"
+    return back
+
+
 def join_css(*layers: str) -> str:
     """Join the CSS texts in order. A later rule overrides an earlier rule.
 
@@ -86,7 +98,6 @@ class TemplateSpec:
     :param back: Back template text.
     :param css_layers: CSS texts in order, the shared sheet first.
     :param fields: Field names of the note type.
-    :param char_links: True to add the Han character-link script.
     :param optional_blocks: Block names that the note type drops when the
         field is absent.
     """
@@ -95,7 +106,6 @@ class TemplateSpec:
     back: str
     css_layers: Sequence[str] = ()
     fields: Sequence[str] = ()
-    char_links: bool = False
     optional_blocks: Sequence[str] = ()
 
 
@@ -135,10 +145,7 @@ def assemble_templates(spec: TemplateSpec) -> TemplatePair:
     for name in spec.optional_blocks:
         if name not in spec.fields:
             back = drop_block(back, name)
-    if spec.char_links:
-        script = load_char_links()
-        if script:
-            back = f"{back}\n{script}"
+    back = add_char_links(back)
     return TemplatePair(front=spec.front, back=back, css=join_css(*spec.css_layers))
 
 
@@ -255,9 +262,7 @@ def apply_templates(
             if mapping and verbose:
                 print(f"  Auto-mapping: {mapping}")
             afmt = apply_field_mapping(afmt, mapping)
-        script = load_char_links()
-        if script and "char-links" in afmt:
-            afmt = f"{afmt.rstrip()}\n{script}"
+        afmt = add_char_links(afmt)
     elif verbose:
         print(f"No {back_path} found, skipping back template")
 

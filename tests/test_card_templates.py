@@ -225,12 +225,13 @@ def test_the_assembly_keeps_a_block_that_has_a_field() -> None:
     assert "{{Romanization}}" in pair.back
 
 
-def test_the_assembly_adds_the_script_only_when_the_switch_is_on() -> None:
+def test_the_assembly_adds_the_script_only_when_the_hook_is_present() -> None:
+    hooked = '<div class="char-links">b</div>'
     off = assemble_templates(TemplateSpec(front="f", back="b"))
-    on = assemble_templates(TemplateSpec(front="f", back="b", char_links=True))
+    on = assemble_templates(TemplateSpec(front="f", back=hooked))
 
     assert off.back == "b"
-    assert on.back == f"b\n{load_char_links()}"
+    assert on.back == f"{hooked}\n{load_char_links()}"
 
 
 def test_the_assembly_joins_the_css_layers_in_order() -> None:

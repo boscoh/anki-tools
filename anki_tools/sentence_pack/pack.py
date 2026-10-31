@@ -495,7 +495,6 @@ def build_pack(
             back=profile.back_template,
             css_layers=(load_optional_text(css_path), profile.extra_css),
             fields=profile.fields,
-            char_links=profile.char_links,
         )
     )
 

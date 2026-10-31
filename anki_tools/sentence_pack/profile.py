@@ -97,8 +97,6 @@ class LanguageProfile:
     :param finalize_candidate: Hook that fills the language-specific card fields.
     :param highlight: Hook that marks the matched target tokens of a card
         sentence, None to wrap the first target substring.
-    :param char_links: True when the back template links each Han character
-        to the CC-Canto dictionary.
     :param sense_filter: Hook that rejects a form whose paired English holds a
         false-friend sense, given the form and the English text.
     :param false_friend_spans: Hook that gives the spans where a form sits in a
@@ -173,7 +171,6 @@ class LanguageProfile:
     excluded_words: Callable[[Sequence[Any], Collection[str]], list[str]]
     finalize_candidate: Callable[[Any, str], Any]
     highlight: Callable[[str, str], str] | None = None
-    char_links: bool = False
     sense_filter: Callable[[str, str], bool] | None = None
     false_friend_spans: Callable[[str, str], Sequence[tuple[int, int]]] | None = None
     warm_tokens: Callable[[Iterable[str]], None] | None = None

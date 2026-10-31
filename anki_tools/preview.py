@@ -18,6 +18,7 @@ from anki_tools.apkg.templates import (
     DEFAULT_TEMPLATE_DIR,
     SHARED_CSS_PATH,
     TEMPLATES_DIR,
+    add_char_links,
     load_char_links,
     load_css_layers,
     load_text,
@@ -478,8 +479,7 @@ def sentence_card(language: str, title: str, row: dict[str, str]) -> PreviewCard
     directory = TEMPLATES_DIR / "sentence_pack" / language
     front_template = load_text(directory / "front.html")
     back_template = load_text(directory / "back.html")
-    if language in {"mandarin", "cantonese"} and SHARED_SCRIPT:
-        back_template = f"{back_template}\n{SHARED_SCRIPT}"
+    back_template = add_char_links(back_template)
     css = load_css_layers(
         SHARED_CSS_PATH,
         directory / "card.css",
@@ -527,8 +527,7 @@ def default_card() -> PreviewCard:
     """
     front_template = load_text(DEFAULT_TEMPLATE / "front.html")
     back_template = load_text(DEFAULT_TEMPLATE / "back.html")
-    if SHARED_SCRIPT and "char-links" in back_template:
-        back_template = f"{back_template.rstrip()}\n{SHARED_SCRIPT}"
+    back_template = add_char_links(back_template)
     css = load_css_layers(SHARED_CSS_PATH, DEFAULT_TEMPLATE / "card.css")
     fields = {
         "[a]": "[sound:wo_jintian_hen_mang.mp3]",
@@ -592,8 +591,7 @@ def fix_card(language: str, mode: str, title: str) -> PreviewCard:
         TEMPLATES_DIR / "sentence_pack" / language / "card.css",
     )
     back = load_text(directory / "back.html")
-    if SHARED_SCRIPT and "char-links" in back:
-        back = f"{back.rstrip()}\n{SHARED_SCRIPT}"
+    back = add_char_links(back)
     sample = FIX_SAMPLES[language]
     profile = LANGUAGES[language].profile
     if profile is not None and profile.highlight is not None:

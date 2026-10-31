@@ -1003,7 +1003,6 @@ MANDARIN = register(
         sort_field_index=SORT_FIELD_INDEX,
         front_template=FRONT_TEMPLATE,
         back_template=BACK_TEMPLATE,
-        char_links=True,
         deck_description=DECK_DESCRIPTION,
         licenses=(
             ("Swadesh word data", "CC BY-SA 4.0"),
