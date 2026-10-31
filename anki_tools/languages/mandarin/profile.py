@@ -143,8 +143,6 @@ REVIEW_FIELDS = [
 ]
 OVERRIDE_FIELDS = ["mandarin", "pinyin", "reason"]
 
-MODEL_NAME = "Swadesh Mandarin Sentences"
-DECK_NAME = "Swadesh Mandarin Sentences"
 FIELDS = (
     "Audio",
     "Sentence",
@@ -1001,10 +999,6 @@ MANDARIN = register(
         pool_report=POOL_REPORT_PATH,
         audio_dir=AUDIO_DIR,
         word_review_csv=DEFAULT_REVIEW_PATH,
-        deck_name=DECK_NAME,
-        model_name=MODEL_NAME,
-        output_apkg=Path("apkg/swadesh_mandarin_sentences.apkg"),
-        manifest_path=Path("apkg/swadesh_mandarin_sentences.manifest.json"),
         fields=FIELDS,
         sort_field_index=SORT_FIELD_INDEX,
         front_template=FRONT_TEMPLATE,

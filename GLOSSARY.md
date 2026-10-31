@@ -45,7 +45,7 @@ _Avoid_: notetype blob, model config
 **Vocabulary deck**:
 The deck with one card per Swadesh concept, its form, and its audio. The
 `anki swadesh vocab` command builds it from an `english-<lang>.csv` file and an
-audio directory, for example `apkg/swadesh_mandarin.apkg`. The code lives in
+audio directory, for example `apkg/swadesh_vocab_mandarin.apkg`. The code lives in
 `anki_tools/swadesh_vocab.py`.
 _Avoid_: word deck, word list deck
 

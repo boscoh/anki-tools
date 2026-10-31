@@ -25,13 +25,13 @@ from anki_tools.languages.spanish.frequency import (
 )
 from anki_tools.languages.spanish.profile import (
     INTERNAL_MARKS,
-    MODEL_NAME as SWADESH_MODEL_NAME,
     QUOTE_MARKS,
     SWADESH_ROWS,
     TOKENIZER,
     prepare_text,
 )
 from anki_tools.ranking import coreflow, corelist, cullflow
+from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.ranking.coreflow import InputCard
 from anki_tools.sentence_pack.tokens import load_model
 
@@ -39,7 +39,8 @@ TATOEBA_PATH = Path("data/tatoeba/spa_sentences.tsv")
 NAMES_PATH = Path("vocab/spanish_names.txt")
 
 
-SWADESH_PACK_PATH = Path("apkg/swadesh_spanish_sentences.apkg")
+SWADESH_PACK_PATH = default_output("spanish", "pack")
+SWADESH_MODEL_NAME = DeckIdentity(SWADESH_PACK_PATH).model_name
 SWADESH_TOTAL = SWADESH_ROWS
 # ``corteza`` has no card in the stale reserve pack. The shared reserve dedupe
 # drops the cards of ``cola``, ``coser``, and ``raíz`` against input cards that

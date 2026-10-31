@@ -25,6 +25,7 @@ from anki_tools.apkg.templates import (
     load_optional_text,
     load_text,
 )
+from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.languages import LANGUAGES
 from anki_tools.languages.registry import vocab_languages
 
@@ -54,20 +55,17 @@ def clean_text_for_audio(text: str) -> str:
 
 
 def _deck_config(language: str) -> dict:
-    """Give the paths and names of the vocabulary deck of one language.
+    """Give the paths and the output identity of the vocabulary deck.
 
     :param language: Language name, for example ``french``.
     :returns: Config dict of the deck.
     """
     lang_lower = language.lower()
-    lang_title = language.title()
     return {
         "language": language,
         "vocab_file": f"vocab/english-{lang_lower}.csv",
         "audio_dir": f"audio/audio_{lang_lower}",
-        "deck_name": f"Swadesh {lang_title} Vocabulary",
-        "model_name": f"Swadesh {lang_title} Vocabulary",
-        "output_file": f"swadesh_{lang_lower}.apkg",
+        "identity": DeckIdentity(default_output(lang_lower, "vocab")),
         "audio_field_name": lang_lower,
     }
 
@@ -308,13 +306,11 @@ def _pack_apkg(
         print(f"Error: {len(missing)} forms have no audio: " + ", ".join(missing))
         return None
 
-    apkg_dir = Path("apkg")
-    apkg_dir.mkdir(exist_ok=True)
+    identity = config["identity"]
+    identity.output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    output_path = apkg_dir / config["output_file"]
-
-    print(f"Creating APKG: {output_path}")
-    print(f"  Deck: {config['deck_name']}")
+    print(f"Creating APKG: {identity.output_path}")
+    print(f"  Deck: {identity.title}")
     print(f"  Cards: {len(cards)}")
     print(f"  Audio files: {len(media)}")
     if layout.css_content:
@@ -322,10 +318,10 @@ def _pack_apkg(
 
     files = deck_writer.write_deck(
         deck_writer.DeckWrite(
-            output_path=output_path,
+            output_path=identity.output_path,
             shape=deck_writer.NoteTypeShape(
-                deck_name=config["deck_name"],
-                model_name=config["model_name"],
+                deck_name=identity.title,
+                model_name=identity.model_name,
                 fields=tuple(layout.fields),
                 templates=((layout.front_template, layout.answer_format),),
                 css=layout.css_content,

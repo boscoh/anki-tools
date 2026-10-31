@@ -10,13 +10,15 @@ import pytest
 from anki_tools.languages.mandarin import stages as audit
 from anki_tools.languages.mandarin.profile import (
     FIELDS,
-    MODEL_NAME,
     SENTENCE_FIELDS,
     WordForm,
 )
 from anki_tools.languages.mandarin.stages import print_audit, run_audit
 from anki_tools.apkg.package import AnkiPackage
+from anki_tools.ranking.identity import DeckIdentity, default_output
 
+PACK_PATH = default_output("mandarin", "pack")
+MODEL_NAME = DeckIdentity(PACK_PATH).model_name
 FAKE_MP3 = b"ID3\x03\x00\x00\x00" + b"\x00" * 64
 INDEX_FIELDS = [
     "filename",
@@ -219,10 +221,10 @@ def build_env(
         "# Attribution\n\nSentences: Tatoeba.\n", encoding="utf-8"
     )
 
-    apkg_path = tmp_path / "pack.apkg"
+    apkg_path = tmp_path / PACK_PATH.name
     AnkiPackage.create(
         apkg_path,
-        "Swadesh Mandarin Sentences",
+        DeckIdentity(PACK_PATH).title,
         fields=FIELDS,
         cards=[{field: "" for field in FIELDS} for _ in rows],
         media_files=media,
@@ -415,7 +417,7 @@ def test_g13_rejects_a_wrong_note_count(
     env = build_env(tmp_path, monkeypatch)
     AnkiPackage.create(
         env["apkg_path"],
-        "Swadesh Mandarin Sentences",
+        MODEL_NAME,
         fields=FIELDS,
         cards=[{field: "" for field in FIELDS} for _ in range(5)],
         model_name=MODEL_NAME,

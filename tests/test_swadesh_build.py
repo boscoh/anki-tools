@@ -78,8 +78,9 @@ def test_vocab_deck_and_model_names(monkeypatch: pytest.MonkeyPatch) -> None:
 
     swadesh_vocab.build_vocab_deck("french")
 
-    assert captured["deck_name"] == "Swadesh French Vocabulary"
-    assert captured["model_name"] == "Swadesh French Vocabulary"
+    identity = captured["identity"]
+    assert identity.title == "Swadesh Vocab French"
+    assert identity.model_name == identity.title
 
 
 def test_the_swadesh_help_lists_the_languages(

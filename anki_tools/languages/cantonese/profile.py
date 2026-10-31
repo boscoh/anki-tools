@@ -154,8 +154,6 @@ WORD_REVIEW_FIELDS = [
     "status",
 ]
 
-MODEL_NAME = "Swadesh Cantonese Sentences"
-DECK_NAME = "Swadesh Cantonese Sentences"
 FIELDS = (
     "Audio",
     "Sentence",
@@ -972,10 +970,6 @@ CANTONESE = register(
         pool_report=POOL_REPORT_PATH,
         audio_dir=AUDIO_DIR,
         word_review_csv=DEFAULT_REVIEW_PATH,
-        deck_name=DECK_NAME,
-        model_name=MODEL_NAME,
-        output_apkg=Path("apkg/swadesh_cantonese_sentences.apkg"),
-        manifest_path=Path("apkg/swadesh_cantonese_sentences.manifest.json"),
         fields=FIELDS,
         sort_field_index=SORT_FIELD_INDEX,
         front_template=FRONT_TEMPLATE,

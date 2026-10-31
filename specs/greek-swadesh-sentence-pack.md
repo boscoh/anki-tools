@@ -166,7 +166,7 @@ Rules:
 | S2    | Candidate pool     | S0, S1       | in-memory pool, pool report                   |
 | S3    | Sentence selection | S2           | `vocab/greek_sentences.csv`, review CSV       |
 | S4    | Audio              | S3           | `audio/greek_sentences/*.mp3`, index CSV      |
-| S5    | Pack               | S1, S3, S4   | `apkg/swadesh_greek_sentences.apkg`, manifest |
+| S5    | Pack               | S1, S3, S4   | `apkg/swadesh_sentences_greek.apkg`, manifest |
 
 Each stage reads its input files and writes deterministic output. Each stage
 is safe to re-run. A stage skips work when its cache is complete.
@@ -183,8 +183,8 @@ The Greek pack uses the shared layer from the French spec, section 5.1. The
 | Word CSV        | `vocab/english-greek.csv`                               |
 | Sentence CSV    | `vocab/greek_sentences.csv`                             |
 | Audio directory | `audio/greek_sentences`                                 |
-| Deck name       | `Swadesh Greek Sentences`                               |
-| Model name      | `Swadesh Greek Sentences`                               |
+| Deck name       | `Swadesh Sentences Greek`                               |
+| Model name      | `Swadesh Sentences Greek`                               |
 | Word window     | 4 to 10 words                                           |
 | Final marks     | `.?!;`                                                  |
 | Internal marks  | `,·:`                                                   |
@@ -590,7 +590,7 @@ about 9 minutes.
 
 ### 10.1 Note model
 
-Model name: `Swadesh Greek Sentences`. The field list is the same as the French
+Model name: `Swadesh Sentences Greek`. The field list is the same as the French
 model, section 10.1 of that spec:
 
 | Order | Field       | Content                       |
@@ -619,13 +619,13 @@ from `templates/sentence_pack/greek/card.css`.
 
 ### 10.3 Deck
 
-- Deck name: `Swadesh Greek Sentences`.
+- Deck name: `Swadesh Sentences Greek`.
 - Add notes in Swadesh index order.
 - Do not split the deck. Use tags for study filters.
 
 ### 10.4 Manifest
 
-Write `apkg/swadesh_greek_sentences.manifest.json` with the same shape as the
+Write `apkg/swadesh_sentences_greek.manifest.json` with the same shape as the
 French manifest, section 10.4 of that spec, and these values:
 
 ```json
@@ -707,8 +707,8 @@ vocab/
 audio/greek_sentences/
   tts_*.mp3  word_*.mp3  index.csv
 apkg/
-  swadesh_greek_sentences.apkg
-  swadesh_greek_sentences.manifest.json
+  swadesh_sentences_greek.apkg
+  swadesh_sentences_greek.manifest.json
 ATTRIBUTION.md
 ```
 

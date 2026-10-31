@@ -38,10 +38,6 @@ class LanguageProfile:
     :param pool_report: JSON pool report written by S3.
     :param audio_dir: Directory of the MP3 files and ``index.csv``.
     :param word_review_csv: Word review CSV that must have no open row.
-    :param deck_name: Anki deck name.
-    :param model_name: Anki note model name.
-    :param output_apkg: APKG file written by S5.
-    :param manifest_path: Manifest JSON written by S5.
     :param fields: Note fields in display order.
     :param sort_field_index: Index of the sort field.
     :param front_template: Front card template.
@@ -121,10 +117,6 @@ class LanguageProfile:
     pool_report: Path
     audio_dir: Path
     word_review_csv: Path
-    deck_name: str
-    model_name: str
-    output_apkg: Path
-    manifest_path: Path
     fields: tuple[str, ...]
     sort_field_index: int
     front_template: str

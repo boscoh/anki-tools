@@ -19,6 +19,7 @@ from typing import Any, Callable, Iterable, Sequence
 
 from anki_tools.apkg import deck_writer
 from anki_tools.apkg.deck_writer import sha256_value
+from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.sentence_pack.audio import (
     NATIVE_LICENSE_BLOCK,
     PRIVATE_PACK,
@@ -388,6 +389,7 @@ def build_manifest(
     rows: Sequence[dict[str, str]],
     index: AudioIndex,
     *,
+    identity: DeckIdentity,
     word_csv: Path,
     csv_path: Path,
     pack_license: str = PUBLIC_PACK,
@@ -398,6 +400,7 @@ def build_manifest(
     :param table: Reviewed word table.
     :param rows: Sentence CSV rows.
     :param index: Audio index of the pack.
+    :param identity: Identity of the output package, which names the deck.
     :param word_csv: Reviewed word CSV.
     :param csv_path: Sentence CSV.
     :param pack_license: ``public`` or ``private``.
@@ -409,8 +412,8 @@ def build_manifest(
         positions[target][0] for target in targets if target in positions
     }
     manifest: dict[str, Any] = {
-        "deck": profile.deck_name,
-        "model": profile.model_name,
+        "deck": identity.title,
+        "model": identity.model_name,
         "build_date": date.today().isoformat(),
         "source_dump_date": source_dump_date(),
         "counts": {
@@ -462,8 +465,8 @@ def build_pack(
     :param csv_path: Sentence CSV with one row per card.
     :param word_csv: Reviewed Swadesh word CSV.
     :param audio_dir: Directory with the MP3 files and ``index.csv``.
-    :param output: Path of the APKG file to write.
-    :param manifest_path: Path of the manifest JSON file to write.
+    :param output: Path of the APKG file to write, default the pack default.
+    :param manifest_path: Path of the manifest JSON file, default the side file.
     :param attribution_path: Path of the attribution Markdown file to write.
     :param pack_license: ``public`` or ``private``.
     :param css_path: Base card CSS file.
@@ -474,9 +477,13 @@ def build_pack(
     csv_path = Path(csv_path) if csv_path is not None else profile.sentence_csv
     word_csv = Path(word_csv) if word_csv is not None else profile.word_csv
     audio_dir = Path(audio_dir) if audio_dir is not None else profile.audio_dir
-    output = Path(output) if output is not None else profile.output_apkg
+    identity = DeckIdentity(
+        Path(output) if output is not None else default_output(profile.name, "pack")
+    )
     manifest_path = (
-        Path(manifest_path) if manifest_path is not None else profile.manifest_path
+        Path(manifest_path)
+        if manifest_path is not None
+        else identity.side("manifest.json")
     )
     table = list(load_table(csv_path=word_csv))
     by_target = {profile.form_text(form): form for form in table}
@@ -535,6 +542,7 @@ def build_pack(
         table,
         packed_rows,
         index,
+        identity=identity,
         word_csv=word_csv,
         csv_path=csv_path,
         pack_license=pack_license,
@@ -542,10 +550,10 @@ def build_pack(
     manifest["counts"]["no_target"] = no_target
     files = deck_writer.write_deck(
         deck_writer.DeckWrite(
-            output_path=output,
+            output_path=identity.output_path,
             shape=deck_writer.NoteTypeShape(
-                deck_name=profile.deck_name,
-                model_name=profile.model_name,
+                deck_name=identity.title,
+                model_name=identity.model_name,
                 fields=profile.fields,
                 templates=((templates.front, templates.back),),
                 css=templates.css,

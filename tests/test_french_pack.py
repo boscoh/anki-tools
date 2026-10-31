@@ -7,6 +7,7 @@ import json
 from dataclasses import replace
 from pathlib import Path
 
+from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.sentence_pack import audio, pack, pool, select
 from anki_tools.sentence_pack.audit import AuditInputs, gate_proper_sentences
 from anki_tools.sentence_pack.guards import check_sentence_shape
@@ -473,7 +474,13 @@ def test_manifest_counts(tmp_path: Path) -> None:
     )
 
     manifest = pack.build_manifest(
-        french.FRENCH, table, rows, index, word_csv=word_csv, csv_path=csv_path
+        french.FRENCH,
+        table,
+        rows,
+        index,
+        identity=DeckIdentity(default_output("french", "pack")),
+        word_csv=word_csv,
+        csv_path=csv_path,
     )
 
     assert manifest["counts"]["words"] == 3

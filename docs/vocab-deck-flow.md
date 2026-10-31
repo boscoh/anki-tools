@@ -182,10 +182,10 @@ The vocabulary deck has no gate table. Use the inspect commands on the output
 file:
 
 ```bash
-uv run anki inspect cards apkg/swadesh_mandarin.apkg
-uv run anki inspect decks apkg/swadesh_mandarin.apkg
-uv run anki inspect models apkg/swadesh_mandarin.apkg --verbose
-uv run anki inspect audio apkg/swadesh_mandarin.apkg
+uv run anki inspect cards apkg/swadesh_vocab_mandarin.apkg
+uv run anki inspect decks apkg/swadesh_vocab_mandarin.apkg
+uv run anki inspect models apkg/swadesh_vocab_mandarin.apkg --verbose
+uv run anki inspect audio apkg/swadesh_vocab_mandarin.apkg
 ```
 
 A card count that differs from the row count of the CSV is a defect. So is an

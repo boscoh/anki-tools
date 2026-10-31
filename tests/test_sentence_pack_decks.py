@@ -3,17 +3,20 @@
 from __future__ import annotations
 
 from anki_tools.languages import PROFILES
+from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.sentence_pack.pack import used_audio_authors
 
 
-def test_deck_name_has_the_swadesh_prefix() -> None:
-    for name, profile in PROFILES.items():
-        assert profile.deck_name == f"Swadesh {name.title()} Sentences"
+def test_the_default_deck_title_has_the_swadesh_prefix() -> None:
+    for name in PROFILES:
+        identity = DeckIdentity(default_output(name, "pack"))
+        assert identity.title == f"Swadesh Sentences {name.title()}"
 
 
-def test_every_pack_model_name_matches_its_deck_name() -> None:
-    for name, profile in PROFILES.items():
-        assert profile.model_name == profile.deck_name
+def test_the_pack_note_type_matches_its_deck_title() -> None:
+    for name in PROFILES:
+        identity = DeckIdentity(default_output(name, "pack"))
+        assert identity.model_name == identity.title
 
 
 def test_used_audio_authors_keeps_only_the_native_rows_of_the_pack() -> None:

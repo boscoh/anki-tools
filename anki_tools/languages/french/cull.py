@@ -24,6 +24,7 @@ from anki_tools.languages.french.profile import (
     TOKENIZER,
 )
 from anki_tools.ranking import coreflow, corelist, cullflow
+from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.ranking.coreflow import InputCard
 from anki_tools.ranking.deckprofile import LanguageDeckProfile
 from anki_tools.apkg.templates import load_css
@@ -37,8 +38,8 @@ FRENCH_FIELD = "French"
 AUDIO_FIELD = "sound"
 ENGLISH_FIELD = "Back"
 
-SWADESH_PACK_PATH = Path("apkg/swadesh_french_sentences.apkg")
-SWADESH_MODEL_NAME = "Swadesh French Sentences"
+SWADESH_PACK_PATH = default_output("french", "pack")
+SWADESH_MODEL_NAME = DeckIdentity(SWADESH_PACK_PATH).model_name
 SWADESH_TOTAL = 207
 SWADESH_EXCEPTIONS = ("intestins",)
 

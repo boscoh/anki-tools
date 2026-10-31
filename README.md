@@ -194,7 +194,7 @@ audio. See the appendix for the languages. A build does these steps in order:
 2. Deletes each audio file in `audio/audio_<language>/` that the current list
    does not use. `--no-prune` keeps those files.
 3. Stops with an error if a form still has no audio. No deck is written.
-4. Writes `apkg/swadesh_<language>.apkg` through a temporary file. The old
+4. Writes `apkg/swadesh_vocab_<language>.apkg` through a temporary file. The old
    deck is replaced only after a complete write.
 
 The audio file name comes from the target-language text. If you correct a form
@@ -236,8 +236,8 @@ The commands write these files. A language that has no word review file
 | `vocab/<language>_sentences.csv`                       | one row per card                  |
 | `vocab/<language>_sentences_review.csv`                | top candidates for the weak words |
 | `audio/<language>_sentences/index.csv`                 | file index of the audio cache     |
-| `apkg/swadesh_<language>_sentences.apkg`               | the deck                          |
-| `apkg/swadesh_<language>_sentences.manifest.json`      | counts, coverage, and file hashes |
+| `apkg/swadesh_sentences_<language>.apkg`               | the deck                          |
+| `apkg/swadesh_sentences_<language>.manifest.json`      | counts, coverage, and file hashes |
 | `ATTRIBUTION.md`                                       | the `## <Language> pack` section  |
 
 Every pack uses word data under CC BY-SA 4.0 and Tatoeba sentence text under
@@ -466,7 +466,7 @@ weight and the similarity limit, are fields of `CullRequest`.
 A target `status` is `covered` for two or more cards, `partial` for one card,
 and `absent` for no card.
 
-The cull adds a Swadesh reserve from `apkg/swadesh_french_sentences.apkg`: one
+The cull adds a Swadesh reserve from `apkg/swadesh_sentences_french.apkg`: one
 card per Swadesh concept, with its audio. The frequency pass fills the rest of
 the 1,000 cards. `--no-reserve` runs the frequency cull alone. The reserve
 path is a `CullRequest` field.
@@ -578,7 +578,7 @@ A note field refers to audio with `[sound:filename.mp3]`.
 ```text
 #separator:Pipe
 #html:true
-#deck:Swadesh Mandarin Vocabulary
+#deck:Swadesh Vocab Mandarin
 #notetype:Basic
 I | <span style='font-size: 3rem'>我</span> <br> wǒ [sound:我.mp3]
 ```

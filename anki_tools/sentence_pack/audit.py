@@ -19,6 +19,7 @@ from typing import Any, Callable, Iterable, Sequence
 from anki_tools.apkg.deck_writer import sha256_value
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.gate_files import GateFileReader
+from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.sentence_pack.audio import (
     AUDIO_INDEX_NAME,
     MAX_DURATION_S,
@@ -523,19 +524,20 @@ def gate_apkg(
     if info["notes"] != len(rows):
         problems.append(f"{info['notes']} notes but {len(rows)} cards")
     models = info["models"]
+    model_name = DeckIdentity(inputs.apkg_path).model_name
     model = next(
-        (item for item in models.values() if item["name"] == profile.model_name), None
+        (item for item in models.values() if item["name"] == model_name), None
     )
     if model is None:
         names = sorted(item.get("name", "") for item in models.values())
-        problems.append(f"model {profile.model_name!r} not found in {names}")
+        problems.append(f"model {model_name!r} not found in {names}")
     else:
         fields = [field["name"] for field in model["flds"]]
         if fields != list(profile.fields):
             problems.append(f"model fields {fields} != {list(profile.fields)}")
     if problems:
         return False, sample(problems)
-    return True, f"{info['notes']} notes with model {profile.model_name!r}"
+    return True, f"{info['notes']} notes with model {model_name!r}"
 
 
 def gate_proper_sentences(
@@ -759,29 +761,32 @@ def run_pack_audit(
     load_table: Callable[..., Sequence[WordRow]],
     probe: Callable[[Path], float] = probe_duration,
 ) -> list[GateRow]:
-    """Run the gates of one pack on the default paths of its profile.
+    """Run the gates of one pack on the default paths of the pack.
 
-    :param profile: Language profile, which holds the default paths.
+    :param profile: Language profile of the pack.
     :param gates: Ordered gate names and checks.
-    :param apkg_path: APKG file of the pack, default the profile file.
+    :param apkg_path: APKG file of the pack, default the pack default output.
     :param sentences_csv: Sentence CSV, default the profile file.
     :param word_csv: Reviewed word CSV, default the profile file.
     :param review_csv: Word review CSV, default the profile file.
     :param audio_dir: Audio directory, default the profile directory.
-    :param manifest_path: Manifest JSON, default the profile file.
+    :param manifest_path: Manifest JSON, default the side file of the APKG.
     :param attribution_path: Attribution Markdown file.
     :param load_table: Callable that reads the reviewed word table.
     :param probe: Function that reads the duration of a file.
     :returns: One ``(gate, passed, message)`` row per gate.
     """
+    identity = DeckIdentity(
+        apkg_path if apkg_path is not None else default_output(profile.name, "pack")
+    )
     inputs = AuditInputs(
         profile,
-        apkg_path=apkg_path or profile.output_apkg,
+        apkg_path=identity.output_path,
         sentences_csv=sentences_csv or profile.sentence_csv,
         word_csv=word_csv or profile.word_csv,
         review_csv=review_csv or profile.word_review_csv,
         audio_dir=audio_dir or profile.audio_dir,
-        manifest_path=manifest_path or profile.manifest_path,
+        manifest_path=manifest_path or identity.side("manifest.json"),
         attribution_path=attribution_path,
         load_table=load_table,
         probe=probe,

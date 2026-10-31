@@ -1,20 +1,20 @@
 {
-  "deck": "Swadesh Spanish Sentences",
-  "model": "Swadesh Spanish Sentences",
+  "deck": "Swadesh Sentences French",
+  "model": "Swadesh Sentences French",
   "build_date": "2026-10-27",
   "source_dump_date": "2026-10-22",
   "counts": {
     "words": 207,
-    "cards": 408,
-    "scaffold": 1,
+    "cards": 412,
+    "scaffold": 0,
     "native_audio": 0,
-    "tts_audio": 408,
+    "tts_audio": 412,
     "no_target": 0
   },
   "coverage": {
     "core_with_card": 0.9952
   },
-  "voice": "gtts:es",
+  "voice": "gtts:fr",
   "pack_license": "public",
   "audio_license_skipped": {
     "empty": 0,
@@ -24,12 +24,12 @@
   "noun_rows": 84,
   "noun_gender_missing": 0,
   "files": {
-    "source_csv": "sha256:a2f45656f247b601e10542ca723a0e47741fcd377fa3c8282a1272a3074e3900",
-    "sentences_csv": "sha256:7530759895baa2c4844eeedbf074c69eefddb2f99476383b9eebea41956f77c6"
+    "source_csv": "sha256:014b1e7593affdd80cff7b101b90878bad8eb7a13a42de1361d00920a1b14604",
+    "sentences_csv": "sha256:5aefce0fe4e070d114a44671450fe0cd4f83ba9b66fc4e2839a39b050e4b6405"
   },
   "licenses": [
     {
-      "data": "Spanish Swadesh word data",
+      "data": "French Swadesh word data",
       "license": "CC BY-SA 4.0"
     },
     {
@@ -41,8 +41,8 @@
       "license": "per recording"
     },
     {
-      "data": "spaCy es_core_news_sm",
-      "license": "GPL-3.0"
+      "data": "spaCy fr_core_news_sm",
+      "license": "MIT"
     },
     {
       "data": "gTTS",
@@ -50,6 +50,6 @@
     }
   ],
   "excluded_words": [
-    "corteza"
+    "intestins"
   ]
 }

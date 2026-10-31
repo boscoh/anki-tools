@@ -171,26 +171,17 @@ def sample(items: Sequence[str], limit: int = SAMPLE) -> str:
 
 
 def gate_identity(files: GateFiles) -> tuple[bool, str]:
-    """K9 and G10: the deck title, the note type, and the manifest agree.
+    """K9 and G10: the deck title of the manifest is the one deck title in the package.
 
-    The values come from the manifest that the same writer wrote, so the gate
-    reports the identity of the run and not of the profile.
+    The note type check lives in :func:`gate_output_model`.
     """
     params = files.params()
-    source = files.manifest().get("source", {})
     output = files.output()
     title = str(params.get("name"))
-    model = str(source.get("model"))
-    problems: list[str] = []
-    if title != model:
-        problems.append(f"title {title!r} and model {model!r}")
     if output["decks"] != {title}:
-        problems.append(f"decks {sorted(map(str, output['decks']))}")
-    if output["note_models"] != {model}:
-        problems.append(f"models {sorted(map(str, output['note_models']))}")
-    if problems:
+        problems = [f"decks {sorted(map(str, output['decks']))}"]
         return False, f"issues {sample(problems)}"
-    return True, f"deck {title!r} and model {model!r}"
+    return True, f"deck {title!r}"
 
 
 def output_model_problems(files: GateFiles) -> list[str]:

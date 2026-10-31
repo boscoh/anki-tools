@@ -65,8 +65,6 @@ POOL_REPORT_PATH = Path("data/french_pool_report.json")
 AUDIO_DIR = Path("audio/french_sentences")
 MODULE_CACHE_PATH = Path("data/swadesh/french_module.txt")
 
-MODEL_NAME = "Swadesh French Sentences"
-DECK_NAME = "Swadesh French Sentences"
 FIELDS = (
     "Audio",
     "Sentence",
@@ -1083,10 +1081,6 @@ FRENCH = register(
         pool_report=POOL_REPORT_PATH,
         audio_dir=AUDIO_DIR,
         word_review_csv=WORD_REVIEW_PATH,
-        deck_name=DECK_NAME,
-        model_name=MODEL_NAME,
-        output_apkg=Path("apkg/swadesh_french_sentences.apkg"),
-        manifest_path=Path("apkg/swadesh_french_sentences.manifest.json"),
         fields=FIELDS,
         sort_field_index=SORT_FIELD_INDEX,
         front_template=FRONT_TEMPLATE,

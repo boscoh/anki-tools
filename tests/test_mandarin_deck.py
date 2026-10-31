@@ -10,6 +10,7 @@ from anki_tools.languages.mandarin import stages as deck
 from anki_tools.languages.mandarin.profile import SWADESH_ROWS, WordForm
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.templates import load_char_links
+from anki_tools.ranking.identity import DeckIdentity
 
 FAKE_MP3 = b"ID3\x03\x00\x00\x00" + b"\x00" * 64
 
@@ -257,13 +258,14 @@ def test_apkg_opens_with_two_cards(pack_env: dict[str, Path]) -> None:
     assert len(cards) == 2
     assert audio_stats["audio_files"] == 4
     assert [item["fields"]["Target"] for item in parsed] == ["水", "火"]
-    assert [item["model"] for item in parsed] == [deck.MODEL_NAME, deck.MODEL_NAME]
+    title = DeckIdentity(pack_env["output"]).title
+    assert [item["model"] for item in parsed] == [title, title]
     assert [list(item["fields"]) for item in parsed] == [deck.FIELDS, deck.FIELDS]
     assert parsed[0]["fields"]["Sentence"] == "我要喝<b>水</b>。"
     assert "swadesh::water" in parsed[0]["tags"]
     assert "audio::tts" in parsed[0]["tags"]
     assert "tier::scaffold" in parsed[1]["tags"]
-    named = [info for info in decks.values() if info.get("name") == deck.DECK_NAME]
+    named = [info for info in decks.values() if info.get("name") == title]
     assert [info.get("desc") for info in named] == [deck.DECK_DESCRIPTION]
 
     model = next(iter(models.values()))

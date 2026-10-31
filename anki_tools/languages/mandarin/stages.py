@@ -19,12 +19,10 @@ from anki_tools.languages.mandarin.profile import (
     BACK_TEMPLATE,
     DEFAULT_CSV_PATH,
     DECK_DESCRIPTION,
-    DECK_NAME,
     EXTRA_CSS,
     FIELDS as _PROFILE_FIELDS,
     FRONT_TEMPLATE,
     MANDARIN,
-    MODEL_NAME,
     POOL_REPORT_PATH,
     SENTENCES_PATH,
     SENTENCE_REVIEW_PATH,
@@ -41,6 +39,7 @@ from anki_tools.languages.mandarin.profile import (
     write_sentence_csv,
     write_sentence_review_csv,
 )
+from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.apkg.templates import load_css as load_css_file
 from anki_tools.languages.mandarin.characters import get_chinese_chars
 from anki_tools.sentence_pack import audio as shared_audio
@@ -118,8 +117,8 @@ tts_engine = shared_audio.tts_engine
 synthesize_tts_shared = shared_audio.synthesize_tts
 
 # S5: APKG pack
-OUTPUT_PATH = MANDARIN.output_apkg
-MANIFEST_PATH = MANDARIN.manifest_path
+OUTPUT_PATH = default_output(MANDARIN.name, "pack")
+MANIFEST_PATH = DeckIdentity(OUTPUT_PATH).side("manifest.json")
 ATTRIBUTION_PATH = shared_pack.ATTRIBUTION_PATH
 CSS_PATH = shared_pack.CSS_PATH
 CHECKSUMS_PATH = shared_pack.CHECKSUMS_PATH
@@ -581,7 +580,6 @@ __all__ = [
     "CSS_PATH",
     "Candidate",
     "DECK_DESCRIPTION",
-    "DECK_NAME",
     "DEFAULT_VOICE",
     "DETAIL_WIDTH",
     "FAILURE_SAMPLE",
@@ -592,7 +590,6 @@ __all__ = [
     "GTTS_VOICE",
     "MANDARIN",
     "MANIFEST_PATH",
-    "MODEL_NAME",
     "OPEN_STATUS",
     "OUTPUT_PATH",
     "POOL_REPORT_PATH",

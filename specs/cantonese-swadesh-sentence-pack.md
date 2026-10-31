@@ -105,7 +105,7 @@ module is `anki_tools/sentence_pack/languages/cantonese.py`.
 | S2    | Pool       | S0, S1                  | candidates and `data/cantonese_pool_report.json` |
 | S3    | Select     | S2, S1                  | `vocab/cantonese_sentences.csv`              |
 | S4    | Audio      | S3                      | `audio/cantonese_sentences/`                 |
-| S5    | Pack       | S3, S4                  | `apkg/swadesh_cantonese_sentences.apkg`      |
+| S5    | Pack       | S3, S4                  | `apkg/swadesh_sentences_cantonese.apkg`      |
 
 `anki swadesh pack cantonese --stage fetch` runs S0. The other stages are in
 section 10.
@@ -348,8 +348,8 @@ The commands write these files:
 | `vocab/cantonese_sentences.csv`                         | one row per card                  |
 | `vocab/cantonese_sentences_review.csv`                  | top candidates for the weak words |
 | `audio/cantonese_sentences/index.csv`                   | file index of the audio cache     |
-| `apkg/swadesh_cantonese_sentences.apkg`                 | the deck                          |
-| `apkg/swadesh_cantonese_sentences.manifest.json`        | counts, coverage, and file hashes |
+| `apkg/swadesh_sentences_cantonese.apkg`                 | the deck                          |
+| `apkg/swadesh_sentences_cantonese.manifest.json`        | counts, coverage, and file hashes |
 | `ATTRIBUTION.md`                                        | the `## Cantonese pack` section   |
 
 The `sentences` command takes `--min-words` and `--max-words`. Without them the
@@ -477,7 +477,7 @@ Open questions:
 | C1        | `anki-55q` | Word table, review file, sew fix                  | `vocab/cantonese_word_review.csv`; G1, G15 |
 | C2        | `anki-gkd` | Language profile, tokenizer, jyutping, filters     | profile and hooks                          |
 | C3        | `anki-4ng` | Sentence pool and selection                       | `vocab/cantonese_sentences.csv`            |
-| C4        | `anki-yzf` | Audio and APKG pack                               | `apkg/swadesh_cantonese_sentences.apkg`    |
+| C4        | `anki-yzf` | Audio and APKG pack                               | `apkg/swadesh_sentences_cantonese.apkg`    |
 | C5        | `anki-y2r` | Gates and tests                                   | `tests/test_cantonese_pack.py`; G1 to G21  |
 | C6        | `anki-0wz` | README and `ATTRIBUTION.md`                       | release check                              |
 

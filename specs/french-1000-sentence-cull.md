@@ -627,7 +627,7 @@ not have. This section adds a reserved Swadesh set to the cull.
 
 ### 16.1 Source
 
-The French Swadesh pack `apkg/swadesh_french_sentences.apkg` holds one card per
+The French Swadesh pack `apkg/swadesh_sentences_french.apkg` holds one card per
 concept and one audio file per card.
 
 | Measure                              | Value       |
@@ -642,7 +642,7 @@ concept and one audio file per card.
 | Concept with no source sentence      | `intestins` |
 
 The pack is read with `AnkiPackage`. The note model is
-`Swadesh French Sentences`. The fields are `Audio`, `Sentence`, `English`,
+`Swadesh Sentences French`. The fields are `Audio`, `Sentence`, `English`,
 `Target`, `Gloss`, `WordAudio`, and `Source`. The audio file comes from the
 pack media, so no external audio directory is needed.
 
@@ -682,7 +682,7 @@ guid is a UUID. The tags include `swadesh`.
 | Option            | Default                              | Meaning                         |
 | ----------------- | ------------------------------------ | ------------------------------- |
 | `--reserve`       | on                                   | Add the Swadesh reserve cards   |
-| `reserve_pack`    | `apkg/swadesh_french_sentences.apkg` | Reserve source, a request field |
+| `reserve_pack`    | `apkg/swadesh_sentences_french.apkg` | Reserve source, a request field |
 
 ### 16.5 Gate G14
 

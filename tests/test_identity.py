@@ -11,6 +11,8 @@ def test_the_default_output_names_one_stem_per_language_and_mode() -> None:
     assert default_output("french", "core") == Path("apkg/french_core.apkg")
     assert default_output("french", "cull") == Path("apkg/french_1000.apkg")
     assert default_output("spanish", "cull") == Path("apkg/spanish_1000.apkg")
+    assert default_output("french", "pack") == Path("apkg/swadesh_sentences_french.apkg")
+    assert default_output("french", "vocab") == Path("apkg/swadesh_vocab_french.apkg")
 
 
 def test_the_title_and_the_note_type_are_the_title_case_of_the_stem() -> None:

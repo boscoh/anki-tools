@@ -151,7 +151,7 @@ Rules:
 | S2    | Candidate pool     | S0, S1                   | in-memory pool, pool report                    |
 | S3    | Sentence selection | S2                       | `vocab/french_sentences.csv`, review CSV       |
 | S4    | Audio              | S3                       | `audio/french_sentences/*.mp3`, index CSV      |
-| S5    | Pack               | S1, S3, S4, license data | `apkg/swadesh_french_sentences.apkg`, manifest |
+| S5    | Pack               | S1, S3, S4, license data | `apkg/swadesh_sentences_french.apkg`, manifest |
 
 Each stage reads its input files and writes deterministic output. Each stage
 is safe to re-run. A stage skips work when its cache is complete.
@@ -573,7 +573,7 @@ Measured cost: 450 TTS sentences at 1 request per second take about 8 minutes.
 
 ### 10.1 Note model
 
-Model name: `Swadesh French Sentences`.
+Model name: `Swadesh Sentences French`.
 
 | Order | Field       | Content                       |
 | ----- | ----------- | ----------------------------- |
@@ -630,13 +630,13 @@ Anki tags cannot contain spaces. Map each gloss to a slug. Replace each space,
 
 ### 10.3 Deck
 
-- Deck name: `Swadesh French Sentences`.
+- Deck name: `Swadesh Sentences French`.
 - Add notes in Swadesh index order. Anki shows new cards in note order.
 - Do not split the deck. Use tags for study filters.
 
 ### 10.4 Manifest
 
-Write `apkg/swadesh_french_sentences.manifest.json`:
+Write `apkg/swadesh_sentences_french.manifest.json`:
 
 ```json
 {
@@ -736,8 +736,8 @@ vocab/
 audio/french_sentences/
   ta_*.mp3  tts_*.mp3  word_*.mp3  index.csv
 apkg/
-  swadesh_french_sentences.apkg
-  swadesh_french_sentences.manifest.json
+  swadesh_sentences_french.apkg
+  swadesh_sentences_french.manifest.json
 ATTRIBUTION.md
 ```
 
