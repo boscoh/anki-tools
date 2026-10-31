@@ -14,6 +14,8 @@ About 21 functions are copies of another function. Some rows only report and
 cannot fail. This document lists the gates by family and gives the
 consolidation, rename, repurpose, and refactor plan.
 
+The implementation plan for these actions is in `specs/gate-layer.md`.
+
 The gate ids stay as they are. ADR 0027 records the per-flow namespaces. A
 change below changes the function behind an id, not the id.
 
