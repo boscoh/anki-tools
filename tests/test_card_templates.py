@@ -47,7 +47,6 @@ def test_the_shared_files_exist() -> None:
 
 def test_the_default_css_layers_start_with_the_shared_sheet() -> None:
     assert sentence_pack.CSS_PATH == SHARED_CSS_PATH
-    assert french_cull.CARD_CSS_PATH == SHARED_CSS_PATH
 
 
 def _template_classes() -> set[str]:

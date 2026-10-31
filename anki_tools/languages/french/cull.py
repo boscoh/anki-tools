@@ -43,7 +43,6 @@ SWADESH_MODEL_NAME = DeckIdentity(SWADESH_PACK_PATH).model_name
 SWADESH_TOTAL = 207
 SWADESH_EXCEPTIONS = ("intestins",)
 
-CARD_CSS_PATH = SHARED_CSS_PATH
 TEMPLATE_DIR = TEMPLATES_DIR / "french_cull"
 FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
 BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")
@@ -104,13 +103,12 @@ def load_or_build_frequency(
     return cullflow.load_frequency(frequency_path)
 
 
-def card_css(css_path: Path = CARD_CSS_PATH) -> str:
+def card_css() -> str:
     """Give the CSS of the culled deck.
 
-    :param css_path: Base CSS file of the card classes.
     :returns: The base CSS and the French pack classes.
     """
-    return load_css(css_path, EXTRA_CSS)
+    return load_css(SHARED_CSS_PATH, EXTRA_CSS)
 
 
 def _concept_forms(concept: str) -> set[str]:
@@ -135,8 +133,6 @@ def _reserve_fields(card: cullflow.ReserveCard) -> list[str]:
     """
     return [f"[sound:{card.audio}]", card.html, card.english, card.target, card.gloss]
 
-
-read_reserve = partial(cullflow.load_reserve, model_name=SWADESH_MODEL_NAME)
 
 FRENCH_LANGUAGE = LanguageDeckProfile(
     load_input_deck=load_input_deck,

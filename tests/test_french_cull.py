@@ -568,7 +568,9 @@ def _tiny_swadesh_deck(tmp_path: Path) -> Path:
 
 
 def test_load_reserve_reads_the_plain_and_bold_sentence(tmp_path: Path) -> None:
-    reserve = cull_fr.read_reserve(_tiny_swadesh_deck(tmp_path))
+    reserve = cullflow.load_reserve(
+        _tiny_swadesh_deck(tmp_path), cull_fr.SWADESH_MODEL_NAME
+    )
 
     assert len(reserve) == 1
     assert reserve[0].sentence == "Je suis ici."
@@ -581,7 +583,7 @@ def test_write_deck_inserts_the_reserve_card(tmp_path: Path) -> None:
     source = _tiny_deck(tmp_path)
     cards = cull_fr.load_input_deck(source)
     swadesh = _tiny_swadesh_deck(tmp_path)
-    reserve = cull_fr.read_reserve(swadesh)
+    reserve = cullflow.load_reserve(swadesh, cull_fr.SWADESH_MODEL_NAME)
     output = tmp_path / "merged.apkg"
 
     counts = _write_cull_deck(
