@@ -366,6 +366,7 @@ from L1, L2, or L4 is a defect.
 | `docs/cull-deck-flow.md` | cull rule and gate order |
 | `docs/core-deck-flow.md` | core rule and gate order |
 | `docs/vocab-deck-flow.md` | the vocabulary deck check |
+| `docs/gate-inventory.md` | the gate inventory and the refactor plan |
 | `anki_tools/sentence_pack/pool.py` | `FILTER_KEYS`, `SHAPE_GUARDS`, `FACT_GUARDS` |
 | `anki_tools/sentence_pack/guards.py` | `check_sentence_shape` |
 | `anki_tools/sentence_pack/audit.py` | `GENERIC_GATES`, `run_pack_audit` |
