@@ -24,14 +24,14 @@ from anki_tools.languages.mandarin.profile import (
     write_sentence_review_csv,
 )
 from anki_tools.languages.mandarin.stages import (
-    build_candidate_pool,
-    build_pack_report,
-    check_sentence_shape,
-    rank_key_parts,
-    rank_order,
-    select_sentences,
-    serialize_rank_key,
+    mandarin_candidate_pool,
+    mandarin_rank_key_parts,
+    mandarin_rank_order,
+    mandarin_shape_failure,
+    select_mandarin_sentences,
 )
+from anki_tools.sentence_pack.pool import build_pack_report
+from anki_tools.sentence_pack.select import serialize_rank_key
 
 POOL_SENTENCES = [
     (1, "我要喝水。", 100, "I want to drink water.", "alice", (5001, "CC BY 2.0 FR")),
@@ -103,7 +103,9 @@ def _candidate(**overrides: object) -> Candidate:
     }
     values.update(overrides)
     candidate = Candidate(**values)  # type: ignore[arg-type]
-    return replace(candidate, rank_key=serialize_rank_key(rank_key_parts(candidate)))
+    return replace(
+        candidate, rank_key=serialize_rank_key(mandarin_rank_key_parts(candidate))
+    )
 
 
 def _write_pool_data(data_dir: Path) -> Path:
@@ -153,12 +155,12 @@ def pool_data(tmp_path: Path) -> Path:
 
 class TestSentenceShape:
     def test_accepts_a_complete_sentence(self) -> None:
-        assert check_sentence_shape("我要喝水。") is None
+        assert mandarin_shape_failure("我要喝水。") is None
 
     def test_length_window_stops_at_seven(self) -> None:
-        assert check_sentence_shape("我们今天去学校。") is None
-        assert check_sentence_shape("我们今天要去学校。") == "F2"
-        assert check_sentence_shape("我们今天要去学校。", max_han=8) is None
+        assert mandarin_shape_failure("我们今天去学校。") is None
+        assert mandarin_shape_failure("我们今天要去学校。") == "F2"
+        assert mandarin_shape_failure("我们今天要去学校。", max_han=8) is None
 
     def test_profile_window_is_four_to_seven(self) -> None:
         assert (MANDARIN.min_units, MANDARIN.max_units) == (4, 7)
@@ -177,11 +179,11 @@ class TestSentenceShape:
         ],
     )
     def test_rejects_in_order(self, sentence: str, expected: str) -> None:
-        assert check_sentence_shape(sentence) == expected
+        assert mandarin_shape_failure(sentence) == expected
 
     def test_fallback_window_accepts_short_sentence(self) -> None:
-        assert check_sentence_shape("火灭了。") == "F2"
-        assert check_sentence_shape("火灭了。", min_han=3) is None
+        assert mandarin_shape_failure("火灭了。") == "F2"
+        assert mandarin_shape_failure("火灭了。", min_han=3) is None
 
     def test_predicate_and_conjunction(self) -> None:
         assert has_predicate("我要喝水。") is True
@@ -243,7 +245,7 @@ class TestRankingKey:
         no_audio = _candidate(han_len=5, tatoeba_id=3)
         more_unknown = _candidate(unknown_words=1, han_len=5, tatoeba_id=2)
         shuffled = [more_unknown, short, no_audio, low_zipf, high_id, best]
-        assert sorted(shuffled, key=rank_order) == [
+        assert sorted(shuffled, key=mandarin_rank_order) == [
             best,
             no_audio,
             high_id,
@@ -255,12 +257,12 @@ class TestRankingKey:
     def test_key_serialization(self) -> None:
         candidate = _candidate(unknown_words=2, zipf_mean=5.1234, tatoeba_id=42)
         assert candidate.rank_key == "2|0|-5.123|1|42"
-        assert rank_key_parts(candidate) == (2, 0, -5.1234, 1, 42)
+        assert mandarin_rank_key_parts(candidate) == (2, 0, -5.1234, 1, 42)
 
 
 class TestCandidatePool:
     def test_filter_counts(self, pool_table: list[WordForm], pool_data: Path) -> None:
-        pool, report = build_candidate_pool(pool_table, data_dir=pool_data)
+        pool, report = mandarin_candidate_pool(pool_table, data_dir=pool_data)
         counts = report["counts"]
         assert report["total_linked"] == 14
         assert counts["F1"] == 13
@@ -281,11 +283,11 @@ class TestCandidatePool:
     def test_accepts_only_clean_sentences(
         self, pool_table: list[WordForm], pool_data: Path
     ) -> None:
-        pool, _ = build_candidate_pool(pool_table, data_dir=pool_data)
+        pool, _ = mandarin_candidate_pool(pool_table, data_dir=pool_data)
         sentences = {candidate.sentence for candidate in pool}
         assert "我要喝水。" in sentences
         for candidate in pool:
-            assert check_sentence_shape(candidate.sentence) is None
+            assert mandarin_shape_failure(candidate.sentence) is None
             assert candidate.tier == "core"
             assert candidate.tatoeba_author
             assert candidate.audio_source in {"native", "tts"}
@@ -294,7 +296,7 @@ class TestCandidatePool:
         self, pool_table: list[WordForm], pool_data: Path
     ) -> None:
         """Decision anki-gj6: the Mandarin profile has no native tier."""
-        pool, _ = build_candidate_pool(pool_table, data_dir=pool_data)
+        pool, _ = mandarin_candidate_pool(pool_table, data_dir=pool_data)
         first = next(candidate for candidate in pool if candidate.tatoeba_id == 1)
         assert first.audio_id == 0
         assert first.audio_license == ""
@@ -325,18 +327,18 @@ class TestCandidatePool:
         assert shared_parts(without_audio, profile(False))[1] == 0
 
     def test_unknown_budget(self, pool_table: list[WordForm], pool_data: Path) -> None:
-        _, strict = build_candidate_pool(pool_table, data_dir=pool_data, max_unknown=0)
-        _, loose = build_candidate_pool(pool_table, data_dir=pool_data, max_unknown=2)
+        _, strict = mandarin_candidate_pool(pool_table, data_dir=pool_data, max_unknown=0)
+        _, loose = mandarin_candidate_pool(pool_table, data_dir=pool_data, max_unknown=2)
         assert strict["counts"]["unknown"] <= loose["counts"]["unknown"]
 
     def test_fallback_scaffold(
         self, pool_table: list[WordForm], pool_data: Path
     ) -> None:
-        core_pool, core_report = build_candidate_pool(pool_table, data_dir=pool_data)
+        core_pool, core_report = mandarin_candidate_pool(pool_table, data_dir=pool_data)
         assert not any("火" in candidate.covered for candidate in core_pool)
         assert pool_table[1].candidate_count == 0
 
-        pool, report = build_candidate_pool(
+        pool, report = mandarin_candidate_pool(
             pool_table, data_dir=pool_data, fallback=True
         )
         scaffold = [candidate for candidate in pool if candidate.tier == "scaffold"]
@@ -353,7 +355,7 @@ class TestCandidatePool:
 class TestSelection:
     def test_sentence_covers_two_targets(self, pool_table: list[WordForm]) -> None:
         candidate = _candidate(covered=frozenset({"水", "火"}))
-        cards, report = select_sentences([candidate], pool_table, per_word=1)
+        cards, report = select_mandarin_sentences([candidate], pool_table, per_word=1)
         assert [card.target for card in cards] == ["水"]
         assert report["cards"] == 1
         assert report["uncovered"] == [
@@ -382,7 +384,7 @@ class TestSelection:
                 tatoeba_id=3,
             ),
         ]
-        cards, _ = select_sentences(pool, table, per_word=2)
+        cards, _ = select_mandarin_sentences(pool, table, per_word=2)
         assert [card.target for card in cards] == ["老", "旧"]
 
     def test_per_word_limit(self, pool_table: list[WordForm]) -> None:
@@ -395,7 +397,7 @@ class TestSelection:
                 tatoeba_id=3, covered=frozenset({"水"}), sentence="我喝那杯水。"
             ),
         ]
-        cards, report = select_sentences(pool, pool_table, per_word=2)
+        cards, report = select_mandarin_sentences(pool, pool_table, per_word=2)
         assert len(cards) == 2
         assert report["tier_counts"]["core"] == 2
 
@@ -411,7 +413,7 @@ class TestSelection:
             _candidate(tatoeba_id=index, sentence=sentence)
             for index, sentence in enumerate(sentences, start=1)
         ]
-        cards, report = select_sentences(pool, pool_table, per_word=5, max_cards=3)
+        cards, report = select_mandarin_sentences(pool, pool_table, per_word=5, max_cards=3)
         assert len(cards) == 3
         assert report["max_cards"] == 3
 
@@ -422,7 +424,7 @@ class TestSelection:
             _candidate(tatoeba_id=1, covered=frozenset({"水"})),
             _candidate(tatoeba_id=1, covered=frozenset({"火"})),
         ]
-        cards, _ = select_sentences(pool, pool_table, per_word=2)
+        cards, _ = select_mandarin_sentences(pool, pool_table, per_word=2)
         assert len({card.tatoeba_id for card in cards}) == len(cards)
 
     def test_scaffold_card_is_selected(self, pool_table: list[WordForm]) -> None:
@@ -439,7 +441,7 @@ class TestSelection:
                 covered=frozenset({"火"}),
             ),
         ]
-        cards, report = select_sentences(pool, pool_table, per_word=1)
+        cards, report = select_mandarin_sentences(pool, pool_table, per_word=1)
         assert {card.target: card.tier for card in cards} == {
             "水": "core",
             "火": "scaffold",
@@ -452,11 +454,11 @@ class TestSelection:
             _candidate(tatoeba_id=1, covered=frozenset({"水"}), sentence="我要喝水。"),
             _candidate(tatoeba_id=2, covered=frozenset({"水"}), sentence="我要喝水。"),
         ]
-        cards, _ = select_sentences(pool, pool_table, per_word=2)
+        cards, _ = select_mandarin_sentences(pool, pool_table, per_word=2)
         assert len(cards) == 1
 
     def test_pinyin_is_filled(self, pool_table: list[WordForm]) -> None:
-        cards, _ = select_sentences([_candidate()], pool_table, per_word=1)
+        cards, _ = select_mandarin_sentences([_candidate()], pool_table, per_word=1)
         assert cards[0].pinyin == "wǒ yào hē shuǐ"
 
 
@@ -505,7 +507,7 @@ class TestWriters:
         assert by_target["水"]["sentence"] == "我要喝水。"
 
     def test_pack_report_has_coverage(self, pool_table: list[WordForm]) -> None:
-        cards, selection = select_sentences(
+        cards, selection = select_mandarin_sentences(
             [_candidate()], pool_table, per_word=1, max_cards=10
         )
         report = build_pack_report({"total_linked": 1, "counts": {}}, selection)

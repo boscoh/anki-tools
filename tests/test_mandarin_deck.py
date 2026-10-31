@@ -79,7 +79,7 @@ def test_slug() -> None:
 
 
 def test_build_card_fields_and_tags() -> None:
-    card = deck.build_card(WORD_ROWS[0], TABLE[0], "tts_aaaa.mp3", "word_aaaa.mp3")
+    card = deck.mandarin_card(WORD_ROWS[0], TABLE[0], "tts_aaaa.mp3", "word_aaaa.mp3")
 
     assert list(card)[:8] == deck.FIELDS
     assert card["Audio"] == "[sound:tts_aaaa.mp3]"
@@ -94,7 +94,7 @@ def test_build_card_fields_and_tags() -> None:
 
 
 def test_sentence_target_is_bold_once() -> None:
-    card = deck.build_card(WORD_ROWS[1], TABLE[1], "tts_bbbb.mp3", "word_bbbb.mp3")
+    card = deck.mandarin_card(WORD_ROWS[1], TABLE[1], "tts_bbbb.mp3", "word_bbbb.mp3")
 
     assert card["Sentence"].count("<b>火</b>") == 1
     assert card["Sentence"].count("<b>") == 1
@@ -172,7 +172,7 @@ def pack_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, Path]
 
 
 def test_pack_manifest_counts(pack_env: dict[str, Path]) -> None:
-    result = deck.build_pack(
+    result = deck.build_mandarin_pack(
         csv_path=pack_env["csv_path"],
         word_csv=pack_env["word_csv"],
         audio_dir=pack_env["audio_dir"],
@@ -239,7 +239,7 @@ def test_create_passes_tags_and_deck_description(tmp_path: Path) -> None:
 
 
 def test_apkg_opens_with_two_cards(pack_env: dict[str, Path]) -> None:
-    deck.build_pack(
+    deck.build_mandarin_pack(
         csv_path=pack_env["csv_path"],
         word_csv=pack_env["word_csv"],
         audio_dir=pack_env["audio_dir"],
