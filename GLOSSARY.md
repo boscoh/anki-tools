@@ -114,10 +114,11 @@ the cull mode view both satisfy it. The code lives in
 _Avoid_: profile protocol, writer contract
 
 **Gate table**:
-The runner, the report, and the shared gates of the core and cull modes. Each
-mode supplies a loader table to one lazy file reader. The runner, the report,
-and the shared gates live in `anki_tools/ranking/gates.py`. The reader lives in
-`anki_tools/gate_files.py`.
+The gate value, the result row, the runner, and the shared checks of one
+flow. Each flow supplies its own table and one lazy file reader. The value, the
+row, and the runner live in `anki_tools/gates.py`; the report and the shared
+rank checks live in `anki_tools/ranking/gates.py`, and the reader lives in
+`anki_tools/gate_files.py`. `docs/gates.md` holds the tables and the contract.
 _Avoid_: audit list, check list
 
 **Language deck profile**:
