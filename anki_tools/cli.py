@@ -32,6 +32,7 @@ from anki_tools.sentence_pack.audit import print_audit as print_gate_table
 from anki_tools.sentence_pack.profile import LanguageProfile
 from anki_tools.languages import (
     LANGUAGES,
+    CliLanguage,
     profile_languages,
     resolve,
     vocab_languages,
@@ -401,12 +402,28 @@ _PARAMS_DOC = """
 """
 
 
+def _fix_route(language: CliLanguage) -> fixrun.FixLanguage:
+    """Resolve the shared fix route of a language, which imports its package.
+
+    :param language: Registry entry with a declared ``fix`` command.
+    :returns: Values of the shared fix route.
+    """
+    declaration = language.fix
+    assert declaration is not None
+    return fixrun.FixLanguage(
+        name=language.name,
+        label=language.label,
+        core=declaration.core,
+        cull=declaration.cull,
+    )
+
+
 def _declare_core_fix(
-    route: fixrun.FixLanguage, declaration: FixCommand
+    language: CliLanguage, declaration: FixCommand
 ) -> Callable[..., None]:
     """Declare the ``fix`` command of a language without a cull mode.
 
-    :param route: Values of the shared fix route.
+    :param language: Registry entry of the language.
     :param declaration: Declared ``fix`` command of the language.
     :returns: Command with the shared option set.
     """
@@ -422,7 +439,7 @@ def _declare_core_fix(
         check: bool = False,
     ) -> None:
         fixrun.run_fix(
-            route,
+            _fix_route(language),
             apkg_path=apkg_path,
             output=output,
             core=core,
@@ -436,11 +453,11 @@ def _declare_core_fix(
 
 
 def _declare_cull_fix(
-    route: fixrun.FixLanguage, declaration: FixCommand
+    language: CliLanguage, declaration: FixCommand
 ) -> Callable[..., None]:
     """Declare the ``fix`` command of a language with a cull mode.
 
-    :param route: Values of the shared fix route.
+    :param language: Registry entry of the language.
     :param declaration: Declared ``fix`` command of the language.
     :returns: Command with the shared option set and the select options.
     """
@@ -461,7 +478,7 @@ def _declare_cull_fix(
         check: bool = False,
     ) -> None:
         fixrun.run_fix(
-            route,
+            _fix_route(language),
             apkg_path=apkg_path,
             output=output,
             core=core,
@@ -480,14 +497,8 @@ for _language in LANGUAGES.values():
     _declaration = _language.fix
     if _declaration is None:
         continue
-    _declare = _declare_cull_fix if _declaration.cull else _declare_core_fix
-    _route = fixrun.FixLanguage(
-        name=_language.name,
-        label=_language.label,
-        core=_declaration.core,
-        cull=_declaration.cull,
-    )
-    _command = _declare(_route, _declaration)
+    _declare = _declare_cull_fix if _declaration.cull_path else _declare_core_fix
+    _command = _declare(_language, _declaration)
     globals()[_declaration.code] = _command
     fix_app.command(_command, name=_language.name, alias=_declaration.code)
 
@@ -572,33 +583,35 @@ def pack(
         empty.
     """
     entry = LANGUAGES.get(resolve(language))
-    if entry is None or entry.module is None:
+    module = entry.module if entry else None
+    profile = entry.profile if entry else None
+    if module is None or profile is None:
         print(
             f"Unsupported language: {language}. "
             f"Supported: {SENTENCE_PACK_LANGUAGE_NAMES}."
         )
         return
-    _fetch_language(entry.profile, refresh=refresh)
+    _fetch_language(profile, refresh=refresh)
     if stage == "fetch":
         return
     _language_sentences(
-        entry.module,
-        entry.profile,
+        module,
+        profile,
         per_word=per_word,
         max_cards=max_cards,
     )
     if stage == "sentences":
         return
     _language_audio(
-        entry.module,
-        entry.profile,
+        module,
+        profile,
         native_audio=native_audio,
         voice=voice,
         tts=tts,
     )
     if stage == "audio":
         return
-    _language_pack(entry.module, entry.profile)
+    _language_pack(module, profile)
 
 
 @swadesh_app.command

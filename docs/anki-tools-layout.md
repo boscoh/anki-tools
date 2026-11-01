@@ -123,6 +123,9 @@ audio directory.
   no language package.
 - `cli.py` builds the command list from `languages.registry`. It is the only
   module that imports every package.
+- `languages.registry` imports no language package. It holds dotted paths and
+  imports a package on the first read of `profile`, `module`, `audit`, `core`,
+  or `cull` (ADR 0056).
 - One key for each language. `languages.registry.ALIASES` maps a short code
   (`yue`, `cmn`, `zh`, `el`) to the canonical name.
 
