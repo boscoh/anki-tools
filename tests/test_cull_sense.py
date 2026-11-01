@@ -2,62 +2,28 @@
 
 from __future__ import annotations
 
-import math
-
-from anki_tools.ranking import corelist, coreflow, cullflow
 from anki_tools.sentence_pack.english_sense import SenseRow
+from tests.cull_fixture import card, select, target
 
-CONTENT_POS = corelist.CONTENT_POS
 SENSES = {
     "car": SenseRow(
         senses=frozenset({"expensive", "dear"}),
         false_friends=frozenset({"face"}),
     )
 }
-
-
-def _card(index: int, english: str) -> coreflow.InputCard:
-    return coreflow.InputCard(
-        note_id=1000 + index,
-        sentence=f"phrase {index}",
-        english=english,
-        audio="a.mp3",
-        index=index,
-    )
-
-
-def _target(lemma: str, rank: int) -> corelist.TargetWord:
-    return corelist.TargetWord(
-        lemma=lemma,
-        rank=rank,
-        deck_count=2,
-        content_share=1.0,
-        weight=1 / math.log2(rank + 1),
-    )
+TARGETS = [target("car", 5, deck_count=2)]
+RANKS = {"car": 5}
 
 
 def test_a_false_friend_card_does_not_count_for_the_lemma() -> None:
     cards = [
-        _card(0, "The shoes are expensive."),
-        _card(1, "I face the wall."),
-        _card(2, "Nothing is said."),
+        card("phrase 0", 0, "The shoes are expensive."),
+        card("phrase 1", 1, "I face the wall."),
+        card("phrase 2", 2, "Nothing is said."),
     ]
-    tokens = [
-        [("car", "NOUN"), ("f0", "NOUN")],
-        [("car", "NOUN"), ("f1", "NOUN")],
-        [("car", "NOUN"), ("f2", "NOUN")],
-    ]
+    tokens = [[("car", "NOUN"), (f"f{index}", "NOUN")] for index in range(3)]
 
-    result = cullflow.select_cards(
-        cards,
-        tokens,
-        [_target("car", 5)],
-        {"car": 5},
-        max_cards=10,
-        exempt_top=0,
-        content_pos=CONTENT_POS,
-        senses=SENSES,
-    )
+    result = select(cards, tokens, TARGETS, RANKS, senses=SENSES)
 
     assert result.card_targets == {0: ("car",)}
     assert result.uses["car"] == 1
@@ -66,42 +32,24 @@ def test_a_false_friend_card_does_not_count_for_the_lemma() -> None:
 
 
 def test_a_lemma_without_a_row_counts() -> None:
-    cards = [_card(0, "I face the wall.")]
-    tokens = [[("car", "NOUN")]]
+    cards = [card("phrase 0", 0, "I face the wall.")]
 
-    result = cullflow.select_cards(
-        cards,
-        tokens,
-        [_target("car", 5)],
-        {"car": 5},
-        max_cards=10,
-        exempt_top=0,
-        content_pos=CONTENT_POS,
-    )
+    result = select(cards, [[("car", "NOUN")]], TARGETS, RANKS)
 
     assert result.card_targets == {0: ("car",)}
 
 
 def test_similarity_uses_the_full_lemma_sets() -> None:
     cards = [
-        _card(0, "The shoes are expensive."),
-        _card(1, "I face the wall."),
+        card("phrase 0", 0, "The shoes are expensive."),
+        card("phrase 1", 1, "I face the wall."),
     ]
     tokens = [
         [(lemma, "NOUN") for lemma in ("car", "a", "b", "c", "d", "e")],
         [(lemma, "NOUN") for lemma in ("car", "a", "b", "c", "d", "f")],
     ]
 
-    result = cullflow.select_cards(
-        cards,
-        tokens,
-        [_target("car", 5)],
-        {"car": 5},
-        max_cards=10,
-        exempt_top=0,
-        content_pos=CONTENT_POS,
-        senses=SENSES,
-    )
+    result = select(cards, tokens, TARGETS, RANKS, senses=SENSES)
 
     assert result.kept == [0]
     assert result.reasons == {1: "similar"}

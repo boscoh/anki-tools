@@ -9,7 +9,6 @@ unit tests of the shared flow.
 from __future__ import annotations
 
 import json
-import math
 from collections import Counter
 from dataclasses import replace
 from pathlib import Path
@@ -18,9 +17,19 @@ from typing import Iterable
 
 import pytest
 
+from anki_tools.apkg.deck_writer import RunFiles
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.ranking import assemble, coreflow, corelist, cullflow, cullgates
+from anki_tools.ranking import corelist, coreflow, cullflow, cullgates
 from anki_tools.ranking.identity import DeckIdentity
+from tests.cull_fixture import (
+    CONTENT_POS,
+    ENGLISH,
+    card,
+    freq_row,
+    select,
+    target,
+    tiny_deck,
+)
 
 SENTENCES = [
     ("kat ser stor.", "cat is big."),
@@ -29,9 +38,6 @@ SENTENCES = [
 ]
 FIELDS = ["Text", "Audio", "Meaning"]
 MODEL_NAME = "Test Sentences"
-DECK_NAME = "Test Two Sentences"
-ENGLISH = "A short English line."
-CONTENT_POS = corelist.CONTENT_POS
 ORDER_TOKENS = [
     [("maison", "NOUN"), ("grande", "ADJ")],
     [("chat", "NOUN"), ("noir", "ADJ")],
@@ -101,47 +107,60 @@ def _profile() -> cullflow.CullProfile:
 
 
 def _tiny_deck(tmp_path: Path) -> Path:
-    source = tmp_path / "input.apkg"
-    audio = tmp_path / "in.mp3"
-    audio.write_bytes(b"ID3")
-    AnkiPackage.create(
-        source,
-        "Source Deck",
-        fields=FIELDS,
-        cards=[
-            {"Text": sentence, "Audio": "[sound:in.mp3]", "Meaning": english}
-            for sentence, english in SENTENCES
-        ],
-        media_files=[str(audio)],
-        model_name=MODEL_NAME,
+    rows = [
+        {"Text": sentence, "Audio": "[sound:in.mp3]", "Meaning": english}
+        for sentence, english in SENTENCES
+    ]
+    return tiny_deck(tmp_path, FIELDS, rows, MODEL_NAME, ["in.mp3"])
+
+
+def _senses(tmp_path: Path, gloss: str = "cat") -> Path:
+    path = tmp_path / "senses.tsv"
+    path.write_text(f"word\tsenses\tfalse_friends\nkat\t{gloss}\t\n", encoding="utf-8")
+    return path
+
+
+def _cull(
+    tmp_path: Path,
+    profile: cullflow.CullProfile,
+    *,
+    max_cards: int = 2,
+    source: Path | None = None,
+    name: str = "culled.apkg",
+) -> RunFiles:
+    return cullflow.run_cull(
+        cullflow.CullRequest(
+            input_path=source or _tiny_deck(tmp_path),
+            output_path=tmp_path / name,
+            max_cards=max_cards,
+            target_words=2,
+        ),
+        profile,
     )
-    return source
+
+
+def _notes(path: Path) -> list[list[str]]:
+    with AnkiPackage(path) as package:
+        return [str(row["flds"]).split("\x1f") for row in package.get_notes()]
 
 
 def test_a_second_profile_drives_every_output_value(tmp_path: Path) -> None:
-    source = _tiny_deck(tmp_path)
-    output = tmp_path / "culled.apkg"
-
-    run = cullflow.run_cull(
-        cullflow.CullRequest(
-            input_path=source,
-            output_path=output,
-            max_cards=2,
-            target_words=2,
-        ),
-        _profile(),
-    )
+    run = _cull(tmp_path, _profile())
+    output = run.output_path
 
     title = DeckIdentity(output).title
     with AnkiPackage(output) as package:
         models = package.get_models()
         decks = {deck["name"] for deck in package.get_decks().values()}
         fields = [field["name"] for model in models.values() for field in model["flds"]]
-        notes = [str(note["flds"]).split("\x1f") for note in package.get_notes()]
+        cards = package.get_cards()
+    notes = _notes(output)
 
     assert {model["name"] for model in models.values()} == {title}
     assert decks == {title}
-    assert fields == list(assemble.output_fields(_profile()))
+    assert fields == ["Audio", "Sentence", "English", "Core", "CoreGloss"]
+    assert len(cards) == len(notes) == 2
+    assert {int(row["ord"]) for row in cards} == {0}
     assert notes[0][1].startswith("<b>kat</b> ser")
     assert notes[0][2] == "cat is big."
     assert notes[0][3] == "kat"
@@ -155,8 +174,8 @@ def test_a_second_profile_drives_every_output_value(tmp_path: Path) -> None:
     assert "reserve_pack" not in manifest
 
 
-def _han_profile() -> cullflow.CullProfile:
-    return replace(
+def test_a_han_profile_keeps_one_character_lemmas_and_a_han_final_mark() -> None:
+    profile = replace(
         _profile(),
         content_pos=frozenset(),
         min_lemma_length=1,
@@ -164,10 +183,6 @@ def _han_profile() -> cullflow.CullProfile:
         quote_marks="「」『』",
         internal_marks="，：；",
     )
-
-
-def test_a_han_profile_keeps_one_character_lemmas_and_a_han_final_mark() -> None:
-    profile = _han_profile()
     tokens = [[("水", "n")] for _index in range(3)]
     cards = [
         cullflow.InputCard(
@@ -191,46 +206,6 @@ def test_a_han_profile_keeps_one_character_lemmas_and_a_han_final_mark() -> None
     assert cullflow.filter_reason(cards[0], _profile()) == "marks"
 
 
-def _card(
-    sentence: str,
-    index: int = 0,
-    english: str = ENGLISH,
-    audio: str = "a.mp3",
-) -> coreflow.InputCard:
-    return coreflow.InputCard(
-        note_id=1000 + index,
-        sentence=sentence,
-        english=english,
-        audio=audio,
-        index=index,
-    )
-
-
-def _target(lemma: str, rank: int) -> corelist.TargetWord:
-    return corelist.TargetWord(
-        lemma=lemma,
-        rank=rank,
-        deck_count=3,
-        content_share=1.0,
-        weight=1 / math.log2(rank + 1),
-    )
-
-
-def _freq_row(
-    word: str,
-    count: int = 10,
-    pm: float = 5.0,
-    written: float = 5.0,
-) -> cullflow.FrequencyRow:
-    return cullflow.FrequencyRow(
-        word=word,
-        tatoeba_count=count,
-        tatoeba_pm=pm,
-        written_pm=written,
-        zipf=4.0,
-    )
-
-
 def _target_fixture() -> tuple[
     list[coreflow.InputCard], list[list[tuple[str, str]]], dict[str, int]
 ]:
@@ -245,7 +220,7 @@ def _target_fixture() -> tuple[
         + [("chien", "NOUN")] * 4
     )
     tokens = [pairs[start : start + 3] for start in range(0, len(pairs), 3)]
-    cards = [_card("Le chat mange ici.", index=index) for index in range(len(tokens))]
+    cards = [card("Le chat mange ici.", index=index) for index in range(len(tokens))]
     return cards, tokens, {"mange": 10, "chien": 2, "le": 1}
 
 
@@ -262,228 +237,142 @@ def _cap_fixture() -> tuple[
         "Le chat est noir.",
         "Le chat est grand.",
     ]
-    cards = [_card(sentence, index=index) for index, sentence in enumerate(sentences)]
+    cards = [card(sentence, index=index) for index, sentence in enumerate(sentences)]
     tokens = [
         [("chat", "NOUN"), (f"f{index}", "NOUN")] for index in range(len(sentences))
     ]
-    return cards, tokens, [_target("chat", 1)], {"chat": 1}
+    return cards, tokens, [target("chat", 1)], {"chat": 1}
 
 
+@pytest.mark.parametrize(
+    ("count", "pm", "written", "spoken_weight", "expected"),
+    [
+        pytest.param(4, 0.0, 12.5, 1.0, 12.5, id="below five, spoken weight 1"),
+        pytest.param(4, 0.0, 12.5, 0.0, 12.5, id="below five, spoken weight 0"),
+        pytest.param(10, 20.0, 10.0, 0.5, 15.0, id="middle weight uses both terms"),
+    ],
+)
+def test_the_blended_pm(
+    count: int, pm: float, written: float, spoken_weight: float, expected: float
+) -> None:
+    row = freq_row("chat", count=count, pm=pm, written=written)
 
-def test_a_count_below_five_uses_the_written_term() -> None:
-    row = _freq_row("rare", count=4, pm=0.0, written=12.5)
-
-    assert cullflow.blend_pm(row, spoken_weight=1.0) == pytest.approx(12.5)
-    assert cullflow.blend_pm(row, spoken_weight=0.0) == pytest.approx(12.5)
+    assert cullflow.blend_pm(row, spoken_weight=spoken_weight) == pytest.approx(expected)
 
 
-def test_the_middle_weight_uses_both_terms() -> None:
-    row = _freq_row("chat", count=10, pm=20.0, written=10.0)
+@pytest.mark.parametrize(
+    ("target_words", "expected", "content"),
+    [
+        pytest.param(300, [("chien", 2), ("mange", 10)], 2, id="every candidate"),
+        pytest.param(1, [("chien", 2)], 2, id="the cut keeps the best rank"),
+    ],
+)
+def test_the_target_rules(
+    target_words: int, expected: list[tuple[str, int]], content: int
+) -> None:
+    cards, tokens, ranks = _target_fixture()
 
-    assert cullflow.blend_pm(row, spoken_weight=0.5) == pytest.approx(15.0)
+    targets, counted = corelist.build_targets(
+        cards, tokens, ranks, {"paris"}, target_words=target_words
+    )
+
+    assert [(item.lemma, item.rank) for item in targets] == expected
+    assert counted == content
 
 
-class TestTargets:
-    def test_the_target_rules_keep_two_of_the_candidates(self) -> None:
-        cards, tokens, ranks = _target_fixture()
+def test_a_mismatched_token_list_raises() -> None:
+    cards, tokens, ranks = _target_fixture()
 
-        targets, content = corelist.build_targets(
-            cards, tokens, ranks, {"paris"}, target_words=300
+    with pytest.raises(ValueError):
+        corelist.build_targets(cards[:-1], tokens, ranks, set(), target_words=3)
+
+
+def test_a_rare_word_wins_over_a_repeated_word() -> None:
+    cards = [
+        card("Une phrase rare ici.", index=0),
+        card("Une phrase commune ici.", index=1),
+        card("Une autre phrase commune.", index=2),
+    ]
+    tokens = [
+        [("rare", "NOUN"), ("f1", "NOUN")],
+        [("commune", "NOUN"), ("f2", "NOUN")],
+        [("commune", "NOUN"), ("f3", "NOUN")],
+    ]
+    ranks = {"rare": 1, "commune": 50}
+
+    result = select(cards, tokens, [target("rare", 1), target("commune", 50)], ranks)
+
+    assert result.kept == [0, 1, 2]
+    assert result.gain[1] > result.gain[2]
+
+
+@pytest.mark.parametrize(
+    ("exempt_top", "kept", "rejected"),
+    [
+        pytest.param(0, 2, ["use_cap"] * 3, id="a non-exempt word stops at the cap"),
+        pytest.param(1, 5, [], id="an exempt word passes the cap"),
+    ],
+)
+def test_the_use_cap(exempt_top: int, kept: int, rejected: list[str]) -> None:
+    cards, tokens, targets, ranks = _cap_fixture()
+
+    result = select(cards, tokens, targets, ranks, max_uses=2, exempt_top=exempt_top)
+
+    assert len(result.kept) == kept
+    assert result.uses["chat"] == kept
+    left = [index for index in range(len(cards)) if index not in result.kept]
+    assert [result.reasons[index] for index in left] == rejected
+
+
+def test_a_lemma_jaccard_of_067_is_duplicate() -> None:
+    shared = [f"s{index}" for index in range(67)]
+    first = shared + [f"a{index}" for index in range(20)]
+    second = shared + [f"b{index}" for index in range(13)]
+    cards = [card("Le chat est ici.", index=0), card("Le chat est la.", index=1)]
+    tokens = [
+        [(lemma, "NOUN") for lemma in first],
+        [(lemma, "NOUN") for lemma in second],
+    ]
+
+    result = select(cards, tokens, [], {lemma: 100 for lemma in shared})
+
+    assert len(result.kept) == 1
+    assert result.reasons == {1: "similar"}
+
+
+def test_coverage_gives_a_non_decreasing_hardest_rank() -> None:
+    ordered = cullflow.order_cards(
+        [0, 1, 2], ORDER_TOKENS, ORDER_RANKS, content_pos=CONTENT_POS
+    )
+
+    hardest = [
+        cullflow.hardest_rank(ORDER_TOKENS[index], ORDER_RANKS, CONTENT_POS)
+        for index in ordered
+    ]
+    assert ordered == [0, 1, 2]
+    assert hardest == [40, 900, cullflow.UNRANKED_ORDER]
+
+
+def test_input_order_keeps_the_given_order() -> None:
+    ordered = cullflow.order_cards(
+        [2, 0, 1], ORDER_TOKENS, ORDER_RANKS, order="input", content_pos=CONTENT_POS
+    )
+
+    assert ordered == [2, 0, 1]
+
+
+def test_an_unknown_order_raises() -> None:
+    with pytest.raises(ValueError):
+        cullflow.order_cards(
+            [0], ORDER_TOKENS, ORDER_RANKS, order="random", content_pos=CONTENT_POS
         )
-
-        assert [target.lemma for target in targets] == ["chien", "mange"]
-        assert content == 2
-        assert targets[0].rank == 2
-        assert targets[1].rank == 10
-
-    def test_the_target_cut_keeps_the_best_rank(self) -> None:
-        cards, tokens, ranks = _target_fixture()
-
-        targets, content = corelist.build_targets(
-            cards, tokens, ranks, {"paris"}, target_words=1
-        )
-
-        assert [target.lemma for target in targets] == ["chien"]
-        assert content == 2
-
-    def test_a_mismatched_token_list_raises(self) -> None:
-        cards, tokens, ranks = _target_fixture()
-
-        with pytest.raises(ValueError):
-            corelist.build_targets(cards[:-1], tokens, ranks, set(), target_words=3)
-
-
-class TestSelection:
-    def test_a_rare_word_wins_over_a_repeated_word(self) -> None:
-        cards = [
-            _card("Une phrase rare ici.", index=0),
-            _card("Une phrase commune ici.", index=1),
-            _card("Une autre phrase commune.", index=2),
-        ]
-        tokens = [
-            [("rare", "NOUN"), ("f1", "NOUN")],
-            [("commune", "NOUN"), ("f2", "NOUN")],
-            [("commune", "NOUN"), ("f3", "NOUN")],
-        ]
-        targets = [_target("rare", 1), _target("commune", 50)]
-        ranks = {"rare": 1, "commune": 50}
-
-        result = cullflow.select_cards(
-            cards,
-            tokens,
-            targets,
-            ranks,
-            max_cards=10,
-            max_uses=4,
-            exempt_top=0,
-            content_pos=CONTENT_POS,
-        )
-
-        assert result.kept == [0, 1, 2]
-        assert result.gain[1] > result.gain[2]
-
-    def test_a_non_exempt_word_stops_at_the_cap(self) -> None:
-        cards, tokens, targets, ranks = _cap_fixture()
-
-        result = cullflow.select_cards(
-            cards,
-            tokens,
-            targets,
-            ranks,
-            max_cards=10,
-            max_uses=2,
-            exempt_top=0,
-            content_pos=CONTENT_POS,
-        )
-
-        assert len(result.kept) == 2
-        assert result.uses["chat"] == 2
-
-    def test_a_card_with_a_capped_word_is_skipped(self) -> None:
-        cards, tokens, targets, ranks = _cap_fixture()
-
-        result = cullflow.select_cards(
-            cards,
-            tokens,
-            targets,
-            ranks,
-            max_cards=10,
-            max_uses=2,
-            exempt_top=0,
-            content_pos=CONTENT_POS,
-        )
-
-        rejected = [index for index in range(len(cards)) if index not in result.kept]
-        assert [result.reasons[index] for index in rejected] == ["use_cap"] * 3
-
-    def test_an_exempt_word_passes_the_cap(self) -> None:
-        cards, tokens, targets, ranks = _cap_fixture()
-
-        result = cullflow.select_cards(
-            cards,
-            tokens,
-            targets,
-            ranks,
-            max_cards=10,
-            max_uses=2,
-            exempt_top=1,
-            content_pos=CONTENT_POS,
-        )
-
-        assert len(result.kept) == len(cards)
-        assert result.uses["chat"] == len(cards)
-
-    def test_a_lemma_jaccard_of_067_is_duplicate(self) -> None:
-        shared = [f"s{index}" for index in range(67)]
-        first = shared + [f"a{index}" for index in range(20)]
-        second = shared + [f"b{index}" for index in range(13)]
-        cards = [
-            _card("Le chat est ici.", index=0),
-            _card("Le chat est la.", index=1),
-        ]
-        tokens = [
-            [(lemma, "NOUN") for lemma in first],
-            [(lemma, "NOUN") for lemma in second],
-        ]
-        ranks = {lemma: 100 for lemma in shared}
-
-        result = cullflow.select_cards(
-            cards,
-            tokens,
-            [],
-            ranks,
-            max_cards=10,
-            max_uses=4,
-            exempt_top=0,
-            content_pos=CONTENT_POS,
-        )
-
-        assert len(result.kept) == 1
-        assert result.reasons == {1: "similar"}
-
-    def test_two_runs_keep_the_same_order(self) -> None:
-        cards, tokens, targets, ranks = _cap_fixture()
-
-        first = cullflow.select_cards(
-            cards,
-            tokens,
-            targets,
-            ranks,
-            max_cards=10,
-            max_uses=2,
-            exempt_top=0,
-            content_pos=CONTENT_POS,
-        )
-        second = cullflow.select_cards(
-            cards,
-            tokens,
-            targets,
-            ranks,
-            max_cards=10,
-            max_uses=2,
-            exempt_top=0,
-            content_pos=CONTENT_POS,
-        )
-
-        assert first.kept == second.kept
-
-
-class TestOrder:
-    def test_coverage_gives_a_non_decreasing_hardest_rank(self) -> None:
-        ordered = cullflow.order_cards(
-            [0, 1, 2], ORDER_TOKENS, ORDER_RANKS, content_pos=CONTENT_POS
-        )
-
-        hardest = [
-            cullflow.hardest_rank(ORDER_TOKENS[index], ORDER_RANKS, CONTENT_POS)
-            for index in ordered
-        ]
-        assert ordered == [0, 1, 2]
-        assert hardest == [40, 900, cullflow.UNRANKED_ORDER]
-
-    def test_input_keeps_the_given_order(self) -> None:
-        ordered = cullflow.order_cards(
-            [2, 0, 1],
-            ORDER_TOKENS,
-            ORDER_RANKS,
-            order="input",
-            content_pos=CONTENT_POS,
-        )
-
-        assert ordered == [2, 0, 1]
-
-    def test_an_unknown_order_raises(self) -> None:
-        with pytest.raises(ValueError):
-            cullflow.order_cards(
-                [0], ORDER_TOKENS, ORDER_RANKS, order="random", content_pos=CONTENT_POS
-            )
 
 
 def test_cull_rows_columns_and_reasons() -> None:
     cards = [
-        _card("Le chat mange vite.", index=0),
-        _card("Le chien dort bien.", index=1),
-        _card("Le chat mange vite.", index=2),
+        card("Le chat mange vite.", index=0),
+        card("Le chien dort bien.", index=1),
+        card("Le chat mange vite.", index=2),
     ]
     selection = cullflow.SelectionResult(
         kept=[1],
@@ -497,9 +386,7 @@ def test_cull_rows_columns_and_reasons() -> None:
 
     rows = cullflow.cull_rows(cards, ["internal_mark", "", ""], selection, [1])
 
-
     assert all(set(row) == set(cullflow.CULL_COLUMNS) for row in rows)
-    assert len(rows) == 3
     assert [row["sentence"] for row in rows] == [
         cards[1].sentence,
         cards[0].sentence,
@@ -514,7 +401,7 @@ def test_cull_rows_columns_and_reasons() -> None:
 
 
 def test_coverage_rows_statuses() -> None:
-    targets = [_target("chat", 1), _target("boire", 2), _target("lait", 3)]
+    targets = [target("chat", 1), target("boire", 2), target("lait", 3)]
     selection = cullflow.SelectionResult(
         kept=[0, 1],
         uses=Counter({"chat": 2, "boire": 1}),
@@ -532,36 +419,48 @@ def test_coverage_rows_statuses() -> None:
     assert [row["gloss"] for row in rows] == ["cat", "", ""]
 
 
+def _reserve_card(sentence: str) -> cullflow.ReserveCard:
+    return cullflow.ReserveCard(
+        sentence=sentence,
+        html=sentence,
+        english=ENGLISH,
+        target="chat",
+        gloss="cat",
+        audio="a.mp3",
+    )
+
+
 def test_dedupe_reserve_drops_an_internal_duplicate() -> None:
-    reserve = [
-        cullflow.ReserveCard(
-            sentence="Le chat est ici.",
-            html="Le <b>chat</b> est ici.",
-            english="The cat is here.",
-            target="chat",
-            gloss="cat",
-            audio="a.mp3",
-        ),
-        cullflow.ReserveCard(
-            sentence="Le chat est ici aussi.",
-            html="Le <b>chat</b> est ici aussi.",
-            english="The cat is here too.",
-            target="chat",
-            gloss="cat",
-            audio="b.mp3",
-        ),
-    ]
-    sets = [
-        {"chat", "ici", "aussi"},
-        {"chat", "ici", "aussi", "le"},
-    ]
+    reserve = [_reserve_card("Le chat est ici."), _reserve_card("Le chat est ici aussi.")]
+    sets = [{"chat", "ici", "aussi"}, {"chat", "ici", "aussi", "le"}]
 
     kept, kept_sets = cullflow.dedupe_reserve_sets(
         reserve, sets, [], [], content_pos=CONTENT_POS
     )
 
-    assert len(kept) == 1
-    assert kept_sets == [{"chat", "ici", "aussi"}]
+    assert kept == reserve[:1]
+    assert kept_sets == sets[:1]
+
+
+@pytest.mark.parametrize(
+    ("sentence", "lemmas"),
+    [
+        pytest.param("Le chat est ici.", {"autre"}, id="the same sentence"),
+        pytest.param("Un chat est ici.", {"chat", "ici"}, id="the same lemmas"),
+    ],
+)
+def test_dedupe_reserve_drops_a_card_that_the_input_holds(
+    sentence: str, lemmas: set[str]
+) -> None:
+    kept, _kept_sets = cullflow.dedupe_reserve_sets(
+        [_reserve_card(sentence)],
+        [lemmas],
+        [card("Le chat est ici.")],
+        [[("chat", "NOUN"), ("ici", "NOUN")]],
+        content_pos=CONTENT_POS,
+    )
+
+    assert kept == []
 
 
 RESERVE_PACK_FIELDS = [
@@ -576,7 +475,6 @@ RESERVE_PACK_FIELDS = [
 
 
 def _reserve_pack(tmp_path: Path) -> Path:
-    """Write a reserve pack with one card."""
     audio = tmp_path / "reserve.mp3"
     audio.write_bytes(b"ID3\x03\x00\x00\x00\x00\x00\x00" + bytes(40))
     path = tmp_path / "reserve.apkg"
@@ -601,173 +499,66 @@ def _reserve_pack(tmp_path: Path) -> Path:
     return path
 
 
-def _notes(path: Path) -> list[list[str]]:
-    """Give the field values of every note of a package."""
-    with AnkiPackage(path) as package:
-        return [str(row["flds"]).split("\x1f") for row in package.get_notes()]
-
-
-def test_the_cull_writes_the_output_note_type(tmp_path: Path) -> None:
-    source = _tiny_deck(tmp_path)
-    output = tmp_path / "culled.apkg"
-    profile = _profile()
-
-    cullflow.run_cull(
-        cullflow.CullRequest(
-            input_path=source,
-            output_path=output,
-            max_cards=2,
-            target_words=2,
-        ),
-        profile,
-    )
-
-    with AnkiPackage(output) as package:
-        models = package.get_models()
-        cards = package.get_cards()
-
-    assert [model["name"] for model in models.values()] == [
-        DeckIdentity(output).title
-    ]
-    model = next(iter(models.values()))
-    assert [field["name"] for field in model["flds"]] == [
-        "Audio",
-        "Sentence",
-        "English",
-        "Core",
-        "CoreGloss",
-    ]
-    assert len(cards) == len(_notes(output)) == 2
-    assert {int(row["ord"]) for row in cards} == {0}
-
-
 def test_the_cull_fills_the_core_word_and_the_gloss(tmp_path: Path) -> None:
-    source = _tiny_deck(tmp_path)
-    output = tmp_path / "culled.apkg"
-    senses = tmp_path / "senses.tsv"
-    senses.write_text("word\tsenses\tfalse_friends\nkat\tcat\t\n", encoding="utf-8")
     profile = replace(
         _profile(),
-        sense_path=senses,
+        sense_path=_senses(tmp_path),
         reserve_pack=_reserve_pack(tmp_path),
     )
 
-    cullflow.run_cull(
-        cullflow.CullRequest(
-            input_path=source,
-            output_path=output,
-            max_cards=2,
-            target_words=2,
-        ),
-        profile,
-    )
+    values = _notes(_cull(tmp_path, profile).output_path)
 
-    values = _notes(output)
     reserve = next(row for row in values if "<b>je</b>" in row[1])
     frequency = next(row for row in values if "<b>je</b>" not in row[1])
-
     assert reserve[3:] == ["je", "I"]
     assert frequency[3:] == ["kat", "cat"]
 
 
 def test_the_cull_keeps_the_due_of_a_kept_card(tmp_path: Path) -> None:
     source = _tiny_deck(tmp_path)
-    output = tmp_path / "culled.apkg"
     with AnkiPackage(source) as package:
         package.conn.execute("UPDATE cards SET due = 42")
         package.conn.commit()
         package.touch()
         package.save()
 
-    cullflow.run_cull(
-        cullflow.CullRequest(
-            input_path=source,
-            output_path=output,
-            max_cards=1,
-            target_words=2,
-        ),
-        _profile(),
-    )
+    output = _cull(tmp_path, _profile(), max_cards=1, source=source).output_path
 
     with AnkiPackage(output) as package:
         dues = [
             int(row[0])
             for row in package.conn.execute("SELECT due FROM cards").fetchall()
         ]
-
     assert dues == [42]
     assert len(_notes(output)) == 1
 
 
-def _add_spare_field(path: Path, name: str) -> None:
-    """Append a field to the only note type of a package."""
-    with AnkiPackage(path) as package:
-        conn = package.conn
-        models = json.loads(conn.execute("SELECT models FROM col").fetchone()[0])
-        model = next(iter(models.values()))
-        extra = dict(model["flds"][-1])
-        extra.update({"name": name, "ord": len(model["flds"]), "media": []})
-        model["flds"].append(extra)
-        conn.execute("UPDATE col SET models = ? WHERE id = 1", (json.dumps(models),))
-        conn.commit()
-        package._modified = True
-        package.save()
-
-
-def _run_tiny_cull(tmp_path: Path, profile: cullflow.CullProfile) -> Path:
-    """Run the cull on the tiny deck and give the output path."""
-    output = tmp_path / "culled.apkg"
-    cullflow.run_cull(
-        cullflow.CullRequest(
-            input_path=_tiny_deck(tmp_path),
-            output_path=output,
-            max_cards=2,
-            target_words=2,
+@pytest.mark.parametrize(
+    ("english", "sources", "passes"),
+    [
+        pytest.param(
+            ["cat is big.", "dog is big."],
+            [cullflow.FREQUENCY_SOURCE] * 2,
+            True,
+            id="a lemma that fails the sense test is not a use",
         ),
-        profile,
-    )
-    return output
-
-
-def _sense_profile(tmp_path: Path) -> cullflow.CullProfile:
-    """Give the test profile with a sense file for the target `kat`."""
-    senses = tmp_path / "senses.tsv"
-    senses.write_text("word\tsenses\tfalse_friends\nkat\tcat\t\n", encoding="utf-8")
-    return replace(_profile(), sense_path=senses)
-
-
-def test_gate_output_model_reports_a_spare_field(tmp_path: Path) -> None:
-    profile = _sense_profile(tmp_path)
-    output = _run_tiny_cull(tmp_path, profile)
-    _add_spare_field(output, "Difficulty")
-
-    passed, message = cullgates.gate_output_model(
-        cullgates.CullFiles(output, profile)
-    )
-
-    assert not passed
-    assert "Difficulty" in message
-
-
-def test_gate_core_word_reports_an_empty_core(tmp_path: Path) -> None:
-    profile = _sense_profile(tmp_path)
-    output = _run_tiny_cull(tmp_path, profile)
-    files = cullgates.CullFiles(output, profile)
-    passed, message = cullgates.gate_core_word(files)
-    notes = files.notes()
-    fields = files.output()["fields"]
-    notes[next(iter(notes))][fields.index("Core")] = ""
-
-    failed, failed_message = cullgates.gate_core_word(files)
-
-    assert passed, message
-    assert not failed
-    assert "no core word" in failed_message
-
-
-def test_gate_use_cap_skips_a_lemma_that_fails_the_sense_test(tmp_path: Path) -> None:
-    profile = _sense_profile(tmp_path)
-    english = ["cat is big.", "dog is big."]
+        pytest.param(
+            ["cat is big.", "cat is small."],
+            [cullflow.FREQUENCY_SOURCE] * 2,
+            False,
+            id="two uses pass the cap of one",
+        ),
+        pytest.param(
+            ["cat is big.", "cat is small."],
+            [cullflow.FREQUENCY_SOURCE, "reserve"],
+            True,
+            id="a reserve card is not a use",
+        ),
+    ],
+)
+def test_the_use_cap_gate(
+    tmp_path: Path, english: list[str], sources: list[str], passes: bool
+) -> None:
     cards = [
         SimpleNamespace(sentence=f"kat {index}", english=text)
         for index, text in enumerate(english)
@@ -776,55 +567,56 @@ def test_gate_use_cap_skips_a_lemma_that_fails_the_sense_test(tmp_path: Path) ->
         params=lambda: {"max_uses": 1, "exempt_top": 0},
         coverage=list,
         rows=lambda: [
-            {"sentence": card.sentence, "source": cullflow.FREQUENCY_SOURCE, "kept": "1"}
-            for card in cards
+            {"sentence": card.sentence, "source": source, "kept": "1"}
+            for card, source in zip(cards, sources)
         ],
         output=lambda: {"cards": cards},
         tokens=lambda: [[("kat", "NOUN")]] * 2,
-        profile=profile,
+        profile=replace(_profile(), sense_path=_senses(tmp_path)),
     )
 
-    passed, message = cullgates.gate_use_cap(files)  # type: ignore
+    result, message = cullgates.gate_use_cap(files)  # type: ignore
 
-    assert passed, message
+    assert result is passes, message
 
 
-def test_gate_card_cap_counts_the_no_core_drop() -> None:
-    def files(kept: int, dropped: int) -> SimpleNamespace:
-        return SimpleNamespace(
-            rows=lambda: [{"kept": "1"}] * kept,
-            params=lambda: {"max_cards": 1000},
-            manifest=lambda: {
-                "counts": {"passed": 5000, "dropped_no_core": dropped}
-            },
-        )
+@pytest.mark.parametrize(
+    ("kept", "dropped", "left", "passes"),
+    [
+        pytest.param(924, 76, 50, True, id="the no-core drop fills the cap"),
+        pytest.param(500, 0, 0, True, id="the pool has no more cards"),
+        pytest.param(923, 76, 50, False, id="cards are left in the pool"),
+    ],
+)
+def test_the_card_cap_gate(kept: int, dropped: int, left: int, passes: bool) -> None:
+    files = SimpleNamespace(
+        rows=lambda: [{"kept": "1"}] * kept
+        + [{"kept": "0", "reason": "max_cards"}] * left
+        + [{"kept": "0", "reason": "similar"}],
+        params=lambda: {"max_cards": 1000},
+        manifest=lambda: {"counts": {"dropped_no_core": dropped}},
+    )
 
-    passed, message = cullgates.gate_card_cap(files(924, 76))  # type: ignore
-    assert passed, message
+    result, message = cullgates.gate_card_cap(files)  # type: ignore
 
-    passed, message = cullgates.gate_card_cap(files(923, 76))  # type: ignore
-    assert not passed
-    assert "923 kept + 76 dropped" in message
+    assert result is passes, message
+    assert f"{kept} kept + {dropped} dropped" in message
 
 
 def test_the_distinct_lemma_count_leaves_a_lemma_that_fails_the_sense_test(
     tmp_path: Path,
 ) -> None:
-    senses = tmp_path / "senses.tsv"
-    senses.write_text("word\tsenses\tfalse_friends\nkat\tdog\t\n", encoding="utf-8")
+    senses = _senses(tmp_path, gloss="dog")
     contents = {}
     for name, sense_path in (
         ("plain", Path("vocab/test_core_senses.tsv")),
         ("sense", senses),
     ):
-        run = cullflow.run_cull(
-            cullflow.CullRequest(
-                input_path=_tiny_deck(tmp_path),
-                output_path=tmp_path / f"{name}.apkg",
-                max_cards=3,
-                target_words=2,
-            ),
+        run = _cull(
+            tmp_path,
             replace(_profile(), sense_path=sense_path),
+            max_cards=3,
+            name=f"{name}.apkg",
         )
         assert run.manifest_path is not None
         manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
