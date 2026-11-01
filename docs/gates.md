@@ -236,6 +236,6 @@ unless the change removes a report-only row.
 | `anki_tools/gate_files.py`               | the lazy file reader                                  |
 | `anki_tools/ranking/gates.py`            | the report and the shared rank checks                 |
 | `anki_tools/sentence_pack/audit.py`      | `AuditInputs`, `as_gates`, and the shared pack checks |
-| `anki_tools/ranking/cullgates.py`        | cull gates G1, G2, and G5 to G18                      |
+| `anki_tools/ranking/cullgates.py`        | cull gates G1, G2, G5 to G13, and G15 to G18          |
 | `anki_tools/ranking/coregates.py`        | core gates K1 to K22                                  |
 | `anki_tools/languages/<lang>/profile.py` | the language gates                                    |

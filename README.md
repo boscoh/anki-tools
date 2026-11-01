@@ -452,7 +452,7 @@ non-exempt word appears in more than 4 cards.
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
     --output apkg/french_1000.apkg
 
-# Run gates G1, G2, and G5 to G18 on the written output
+# Run gates G1, G2, G5 to G13, and G15 to G18 on the written output
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
     --output apkg/french_1000.apkg --check
 ```
