@@ -15,7 +15,7 @@ from functools import partial
 from pathlib import Path
 from typing import Sequence
 
-from anki_tools.apkg.templates import SHARED_CSS_PATH, TEMPLATES_DIR, load_text
+from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
 from anki_tools.languages.spanish import core
 from anki_tools.languages.spanish.frequency import (
     FREQUENCY_PATH,
@@ -48,13 +48,11 @@ SWADESH_TOTAL = SWADESH_ROWS
 SWADESH_EXCEPTIONS: tuple[str, ...] = ("cola", "corteza", "coser", "raíz")
 # The Spanish ellipsis closes a sentence in the corpus, so the cull accepts it.
 FINAL_MARKS = ".?!…"
-CARD_CSS_PATH = SHARED_CSS_PATH
 TEMPLATE_DIR = TEMPLATES_DIR / "spanish_cull"
 FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
 BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")
 CARD_TEMPLATES = ((FRONT_TEMPLATE, BACK_TEMPLATE),)
 
-DEFAULT_DECK_NAME = "Spanish 1000 Core Sentences"
 LICENSES = {
     "tatoeba": "Tatoeba sentence text: CC BY 2.0 FR",
     "wordfreq": "wordfreq list: Apache License 2.0",
@@ -137,8 +135,6 @@ def _reserve_fields(card: cullflow.ReserveCard) -> list[str]:
     """
     return [f"[sound:{card.audio}]", card.html, card.english, card.target, card.gloss]
 
-
-read_reserve = partial(cullflow.load_reserve, model_name=SWADESH_MODEL_NAME)
 
 SPANISH_CULL_PROFILE = core.SPANISH_LANGUAGE.cull(
     load_frequency=read_cull_frequency,

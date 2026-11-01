@@ -363,9 +363,6 @@ def pool_paths(profile: LanguageProfile, data_dir: Path) -> dict[str, Path]:
     return paths
 
 
-FRAME_FIELDS = ("target", "sentence", "english")
-
-
 def default_frames_path(
     profile: LanguageProfile, vocab_dir: Path = Path("vocab")
 ) -> Path:

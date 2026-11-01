@@ -133,7 +133,6 @@ REVIEW_FIELDS = [
     "fix",
     "status",
 ]
-OVERRIDE_FIELDS = ["mandarin", "pinyin", "reason"]
 
 FIELDS = (
     "Audio",

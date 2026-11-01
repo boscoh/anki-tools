@@ -4,10 +4,8 @@ import re
 
 try:
     import ToJyutping
-
-    HAS_TOJYUTPING = True
 except ImportError:
-    HAS_TOJYUTPING = False
+    ToJyutping = None
 
 
 def get_jyutping(text: str) -> str:
@@ -16,7 +14,7 @@ def get_jyutping(text: str) -> str:
     :param text: Cantonese text (traditional Chinese).
     :returns: Space-separated jyutping with tone numbers.
     """
-    if not HAS_TOJYUTPING:
+    if ToJyutping is None:
         return ""
     try:
         clean_text = re.sub(r'[！？。，、：；"""（）!?.,;:]', "", text)

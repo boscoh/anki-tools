@@ -22,9 +22,6 @@ from anki_tools.ranking.duplicates import at_limit
 #: The value of example 1, 2, and 3 of one target.
 DEMAND = (1.0, 0.35, 0.12)
 
-#: The passes in order, with the reason label of each.
-PASSES = ("seed", "depth", "completion", "tail", "topup")
-
 #: A candidate and a kept card share a bucket when one lemma Jaccard value
 #: reaches this limit.
 SIMILARITY_LIMIT = 0.67

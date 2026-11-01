@@ -16,7 +16,7 @@ The stages are S0 (fetch), S2 (pool), S3 (selection), S4 (audio), and S5 (pack).
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Callable, Iterable, Sequence
+from typing import Any, Callable
 
 from anki_tools.languages.mandarin.profile import (
     AUDIO_DIR,
@@ -106,7 +106,6 @@ GTTS_VOICE = MANDARIN.gtts_voice
 GTTS_LANG = MANDARIN.tts_lang
 RATE_NORMAL = shared_audio.RATE_NORMAL
 RATE_SLOW = shared_audio.RATE_SLOW
-SLOW_RATE = shared_audio.RATE_SLOW
 MIN_DURATION_S = shared_audio.MIN_DURATION_S
 MAX_DURATION_S = shared_audio.MAX_DURATION_S
 MAX_ATTEMPTS = shared_audio.MAX_ATTEMPTS
@@ -128,11 +127,9 @@ SENTENCE_PREFIXES = shared_pack.SENTENCE_PREFIXES
 LICENSE_KEYS = shared_pack.LICENSE_KEYS
 
 FIELDS = list(_PROFILE_FIELDS)
-DEFAULT_AUDIO_LICENSE_SOURCE = {key: 0 for key in LICENSE_KEYS}
 
 # Audit
 WORD_CSV_PATH = MANDARIN.word_csv
-REVIEW_PATH = MANDARIN.word_review_csv
 OPEN_STATUS = "open"
 FAILURE_SAMPLE = 3
 DETAIL_WIDTH = 110
@@ -433,6 +430,3 @@ __all__ = [
     "write_sentence_review_csv",
 ]
 
-MediaFiles = Iterable[str]
-Composer = Callable[[], dict[str, Any]]
-Cards = Sequence[dict[str, Any]]

@@ -23,9 +23,6 @@ import jieba
 from anki_tools.cache import download_cached_file
 
 CIFU_URL = "https://raw.githubusercontent.com/gwinterstein/Cifu/master/Lexicon/Cifu-v1.txt"
-CIFU_ATTRIBUTION = (
-    "Cantonese spoken frequency: Cifu, Lai and Winterstein 2020 (gwinterstein/Cifu)"
-)
 VOCAB_DIR = Path(__file__).resolve().parents[3] / "vocab"
 VARIANTS_PATH = VOCAB_DIR / "cantonese_variants.tsv"
 OVERRIDES_PATH = VOCAB_DIR / "cantonese_frequency_overrides.tsv"
@@ -33,10 +30,6 @@ YUE_FREQUENCY_URL = (
     "https://raw.githubusercontent.com/chaaklau/appledaily-frequency"
     "/master/release/word-freq.tsv"
 )
-YUE_FREQUENCY_ATTRIBUTION = (
-    "Cantonese word frequency: chaaklau/appledaily-frequency (CC BY 4.0)"
-)
-YUE_FREQUENCY_MAX_WORDS = 50000
 
 MIN_SPOKEN_COUNT = 5
 SPOKEN_DICT_WEIGHT = 40

@@ -41,7 +41,6 @@ SOURCE_NAME = "wordfreq zh"
 SOURCE_VERSION = "wordfreq 3.1.1"
 SOURCE_SHA256 = "e079d7aaff1cfb92874850cb3ffbc7b611af939d9d671c1cbda932d968467cdd"
 LICENSE = "Apache-2.0"
-SCRIPT = "Hans"
 MAX_ROWS = 50_000
 SOURCE_ROWS = 60_000
 
