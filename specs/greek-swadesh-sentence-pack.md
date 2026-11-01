@@ -379,7 +379,7 @@ requirement:
 
 Fallback window: when a word gets no candidate in 4 to 10 words, retry that
 word with a 3 to 10 word window and drop F6 and F8. Mark such a card
-`tier=scaffold`. A scaffold card must pass F3, F4, F5, F7, F9, and F10. G14
+`tier=scaffold`. A scaffold card must pass F3, F4, F5, F7, F9, and F10. P14
 exempts it from F2, F6, and F8.
 
 For Greek the fallback is part of the plan. The probe finds 39 uncovered
@@ -453,7 +453,7 @@ sense word, or holds no false-friend word. The `SENSE_CHECKS` table in
 | γυρίζω  | turn        | return, back, home       |
 | με      | with        | me                       |
 
-Gate G20 checks the built deck against the stored English text.
+Gate P20 checks the built deck against the stored English text.
 ### 8.3 Ranking key
 
 Sort candidates for each target word by this key, first item first:
@@ -664,7 +664,7 @@ the voice.
 Tatoeba text needs this sentence: "Sentences come from Tatoeba
 (<https://tatoeba.org>) and use the CC BY 2.0 FR license."
 
-Gate G12 reads only the section for the pack language.
+Gate P12 reads only the section for the pack language.
 
 ## 11. CLI
 
@@ -720,35 +720,35 @@ a failure.
 
 | Gate | Check                                                                                      |
 | ---- | ------------------------------------------------------------------------------------------ |
-| G1   | Word table: 207 rows, 206 unique forms, no gap                                             |
-| G2   | No duplicate form, except the shared `πόδι` row                                            |
-| G3   | Every card target exists in the reviewed CSV                                               |
-| G4   | Every card has a unique Tatoeba id after normalization                                     |
-| G5   | Target appears one time in each sentence, as a whole token or lemma                        |
-| G6   | No card pair with word-set Jaccard of 0.67 or more                                         |
-| G7   | Every card has a valid audio file with duration 0.4 to 15 seconds                          |
-| G8   | Audio file count equals the media count in the APKG                                        |
-| G9   | No card matches the target inside a longer word                                            |
-| G10  | Core coverage of 76 percent or more                                                        |
-| G11  | Manifest counts match the word table and the sentence CSV (10.4)                           |
-| G12  | `ATTRIBUTION.md` has a Greek section and names every sentence author in the pack           |
-| G13  | The APKG opens with `AnkiPackage` and lists the expected notes                             |
-| G14  | Core cards pass F2 to F10. Scaffold cards pass F3, F4, F5, F7, F9, F10, and length 3 to 10 |
-| G15  | `vocab/greek_word_review.csv` exists and has no open row                                   |
-| G16  | Every card target has a valid `word_{hash}.mp3` file                                       |
-| G17  | Every card field is NFC, monotonic, and has no `ς` inside a word                           |
-| G18  | No card has `audio_source=native`                                                          |
-| G19  | Every card target is in the 206-word table and is not `variant=shared`                     |
-| G20  | No card English holds a different sense than the card word (8.2)                           |
+| P1   | Word table: 207 rows, 206 unique forms, no gap                                             |
+| P2   | No duplicate form, except the shared `πόδι` row                                            |
+| P3   | Every card target exists in the reviewed CSV                                               |
+| P4   | Every card has a unique Tatoeba id after normalization                                     |
+| P5   | Target appears one time in each sentence, as a whole token or lemma                        |
+| P6   | No card pair with word-set Jaccard of 0.67 or more                                         |
+| P7   | Every card has a valid audio file with duration 0.4 to 15 seconds                          |
+| P8   | Audio file count equals the media count in the APKG                                        |
+| P9   | No card matches the target inside a longer word                                            |
+| P10  | Core coverage of 76 percent or more                                                        |
+| P11  | Manifest counts match the word table and the sentence CSV (10.4)                           |
+| P12  | `ATTRIBUTION.md` has a Greek section and names every sentence author in the pack           |
+| P13  | The APKG opens with `AnkiPackage` and lists the expected notes                             |
+| P14  | Core cards pass F2 to F10. Scaffold cards pass F3, F4, F5, F7, F9, F10, and length 3 to 10 |
+| P15  | `vocab/greek_word_review.csv` exists and has no open row                                   |
+| P16  | Every card target has a valid `word_{hash}.mp3` file                                       |
+| P17  | Every card field is NFC, monotonic, and has no `ς` inside a word                           |
+| P18  | No card has `audio_source=native`                                                          |
+| P19  | Every card target is in the 206-word table and is not `variant=shared`                     |
+| P20  | No card English holds a different sense than the card word (8.2)                           |
 
-G10 uses the measured coverage. The probe measures 168 of 207 concepts (0.812)
+P10 uses the measured coverage. The probe measures 168 of 207 concepts (0.812)
 in the 4 to 10 word window. This spec sets the gate at 0.76, which is the
 measured value minus 5 points.
 
 Add unit tests in `tests/test_greek_pack.py` for:
 
 - Word-table cleanup: note removal, article strip, and the one-word exception.
-- The shared `πόδι` row and G19.
+- The shared `πόδι` row and P19.
 - The final sigma and the `ς` to `σ` surface key.
 - `;` as a question mark in F5 and F6, and `·` in F8.
 - Lemma matching with `πίνω` and `πίνει`.
@@ -768,7 +768,7 @@ Add unit tests in `tests/test_greek_pack.py` for:
 | Heavy inflection                  | Missed target match    | lemma matching, carrier lemma key, `ς` to `σ`   |
 | `;` is the question mark          | Wrong filter set       | F5, F6, and F8 rules in 3.2                     |
 | Article in the CSV form           | No surface match       | M1 strips the article, `gender` column keeps it |
-| Two concepts share `πόδι`         | Duplicate form gate    | `variant=shared`, no card, G19                  |
+| Two concepts share `πόδι`         | Duplicate form gate    | `variant=shared`, no card, P19                  |
 | `el-core-news-sm` is not on PyPI  | Install fails          | direct URL in `pyproject.toml`, README step     |
 | Few candidates per concept        | Repeated sentence text | Jaccard gate, review CSV, per-word cap          |
 | gTTS is an unofficial endpoint    | Voice service breaks   | retry, edge-tts option, cached audio            |
@@ -818,7 +818,7 @@ build.
 | Uncovered concepts | 8                                                       |
 | Native audio       | none                                                    |
 | TTS engine         | gTTS, voice `gtts:el`                                   |
-| Gate result        | G1 to G20 pass; `anki swadesh audit greek` exits 0      |
+| Gate result        | P1 to P20 pass; `anki swadesh audit greek` exits 0      |
 
 The uncovered words are ψείρα, σπόρος, λίπος, πούπουλο, νύχι, ξύνω, πλέω,
 and στρογγυλός. They reach the pool but lose the selection to a similar
@@ -844,7 +844,7 @@ The measured values differ from the probe of section 3.3 in four places:
   still-uncovered words.
 
 The coverage denominator is the 207 Swadesh concepts. Index 81 shares the
-form `πόδι` with index 80. G10 at 0.76 passes with a wide margin (0.957).
+form `πόδι` with index 80. P10 at 0.76 passes with a wide margin (0.957).
 
 The word review file has 146 rows: 83 article strips, 6 note removals, 2
 slash choices, 1 shared row, 23 module differences, and 31 rare forms. The

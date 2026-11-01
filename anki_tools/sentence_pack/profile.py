@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Collection, Iterable, Protocol, Sequence
 
-#: Swadesh concept indices of the nouns, the rows where gate G20 reports a gender.
+#: Swadesh concept indices of the nouns, the rows where gate P20 reports a gender.
 NOUN_INDICES = frozenset(
     {
         36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53,
@@ -100,7 +100,7 @@ class LanguageProfile:
     :param core_concepts: Concept count of the Swadesh list.
     :param zipf_min: Zipf value below which a form is rare.
     :param similarity_limit: Jaccard value at which two cards are duplicates.
-    :param coverage_min: Minimum core coverage of gate G10.
+    :param coverage_min: Minimum core coverage of gate P10.
     :param prepare_text: Hook that normalizes a raw sentence.
     :param unit_count: Hook that counts the words of a sentence.
     :param script_ok: Hook for filter script, the script test.

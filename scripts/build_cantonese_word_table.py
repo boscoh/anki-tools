@@ -7,7 +7,7 @@ this script only when the reviewed Cantonese forms change.
 The script compares ``vocab/english-cantonese.csv`` with the terms of
 ``Module:Swadesh/data/yue``. The ``CHOSEN`` map holds the review decisions. A
 row that keeps a form outside the module terms gets a review row with status
-``keep``, so gate G15 of the pack audit stops a build with an open question.
+``keep``, so gate P15 of the pack audit stops a build with an open question.
 
 Usage:
     uv run python scripts/build_cantonese_word_table.py

@@ -64,12 +64,12 @@ S4  audio files and the audio index
 S5  APKG, manifest, attribution
         |
         v
-    audit gates G1 to G19
+    audit gates P1 to P19
 ```
 
 The S5 builder writes a card only when its sentence holds the target in bold.
 A row that cannot is skipped and counted in `counts.no_target`. The audit gate
-G5 still reports the missing match in the source CSV.
+P5 still reports the missing match in the source CSV.
 
 ## 3. S2 guard chain
 
@@ -231,21 +231,21 @@ The audit reads the output files only. The gates fall in these groups:
 
 | Group          | Gates              | Checks                                              |
 | -------------- | ------------------ | --------------------------------------------------- |
-| word table     | G1, G2, G15        | row count, index, label, review status              |
-| cards          | G3 to G6, G14      | target, id, match count, similarity, sentence shape |
-| target parts   | G19 in FR and ES   | a multi-word target keeps both parts                |
-| audio          | G7, G8, G16        | sentence file, word file, media count               |
-| manifest       | G11, G13           | counts, hashes, APKG note count                     |
-| coverage       | G10                | core coverage against `coverage_min`                |
+| word table     | P1, P2, P15        | row count, index, label, review status              |
+| cards          | P3 to P6, P14      | target, id, match count, similarity, sentence shape |
+| target parts   | P19 in FR and ES   | a multi-word target keeps both parts                |
+| audio          | P7, P8, P16        | sentence file, word file, media count               |
+| manifest       | P11, P13           | counts, hashes, APKG note count                     |
+| coverage       | P10                | core coverage against `coverage_min`                |
 
-A language pack can add a gate. For example, Cantonese adds G17 and G18.
-G19 is the French `gate_discontinuous` and the Spanish `gate_pair_parts`, so
-Greek and Cantonese have no G19. G9 is the Mandarin pinyin check, so French,
-Spanish, Greek, and Cantonese have no G9.
+A language pack can add a gate. For example, Cantonese adds P17 and P18.
+P19 is the French `gate_discontinuous` and the Spanish `gate_pair_parts`, so
+Greek and Cantonese have no P19. P9 is the Mandarin pinyin check, so French,
+Spanish, Greek, and Cantonese have no P9.
 
 ADR 0039 retired the gates for English sense, false friend, attribution,
 typography, license, and script. The `sense` filter is the one sense test. The
-Mandarin attribution gate G12 stays, because it checks the native audio authors.
+Mandarin attribution gate P12 stays, because it checks the native audio authors.
 
 ## 7. File map
 

@@ -24,7 +24,7 @@ One command runs the stages in order: `anki fix <language> --select`. The
 | C4    | select    | C1, C2, C3, reserve pack | kept cards and reserve cards                |
 | C5    | write     | C0, C4                   | APKG and three side files                   |
 
-The gates G1, G2, G5, and G6 run after C5. G3, G4, G7 to G18 are retired.
+The gates C1, C2, C5, and C6 run after stage C5. The gate ids C3, C4, and C7 to C18 are retired. A stage id and a gate id look the same (ADR 0057): the text says stage or gate before each id.
 
 The `--cards` and `--reserve` values change the request. The other
 `CullRequest` fields, such as `max_uses` and `target_words`, keep their
@@ -74,7 +74,7 @@ C4  selection
 C5  APKG, .cull.csv, .coverage.csv, .manifest.json
         |
         v
-    gates G1, G2, G5, G6
+    gates C1, C2, C5, C6
 ```
 
 ## 3. Target words (C1 and C2)
@@ -265,7 +265,7 @@ target lemma of the card that has a sense row, and `coreflow.note_values` writes
 that lemma and its first sense. `select_cards` leaves out a card without a
 target before the pick, so the cap fills from cards that have a core word. Its
 CSV row holds `kept = 0` and `reason = no_core`. `counts.dropped_no_core` is 0
-for a cull and stays in the manifest for G1.
+for a cull and stays in the manifest for gate C1.
 
 The report line `Length pool/kept %` gives `length:pool/kept` per sentence
 length, as whole percent of the passed cards and of the kept frequency cards.
@@ -283,29 +283,29 @@ exceptions.
 
 | Group     | Gates        | Checks                                                    |
 | --------- | ------------ | --------------------------------------------------------- |
-| size      | G1, G2       | card count against the cap, lemma uses against the cap    |
-| rules     | G5, G6       | F1 to F9 on every kept card, similarity                   |
+| size      | C1, C2       | card count against the cap, lemma uses against the cap    |
+| rules     | C5, C6       | F1 to F9 on every kept card, similarity                   |
 
-G3, G4, G7 to G11, G13 to G17 are retired (ADR 0033, 0035, 0040 to 0045). Their ids are not reused. The
+The gate ids C3, C4, C7 to C11, C13 to C17 are retired (ADR 0033, 0035, 0040 to 0045). Their ids are not reused. The
 report and the coverage CSV still give the targets with one card and with two
 cards, and the Swadesh count of the reserve concepts. No gate tests them.
 
-G18 is retired (ADR 0039). The `sense` filter is the one sense test, and no gate
+Gate C18 is retired (ADR 0039). The `sense` filter is the one sense test, and no gate
 repeats it.
 
-G2 counts the lemma uses with `sense_lemma_sets`, the same function that
+Gate C2 counts the lemma uses with `sense_lemma_sets`, the same function that
 `select_cards` uses. A lemma that fails the sense test on a card is not a use of
-that card. G2 and G6 read their limits from the constants `DEFAULT_MAX_USES`,
-`EXEMPT_TOP`, and `SIMILARITY`, not from the manifest. G1 reads the cap from the
-manifest, because the user sets it with `--cards`. G5 checks the frequency rows
+that card. Gates C2 and C6 read their limits from the constants `DEFAULT_MAX_USES`,
+`EXEMPT_TOP`, and `SIMILARITY`, not from the manifest. Gate C1 reads the cap from the
+manifest, because the user sets it with `--cards`. Gate C5 checks the frequency rows
 and skips the reserve rows, which have their own length window (ADR 0046).
 
-G1 passes when the kept count plus `counts.dropped_no_core` reaches the cap. It
+Gate C1 passes when the kept count plus `counts.dropped_no_core` reaches the cap. It
 also passes when the pool has no more cards: no unkept row has the reason
 `max_cards`. Every other passed card then has the reason `similar`,
-`use_cap`, `no_gain`, or `no_core`. A small input deck does not fail G1.
+`use_cap`, `no_gain`, or `no_core`. A small input deck does not fail gate C1.
 
-The similarity test of `select_cards` and G6 use the full lemma sets of the
+The similarity test of `select_cards` and gate C6 use the full lemma sets of the
 cards. A duplicate is a property of the text, so the sense test does not change
 it.
 
@@ -314,7 +314,7 @@ it.
 | Path                                      | Content                                        |
 | ----------------------------------------- | ---------------------------------------------- |
 | `anki_tools/ranking/cullflow.py`          | C0 to C5 flow, profile, selection, values      |
-| `anki_tools/ranking/cullgates.py`         | gates G1, G2, G5, G6, 4 rows                        |
+| `anki_tools/ranking/cullgates.py`         | gates C1, C2, C5, C6, 4 rows                        |
 | `anki_tools/gates.py`                     | gate value, row, runner, reader contract       |
 | `anki_tools/ranking/gates.py`             | report, shared gates                           |
 | `anki_tools/ranking/assemble.py`          | deck, side files, manifest, report             |

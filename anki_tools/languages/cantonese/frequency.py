@@ -312,7 +312,7 @@ def load_yue_frequency(
 
 
 def check_frequency(data: YueFrequency) -> list[tuple[str, bool, str]]:
-    """Run gates G1, G3, and G4 of the spec on the list.
+    """Run gates P1, P3, and P4 of the spec on the list.
 
     :param data: The ranked list.
     :returns: A list of gate name, pass flag, and message.
@@ -321,13 +321,13 @@ def check_frequency(data: YueFrequency) -> list[tuple[str, bool, str]]:
     results = []
     contiguous = [row.rank for row in data.rows] == list(range(1, len(data.rows) + 1))
     results.append((
-        "G1",
+        "P1",
         len(data.rows) >= 40_000 and contiguous,
         f"{len(data.rows)} rows, ranks contiguous: {contiguous}",
     ))
     for gate, words, limit in (
-        ("G3", ("係", "嘅", "唔", "我", "你"), 20),
-        ("G4", ("你好", "早晨", "唔該"), 3000),
+        ("P3", ("係", "嘅", "唔", "我", "你"), 20),
+        ("P4", ("你好", "早晨", "唔該"), 3000),
     ):
         found = {word: ranks.get(word) for word in words}
         ok = all(rank is not None and rank <= limit for rank in found.values())

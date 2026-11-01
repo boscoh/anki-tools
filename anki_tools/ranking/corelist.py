@@ -45,7 +45,7 @@ def lemma_sets(
 ) -> list[set[str]]:
     """Collect the content lemmas of every card.
 
-    The cull, the core build, and gates G6 and K6 use this set for duplicates.
+    The cull, the core build, and gates C6 and K6 use this set for duplicates.
 
     :param tokens: Lemma and part of speech per card.
     :param content_pos: Parts of speech that count as content, empty for every

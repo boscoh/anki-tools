@@ -173,16 +173,15 @@ gives the map. ADR 0027 records it.
 _Avoid_: filter name, rule number
 
 **Gate**:
-An audit check on the built files, for example `G4`. A gate reports a fault in the
+An audit check on the built files, for example `P4`. A gate reports a fault in the
 output. It does not reject a sentence.
 _Avoid_: guard, test
 
 **Gate id namespace**:
-The set of gate ids that one flow owns. The pack audit holds `G1` to `G21`, the
-cull deck holds `G1`, `G2`, `G5`, and `G6`, and the core deck holds `K5`, `K6`,
-`K13`, `K23`, and `K24`. A number
-alone does not identify a check, so a doc row or a message names the flow.
-ADR 0027 records the owner tables.
+The set of gate ids that one flow owns. The pack audit holds `P1` to `P21`, the
+cull deck holds `C1`, `C2`, `C5`, and `C6`, and the core deck holds `K5`, `K6`,
+`K13`, `K23`, and `K24`. The prefix names the flow. ADR 0057 records the
+owner tables and the map from the old `G` ids (ADR 0027).
 _Avoid_: gate number, bare gate id
 
 **Frame**:

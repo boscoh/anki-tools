@@ -285,7 +285,7 @@ def build_mandarin_pack(
     return result
 
 
-def _gate_g1(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
+def _gate_p1(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
     table = inputs.table()
     failures = check_word_table(
         table, csv_path=inputs.word_csv, review_path=inputs.review_csv
@@ -296,7 +296,7 @@ def _gate_g1(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
     return True, f"{concepts} concepts, {len(table)} forms"
 
 
-def _gate_g9(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
+def _gate_p9(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
     rows = inputs.rows()
     bad = []
     for row in rows:
@@ -316,7 +316,7 @@ def _audio_id(row: dict[str, str]) -> int:
         return 0
 
 
-def _gate_g12(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
+def _gate_p12(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
     path = inputs.attribution_path
     if not path.is_file():
         return False, f"attribution file missing: {path}"
@@ -338,30 +338,30 @@ def _gate_g12(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
 
 
 GATES: tuple[tuple[str, GateCheck], ...] = (
-    ("G1", _gate_g1),
-    ("G2", gate_unique_forms),
-    ("G3", gate_targets_in_table),
-    ("G4", gate_unique_tatoeba_ids),
-    ("G5", gate_target_once),
-    ("G6", gate_similarity),
-    ("G7", gate_sentence_audio),
-    ("G8", gate_media_count),
-    ("G9", _gate_g9),
-    ("G10", gate_coverage),
-    ("G11", gate_manifest_counts),
-    ("G12", _gate_g12),
-    ("G13", gate_apkg),
-    ("G14", gate_filter_recheck),
-    ("G15", gate_review_file),
-    ("G16", gate_word_audio),
+    ("P1", _gate_p1),
+    ("P2", gate_unique_forms),
+    ("P3", gate_targets_in_table),
+    ("P4", gate_unique_tatoeba_ids),
+    ("P5", gate_target_once),
+    ("P6", gate_similarity),
+    ("P7", gate_sentence_audio),
+    ("P8", gate_media_count),
+    ("P9", _gate_p9),
+    ("P10", gate_coverage),
+    ("P11", gate_manifest_counts),
+    ("P12", _gate_p12),
+    ("P13", gate_apkg),
+    ("P14", gate_filter_recheck),
+    ("P15", gate_review_file),
+    ("P16", gate_word_audio),
 )
 
 
 def run_audit(**paths: Path | None) -> list[GateResult]:
-    """Run the quality gates G1 to G16.
+    """Run the quality gates P1 to P16.
 
     :param paths: Input paths that replace the defaults of the profile.
-    :returns: One ``(gate, passed, message)`` row per gate, G1 first.
+    :returns: One ``(gate, passed, message)`` row per gate, P1 first.
     """
     return run_pack_audit(
         MANDARIN,

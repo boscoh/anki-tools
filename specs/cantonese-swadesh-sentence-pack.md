@@ -36,7 +36,7 @@ In scope:
 - Audio for each sentence and for each target word.
 - A build command that writes one `.apkg` file.
 - A manifest with provenance and licenses.
-- Quality gates G1 to G21.
+- Quality gates P1 to P21.
 
 Out of scope:
 
@@ -142,7 +142,7 @@ wrong character, and one wrong verb. The script
 
 A form changed when the module term has more linked sentences and keeps the
 sense. A form stayed when the module term is less precise. The review file
-marks each row `fixed` or `keep`, so gate G15 stops a build with an `open` row.
+marks each row `fixed` or `keep`, so gate P15 stops a build with an `open` row.
 The corrected forms also enter the vocabulary deck of
 `anki swadesh build cantonese`. Its audio cache prunes the old files on the
 next run.
@@ -240,7 +240,7 @@ in `anki_tools/sentence_pack/languages/cantonese.py` holds these compounds:
 | 燒   | to burn  | 發燒 (fever)                                |
 | 揸   | to hold  | 揸車 (to drive)                             |
 
-Gate G20 checks the built deck. A card fails when its target sits inside one
+Gate P20 checks the built deck. A card fails when its target sits inside one
 of these compounds.
 
 The list does not catch every case. A bare verb can carry a different sense
@@ -266,7 +266,7 @@ false-friend word. The `SENSE_CHECKS` table in `cantonese.py` holds the lists:
 | 數    | count, counts, counted | math, mathematics, number, numbers |
 | 燒    | burn, burned, fire     | fever, temperature                 |
 
-Gate G21 checks the built deck against the stored English text.
+Gate P21 checks the built deck against the stored English text.
 
 ## 7. Filters
 
@@ -337,7 +337,7 @@ voice.
 
 ```bash
 uv run anki swadesh pack cantonese --per-word 2 --max-cards 450 --native-audio auto  # S0 to S5
-uv run anki swadesh audit cantonese                          # gates G1 to G21
+uv run anki swadesh audit cantonese                          # gates P1 to P21
 ```
 
 The commands write these files:
@@ -373,27 +373,27 @@ with a non-zero exit code.
 
 | Gate | Check                                                                          |
 | ---- | ------------------------------------------------------------------------------ |
-| G1   | The word table passes the row count, index, label, jyutping, and review checks |
-| G2   | No two reviewed forms are the same                                             |
-| G3   | Every card target is a reviewed form                                           |
-| G4   | Every card has a unique Tatoeba id                                             |
-| G5   | The target matches exactly one whole token in the sentence                     |
-| G6   | No two cards reach the 0.67 character Jaccard limit                            |
-| G7   | Every card has a valid sentence MP3                                            |
-| G8   | The media count in the manifest matches the APKG                               |
-| G9   | No card sentence or target holds a Latin letter or a digit                     |
-| G10  | Core coverage is at least 0.70                                                 |
-| G11  | The manifest counts and hashes match the files                                 |
-| G12  | The `## Cantonese pack` section names every sentence author                    |
-| G13  | The APKG opens and its note count matches the CSV                              |
-| G14  | Every card passes the complete-sentence rules                                |
-| G15  | The word review file has no `open` row                                         |
-| G16  | Every card target has a valid word MP3                                         |
-| G17  | Every card has a jyutping reading                                              |
-| G18  | Every native card keeps a license                                              |
-| G19  | Every card target is a reviewed form with a card                               |
-| G20  | No card uses its target inside a false-friend compound                         |
-| G21  | No card English holds a different sense than the card word                     |
+| P1   | The word table passes the row count, index, label, jyutping, and review checks |
+| P2   | No two reviewed forms are the same                                             |
+| P3   | Every card target is a reviewed form                                           |
+| P4   | Every card has a unique Tatoeba id                                             |
+| P5   | The target matches exactly one whole token in the sentence                     |
+| P6   | No two cards reach the 0.67 character Jaccard limit                            |
+| P7   | Every card has a valid sentence MP3                                            |
+| P8   | The media count in the manifest matches the APKG                               |
+| P9   | No card sentence or target holds a Latin letter or a digit                     |
+| P10  | Core coverage is at least 0.70                                                 |
+| P11  | The manifest counts and hashes match the files                                 |
+| P12  | The `## Cantonese pack` section names every sentence author                    |
+| P13  | The APKG opens and its note count matches the CSV                              |
+| P14  | Every card passes the complete-sentence rules                                |
+| P15  | The word review file has no `open` row                                         |
+| P16  | Every card target has a valid word MP3                                         |
+| P17  | Every card has a jyutping reading                                              |
+| P18  | Every native card keeps a license                                              |
+| P19  | Every card target is a reviewed form with a card                               |
+| P20  | No card uses its target inside a false-friend compound                         |
+| P21  | No card English holds a different sense than the card word                     |
 
 ### 11.1 Tests
 
@@ -433,7 +433,7 @@ Measured on 2026-10-22 with the defaults, after the five alternate rows:
 | Media files                | 434                   |
 | Audio duration             | 0.4 s to 15.0 s       |
 | Jyutping on every card     | yes                   |
-| Gates G1 to G21            | sentence stage only   |
+| Gates P1 to P21            | sentence stage only   |
 
 The 51 forms without a candidate: 闊, 厚, 窄, 薄, 蝨, 棍, 種子, 葉, 根,
 樹皮, 皮, 脂肪, 角, 尾, 羽毛, 嘴, 腳, 腿, 膝頭, 翼, 腸, 頸, 胸, 肝, 咬,
@@ -474,11 +474,11 @@ Open questions:
 
 | Milestone | Issue      | Task                                              | Output                                    |
 | --------- | ---------- | ------------------------------------------------- | ----------------------------------------- |
-| C1        | `anki-55q` | Word table, review file, sew fix                  | `vocab/cantonese_word_review.csv`; G1, G15 |
+| C1        | `anki-55q` | Word table, review file, sew fix                  | `vocab/cantonese_word_review.csv`; P1, P15 |
 | C2        | `anki-gkd` | Language profile, tokenizer, jyutping, filters     | profile and hooks                          |
 | C3        | `anki-4ng` | Sentence pool and selection                       | `vocab/cantonese_sentences.csv`            |
 | C4        | `anki-yzf` | Audio and APKG pack                               | `apkg/swadesh_sentences_cantonese.apkg`    |
-| C5        | `anki-y2r` | Gates and tests                                   | `tests/test_cantonese_pack.py`; G1 to G21  |
+| C5        | `anki-y2r` | Gates and tests                                   | `tests/test_cantonese_pack.py`; P1 to P21  |
 | C6        | `anki-0wz` | README and `ATTRIBUTION.md`                       | release check                              |
 
 ## 15. Appendix: evidence

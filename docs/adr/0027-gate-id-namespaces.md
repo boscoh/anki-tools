@@ -21,7 +21,7 @@ at 3e13e76 (2026-10-20). Each table numbers from `G1`.
 ADR 0054 records part of the map in `MARK_RULES` (`ranking/cullflow.py`). The
 rest of the map has no record.
 
-Status: accepted.
+Status: superseded by ADR 0057.
 
 ## Decision
 

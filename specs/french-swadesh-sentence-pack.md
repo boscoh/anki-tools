@@ -223,7 +223,7 @@ Rules:
   or another word class. The module has no gender data, so M1 fills the
   value by hand from a dictionary. Do not infer it from a `le` or `la` probe,
   and do not translate it. The probe expects 120 nouns with a value.
-  A missing value is not a build error, but G20 counts the empty noun rows.
+  A missing value is not a build error, but P20 counts the empty noun rows.
 - One form per concept. The table has 207 rows and 207 unique forms.
 - The `swadesh_index` is the CSV row order, starting at 1. `vocab/swadesh.txt`
   has 207 labels and no trailing newline.
@@ -358,7 +358,7 @@ requirement:
 
 Fallback window: when a word gets no candidate in 4 to 10 words, retry that
 word with a 3 to 10 word window and drop F6 and F8. Mark such a card
-`tier=scaffold`. A scaffold card must pass F3, F4, F5, F7, F9, and F10. G14
+`tier=scaffold`. A scaffold card must pass F3, F4, F5, F7, F9, and F10. P14
 exempts it from F2, F6, and F8.
 
 The probe found no uncovered concept, so the fallback is unused for French. The
@@ -428,7 +428,7 @@ sense word, or holds no false-friend word. The `SENSE_CHECKS` table in
 | rond    | round       | money, cash, penny, dime    |
 | droit   | straight    | right, allowed, entitled    |
 
-Gate G21 checks the built deck against the stored English text.
+Gate P21 checks the built deck against the stored English text.
 ### 8.3 Ranking key
 
 Sort candidates for each target word by this key, first item first:
@@ -687,7 +687,7 @@ names the engine and the voice. A native file keeps its recording license.
 Tatoeba text needs this sentence: "Sentences come from Tatoeba
 (<https://tatoeba.org>) and use the CC BY 2.0 FR license."
 
-Gate G12 reads only the section for the pack language. Do not change the
+Gate P12 reads only the section for the pack language. Do not change the
 Mandarin section.
 
 ## 11. CLI
@@ -751,29 +751,29 @@ a failure.
 | ---- | ------------------------------------------------------------------------------------------ |
 | Gate | Check                                                                                      |
 | ---- | ------------------------------------------------------------------------------------------ |
-| G1   | Word table: 207 rows, 207 forms, no gap                                                    |
-| G2   | No duplicate word form                                                                     |
-| G3   | Every card target exists in the reviewed CSV                                               |
-| G4   | Every card has a unique Tatoeba id after normalization                                     |
-| G5   | Target appears one time in each sentence, as a whole token or lemma                        |
-| G6   | No card pair with word-set Jaccard of 0.67 or more                                         |
-| G7   | Every card has a valid audio file with duration 0.4 to 15 seconds                          |
-| G8   | Audio file count equals the media count in the APKG                                        |
-| G9   | No card matches the target inside a longer word                                            |
-| G10  | Core coverage of 95 percent or more                                                        |
-| G11  | Manifest counts match the word table and the sentence CSV (10.4)                           |
-| G12  | `ATTRIBUTION.md` has a French section and names every audio author in the pack             |
-| G13  | The APKG opens with `AnkiPackage` and lists the expected notes                             |
-| G14  | Core cards pass F2 to F10. Scaffold cards pass F3, F4, F5, F7, F9, F10, and length 3 to 10 |
-| G15  | `vocab/french_word_review.csv` exists and has no open row                                  |
-| G16  | Every card target has a valid `word_{hash}.mp3` file                                       |
-| G17  | No card field contains U+202F or U+00A0, and every field is NFC                            |
-| G18  | A public pack has no card with a CC BY-NC 4.0 audio file                                   |
-| G19  | No card has `form_kind=discontinuous` without both parts in the sentence (8.2)             |
-| G20  | Noun rows with an empty `gender` are reported; the count is in the manifest                |
-| G21  | No card English holds a different sense than the card word (8.2)                           |
+| P1   | Word table: 207 rows, 207 forms, no gap                                                    |
+| P2   | No duplicate word form                                                                     |
+| P3   | Every card target exists in the reviewed CSV                                               |
+| P4   | Every card has a unique Tatoeba id after normalization                                     |
+| P5   | Target appears one time in each sentence, as a whole token or lemma                        |
+| P6   | No card pair with word-set Jaccard of 0.67 or more                                         |
+| P7   | Every card has a valid audio file with duration 0.4 to 15 seconds                          |
+| P8   | Audio file count equals the media count in the APKG                                        |
+| P9   | No card matches the target inside a longer word                                            |
+| P10  | Core coverage of 95 percent or more                                                        |
+| P11  | Manifest counts match the word table and the sentence CSV (10.4)                           |
+| P12  | `ATTRIBUTION.md` has a French section and names every audio author in the pack             |
+| P13  | The APKG opens with `AnkiPackage` and lists the expected notes                             |
+| P14  | Core cards pass F2 to F10. Scaffold cards pass F3, F4, F5, F7, F9, F10, and length 3 to 10 |
+| P15  | `vocab/french_word_review.csv` exists and has no open row                                  |
+| P16  | Every card target has a valid `word_{hash}.mp3` file                                       |
+| P17  | No card field contains U+202F or U+00A0, and every field is NFC                            |
+| P18  | A public pack has no card with a CC BY-NC 4.0 audio file                                   |
+| P19  | No card has `form_kind=discontinuous` without both parts in the sentence (8.2)             |
+| P20  | Noun rows with an empty `gender` are reported; the count is in the manifest                |
+| P21  | No card English holds a different sense than the card word (8.2)                           |
 
-G10 uses the measured coverage. The probe measures 207 of 207 concepts (1.00).
+P10 uses the measured coverage. The probe measures 207 of 207 concepts (1.00).
 This spec sets the gate at 0.95, which is the measured value minus 5 points.
 
 Add unit tests in `tests/test_french_pack.py` for:
@@ -786,7 +786,7 @@ Add unit tests in `tests/test_french_pack.py` for:
 - Set cover on a small fixture.
 - Audio filename determinism.
 - Proper-sentence filters F2 to F10 on a small fixture.
-- The scaffold exemption in G14.
+- The scaffold exemption in P14.
 - Manifest counts.
 - Mandarin output is unchanged after the refactor.
 
@@ -849,7 +849,7 @@ Milestone M5 is complete. These values come from the full pipeline run of
 | Uncovered concepts   | 1 (`intestins`)                                         |
 | Native audio         | none, the public pack is TTS only                       |
 | TTS engine           | gTTS, voice `gtts:fr`                                   |
-| Gate result          | G1 to G21 pass; `anki swadesh audit french` exits 0     |
+| Gate result          | P1 to P21 pass; `anki swadesh audit french` exits 0     |
 
 The one uncovered word is `intestins` (index 86, guts). It has no candidate in
 the core window and none in the 3 to 10 word fallback window, so the deck has
@@ -876,9 +876,9 @@ The measured values differ from the probe of section 3 in six places:
   84 noun rows (indices 36 to 91, 147 to 168, 170, 171, 177 to 179, and 207);
   the other rows are pronouns, numerals, adjectives, verbs, adverbs, and
   prepositions. The gender column is a noun column, so all 84 noun rows carry a
-  value and G20 reports 0 empty rows.
+  value and P20 reports 0 empty rows.
 
-G10 keeps the gate at 0.95. The measured coverage is 206 of 207 concepts
+P10 keeps the gate at 0.95. The measured coverage is 206 of 207 concepts
 (0.995), so the rule "measured value minus 5 points" gives a gate of 0.945; the
 spec value of 0.95 is higher and stays. The two numbers are 0.995 measured and
 0.95 required.

@@ -246,7 +246,7 @@ CC BY 2.0 FR. The audio follows its engine and voice.
 ### Mandarin
 
 - gTTS is the only voice. `edge-tts` is absent.
-- Audit gates G1 to G16.
+- Audit gates P1 to P16.
 - 2 scaffold cards. Each sentence has 4 to 7 Han characters.
 - 16 words have no selected sentence: 虱子, 棍子, 种子, 根, 骨头, 脂肪, 羽毛,
   肠子, 乳房, 肝, 呕吐, 分开, 揉, 绑, 肿, 灰.
@@ -262,7 +262,7 @@ CC BY 2.0 FR. The audio follows its engine and voice.
   3. `gtts` for the voice `gtts:el`. `--tts edge --voice
      el-GR-AthinaNeural` selects the Microsoft voice. The voice
      `el-GR-NestorasNeural` is also available.
-- Audit gates G1 to G18, 15 rows.
+- Audit gates P1 to P18, 15 rows.
 - Greek has no Tatoeba recordings. `ell_sentences_with_audio.tsv.bz2` returns
   HTTP 404, so `--native-audio auto` and `--native-audio only` are rejected.
   The pack is TTS only.
@@ -275,7 +275,7 @@ CC BY 2.0 FR. The audio follows its engine and voice.
   σκουπίζω, τραβάω, δένω, μετρώ, πλέω, ρέω, παγώνω, πρήζομαι, σκόνη, στάχτη,
   σάπιος, στρογγυλός, αιχμηρός, στομωμένος, λείος.
 - Index 81 (`πόδι`, leg) shares its form with index 80 (foot). The shared row
-  has `variant=shared`, gets no card. Gate G19 rejects a card on a shared-only
+  has `variant=shared`, gets no card. Gate P19 rejects a card on a shared-only
   form.
 - The spaCy model is under the MIT license.
 
@@ -287,7 +287,7 @@ CC BY 2.0 FR. The audio follows its engine and voice.
   2. `ffprobe` on the path.
   3. `gtts` for the voice `gtts:fr`. `--tts edge --voice fr-FR-DeniseNeural`
      selects the Microsoft voice.
-- Audit gates G1 to G19, 15 rows.
+- Audit gates P1 to P19, 15 rows.
 - The build reads `vocab/english-french.csv` and `vocab/french_word_review.csv`
   and never writes them. Run `uv run python
   scripts/build_french_word_table.py` to regenerate them from
@@ -311,7 +311,7 @@ CC BY 2.0 FR. The audio follows its engine and voice.
   2. `ffprobe` on the path.
   3. `gtts` for the voice `gtts:yue`. `--tts edge --voice zh-HK-HiuMaanNeural`
      selects the Microsoft voice.
-- Audit gates G1 to G18, 16 rows.
+- Audit gates P1 to P18, 16 rows.
 - The build reads `vocab/english-cantonese.csv` and
   `vocab/cantonese_word_review.csv` and never writes them. Run `uv run python
   scripts/build_cantonese_word_table.py` to rebuild them from
@@ -444,7 +444,7 @@ non-exempt word appears in more than 4 cards.
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
     --output apkg/french_1000.apkg
 
-# Run gates G1, G2, G5, and G6 on the written output
+# Run gates C1, C2, C5, and C6 on the written output
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
     --output apkg/french_1000.apkg --check
 ```

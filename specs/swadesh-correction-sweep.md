@@ -184,7 +184,7 @@ revision ids in section 3.1 pin the counts. Fetch each page with
 - The counts were verified on 2026-10-18 with the live module dumps in
   section 3.1. O3 is closed.
 - The review file holds the Mandarin rows only. The other languages have no
-  rows, and the pack spec gates G15 on the file.
+  rows, and the pack spec gates P15 on the file.
 - Cantonese index 138 was `聯 lyun4`. 聯 means to unite. The form is now
   縫 fung4, and `vocab/cantonese_word_review.csv` records the change. O6 is
   closed. The pack spec keeps the two-character 縫紉 as an open question.

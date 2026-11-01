@@ -983,7 +983,7 @@ def gate_word_table(
     inputs: Any,
     _profile: LanguageProfile,
 ) -> tuple[bool, str]:
-    """Cantonese gate G1: the reviewed word table passes every S1 check.
+    """Cantonese gate P1: the reviewed word table passes every S1 check.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -1006,7 +1006,7 @@ def gate_jyutping(
     inputs: Any,
     _profile: LanguageProfile,
 ) -> tuple[bool, str]:
-    """Cantonese gate G17: every card has a jyutping reading.
+    """Cantonese gate P17: every card has a jyutping reading.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -1023,7 +1023,7 @@ def gate_native_license(
     inputs: Any,
     _profile: LanguageProfile,
 ) -> tuple[bool, str]:
-    """Cantonese gate G18: a native recording has a license.
+    """Cantonese gate P18: a native recording has a license.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -1063,22 +1063,22 @@ def cantonese_gates() -> tuple[tuple[str, Any], ...]:
     )
 
     return (
-        ("G1", gate_word_table),
-        ("G2", gate_unique_forms),
-        ("G3", gate_targets_in_table),
-        ("G4", gate_unique_tatoeba_ids),
-        ("G5", gate_target_once),
-        ("G6", gate_similarity),
-        ("G7", gate_sentence_audio),
-        ("G8", gate_media_count),
-        ("G10", gate_coverage),
-        ("G11", gate_manifest_counts),
-        ("G13", gate_apkg),
-        ("G14", gate_filter_recheck),
-        ("G15", gate_review_file),
-        ("G16", gate_word_audio),
-        ("G17", gate_jyutping),
-        ("G18", gate_native_license),
+        ("P1", gate_word_table),
+        ("P2", gate_unique_forms),
+        ("P3", gate_targets_in_table),
+        ("P4", gate_unique_tatoeba_ids),
+        ("P5", gate_target_once),
+        ("P6", gate_similarity),
+        ("P7", gate_sentence_audio),
+        ("P8", gate_media_count),
+        ("P10", gate_coverage),
+        ("P11", gate_manifest_counts),
+        ("P13", gate_apkg),
+        ("P14", gate_filter_recheck),
+        ("P15", gate_review_file),
+        ("P16", gate_word_audio),
+        ("P17", gate_jyutping),
+        ("P18", gate_native_license),
     )
 
 
@@ -1086,7 +1086,7 @@ def run_cantonese_audit(**paths: Path | None) -> list[GateResult]:
     """Run the Cantonese quality gates.
 
     :param paths: Input paths that replace the defaults of the profile.
-    :returns: One ``(gate, passed, message)`` row per gate, G1 first.
+    :returns: One ``(gate, passed, message)`` row per gate, P1 first.
     """
     return run_pack_audit(
         CANTONESE, cantonese_gates(), load_table=load_word_table, **paths

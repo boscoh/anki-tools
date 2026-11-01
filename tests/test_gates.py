@@ -51,11 +51,11 @@ def test_the_report_prints_one_table(capsys) -> None:
     assert "PASS" in passed
     assert "all 1 gates passed" in passed
 
-    assert gates.report([gates.GateResult("G1", False, "bad")]) == 1
+    assert gates.report([gates.GateResult("K1", False, "bad")]) == 1
     failed = capsys.readouterr().out
 
     assert "FAIL" in failed
-    assert "1 of 1 gates failed: G1" in failed
+    assert "1 of 1 gates failed: K1" in failed
 
 
 class _CoverageFiles:

@@ -84,7 +84,7 @@ jieba dictionary, because the Mandarin code uses it.
 | Overrides  | Words from 2.4, at the same weight as the top word                       |
 
 `spoken_token_coverage` measures the share of Han tokens that have a spoken
-Cifu count (gate G2). The Cifu dictionary gives 92.3% on the LTL deck, against
+Cifu count (gate P2). The Cifu dictionary gives 92.3% on the LTL deck, against
 91.1% for the jieba default and 85.4% for PyCantonese.
 
 ## 4. Data sources and licenses
@@ -113,8 +113,8 @@ Rules:
 
 | Gate | Test                                                             |
 | ---- | ---------------------------------------------------------------- |
-| G1   | At least 40,000 rows, and the ranks are contiguous from 1        |
-| G3   | `係`, `嘅`, `唔`, `我`, and `你` are in the top 20                |
-| G4   | `你好`, `早晨`, and `唔該` are in the top 3000                    |
+| P1   | At least 40,000 rows, and the ranks are contiguous from 1        |
+| P3   | `係`, `嘅`, `唔`, `我`, and `你` are in the top 20                |
+| P4   | `你好`, `早晨`, and `唔該` are in the top 3000                    |
 
 A failed gate stops the run.

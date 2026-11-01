@@ -47,7 +47,7 @@ Three of these files come back trimmed for the output note type. The next
 section gives them.
 The cut gave 379 tests, not 350. The restored critical tests and the note-type
 tests give 399. The last 29 tests of the cut are the audit
-gates `G2` to `G16` in `test_mandarin_audit.py`, the one end-to-end test of
+gates `P2` to `P16` in `test_mandarin_audit.py`, the one end-to-end test of
 `sentence_pack/pack.py` in `test_mandarin_deck.py`, and two small shared units.
 They are not per-language copies, so cut 2 stops before them.
 
@@ -115,7 +115,7 @@ The naming and source choice of the module keep coverage in
 | `test_apkg_package.py`                                                                              | The APKG writer is the artifact             |
 | `test_import_graph.py`, `test_language_layout.py`                                                   | Cheap guards that catch a real break        |
 | `test_core_deck.py`, `test_cull_shared.py`, `test_shared_coreflow.py`                               | One test per rule of the shared flow        |
-| `test_mandarin_audit.py`                                                                            | The gates G2 to G16                         |
+| `test_mandarin_audit.py`                                                                            | The gates P2 to P16                         |
 | `test_sentence_pack_guards.py`, `test_duplicates.py`, `test_char_links.py`, `test_ranking_cover.py` | One guard, one test                         |
 | `test_french_pack.py`                                                                               | The reference language of the sentence pack |
 

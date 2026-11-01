@@ -66,7 +66,7 @@ The cull and the core reject a card as `unique` when one of two keys is not new:
    text, casefolded, with single spaces.
 
 A card with an empty English text never matches on the English key. Only a
-passed card adds its keys, so a rejected card blocks no later card. Cull `G5`
+passed card adds its keys, so a rejected card blocks no later card. Cull `C5`
 and core `K5` call `filter_cards`, so they use the same rule (ADR 0047). The
 pack has its own sentence dedupe in `sentence_pack/pool.py` and does not test
 the English key.
@@ -122,7 +122,7 @@ sentence with more whitespace chunks than `max_units` and records
 | Cantonese | 4 to 7               | `FALLBACK_MIN_HAN`    |
 
 Each language states the window once, in its profile. No flag changes it. The
-gates G5 and K5 read the same values. The run manifest records the window.
+gates C5 and K5 read the same values. The run manifest records the window.
 
 ## 5. Deliberate differences
 
@@ -213,7 +213,7 @@ Steps of L9:
 | S1 | write the sense section                                               | done              |
 | S2 | cull: remove a lemma that fails `sense_failure` in `select_cards`     | done, ADR 0030    |
 | S3 | one shared function and one record; move the dicts into the TSV files | done              |
-| S4 | one `sense` recheck gate in the cull and the core (G18, K22)          | retired, ADR 0039 |
+| S4 | one `sense` recheck gate in the cull and the core (C18, K22)          | retired, ADR 0039 |
 | S5 | sense rows for all 300 cull targets, and a Cantonese file             | done, ADR 0031    |
 
 L9 removed these parts:
@@ -224,7 +224,7 @@ L9 removed these parts:
 | `false_friend_spans` hook, `FALSE_FRIENDS`               | the sense test (ADR 0053)            |
 | `holds_sense`, `holds_tier_s_sense`, `sense_match`       | `sense_failure`                      |
 | `gate_no_sense_mismatch`, `gate_no_false_friend`         | the `sense` filter (ADR 0039)        |
-| `gate_sense` (cull G18, core K22)                        | the `sense` filter (ADR 0039)        |
+| `gate_sense` (cull C18, core K22)                        | the `sense` filter (ADR 0039)        |
 
 A deck built before S2 can keep a card that no sense test checked, and no gate
 reports it. Build the deck again.
@@ -233,7 +233,7 @@ reports it. Build the deck again.
 
 | Issue       | Problem                                          |
 | ----------- | ------------------------------------------------ |
-| `anki-xrfk` | Spanish cull G5: one card fails `length_window`  |
+| `anki-xrfk` | Spanish cull C5: one card fails `length_window`  |
 
 ## 9. Verification
 

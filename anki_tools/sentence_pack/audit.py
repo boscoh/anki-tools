@@ -248,7 +248,7 @@ def scaffold_problem(sentence: str, profile: LanguageProfile) -> str | None:
 def gate_unique_forms(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
-    """Gate G2: no duplicate word form.
+    """Gate P2: no duplicate word form.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -268,7 +268,7 @@ def gate_unique_forms(
 def gate_targets_in_table(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
-    """Gate G3: every card target is a table form that is not shared.
+    """Gate P3: every card target is a table form that is not shared.
 
     A shared form has no card of its own, so a target on it is a fault.
 
@@ -297,7 +297,7 @@ def gate_targets_in_table(
 def gate_unique_tatoeba_ids(
     inputs: AuditInputs, profile: LanguageProfile  # noqa: ARG001 - gate signature
 ) -> tuple[bool, str]:
-    """Gate G4: every card has a unique Tatoeba id.
+    """Gate P4: every card has a unique Tatoeba id.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -315,7 +315,7 @@ def gate_unique_tatoeba_ids(
 def gate_target_once(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
-    """Gate G5: the target appears one time in each sentence.
+    """Gate P5: the target appears one time in each sentence.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -344,7 +344,7 @@ def gate_target_once(
 def gate_similarity(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
-    """Gate G6: no card pair reaches the Jaccard limit.
+    """Gate P6: no card pair reaches the Jaccard limit.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -371,7 +371,7 @@ def gate_similarity(
 def gate_sentence_audio(
     inputs: AuditInputs, profile: LanguageProfile  # noqa: ARG001 - gate signature
 ) -> tuple[bool, str]:
-    """Gate G7: every card has a valid sentence file.
+    """Gate P7: every card has a valid sentence file.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -431,7 +431,7 @@ def expected_media(inputs: AuditInputs) -> set[str]:
 def gate_media_count(
     inputs: AuditInputs, profile: LanguageProfile  # noqa: ARG001 - gate signature
 ) -> tuple[bool, str]:
-    """Gate G8: the audio file count equals the media count of the APKG.
+    """Gate P8: the audio file count equals the media count of the APKG.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -456,7 +456,7 @@ def gate_media_count(
 def gate_coverage(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
-    """Gate G10: core coverage reaches the minimum.
+    """Gate P10: core coverage reaches the minimum.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -472,7 +472,7 @@ def gate_coverage(
 def gate_manifest_counts(
     inputs: AuditInputs, profile: LanguageProfile  # noqa: ARG001 - gate signature
 ) -> tuple[bool, str]:
-    """Gate G11: manifest counts and file hashes match the pack.
+    """Gate P11: manifest counts and file hashes match the pack.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -508,7 +508,7 @@ def gate_manifest_counts(
 def gate_apkg(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
-    """Gate G13: the APKG opens and lists the expected notes.
+    """Gate P13: the APKG opens and lists the expected notes.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -539,7 +539,7 @@ def gate_apkg(
 def gate_filter_recheck(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
-    """Gate G14: core and scaffold cards pass the complete-sentence rules.
+    """Gate P14: core and scaffold cards pass the complete-sentence rules.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -566,7 +566,7 @@ def gate_filter_recheck(
 def gate_review_file(
     inputs: AuditInputs, profile: LanguageProfile  # noqa: ARG001 - gate signature
 ) -> tuple[bool, str]:
-    """Gate G15: the word review file exists and has no open row.
+    """Gate P15: the word review file exists and has no open row.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -588,7 +588,7 @@ def gate_review_file(
 def gate_word_audio(
     inputs: AuditInputs, profile: LanguageProfile  # noqa: ARG001 - gate signature
 ) -> tuple[bool, str]:
-    """Gate G16: every card target has a valid word file.
+    """Gate P16: every card target has a valid word file.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -613,7 +613,7 @@ def gate_word_audio(
 def gate_no_native_audio(
     inputs: AuditInputs, profile: LanguageProfile  # noqa: ARG001 - gate signature
 ) -> tuple[bool, str]:
-    """Gate G18: no card uses the native audio source.
+    """Gate P18: no card uses the native audio source.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -628,20 +628,20 @@ def gate_no_native_audio(
 
 
 GENERIC_GATES: tuple[tuple[str, GateCheck], ...] = (
-    ("G2", gate_unique_forms),
-    ("G3", gate_targets_in_table),
-    ("G4", gate_unique_tatoeba_ids),
-    ("G5", gate_target_once),
-    ("G6", gate_similarity),
-    ("G7", gate_sentence_audio),
-    ("G8", gate_media_count),
-    ("G10", gate_coverage),
-    ("G11", gate_manifest_counts),
-    ("G13", gate_apkg),
-    ("G14", gate_filter_recheck),
-    ("G15", gate_review_file),
-    ("G16", gate_word_audio),
-    ("G18", gate_no_native_audio),
+    ("P2", gate_unique_forms),
+    ("P3", gate_targets_in_table),
+    ("P4", gate_unique_tatoeba_ids),
+    ("P5", gate_target_once),
+    ("P6", gate_similarity),
+    ("P7", gate_sentence_audio),
+    ("P8", gate_media_count),
+    ("P10", gate_coverage),
+    ("P11", gate_manifest_counts),
+    ("P13", gate_apkg),
+    ("P14", gate_filter_recheck),
+    ("P15", gate_review_file),
+    ("P16", gate_word_audio),
+    ("P18", gate_no_native_audio),
 )
 
 

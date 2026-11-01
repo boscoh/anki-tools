@@ -882,7 +882,7 @@ def spanish_extra_manifest(rows: Sequence[dict[str, str]]) -> dict[str, Any]:
     """Add the Spanish manifest keys.
 
     :param rows: Sentence CSV rows.
-    :returns: Extra manifest keys, with the noun gender count of gate G20.
+    :returns: Extra manifest keys, with the noun gender count of gate P20.
     """
     table = load_word_table()
     nouns = [form for form in table if form.swadesh_index in NOUN_INDICES]
@@ -995,7 +995,7 @@ SPANISH = register(
 def gate_word_table(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
-    """Spanish gate G1: the reviewed word table passes every S1 check.
+    """Spanish gate P1: the reviewed word table passes every S1 check.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -1012,7 +1012,7 @@ def gate_word_table(
 def gate_pair_parts(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
-    """Spanish gate G19: a pair target keeps its parts adjacent in the sentence.
+    """Spanish gate P19: a pair target keeps its parts adjacent in the sentence.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
@@ -1054,21 +1054,21 @@ def spanish_gates() -> tuple[tuple[str, Any], ...]:
     )
 
     return (
-        ("G1", gate_word_table),
-        ("G2", gate_unique_forms),
-        ("G3", gate_targets_in_table),
-        ("G4", gate_unique_tatoeba_ids),
-        ("G5", gate_target_once),
-        ("G6", gate_similarity),
-        ("G7", gate_sentence_audio),
-        ("G8", gate_media_count),
-        ("G10", gate_coverage),
-        ("G11", gate_manifest_counts),
-        ("G13", gate_apkg),
-        ("G14", gate_filter_recheck),
-        ("G15", gate_review_file),
-        ("G16", gate_word_audio),
-        ("G19", gate_pair_parts),
+        ("P1", gate_word_table),
+        ("P2", gate_unique_forms),
+        ("P3", gate_targets_in_table),
+        ("P4", gate_unique_tatoeba_ids),
+        ("P5", gate_target_once),
+        ("P6", gate_similarity),
+        ("P7", gate_sentence_audio),
+        ("P8", gate_media_count),
+        ("P10", gate_coverage),
+        ("P11", gate_manifest_counts),
+        ("P13", gate_apkg),
+        ("P14", gate_filter_recheck),
+        ("P15", gate_review_file),
+        ("P16", gate_word_audio),
+        ("P19", gate_pair_parts),
     )
 
 
@@ -1076,7 +1076,7 @@ def run_spanish_audit(**paths: Path | None) -> list[GateResult]:
     """Run the Spanish quality gates.
 
     :param paths: Input paths that replace the defaults of the profile.
-    :returns: One ``(gate, passed, message)`` row per gate, G1 first.
+    :returns: One ``(gate, passed, message)`` row per gate, P1 first.
     """
     return run_pack_audit(
         SPANISH, spanish_gates(), load_table=load_word_table, **paths

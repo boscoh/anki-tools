@@ -2,10 +2,10 @@
 
 | Field   | Value                                                  |
 | ------- | ------------------------------------------------------ |
-| Status  | Consolidation done; pack G1 and one output reader open |
+| Status  | Consolidation done; pack P1 and one output reader open |
 | Date    | 2026-11-01                                             |
 | Owner   | anki-tools                                             |
-| Related | `docs/filters.md`, ADR 0021, ADR 0027                  |
+| Related | `docs/filters.md`, ADR 0021, ADR 0027, ADR 0057        |
 
 ## 1. What a gate is
 
@@ -13,13 +13,13 @@ A gate reads a built file, reports one fault, and returns a pass or a fail. A
 gate never rejects a sentence and never writes a file. A filter rejects a
 sentence or a card before selection (`docs/filters.md`).
 
-Each flow owns its gate ids (ADR 0027). Pack `G5` and cull `G5` are different
-checks. A doc row, a report line, and an issue must name the flow with the id.
+Each flow owns its gate prefix (ADR 0057): pack `P`, cull `C`, core `K`. Pack
+`P5` and cull `C5` are different checks. The prefix names the flow.
 
 | Flow            | Command                            | Gate ids                                        | Rows  |
 | --------------- | ---------------------------------- | ----------------------------------------------- | ----- |
-| Sentence pack   | `anki swadesh pack <lang>`         | G1 to G19, one list for each language           | 15-16 |
-| Cull deck       | `anki fix <lang> <input> --select` | G1, G2, G5, G6                                  | 4     |
+| Sentence pack   | `anki swadesh pack <lang>`         | P1 to P19, one list for each language           | 15-16 |
+| Cull deck       | `anki fix <lang> <input> --select` | C1, C2, C5, C6                                  | 4     |
 | Core deck       | `anki fix <lang> <input> --core`   | K5, K6, K13, K23, K24                           | 5     |
 | Vocabulary deck | `anki swadesh vocab <lang>`        | none                                            | 0     |
 
@@ -27,10 +27,10 @@ The pack lists differ by language:
 
 | Language        | Ids                                 | Rows |
 | --------------- | ----------------------------------- | ---- |
-| French, Spanish | G1 to G8, G10, G11, G13 to G16, G19 | 15   |
-| Greek           | G1 to G8, G10, G11, G13 to G16, G18 | 15   |
-| Mandarin        | G1 to G16                           | 16   |
-| Cantonese       | G1 to G8, G10, G11, G13 to G18      | 16   |
+| French, Spanish | P1 to P8, P10, P11, P13 to P16, P19 | 15   |
+| Greek           | P1 to P8, P10, P11, P13 to P16, P18 | 15   |
+| Mandarin        | P1 to P16                           | 16   |
+| Cantonese       | P1 to P8, P10, P11, P13 to P18      | 16   |
 
 Each flow doc gives the check of each pack, cull, and core row:
 `docs/swadesh-sentence-flow.md`, `docs/cull-deck-flow.md`, and
@@ -46,21 +46,21 @@ parameter.
 
 | Check                  | Pack | Cull | Core | Plain meaning                                       |
 | ---------------------- | ---- | ---- | ---- | --------------------------------------------------- |
-| `gate_word_table`      | G1   | -    | -    | The word table is valid. Five copies exist (open).  |
-| `gate_filter_recheck`  | G14  | G5   | K5   | Every kept card passes the filter rules.            |
-| `gate_similarity`      | -    | G6   | K6   | No two cards are almost the same sentence.          |
+| `gate_word_table`      | P1   | -    | -    | The word table is valid. Five copies exist (open).  |
+| `gate_filter_recheck`  | P14  | C5   | K5   | Every kept card passes the filter rules.            |
+| `gate_similarity`      | -    | C6   | K6   | No two cards are almost the same sentence.          |
 
 ### Cull-only and core-only checks
 
 | Id  | Check                     | Plain meaning                                             |
 | --- | ------------------------- | --------------------------------------------------------- |
-| G1  | `gate_card_cap`           | The deck has the cap number of cards, or the pool ends.   |
-| G2  | `gate_use_cap`            | No lemma appears in more cards than the cap.              |
+| C1  | `gate_card_cap`           | The deck has the cap number of cards, or the pool ends.   |
+| C2  | `gate_use_cap`            | No lemma appears in more cards than the cap.              |
 | K13 | `gate_target_in_sentence` | Each card sentence holds its targets and its Core word.   |
 | K23 | `gate_coverage_floor`     | The share of targets with a kept card reaches the floor.  |
 | K24 | `gate_recount_forms`      | Each card holds its tier S forms, by substring or lemma.  |
 
-The pack has more checks, for example G10 coverage. The cull has no coverage
+The pack has more checks, for example P10 coverage. The cull has no coverage
 gate (ADR 0045, ADR 0046). The core has one floor gate, K23 (ADR 0048). The
 floor is `coverage_floor` in the language core profile: the current share
 rounded down to 0.05. It is a ratchet, and a drop below it means the selection
@@ -80,7 +80,7 @@ A removed row leaves a gap in the numbering. The ids are not reused.
 
 | Flow | Retired ids                                                    | ADR                          |
 | ---- | -------------------------------------------------------------- | ---------------------------- |
-| Cull | G3, G4, G7 to G18                                              | 0033, 0035, 0039 to 0045     |
+| Cull | C3, C4, C7 to C18                                              | 0033, 0035, 0039 to 0045     |
 | Core | K1 to K4, K7 to K12, K14 to K22                               | 0038 to 0044, 0046           |
 | Pack | sense, attribution, typography, license, and script gates      | 0039                         |
 
@@ -116,24 +116,24 @@ when a pack check must serve a second flow.
 - The pack gates read input artifacts: the word table, the review CSV, and the
   sentence CSV. The cull and core gates read the output APKG, the output CSVs,
   and the manifest.
-- Pack `G6` uses `profile.similarity` on the sentence text. Cull `G6` and core
+- Pack `P6` uses `profile.similarity` on the sentence text. Cull `C6` and core
   `K6` use the lemma Jaccard value on the full lemma set of a card.
 - The pack manifest has a second shape. `sentence_pack/pack.py` writes it, and
-  `G11` reads it. The rank manifest comes from `ranking/assemble.py`.
+  `P11` reads it. The rank manifest comes from `ranking/assemble.py`.
 - The `sense` filter is the one test of the word sense (ADR 0039). No gate
   repeats it. Core `K13` stays: it tests that the form is in the sentence. It
   tests each credited target and the word in the `Core` field of the card
   (ADR 0049). A card with an empty `Core` field has no Core word to test.
-- Cull `G1` checks the cap or the pool end. The pool ends when no passed card
+- Cull `C1` checks the cap or the pool end. The pool ends when no passed card
   keeps the reason `max_cards`. The old core `K1` count check is retired
   (ADR 0043).
-- Cull `G2` and `G6` read their limits from the producer constants, not from
-  the manifest. Cull `G1` reads the cap from the manifest, because the user sets
+- Cull `C2` and `C6` read their limits from the producer constants, not from
+  the manifest. Cull `C1` reads the cap from the manifest, because the user sets
   it with `--cards` (ADR 0046).
-- Cull `G5` skips the reserve rows. They have their own length window
+- Cull `C5` skips the reserve rows. They have their own length window
   (ADR 0046). It calls `filter_cards`, so it uses the same `unique` rule as the
   producer: the sentence key and the English key (ADR 0047).
-- Mandarin `G12` checks the native audio authors, not every sentence author, so
+- Mandarin `P12` checks the native audio authors, not every sentence author, so
   it holds its own function.
 
 ## 5. Decisions
@@ -154,7 +154,7 @@ function behind an id:
   - core `K4` is the outside counts of the manifest
   - core `K15` is part of `K19`
   - core `K17` is Rejected names and Rejected loan words
-  - pack `G20` is the manifest value `noun_gender_missing`
+  - pack `P20` is the manifest value `noun_gender_missing`
 - A gate left the table when one build step wrote both sides of its comparison
   (ADR 0041), or when it only ran a filter again or tested a rule that no card
   can break (ADR 0039).
@@ -177,7 +177,7 @@ current fault, so both wait for a third consumer.
 
 Both items are in `anki-ujvj`.
 
-- Pack `G1`. Five language modules define `gate_word_table`. The French and
+- Pack `P1`. Five language modules define `gate_word_table`. The French and
   Spanish `check_word_table` take no `csv_path`, so one shared function needs a
   profile hook for the path.
 - One output reader. The pack `read_apkg` returns a different shape from the

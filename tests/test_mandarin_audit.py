@@ -1,4 +1,4 @@
-"""Tests for the Mandarin Swadesh quality gates (G1 to G16)."""
+"""Tests for the Mandarin Swadesh quality gates (P1 to P16)."""
 
 from __future__ import annotations
 
@@ -85,7 +85,7 @@ def build_env(
     no_file: frozenset[str] = frozenset(),
     no_index: frozenset[str] = frozenset(),
 ) -> dict[str, Path]:
-    """Write one small pack that passes every gate but G1.
+    """Write one small pack that passes every gate but P1.
 
     :param tmp_path: Test directory.
     :param table: Word table that the audit reads.
@@ -195,8 +195,8 @@ def test_base_pack_fails_only_the_word_table_gate(tmp_path: Path) -> None:
     results = run(build_env(tmp_path))
     failed = [gate for gate, passed, _ in results if not passed]
 
-    assert [gate for gate, _, _ in results] == [f"G{number}" for number in range(1, 17)]
-    assert failed == ["G1"]
+    assert [gate for gate, _, _ in results] == [f"P{number}" for number in range(1, 17)]
+    assert failed == ["P1"]
     assert print_audit(results) == 1
 
 
@@ -210,36 +210,36 @@ SIMILAR_BELOW_LIMIT = _overlap_pair(66)
     [
         pytest.param(
             {"table": TABLE + [WordForm(5, "bird", "水", "shuǐ", "水", "alternate", 5.0)]},
-            "G2", False, ("duplicate form", "水"),
-            id="G2 a duplicate form",
+            "P2", False, ("duplicate form", "水"),
+            id="P2 a duplicate form",
         ),
         pytest.param(
             {"rows": ROWS + [MOON]},
-            "G3", False, ("月 is not in the word table",),
-            id="G3 a target outside the table",
+            "P3", False, ("月 is not in the word table",),
+            id="P3 a target outside the table",
         ),
         pytest.param(
             {
                 "table": TABLE + [WordForm(6, "moon", "月", "yuè", "月", "shared", 5.0)],
                 "rows": ROWS + [MOON],
             },
-            "G3", False, ("月 is a shared form",),
-            id="G3 a target on a shared form",
+            "P3", False, ("月 is a shared form",),
+            id="P3 a target on a shared form",
         ),
         pytest.param(
             {"rows": ROWS + [_card(sentence="这里没有水。", pinyin="zhè lǐ méi yǒu shuǐ")]},
-            "G4", False, ("duplicate Tatoeba id", "200"),
-            id="G4 a repeated Tatoeba id",
+            "P4", False, ("duplicate Tatoeba id", "200"),
+            id="P4 a repeated Tatoeba id",
         ),
         pytest.param(
             {"rows": ROWS + [_card(sentence="水里有水。", pinyin="shuǐ lǐ yǒu shuǐ", tatoeba_id="600")]},
-            "G5", False, ("水 x2",),
-            id="G5 a target that appears twice",
+            "P5", False, ("水 x2",),
+            id="P5 a target that appears twice",
         ),
         pytest.param(
             {"rows": ROWS + [_card(sentence="我要水。", pinyin="wǒ yào shuǐ", tatoeba_id="700")]},
-            "G6", False, ("0.67 limit", "0.75"),
-            id="G6 a similar pair",
+            "P6", False, ("0.67 limit", "0.75"),
+            id="P6 a similar pair",
         ),
         pytest.param(
             {
@@ -249,8 +249,8 @@ SIMILAR_BELOW_LIMIT = _overlap_pair(66)
                     _card(target="火", sentence=SIMILAR_AT_LIMIT[1], tatoeba_id="702"),
                 ]
             },
-            "G6", False, ("= 0.67",),
-            id="G6 a pair at the limit",
+            "P6", False, ("= 0.67",),
+            id="P6 a pair at the limit",
         ),
         pytest.param(
             {
@@ -260,45 +260,45 @@ SIMILAR_BELOW_LIMIT = _overlap_pair(66)
                     _card(target="火", sentence=SIMILAR_BELOW_LIMIT[1], tatoeba_id="702"),
                 ]
             },
-            "G6", True, ("stay below",),
-            id="G6 a pair below the limit",
+            "P6", True, ("stay below",),
+            id="P6 a pair below the limit",
         ),
         pytest.param(
             {"no_file": frozenset({"我要喝水。"})},
-            "G7", False, ("tts_0000.mp3", "missing"),
-            id="G7 a missing sentence file",
+            "P7", False, ("tts_0000.mp3", "missing"),
+            id="P7 a missing sentence file",
         ),
         pytest.param(
             {"probe": _probe(MIN_DURATION_S - 0.01)},
-            "G7", False, ("0.39 s",),
-            id="G7 just under the shortest duration",
+            "P7", False, ("0.39 s",),
+            id="P7 just under the shortest duration",
         ),
         pytest.param(
-            {"probe": _probe(MIN_DURATION_S)}, "G7", True, ("sentence files",),
-            id="G7 the shortest duration",
+            {"probe": _probe(MIN_DURATION_S)}, "P7", True, ("sentence files",),
+            id="P7 the shortest duration",
         ),
         pytest.param(
-            {"probe": _probe(MAX_DURATION_S)}, "G7", True, ("sentence files",),
-            id="G7 the longest duration",
+            {"probe": _probe(MAX_DURATION_S)}, "P7", True, ("sentence files",),
+            id="P7 the longest duration",
         ),
         pytest.param(
             {"probe": _probe(MAX_DURATION_S + 0.01)},
-            "G7", False, ("15.01 s",),
-            id="G7 just over the longest duration",
+            "P7", False, ("15.01 s",),
+            id="P7 just over the longest duration",
         ),
         pytest.param(
-            {"probe": _unreadable}, "G7", False, ("is not readable",),
-            id="G7 an unreadable file",
+            {"probe": _unreadable}, "P7", False, ("is not readable",),
+            id="P7 an unreadable file",
         ),
         pytest.param(
             {"apkg": {"extra": ("stray.mp3",)}},
-            "G8", False, ("media files, cards use",),
-            id="G8 an extra media file",
+            "P8", False, ("media files, cards use",),
+            id="P8 an extra media file",
         ),
         pytest.param(
             {"apkg": {"drop": ("word_0000.mp3",), "extra": ("stray.mp3",)}},
-            "G8", False, ("media names differ", "word_0000.mp3", "stray.mp3"),
-            id="G8 the same count with other names",
+            "P8", False, ("media names differ", "word_0000.mp3", "stray.mp3"),
+            id="P8 the same count with other names",
         ),
         pytest.param(
             {
@@ -308,35 +308,35 @@ SIMILAR_BELOW_LIMIT = _overlap_pair(66)
                     for index, form in enumerate(("雨", "雪", "风", "云", "星"), start=6)
                 ]
             },
-            "G10", False, ("core coverage 4/10 = 0.400", "0.80 minimum"),
-            id="G10 low core coverage",
+            "P10", False, ("core coverage 4/10 = 0.400", "0.80 minimum"),
+            id="P10 low core coverage",
         ),
         pytest.param(
             {"apkg": {"model_name": "Basic"}},
-            "G13", False, (MODEL_NAME, "not found"),
-            id="G13 a wrong model name",
+            "P13", False, (MODEL_NAME, "not found"),
+            id="P13 a wrong model name",
         ),
         pytest.param(
-            {"apkg": {"notes": 5}}, "G13", False, ("5 notes but 4 cards",),
-            id="G13 a wrong note count",
+            {"apkg": {"notes": 5}}, "P13", False, ("5 notes but 4 cards",),
+            id="P13 a wrong note count",
         ),
         pytest.param(
-            {"apkg": {"fields": FIELDS[:-1]}}, "G13", False, ("model fields",),
-            id="G13 a wrong field list",
+            {"apkg": {"fields": FIELDS[:-1]}}, "P13", False, ("model fields",),
+            id="P13 a wrong field list",
         ),
         pytest.param(
-            {"review_status": "open"}, "G15", False, ("1 open review row",),
-            id="G15 an open review row",
+            {"review_status": "open"}, "P15", False, ("1 open review row",),
+            id="P15 an open review row",
         ),
         pytest.param(
             {"no_file": frozenset({"水"})},
-            "G16", False, ("word_0000.mp3 for 水 is missing",),
-            id="G16 a missing word file",
+            "P16", False, ("word_0000.mp3 for 水 is missing",),
+            id="P16 a missing word file",
         ),
         pytest.param(
             {"no_index": frozenset({"水"})},
-            "G16", False, ("水 has no word file in the index",),
-            id="G16 a word with no index row",
+            "P16", False, ("水 has no word file in the index",),
+            id="P16 a word with no index row",
         ),
     ],
 )
@@ -361,7 +361,7 @@ def test_the_gate_verdict_follows_the_pack(
         pytest.param("files", "sentences_csv", "sha256:deadbeef", "files.sentences_csv", id="a bad hash"),
     ],
 )
-def test_g11_rejects_a_manifest_that_differs_from_the_pack(
+def test_p11_rejects_a_manifest_that_differs_from_the_pack(
     tmp_path: Path, section: str, key: str, value: Any, fragment: str
 ) -> None:
     env = build_env(tmp_path)
@@ -369,17 +369,17 @@ def test_g11_rejects_a_manifest_that_differs_from_the_pack(
     manifest[section][key] = value
     env["manifest_path"].write_text(json.dumps(manifest), encoding="utf-8")
 
-    passed, message = _gate(run(env), "G11")
+    passed, message = _gate(run(env), "P11")
 
     assert passed is False
     assert fragment in message
 
 
-def test_g15_rejects_a_missing_review_file(tmp_path: Path) -> None:
+def test_p15_rejects_a_missing_review_file(tmp_path: Path) -> None:
     env = build_env(tmp_path)
     env["review_csv"].unlink()
 
-    passed, message = _gate(run(env), "G15")
+    passed, message = _gate(run(env), "P15")
 
     assert passed is False
     assert "review file missing" in message
