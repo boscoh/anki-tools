@@ -101,6 +101,7 @@ def test_compound_rows_block_insect_and_can_hear() -> None:
     [
         (french_hits, "Quelque chose ne va pas.", "quelques", {}),
         (french_hits, "Je lis quelque livre.", "quelques", {"quelques": 1}),
+        (french_hits, "Il a quelques amis.", "quelques", {"quelques": 1}),
         (spanish_hits, "Lo hice otra vez.", "otro", {}),
         (spanish_hits, "Lo hice otra vez.", "otra", {}),
         (spanish_hits, "Quiero otra casa.", "otra", {"otra": 1}),

@@ -497,11 +497,11 @@ def hits(sentence: str, forms: Collection[str]) -> dict[str, int]:
     lowered = sentence.lower()
     counts: dict[str, int] = {}
     for token in tokens:
-        for key in _token_keys(token):
-            for form in index.get(key, ()):
-                blocked = compound_spans(lowered, form_compounds(SENSE_PATH, form))
-                if not inside_spans(token.idx, blocked):
-                    counts[form] = counts.get(form, 0) + 1
+        matched = set().union(*(index.get(key, ()) for key in _token_keys(token)))
+        for form in matched:
+            blocked = compound_spans(lowered, form_compounds(SENSE_PATH, form))
+            if not inside_spans(token.idx, blocked):
+                counts[form] = counts.get(form, 0) + 1
     found = {form: count for form, count in counts.items() if count == 1}
     for form in forms:
         if form in found or len(form_parts(form)) <= 1:
