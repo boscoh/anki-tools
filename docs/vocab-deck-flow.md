@@ -11,8 +11,7 @@ Related: `docs/swadesh-sentence-flow.md`, `docs/core-deck-flow.md`, and
 ## 1. Stage map
 
 One command runs the stages in order: `anki swadesh vocab <language>`. The
-`--prune` value is on by default. `--no-prune` keeps the unused audio files.
-The value `all` runs every language of the registry that has a vocabulary
+value `all` runs every language of the registry that has a vocabulary
 deck. The languages are mandarin, spanish, greek, german, cantonese, arabic,
 and hindi.
 
@@ -151,10 +150,9 @@ dictionary.
 ## 6. Prune (V3)
 
 `_prune_outdated_audio` deletes each file of the audio directory that no row
-of V0 uses. The run prints the count of the deleted files. `--no-prune` keeps
-them.
+of V0 uses. The run prints the count of the deleted files.
 
-The default is on, so a removed word removes its audio file on the next run.
+A removed word removes its audio file on the next run.
 Thus the audio directory holds the files of the current word list only.
 
 ## 7. Pack (V4)

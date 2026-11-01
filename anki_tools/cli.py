@@ -530,23 +530,21 @@ def vocab(
     language: Annotated[
         str, Parameter(help=f"One of {', '.join(VOCAB_LANGUAGES)}, or all.")
     ],
-    prune: bool = True,
 ):
     """Build the Swadesh vocabulary deck for a language.
 
     :param language: One of the supported languages, or all.
-    :param prune: Delete audio files that the current list does not use.
     """
     lang = resolve(language)
     if lang == "all":
         for name in VOCAB_LANGUAGES:
-            swadesh_vocab.build_vocab_deck(name, prune=prune)
+            swadesh_vocab.build_vocab_deck(name)
         return
 
     if lang not in VOCAB_LANGUAGES:
         print(f"Unknown language: {language}. Supported: {', '.join(VOCAB_LANGUAGES)}")
         return
-    swadesh_vocab.build_vocab_deck(lang, prune=prune)
+    swadesh_vocab.build_vocab_deck(lang)
 
 
 def _fetch_language(profile: LanguageProfile, refresh: bool) -> None:

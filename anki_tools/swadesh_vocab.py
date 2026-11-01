@@ -259,14 +259,13 @@ def _build_layout(config: dict, entries: list[dict]) -> _BuildLayout:
 
 
 def _pack_apkg(
-    config: dict, entries: list[dict], layout: _BuildLayout, prune: bool
+    config: dict, entries: list[dict], layout: _BuildLayout
 ) -> deck_writer.RunFiles | None:
     """Write the APKG file and prune the outdated audio files.
 
     :param config: Config dict with the deck and audio settings.
     :param entries: List of entry dicts from _parse_vocab_entries.
     :param layout: Deck layout from _build_layout.
-    :param prune: Delete audio files that the current list does not use.
     :returns: The written paths, or None when a form has no audio.
     """
     audio_dir = Path(config["audio_dir"])
@@ -277,10 +276,9 @@ def _pack_apkg(
         return None
 
     keep = {entry["audio_filename"] for entry in entries}
-    if prune:
-        removed = _prune_outdated_audio(audio_dir, keep)
-        if removed:
-            print(f"Removed {len(removed)} outdated audio files")
+    removed = _prune_outdated_audio(audio_dir, keep)
+    if removed:
+        print(f"Removed {len(removed)} outdated audio files")
 
     cards: list[deck_writer.Card] = []
     media: list[deck_writer.MediaFile] = []
@@ -333,11 +331,10 @@ def _pack_apkg(
     return files
 
 
-def build_vocab_deck(language: str, prune: bool = True) -> deck_writer.RunFiles | None:
+def build_vocab_deck(language: str) -> deck_writer.RunFiles | None:
     """Build the Swadesh vocabulary deck of one language.
 
     :param language: Language name, for example ``french``.
-    :param prune: Delete audio files that the current list does not use.
     :returns: The written paths, or None when a form has no audio.
     """
     config = _deck_config(language)
@@ -346,5 +343,5 @@ def build_vocab_deck(language: str, prune: bool = True) -> deck_writer.RunFiles 
     entries = _parse_vocab_entries(config)
     _generate_audio_files(entries, config)
     layout = _build_layout(config, entries)
-    return _pack_apkg(config, entries, layout, prune)
+    return _pack_apkg(config, entries, layout)
 

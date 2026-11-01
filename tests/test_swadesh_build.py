@@ -140,7 +140,7 @@ def test_the_vocab_deck_holds_a_card_and_audio_for_every_csv_row(
 
     entries = swadesh_vocab._parse_vocab_entries(config)
     layout = swadesh_vocab._build_layout(config, entries)
-    files = swadesh_vocab._pack_apkg(config, entries, layout, prune=True)
+    files = swadesh_vocab._pack_apkg(config, entries, layout)
 
     assert files is not None
     with csv_path.open(encoding="utf-8", newline="") as handle:

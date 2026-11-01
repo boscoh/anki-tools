@@ -194,7 +194,7 @@ audio. See the appendix for the languages. A build does these steps in order:
 
 1. Generates the MP3 file for each form that has no file yet.
 2. Deletes each audio file in `audio/audio_<language>/` that the current list
-   does not use. `--no-prune` keeps those files.
+   does not use.
 3. Stops with an error if a form still has no audio. No deck is written.
 4. Writes `apkg/swadesh_vocab_<language>.apkg` through a temporary file. The old
    deck is replaced only after a complete write.
