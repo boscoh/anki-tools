@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.languages.cantonese import core
 from tests.cull_fixture import tiny_deck, write_core_package
@@ -43,6 +45,7 @@ def test_the_jyutping_field_survives_the_new_model(tmp_path: Path) -> None:
     assert values[3] == "séihōi ！"
 
 
+@pytest.mark.usefixtures("fake_jyutping")
 def test_finalize_writes_the_jyutping_of_the_sentence(tmp_path: Path) -> None:
     """The LTL deck holds Yale in its Jyutping field, so the fix derives it."""
     output, note_id = _build_output(tmp_path, "séihōi ！")
@@ -57,4 +60,4 @@ def test_finalize_writes_the_jyutping_of_the_sentence(tmp_path: Path) -> None:
         values = str(package.get_notes()[0]["flds"]).split("\x1f")
 
     assert values[1] == "死開!"
-    assert values[3] == "sei2 hoi1"
+    assert values[3] == "jyutping:死開"

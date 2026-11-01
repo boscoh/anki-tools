@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterator
-from typing import Any
-
+import re
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -14,20 +12,20 @@ import spacy
 from anki_tools.ranking import corerecount
 from tests.ast_fixture import imported_names
 
+LEMMAS = {"sais": "savoir", "donne": "donner", "senté": "sentar"}
 
-@pytest.fixture(scope="module", autouse=True)
-def _load_each_model_once() -> Iterator[None]:
-    real_load = spacy.load
-    models: dict[str, Any] = {}
 
-    def load(name: str, **kwargs: Any) -> Any:
-        if name not in models:
-            models[name] = real_load(name, **kwargs)
-        return models[name]
+@pytest.fixture(autouse=True)
+def _fake_spacy(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Replace the spaCy model with a word splitter that knows ``LEMMAS``."""
 
-    with pytest.MonkeyPatch.context() as patch:
-        patch.setattr(spacy, "load", load)
-        yield
+    def nlp(text: str) -> list[SimpleNamespace]:
+        return [
+            SimpleNamespace(lemma_=LEMMAS.get(word, word), lower_=word)
+            for word in re.findall(r"\w+", text.casefold())
+        ]
+
+    monkeypatch.setattr(spacy, "load", lambda _name, **_kwargs: nlp)
 
 
 class _Files:
@@ -62,8 +60,7 @@ class _Files:
         return {1: self._fields}
 
 
-FRENCH = "fr_core_news_sm"
-SPANISH = "es_core_news_sm"
+MODEL = "fake_model"
 
 CASES = [
     ("form in text", "我<b>得到</b>了。", "S1:得到|S2:我", "得到", "", True),
@@ -73,10 +70,10 @@ CASES = [
     ("kept row only", "我拿到了。", "S2:我", "", "", True),
     ("no model means a plain test", "je sais", "S3:savoir", "", "", False),
     ("substring is not proof", "我听得到了。", "S1:得到", "得到", "", True),
-    ("french inflected form", "Je sais la réponse.", "S3:savoir", "", FRENCH, True),
-    ("french target absent", "Je mange la pomme.", "S3:savoir", "", FRENCH, False),
-    ("french split negation", "Il ne donne pas de lait.", "S4:ne pas", "", FRENCH, True),
-    ("spanish reflexive form", "Me senté entre Tom y John.", "S6:sentarse", "", SPANISH, True),
+    ("inflected form", "Je sais la réponse.", "S3:savoir", "", MODEL, True),
+    ("target absent", "Je mange la pomme.", "S3:savoir", "", MODEL, False),
+    ("split negation", "Il ne donne pas de lait.", "S4:ne pas", "", MODEL, True),
+    ("reflexive stem", "Me senté entre Tom y John.", "S6:sentarse", "", MODEL, True),
 ]
 
 
