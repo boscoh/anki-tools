@@ -258,9 +258,14 @@ The field set is `output_fields(profile)`: `Audio`, `Sentence`, `English`, the
 `Romanization` field when the language has a romanization, `Core`, and
 `CoreGloss`. `card_cores` takes the first
 target lemma of the card that has a sense row, and `coreflow.note_values` writes
-that lemma and its first sense. A card without a target has no core word, so
-the run does not write it. Its CSV row holds `kept = 0` and `reason = no_core`,
-and the manifest counts it in `counts.dropped_no_core`.
+that lemma and its first sense. `select_cards` leaves out a card without a
+target before the pick, so the cap fills from cards that have a core word. Its
+CSV row holds `kept = 0` and `reason = no_core`. `counts.dropped_no_core` is 0
+for a cull and stays in the manifest for G1.
+
+The report line `Length pool/kept %` gives `length:pool/kept` per sentence
+length, as whole percent of the passed cards and of the kept frequency cards.
+No gate tests it.
 
 The manifest records the output note type in `source.model` and the input note
 type in `source.input_model`. It records the kept order hash of the reserve
@@ -294,8 +299,7 @@ and skips the reserve rows, which have their own length window (ADR 0046).
 G1 passes when the kept count plus `counts.dropped_no_core` reaches the cap. It
 also passes when the pool has no more cards: no unkept row has the reason
 `max_cards`. Every other passed card then has the reason `similar`,
-`use_cap`, or `no_gain`. A kept card without a core word leaves the deck, so the
-gate compares the count before that drop. A small input deck does not fail G1.
+`use_cap`, `no_gain`, or `no_core`. A small input deck does not fail G1.
 
 The similarity test of `select_cards` and G6 use the full lemma sets of the
 cards. A duplicate is a property of the text, so the sense test does not change

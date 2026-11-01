@@ -27,8 +27,8 @@ def test_a_false_friend_card_does_not_count_for_the_lemma() -> None:
 
     assert result.card_targets == {0: ("car",)}
     assert result.uses["car"] == 1
-    assert result.kept == [0, 1, 2]
-    assert result.gain[0] > result.gain[1] == result.gain[2]
+    assert result.kept == [0]
+    assert result.reasons == {1: "no_core", 2: "no_core"}
 
 
 def test_a_lemma_without_a_row_counts() -> None:
@@ -49,7 +49,9 @@ def test_similarity_uses_the_full_lemma_sets() -> None:
         [(lemma, "NOUN") for lemma in ("car", "a", "b", "c", "d", "f")],
     ]
 
-    result = select(cards, tokens, TARGETS, RANKS, senses=SENSES)
+    result = select(
+        cards, tokens, [*TARGETS, target("a", 6)], RANKS, senses=SENSES
+    )
 
     assert result.kept == [0]
     assert result.reasons == {1: "similar"}

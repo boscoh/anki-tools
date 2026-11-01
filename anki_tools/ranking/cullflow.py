@@ -682,6 +682,9 @@ def select_cards(
         )
 
     indices = list(range(len(cards))) if passed is None else list(passed)
+    target_lemmas = {target.lemma for target in targets}
+    no_core = {index for index in indices if sets[index].isdisjoint(target_lemmas)}
+    indices = [index for index in indices if index not in no_core]
     picked: dict[int, float] = {}
     shared: dict[str, list[int]] = {}
 
@@ -713,6 +716,7 @@ def select_cards(
     for index in indices:
         if index not in picked:
             reasons.setdefault(index, "max_cards")
+    reasons.update(dict.fromkeys(no_core, coreflow.NO_CORE_REASON))
 
     target_ranks = {target.lemma: target.rank for target in targets}
     card_targets: dict[int, tuple[str, ...]] = {}
@@ -973,6 +977,21 @@ def kept_order_hash(
     return f"sha256:{hashlib.sha256(text.encode('utf-8')).hexdigest()}"
 
 
+def length_spread(pool: Sequence[int], kept: Sequence[int]) -> str:
+    """Give the share of each sentence length in the pool and in the kept cards.
+
+    :param pool: Unit count of each passed card.
+    :param kept: Unit count of each kept frequency card.
+    :returns: ``length:pool/kept`` per length, the shares in whole percent.
+    """
+    in_pool, in_kept = Counter(pool), Counter(kept)
+    return " ".join(
+        f"{length}:{in_pool[length] * 100 / max(len(pool), 1):.0f}"
+        f"/{in_kept[length] * 100 / max(len(kept), 1):.0f}"
+        for length in sorted(in_pool | in_kept)
+    )
+
+
 def card_cores(
     selection: SelectionResult,
     ordered: Sequence[int],
@@ -1159,6 +1178,13 @@ def run_cull(request: CullRequest, profile: CullProfile) -> deck_writer.RunFiles
         ("Max uses reserve", str(reserve_max)),
         ("Max uses exempt", str(exempt_max)),
         ("spoken_mass", f"{mass:.3f}"),
+        (
+            "Length pool/kept %",
+            length_spread(
+                [profile.unit_count(cards[index].sentence) for index in passed],
+                [profile.unit_count(cards[index].sentence) for index in kept],
+            ),
+        ),
         (None, "First 10 kept cards"),
     ]
     target_ranks = {target.lemma: target.rank for target in targets}

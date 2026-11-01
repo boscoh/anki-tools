@@ -307,6 +307,25 @@ def test_a_rare_word_wins_over_a_repeated_word() -> None:
     assert result.gain[1] > result.gain[2]
 
 
+def test_the_length_spread_shows_the_pool_against_the_kept_cards() -> None:
+    assert cullflow.length_spread([4, 4, 5, 6], [4, 6]) == "4:50/50 5:25/0 6:25/50"
+    assert cullflow.length_spread([4], []) == "4:100/0"
+
+
+def test_the_cap_fills_with_cards_that_hold_a_target() -> None:
+    cards = [card(f"Phrase {index}.", index=index) for index in range(4)]
+    tokens = [[("autre", "NOUN"), ("rare", "NOUN")]] + [
+        [(f"w{index}", "NOUN")] for index in range(1, 4)
+    ]
+    ranks = {"autre": 1, "rare": 2, "w1": 3, "w2": 4, "w3": 5}
+    targets = [target("w1", 3), target("w2", 4), target("w3", 5)]
+
+    result = select(cards, tokens, targets, ranks, max_cards=3)
+
+    assert sorted(result.kept) == [1, 2, 3]
+    assert result.reasons[0] == "no_core"
+
+
 @pytest.mark.parametrize(
     ("exempt_top", "kept", "rejected"),
     [
@@ -335,7 +354,7 @@ def test_a_lemma_jaccard_of_067_is_duplicate() -> None:
         [(lemma, "NOUN") for lemma in second],
     ]
 
-    result = select(cards, tokens, [], {lemma: 100 for lemma in shared})
+    result = select(cards, tokens, [target("s0", 100)], {lemma: 100 for lemma in shared})
 
     assert len(result.kept) == 1
     assert result.reasons == {1: "similar"}
