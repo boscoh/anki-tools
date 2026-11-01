@@ -63,6 +63,8 @@ class LanguageDeckProfile:
     :param highlight: Bold hook, or None when the language does not bold.
     :param romanization_source: Input field of the romanization line, or None
         when the language has none.
+    :param register_ok: Test of the ``register`` rule, or None when the language
+        has no such rule.
     """
 
     load_input_deck: Callable[[Path], Any]
@@ -85,6 +87,7 @@ class LanguageDeckProfile:
     max_units: int
     highlight: Callable[[str, str], str] | None = None
     romanization_source: str | None = None
+    register_ok: Callable[[str], bool] | None = None
 
     def core(self, **mode: Any) -> CoreProfile:
         """Give the core mode view of the language.
@@ -113,6 +116,7 @@ class LanguageDeckProfile:
             "max_units": self.max_units,
             "highlight": self.highlight,
             "romanization_source": self.romanization_source,
+            "register_ok": self.register_ok,
         }
         facts.update(mode)
         return CoreProfile(**facts)
@@ -144,6 +148,7 @@ class LanguageDeckProfile:
             "max_units": self.max_units,
             "highlight": self.highlight,
             "romanization_source": self.romanization_source,
+            "register_ok": self.register_ok,
         }
         facts.update(mode)
         return CullProfile(**facts)

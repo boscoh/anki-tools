@@ -343,6 +343,25 @@ def is_repeated_sentence(sentence: str) -> bool:
     return False
 
 
+# The small model gives every unknown form the passé simple tags, so a form must also end like one.
+PASSE_SIMPLE_ENDINGS = ("a", "it", "ut", "int", "rent")
+PASSE_SIMPLE_MORPH = frozenset({"Mood=Ind", "Tense=Past", "VerbForm=Fin"})
+
+
+def register_ok(sentence: str) -> bool:
+    """Check filter register: no verb is in the passé simple.
+
+    :param sentence: French sentence.
+    :returns: False for text such as ``Elle mit le linge sale.``.
+    """
+    return not any(
+        token.pos in ("VERB", "AUX")
+        and token.text.casefold().endswith(PASSE_SIMPLE_ENDINGS)
+        and PASSE_SIMPLE_MORPH <= set(token.morph.split("|"))
+        for token in french_tokens(sentence)
+    )
+
+
 
 @lru_cache(maxsize=1)
 def verb_heads() -> frozenset[str]:

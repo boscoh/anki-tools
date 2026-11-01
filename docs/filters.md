@@ -25,7 +25,8 @@ The flows differ because their jobs differ:
 
 ## 2. Rules
 
-All three flows run the same seven rule ids.
+All three flows run the same seven rule ids. The cull and the core also run
+`register`, and only for a language with a test for it (French; ADR 0055).
 
 | Id              | Test                                              | Note                                           |
 | --------------- | ------------------------------------------------- | ---------------------------------------------- |
@@ -34,6 +35,7 @@ All three flows run the same seven rule ids.
 | `script`        | the alphabet test of the language                 | the profile hook `script_ok`                   |
 | `repeat`        | no repeated pattern                               | the profile gives the test                     |
 | `marks`         | final, quote, and internal marks                  | four checks, no sub-reason                     |
+| `register`      | the sentence has no passe simple verb             | cull and core only; the hook `register_ok`     |
 | `unique`        | the dedupe key is new                             | section 2.1; the profile gives the key         |
 | `sense`         | the English holds the sense of the target         | per target in the cull and the core; section 6 |
 
@@ -71,15 +73,19 @@ the English key.
 
 ## 3. Rule order
 
-| Flow | Order                                                                                  |
-| ---- | -------------------------------------------------------------------------------------- |
-| Pack | `SHAPE_GUARDS`, the measure step, then `FACT_GUARDS`                                   |
-| Cull | `filter_reason`: `length_window`, `digit_marks`, `script`, `repeat`, `marks`, `unique` |
-| Core | `filter_cards` with the `filter_reason` of the cull, in `filter_core_cards`            |
+| Flow | Order                                                                                              |
+| ---- | -------------------------------------------------------------------------------------------------- |
+| Pack | `SHAPE_GUARDS`, the measure step, then `FACT_GUARDS`                                               |
+| Cull | `filter_reason`: `length_window`, `digit_marks`, `script`, `repeat`, `marks`, `register`, `unique` |
+| Core | `filter_cards` with the `filter_reason` of the cull, in `filter_core_cards`                        |
 
 - `SHAPE_GUARDS` holds `length_window` to `marks`. `FACT_GUARDS` holds `unique`
   and `sense`. The shape tests run first, because they are cheap.
-- `FILTER_KEYS` gives the report order of the pack.
+- `FILTER_KEYS` gives the report order of the pack. The pack has no `register`
+  rule, so it is not in `SHAPE_GUARDS`: `filter_reason` runs it after the shape
+  guards.
+- A language with no `register_ok` hook skips `register`. Only French has one.
+  A French pack card with a passe simple verb stays in the pack.
 - `check_sentence_shape` gives all rules except `unique`.
   `LENGTH_RULES`, `TEXT_RULES`, and `MARK_RULES` hold their ids.
 - The cull and the core run `sense` after the filter, on each target of a card.

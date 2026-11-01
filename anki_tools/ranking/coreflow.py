@@ -79,6 +79,7 @@ FILTER_KEYS = (
     "script",
     "repeat",
     "marks",
+    "register",
     "unique",
 )
 TARGET_SEPARATOR = "|"

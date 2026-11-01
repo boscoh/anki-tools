@@ -49,6 +49,7 @@ class CoreProfile:
     :param internal_marks: Internal punctuation marks of the language.
     :param script_ok: Alphabet test of the ``script`` rule.
     :param is_repeated: Test of the ``repeat`` rule.
+    :param register_ok: Test of the ``register`` rule, or None to skip it.
     :param dedupe_key: Key of the ``unique`` rule.
     :param unit_count: Unit count of a sentence, the same count as the sentence
         pack.
@@ -101,6 +102,7 @@ class CoreProfile:
     lemma_overrides: Mapping[str, str] = field(default_factory=dict)
     finalize: Callable[[Any], None] | None = None
     romanization_source: str | None = None
+    register_ok: Callable[[str], bool] | None = None
 
 
 @dataclass(frozen=True)

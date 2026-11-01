@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 import pytest
 
@@ -10,9 +10,8 @@ from anki_tools.languages.french.profile import FRENCH
 from anki_tools.languages.greek.profile import GREEK
 from anki_tools.languages.mandarin.profile import MANDARIN
 from anki_tools.languages.spanish import core as spanish_core
-from anki_tools.ranking.cardfilter import ShapeProfile
 
-PROFILES: dict[str, ShapeProfile] = {
+PROFILES: dict[str, Any] = {
     "spanish": spanish_core.SPANISH_CORE_PROFILE,
     "french": FRENCH,
     "greek": GREEK,
@@ -28,6 +27,7 @@ class ShapeRule(NamedTuple):
 
 SHAPE_RULES = [
     ShapeRule("spanish", "El perro come pan.", ""),
+    ShapeRule("spanish", "Ella comió el pan ayer.", ""),
     ShapeRule("spanish", "El perro.", "length_window"),
     ShapeRule("spanish", "El perro tiene 2 años.", "digit_marks"),
     ShapeRule("spanish", "El perro come хлеб.", "script"),

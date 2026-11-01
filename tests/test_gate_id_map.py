@@ -6,14 +6,15 @@ from anki_tools.ranking import cardfilter, coreflow, cullflow
 from anki_tools.sentence_pack import pool
 
 SHAPE_KEYS = ("length_window", "digit_marks", "script", "repeat", "marks", "unique")
+CARD_KEYS = (*SHAPE_KEYS[:5], "register", "unique")
 
 
 @pytest.mark.parametrize(
     "keys, expected",
     [
         pytest.param(tuple(pool.FILTER_KEYS), (*SHAPE_KEYS, "sense"), id="pack"),
-        pytest.param(cullflow.FILTER_RULES, SHAPE_KEYS, id="cull"),
-        pytest.param(coreflow.FILTER_KEYS, SHAPE_KEYS, id="core"),
+        pytest.param(cullflow.FILTER_RULES, CARD_KEYS, id="cull"),
+        pytest.param(coreflow.FILTER_KEYS, CARD_KEYS, id="core"),
     ],
 )
 def test_the_filter_keys_keep_their_order(keys: tuple[str, ...], expected: tuple[str, ...]) -> None:

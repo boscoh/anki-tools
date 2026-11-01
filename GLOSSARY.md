@@ -158,6 +158,13 @@ A test that rejects a sentence early, for example the sentence shape or the
 missing English link. The guards run in one fixed order.
 _Avoid_: filter, check
 
+**Register rule**:
+The card filter rule `register`. It rejects a sentence in a style that a learner
+should not meet as a first example, for example the French passe simple. A
+language with no test for it skips the rule. The pack does not run it. ADR 0055
+records it.
+_Avoid_: style filter, tense filter
+
 **Rule key**:
 The `F` number of one card rule in the pack guard table or in the ranking filter
 table. The two tables number from `F1` and differ: pack `F8` is the internal mark

@@ -22,6 +22,7 @@ from anki_tools.languages.french.profile import (
     INTERNAL_MARKS,
     QUOTE_MARKS,
     TOKENIZER,
+    register_ok,
 )
 from anki_tools.ranking import coreflow, corelist, cullflow
 from anki_tools.ranking.identity import DeckIdentity, default_output
@@ -173,6 +174,7 @@ FRENCH_LANGUAGE = LanguageDeckProfile(
     sense_path=SENSE_PATH,
     script_ok=FRENCH.script_ok,
     is_repeated=FRENCH.is_repeated,
+    register_ok=register_ok,
     dedupe_key=FRENCH.dedupe_key,
     unit_count=FRENCH.unit_count,
     min_units=FRENCH.min_units,

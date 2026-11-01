@@ -133,6 +133,10 @@ than the target list.
 | F8  | the text holds no proper noun tag                               |
 | F9  | the sentence text is not kept yet                               |
 
+A language with a `register_ok` hook also runs the `register` rule after the
+mark rules and before F9. French rejects a sentence with a passe simple verb
+(ADR 0055).
+
 The proper-noun rule F8 is a shared rule of `anki_tools/ranking/cardfilter.py`. F2
 to F7 come from the sentence shape guard `check_sentence_shape`, with the window,
 the marks, and the alphabet test of the language profile. One card filter,

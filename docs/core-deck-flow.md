@@ -146,6 +146,10 @@ A card must pass every rule. `filter_cards` applies F1 to F9 through
 | F8  | the text holds no proper noun tag                               |
 | F9  | the sentence text is not kept yet                               |
 
+A language with a `register_ok` hook also runs the `register` rule after the
+mark rules and before F9. French rejects a sentence with a passe simple verb
+(ADR 0055).
+
 The run stores the first failed rule as the `reason` of the card. The reason
 value is one of F1 to F9. A passed card has the empty reason.
 

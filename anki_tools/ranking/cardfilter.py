@@ -75,6 +75,9 @@ class ShapeProfile(SentenceShape, Protocol):
     def dedupe_key(self) -> Callable[[str], str]: ...
 
     @property
+    def register_ok(self) -> Callable[[str], bool] | None: ...
+
+    @property
     def min_units(self) -> int: ...
 
     @property
@@ -89,20 +92,22 @@ def filter_reason(
 
     The length window, the text rules, and the mark rules come from the sentence
     shape guard, so the unit count, the marks, and the alphabet test are those of
-    the language profile.
+    the language profile. The ``register`` rule follows them, when the profile
+    has a test for it. The sentence pack does not run it.
 
     :param card: Input card.
     :param profile: Shape values of the language.
     :returns: The first failed rule id, or the empty string on a pass.
     """
     # The rank flows pass only the length, text, and mark keys.
-    return (
-        check_sentence_shape(
-            card.sentence,
-            profile,
-            profile.min_units,
-            profile.max_units,
-            keys=LENGTH_RULES + TEXT_RULES + MARK_RULES,
-        )
-        or ""
+    reason = check_sentence_shape(
+        card.sentence,
+        profile,
+        profile.min_units,
+        profile.max_units,
+        keys=LENGTH_RULES + TEXT_RULES + MARK_RULES,
     )
+    if reason:
+        return reason
+    register_ok = profile.register_ok
+    return "register" if register_ok and not register_ok(card.sentence) else ""

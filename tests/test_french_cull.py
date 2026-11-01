@@ -205,3 +205,22 @@ def test_swadesh_coverage_counts_a_word_from_another_card() -> None:
 
     assert covered == 1
     assert total == cull_fr.SWADESH_TOTAL
+
+
+@pytest.mark.parametrize(
+    ("sentence", "expected"),
+    [
+        pytest.param("Elle mit le linge sale dans la machine à laver.", "register", id="mit"),
+        pytest.param("Leur voyage fut annulé en raison de la pluie.", "register", id="fut"),
+        pytest.param("Elle a mis le linge sale.", "", id="passé composé"),
+        pytest.param("J'ai senti quelque chose toucher mes pieds.", "", id="participle senti"),
+        pytest.param("Le drapeau français est bleu, blanc et rouge.", "", id="adjective bleu"),
+        pytest.param("Il mangeait une pomme.", "", id="imperfect"),
+    ],
+)
+def test_the_register_rule_rejects_a_passe_simple(sentence: str, expected: str) -> None:
+    card = cull_fr.InputCard(
+        note_id=0, sentence=sentence, english="", audio="", index=0
+    )
+
+    assert cullflow.filter_reason(card, PROFILE) == expected
