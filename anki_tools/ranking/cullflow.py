@@ -23,6 +23,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 from functools import partial
 from pathlib import Path
+from types import MappingProxyType
 from typing import (
     Any,
     Callable,
@@ -47,7 +48,11 @@ from anki_tools.ranking.cover import greedy_cover
 from anki_tools.ranking.coverage import write_rows
 from anki_tools.ranking.duplicates import at_limit
 from anki_tools.ranking.identity import DeckIdentity
-from anki_tools.sentence_pack.english_sense import read_senses
+from anki_tools.sentence_pack.english_sense import (
+    SenseRow,
+    read_senses,
+    sense_failure,
+)
 from anki_tools.sentence_pack.tokens import load_model
 
 DEFAULT_MAX_CARDS = 1000
@@ -610,8 +615,12 @@ def select_cards(
     reserved: Sequence[ReserveCard] = (),
     reserved_sets: Sequence[set[str]] = (),
     content_pos: frozenset[str],
+    senses: Mapping[str, SenseRow] = MappingProxyType({}),
 ) -> SelectionResult:
     """Select the kept cards with the greedy cover of spec section 8.
+
+    A lemma that fails the sense test against the English of a card leaves the
+    lemma set of that card. It adds no gain, use, similarity, or target entry.
 
     :param cards: Input cards.
     :param tokens: Lemma and part of speech per card.
@@ -627,6 +636,8 @@ def select_cards(
     :param reserved_sets: Content lemmas per reserve card.
     :param content_pos: Parts of speech that count as content, empty for every
         token.
+    :param senses: Tier F sense row per lemma. A lemma without a row is not
+        checked.
     :raises ValueError: A card list and its token list differ in size.
     :returns: The kept cards in gain order, the lemma uses, and the reasons.
     """
@@ -636,6 +647,12 @@ def select_cards(
         raise ValueError("The reserve list and the lemma set list differ in size.")
 
     sets = lemma_sets(tokens, content_pos)
+    for card, lemma_set in zip(cards, sets):
+        lemma_set -= {
+            lemma
+            for lemma in lemma_set & senses.keys()
+            if sense_failure(card.english, senses[lemma])
+        }
     exempt = {target.lemma for target in targets[:exempt_top]}
     weights = {target.lemma: target.weight for target in targets}
 
@@ -704,11 +721,7 @@ def select_cards(
     card_targets: dict[int, tuple[str, ...]] = {}
     card_hardest: dict[int, int] = {}
     for index, card_tokens in enumerate(tokens):
-        hits = {
-            lemma
-            for lemma, pos in card_tokens
-            if is_content(pos, content_pos) and lemma in target_ranks
-        }
+        hits = {lemma for lemma in sets[index] if lemma in target_ranks}
         if hits:
             card_targets[index] = tuple(
                 sorted(hits, key=lambda lemma: (target_ranks[lemma], lemma))
@@ -1044,11 +1057,12 @@ def run_cull(request: CullRequest, profile: CullProfile) -> deck_writer.RunFiles
         profile.input_audio_field,
         profile.clean_sentence,
     )
-    glosses = {
-        lemma: row.first
+    senses = {
+        lemma: row
         for (tier, lemma), row in read_senses(profile.sense_path).items()
         if tier == "F"
     }
+    glosses = {lemma: row.first for lemma, row in senses.items()}
     frequency = profile.load_frequency()
     ranks = profile.frequency_ranks(frequency, request.spoken_weight)
     names = profile.read_names()
@@ -1098,6 +1112,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> deck_writer.RunFiles
         reserved=reserve,
         reserved_sets=reserve_sets,
         content_pos=profile.content_pos,
+        senses=senses,
     )
     ordered = order_cards(
         selection.kept,

@@ -143,7 +143,7 @@ The cull and core reports once left out `repeat`. Both report lists now hold it.
 | L6    | one identical rule set for every flow | a different accepted set                       | rejected, the two jobs differ                  |
 | L7    | `length_window` to the gate layer     | none                                           | rejected, a gate never rejects a sentence      |
 | L8    | `digit_marks`, `script` in all flows  | the cull and the core gain an alphabet test    | done, `anki-sxzu`, ADR 0029                    |
-| L9    | one `sense` rule in every flow        | the cull and the core drop a failed target     | in progress, S1, S3, S5 done; S2, S4 open      |
+| L9    | one `sense` rule in every flow        | the cull and the core drop a failed target     | in progress, S1, S2, S3, S5 done; S4 open      |
 
 L3 added `final_marks`, `quote_marks`, and `internal_marks` to `CoreProfile`. It
 moved `CardShape` and `filter_reason` to `ranking/cardfilter.py`, and
@@ -213,6 +213,12 @@ TSV has the columns `word`, `senses`, `false_friends`, `compounds`, `tier`. A
 blank `tier` is `F`. Greek has no core flow, so `vocab/greek_core_senses.tsv`
 holds its tier S rows only.
 
+S4 is done. `gate_sense` in `ranking/gates.py` is cull `G18` and core `K22`. It
+calls `sense_failure` on the `Core` word and the English of every kept note. The
+pack gates `gate_no_sense_mismatch` and `gate_no_false_friend`, core `K13`, and
+core `K16` stay until S2 lands and the pack filter uses `sense_failure`. A cull
+deck built before S2 can fail `G18`, because the cull has no sense test.
+
 The English table `vocab/english_senses.json` stays. It gives the sense words of a
 Swadesh gloss, and WordNet builds it.
 
@@ -221,9 +227,9 @@ Work items:
 | Id | Task                                                                  | Behavior change        |
 | -- | --------------------------------------------------------------------- | ---------------------- |
 | S1 | write this section                                                    | none                   |
-| S2 | cull: remove a lemma that fails `sense_failure` in `select_cards`     | kept cards change; ADR |
+| S2 | cull: remove a lemma that fails `sense_failure` in `select_cards`     | done, ADR 0030         |
 | S3 | one shared function and one record; move the dicts into the TSV files | none                   |
-| S4 | one `sense` recheck gate in the cull and the core                     | an old deck can fail   |
+| S4 | one `sense` recheck gate in the cull and the core (G18, K22), done    | an old deck can fail   |
 | S5 | sense rows for all 300 cull targets, and a Cantonese file             | data                   |
 
 A compound-only sentence has no hit, so it is not a candidate and the pack counts
