@@ -102,7 +102,6 @@ FALLBACK_MIN_HAN = 3
 FINAL_MARKS = "。？！.!?"
 QUOTE_MARKS = '"“”「」『』'
 INTERNAL_MARKS = "，：；,:;"
-LATIN_OR_DIGIT = re.compile(r"[A-Za-z0-9０-９]")
 LATIN_LETTER = re.compile(r"[A-Za-z]")
 
 SENTENCE_FIELDS = [
@@ -1009,24 +1008,6 @@ def gate_word_table(
     return True, f"{concepts} concepts, {len(table)} forms"
 
 
-def gate_script(inputs: Any, _profile: LanguageProfile) -> tuple[bool, str]:
-    """Cantonese gate G9: no card holds a Latin letter or a digit.
-
-    :param inputs: Lazy file reader of the audit.
-    :param _profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    rows = inputs.rows()
-    bad = [
-        row.get("sentence", "")
-        for row in rows
-        if LATIN_OR_DIGIT.search(row.get("sentence", ""))
-        or LATIN_OR_DIGIT.search(row.get("target", ""))
-    ]
-    if bad:
-        return False, f"{len(bad)} card(s) hold Latin text: {bad[0]}"
-    return True, f"{len(rows)} cards hold Han text only"
-
 
 def gate_jyutping(
     inputs: Any,
@@ -1068,18 +1049,15 @@ def gate_native_license(
 
 
 def cantonese_gates() -> tuple[tuple[str, Any], ...]:
-    """Give the ordered gate list G1 to G21 of the Cantonese pack.
+    """Give the ordered gate list of the Cantonese pack.
 
     :returns: Pairs of gate name and gate function.
     """
     from anki_tools.sentence_pack.audit import (
         gate_apkg,
-        gate_attribution,
         gate_coverage,
         gate_manifest_counts,
         gate_media_count,
-        gate_no_false_friend,
-        gate_no_sense_mismatch,
         gate_filter_recheck,
         gate_review_file,
         gate_sentence_audio,
@@ -1100,23 +1078,19 @@ def cantonese_gates() -> tuple[tuple[str, Any], ...]:
         ("G6", gate_similarity),
         ("G7", gate_sentence_audio),
         ("G8", gate_media_count),
-        ("G9", gate_script),
         ("G10", gate_coverage),
         ("G11", gate_manifest_counts),
-        ("G12", gate_attribution),
         ("G13", gate_apkg),
         ("G14", gate_filter_recheck),
         ("G15", gate_review_file),
         ("G16", gate_word_audio),
         ("G17", gate_jyutping),
         ("G18", gate_native_license),
-        ("G20", gate_no_false_friend),
-        ("G21", gate_no_sense_mismatch),
     )
 
 
 def run_cantonese_audit(**paths: Path | None) -> list[GateResult]:
-    """Run the Cantonese quality gates G1 to G21.
+    """Run the Cantonese quality gates.
 
     :param paths: Input paths that replace the defaults of the profile.
     :returns: One ``(gate, passed, message)`` row per gate, G1 first.

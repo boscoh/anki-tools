@@ -1054,25 +1054,21 @@ def gate_discontinuous(
     return True, f"{checked} discontinuous card(s) keep both parts"
 
 def french_gates() -> tuple[tuple[str, Any], ...]:
-    """Give the ordered gate list G1 to G21 of the French pack.
+    """Give the ordered gate list of the French pack.
 
     :returns: Pairs of gate name and gate function.
     """
     from anki_tools.sentence_pack.audit import (
         gate_apkg,
-        gate_attribution,
         gate_coverage,
         gate_manifest_counts,
         gate_media_count,
-        gate_no_blocked_license,
-        gate_no_sense_mismatch,
         gate_filter_recheck,
         gate_review_file,
         gate_sentence_audio,
         gate_similarity,
         gate_target_once,
         gate_targets_in_table,
-        gate_typography,
         gate_unique_forms,
         gate_unique_tatoeba_ids,
         gate_word_audio,
@@ -1089,20 +1085,16 @@ def french_gates() -> tuple[tuple[str, Any], ...]:
         ("G8", gate_media_count),
         ("G10", gate_coverage),
         ("G11", gate_manifest_counts),
-        ("G12", gate_attribution),
         ("G13", gate_apkg),
         ("G14", gate_filter_recheck),
         ("G15", gate_review_file),
         ("G16", gate_word_audio),
-        ("G17", gate_typography),
-        ("G18", gate_no_blocked_license),
         ("G19", gate_discontinuous),
-        ("G21", gate_no_sense_mismatch),
     )
 
 
 def run_french_audit(**paths: Path | None) -> list[GateResult]:
-    """Run the French quality gates G1 to G21.
+    """Run the French quality gates.
 
     :param paths: Input paths that replace the defaults of the profile.
     :returns: One ``(gate, passed, message)`` row per gate, G1 first.

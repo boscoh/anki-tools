@@ -509,7 +509,7 @@ def test_run_gates_passes_on_a_tiny_output(
     )
 
     assert [gate for gate, _passed, _message in rows] == [
-        f"G{number}" for number in (1, 2, *range(5, 14), *range(15, 19))
+        f"G{number}" for number in (1, 2, *range(5, 14), *range(15, 18))
     ]
     for gate, passed, message in rows:
         assert passed, f"{gate}: {message}"

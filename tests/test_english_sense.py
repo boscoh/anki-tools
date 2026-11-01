@@ -6,14 +6,12 @@ from pathlib import Path
 
 import pytest
 
-from anki_tools.sentence_pack import english_sense
 from anki_tools.sentence_pack.english_sense import (
     SenseRow,
     english_tokens,
     load_senses,
     read_senses,
     sense_failure,
-    sense_mismatches,
     sense_row,
 )
 from anki_tools.sentence_pack.pool import FILTER_KEYS, FILTER_NAMES
@@ -125,21 +123,6 @@ def test_read_senses_keeps_a_tier_s_row_apart_from_a_tier_f_row(
 
 def test_read_senses_of_a_missing_file_is_empty(tmp_path: Path) -> None:
     assert read_senses(tmp_path / "absent.tsv") == {}
-
-def test_sense_mismatches_reports_bad_cards() -> None:
-    senses = {
-        "tongue": english_sense.GlossSense(
-            frozenset({"tongue"}), ()
-        ),
-    }
-    rows = [
-        {"target": "langue", "sentence": "J'ai mordu ma langue.", "english": "I bit my tongue."},
-        {"target": "langue", "sentence": "J'aime cette langue.", "english": "I love this language."},
-    ]
-    bad = sense_mismatches(
-        rows, {"langue": "tongue"}, Path("absent.tsv"), senses=senses
-    )
-    assert bad == ["langue in J'aime cette langue."]
 
 
 def test_sense_stage_is_in_the_filter_report() -> None:

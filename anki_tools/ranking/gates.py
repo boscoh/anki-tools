@@ -28,7 +28,6 @@ from anki_tools.ranking.coreflow import (
 )
 from anki_tools.ranking.duplicates import at_limit
 from anki_tools.sentence_pack.audit import print_audit, sha256_value
-from anki_tools.sentence_pack.english_sense import sense_failure, sense_row
 
 #: Items of a failure message before the rest become a count.
 SAMPLE = 3
@@ -185,42 +184,6 @@ def gate_core_word(files: GateFiles) -> tuple[bool, str]:
         files.notes(), files.fields(), coverage_glosses(files.coverage())
     )
     return not problems, f"{filled} core word(s), {len(problems)} bad: {sample(problems)}"
-
-
-def gate_sense(
-    files: GateFiles,
-    sense_path: Path,
-    tier_of: Callable[[str, str, str], str],
-) -> tuple[bool, str]:
-    """G18 and K22: the core word of every card passes the sense test.
-
-    A word with no sense row passes.
-
-    :param files: Reader of the output files.
-    :param sense_path: Sense file of the language.
-    :param tier_of: Give ``S`` or ``F`` from the core word, its gloss, and the
-        plain sentence of a card.
-    """
-    notes = files.notes()
-    fields = files.fields()
-    word_index = fields.index(OUTPUT_CORE_FIELD)
-    gloss_index = fields.index(OUTPUT_GLOSS_FIELD)
-    problems: list[str] = []
-    for card in files.output()["cards"]:
-        values = notes[card.note_id]
-        word, gloss = values[word_index].strip(), values[gloss_index].strip()
-        tier = tier_of(word, gloss, card.sentence)
-        failure = sense_failure(
-            card.english,
-            sense_row(sense_path, tier, word),
-            gloss if tier == "S" else None,
-        )
-        if failure:
-            problems.append(f"{word} {failure}: {card.english[:40]}")
-    count = len(files.output()["cards"])
-    if problems:
-        return False, f"{len(problems)} card(s) fail: {sample(problems)}"
-    return True, f"{count} core words pass the sense test"
 
 
 def gate_audio(files: GateFiles) -> tuple[bool, str]:

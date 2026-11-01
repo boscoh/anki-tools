@@ -192,7 +192,7 @@ are tokenizer lemmas, and its languages have no compounds.
 | `sense_filter` hook, `make_sense_filter`, `SENSE_CHECKS` | removed; the record holds `false_friends` |
 | `false_friend_spans` hook, `FALSE_FRIENDS`               | removed; the record holds `compounds`     |
 | `holds_sense`, `holds_tier_s_sense`, `sense_match`       | one function, `sense_failure`             |
-| `gate_no_sense_mismatch`, `gate_no_false_friend`         | one `sense` recheck gate in every flow    |
+| `gate_no_sense_mismatch`, `gate_no_false_friend`         | removed; the `sense` filter is the test   |
 | `gate_unchecked_sense` (K16)                             | a limit on the `sense` rule in every flow |
 | `gate_target_in_sentence` (K13)                          | test 1 of the rule                        |
 
@@ -207,13 +207,11 @@ TSV has the columns `word`, `senses`, `false_friends`, `compounds`, `tier`. A
 blank `tier` is `F`. Greek has no core flow, so `vocab/greek_core_senses.tsv`
 holds its tier S rows only.
 
-S4 is done. `gate_sense` in `ranking/gates.py` is cull `G18` and core `K22`. It
-calls `sense_failure` on the `Core` word and the English of every kept note. The
-pack filter, the cull, and the core call the same function. The pack gates
-`gate_no_sense_mismatch` and `gate_no_false_friend`, core `K13`, and core `K16`
-stay as separate gates: they test the sentence CSV, the form in the sentence, and
-the count of unchecked targets. A cull deck built
-before S2 can fail `G18`, because it kept cards that no sense test checked.
+S4 added `gate_sense` as cull `G18` and core `K22`. ADR 0039 retired it and the
+pack gates `gate_no_sense_mismatch` and `gate_no_false_friend`. The `sense`
+filter is the one test. Core `K13` and core `K16` stay: they test the form in
+the sentence and the count of unchecked targets. A deck built before S2 can keep
+a card that no sense test checked, and no gate reports it. Build the deck again.
 
 The English table `vocab/english_senses.json` stays. It gives the sense words of a
 Swadesh gloss, and WordNet builds it.
@@ -225,7 +223,7 @@ Work items:
 | S1 | write this section                                                    | done                   |
 | S2 | cull: remove a lemma that fails `sense_failure` in `select_cards`     | done, ADR 0030         |
 | S3 | one shared function and one record; move the dicts into the TSV files | done                   |
-| S4 | one `sense` recheck gate in the cull and the core (G18, K22)          | done                   |
+| S4 | one `sense` recheck gate in the cull and the core (G18, K22)          | retired, ADR 0039      |
 | S5 | sense rows for all 300 cull targets, and a Cantonese file             | done, ADR 0031         |
 
 A compound-only sentence has no hit, so it is not a candidate and the pack counts

@@ -1,4 +1,4 @@
-"""Shared gates G1 to G18 of the cull deck, without the retired G3 and G4.
+"""Shared gates G1 to G17 of the cull deck, without the retired G3, G4, and G14.
 
 The gates read the output APKG, the two CSV files, and the manifest. A gate
 never writes a file. A language package supplies a
@@ -20,7 +20,6 @@ from anki_tools.gate_files import GateFileReader, read_notes
 from anki_tools.ranking.coreflow import InputCard, read_output
 from anki_tools.ranking.cullflow import (
     FREQUENCY_SOURCE,
-    SWADESH_SOURCE,
     CullProfile,
     coverage_status,
     filter_reason,
@@ -37,7 +36,6 @@ from anki_tools.ranking.gates import (
     gate_kept_order as _gate_kept_order,
     gate_manifest_hashes as _gate_manifest_hashes,
     gate_output_model,
-    gate_sense as _gate_sense,
     gate_similarity as _gate_similarity,
     gate_templates as _gate_templates,
     read_csv,
@@ -258,17 +256,6 @@ def gate_card_templates(files: CullFiles) -> tuple[bool, str]:
     return _gate_templates(files, _css_class_problems)
 
 
-def gate_sense(files: CullFiles) -> tuple[bool, str]:
-    """G18: the core word of every kept card passes the sense test."""
-    swadesh = {
-        row["sentence"] for row in files.rows() if row.get("source") == SWADESH_SOURCE
-    }
-    return _gate_sense(
-        files,
-        files.profile.sense_path,
-        lambda _word, _gloss, sentence: "S" if sentence in swadesh else "F",
-    )
-
 
 GATES: tuple[Gate, ...] = (
     Gate("G1", gate_card_cap),
@@ -285,12 +272,11 @@ GATES: tuple[Gate, ...] = (
     Gate("G15", gate_card_templates),
     Gate("G16", gate_output_model),
     Gate("G17", gate_core_word),
-    Gate("G18", gate_sense),
 )
 
 
 def check_cull(output_path: Path, profile: CullProfile) -> int:
-    """Run gates G1 to G18, without the retired G3 and G4, on a cull output.
+    """Run gates G1 to G17, without the retired G3, G4, and G14, on a cull output.
 
     :param output_path: Output APKG file.
     :param profile: Language hooks.

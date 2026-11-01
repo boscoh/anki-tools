@@ -262,7 +262,7 @@ def test_base_pack_fails_only_the_word_table_gate(
     results = run_audit(**env)
     failed = [gate for gate, passed, _ in results if not passed]
 
-    assert [gate for gate, _, _ in results] == [f"G{number}" for number in range(1, 19)]
+    assert [gate for gate, _, _ in results] == [f"G{number}" for number in range(1, 17)]
     assert failed == ["G1"]
     assert print_audit(results) == 1
 

@@ -59,8 +59,6 @@ from anki_tools.sentence_pack.audit import (
     gate_coverage,
     gate_manifest_counts,
     gate_media_count,
-    gate_no_false_friend,
-    gate_no_sense_mismatch,
     gate_filter_recheck,
     gate_review_file,
     gate_sentence_audio,
@@ -362,13 +360,11 @@ GATES: tuple[tuple[str, GateCheck], ...] = (
     ("G14", gate_filter_recheck),
     ("G15", gate_review_file),
     ("G16", gate_word_audio),
-    ("G17", gate_no_false_friend),
-    ("G18", gate_no_sense_mismatch),
 )
 
 
 def run_audit(**paths: Path | None) -> list[GateResult]:
-    """Run the quality gates G1 to G18.
+    """Run the quality gates G1 to G16.
 
     :param paths: Input paths that replace the defaults of the profile.
     :returns: One ``(gate, passed, message)`` row per gate, G1 first.

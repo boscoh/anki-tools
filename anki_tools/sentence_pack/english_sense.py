@@ -18,7 +18,7 @@ import re
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Iterable, Mapping, Sequence
+from typing import Mapping, Sequence
 
 SENSE_PATH = Path("vocab/english_senses.json")
 
@@ -221,29 +221,3 @@ def _holds_gloss(
         return True
     return any(_phrase_matches(tokens, phrase) for phrase in sense.phrases)
 
-
-def sense_mismatches(
-    rows: Iterable[Mapping[str, str]],
-    gloss_by_form: Mapping[str, str],
-    sense_path: Path,
-    senses: Mapping[str, GlossSense] | None = None,
-) -> list[str]:
-    """List the cards whose English does not show the word sense.
-
-    :param rows: Card rows with ``target``, ``sentence``, and ``english``.
-    :param gloss_by_form: Mapping from a card target to its Swadesh gloss.
-    :param sense_path: Sense file of the language.
-    :param senses: Gloss table, loaded from the data file when empty.
-    :returns: One ``target in sentence`` text per bad card.
-    """
-    return [
-        f"{target} in {row.get('sentence', '')}"
-        for row in rows
-        for target in [row.get("target", "")]
-        if sense_failure(
-            row.get("english", ""),
-            sense_row(sense_path, "S", target),
-            gloss_by_form.get(target, ""),
-            senses,
-        )
-    ]

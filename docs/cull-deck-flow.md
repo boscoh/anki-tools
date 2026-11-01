@@ -24,7 +24,7 @@ One command runs the stages in order: `anki fix <language> --select`. The
 | C4    | select    | C1, C2, C3, reserve pack | kept cards and reserve cards                |
 | C5    | write     | C0, C4                   | APKG and three side files                   |
 
-The gates G1, G2, G5 to G13, and G15 to G18 run after C5. G3, G4, and G14 are retired.
+The gates G1, G2, G5 to G13, and G15 to G17 run after C5. G3, G4, G14, and G18 are retired.
 
 The `--cards` and `--reserve` values change the request. The other
 `CullRequest` fields, such as `max_uses` and `target_words`, keep their
@@ -71,7 +71,7 @@ C4  selection
 C5  APKG, .cull.csv, .coverage.csv, .manifest.json
         |
         v
-    gates G1, G2, G5 to G13, G15 to G18
+    gates G1, G2, G5 to G13, G15 to G17
 ```
 
 ## 3. Target words (C1 and C2)
@@ -279,7 +279,6 @@ exceptions.
 | manifest  | G13          | the two CSV hashes                                        |
 | templates | G15          | the cull templates and the CSS classes                    |
 | note type | G16, G17     | one note type, its fields, the core word, gloss, and bold |
-| sense     | G18          | the core word of each card passes the sense test          |
 
 G3, G4, and G14 are retired (ADR 0033, ADR 0035). Their ids are not reused. The
 report and the coverage CSV still give the targets with one card and with two
@@ -289,8 +288,8 @@ G15 needs the template set of the profile and
 each card class in the CSS. G16 checks the single note type, the field set, and
 one card per note. G17 checks that every note holds a `Core`, a `CoreGloss`,
 and a bold core word, and that the gloss is the coverage gloss of that word.
-G18 is `gate_sense`. It checks that the core word of every card passes the
-sense test. A word with no sense row passes.
+G18 is retired (ADR 0039). The `sense` filter is the one sense test, and no gate
+repeats it.
 
 G2 counts the lemma uses with `sense_lemma_sets`, the same function that
 `select_cards` uses. A lemma that fails the sense test on a card is not a use of
@@ -310,7 +309,7 @@ it.
 | Path                                      | Content                                        |
 | ----------------------------------------- | ---------------------------------------------- |
 | `anki_tools/ranking/cullflow.py`          | C0 to C5 flow, profile, selection, values      |
-| `anki_tools/ranking/cullgates.py`         | gates G1, G2, G5 to G13, and G15 to G18        |
+| `anki_tools/ranking/cullgates.py`         | gates G1, G2, G5 to G13, and G15 to G17        |
 | `anki_tools/gates.py`                     | gate value, row, runner, reader contract       |
 | `anki_tools/ranking/gates.py`             | report, shared gates                           |
 | `anki_tools/ranking/assemble.py`          | deck, side files, manifest, report             |

@@ -64,7 +64,7 @@ S4  audio files and the audio index
 S5  APKG, manifest, attribution
         |
         v
-    audit gates G1 to G21
+    audit gates G1 to G19
 ```
 
 The S5 builder writes a card only when its sentence holds the target in bold.
@@ -241,22 +241,6 @@ count inside 我哋.
 Mandarin uses `form_occurrences` on the Han character stream, because jieba
 merges some forms into a longer token. So 水 counts inside 喝水.
 
-### 5.5 Gate numbers
-
-| Pack      | False-friend gate | English sense gate |
-| --------- | ----------------- | ------------------ |
-| Mandarin  | G17               | G18                |
-| Cantonese | G20               | G21                |
-| French    | none              | G21                |
-| Spanish   | none              | G21                |
-| Greek     | none              | G20                |
-
-The shared English sense gate and the shared false-friend gate live in
-`anki_tools/sentence_pack/audit.py`. The word table gate, the attribution gate,
-the typography gate, the license gate, and the other language gates live in
-`audit.py` or the language module. The gate table of the language lists them in
-gate number order.
-
 ## 6. Audit gates
 
 The audit reads the output files only. The gates fall in these groups:
@@ -269,15 +253,15 @@ The audit reads the output files only. The gates fall in these groups:
 | audio          | G7, G8, G16        | sentence file, word file, media count               |
 | manifest       | G11, G13           | counts, hashes, APKG note count                     |
 | coverage       | G10                | core coverage against `coverage_min`                |
-| language rules | per pack           | false-friend compound, English sense                |
-| attribution    | G12                | author names                                        |
 
-A language pack can add a gate. For example, Cantonese adds G20 and G21.
+A language pack can add a gate. For example, Cantonese adds G17 and G18.
 G19 is the French `gate_discontinuous` and the Spanish `gate_pair_parts`, so
-Greek and Cantonese have no G19. G9 is the Cantonese script check and the
-Mandarin pinyin check, so French, Spanish, and Greek have no G9. G20 is the
-Greek sense gate and the Cantonese false-friend gate; French and Spanish have
-no G20.
+Greek and Cantonese have no G19. G9 is the Mandarin pinyin check, so French,
+Spanish, Greek, and Cantonese have no G9.
+
+ADR 0039 retired the gates for English sense, false friend, attribution,
+typography, license, and script. The `sense` filter is the one sense test. The
+Mandarin attribution gate G12 stays, because it checks the native audio authors.
 
 ## 7. File map
 

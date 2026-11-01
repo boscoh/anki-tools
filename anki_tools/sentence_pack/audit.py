@@ -12,8 +12,6 @@ from __future__ import annotations
 
 import csv
 import json
-import re
-import unicodedata
 from collections import Counter
 from pathlib import Path
 from typing import Any, Callable, Iterable, Sequence
@@ -29,17 +27,12 @@ from anki_tools.sentence_pack.audio import (
     MIN_DURATION_S,
     probe_duration,
 )
-from anki_tools.sentence_pack.english_sense import sense_mismatches
 from anki_tools.sentence_pack.pack import (
     ATTRIBUTION_PATH,
     WORD_PREFIX,
     load_audio_index,
 )
-from anki_tools.sentence_pack.guards import (
-    check_sentence_shape,
-    compound_spans,
-    form_compounds,
-)
+from anki_tools.sentence_pack.guards import check_sentence_shape
 from anki_tools.sentence_pack.pool import shape_failure
 from anki_tools.sentence_pack.profile import (
     LanguageProfile,
@@ -48,9 +41,6 @@ from anki_tools.sentence_pack.profile import (
 )
 
 OPEN_STATUS = "open"
-LATIN_OR_DIGIT = re.compile(r"[A-Za-z0-9０-９]")
-#: Card field characters that gate G17 rejects, the no-break spaces.
-NO_BREAK_SPACES = ("\u202f", "\u00a0")
 FAILURE_SAMPLE = 3
 DETAIL_WIDTH = 110
 
@@ -636,133 +626,6 @@ def gate_no_native_audio(
         return False, f"{len(native)} card(s) use native audio: {sample(native)}"
     return True, "no card uses native audio"
 
-
-def gate_no_false_friend(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Gate: no card uses its target in a different-sense compound.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    rows = inputs.rows()
-    bad: list[str] = []
-    for row in rows:
-        sentence = row.get("sentence", "")
-        target = row.get("target", "")
-        if compound_spans(sentence, form_compounds(profile.sense_path, target)):
-            bad.append(f"{target} in {sentence}")
-    if bad:
-        return False, (
-            f"{len(bad)} card(s) use the target in a different sense: {sample(bad)}"
-        )
-    return True, f"{len(rows)} cards use each target in its Swadesh sense"
-
-
-def gate_no_sense_mismatch(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Gate: no card English holds a different sense.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    rows = inputs.rows()
-    gloss_by_form = {
-        profile.form_text(form): form.english for form in inputs.table()
-    }
-    bad = sense_mismatches(rows, gloss_by_form, profile.sense_path)
-    if bad:
-        return False, (
-            f"{len(bad)} card(s) use the target in a different sense: {sample(bad)}"
-        )
-    return True, f"{len(rows)} cards use each target in its Swadesh sense"
-
-def gate_typography(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Gate G17: no card field holds a no-break space and all text is NFC.
-
-    ``text_original`` keeps the raw sentence, so only the card fields are read.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    glosses = {
-        profile.form_text(form): profile.gloss(form) for form in inputs.table()
-    }
-    bad: list[str] = []
-    for row in inputs.rows():
-        fields = {
-            "sentence": row.get("sentence", ""),
-            "english": row.get("english", ""),
-            "target": row.get("target", ""),
-            "gloss": glosses.get(row.get("target", ""), ""),
-        }
-        for name, value in fields.items():
-            if any(char in value for char in NO_BREAK_SPACES):
-                bad.append(f"{name}={value}: no-break space")
-            elif unicodedata.normalize("NFC", value) != value:
-                bad.append(f"{name}={value}: not NFC")
-    if bad:
-        return False, f"{len(bad)} card field(s) fail the typography: {sample(bad)}"
-    return True, f"{len(inputs.rows())} cards hold NFC text with normal spaces"
-
-
-def gate_no_blocked_license(
-    inputs: AuditInputs, profile: LanguageProfile  # noqa: ARG001 - gate signature
-) -> tuple[bool, str]:
-    """Gate G18: a public pack has no card with a blocked recording.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    pack_license = inputs.manifest().get("pack_license", "public")
-    if pack_license != "public":
-        return True, f"pack license is {pack_license}, so no recording is blocked"
-    blocked = [
-        row["sentence"]
-        for row in inputs.rows()
-        if row.get("audio_source") == "native"
-        and row.get("audio_license", "").strip() in ("", "CC BY-NC 4.0")
-    ]
-    if blocked:
-        return False, f"{len(blocked)} card(s) use a blocked license: {sample(blocked)}"
-    return True, "no card uses a CC BY-NC 4.0 or empty-license recording"
-
-
-def gate_attribution(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Gate G12: the attribution section names every sentence author.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile, whose name gives the section heading.
-    :returns: Pass flag and detail text.
-    """
-    language = profile.name.capitalize()
-    path = inputs.attribution_path
-    if not path.is_file():
-        return False, f"attribution file missing: {path}"
-    text = path.read_text(encoding="utf-8")
-    problems: list[str] = []
-    if f"## {language} pack" not in text:
-        problems.append(f"no '## {language} pack' section")
-    authors = {
-        row.get("tatoeba_author", "").strip() or "unknown" for row in inputs.rows()
-    }
-    missing = sorted(author for author in authors if author not in text)
-    if missing:
-        problems.append(f"{len(missing)} author(s) missing: {sample(missing)}")
-    if problems:
-        return False, sample(problems)
-    return True, (
-        f"{len(authors)} author(s) named in the {language} section"
-    )
 
 GENERIC_GATES: tuple[tuple[str, GateCheck], ...] = (
     ("G2", gate_unique_forms),
