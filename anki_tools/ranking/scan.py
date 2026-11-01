@@ -57,6 +57,9 @@ class CoreProfile:
     :param coverage_floor: Lowest share of core targets that hold at least one
         kept card. Gate K23 reads it. It is a ratchet: set it to the current
         share, rounded down to 0.05.
+    :param exact_forms: The tier S forms of the language appear unchanged in a
+        sentence, so gate K24 can match them as substrings. False for a
+        language that inflects its words.
     :param lemma_overrides: Lemma repair map of the lemmatizer artefacts,
         applied by :func:`scan` to the tokens of every card.
     :param finalize: Post-processing step of the written deck, called with
@@ -94,6 +97,7 @@ class CoreProfile:
     default_options: Any
     frequency_source: str
     coverage_floor: float
+    exact_forms: bool = False
     lemma_overrides: Mapping[str, str] = field(default_factory=dict)
     finalize: Callable[[Any], None] | None = None
     romanization_source: str | None = None

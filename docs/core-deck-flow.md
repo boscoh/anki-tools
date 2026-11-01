@@ -23,9 +23,9 @@ One command runs the stages in order: `anki fix <language> --core`. The
 | K5    | order   | K4                                        | card order, assigned target per card        |
 | K6    | write   | K0, K4, K5                                | APKG and four side files                    |
 
-The gates run after K6. The table holds 4 rows: K5, K6, K13, and K23. The other
+The gates run after K6. The table holds 5 rows: K5, K6, K13, K23, and K24. The other
 gate ids are retired (ADR 0038 to 0044, ADR 0046). K23 is the coverage floor
-(ADR 0048). The flow step K4 is the selection.
+(ADR 0048). K24 is the independent substring recount (ADR 0052). The flow step K4 is the selection.
 
 The `--cards` and `--words` values change the tier F target count and the
 card cap. The other `CoreRequest` fields keep their defaults.
@@ -77,7 +77,7 @@ K5  order: target position, example number, new words, units
 K6  APKG, .core.csv, .coverage.csv, .manifest.json, .rank.csv
         |
         v
-    gates K5, K6, K13, K23
+    gates K5, K6, K13, K23, K24
 ```
 
 ## 3. Core list (K2)
@@ -302,6 +302,7 @@ The coverage status of a target is one of these values:
 | rules      | K5, K6             | F1 to F9, similarity                                                |
 | cards      | K13                | targets and the shown Core word in the text                         |
 | coverage   | K23                | share of targets with a kept card, floor from the language profile  |
+| recount    | K24                | tier S forms in the text by substring, no producer code             |
 
 The build report holds the value of K3 and K15, Covered twice, and the count of
 cards that K1 drops for a missing audio file. It also holds the count of
@@ -315,7 +316,8 @@ The `sense` filter is the one sense test (ADR 0039); no gate repeats it.
 | Path                                            | Content                                    |
 | ----------------------------------------------- | ------------------------------------------ |
 | `anki_tools/ranking/coreflow.py`                | K0 to K6 flow, output field values         |
-| `anki_tools/ranking/coregates.py`               | gates K5, K6, K13, K23, 4 rows             |
+| `anki_tools/ranking/coregates.py`               | gates K5, K6, K13, K23, K24, 5 rows        |
+| `anki_tools/ranking/corerecount.py`             | gate K24, imports no producer code         |
 | `anki_tools/gates.py`                           | gate value, row, runner, reader contract   |
 | `anki_tools/ranking/gates.py`                   | report, shared gates                       |
 | `anki_tools/ranking/assemble.py`                | deck, side files, manifest, report         |

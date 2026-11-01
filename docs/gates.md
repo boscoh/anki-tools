@@ -20,7 +20,7 @@ checks. A doc row, a report line, and an issue must name the flow with the id.
 | --------------- | ---------------------------------- | ----------------------------------------------- | ----- |
 | Sentence pack   | `anki swadesh pack <lang>`         | G1 to G19, one list for each language           | 15-16 |
 | Cull deck       | `anki fix <lang> <input> --select` | G1, G2, G5, G6                                  | 4     |
-| Core deck       | `anki fix <lang> <input> --core`   | K5, K6, K13, K23                                | 4     |
+| Core deck       | `anki fix <lang> <input> --core`   | K5, K6, K13, K23, K24                           | 5     |
 | Vocabulary deck | `anki swadesh vocab <lang>`        | none                                            | 0     |
 
 The pack lists differ by language:
@@ -58,12 +58,18 @@ parameter.
 | G2  | `gate_use_cap`            | No lemma appears in more cards than the cap.              |
 | K13 | `gate_target_in_sentence` | Each card sentence holds its targets and its Core word.   |
 | K23 | `gate_coverage_floor`     | The share of targets with a kept card reaches the floor.  |
+| K24 | `gate_recount_forms`      | Each card text holds its tier S forms, by substring.      |
 
 The pack has more checks, for example G10 coverage. The cull has no coverage
 gate (ADR 0045, ADR 0046). The core has one floor gate, K23 (ADR 0048). The
 floor is `coverage_floor` in the language core profile: the current share
 rounded down to 0.05. It is a ratchet, and a drop below it means the selection
-or the input got worse. Neither flow has a gate on the share of targets with one
+or the input got worse. K24 is the independent recount (ADR 0052): it imports
+no producer code and tests the form by a plain substring match. A form absent
+from the text is a fault. A form present is not proof, because `得到` is a
+substring of `听得到`. It runs for Mandarin and Cantonese, where
+`CoreProfile.exact_forms` is true. French and Spanish headwords inflect
+(`savoir`, `sais`), so K24 passes with the message `skipped`. Neither flow has a gate on the share of targets with one
 card or two cards (ADR 0033).
 
 ### Retired ids
@@ -211,4 +217,5 @@ unless the change removes a report-only row.
 | `anki_tools/sentence_pack/audit.py`      | `AuditInputs`, `as_gates`, and the shared pack checks |
 | `anki_tools/ranking/cullgates.py`        | the cull gates                                        |
 | `anki_tools/ranking/coregates.py`        | the core gates                                        |
+| `anki_tools/ranking/corerecount.py`      | core gate K24, no producer import                     |
 | `anki_tools/languages/<lang>/profile.py` | the language gates                                    |

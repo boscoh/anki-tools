@@ -1,4 +1,4 @@
-"""Shared gates K5, K6, K13, and K23 of the core deck. The ids K1 to K22 are retired.
+"""Shared gates K5, K6, K13, K23, and K24 of the core deck. The ids K1 to K22 are retired.
 
 The gates read the output APKG, the two CSV files, and the manifest. A gate
 never writes a file. A language package supplies the
@@ -24,6 +24,7 @@ from anki_tools.ranking.coreflow import (
     read_output,
 )
 from anki_tools.ranking.corelist import CONTENT_POS, lemma_sets
+from anki_tools.ranking.corerecount import gate_recount_forms
 from anki_tools.ranking.gates import (
     Gate,
     GateResult,
@@ -45,6 +46,7 @@ __all__ = [
     "check_core",
     "gate_coverage_floor",
     "gate_filter_recheck",
+    "gate_recount_forms",
     "gate_target_in_sentence",
     "gate_similarity",
     "run_gates",
@@ -200,11 +202,12 @@ GATES: tuple[Gate, ...] = (
     Gate("K6", gate_similarity),
     Gate("K13", gate_target_in_sentence),
     Gate("K23", gate_coverage_floor),
+    Gate("K24", gate_recount_forms),
 )
 
 
 def check_core(output_path: Path, profile: CoreProfile) -> int:
-    """Run gates K5, K6, K13, and K23 on the files of a core output.
+    """Run gates K5, K6, K13, K23, and K24 on the files of a core output.
 
     :param output_path: Output APKG file.
     :param profile: Language hooks.
