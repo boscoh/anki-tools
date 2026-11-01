@@ -18,14 +18,15 @@ from typing import Any
 from anki_tools.gate_files import GateFileReader, read_notes
 
 from anki_tools.ranking.coreflow import InputCard, read_output
-from anki_tools.ranking.corelist import is_content
 from anki_tools.ranking.cullflow import (
     FREQUENCY_SOURCE,
     SWADESH_SOURCE,
     CullProfile,
     coverage_status,
     filter_reason,
+    frequency_senses,
     lemma_sets,
+    sense_lemma_sets,
 )
 from anki_tools.ranking.gates import (
     Gate,
@@ -131,7 +132,10 @@ def gate_card_cap(files: CullFiles) -> tuple[bool, str]:
 
 
 def gate_use_cap(files: CullFiles) -> tuple[bool, str]:
-    """G2: no non-exempt lemma is in more than the cap of kept cards."""
+    """G2: no non-exempt lemma is in more than the cap of kept cards.
+
+    A lemma that fails the sense test on a card is not a use of that card.
+    """
     limit = int(files.params().get("max_uses", 0))
     exempt = _exempt_lemmas(files)
     frequency_sentences = {
@@ -139,17 +143,17 @@ def gate_use_cap(files: CullFiles) -> tuple[bool, str]:
         for row in files.rows()
         if row.get("source") == FREQUENCY_SOURCE and row.get("kept") == "1"
     }
+    cards = files.output()["cards"]
+    sets = sense_lemma_sets(
+        [card.english for card in cards],
+        files.tokens(),
+        files.profile.content_pos,
+        frequency_senses(files.profile.sense_path),
+    )
     uses: Counter[str] = Counter()
-    for card, card_tokens in zip(files.output()["cards"], files.tokens()):
-        if card.sentence not in frequency_sentences:
-            continue
-        uses.update(
-            {
-                lemma
-                for lemma, pos in card_tokens
-                if is_content(pos, files.profile.content_pos)
-            }
-        )
+    for card, lemma_set in zip(cards, sets):
+        if card.sentence in frequency_sentences:
+            uses.update(lemma_set)
     over = {
         lemma: count
         for lemma, count in uses.items()

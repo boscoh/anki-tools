@@ -789,6 +789,30 @@ def test_gate_core_word_reports_an_empty_core(tmp_path: Path) -> None:
     assert "no core word" in failed_message
 
 
+def test_gate_use_cap_skips_a_lemma_that_fails_the_sense_test(tmp_path: Path) -> None:
+    profile = _sense_profile(tmp_path)
+    english = ["cat is big.", "dog is big."]
+    cards = [
+        SimpleNamespace(sentence=f"kat {index}", english=text)
+        for index, text in enumerate(english)
+    ]
+    files = SimpleNamespace(
+        params=lambda: {"max_uses": 1, "exempt_top": 0},
+        coverage=list,
+        rows=lambda: [
+            {"sentence": card.sentence, "source": cullflow.FREQUENCY_SOURCE, "kept": "1"}
+            for card in cards
+        ],
+        output=lambda: {"cards": cards},
+        tokens=lambda: [[("kat", "NOUN")]] * 2,
+        profile=profile,
+    )
+
+    passed, message = cullgates.gate_use_cap(files)  # type: ignore
+
+    assert passed, message
+
+
 def test_gate_card_cap_counts_the_no_core_drop() -> None:
     def files(kept: int, dropped: int) -> SimpleNamespace:
         return SimpleNamespace(

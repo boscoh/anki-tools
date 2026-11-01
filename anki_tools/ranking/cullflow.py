@@ -474,6 +474,46 @@ def lemma_sets(
     ]
 
 
+def frequency_senses(sense_path: Path) -> dict[str, SenseRow]:
+    """Read the tier F sense row of every frequency lemma.
+
+    :param sense_path: Sense file of the language.
+    :returns: Lemma to its sense row.
+    """
+    return {
+        lemma: row for (tier, lemma), row in read_senses(sense_path).items() if tier == "F"
+    }
+
+
+def sense_lemma_sets(
+    english: Sequence[str],
+    tokens: Sequence[Sequence[tuple[str, str]]],
+    content_pos: frozenset[str],
+    senses: Mapping[str, SenseRow],
+) -> list[set[str]]:
+    """Collect the content lemmas of every card that pass the sense test.
+
+    A lemma that fails the sense test against the English of a card leaves the
+    lemma set of that card.
+
+    :param english: English translation per card.
+    :param tokens: Lemma and part of speech per card.
+    :param content_pos: Parts of speech that count as content, empty for every
+        token.
+    :param senses: Tier F sense row per lemma. A lemma without a row is not
+        checked.
+    :returns: One set of content lemmas per card.
+    """
+    sets = lemma_sets(tokens, content_pos)
+    for text, lemma_set in zip(english, sets):
+        lemma_set -= {
+            lemma
+            for lemma in lemma_set & senses.keys()
+            if sense_failure(text, senses[lemma])
+        }
+    return sets
+
+
 def reserve_lemma_sets(
     reserve: Sequence[ReserveCard],
     profile: CullProfile,
@@ -658,13 +698,9 @@ def select_cards(
     if len(reserved) != len(reserved_sets):
         raise ValueError("The reserve list and the lemma set list differ in size.")
 
-    sets = lemma_sets(tokens, content_pos)
-    for card, lemma_set in zip(cards, sets):
-        lemma_set -= {
-            lemma
-            for lemma in lemma_set & senses.keys()
-            if sense_failure(card.english, senses[lemma])
-        }
+    sets = sense_lemma_sets(
+        [card.english for card in cards], tokens, content_pos, senses
+    )
     exempt = {target.lemma for target in targets[:exempt_top]}
     weights = {target.lemma: target.weight for target in targets}
 
@@ -1071,11 +1107,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> deck_writer.RunFiles
         profile.input_audio_field,
         profile.clean_sentence,
     )
-    senses = {
-        lemma: row
-        for (tier, lemma), row in read_senses(profile.sense_path).items()
-        if tier == "F"
-    }
+    senses = frequency_senses(profile.sense_path)
     glosses = {lemma: row.first for lemma, row in senses.items()}
     frequency = profile.load_frequency()
     ranks = profile.frequency_ranks(frequency, request.spoken_weight)

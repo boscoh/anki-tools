@@ -292,6 +292,10 @@ and a bold core word, and that the gloss is the coverage gloss of that word.
 G18 is `gate_sense`. It checks that the core word of every card passes the
 sense test. A word with no sense row passes.
 
+G2 counts the lemma uses with `sense_lemma_sets`, the same function that
+`select_cards` uses. A lemma that fails the sense test on a card is not a use of
+that card.
+
 G1 passes when the kept count plus `counts.dropped_no_core` reaches the cap, or
 when the pool has no more cards. A kept card without a core word leaves the
 deck, so the gate compares the count before that drop. A small input deck does
