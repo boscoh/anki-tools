@@ -77,7 +77,7 @@ def sample(items: Sequence[str], limit: int = SAMPLE) -> str:
 def gate_similarity(
     files: GateFiles, sets: Sequence[AbstractSet[str]], limit: float
 ) -> tuple[bool, str]:
-    """C6 and K6: no kept card pair reaches the lemma Jaccard limit.
+    """R6 and K6: no kept card pair reaches the lemma Jaccard limit.
 
     :param files: Reader of the output files.
     :param sets: Content lemmas of every card, in card order.

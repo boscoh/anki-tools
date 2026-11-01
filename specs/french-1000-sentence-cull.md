@@ -439,7 +439,7 @@ uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
 | `--cards`    | 1000                | Card cap                                     |
 | `--reserve`  | on                  | Add the Swadesh reserve cards                |
 | `--output`   | `apkg/<language>_1000.apkg` | Output APKG                         |
-| `--check`    | off                 | Run gates C1 to C17 on the output            |
+| `--check`    | off                 | Run gates R1 to R17 on the output            |
 | `--select`   | off                 | Run the cull                                 |
 
 `max_uses` (4), `target_words` (300), `exempt_top` (100), the spoken
@@ -471,7 +471,7 @@ has no row (section 17.4).
   `CullProfile` seam. The profile holds every French value: the scan adapters,
   the model fields, the templates and the CSS, the reserve pack, and the file
   paths.
-- Add `anki_tools/ranking/cullgates.py` with gates C1 to C15 behind a
+- Add `anki_tools/ranking/cullgates.py` with gates R1 to R15 behind a
   `CullFiles` reader.
 - Keep `anki_tools/languages/french/cull.py` for the French values,
   `FRENCH_CULL_PROFILE`, the bindings, and the re-exports.
@@ -491,23 +491,23 @@ the command with a non-zero exit code.
 
 | Gate | Check                                                                  |
 | ---- | ---------------------------------------------------------------------- |
-| C1   | The count plus `dropped_no_core` is the cap, or the pool count        |
-| C2   | No non-exempt content lemma is in more than `--max-uses` kept cards     |
-| C3   | Target coverage is at least 0.98 of `--target-words` (measured 0.997)   |
-| C4   | At least 0.95 of the targets have 2 cards (measured 0.963)              |
-| C5   | Every kept card passes the filter rules. The reserve cards skip the name rule F8 as a deliberate exemption: no Swadesh pack rule tests a name, and 8 of the 194 kept French reserve cards hold a `PROPN` token. |
-| C6   | No kept card pair reaches the lemma Jaccard limit                       |
-| C7   | Every kept card has its input audio file, and the file is a valid MP3   |
-| C8   | The APKG note count equals the cull CSV `kept` count and the manifest   |
-| C9   | The APKG holds exactly the media files of the kept cards                |
-| C10  | The output deck name is `params.name`, and the only note type name is `manifest.source.model` |
-| C11  | A second run gives the same kept set and the same order                 |
-| C12  | The coverage CSV has one row per target word                            |
-| C13  | The manifest hashes match the cull CSV and the coverage CSV             |
-| C14  | The merged deck covers 206 of 207 Swadesh concepts, with `intestins` as the exception |
-| C15  | The only note type holds exactly one Swadesh-style card template and the CSS |
-| C16  | The package holds one note type, its fields equal `output_fields(profile)`, and every note holds one card (section 17.5) |
-| C17  | Every note holds a non-empty `Core` and `CoreGloss`, and the gloss is the coverage gloss of that word (section 17.4) |
+| R1   | The count plus `dropped_no_core` is the cap, or the pool count        |
+| R2   | No non-exempt content lemma is in more than `--max-uses` kept cards     |
+| R3   | Target coverage is at least 0.98 of `--target-words` (measured 0.997)   |
+| R4   | At least 0.95 of the targets have 2 cards (measured 0.963)              |
+| R5   | Every kept card passes the filter rules. The reserve cards skip the name rule F8 as a deliberate exemption: no Swadesh pack rule tests a name, and 8 of the 194 kept French reserve cards hold a `PROPN` token. |
+| R6   | No kept card pair reaches the lemma Jaccard limit                       |
+| R7   | Every kept card has its input audio file, and the file is a valid MP3   |
+| R8   | The APKG note count equals the cull CSV `kept` count and the manifest   |
+| R9   | The APKG holds exactly the media files of the kept cards                |
+| R10  | The output deck name is `params.name`, and the only note type name is `manifest.source.model` |
+| R11  | A second run gives the same kept set and the same order                 |
+| R12  | The coverage CSV has one row per target word                            |
+| R13  | The manifest hashes match the cull CSV and the coverage CSV             |
+| R14  | The merged deck covers 206 of 207 Swadesh concepts, with `intestins` as the exception |
+| R15  | The only note type holds exactly one Swadesh-style card template and the CSS |
+| R16  | The package holds one note type, its fields equal `output_fields(profile)`, and every note holds one card (section 17.5) |
+| R17  | Every note holds a non-empty `Core` and `CoreGloss`, and the gloss is the coverage gloss of that word (section 17.4) |
 
 ### 11.2 Tests
 
@@ -568,7 +568,7 @@ note type name, the fields, and the deck name of the output (section 17.6).
 | D3        | `anki-3ux` | Filter, gain, cap, similarity, order                  | kept card list                           |
 | D4        | `anki-mq7` | APKG writer, cull CSV, coverage CSV, manifest, gates  | `apkg/french_1000.apkg`                  |
 | D5        | `anki-7n2` | Tests, README, license check                          | release check                            |
-| D6        | `anki-c5g` | Swadesh reserve, merged writer, gate C14              | 206 / 207 Swadesh, 1,000 cards           |
+| D6        | `anki-c5g` | Swadesh reserve, merged writer, gate R14              | 206 / 207 Swadesh, 1,000 cards           |
 
 ## 14. Appendix: evidence
 
@@ -684,9 +684,9 @@ guid is a UUID. The tags include `swadesh`.
 | `--reserve`       | on                                   | Add the Swadesh reserve cards   |
 | `reserve_pack`    | `apkg/swadesh_sentences_french.apkg` | Reserve source, a request field |
 
-### 16.5 Gate C14
+### 16.5 Gate R14
 
-`C14`: the output holds at least `swadesh_total - len(exceptions)` Swadesh
+`R14`: the output holds at least `swadesh_total - len(exceptions)` Swadesh
 concepts. A concept is covered when its form, or the lemma of its head word,
 appears in at least one kept card. The card does not need to be assigned to
 that concept. Example: the reserve card "Un nuage flottait dans le ciel." is
@@ -730,7 +730,7 @@ The templates are in `templates/french_cull/front.html` and `back.html`. The
 CSS is the base `templates/shared/card.css` plus the French pack classes
 (`.front-audio`, `.sentence`, `.english`, `.target`, `.hint`) of
 `templates/sentence_pack/french/card.css`. The target and the gloss hold their
-own fields, so a reserve card and a frequency card read the same way. Gate C15
+own fields, so a reserve card and a frequency card read the same way. Gate R15
 checks that the note type holds exactly this template and the CSS classes.
 
 ## 17. Output note type
@@ -794,11 +794,11 @@ word.
    lemma is `Core`.
 3. `CoreGloss` is the first sense of that row.
 4. When no lemma of the card has a row, `Core` is the first lemma and
-   `CoreGloss` is empty. Gate C17 fails on that note.
+   `CoreGloss` is empty. Gate R17 fails on that note.
 5. A reserve card takes `Core` from the pack `Target` field and `CoreGloss`
    from the pack `Gloss` field.
 6. The card bolds the core word in the `Sentence` field. `coreflow.fill_bold`
-   writes it, and a note without a bold fails C17. A reserve card already holds
+   writes it, and a note without a bold fails R17. A reserve card already holds
    the bold of the pack.
 
 `run_cull` reads the sense file once with
@@ -813,18 +813,18 @@ A kept card with no target leaves the deck. Its CSV row holds `kept = 0` and
 
 Data task: `vocab/french_core_senses.tsv` and `vocab/spanish_core_senses.tsv`
 must hold one row for every target of the build, 300 rows at the default
-`--target-words`. Until then C17 fails and names the count.
+`--target-words`. Until then R17 fails and names the count.
 
 ### 17.5 Gates
 
-- C1 adds `counts.dropped_no_core` to the kept count, because a kept card
+- R1 adds `counts.dropped_no_core` to the kept count, because a kept card
   without a core word leaves the deck (section 17.4).
-- C10 compares the deck name with `params.name` and the only note type name
+- R10 compares the deck name with `params.name` and the only note type name
   with `manifest.source.model`.
-- C15 checks the one template and the CSS classes of the one note type.
-- C16 is new: one note type, the fields of section 17.2 in order, one card per
+- R15 checks the one template and the CSS classes of the one note type.
+- R16 is new: one note type, the fields of section 17.2 in order, one card per
   note, and `ord = 0` on that card.
-- C17 is new: every note holds a `Core`, a `CoreGloss`, and a bold core word,
+- R17 is new: every note holds a `Core`, a `CoreGloss`, and a bold core word,
   and the gloss is the coverage gloss of that word.
 - `CullFiles.output()` gains `fields`, and `write_coverage_csv` writes the
   `gloss` column of section 10.3.
@@ -837,8 +837,8 @@ must hold one row for every target of the build, 300 rows at the default
 | Note type | A frequency card holds its top target lemma and the first sense as the gloss |
 | Note type | A reserve card holds the pack `Target` and `Gloss` values |
 | Note type | A kept card keeps its card id and its `due` value of 42 |
-| Note type | C16 reports a spare field; C17 reports an empty `Core` |
-| Coverage | The coverage CSV holds the `gloss` column, and C17 accepts the deck |
+| Note type | R16 reports a spare field; R17 reports an empty `Core` |
+| Coverage | The coverage CSV holds the `gloss` column, and R17 accepts the deck |
 
 ### 17.7 Migration
 

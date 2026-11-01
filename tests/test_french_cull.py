@@ -130,7 +130,7 @@ def test_the_gates_pass_on_a_tiny_cull(tmp_path: Path) -> None:
         cullgates.GATES, cullgates.CullFiles(run.output_path, profile)
     )
 
-    assert [gate for gate, _passed, _message in rows] == ["C1", "C2", "C5", "C6"]
+    assert [gate for gate, _passed, _message in rows] == ["R1", "R2", "R5", "R6"]
     for gate, passed, message in rows:
         assert passed, f"{gate}: {message}"
 

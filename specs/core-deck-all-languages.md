@@ -595,9 +595,9 @@ Readers after the change:
 | `coreflow.note_values` | `input_model_name`, `OUTPUT_CORE_FIELD`, `OUTPUT_GLOSS_FIELD`, `OUTPUT_SENTENCE_FIELD`, and `highlight` |
 | `assemble.write_run` | `DeckIdentity` and the `OutputShape` of the caller |
 | `coregates.gate_bold` (K15) | `OUTPUT_SENTENCE_FIELD` |
-| `gates.gate_core_word` (K19, C17) | `OUTPUT_CORE_FIELD`, `OUTPUT_GLOSS_FIELD` |
+| `gates.gate_core_word` (K19, R17) | `OUTPUT_CORE_FIELD`, `OUTPUT_GLOSS_FIELD` |
 | `cullflow.run_cull` | the four `input_*` names and `sense_path` |
-| `gates.gate_identity` (K9, C10) | `manifest.params.name` and `manifest.source.model` |
+| `gates.gate_identity` (K9, R10) | `manifest.params.name` and `manifest.source.model` |
 | `mandarin.core.finalize_output`, `cantonese.core.finalize_output` | `OUTPUT_SENTENCE_FIELD` and the only note type |
 
 `anki_tools/apkg/shape.py` states the written package shape behind
@@ -625,11 +625,11 @@ in both.
 | Position | Field | Value | Reader |
 | --- | --- | --- | --- |
 | 1 | `Audio` | the input audio field text, `[sound:<file>]`, verbatim | `front.html` and `back.html` of the mode |
-| 2 | `Sentence` | `InputCard.sentence`, the clean plain text; `fill_bold` writes the core word in bold | `back.html`, K15, C5, C17 |
+| 2 | `Sentence` | `InputCard.sentence`, the clean plain text; `fill_bold` writes the core word in bold | `back.html`, K15, R5, R17 |
 | 3 | `English` | the input English field text, verbatim; the pack English for a reserve card | `back.html` |
 | 4 | `Romanization` | the input field named by `profile.romanization_source`, verbatim; absent when the source is None; Cantonese writes the jyutping of `Sentence` instead | `back.html` of every mode |
-| 5 | `Core` | the target form of the card (14.7) | `back.html`, K19, C17 |
-| 6 | `CoreGloss` | the English gloss of `Core` (14.7) | `back.html`, K19, C17 |
+| 5 | `Core` | the target form of the card (14.7) | `back.html`, K19, R17 |
+| 6 | `CoreGloss` | the English gloss of `Core` (14.7) | `back.html`, K19, R17 |
 
 | Mode | Language | Fields |
 | --- | --- | --- |
@@ -680,12 +680,12 @@ hint line. Both backs hold one unconditional line:
 <div class="target">{{Core}} · {{CoreGloss}}</div>
 ```
 
-The `{{#Core}}` condition goes away. Every note holds both fields (K19, C17),
+The `{{#Core}}` condition goes away. Every note holds both fields (K19, R17),
 so a conditional would only hide a fault. The `french_cull` and `spanish_cull`
 backs gain this line.
 
 The CSS comes from `profile.card_css()`, the value of `templates/shared/card.css`
-plus the language layer, as today. K14 and C15 check it.
+plus the language layer, as today. K14 and R15 check it.
 The romanization field is one shared rule, not one rule per language. A new
 language sets `romanization_source` to the input field that holds the reading.
 The flow adds `Romanization` to the field set. When the source is None, the
@@ -709,7 +709,7 @@ the source of truth (section 14.1). ADR 0015 replaces the naming rows of ADR
   title (ADR 0013).
 - The name holds the name of no input model and no note count.
 - The manifest `source.deck` and `source.model` hold the same value. Gate K9 and
-  gate C10 compare the output with those manifest values.
+  gate R10 compare the output with those manifest values.
 
 ### 14.4 How the output note type is built
 
@@ -916,7 +916,7 @@ languages and both modes, and it keeps the 67 tail cards that do hold a
 target.
 
 Data requirement: the sense file must hold one row for every target of the
-cull list, 300 rows at the default `--target-words`. C17 fails until that
+cull list, 300 rows at the default `--target-words`. R17 fails until that
 file is complete.
 
 ### 14.8 The frequency rank
@@ -948,20 +948,20 @@ reader are the two adapters. The report is
 | K15 `gate_bold` | core | every kept note holds a bold core word in the `Sentence` field |
 | K19 `gate_core_word` (renamed from `gate_gloss`) | core | every note holds a non-empty `Core`, a non-empty `CoreGloss`, and a bold core word; the gloss holds no comma, and the gloss is a coverage gloss of that word |
 | K21 `gate_output_model` (new) | core | the package holds one note type named `manifest.source.model`; its field names equal `output_fields(profile)` in order; it holds one card template; every note holds one card with `ord = 0` |
-| C10 `gate_identity` | cull | as K9 |
-| C15 `gate_card_templates` | cull | the templates of `manifest.source.model` and the CSS classes, as today, on the only note type |
-| C16 `gate_output_model` (new) | cull | as K21 |
-| C17 `gate_core_word` (new) | cull | as K19, with the coverage CSV of the cull as the gloss source |
+| R10 `gate_identity` | cull | as K9 |
+| R15 `gate_card_templates` | cull | the templates of `manifest.source.model` and the CSS classes, as today, on the only note type |
+| R16 `gate_output_model` (new) | cull | as K21 |
+| R17 `gate_core_word` (new) | cull | as K19, with the coverage CSV of the cull as the gloss source |
 
 - K19 keeps its number, so an older gate table still maps. Its name changes
   because it now counts a missing core word, not only a wrong gloss.
 - `CullFiles.output()` gains `fields`, and `write_coverage_csv` gains a
-  `gloss` column, so C17 can compare a note gloss with a coverage gloss:
+  `gloss` column, so R17 can compare a note gloss with a coverage gloss:
   `COVERAGE_COLUMNS = ("word", "rank", "count", "status", "gloss")`.
 - `write_coverage_csv(targets, selection, path, glosses: Mapping[str, str])`
   reads the gloss of a lemma from the sense file.
 - `coreflow.coverage_glosses(rows)` gives the word-to-gloss map of a coverage
-  CSV. K19 and C17 both read it, so a gloss is spelled one way. It replaces
+  CSV. K19 and R17 both read it, so a gloss is spelled one way. It replaces
   `coregates._target_glosses`.
 
 ### 14.10 Tests
@@ -1003,7 +1003,7 @@ The tests that must change:
 | `tests/test_cull_shared.py` | `_profile()` | the new field names, `sense_path`, `romanization_source`; no `output_model_name` or `default_deck_name` |
 | `tests/test_cull_shared.py` | `test_a_second_profile_drives_every_output_value` | assert one note type, the five fields, and the `Core` values |
 | `tests/test_cull_shared.py` | `test_coverage_csv_statuses` | the extra `gloss` column |
-| `tests/test_french_cull.py` | the deck-writer calls, the C10 and C15 tests | the output stem as the deck and note type name; the new C16 and C17 |
+| `tests/test_french_cull.py` | the deck-writer calls, the R10 and R15 tests | the output stem as the deck and note type name; the new R16 and R17 |
 | `tests/test_apkg_package.py` | the `add_model_field` tests | delete with the method |
 | `tests/test_spanish_cull.py` | `test_the_reserve_fields_fit_the_spanish_sentence_model` | five values in the output order |
 | `tests/test_mandarin_core.py` | `test_templates_name_the_audio_field` | `{{Audio}}`, not `{{[a]}}` |
@@ -1036,7 +1036,7 @@ The tests that must change:
 - A note keeps its guid, so Anki matches the note and changes its note type on
   import. A cull import does not delete the notes that the cull drops. That
   limit holds today.
-- A sense file that does not cover the cull target list fails C17. That is a
+- A sense file that does not cover the cull target list fails R17. That is a
   data task, and the gate message names the row count.
 - `docs/core-deck-flow.md` and `docs/cull-deck-flow.md` name the input model
   and the two added fields. The implementer updates the profile field list,

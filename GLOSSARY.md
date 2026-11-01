@@ -179,7 +179,7 @@ _Avoid_: guard, test
 
 **Gate id namespace**:
 The set of gate ids that one flow owns. The pack audit holds `P1` to `P21`, the
-cull deck holds `C1`, `C2`, `C5`, and `C6`, and the core deck holds `K5`, `K6`,
+cull deck holds `R1`, `R2`, `R5`, and `R6`, and the core deck holds `K5`, `K6`,
 `K13`, `K23`, and `K24`. The prefix names the flow. ADR 0057 records the
 owner tables and the map from the old `G` ids (ADR 0027).
 _Avoid_: gate number, bare gate id

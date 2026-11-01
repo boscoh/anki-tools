@@ -1,4 +1,4 @@
-"""Shared gates C1, C2, C5, and C6 of the cull deck. The other ids C3, C4, and C7 to C18 are retired.
+"""Shared gates R1, R2, R5, and R6 of the cull deck. The other ids R3, R4, and R7 to R18 are retired.
 
 The gates read the output APKG, the two CSV files, and the manifest. A gate
 never writes a file. A language package supplies a
@@ -92,7 +92,7 @@ def _exempt_lemmas(files: CullFiles) -> set[str]:
 
 
 def gate_card_cap(files: CullFiles) -> tuple[bool, str]:
-    """C1: the card count is the cap, or the pool has no more cards.
+    """R1: the card count is the cap, or the pool has no more cards.
 
     A kept card that holds no core word leaves the deck, so the count before
     that drop is the value that the gate compares. The pool has no more cards
@@ -118,7 +118,7 @@ def gate_card_cap(files: CullFiles) -> tuple[bool, str]:
 
 
 def gate_use_cap(files: CullFiles) -> tuple[bool, str]:
-    """C2: no non-exempt lemma is in more than the cap of kept cards.
+    """R2: no non-exempt lemma is in more than the cap of kept cards.
 
     A lemma that fails the sense test on a card is not a use of that card.
     """
@@ -155,7 +155,7 @@ def gate_use_cap(files: CullFiles) -> tuple[bool, str]:
 
 
 def gate_filter_recheck(files: CullFiles) -> tuple[bool, str]:
-    """C5: every kept frequency card passes the filter rules.
+    """R5: every kept frequency card passes the filter rules.
 
     A reserve card has its own length window, so the gate skips it.
     """
@@ -186,21 +186,21 @@ def gate_filter_recheck(files: CullFiles) -> tuple[bool, str]:
 
 
 def gate_similarity(files: CullFiles) -> tuple[bool, str]:
-    """C6: no kept card pair reaches the lemma Jaccard limit."""
+    """R6: no kept card pair reaches the lemma Jaccard limit."""
     sets = lemma_sets(files.tokens(), files.profile.content_pos)
     return _gate_similarity(files, sets, SIMILARITY)
 
 
 GATES: tuple[Gate, ...] = (
-    Gate("C1", gate_card_cap),
-    Gate("C2", gate_use_cap),
-    Gate("C5", gate_filter_recheck),
-    Gate("C6", gate_similarity),
+    Gate("R1", gate_card_cap),
+    Gate("R2", gate_use_cap),
+    Gate("R5", gate_filter_recheck),
+    Gate("R6", gate_similarity),
 )
 
 
 def check_cull(output_path: Path, profile: CullProfile) -> int:
-    """Run gates C1, C2, C5, and C6 on a cull output.
+    """Run gates R1, R2, R5, and R6 on a cull output.
 
     :param output_path: Output APKG file.
     :param profile: Language hooks.
