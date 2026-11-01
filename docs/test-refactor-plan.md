@@ -24,7 +24,7 @@ cuts.
 3. **Fake only at the edge.** The edge is network, TTS, ffprobe, and the spaCy
    model. Never patch repo code. If a test must replace repo code, add a seam:
    a keyword argument with the real function as default, and one ADR. `run_fix`
-   is the first case (ADR 0049).
+   is the first case (ADR 0050).
 4. **Prove that a test can fail.** Break production code on purpose. Each kept
    test must fail for at least one break. A break that survives is a gap: add a
    row. The audits ran 72 breaks and found 14 survivors.
@@ -163,7 +163,7 @@ files.
 Done. The owner accepted option A: `run_fix` takes `run_core`, `run_cull`,
 `check_core`, and `check_cull` as keyword arguments, with the real functions as
 defaults. `test_cli_fix.py` has no mocks and tables the routes for all four
-languages. ADR 0049 records the seam.
+languages. ADR 0050 records the seam.
 
 ## 8. Gaps
 
@@ -198,7 +198,5 @@ core selection, because a mutation test already proves those gaps.
 
 ## 10. Out of scope
 
-Two ADR files use the number 0049:
-`0049-fix-route-takes-its-flows.md` and
-`0049-sense-exceptions-compound-rows-and-core-word-check.md`. Renumber the
-newer one.
+The fix-route ADR is `0050-fix-route-takes-its-flows.md`. ADR 0049 is the
+sense-exceptions ADR.
