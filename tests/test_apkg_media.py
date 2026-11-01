@@ -11,6 +11,8 @@ import json
 import zipfile
 from pathlib import Path
 
+import pytest
+
 from anki_tools.apkg.package import AnkiPackage
 from tests.deck_fixture import (
     ANKI21B_NOTE_TYPE,
@@ -147,3 +149,36 @@ def test_the_deck_flow_prunes_and_adds_on_anki21b(tmp_path: Path) -> None:
     assert mapping == {"0": "a0.mp3", "1": "reserve.mp3"}
     assert _media_bytes(deck)[:4] == ZSTD_MAGIC
     assert {name for name in _archive_names(deck) if name.isdigit()} == {"0", "1"}
+
+
+def _orphan(package: AnkiPackage, directory: Path) -> None:
+    (extra,) = write_mp3s(directory, ["orphan.mp3"])
+    package.add_media_file(extra)
+
+
+def _dangling(package: AnkiPackage, _directory: Path) -> None:
+    package.prune_media(package.used_media() - {"note2.mp3"})
+
+
+MEDIA_CASES = [
+    ("built deck", None, True),
+    ("media file no card uses", _orphan, False),
+    ("card audio with no media file", _dangling, False),
+]
+
+
+@pytest.mark.parametrize(("label", "damage", "agrees"), MEDIA_CASES)
+def test_media_list_equals_card_audio(tmp_path: Path, label, damage, agrees) -> None:
+    deck = _anki2_deck(tmp_path)
+
+    with AnkiPackage(deck) as package:
+        if damage:
+            damage(package, tmp_path)
+        package.save()
+
+    with AnkiPackage(deck) as package:
+        media_names = set(package.get_media_mapping().values())
+        card_audio = package.used_media()
+
+    assert card_audio
+    assert (media_names == card_audio) is agrees, label
