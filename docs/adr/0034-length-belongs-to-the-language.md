@@ -23,6 +23,23 @@ of the English text. `FactInput` holds `duplicate`, `unknown_words`, `hits`, and
 
 The Mandarin window stays at 4 to 7 Han characters.
 
+The Cantonese window moves from 3 to 12 to 4 to 7 Han characters, the Mandarin
+window. Both languages use `unit_count` over Han characters. `PREFERRED_MAX_HAN`
+moves from 8 to 7. The input deck of the Cantonese core holds 999 cards. A trial
+run of `anki fix yue --core` with each window gives:
+
+| Window  | Cards passed | Targets | Cards kept | Gates failed |
+| ------- | ------------ | ------- | ---------- | ------------ |
+| 3 to 12 | 889          | 129     | 128        | K6           |
+| 3 to 8  | 827          | 124     | 128        | K4, K6       |
+| 4 to 8  | 749          | 120     | 120        | K4, K6       |
+| 4 to 7  | 655          | 115     | 109        | K6           |
+
+Gate K6 fails on one duplicate card in every run, so it is not an effect of the
+window. Gate K4 (outside words) fails at 3 to 8 and 4 to 8 because the target count
+falls faster than the outside count. The 4 to 7 window passes K4 and keeps 109
+cards, 19 fewer than before.
+
 ## Consequences
 
 The pack tests 8 ids, the cull 7, and the core 7 plus C3 to C5.

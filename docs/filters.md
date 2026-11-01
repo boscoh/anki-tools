@@ -106,7 +106,7 @@ Windows by language, as minimum to maximum:
 | Spanish   | 4 to 10              | 3                     |
 | Greek     | 4 to 10              | 3                     |
 | Mandarin  | 4 to 7               | `FALLBACK_MIN_HAN`    |
-| Cantonese | 3 to 12              | `FALLBACK_MIN_HAN`    |
+| Cantonese | 4 to 7               | `FALLBACK_MIN_HAN`    |
 
 Each language states the window once, in its pack profile. The pack command has
 `--min-words` and `--max-words`. The `fix` select and core modes have the same

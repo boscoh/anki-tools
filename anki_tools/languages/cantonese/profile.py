@@ -97,7 +97,7 @@ OPEN_STATUS = "open"
 KNOWN_WORDS_TOP_N = 1000
 SIMILARITY_LIMIT = 0.67
 PREFERRED_MIN_HAN = 4
-PREFERRED_MAX_HAN = 8
+PREFERRED_MAX_HAN = 7
 FALLBACK_MIN_HAN = 3
 
 FINAL_MARKS = "。？！.!?"
@@ -919,8 +919,8 @@ CANTONESE = register(
             ("Tatoeba audio", "per recording"),
         ),
         extra_css=EXTRA_CSS,
-        min_units=3,
-        max_units=12,
+        min_units=4,
+        max_units=7,
         unit_name="han",
         fallback_min_units=FALLBACK_MIN_HAN,
         preferred_min_units=PREFERRED_MIN_HAN,

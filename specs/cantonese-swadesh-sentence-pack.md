@@ -276,7 +276,7 @@ F12 rules with the Cantonese values below.
 | Rule | Value                                                        |
 | ---- | ------------------------------------------------------------ |
 | F1   | An English link exists                                       |
-| F2   | 3 to 12 Han characters                                       |
+| F2   | 4 to 7 Han characters                                        |
 | F3   | No Latin letter and no digit                                 |
 | F4   | Not a repeated pattern                                       |
 | F5   | One final mark: `。`, `？`, `！`, `.`, `?`, or `!` at the end  |
@@ -285,11 +285,12 @@ F12 rules with the Cantonese values below.
 | F8   | At most one internal mark: `，：；` or the ASCII marks        |
 | F9   | Predicate: off, because no Cantonese tagger exists            |
 | F10  | Orphan conjunction: off, for the same reason                 |
-| F11  | The English text has 2 to 12 words                           |
+| F11  | Retired: the English text length (ADR 0034)                  |
 | F12  | The sentence text is unique                                  |
 
-The 3 to 12 Han character window is a Cantonese value: Cantonese sentences are
-short, so the fallback window of the scaffold tier starts at 3 too.
+The 4 to 7 Han character window is the Mandarin window, because both languages
+count Han characters (ADR 0034). The fallback window of the scaffold tier starts
+at 3.
 
 The known set of the unknown-token budget holds the reviewed forms and the top
 1,000 `wordfreq` Chinese words in Traditional characters. A sentence may hold
@@ -353,7 +354,7 @@ The commands write these files:
 | `ATTRIBUTION.md`                                        | the `## Cantonese pack` section   |
 
 The `sentences` command takes `--min-words` and `--max-words`. Without them the
-profile window applies, which is 3 to 12 for Cantonese and 4 to 10 for Greek
+profile window applies, which is 4 to 7 for Cantonese and 4 to 10 for Greek
 and French.
 
 The back template has `class="sentence char-links"` on the `Sentence`
