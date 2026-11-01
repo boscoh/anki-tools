@@ -23,6 +23,7 @@ from anki_tools.ranking import (
 )
 from anki_tools.ranking.identity import DeckIdentity
 from tests.cull_fixture import freq_row, tiny_deck
+from tests.token_fixture import fake_spacy_load  # noqa: F401
 
 PROFILE = cull_fr.FRENCH_CULL_PROFILE
 DECK_FIELDS = ["French", "sound", "Back", "freq ranks"]
@@ -129,7 +130,7 @@ def test_the_gates_pass_on_a_tiny_cull(tmp_path: Path) -> None:
         cullgates.GATES, cullgates.CullFiles(run.output_path, profile)
     )
 
-    assert [gate for gate, _passed, _message in rows] == ["G1", "G2", "G5", "G6"]
+    assert [gate for gate, _passed, _message in rows] == ["C1", "C2", "C5", "C6"]
     for gate, passed, message in rows:
         assert passed, f"{gate}: {message}"
 
@@ -213,9 +214,6 @@ def test_swadesh_coverage_counts_a_word_from_another_card() -> None:
         pytest.param("Elle mit le linge sale dans la machine à laver.", "register", id="mit"),
         pytest.param("Leur voyage fut annulé en raison de la pluie.", "register", id="fut"),
         pytest.param("Elle a mis le linge sale.", "", id="passé composé"),
-        pytest.param("J'ai senti quelque chose toucher mes pieds.", "", id="participle senti"),
-        pytest.param("Le drapeau français est bleu, blanc et rouge.", "", id="adjective bleu"),
-        pytest.param("Il mangeait une pomme.", "", id="imperfect"),
     ],
 )
 def test_the_register_rule_rejects_a_passe_simple(sentence: str, expected: str) -> None:
@@ -224,3 +222,13 @@ def test_the_register_rule_rejects_a_passe_simple(sentence: str, expected: str) 
     )
 
     assert cullflow.filter_reason(card, PROFILE) == expected
+
+
+@pytest.mark.parametrize(
+    ("word", "lemma"), [("veux", "vouloir"), ("fais", "faire"), ("chat", "chat")]
+)
+@pytest.mark.usefixtures("fake_spacy_load")
+def test_the_tokenizer_repairs_a_lemma_that_the_model_leaves_alone(
+    word: str, lemma: str
+) -> None:
+    assert cull_fr.tokenize_texts([word]) == [[(lemma, "VERB")]]

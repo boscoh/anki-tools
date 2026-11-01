@@ -10,6 +10,7 @@ from collections.abc import Iterable, Iterator
 from types import SimpleNamespace
 
 import pytest
+import spacy
 
 from anki_tools.sentence_pack import tokens
 
@@ -28,6 +29,7 @@ def split_words(text: str) -> list[SimpleNamespace]:
                 pos_="PUNCT" if word in MARKS else "VERB",
                 morph="" if word in MARKS else "VerbForm=Fin",
                 is_punct=word in MARKS,
+                is_alpha=word.isalpha(),
                 idx=idx,
             )
         )
@@ -54,6 +56,16 @@ class FakeNlp:
         self.batch_calls.append((texts, batch_size))
         for text in texts:
             yield split_words(text)
+
+
+@pytest.fixture
+def fake_spacy_load(monkeypatch: pytest.MonkeyPatch) -> Iterator[FakeNlp]:
+    """Replace ``spacy.load``, for the callers that bind ``load_model`` at import."""
+    fake = FakeNlp()
+    tokens.load_model.cache_clear()
+    monkeypatch.setattr(spacy, "load", lambda _name, **_kwargs: fake)
+    yield fake
+    tokens.load_model.cache_clear()
 
 
 @pytest.fixture

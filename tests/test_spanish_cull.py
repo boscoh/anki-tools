@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import pytest
+
 from anki_tools.languages.spanish import cull as cull_es
-from anki_tools.languages.spanish.profile import highlight
+from anki_tools.languages.spanish.lemma import base_lemma
 from anki_tools.ranking import cullflow
 
 
@@ -28,8 +30,9 @@ def test_the_reserve_fields_fit_the_output_note_type() -> None:
     ]
 
 
-def test_the_highlight_bolds_a_clitic_verb() -> None:
-    assert (
-        highlight("Merece la pena intentarlo.", "intentar")
-        == "Merece la pena <b>intentarlo</b>."
-    )
+@pytest.mark.parametrize(
+    ("lemma", "base"),
+    [("hacer \u00e9l", "hacer"), ("hacer", "hacer"), ("hacer algo", "hacer algo")],
+)
+def test_a_trailing_clitic_pronoun_leaves_the_lemma(lemma: str, base: str) -> None:
+    assert base_lemma(lemma) == base
