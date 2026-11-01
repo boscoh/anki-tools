@@ -50,7 +50,7 @@ Shared ranking code only. No language data.
 | `anki_tools/ranking/deckprofile.py` | One language deck profile with two mode views      |
 | `anki_tools/ranking/fixrun.py`    | The one route of the four fix commands                |
 | `anki_tools/ranking/cullflow.py`  | Cull flow behind the `CullProfile` seam               |
-| `anki_tools/ranking/cullgates.py` | Gates G1 to G17 of the cull deck                      |
+| `anki_tools/ranking/cullgates.py` | Gates G1, G2, G5, G6 of the cull deck                 |
 
 `jaccard_similarity`, `compute_similarity_penalties`, and the word metrics of
 `latin.py` are the shared helpers. The core and cull flows call them.

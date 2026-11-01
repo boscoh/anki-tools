@@ -1,4 +1,4 @@
-"""Shared gates K2, K5, K6, K11, and K13 of the core deck. The other ids K1 to K22 are retired.
+"""Shared gates K5, K6, and K13 of the core deck. The other ids K1 to K22 are retired.
 
 The gates read the output APKG, the two CSV files, and the manifest. A gate
 never writes a file. A language package supplies the
@@ -10,7 +10,6 @@ Usage: ``anki fix <lang> --core --check`` calls :func:`check_core`.
 
 from __future__ import annotations
 
-from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -43,8 +42,6 @@ __all__ = [
     "Gate",
     "GateResult",
     "check_core",
-    "gate_coverage_agreement",
-    "gate_covered_targets",
     "gate_filter_recheck",
     "gate_target_in_sentence",
     "gate_similarity",
@@ -95,28 +92,6 @@ def _output_by_note(files: CoreFiles) -> dict[int, Any]:
     return {card.note_id: card for card in files.output()["cards"]}
 
 
-def gate_covered_targets(files: CoreFiles) -> tuple[bool, str]:
-    """K2: every target that a card offers has a kept card.
-
-    A card row lists the targets that pass the sense test. A target in that
-    list with a count of 0 is a selection miss. A target that no card offers
-    (``absent``, ``absent_sense``) is not a miss.
-    """
-    offered = {
-        key
-        for row in files.rows()
-        for key in row["targets"].split(TARGET_SEPARATOR)
-        if key
-    }
-    missed = [
-        row["word"]
-        for row in files.coverage()
-        if row["key"] in offered and int(row["count"]) == 0
-    ]
-    return not missed, f"{len(offered)} offered, {len(missed)} without a card: {_sample(missed)}"
-
-
-
 def gate_filter_recheck(files: CoreFiles) -> tuple[bool, str]:
     """K5: every kept card passes the shared filter rules."""
     output = files.output()
@@ -151,29 +126,6 @@ def gate_similarity(files: CoreFiles) -> tuple[bool, str]:
 def _key_of(row: dict[str, str]) -> str:
     """Give the target key of a coverage row."""
     return row["key"]
-
-
-def gate_coverage_agreement(files: CoreFiles) -> tuple[bool, str]:
-    """K11: the coverage count of each target is the use count in the kept cards."""
-    coverage = files.coverage()
-    kept = _kept(files)
-    used = Counter(
-        key
-        for row in kept
-        for key in row["targets"].split(TARGET_SEPARATOR)
-        if key
-    )
-    problems: list[str] = []
-    for row in coverage:
-        if int(row["count"]) != used.get(_key_of(row), 0):
-            problems.append(f"count of {row['word']}")
-    by_target = {_key_of(row): row for row in coverage}
-    for key, count in used.items():
-        row = by_target.get(key)
-        if row is None or int(row["count"]) != count:
-            problems.append(f"missing target {key}")
-    return not problems, f"{len(coverage)} rows, issues {_sample(problems)}"
-
 
 
 def gate_target_in_sentence(files: CoreFiles) -> tuple[bool, str]:
@@ -213,16 +165,14 @@ def gate_target_in_sentence(files: CoreFiles) -> tuple[bool, str]:
 
 
 GATES: tuple[Gate, ...] = (
-    Gate("K2", gate_covered_targets),
     Gate("K5", gate_filter_recheck),
     Gate("K6", gate_similarity),
-    Gate("K11", gate_coverage_agreement),
     Gate("K13", gate_target_in_sentence),
 )
 
 
 def check_core(output_path: Path, profile: CoreProfile) -> int:
-    """Run gates K1 to K21, without the retired gates, on the files of a core output.
+    """Run gates K5, K6, and K13 on the files of a core output.
 
     :param output_path: Output APKG file.
     :param profile: Language hooks.

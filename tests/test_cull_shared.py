@@ -557,14 +557,18 @@ def test_the_cull_keeps_the_due_of_a_kept_card(tmp_path: Path) -> None:
     ],
 )
 def test_the_use_cap_gate(
-    tmp_path: Path, english: list[str], sources: list[str], passes: bool
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    english: list[str],
+    sources: list[str],
+    passes: bool,
 ) -> None:
+    monkeypatch.setattr(cullgates, "DEFAULT_MAX_USES", 1)
     cards = [
         SimpleNamespace(sentence=f"kat {index}", english=text)
         for index, text in enumerate(english)
     ]
     files = SimpleNamespace(
-        params=lambda: {"max_uses": 1, "exempt_top": 0},
         coverage=list,
         rows=lambda: [
             {"sentence": card.sentence, "source": source, "kept": "1"}
@@ -576,6 +580,26 @@ def test_the_use_cap_gate(
     )
 
     result, message = cullgates.gate_use_cap(files)  # type: ignore
+
+    assert result is passes, message
+
+
+@pytest.mark.parametrize(
+    ("source", "passes"),
+    [
+        pytest.param(cullflow.FREQUENCY_SOURCE, False, id="a short frequency card fails"),
+        pytest.param(cullflow.SWADESH_SOURCE, True, id="a short reserve card is skipped"),
+    ],
+)
+def test_the_filter_gate_skips_a_reserve_card(source: str, passes: bool) -> None:
+    files = SimpleNamespace(
+        rows=lambda: [
+            {"sentence": "kat", "english": "cat", "source": source, "kept": "1"}
+        ],
+        profile=_profile(),
+    )
+
+    result, message = cullgates.gate_filter_recheck(files)  # type: ignore
 
     assert result is passes, message
 

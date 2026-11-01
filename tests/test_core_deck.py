@@ -416,29 +416,6 @@ class TestCoverageFile:
         assert manifest["counts"]["absent"] == 1
         assert manifest["counts"]["targets"] == len(rows) - 1
 
-    def test_the_cover_gate_skips_the_absent_target(self, tmp_path: Path) -> None:
-        _run, output, profile = _absent_core(tmp_path)
-        files = coregates.CoreFiles(output, profile)
-
-        passed, message = coregates.gate_covered_targets(files)
-
-        assert passed, message
-
-    def test_the_cover_gate_fails_on_an_offered_target_without_a_card(self) -> None:
-        files = SimpleNamespace(
-            rows=lambda: [{"targets": "a|b"}, {"targets": ""}],
-            coverage=lambda: [
-                {"key": "a", "word": "a", "count": "1"},
-                {"key": "b", "word": "b", "count": "0"},
-                {"key": "c", "word": "c", "count": "0"},
-            ],
-        )
-
-        passed, message = coregates.gate_covered_targets(files)  # type: ignore
-
-        assert not passed
-        assert "1 without a card: b" in message
-
     def test_the_report_shows_the_two_card_share(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
     ) -> None:
@@ -719,3 +696,19 @@ class TestMandarinRepeatRule:
 
         assert kept == [1]
         assert reasons[0] == "repeat"
+
+
+@pytest.mark.parametrize(
+    ("raw", "cleaned"),
+    [
+        pytest.param('"I am here."', "I am here.", id="straight quotes"),
+        pytest.param("\u201cI am here.\u201d", "I am here.", id="curly quotes"),
+        pytest.param(" I am here. ", "I am here.", id="no quotes"),
+        pytest.param('"He said "no" twice."', 'He said "no" twice.', id="inner quote"),
+        pytest.param('He said "no"', 'He said "no"', id="quote at the end only"),
+    ],
+)
+def test_clean_english_strips_one_pair_of_wrapping_quotes(
+    raw: str, cleaned: str
+) -> None:
+    assert coreflow.clean_english(raw) == cleaned

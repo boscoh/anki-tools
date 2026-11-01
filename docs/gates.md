@@ -20,7 +20,7 @@ checks. A doc row, a report line, and an issue must name the flow with the id.
 | --------------- | ---------------------------------- | ----------------------------------------------- | ----- |
 | Sentence pack   | `anki swadesh pack <lang>`         | G1 to G19, one list for each language           | 15-16 |
 | Cull deck       | `anki fix <lang> <input> --select` | G1, G2, G5, G6                                  | 4     |
-| Core deck       | `anki fix <lang> <input> --core`   | K2, K5, K6, K11, K13                            | 5     |
+| Core deck       | `anki fix <lang> <input> --core`   | K5, K6, K13                                     | 3     |
 | Vocabulary deck | `anki swadesh vocab <lang>`        | none                                            | 0     |
 
 The pack lists differ by language:
@@ -56,14 +56,11 @@ parameter.
 | --- | ------------------------- | --------------------------------------------------------- |
 | G1  | `gate_card_cap`           | The deck has the cap number of cards, or the pool ends.   |
 | G2  | `gate_use_cap`            | No lemma appears in more cards than the cap.              |
-| K2  | `gate_covered_targets`    | Every target that a card offers has a kept card.          |
-| K11 | `gate_coverage_agreement` | Each coverage count is the use count in the kept cards.   |
 | K13 | `gate_target_in_sentence` | Each card sentence holds its target word.                 |
 
-The pack has more checks, for example G10 coverage. The two coverage checks
-(pack G10 and core K2) measure different things and stay separate. The cull has
-no coverage gate (ADR 0045). It has no gate on the share of targets with one
-card or two cards (ADR 0033).
+The pack has more checks, for example G10 coverage. The cull and the core have
+no coverage gate (ADR 0045, ADR 0046). They have no gate on the share of targets
+with one card or two cards (ADR 0033).
 
 ### Retired ids
 
@@ -72,7 +69,7 @@ A removed row leaves a gap in the numbering. The ids are not reused.
 | Flow | Retired ids                                                    | ADR                          |
 | ---- | -------------------------------------------------------------- | ---------------------------- |
 | Cull | G3, G4, G7 to G18                                              | 0033, 0035, 0039 to 0045     |
-| Core | K1, K3, K4, K7 to K10, K12, K14 to K22                         | 0038 to 0044                 |
+| Core | K1 to K4, K7 to K12, K14 to K22                                | 0038 to 0044, 0046           |
 | Pack | sense, attribution, typography, license, and script gates      | 0039                         |
 
 ## 3. The gate contract
@@ -116,8 +113,11 @@ when a pack check must serve a second flow.
 - Cull `G1` checks the cap or the pool end. The pool ends when no passed card
   keeps the reason `max_cards`. The old core `K1` count check is retired
   (ADR 0043).
-- Core `K2` compares the targets that the card rows offer with the coverage
-  counts. A target that no card offers is not a miss (ADR 0043).
+- Cull `G2` and `G6` read their limits from the producer constants, not from
+  the manifest. Cull `G1` reads the cap from the manifest, because the user sets
+  it with `--cards` (ADR 0046).
+- Cull `G5` skips the reserve rows. They have their own length window
+  (ADR 0046).
 - Mandarin `G12` checks the native audio authors, not every sentence author, so
   it holds its own function.
 

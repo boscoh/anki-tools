@@ -19,7 +19,10 @@ from anki_tools.gate_files import GateFileReader, read_notes
 
 from anki_tools.ranking.coreflow import InputCard, read_output
 from anki_tools.ranking.cullflow import (
+    DEFAULT_MAX_USES,
+    EXEMPT_TOP,
     FREQUENCY_SOURCE,
+    SIMILARITY,
     CullProfile,
     filter_reason,
     frequency_senses,
@@ -83,8 +86,7 @@ def _kept_rows(files: CullFiles) -> list[dict[str, str]]:
 
 def _exempt_lemmas(files: CullFiles) -> set[str]:
     """Read the target lemmas that are exempt from the card cap."""
-    top = int(files.params().get("exempt_top", 0))
-    return {row["word"] for row in files.coverage()[:top]}
+    return {row["word"] for row in files.coverage()[:EXEMPT_TOP]}
 
 
 def gate_card_cap(files: CullFiles) -> tuple[bool, str]:
@@ -95,6 +97,8 @@ def gate_card_cap(files: CullFiles) -> tuple[bool, str]:
     when the selection rejected every other passed card by a rule (``similar``,
     ``use_cap``, ``no_gain``). A card with the reason ``max_cards`` was still
     available, so the selection stopped early.
+
+    The cap comes from the manifest, because the user sets it with ``--cards``.
     """
     kept = len(_kept_rows(files))
     dropped = int(files.manifest().get("counts", {}).get("dropped_no_core", 0))
@@ -116,7 +120,7 @@ def gate_use_cap(files: CullFiles) -> tuple[bool, str]:
 
     A lemma that fails the sense test on a card is not a use of that card.
     """
-    limit = int(files.params().get("max_uses", 0))
+    limit = DEFAULT_MAX_USES
     exempt = _exempt_lemmas(files)
     frequency_sentences = {
         row["sentence"]
@@ -149,8 +153,11 @@ def gate_use_cap(files: CullFiles) -> tuple[bool, str]:
 
 
 def gate_filter_recheck(files: CullFiles) -> tuple[bool, str]:
-    """G5: every kept card passes the filter rules."""
-    rows = _kept_rows(files)
+    """G5: every kept frequency card passes the filter rules.
+
+    A reserve card has its own length window, so the gate skips it.
+    """
+    rows = [row for row in _kept_rows(files) if row.get("source") == FREQUENCY_SOURCE]
     problems: list[str] = []
     seen: set[str] = set()
     for row in rows:
@@ -175,9 +182,8 @@ def gate_filter_recheck(files: CullFiles) -> tuple[bool, str]:
 
 def gate_similarity(files: CullFiles) -> tuple[bool, str]:
     """G6: no kept card pair reaches the lemma Jaccard limit."""
-    limit = float(files.params().get("similarity", 0.67))
     sets = lemma_sets(files.tokens(), files.profile.content_pos)
-    return _gate_similarity(files, sets, limit)
+    return _gate_similarity(files, sets, SIMILARITY)
 
 
 GATES: tuple[Gate, ...] = (
@@ -189,7 +195,7 @@ GATES: tuple[Gate, ...] = (
 
 
 def check_cull(output_path: Path, profile: CullProfile) -> int:
-    """Run gates G1 to G17, without the retired gates, on a cull output.
+    """Run gates G1, G2, G5, and G6 on a cull output.
 
     :param output_path: Output APKG file.
     :param profile: Language hooks.

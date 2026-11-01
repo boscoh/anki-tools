@@ -23,9 +23,9 @@ One command runs the stages in order: `anki fix <language> --core`. The
 | K5    | order   | K4                                        | card order, assigned target per card        |
 | K6    | write   | K0, K4, K5                                | APKG and four side files                    |
 
-The gates K1 to K21 run after K6. The table holds 5 rows: K2, K5, K6, K11, and
-K13. The other gate ids are retired (ADR 0038 to 0044). The flow step K4
-is the selection.
+The gates run after K6. The table holds 3 rows: K5, K6, and K13. The other gate
+ids are retired (ADR 0038 to 0044, ADR 0046). The flow step K4 is the
+selection.
 
 The `--cards` and `--words` values change the tier F target count and the
 card cap. The other `CoreRequest` fields keep their defaults.
@@ -33,7 +33,8 @@ card cap. The other `CoreRequest` fields keep their defaults.
 The input fields come from the profile: `input_model_name`,
 `input_sentence_field`, `input_english_field`, and `input_audio_field`. K0
 keeps the lowest card of each note. It cleans the sentence with
-`clean_sentence`.
+`clean_sentence`. It strips one pair of wrapping double quotes from the English
+text (`clean_english`), and the output deck writes the clean value.
 
 K1 drops a card whose audio file is not in the media map of the input APKG
 (`drop_silent_cards` in `ranking/scan.py`). The kept cards get new indices. The
@@ -76,7 +77,7 @@ K5  order: target position, example number, new words, units
 K6  APKG, .core.csv, .coverage.csv, .manifest.json, .rank.csv
         |
         v
-    gates K1 to K21
+    gates K5, K6, K13
 ```
 
 ## 3. Core list (K2)
@@ -298,7 +299,6 @@ The coverage status of a target is one of these values:
 
 | Group      | Gates              | Checks                                                              |
 | ---------- | ------------------ | ------------------------------------------------------------------- |
-| coverage   | K2, K11            | offered targets without a card, coverage count per target           |
 | rules      | K5, K6             | F1 to F9, similarity                                                |
 | cards      | K13                | target in the text                                                  |
 
@@ -314,7 +314,7 @@ The `sense` filter is the one sense test (ADR 0039); no gate repeats it.
 | Path                                            | Content                                    |
 | ----------------------------------------------- | ------------------------------------------ |
 | `anki_tools/ranking/coreflow.py`                | K0 to K6 flow, output field values         |
-| `anki_tools/ranking/coregates.py`               | gates K1 to K21, 5 rows                    |
+| `anki_tools/ranking/coregates.py`               | gates K5, K6, K13, 3 rows                  |
 | `anki_tools/gates.py`                           | gate value, row, runner, reader contract   |
 | `anki_tools/ranking/gates.py`                   | report, shared gates                       |
 | `anki_tools/ranking/assemble.py`                | deck, side files, manifest, report         |

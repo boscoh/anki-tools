@@ -464,6 +464,16 @@ class InputCard:
 
 
 _SOUND_PATTERN = re.compile(r"\[sound:([^\]]+)\]")
+_WRAPPED_QUOTES = re.compile(r'^["“](.*)["”]$', re.DOTALL)
+
+
+def clean_english(text: str) -> str:
+    """Strip the spaces and one pair of wrapping double quotes from English text.
+
+    :param text: Raw English field value.
+    :returns: The text without the wrapping quotes. Inner quotes stay.
+    """
+    return _WRAPPED_QUOTES.sub(r"\1", text.strip())
 
 
 def sound_name(field_value: str) -> str:
@@ -527,7 +537,7 @@ def read_input_deck(
                 InputCard(
                     note_id=note_id,
                     sentence=clean_sentence(values[sentence]),
-                    english=values[english].strip(),
+                    english=clean_english(values[english]),
                     audio=sound.group(1),
                     index=len(cards),
                 )
@@ -559,7 +569,7 @@ def output_values(
     values = {
         OUTPUT_AUDIO_FIELD: value(profile.input_audio_field),
         OUTPUT_SENTENCE_FIELD: sentence,
-        OUTPUT_ENGLISH_FIELD: value(profile.input_english_field),
+        OUTPUT_ENGLISH_FIELD: clean_english(value(profile.input_english_field)),
         OUTPUT_CORE_FIELD: "",
         OUTPUT_GLOSS_FIELD: "",
     }

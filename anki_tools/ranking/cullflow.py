@@ -65,6 +65,7 @@ DEFAULT_MAX_CARDS = 1000
 DEFAULT_TARGET_WORDS = 300
 DEFAULT_MAX_USES = 4
 SIMILARITY = 0.67
+EXEMPT_TOP = 100
 SMALL_COUNT = 5
 UNRANKED_ORDER = 1_000_000
 TOKENIZE_BATCH = 256
@@ -605,7 +606,7 @@ def select_cards(
     *,
     max_cards: int = DEFAULT_MAX_CARDS,
     max_uses: int = DEFAULT_MAX_USES,
-    exempt_top: int = 100,
+    exempt_top: int = EXEMPT_TOP,
     similarity: float = 0.67,
     passed: Sequence[int] | None = None,
     reserved: Sequence[ReserveCard] = (),
@@ -1060,7 +1061,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> deck_writer.RunFiles
         ranks,
         max_cards=request.max_cards,
         max_uses=DEFAULT_MAX_USES,
-        exempt_top=100,
+        exempt_top=EXEMPT_TOP,
         similarity=SIMILARITY,
         passed=passed,
         reserved=reserve,
@@ -1202,7 +1203,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> deck_writer.RunFiles
                     "max_cards": request.max_cards,
                     "target_words": request.target_words,
                     "max_uses": DEFAULT_MAX_USES,
-                    "exempt_top": 100,
+                    "exempt_top": EXEMPT_TOP,
                     "spoken_weight": request.spoken_weight,
                     "min_words": profile.min_units,
                     "max_words": profile.max_units,

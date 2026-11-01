@@ -286,7 +286,10 @@ repeats it.
 
 G2 counts the lemma uses with `sense_lemma_sets`, the same function that
 `select_cards` uses. A lemma that fails the sense test on a card is not a use of
-that card.
+that card. G2 and G6 read their limits from the constants `DEFAULT_MAX_USES`,
+`EXEMPT_TOP`, and `SIMILARITY`, not from the manifest. G1 reads the cap from the
+manifest, because the user sets it with `--cards`. G5 checks the frequency rows
+and skips the reserve rows, which have their own length window (ADR 0046).
 
 G1 passes when the kept count plus `counts.dropped_no_core` reaches the cap. It
 also passes when the pool has no more cards: no unkept row has the reason
@@ -303,7 +306,7 @@ it.
 | Path                                      | Content                                        |
 | ----------------------------------------- | ---------------------------------------------- |
 | `anki_tools/ranking/cullflow.py`          | C0 to C5 flow, profile, selection, values      |
-| `anki_tools/ranking/cullgates.py`         | gates G1 to G17, 4 rows                        |
+| `anki_tools/ranking/cullgates.py`         | gates G1, G2, G5, G6, 4 rows                        |
 | `anki_tools/gates.py`                     | gate value, row, runner, reader contract       |
 | `anki_tools/ranking/gates.py`             | report, shared gates                           |
 | `anki_tools/ranking/assemble.py`          | deck, side files, manifest, report             |
