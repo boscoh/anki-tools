@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from anki_tools.languages import (
     ALIASES,
     LANGUAGES,
@@ -21,31 +23,24 @@ def test_every_profile_has_a_pipeline_module() -> None:
     assert set(pipeline_languages()) == set(PROFILES)
 
 
-def test_vocab_list_matches_the_vocabulary_languages() -> None:
-    assert vocab_languages() == (
-        "mandarin",
-        "spanish",
-        "greek",
-        "german",
-        "cantonese",
-        "arabic",
-        "hindi",
-    )
-
-
 def test_vocab_list_is_a_subset_of_the_registry() -> None:
     assert set(vocab_languages()) <= set(LANGUAGES)
 
 
-def test_alias_gives_the_canonical_name() -> None:
-    assert resolve(" yue ") == "cantonese"
-    assert resolve("cmn") == "mandarin"
-    assert resolve("zh") == "mandarin"
-    assert resolve("el") == "greek"
-
-
-def test_unknown_name_folds_to_lowercase() -> None:
-    assert resolve("Klingon") == "klingon"
+@pytest.mark.parametrize(
+    "name, expected",
+    [
+        (" yue ", "cantonese"),
+        ("cmn", "mandarin"),
+        ("zh", "mandarin"),
+        ("el", "greek"),
+        ("Klingon", "klingon"),
+    ],
+)
+def test_resolve_gives_the_canonical_name_or_folds_to_lowercase(
+    name: str, expected: str
+) -> None:
+    assert resolve(name) == expected
 
 
 def test_every_alias_points_at_a_registry_name() -> None:

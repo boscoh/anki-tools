@@ -4,28 +4,41 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from anki_tools.ranking.identity import DeckIdentity, default_output
 
 
-def test_the_default_output_names_one_stem_per_language_and_mode() -> None:
-    assert default_output("french", "core") == Path("apkg/french_core.apkg")
-    assert default_output("french", "cull") == Path("apkg/french_1000.apkg")
-    assert default_output("spanish", "cull") == Path("apkg/spanish_1000.apkg")
-    assert default_output("french", "pack") == Path("apkg/swadesh_sentences_french.apkg")
-    assert default_output("french", "vocab") == Path("apkg/swadesh_vocab_french.apkg")
+@pytest.mark.parametrize(
+    "language, mode, expected",
+    [
+        ("french", "core", "apkg/french_core.apkg"),
+        ("french", "cull", "apkg/french_1000.apkg"),
+        ("spanish", "cull", "apkg/spanish_1000.apkg"),
+        ("french", "pack", "apkg/swadesh_sentences_french.apkg"),
+        ("french", "vocab", "apkg/swadesh_vocab_french.apkg"),
+    ],
+)
+def test_the_default_output_names_one_stem_per_language_and_mode(
+    language: str, mode: str, expected: str
+) -> None:
+    assert default_output(language, mode) == Path(expected)
 
 
-def test_the_title_and_the_note_type_are_the_title_case_of_the_stem() -> None:
-    identity = DeckIdentity(Path("apkg/french_core.apkg"))
+@pytest.mark.parametrize(
+    "output, stem, title",
+    [
+        ("apkg/french_core.apkg", "french_core", "French Core"),
+        ("apkg/spanish_1000.apkg", "spanish_1000", "Spanish 1000"),
+    ],
+)
+def test_the_title_and_the_note_type_are_the_title_case_of_the_stem(
+    output: str, stem: str, title: str
+) -> None:
+    identity = DeckIdentity(Path(output))
 
-    assert identity.stem == "french_core"
-    assert identity.title == identity.model_name == "French Core"
-
-
-def test_the_title_keeps_a_number_part() -> None:
-    identity = DeckIdentity(Path("apkg/spanish_1000.apkg"))
-
-    assert identity.title == identity.model_name == "Spanish 1000"
+    assert identity.stem == stem
+    assert identity.title == identity.model_name == title
 
 
 def test_the_side_files_take_the_output_stem() -> None:

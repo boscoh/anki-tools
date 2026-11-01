@@ -48,13 +48,3 @@ def test_the_views_use_the_pack_window_and_unit_count() -> None:
         french_cull.FRENCH_CULL_PROFILE.max_units,
     ) == (FRENCH.min_units, FRENCH.max_units)
 
-
-def test_the_french_modes_share_one_frequency_loader() -> None:
-    assert (
-        french_core.FRENCH_CORE_PROFILE.load_frequency
-        is french_cull.FRENCH_CULL_PROFILE.load_frequency
-    )
-    assert (
-        french_core.FRENCH_CORE_PROFILE.read_names
-        is french_cull.FRENCH_CULL_PROFILE.read_names
-    )

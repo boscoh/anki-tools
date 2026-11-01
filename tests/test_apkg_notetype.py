@@ -5,6 +5,8 @@ The tests give raw protobuf bytes and open no package.
 
 from __future__ import annotations
 
+import pytest
+
 from anki_tools.apkg import notetype
 
 # Leading bytes of the note type config of "Spanish sentences cloze+" in
@@ -42,10 +44,8 @@ def test_the_parser_reads_the_kind_and_the_sort_index() -> None:
 def test_a_config_with_a_two_byte_tag_copies_whole() -> None:
     """Anki writes field 255, so a tag can hold more than one byte."""
     clone = notetype.clone(CONFIG, ".card { color: red }", 1)
-    with_kind = notetype.with_kind(CONFIG, 2)
 
     assert clone.endswith(FIELD_255)
-    assert FIELD_255 in with_kind
     assert notetype.parse(clone).css == ".card { color: red }"
 
 
@@ -58,20 +58,25 @@ def test_with_css_replaces_the_css_in_place() -> None:
     assert out == bytes([0x08, 0x01, 0x10, 0x02, 0x1A, 0x03]) + b"new" + FIELD_255
 
 
-def test_with_kind_replaces_the_kind_in_its_place() -> None:
-    """The kind stays where the input holds it, and the CSS goes last."""
-    out = notetype.with_kind(CONFIG, 2)
-
-    assert out == bytes([0x08, 0x02]) + FIELD_255 + bytes([0x1A, len(CSS)]) + CSS
-
-
-def test_with_kind_adds_a_kind_that_the_input_lacks() -> None:
-    """A config with no kind field gets one at the end, before the CSS."""
-    config = bytes([0x1A, len(CSS)]) + CSS + FIELD_255
-
-    out = notetype.with_kind(config, 1)
-
-    assert out == FIELD_255 + bytes([0x08, 0x01, 0x1A, len(CSS)]) + CSS
+@pytest.mark.parametrize(
+    "config, kind, expected",
+    [
+        pytest.param(
+            CONFIG,
+            2,
+            bytes([0x08, 0x02]) + FIELD_255 + bytes([0x1A, len(CSS)]) + CSS,
+            id="replaces-the-kind-in-place-and-the-css-goes-last",
+        ),
+        pytest.param(
+            bytes([0x1A, len(CSS)]) + CSS + FIELD_255,
+            1,
+            FIELD_255 + bytes([0x08, 0x01, 0x1A, len(CSS)]) + CSS,
+            id="adds-a-missing-kind-before-the-css",
+        ),
+    ],
+)
+def test_with_kind_writes_the_kind(config: bytes, kind: int, expected: bytes) -> None:
+    assert notetype.with_kind(config, kind) == expected
 
 
 def test_clone_writes_the_sort_index_and_the_css_first() -> None:
