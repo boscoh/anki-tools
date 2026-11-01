@@ -184,7 +184,7 @@ file:
 ```bash
 uv run anki inspect cards apkg/swadesh_vocab_mandarin.apkg
 uv run anki inspect decks apkg/swadesh_vocab_mandarin.apkg
-uv run anki inspect models apkg/swadesh_vocab_mandarin.apkg --verbose
+uv run anki inspect models apkg/swadesh_vocab_mandarin.apkg
 uv run anki inspect audio apkg/swadesh_vocab_mandarin.apkg
 ```
 

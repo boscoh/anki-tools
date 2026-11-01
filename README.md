@@ -167,16 +167,14 @@ Rules:
 to see every card type with sample data. The command reads the real template
 and CSS files. Run it again after a template edit.
 
-- `--open-browser` opens the file after the write. `--output <path>` writes
-  another file.
+- `--output <path>` writes another file.
 - `--apkg <path>` previews the real cards of a package. The command reads the
   note fields, the card templates, and the model CSS of that file. It also
   extracts the media files, so the audio controls play and the images show.
 - The package preview shows 50 cards by default. `--limit 0` shows every card.
   `--deck <text>` selects a deck and `--search <text>` selects a field value.
-- `--no-media` keeps the audio placeholders. The media files go to a directory
-  named after the HTML file, for example `preview/deck_media/`. Use
-  `--media-dir <path>` to select another directory.
+- The media files go to a directory named after the HTML file, for example
+  `preview/deck_media/`.
 
 ```bash
 uv run anki preview --apkg deck.apkg --output preview/deck.html
@@ -491,11 +489,10 @@ License 2.0, and the input audio under the license of the source deck.
 ```python
 from anki_tools import AnkiPackage
 
-# Read and extract audio
+# Read cards and audio statistics
 with AnkiPackage('deck.apkg') as reader:
     cards = reader.get_cards()
     stats = reader.get_audio_statistics()
-    reader.extract_audio_files('./audio_output')
 
     # Add an audio file to the package
     filename = reader.add_media_file('/path/to/audio.mp3')
@@ -518,8 +515,7 @@ with AnkiPackage('deck.apkg') as reader:
 Reading: `get_decks()`, `get_models()`, `get_notes()`, `get_cards()`,
 `parse_card()`.
 
-Audio: `get_media_mapping()`, `extract_audio_files()`,
-`get_audio_statistics()`, `add_media_file()`.
+Audio: `get_media_mapping()`, `get_audio_statistics()`, `add_media_file()`.
 
 Editing: `update_note_field()`, `move_card()`, `delete_card()`,
 `delete_cards()`, `save()`.

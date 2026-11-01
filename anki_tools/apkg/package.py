@@ -929,35 +929,6 @@ class AnkiPackage:
         """
         media.prune(self, used)
 
-    def extract_audio_files(
-        self, output_dir: str | Path, audio_only: bool = True
-    ) -> dict[str, str]:
-        """
-        Extract media files from .apkg to output directory.
-
-        :param output_dir: Destination directory for extracted files.
-        :param audio_only: If True, only extract audio files (.mp3, .wav, .ogg).
-        :returns: Dict mapping filenames to extracted file paths.
-        """
-        os.makedirs(output_dir, exist_ok=True)
-        mapping = self.get_media_mapping()
-        extracted = {}
-
-        for file_id, filename in mapping.items():
-            # Filter for audio files if requested
-            if audio_only and not filename.endswith((".mp3", ".wav", ".ogg")):
-                continue
-
-            src = os.path.join(self._open_temp_dir(), file_id)
-            if not os.path.exists(src):
-                continue
-
-            dst = os.path.join(output_dir, filename)
-            shutil.copy2(src, dst)
-            extracted[filename] = dst
-
-        return extracted
-
     def get_audio_statistics(self) -> dict:
         """
         Get statistics about audio files in the package.

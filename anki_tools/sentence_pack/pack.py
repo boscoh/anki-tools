@@ -22,8 +22,6 @@ from anki_tools.apkg.deck_writer import sha256_value
 from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.sentence_pack.audio import (
     NATIVE_LICENSE_BLOCK,
-    PRIVATE_PACK,
-    PUBLIC_PACK,
 )
 from anki_tools.sentence_pack.profile import (
     LanguageProfile,
@@ -195,12 +193,11 @@ def audio_license_source(tsv_path: Path) -> dict[str, int]:
 
 
 def skipped_license_counts(
-    rows: Iterable[dict[str, str]], pack_license: str = PUBLIC_PACK
+    rows: Iterable[dict[str, str]],
 ) -> dict[str, int]:
     """Count the native recordings that this build leaves out.
 
     :param rows: Sentence CSV rows.
-    :param pack_license: ``public`` or ``private``.
     :returns: Empty-license and CC BY-NC 4.0 counts of the skipped files.
     """
     counts = {key: 0 for key in LICENSE_KEYS}
@@ -213,7 +210,7 @@ def skipped_license_counts(
         license_text = row.get("audio_license", "").strip()
         if not license_text:
             counts["empty"] += 1
-        elif license_text == NATIVE_LICENSE_BLOCK and pack_license != PRIVATE_PACK:
+        elif license_text == NATIVE_LICENSE_BLOCK:
             counts[NATIVE_LICENSE_BLOCK] += 1
     return counts
 
@@ -392,7 +389,6 @@ def build_manifest(
     identity: DeckIdentity,
     word_csv: Path,
     csv_path: Path,
-    pack_license: str = PUBLIC_PACK,
 ) -> dict[str, Any]:
     """Build the manifest mapping of one pack.
 
@@ -403,7 +399,6 @@ def build_manifest(
     :param identity: Identity of the output package, which names the deck.
     :param word_csv: Reviewed word CSV.
     :param csv_path: Sentence CSV.
-    :param pack_license: ``public`` or ``private``.
     :returns: The manifest mapping.
     """
     targets = {row["target"] for row in rows}
@@ -429,8 +424,7 @@ def build_manifest(
             "core_with_card": round(len(concepts) / profile.core_concepts, 4),
         },
         "voice": index.voice,
-        "pack_license": pack_license,
-        "audio_license_skipped": skipped_license_counts(rows, pack_license),
+        "audio_license_skipped": skipped_license_counts(rows),
     }
     manifest.update(profile.extra_manifest(rows))
     manifest["files"] = {
@@ -455,7 +449,6 @@ def build_pack(
     output: Path | None = None,
     manifest_path: Path | None = None,
     attribution_path: Path = ATTRIBUTION_PATH,
-    pack_license: str = PUBLIC_PACK,
     css_path: Path = CSS_PATH,
 ) -> dict[str, Any]:
     """Build the APKG file, the manifest, and the attribution file.
@@ -468,7 +461,6 @@ def build_pack(
     :param output: Path of the APKG file to write, default the pack default.
     :param manifest_path: Path of the manifest JSON file, default the side file.
     :param attribution_path: Path of the attribution Markdown file to write.
-    :param pack_license: ``public`` or ``private``.
     :param css_path: Base card CSS file.
     :raises FileNotFoundError: The audio index or a media file is missing.
     :returns: The written paths, the media count, the skipped card count, and
@@ -544,7 +536,6 @@ def build_pack(
         identity=identity,
         word_csv=word_csv,
         csv_path=csv_path,
-        pack_license=pack_license,
     )
     manifest["counts"]["no_target"] = no_target
     files = deck_writer.write_deck(

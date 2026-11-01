@@ -195,7 +195,6 @@ def test_pack_manifest_counts(pack_env: dict[str, Path]) -> None:
     }
     assert manifest["coverage"] == {"core_with_card": round(2 / SWADESH_ROWS, 4)}
     assert manifest["voice"] == "gtts:zh-CN"
-    assert manifest["pack_license"] == "public"
     assert manifest["audio_license_skipped"] == {"empty": 0, "CC BY-NC 4.0": 0}
     source = manifest["audio_license_source"]
     assert set(source) == {"empty", "CC BY-NC 4.0"}

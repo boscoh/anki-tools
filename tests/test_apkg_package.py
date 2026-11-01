@@ -20,7 +20,6 @@ from tests.deck_fixture import (
     ANKI21B_FIELDS,
     ANKI21B_NOTE_TYPE,
     ANKI21B_NOTE_TYPE_NAME,
-    MP3_STUB,
     build_anki21b_deck,
 )
 
@@ -87,18 +86,6 @@ def test_the_deck_references_every_media_file(package: AnkiPackage) -> None:
     used = set().union(*_note_audio(package).values())
 
     assert media == used
-
-
-def test_the_extraction_writes_every_mapped_audio_file(
-    package: AnkiPackage, tmp_path: Path
-) -> None:
-    extracted = package.extract_audio_files(tmp_path, audio_only=True)
-    media = set(package.get_media_mapping().values())
-
-    assert set(extracted) == {name for name in media if name.endswith(AUDIO_SUFFIXES)}
-    assert extracted
-    for path in extracted.values():
-        assert Path(path).stat().st_size == len(MP3_STUB)
 
 
 def test_delete_card_removes_the_note_and_its_exclusive_audio(

@@ -13,7 +13,6 @@ import importlib.util
 import os
 import re
 import shutil
-import webbrowser
 from pathlib import Path
 from typing import Annotated, Callable, Literal
 
@@ -136,11 +135,10 @@ def decks(apkg_path: Path):
 
 
 @inspect_app.command
-def models(apkg_path: Path, *, verbose: bool = False):
+def models(apkg_path: Path):
     """List note types (models) and their fields.
 
     :param apkg_path: Path to .apkg file.
-    :param verbose: If True, show all model details.
     """
     with AnkiPackage(str(apkg_path)) as pkg:
         models = pkg.get_models()
@@ -156,13 +154,6 @@ def models(apkg_path: Path, *, verbose: bool = False):
             print(f"    ID: {model_id}")
             print(f"    Fields: {', '.join(fields)}")
             print(f"    Templates: {', '.join(templates)}")
-
-            if verbose:
-                print(f"    CSS length: {len(model_info.get('css', ''))}")
-                for tmpl in model_info.get("tmpls", []):
-                    print(f"    Template '{tmpl['name']}':")
-                    print(f"      Front: {len(tmpl.get('qfmt', ''))} chars")
-                    print(f"      Back: {len(tmpl.get('afmt', ''))} chars")
             print()
 
 
@@ -237,11 +228,10 @@ def fields(apkg_path: Path, model_name: str | None = None):
 
 
 @inspect_app.command
-def audio(apkg_path: Path, *, extract: Path | None = None):
-    """Show audio/media statistics and optionally extract files.
+def audio(apkg_path: Path):
+    """Show audio/media statistics.
 
     :param apkg_path: Path to .apkg file.
-    :param extract: Directory to extract audio files to.
     """
     with AnkiPackage(str(apkg_path)) as pkg:
         stats = pkg.get_audio_statistics()
@@ -252,14 +242,6 @@ def audio(apkg_path: Path, *, extract: Path | None = None):
         print(f"  Image files: {stats['image_files']}")
         print(f"  Audio formats: {stats['audio_formats']}")
         print()
-
-        if extract:
-            extracted = pkg.extract_audio_files(str(extract))
-            print(f"Extracted {len(extracted)} audio files to: {extract}")
-            for filename in list(extracted.keys())[:10]:
-                print(f"  {filename}")
-            if len(extracted) > 10:
-                print(f"  ... and {len(extracted) - 10} more")
 
 
 @inspect_app.command
@@ -572,8 +554,6 @@ def pack(
     max_cards: int = 450,
     native_audio: str = "none",
     voice: str = "",
-    slow_audio: bool = False,
-    pack_license: str = "public",
     tts: str = "",
 ) -> None:
     """Build one Swadesh sentence pack from the Tatoeba exports (S0 to S5).
@@ -588,8 +568,6 @@ def pack(
     :param max_cards: Hard card cap.
     :param native_audio: Tatoeba tier: none, auto, or only.
     :param voice: TTS voice name. The profile default applies when empty.
-    :param slow_audio: Generate the slow variant.
-    :param pack_license: public or private.
     :param tts: TTS engine, gtts or edge. The installed engine applies when
         empty.
     """
@@ -616,13 +594,11 @@ def pack(
         entry.profile,
         native_audio=native_audio,
         voice=voice,
-        slow_audio=slow_audio,
-        pack_license=pack_license,
         tts=tts,
     )
     if stage == "audio":
         return
-    _language_pack(entry.module, entry.profile, pack_license=pack_license)
+    _language_pack(entry.module, entry.profile)
 
 
 @swadesh_app.command
@@ -694,8 +670,6 @@ def _language_audio(
     profile,
     native_audio: str,
     voice: str,
-    slow_audio: bool,
-    pack_license: str,
     tts: str,
 ) -> None:
     """Generate and validate the audio files of one sentence pack.
@@ -704,8 +678,6 @@ def _language_audio(
     :param profile: Language profile of the pack.
     :param native_audio: Tatoeba tier: none, auto, or only.
     :param voice: TTS voice name.
-    :param slow_audio: Generate the slow variant.
-    :param pack_license: public or private.
     :param tts: TTS engine, gtts or edge.
     """
     if tts and tts not in ("gtts", "edge"):
@@ -724,8 +696,6 @@ def _language_audio(
             profile,
             voice=voice or profile.voice,
             native_audio=native_audio,
-            slow_audio=slow_audio,
-            pack_license=pack_license,
             engine=engine,
             csv_path=module.SENTENCES_PATH,
         )
@@ -745,17 +715,15 @@ def _language_audio(
         print(f"wrote {result['csv_path']}")
 
 
-def _language_pack(module, profile, pack_license: str) -> None:
+def _language_pack(module, profile) -> None:
     """Build the APKG file, the manifest, and the attribution of one pack.
 
     :param module: Language module of the pack.
     :param profile: Language profile of the pack.
-    :param pack_license: public or private.
     """
     result = sentence_pack.build_pack(
         profile,
         module.load_word_table,
-        pack_license=pack_license,
     )
     counts = result["manifest"]["counts"]
     print(
@@ -780,9 +748,6 @@ def preview(
     limit: int = 50,
     deck: str | None = None,
     search: str | None = None,
-    media: bool = True,
-    media_dir: Path | None = None,
-    open_browser: bool = False,
 ):
     """Build a browser preview of the card templates or of a package.
 
@@ -795,9 +760,6 @@ def preview(
     :param limit: Maximum card count of the package preview. Zero shows all.
     :param deck: Only show package cards of a deck with this text.
     :param search: Only show package cards with a field that holds this text.
-    :param media: Extract media and link it in the page.
-    :param media_dir: Directory for the extracted media files.
-    :param open_browser: Open the written file in the default browser.
     """
     if apkg is None:
         cards, sections = write_preview(output)
@@ -809,16 +771,12 @@ def preview(
             limit=limit,
             deck=deck,
             search=search,
-            extract_media=media,
-            media_dir=media_dir,
         )
         print(
             f"wrote {result.output_path} with {result.cards} of "
             f"{result.total} cards in {result.sections} sections and "
             f"{result.media} media files"
         )
-    if open_browser:
-        webbrowser.open(Path(output).resolve().as_uri())
 
 
 def main() -> None:

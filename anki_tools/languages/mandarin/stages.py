@@ -103,13 +103,10 @@ DEFAULT_VOICE = MANDARIN.voice
 GTTS_VOICE = MANDARIN.gtts_voice
 GTTS_LANG = MANDARIN.tts_lang
 RATE_NORMAL = shared_audio.RATE_NORMAL
-RATE_SLOW = shared_audio.RATE_SLOW
 MIN_DURATION_S = shared_audio.MIN_DURATION_S
 MAX_DURATION_S = shared_audio.MAX_DURATION_S
 MAX_ATTEMPTS = shared_audio.MAX_ATTEMPTS
 RETRY_DELAYS = shared_audio.RETRY_DELAYS
-PUBLIC_PACK = shared_audio.PUBLIC_PACK
-PRIVATE_PACK = shared_audio.PRIVATE_PACK
 NATIVE_LICENSE_BLOCK = shared_audio.NATIVE_LICENSE_BLOCK
 INDEX_FIELDS = shared_audio.INDEX_FIELDS
 time = shared_audio.time
@@ -261,7 +258,6 @@ def build_mandarin_pack(
     output: Path = OUTPUT_PATH,
     manifest_path: Path = MANIFEST_PATH,
     attribution_path: Path = ATTRIBUTION_PATH,
-    pack_license: str = shared_pack.PUBLIC_PACK,
 ) -> dict[str, Any]:
     """Build the APKG file, the manifest, and the attribution file.
 
@@ -271,7 +267,6 @@ def build_mandarin_pack(
     :param output: Path of the APKG file to write.
     :param manifest_path: Path of the manifest JSON file to write.
     :param attribution_path: Path of the attribution Markdown file to write.
-    :param pack_license: ``public`` or ``private``.
     :raises FileNotFoundError: The audio index or a media file is missing.
     :returns: The written paths, the media count, the skipped card count, and
         the manifest mapping.
@@ -285,7 +280,6 @@ def build_mandarin_pack(
         output=output,
         manifest_path=manifest_path,
         attribution_path=attribution_path,
-        pack_license=pack_license,
     )
     result["attribution_path"] = str(attribution_path)
     return result

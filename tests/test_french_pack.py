@@ -373,12 +373,11 @@ def test_audio_file_names_are_deterministic() -> None:
         "Je voudrais un verre d'eau.", "gtts:fr", "-10%", "tts", 0
     ) == (f"tts_{first}.mp3")
     assert audio.word_audio_name("eau", "gtts:fr", "-10%").startswith("word_")
-    assert audio.choose_source({}, "none", "public", french.FRENCH) == "tts"
+    assert audio.choose_source({}, "none", french.FRENCH) == "tts"
     assert (
         audio.choose_source(
             {"audio_id": "9", "audio_license": "CC BY-NC 4.0"},
             "auto",
-            "public",
             french.FRENCH,
         )
         == "tts"

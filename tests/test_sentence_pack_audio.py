@@ -119,7 +119,6 @@ def test_generate_audio_retries_a_failed_native_fetch(
         make_profile(tmp_path, native=True),
         audio_dir=tmp_path / "audio",
         native_audio="auto",
-        pack_license="public",
         rate_limit=0.0,
         probe=lambda path: 1.5,
         synthesize=write_synthesizer([]),
@@ -181,11 +180,11 @@ def test_generate_audio_writes_files_index_and_csv(tmp_path: Path) -> None:
 def test_synthesize_tts_writes_engine_bytes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    saved: list[tuple[str, str, bool]] = []
+    saved: list[tuple[str, str]] = []
 
     class FakeGtts:
-        def __init__(self, text: str, lang: str, slow: bool) -> None:
-            saved.append((text, lang, slow))
+        def __init__(self, text: str, lang: str) -> None:
+            saved.append((text, lang))
 
         def save(self, dest: str) -> None:
             Path(dest).write_bytes(MP3_BYTES)
@@ -195,8 +194,8 @@ def test_synthesize_tts_writes_engine_bytes(
     dest = tmp_path / "one.mp3"
 
     audio.synthesize_tts(
-        "alpha", dest, voice=VOICE, rate=RATE, slow=True, profile=make_profile(tmp_path)
+        "alpha", dest, voice=VOICE, rate=RATE, profile=make_profile(tmp_path)
     )
 
     assert dest.read_bytes() == MP3_BYTES
-    assert saved == [("alpha", "xx", True)]
+    assert saved == [("alpha", "xx")]

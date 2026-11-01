@@ -26,14 +26,11 @@ AUDIO_INDEX_NAME = "index.csv"
 TATOEBA_AUDIO_URL = "https://tatoeba.org/audio/download/{audio_id}"
 
 RATE_NORMAL = "-10%"
-RATE_SLOW = "-25%"
 MIN_DURATION_S = 0.4
 MAX_DURATION_S = 15.0
 MAX_ATTEMPTS = 3
 RETRY_DELAYS = (2.0, 4.0)
 DOWNLOAD_TIMEOUT = 120
-PUBLIC_PACK = "public"
-PRIVATE_PACK = "private"
 NATIVE_LICENSE_BLOCK = "CC BY-NC 4.0"
 
 INDEX_FIELDS = [
@@ -114,24 +111,12 @@ def effective_voice(voice: str, profile: LanguageProfile, engine: str) -> str:
     return voice if engine == "edge" else profile.gtts_voice
 
 
-def audio_rate(slow_audio: bool) -> str:
-    """Select the rate string.
-
-    :param slow_audio: Use the slow variant.
-    :returns: ``-25%`` for a slow file, else ``-10%``.
-    """
-    return RATE_SLOW if slow_audio else RATE_NORMAL
-
-
-def license_allows(audio_license: str, pack_license: str) -> bool:
-    """Check whether a recording license fits the pack license.
+def license_allows(audio_license: str) -> bool:
+    """Check whether a recording license lets the recording enter the pack.
 
     :param audio_license: Recording license text from the CSV or empty.
-    :param pack_license: ``public`` or ``private``.
     :returns: True when the recording may enter the pack.
     """
-    if pack_license == PRIVATE_PACK:
-        return True
     text = audio_license.strip()
     return bool(text) and text != NATIVE_LICENSE_BLOCK
 
@@ -139,14 +124,12 @@ def license_allows(audio_license: str, pack_license: str) -> bool:
 def choose_source(
     row: dict[str, str],
     native_audio: str,
-    pack_license: str,
     profile: LanguageProfile | None = None,
 ) -> str:
     """Choose the audio tier for one card row.
 
     :param row: One sentence CSV row.
     :param native_audio: ``none``, ``auto``, or ``only``.
-    :param pack_license: ``public`` or ``private``.
     :param profile: Language profile. A profile without a native tier forces TTS.
     :raises ValueError: The language has no native tier but ``auto`` or ``only``
         is set.
@@ -164,7 +147,7 @@ def choose_source(
     audio_id = str(row.get("audio_id", "")).strip()
     if not audio_id or audio_id == "0":
         return "tts"
-    if not license_allows(row.get("audio_license", ""), pack_license):
+    if not license_allows(row.get("audio_license", "")):
         return "tts"
     return "native"
 
@@ -244,7 +227,6 @@ def synthesize_tts(
     dest: Path,
     voice: str,
     rate: str,
-    slow: bool,
     profile: LanguageProfile | None = None,
 ) -> None:
     """Write one TTS file.
@@ -253,7 +235,6 @@ def synthesize_tts(
     :param dest: Destination MP3 file.
     :param voice: Requested edge-tts voice.
     :param rate: Engine rate string.
-    :param slow: Slow flag for the gTTS engine.
     :param profile: Language profile, which supplies the gTTS language.
     """
     if tts_engine() == "edge":
@@ -271,7 +252,7 @@ def synthesize_tts(
     from gtts import gTTS
 
     lang = profile.tts_lang if profile is not None else ""
-    gTTS(text=text, lang=lang, slow=slow).save(str(dest))
+    gTTS(text=text, lang=lang).save(str(dest))
 
 
 def download_native(audio_id: int | str, dest: Path) -> None:
@@ -425,8 +406,6 @@ def generate_audio(
     audio_dir: Path | None = None,
     voice: str | None = None,
     native_audio: str = "none",
-    slow_audio: bool = False,
-    pack_license: str = PUBLIC_PACK,
     rate_limit: float = 1.0,
     refresh: bool = False,
     csv_path: Path | None = None,
@@ -441,8 +420,6 @@ def generate_audio(
     :param audio_dir: Output directory for the MP3 files and the index.
     :param voice: Requested edge-tts voice.
     :param native_audio: ``none``, ``auto``, or ``only``.
-    :param slow_audio: Generate the slow variant.
-    :param pack_license: ``public`` or ``private``.
     :param rate_limit: Minimum seconds between two requests.
     :param refresh: Ignore the existing files and generate them again.
     :param csv_path: Sentence CSV to rewrite, or None to skip the rewrite.
@@ -454,8 +431,7 @@ def generate_audio(
     audio_dir = Path(audio_dir) if audio_dir is not None else profile.audio_dir
     audio_dir.mkdir(parents=True, exist_ok=True)
     engine_voice = effective_voice(voice or profile.voice, profile, engine)
-    rate = audio_rate(slow_audio)
-    slow = slow_audio
+    rate = RATE_NORMAL
 
     state: dict[str, float] = {}
     entries: list[dict[str, Any]] = []
@@ -471,7 +447,7 @@ def generate_audio(
     }
 
     for row in rows:
-        source = choose_source(row, native_audio, pack_license, profile)
+        source = choose_source(row, native_audio, profile)
         audio_id = int(row["audio_id"]) if source == "native" else 0
         license_text = (
             row.get("audio_license", "").strip() if source == "native" else ""
@@ -487,7 +463,6 @@ def generate_audio(
                 sentence,
                 voice=engine_voice,
                 rate=rate,
-                slow=slow,
                 profile=profile,
             )
         ok, duration, error, generated = _produce_file(
@@ -532,7 +507,6 @@ def generate_audio(
             word,
             voice=engine_voice,
             rate=rate,
-            slow=slow,
             profile=profile,
         )
         ok, duration, error, generated = _produce_file(
