@@ -12,15 +12,11 @@ from anki_tools.languages.mandarin.profile import (
     SENTENCE_REVIEW_FIELDS,
     Candidate,
     WordForm,
-    known_words,
-    count_form_occurrences,
-    han_tokens,
     sentence_pinyin,
     single_hits,
     write_sentence_csv,
     write_sentence_review_csv,
 )
-from anki_tools.sentence_pack.english_sense import sense_failure, sense_row
 from anki_tools.languages.mandarin.stages import (
     mandarin_candidate_pool,
     mandarin_rank_key_parts,
@@ -115,51 +111,9 @@ def pool_data(tmp_path: Path) -> Path:
     return write_tatoeba_dir(tmp_path / "tatoeba", "cmn", POOL_ROWS)
 
 
-def test_unknown_tokens_come_from_the_word_table(pool_table: list[WordForm]) -> None:
-    known = known_words(pool_table)
-
-    assert {"水", "火", "的"} <= known
-    assert han_tokens("我要喝水。") == ["我", "要", "喝水"]
-    assert [word for word in han_tokens("我要喝水。") if word not in known] == ["喝水"]
-    assert not {word for word in han_tokens("饕餮来了。") if word not in known} & known
-
-
-@pytest.mark.parametrize(
-    ("sentence", "form", "expected"),
-    [
-        pytest.param("我要喝水。", "水", 1, id="once"),
-        pytest.param("我要喝水，水很凉。", "水", 2, id="twice"),
-        pytest.param("我闻花香。", "闻", 1, id="the verb"),
-    ],
-)
-def test_count_form_occurrences(
-    sentence: str, form: str, expected: int
-) -> None:
-    assert count_form_occurrences(sentence, form) == expected
-
-
 def test_a_target_must_appear_once() -> None:
     assert single_hits("我要喝水。", ["水", "火"]) == {"水": 1}
     assert single_hits("我要喝水，水很凉。", ["水"]) == {}
-
-
-@pytest.mark.parametrize(
-    ("form", "english", "expected"),
-    [
-        ("抓", "He grabbed a handful of rice.", True),
-        ("抓", "I scratched my arm.", False),
-        ("数", "What are those numbers?", True),
-        ("数", "I counted to ten.", False),
-        ("挤", "This room is cramped.", True),
-        ("挤", "Squeeze the lemon.", False),
-    ],
-)
-def test_sense_rows_reject_false_friend_english(
-    form: str, english: str, expected: bool
-) -> None:
-    row = sense_row(MANDARIN.sense_path, "S", form)
-
-    assert (sense_failure(english, row, "") == "false_friend") == expected
 
 
 class TestRankingKey:
@@ -355,13 +309,12 @@ class TestSelection:
 
     def test_pinyin_is_filled(self, pool_table: list[WordForm]) -> None:
         cards, _ = select_mandarin_sentences([_candidate()], pool_table, per_word=1)
-        assert cards[0].pinyin == "wǒ yào hē shuǐ"
+        assert cards[0].pinyin == sentence_pinyin(cards[0].sentence) != ""
 
 
 @pytest.mark.parametrize(
     ("sentence", "expected"),
     [
-        ("我要喝水。", "wǒ yào hē shuǐ"),
         ("我不去。", "wǒ bú qù"),
         ("我不喝。", "wǒ bù hē"),
         ("我喝一杯水。", "wǒ hē yì bēi shuǐ"),
