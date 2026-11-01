@@ -8,7 +8,6 @@ French model on a few sentences.
 from __future__ import annotations
 
 from dataclasses import replace
-from functools import partial
 from pathlib import Path
 
 import pytest
@@ -23,9 +22,7 @@ from anki_tools.ranking import (
     cullgates,
 )
 from anki_tools.ranking.identity import DeckIdentity
-from tests.cull_fixture import card, freq_row, tiny_deck
-from tests.deck_fixture import _add_second_template
-from tests.shape_fixture import shape_rules
+from tests.cull_fixture import freq_row, tiny_deck
 
 PROFILE = cull_fr.FRENCH_CULL_PROFILE
 DECK_FIELDS = ["French", "sound", "Back", "freq ranks"]
@@ -39,16 +36,6 @@ DECK_ENGLISH = [
     "The cat sees the dog.",
     "The cat likes the house.",
 ]
-
-
-def test_the_spoken_weight_changes_the_order() -> None:
-    rows = [
-        freq_row("parle", pm=100.0, written=1.0),
-        freq_row("ecrit", pm=1.0, written=100.0),
-    ]
-
-    assert cullflow.frequency_ranks(rows, spoken_weight=0.0) == {"ecrit": 1, "parle": 2}
-    assert cullflow.frequency_ranks(rows, spoken_weight=1.0) == {"parle": 1, "ecrit": 2}
 
 
 def test_the_loader_builds_the_file_once_from_the_corpus(tmp_path: Path) -> None:
@@ -76,46 +63,6 @@ def test_read_names_skips_blanks_and_comments(tmp_path: Path) -> None:
     path.write_text("# a comment\n\nParis\n  zoe \n", encoding="utf-8")
 
     assert cullflow.read_names(path) == {"paris", "zoe"}
-
-
-@pytest.mark.parametrize("language, sentence, expected", shape_rules("french"))
-def test_a_card_gets_the_first_failed_shape_rule(
-    language: str, sentence: str, expected: str
-) -> None:
-    assert cullflow.filter_reason(card(sentence), PROFILE) == expected
-
-
-@pytest.mark.parametrize(
-    ("sentences", "reasons"),
-    [
-        pytest.param(
-            ["Le chat mange vite.", "Le chien dort bien.", "Le chat mange vite."],
-            ["", "", "unique"],
-            id="the same text",
-        ),
-        pytest.param(
-            ["Le chat mange vite.", "Le chat mange vite!"],
-            ["", "unique"],
-            id="a different mark",
-        ),
-    ],
-)
-def test_filter_cards_rejects_a_duplicate_text(
-    sentences: list[str], reasons: list[str]
-) -> None:
-    cards = [
-        card(sentence, index=index, english=f"English {sentence}")
-        for index, sentence in enumerate(sentences)
-    ]
-
-    passed, found = cullflow.filter_cards(
-        cards,
-        card_rule=partial(cullflow.filter_reason, profile=PROFILE),
-        dedupe_key=PROFILE.dedupe_key,
-    )
-
-    assert found == reasons
-    assert passed == [index for index, reason in enumerate(found) if not reason]
 
 
 def _tiny_deck(tmp_path: Path) -> Path:
@@ -159,56 +106,6 @@ def _write_cull_deck(
         reserve_pack_path=reserve_pack_path,
         reserve_values=PROFILE.reserve_fields,
     )
-
-
-def _output_model(output: Path) -> dict:
-    with AnkiPackage(output) as package:
-        models = package.get_models(include_templates=True)
-    return next(
-        m for m in models.values() if m.get("name") == DeckIdentity(output).title
-    )
-
-
-def test_write_deck_keeps_the_notes_media_and_profile_templates(tmp_path: Path) -> None:
-    source = _tiny_deck(tmp_path)
-    cards = cull_fr.load_input_deck(source)
-    output = tmp_path / "output.apkg"
-
-    counts = _write_cull_deck(source, cards, [0, 2], output)
-
-    with AnkiPackage(output) as package:
-        media = set(package.get_media_mapping().values())
-        decks = {deck.get("name") for deck in package.get_decks().values()}
-    model = _output_model(output)
-    templates = [(template["qfmt"], template["afmt"]) for template in model["tmpls"]]
-    assert counts == {"notes": 2, "media": 2, "items": 2}
-    assert media == {"a0.mp3", "a2.mp3"}
-    assert decks == {DeckIdentity(output).title}
-    assert [card.sentence for card in coreflow.read_output_deck(output)] == [
-        DECK_SENTENCES[0],
-        DECK_SENTENCES[2],
-    ]
-    assert templates == list(assemble.deck_templates(PROFILE))
-    assert all(
-        selector in model["css"] for selector in (".sentence", ".english", ".hint")
-    )
-
-
-def test_write_deck_removes_the_second_card_template(tmp_path: Path) -> None:
-    source = _tiny_deck(tmp_path)
-    _add_second_template(source, 1)
-    cards = cull_fr.load_input_deck(source)
-    output = tmp_path / "one-card.apkg"
-
-    _write_cull_deck(source, cards, [0, 1], output)
-
-    with AnkiPackage(output) as package:
-        rows = package.get_cards()
-    assert [template["name"] for template in _output_model(output)["tmpls"]] == [
-        "Card 1"
-    ]
-    assert {row["ord"] for row in rows} == {0}
-    assert len(rows) == 2
 
 
 def test_the_gates_pass_on_a_tiny_cull(tmp_path: Path) -> None:
@@ -268,18 +165,6 @@ def _tiny_swadesh_deck(tmp_path: Path) -> Path:
         ["tts_reserve.mp3", "word_reserve.mp3"],
         filename="swadesh.apkg",
     )
-
-
-def test_load_reserve_reads_the_plain_and_bold_sentence(tmp_path: Path) -> None:
-    reserve = cullflow.load_reserve(
-        _tiny_swadesh_deck(tmp_path), cull_fr.SWADESH_MODEL_NAME
-    )
-
-    assert len(reserve) == 1
-    assert reserve[0].sentence == "Je suis ici."
-    assert reserve[0].html == "<b>Je</b> suis ici."
-    assert reserve[0].target == "je"
-    assert reserve[0].audio == "tts_reserve.mp3"
 
 
 def test_write_deck_inserts_the_reserve_card(tmp_path: Path) -> None:

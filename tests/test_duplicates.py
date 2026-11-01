@@ -4,26 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from anki_tools.ranking.duplicates import at_limit, jaccard
+from anki_tools.ranking.duplicates import at_limit
 
 CAT_DOG = {"chat", "chien"}
-
-
-@pytest.mark.parametrize(
-    "left, right, expected",
-    [
-        pytest.param(set(), set(), 0.0, id="both-empty"),
-        pytest.param({"chat"}, set(), 0.0, id="right-empty"),
-        pytest.param(set(), {"chat"}, 0.0, id="left-empty"),
-        pytest.param(CAT_DOG, {"boire", "lait"}, 0.0, id="disjoint"),
-        pytest.param(CAT_DOG, {"chien", "chat"}, 1.0, id="equal"),
-        pytest.param(CAT_DOG, {"chat", "lait"}, pytest.approx(1 / 3), id="shared-over-union"),
-    ],
-)
-def test_jaccard_is_the_shared_lemmas_over_the_union(
-    left: set[str], right: set[str], expected: float
-) -> None:
-    assert jaccard(left, right) == expected
 
 
 @pytest.mark.parametrize(

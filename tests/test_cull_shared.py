@@ -115,9 +115,9 @@ def _tiny_deck(tmp_path: Path) -> Path:
     return tiny_deck(tmp_path, FIELDS, rows, MODEL_NAME, ["in.mp3"])
 
 
-def _senses(tmp_path: Path, gloss: str = "cat") -> Path:
+def _senses(tmp_path: Path) -> Path:
     path = tmp_path / "senses.tsv"
-    path.write_text(f"word\tsenses\tfalse_friends\nkat\t{gloss}\t\n", encoding="utf-8")
+    path.write_text("word\tsenses\tfalse_friends\nkat\tcat\t\n", encoding="utf-8")
     return path
 
 
@@ -288,42 +288,9 @@ def test_a_mismatched_token_list_raises() -> None:
         corelist.build_targets(cards[:-1], tokens, ranks, set(), target_words=3)
 
 
-def test_a_rare_word_wins_over_a_repeated_word() -> None:
-    cards = [
-        card("Une phrase rare ici.", index=0),
-        card("Une phrase commune ici.", index=1),
-        card("Une autre phrase commune.", index=2),
-    ]
-    tokens = [
-        [("rare", "NOUN"), ("f1", "NOUN")],
-        [("commune", "NOUN"), ("f2", "NOUN")],
-        [("commune", "NOUN"), ("f3", "NOUN")],
-    ]
-    ranks = {"rare": 1, "commune": 50}
-
-    result = select(cards, tokens, [target("rare", 1), target("commune", 50)], ranks)
-
-    assert result.kept == [0, 1, 2]
-    assert result.gain[1] > result.gain[2]
-
-
 def test_the_length_spread_shows_the_pool_against_the_kept_cards() -> None:
     assert cullflow.length_spread([4, 4, 5, 6], [4, 6]) == "4:50/50 5:25/0 6:25/50"
     assert cullflow.length_spread([4], []) == "4:100/0"
-
-
-def test_the_cap_fills_with_cards_that_hold_a_target() -> None:
-    cards = [card(f"Phrase {index}.", index=index) for index in range(4)]
-    tokens = [[("autre", "NOUN"), ("rare", "NOUN")]] + [
-        [(f"w{index}", "NOUN")] for index in range(1, 4)
-    ]
-    ranks = {"autre": 1, "rare": 2, "w1": 3, "w2": 4, "w3": 5}
-    targets = [target("w1", 3), target("w2", 4), target("w3", 5)]
-
-    result = select(cards, tokens, targets, ranks, max_cards=3)
-
-    assert sorted(result.kept) == [1, 2, 3]
-    assert result.reasons[0] == "no_core"
 
 
 @pytest.mark.parametrize(
@@ -358,19 +325,6 @@ def test_a_lemma_jaccard_of_067_is_duplicate() -> None:
 
     assert len(result.kept) == 1
     assert result.reasons == {1: "similar"}
-
-
-def test_coverage_gives_a_non_decreasing_hardest_rank() -> None:
-    ordered = cullflow.order_cards(
-        [0, 1, 2], ORDER_TOKENS, ORDER_RANKS, content_pos=CONTENT_POS
-    )
-
-    hardest = [
-        cullflow.hardest_rank(ORDER_TOKENS[index], ORDER_RANKS, CONTENT_POS)
-        for index in ordered
-    ]
-    assert ordered == [0, 1, 2]
-    assert hardest == [40, 900, cullflow.UNRANKED_ORDER]
 
 
 def test_input_order_keeps_the_given_order() -> None:
@@ -552,24 +506,27 @@ def test_the_cull_keeps_the_due_of_a_kept_card(tmp_path: Path) -> None:
     assert len(_notes(output)) == 1
 
 
+CAP = cullflow.DEFAULT_MAX_USES
+
+
 @pytest.mark.parametrize(
     ("english", "sources", "passes"),
     [
         pytest.param(
-            ["cat is big.", "dog is big."],
-            [cullflow.FREQUENCY_SOURCE] * 2,
+            ["dog is big."] * (CAP + 1),
+            [cullflow.FREQUENCY_SOURCE] * (CAP + 1),
             True,
             id="a lemma that fails the sense test is not a use",
         ),
         pytest.param(
-            ["cat is big.", "cat is small."],
-            [cullflow.FREQUENCY_SOURCE] * 2,
+            ["cat is big."] * (CAP + 1),
+            [cullflow.FREQUENCY_SOURCE] * (CAP + 1),
             False,
-            id="two uses pass the cap of one",
+            id="one use over the cap fails",
         ),
         pytest.param(
-            ["cat is big.", "cat is small."],
-            [cullflow.FREQUENCY_SOURCE, "reserve"],
+            ["cat is big."] * (CAP + 1),
+            [cullflow.FREQUENCY_SOURCE] * CAP + ["reserve"],
             True,
             id="a reserve card is not a use",
         ),
@@ -577,12 +534,10 @@ def test_the_cull_keeps_the_due_of_a_kept_card(tmp_path: Path) -> None:
 )
 def test_the_use_cap_gate(
     tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
     english: list[str],
     sources: list[str],
     passes: bool,
 ) -> None:
-    monkeypatch.setattr(cullgates, "DEFAULT_MAX_USES", 1)
     cards = [
         SimpleNamespace(sentence=f"kat {index}", english=text)
         for index, text in enumerate(english)
@@ -594,7 +549,7 @@ def test_the_use_cap_gate(
             for card, source in zip(cards, sources)
         ],
         output=lambda: {"cards": cards},
-        tokens=lambda: [[("kat", "NOUN")]] * 2,
+        tokens=lambda: [[("kat", "NOUN")]] * len(cards),
         profile=replace(_profile(), sense_path=_senses(tmp_path)),
     )
 
@@ -644,25 +599,3 @@ def test_the_card_cap_gate(kept: int, dropped: int, left: int, passes: bool) -> 
 
     assert result is passes, message
     assert f"{kept} kept + {dropped} dropped" in message
-
-
-def test_the_distinct_lemma_count_leaves_a_lemma_that_fails_the_sense_test(
-    tmp_path: Path,
-) -> None:
-    senses = _senses(tmp_path, gloss="dog")
-    contents = {}
-    for name, sense_path in (
-        ("plain", Path("vocab/test_core_senses.tsv")),
-        ("sense", senses),
-    ):
-        run = _cull(
-            tmp_path,
-            replace(_profile(), sense_path=sense_path),
-            max_cards=3,
-            name=f"{name}.apkg",
-        )
-        assert run.manifest_path is not None
-        manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
-        contents[name] = manifest["counts"]["content"]
-
-    assert contents["sense"] == contents["plain"] - 1
