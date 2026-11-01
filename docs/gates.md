@@ -93,31 +93,68 @@ second flow.
 | Core deck                      | K1, K2, K5, K6, K8, K11 to K13, K16, K18 to K21 | 13   |
 | Vocabulary deck                | none                                            | 0    |
 
-A removed row leaves a gap in the numbering. Cull G3, G4, G7, G10, G11, G14, G15, and G18 and core
-K4, K7, K9, K10, K14, and K22 are retired (ADR 0033, 0035, 0038, 0039, 0040, 0041). Pack gates for sense,
-attribution, typography, license, and script are retired too (ADR 0039). Their
-ids are not reused. Each flow doc gives the check of
-each row: `docs/swadesh-sentence-flow.md`, `docs/cull-deck-flow.md`,
-`docs/core-deck-flow.md`.
+A removed row leaves a gap in the numbering. These ids are retired and not
+reused:
+
+- Cull G3, G4, G7, G10, G11, G14, G15, and G18.
+- Core K4, K7, K9, K10, K14, and K22.
+- Pack gates for sense, attribution, typography, license, and script.
+
+The ADRs are 0033, 0035, 0038, 0039, 0040, and 0041. Each flow doc gives the
+check of each row: `docs/swadesh-sentence-flow.md`,
+`docs/cull-deck-flow.md`, and `docs/core-deck-flow.md`.
+
+Plain meaning of the cull gates:
+
+| Id  | Gate                   | Plain meaning                                               |
+| --- | ---------------------- | ----------------------------------------------------------- |
+| G1  | `gate_card_cap`        | The deck has the cap number of cards, or the pool is empty. |
+| G2  | `gate_use_cap`         | No lemma appears in too many cards.                         |
+| G5  | `gate_filter_recheck`  | Every kept card passes the filter rules.                    |
+| G6  | `gate_similarity`      | No two cards are almost the same sentence.                  |
+| G8  | `gate_note_count`      | The deck, the CSV, and the manifest give the same count.    |
+| G9  | `gate_media`           | The deck holds exactly the audio files of the kept cards.   |
+| G12 | `gate_coverage_shape`  | The coverage CSV has one row for each target word.          |
+| G13 | `gate_manifest_hashes` | The two CSV files are not stale.                            |
+| G16 | `gate_output_model`    | One note type, the right fields, one card per note.         |
+| G17 | `gate_core_word`       | Every note has a core word, a gloss, and bold text.         |
+
+Plain meaning of the core gates:
+
+| Id  | Gate                      | Plain meaning                                            |
+| --- | ------------------------- | -------------------------------------------------------- |
+| K1  | `gate_card_count`         | The CSV, the deck, and the manifest give the same count. |
+| K2  | `gate_covered_targets`    | Every target that can have a card has a card.            |
+| K5  | `gate_filter_recheck`     | Every kept card passes the filter rules.                 |
+| K6  | `gate_similarity`         | No two cards are almost the same sentence.               |
+| K8  | `gate_counts`             | The note, media, and manifest counts agree.              |
+| K11 | `gate_coverage_agreement` | The coverage CSV agrees with the card CSV.               |
+| K12 | `gate_hashes`             | The two CSV files are not stale.                         |
+| K13 | `gate_target_in_sentence` | Each card sentence holds its target word.                |
+| K16 | `gate_unchecked_sense`    | Few targets have an unchecked word sense.                |
+| K18 | `gate_tail`               | Each tail card adds a new content lemma.                 |
+| K19 | `gate_core_word`          | Every note has a core word, a gloss, and bold text.      |
+| K20 | `gate_unranked`           | Few targets have no rank.                                |
+| K21 | `gate_output_model`       | One note type, the right fields, one card per note.      |
 
 ## 4. Shared checks
 
 The table lists the checks that more than one flow runs. A check outside the
 table lives in one flow only, and the flow doc holds it.
 
-| Family          | Function                  | Flows and ids                                                         |
-| --------------- | ------------------------- | --------------------------------------------------------------------- |
-| Word table      | `gate_word_table`         | pack G1, five copies, open                                            |
-| Filter recheck  | `gate_filter_recheck`     | pack G14, cull G5, core K5, one name and three bodies                 |
-| Similarity      | `gate_similarity`         | cull G6, core K6, one rule and two limits                             |
-| Media count     | `gate_counts`             | cull G8 `gate_note_count`, core K8                                    |
-| Manifest hashes | `gate_manifest_hashes`    | cull G13, core K12 `gate_hashes`                                      |
-| Core word       | `gate_core_word`          | cull G17, core K19                                                    |
-| Output model    | `gate_output_model`       | cull G16, core K21                                                    |
+| Family          | Function               | Flows and ids                                         |
+| --------------- | ---------------------- | ----------------------------------------------------- |
+| Word table      | `gate_word_table`      | pack G1, five copies, open                            |
+| Filter recheck  | `gate_filter_recheck`  | pack G14, cull G5, core K5, one name and three bodies |
+| Similarity      | `gate_similarity`      | cull G6, core K6, one rule and two limits             |
+| Counts          | `gate_counts`          | cull G8 `gate_note_count`, core K8                    |
+| Manifest hashes | `gate_manifest_hashes` | cull G13, core K12 `gate_hashes`                      |
+| Core word       | `gate_core_word`       | cull G17, core K19                                    |
+| Output model    | `gate_output_model`    | cull G16, core K21                                    |
 
 The cull and core rows call the one function of `ranking/gates.py` and pass
-their own values. The similarity limit, the manifest file keys, the CSS check,
-and the kept rows are parameters.
+their own values. The similarity limit, the manifest file keys, and the media
+check are parameters.
 
 The coverage family holds three checks that measure different things: pack G10,
 cull G12, and core K2. They stay separate. The cull has no gate on the share of
