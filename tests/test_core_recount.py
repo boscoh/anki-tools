@@ -2,13 +2,32 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+from typing import Any
+
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+import spacy
 
 from anki_tools.ranking import corerecount
 from tests.ast_fixture import imported_names
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _load_each_model_once() -> Iterator[None]:
+    real_load = spacy.load
+    models: dict[str, Any] = {}
+
+    def load(name: str, **kwargs: Any) -> Any:
+        if name not in models:
+            models[name] = real_load(name, **kwargs)
+        return models[name]
+
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(spacy, "load", load)
+        yield
 
 
 class _Files:
