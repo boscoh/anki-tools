@@ -46,7 +46,7 @@ from anki_tools.ranking.core import (
 )
 from anki_tools.ranking import coregates
 from anki_tools.ranking.coregates import gate_core_word
-from anki_tools.ranking.scan import CoreProfile
+from anki_tools.ranking.scan import CoreProfile, drop_silent_cards
 
 
 def _card(
@@ -61,22 +61,6 @@ def _card(
         english=english,
         audio=audio,
         index=index,
-    )
-
-
-def _filter(
-    cards: Sequence[InputCard],
-    names: Sequence[str] = (),
-    loanwords: Sequence[str] = (),
-) -> tuple[list[int], list[str]]:
-    """Apply the shared rules with the French profile and a test window."""
-    profile = core.FRENCH_CORE_PROFILE
-    return coreflow.filter_core_cards(
-        cards,
-        {"a.mp3"},
-        names,
-        loanwords,
-        shape=replace(profile, script_ok=lambda sentence: True, min_units=1, max_units=9),
     )
 
 
@@ -267,61 +251,21 @@ class TestBuildTargets:
         assert targets[0].gloss == "do"
 
 
-class TestFilter:
-    def test_c3_matches_a_whole_name(self) -> None:
-        cards = [_card("Tomber est facile.")]
+class TestDropSilentCards:
+    def test_a_card_without_a_media_file_leaves_and_the_rest_are_reindexed(
+        self, tmp_path: Path
+    ) -> None:
+        source = _tiny_deck(tmp_path)
+        cards = cull.load_input_deck(source)
+        cards[0] = replace(cards[0], audio="missing.mp3")
 
-        passed, _reasons = _filter(cards, ["tom"])
+        kept = drop_silent_cards(cards, source)
 
-        assert passed == [0]
-
-    def test_c3_rejects_a_name_word(self) -> None:
-        cards = [_card("Tom mange une pomme.")]
-
-        passed, reasons = _filter(cards, ["tom"])
-
-        assert passed == []
-        assert reasons[0] == "C3"
-
-    def test_c4_rejects_a_loan_word(self) -> None:
-        cards = [_card("Le week-end est court.")]
-
-        passed, reasons = _filter(cards, [], ["week-end"])
-
-        assert passed == []
-        assert reasons[0] == "C4"
-
-    def test_c4_rejects_a_han_loan_word_as_a_span(self) -> None:
-        cards = [_card("我想喝咖啡?", english="I want coffee.")]
-
-        passed, reasons = _filter(cards, [], ["咖啡"])
-
-        assert passed == []
-        assert reasons[0] == "C4"
-
-    def test_c4_keeps_a_han_sentence_without_a_loan_word(self) -> None:
-        cards = [_card("我想喝茶?", english="I want tea.")]
-
-        passed, reasons = _filter(cards, [], ["咖啡"])
-
-        assert passed == [0]
-        assert reasons[0] == ""
-
-    def test_c3_rejects_a_han_name_as_a_span(self) -> None:
-        cards = [_card("我爱北京?", english="I love Beijing.")]
-
-        passed, reasons = _filter(cards, ["北京"])
-
-        assert passed == []
-        assert reasons[0] == "C3"
-
-    def test_c5_rejects_a_card_without_audio(self) -> None:
-        cards = [_card("Le chat mange.", audio="missing.mp3")]
-
-        passed, reasons = _filter(cards)
-
-        assert passed == []
-        assert reasons[0] == "C5"
+        assert [card.sentence for card in kept] == [
+            "Le chat mange.",
+            "Le lapin court.",
+        ]
+        assert [card.index for card in kept] == [0, 1]
 
 
 class TestSense:
@@ -339,18 +283,15 @@ class TestSense:
     def test_an_unchecked_target_accepts_every_hit(self) -> None:
         assert sense_failure("anything", SenseRow()) is None
 
-    def test_the_sense_file_and_the_loan_list_load(self, tmp_path: Path) -> None:
+    def test_the_sense_file_loads(self, tmp_path: Path) -> None:
         senses = tmp_path / "senses.tsv"
         senses.write_text(
             "word\tsenses\tfalse_friends\npas\tnot\t\n", encoding="utf-8"
         )
-        loans = tmp_path / "loans.txt"
-        loans.write_text("# a comment\nweek-end\n", encoding="utf-8")
 
         assert read_senses(senses) == {
             ("F", "pas"): SenseRow(frozenset({"not"}), first="not")
         }
-        assert coreflow.read_loanwords(loans) == frozenset({"week-end"})
 
 
 class TestOutside:
@@ -541,7 +482,6 @@ def _offline_profile(tmp_path: Path) -> CoreProfile:
         read_names=set,
         word_table=lambda: [(1, "chat", "cat")],
         sense_path=tmp_path / "absent_senses.tsv",
-        loan_path=tmp_path / "absent_loans.txt",
         min_units=1,
         max_units=9,
         default_options=CoreOptions(
@@ -769,15 +709,14 @@ class TestCardDesign:
         assert not passed
         assert "is not the coverage gloss" in message
 
-    def test_the_report_shows_the_rejected_name_counts(
+    def test_the_report_shows_the_silent_card_count(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
     ) -> None:
         _run_core(tmp_path)
 
         shown = capsys.readouterr().out
 
-        assert "Rejected names:" in shown
-        assert "Rejected loan words:" in shown
+        assert "Dropped, no audio file:" in shown
 
     def test_a_kept_card_without_a_core_word_leaves_the_deck(
         self, tmp_path: Path
@@ -861,13 +800,7 @@ class TestMandarinRepeatRule:
             InputCard(2, "起来吧大家.", "Get up.", "a.mp3", 1),
         ]
 
-        kept, reasons = coreflow.filter_core_cards(
-            cards,
-            {"a.mp3"},
-            [],
-            [],
-            shape=profile,
-        )
+        kept, reasons = coreflow.filter_core_cards(cards, profile)
 
         assert kept == [1]
         assert reasons[0] == "repeat"

@@ -265,7 +265,7 @@ class TestCandidatePool:
         pool, report = mandarin_candidate_pool(pool_table, data_dir=pool_data)
         counts = report["counts"]
         assert report["total_linked"] == 14
-        assert counts["english_link"] == 13
+        assert report["english_paired"] == 13
         assert counts["length_window"] == 12
         assert counts["script"] == 11
         assert counts["repeat"] == 10

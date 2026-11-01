@@ -1,6 +1,7 @@
 """Candidate sentence pool (stage S2).
 
-The pool applies the ordered guards, from ``english_link`` through ``unique``,
+The pool reads only the linked sentences that have an English text. It applies
+the ordered guards, from ``length_window`` through ``unique``,
 then the English sense test. The guard tables give
 the order, and each report count is the number of sentences that pass the
 guard. A sentence that fails no guard becomes a candidate for the lowest-index
@@ -34,7 +35,6 @@ from anki_tools.sentence_pack.tatoeba import (
 from wordfreq import zipf_frequency
 
 FILTER_KEYS = [
-    "english_link",
     "length_window",
     "digit_marks",
     "script",
@@ -44,7 +44,6 @@ FILTER_KEYS = [
     "sense",
 ]
 FILTER_NAMES = {
-    "english_link": "english link",
     "length_window": "length window",
     "digit_marks": "no digit, bracket, link, or ellipsis",
     "script": "script",
@@ -457,23 +456,21 @@ def build_candidate_pool(
     english = read_english_sentences(paths["english"], wanted_english)
     authors = read_authors(paths["detailed"])
     audio = read_audio(paths["audio"]) if "audio" in paths else {}
+    linked = [sentence_id for sentence_id in sorted(links) if sentence_id in sentences]
+    paired: dict[int, tuple[int, str]] = {}
+    for sentence_id in linked:
+        pair = pair_english(links[sentence_id], english)
+        if pair is not None:
+            paired[sentence_id] = pair
 
     counts: dict[str, int] = dict.fromkeys(FILTER_KEYS, 0)
     core_facts: list[SentenceFacts] = []
     relax_facts: list[SentenceFacts] = []
     seen: set[str] = set()
     relax_seen: set[str] = set()
-    total = 0
     warm_buffer: list[str] = []
-    for sentence_id in sorted(links):
-        raw = sentences.get(sentence_id)
-        if raw is None:
-            continue
-        total += 1
-        pair = pair_english(links[sentence_id], english)
-        if pair is None:
-            continue
-        english_id, english_text = pair
+    for sentence_id, (english_id, english_text) in paired.items():
+        raw = sentences[sentence_id]
         sentence = prepared[sentence_id]
         if exceeds_max_units(sentence, max_units):
             record_pass(counts, "length_window")
@@ -665,7 +662,8 @@ def build_candidate_pool(
         "max_units": max_units,
         "fallback": fallback,
         "english_ids": len(wanted_english),
-        "total_linked": total,
+        "total_linked": len(linked),
+        "english_paired": len(paired),
         "counts": counts,
         "filter_names": filter_names(profile),
         "pool_candidates": len(pool),
@@ -728,6 +726,7 @@ def print_sentence_report(report: dict[str, Any]) -> None:
     :param report: Mapping from :func:`build_pack_report`.
     """
     print(f"linked sentences: {report['total_linked']}")
+    print(f"  with English: {report['english_paired']}")
     names = report.get("filter_names", FILTER_NAMES)
     for key in FILTER_KEYS:
         print(f"  {key} {names[key]}: {report['counts'][key]}")

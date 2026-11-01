@@ -35,7 +35,7 @@ issue must name the flow with the id.
 | pack G | `sentence_pack/audit.py` | G1 to G21 |
 | cull G | `ranking/cullgates.py` | G1 to G17 |
 | core K | `ranking/coregates.py` | K1 to K21 |
-| core C | `ranking/coreflow.py` | C1 to C5 |
+| core C | `ranking/coreflow.py` | none; C3 to C5 retired, ADR 0036 |
 
 The pack and ranking rule keys map as follows:
 

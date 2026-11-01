@@ -174,29 +174,11 @@ class TestFilterCoreCards:
         cards = [_card()]
 
         passed, reasons = coreflow.filter_core_cards(
-            cards,
-            {"a.mp3"},
-            [],
-            [],
-            shape=spanish_core.SPANISH_CORE_PROFILE,
+            cards, spanish_core.SPANISH_CORE_PROFILE
         )
 
         assert passed == [0]
         assert reasons == [""]
-
-    def test_c5_rejects_a_card_whose_audio_is_absent(self) -> None:
-        cards = [_card(audio="other.mp3")]
-
-        passed, reasons = coreflow.filter_core_cards(
-            cards,
-            {"a.mp3"},
-            [],
-            [],
-            shape=spanish_core.SPANISH_CORE_PROFILE,
-        )
-
-        assert passed == []
-        assert reasons[0] == "C5"
 
 
 
@@ -292,9 +274,6 @@ class TestManifestCounts:
 
 
 class TestFiles:
-    def test_read_loanwords_of_a_missing_file_is_empty(self, tmp_path: Path) -> None:
-        assert coreflow.read_loanwords(tmp_path / "absent.txt") == frozenset()
-
     def test_read_senses_gives_the_first_sense_word(self, tmp_path: Path) -> None:
         path = tmp_path / "senses.tsv"
         path.write_text(

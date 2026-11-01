@@ -317,7 +317,7 @@ def test_pool_uses_the_french_filters(tmp_path: Path) -> None:
         "Le chien mange vite, il aboie.",
         "Et le chien mange vite.",
     }
-    assert counts["english_link"] == 7
+    assert report["english_paired"] == 7
     assert counts["length_window"] == 6
     assert counts["script"] == 5
     assert counts["marks"] == 3

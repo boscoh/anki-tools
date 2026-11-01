@@ -21,9 +21,9 @@ One table shows the four flows at a glance:
 
 | Flow            | Command                              | Gate table               | Filter table          |
 | --------------- | ------------------------------------ | ------------------------ | --------------------- |
-| Sentence pack   | `anki swadesh pack <lang>`           | G1 to G21, 18 to 20 rows | 9 rule ids            |
+| Sentence pack   | `anki swadesh pack <lang>`           | G1 to G21, 18 to 20 rows | 7 rule ids            |
 | Cull deck       | `anki fix <lang> <input> --select`   | G1 to G18, 15 rows       | 7 rule ids            |
-| Core deck       | `anki fix <lang> <input> --core`     | K1 to K22, 19 rows       | 7 rule ids, C3 to C5  |
+| Core deck       | `anki fix <lang> <input> --core`     | K1 to K22, 19 rows       | 7 rule ids            |
 | Vocabulary deck | `anki swadesh vocab <lang>`          | none                     | none                  |
 
 The filter column lives in `docs/filters.md`.
@@ -49,7 +49,6 @@ The reverse direction reads each check as a row and each flow as a column.
 | gate   | `gate_no_blocked_license` | G18 (Fr Es)                      | -                                 | -                                 | -               |
 | gate   | `gate_no_false_friend`    | G17 (zh) G20 (Yue)               | -                                 | -                                 | -               |
 | gate   | `gate_script`             | G9 (Yue) G17 (El)                | -                                 | -                                 | -               |
-| filter | `english_link`            | yes                              | -                                 | -                                 | -               |
 | filter | `length_window`           | yes                              | yes                               | yes                               | -               |
 | filter | `digit_marks`             | yes                              | yes                               | yes                               | -               |
 | filter | `script`                  | yes                              | yes                               | yes                               | -               |
@@ -57,7 +56,6 @@ The reverse direction reads each check as a row and each flow as a column.
 | filter | `marks`                   | yes                              | yes                               | yes                               | -               |
 | filter | `unique`                  | yes                              | yes                               | yes                               | -               |
 | filter | `sense`                   | yes                              | yes                               | yes                               | -               |
-| filter | C3 to C5                  | -                                | -                                 | yes                               | -               |
 
 Language codes: Fr French, Es Spanish, El Greek, Yue Cantonese, zh Mandarin.
 A filter id names one check in every flow that runs it. Each flow keeps its own

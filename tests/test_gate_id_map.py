@@ -4,7 +4,6 @@ from anki_tools.ranking import cardfilter, coreflow, cullflow
 from anki_tools.sentence_pack import pool
 
 PACK_KEYS = (
-    "english_link",
     "length_window",
     "digit_marks",
     "script",
@@ -21,7 +20,7 @@ CULL_KEYS = (
     "marks",
     "unique",
 )
-CORE_RULE_KEYS = CULL_KEYS + ("C3", "C4", "C5")
+CORE_RULE_KEYS = CULL_KEYS
 
 
 def test_pack_keys_keep_the_pack_order() -> None:
@@ -36,10 +35,10 @@ def test_core_keys_keep_the_core_order() -> None:
     assert coreflow.FILTER_KEYS == CORE_RULE_KEYS
 
 
-def test_the_guard_tables_cover_the_pack_keys_after_english_link() -> None:
+def test_the_guard_tables_cover_the_pack_keys() -> None:
     shape_keys = {key for key, _ in pool.SHAPE_GUARDS}
     fact_keys = {key for key, _ in pool.FACT_GUARDS}
-    assert shape_keys | fact_keys == set(pool.FILTER_KEYS[1:])
+    assert shape_keys | fact_keys == set(pool.FILTER_KEYS)
 
 
 def test_the_cull_mark_keys_are_the_pack_mark_keys() -> None:

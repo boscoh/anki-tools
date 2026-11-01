@@ -8,7 +8,6 @@ generic logic lives in ``anki_tools.ranking.coreflow`` and
 
 from __future__ import annotations
 
-from pathlib import Path
 
 from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
 from anki_tools.languages.french import cull
@@ -16,7 +15,6 @@ from anki_tools.languages.french.profile import FRENCH, load_word_table
 from anki_tools.ranking.core import CoreOptions
 
 SENSE_PATH = cull.SENSE_PATH
-LOAN_PATH = Path("vocab/french_loanwords.txt")
 DEFAULT_CORE_WORDS = 50
 DEFAULT_OPTIONS = CoreOptions(tail_cards=120)
 
@@ -39,7 +37,6 @@ def word_table() -> list[tuple[int, str, str]]:
 
 FRENCH_CORE_PROFILE = cull.FRENCH_LANGUAGE.core(
     word_table=word_table,
-    loan_path=LOAN_PATH,
     hits=FRENCH.hits,
     lemma_key=str.casefold,
     templates=CORE_TEMPLATES,

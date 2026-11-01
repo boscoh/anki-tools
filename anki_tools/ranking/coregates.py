@@ -25,7 +25,6 @@ from anki_tools.ranking.coreflow import (
     UNCOVERABLE_STATUSES,
     coverage_glosses,
     filter_core_cards,
-    read_loanwords,
     read_output,
 )
 from anki_tools.ranking.corelist import CONTENT_POS, lemma_sets
@@ -161,17 +160,10 @@ def gate_outside(files: CoreFiles) -> tuple[bool, str]:
 
 
 def gate_filter_recheck(files: CoreFiles) -> tuple[bool, str]:
-    """K5: every kept card passes the shared filter rules and C3 to C5."""
+    """K5: every kept card passes the shared filter rules."""
     output = files.output()
     cards = output["cards"]
-    profile = files.profile
-    kept, _reasons = filter_core_cards(
-        cards,
-        set(output["media"]),
-        profile.read_names(),
-        read_loanwords(profile.loan_path),
-        shape=profile,
-    )
+    kept, _reasons = filter_core_cards(cards, files.profile)
     if len(kept) != len(cards):
         failed = [
             cards[index].sentence

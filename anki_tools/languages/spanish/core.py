@@ -44,7 +44,6 @@ ENGLISH_FIELD = "EnglishSentence"
 AUDIO_FIELD = "Audio"
 
 SENSE_PATH = SPANISH.sense_path
-LOAN_PATH = Path("vocab/spanish_loanwords.txt")
 
 DEFAULT_CORE_WORDS = 50
 # The spaCy model gives two artefact lemmas: ``quier`` for ``quieres``, and
@@ -190,7 +189,6 @@ SPANISH_LANGUAGE = LanguageDeckProfile(
 SPANISH_CORE_PROFILE = SPANISH_LANGUAGE.core(
     tokenize_deck=tokenize_deck,
     word_table=word_table,
-    loan_path=LOAN_PATH,
     hits=SPANISH.hits,
     lemma_key=str.casefold,
     templates=CORE_TEMPLATES,

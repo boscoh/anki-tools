@@ -18,7 +18,7 @@ One command runs the stages in order: `anki fix <language> --core`. The
 | K0    | extract | input APKG                                | one card per note: sentence, English, audio |
 | K1    | scan    | K0, frequency list, name list             | tokens with lemma and tag, ranks, names     |
 | K2    | targets | K1, Swadesh word table, tier F sense file | core list: tier S, then tier F              |
-| K3    | filter  | K1, name list, loan word list, media map  | passed cards, reason per card               |
+| K3    | filter  | K1                                        | passed cards, reason per card               |
 | K4    | select  | K2, K3, ranks                             | kept cards, quota, uses                     |
 | K5    | order   | K4                                        | card order, assigned target per card        |
 | K6    | write   | K0, K4, K5                                | APKG and four side files                    |
@@ -33,6 +33,10 @@ The input fields come from the profile: `input_model_name`,
 `input_sentence_field`, `input_english_field`, and `input_audio_field`. K0
 keeps the lowest card of each note. It cleans the sentence with
 `clean_sentence`.
+
+K1 drops a card whose audio file is not in the media map of the input APKG
+(`drop_silent_cards` in `ranking/scan.py`). The kept cards get new indices. The
+build report shows the count as `Dropped, no audio file`.
 
 ## 2. Flow diagram
 
@@ -49,8 +53,6 @@ K2  core list (tier S in Swadesh order, then tier F by rank)
 K3  filter
         |
         +--> F1 to F9  shared card filter
-        |
-        +--> C3 to C5  name, loan word, audio
         |
         v
     target hits (`core_hits`)
@@ -129,10 +131,8 @@ target.
 
 ## 4. Sentence rules (K3)
 
-A card must pass every rule. `filter_cards` applies F1 to F9, and
-`filter_core_cards` applies C3 to C5.
-
-### 4.1 Shared card filter
+A card must pass every rule. `filter_cards` applies F1 to F9 through
+`filter_core_cards`.
 
 | Key | The rule passes when                                            |
 | --- | --------------------------------------------------------------- |
@@ -146,19 +146,8 @@ A card must pass every rule. `filter_cards` applies F1 to F9, and
 | F8  | the text holds no proper noun tag                               |
 | F9  | the sentence text is not kept yet                               |
 
-### 4.2 Core guards
-
-| Key | The rule passes when                                          |
-| --- | ------------------------------------------------------------- |
-| C3  | no whole word of the name list occurs in the sentence         |
-| C4  | no word of the loan word list occurs in the sentence          |
-| C5  | the card audio file exists in the media map of the input APKG |
-
-C3 and C4 are whole-word tests. Thus the name `tom` does not reject
-`tomber`.
-
 The run stores the first failed rule as the `reason` of the card. The reason
-value is one of F1 to F9 or C3 to C5. A passed card has the empty reason.
+value is one of F1 to F9. A passed card has the empty reason.
 
 ## 5. Selection (K4)
 
@@ -310,7 +299,7 @@ The coverage status of a target is one of these values:
 | ---------- | ------------------ | ------------------------------------------------------------------- |
 | size       | K1, K4             | card count, outside set and rare outside words                      |
 | coverage   | K2, K11            | covered targets, coverage CSV                                       |
-| rules      | K5, K6             | F1 to F9 and C3 to C5, similarity                                   |
+| rules      | K5, K6             | F1 to F9, similarity                                                |
 | files      | K7, K8, K12        | audio files, counts, manifest hashes                                |
 | identity   | K9, K10            | deck name, note type, kept order                                    |
 | cards      | K13, K14           | target in the text, templates and CSS                               |
@@ -318,8 +307,9 @@ The coverage status of a target is one of these values:
 | shape      | K18                | each tail card brings a new content lemma                           |
 | note type  | K21                | one note type, the output fields, one card per note                 |
 
-The build report holds the values of K3, K15, and K17: Covered twice, Rejected
-names, and Rejected loan words. A report line does not fail the run.
+The build report holds the value of K3 and K15, Covered twice, and the count of
+cards that K1 drops for a missing audio file. A report line does not fail the
+run.
 
 K14 checks the templates and the CSS of the language profile. K19 checks that
 every note holds a

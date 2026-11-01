@@ -28,7 +28,6 @@ from anki_tools.apkg.shape import find_model_id, find_only_model_id
 from anki_tools.ranking import assemble
 from anki_tools.ranking.assemble import DeckProfile, output_fields
 from anki_tools.ranking.cardfilter import (
-    _WORD_PATTERN,
     ShapeProfile,
     filter_cards,
     filter_reason,
@@ -85,9 +84,6 @@ FILTER_KEYS = (
     "repeat",
     "marks",
     "unique",
-    "C3",
-    "C4",
-    "C5",
 )
 TARGET_SEPARATOR = "|"
 STATUSES = ("covered", "partial", "absent", "absent_sense", "unchecked")
@@ -119,23 +115,6 @@ class CoreRequest:
     core_words: int
     spoken_weight: float = 0.5
     max_cards: int | None = None
-
-
-def read_loanwords(path: Path) -> frozenset[str]:
-    """Read the loan word list of rule C4.
-
-    :param path: Text file, one word per line. A ``#`` line is a comment.
-    :returns: Casefolded words, empty when the file is missing.
-    """
-    source = Path(path)
-    if not source.exists():
-        return frozenset()
-    words = set()
-    for line in source.read_text(encoding="utf-8").splitlines():
-        text = line.strip()
-        if text and not text.startswith("#"):
-            words.add(text.casefold())
-    return frozenset(words)
 
 
 def core_hits(
@@ -189,67 +168,21 @@ def core_hits(
     return hits, dict(sense_failures), present
 
 
-_HAN_PATTERN = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
-
-
-def _holds_word(sentence: str, words: Collection[str]) -> bool:
-    """Tell when one word of the list occurs in the sentence.
-
-    A Latin word matches a whole token of the sentence. A word with a Han
-    character matches as a character span, because the word pattern gives one
-    token for a whole Han run.
-
-    :param sentence: Prepared sentence text.
-    :param words: Name list of rule C3 or loan word list of rule C4.
-    :returns: True when one word of the list occurs in the sentence.
-    """
-    tokens = {token.casefold() for token in _WORD_PATTERN.findall(sentence)}
-    text = sentence.casefold()
-    for word in words:
-        parts = [part.casefold() for part in _WORD_PATTERN.findall(word)]
-        if parts and all(part in tokens for part in parts):
-            return True
-        if _HAN_PATTERN.search(word) and word.casefold() in text:
-            return True
-    return False
-
-
 def filter_core_cards(
-    cards: Sequence[Any],
-    media: set[str],
-    names: Collection[str],
-    loanwords: Collection[str],
-    *,
-    shape: ShapeProfile,
+    cards: Sequence[Any], shape: ShapeProfile
 ) -> tuple[list[int], list[str]]:
-    """Apply the shared filter rules and C3 to C5 to the cards.
+    """Apply the shared filter rules to the cards.
 
     :param cards: Input cards.
-    :param media: File names of the input media map.
-    :param names: Name list of rule C3.
-    :param loanwords: Loan word list of rule C4.
     :param shape: Shape values and length window of the language profile.
     :returns: The input indices that pass, and the reason per input index. A
         passed card has the empty string as its reason.
     """
-    passed, cull_reasons = filter_cards(
+    return filter_cards(
         cards,
         card_rule=partial(filter_reason, profile=shape),
         dedupe_key=shape.dedupe_key,
     )
-    reasons = list(cull_reasons)
-    kept: list[int] = []
-    for index in passed:
-        card = cards[index]
-        if _holds_word(card.sentence, names):
-            reasons[index] = "C3"
-        elif _holds_word(card.sentence, loanwords):
-            reasons[index] = "C4"
-        elif not card.audio or card.audio not in media:
-            reasons[index] = "C5"
-        else:
-            kept.append(index)
-    return kept, reasons
 
 
 
@@ -303,11 +236,6 @@ def kept_order_hash(cards: Sequence[Any], ordered: Sequence[int]) -> str:
     text = "\n".join(cards[index].sentence for index in ordered)
     return f"sha256:{hashlib.sha256(text.encode('utf-8')).hexdigest()}"
 
-
-def _media_names(apkg_path: Path) -> set[str]:
-    """Give the file names of the input media map."""
-    with AnkiPackage(apkg_path) as package:
-        return set(package.get_media_mapping().values())
 
 
 def card_rows(
@@ -925,7 +853,6 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
     if request.max_cards is not None:
         options = replace(options, max_cards=request.max_cards)
     sense_path = profile.sense_path
-    loan_path = profile.loan_path
     identity = DeckIdentity(output_path)
 
     scanned = scan(profile, apkg_path, request.spoken_weight)
@@ -933,9 +860,7 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
     tokens = scanned.tokens
     ranks = scanned.ranks
     names = scanned.names
-    loanwords = read_loanwords(loan_path)
     senses = read_senses(sense_path)
-    media = _media_names(apkg_path)
 
     table = profile.word_table()
     frequency_targets, _content = build_targets(
@@ -952,13 +877,7 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
         senses,
         request.core_words,
     )
-    passed, reasons = filter_core_cards(
-        cards,
-        media,
-        names,
-        loanwords,
-        shape=profile,
-    )
+    passed, reasons = filter_core_cards(cards, profile)
     hits, sense_failures, present = core_hits(
         cards, tokens, passed, targets, profile
     )
@@ -1028,8 +947,6 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
         rows, coverage_rows, result, candidates, kept, ranks, options,
         bolded=bolded, unbolded=unbolded, dropped_no_core=len(dropped),
     )
-    counts["rejected_c3"] = sum(1 for reason in reasons if reason == "C3")
-    counts["rejected_c4"] = sum(1 for reason in reasons if reason == "C4")
     counts["sense_failures"] = sum(sense_failures.values())
     counts["sense_rows"] = sum(1 for target in targets if target.checked)
 
@@ -1037,20 +954,19 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
     report: list[tuple[str | None, str]] = [
         ("Input", str(apkg_path)),
         ("Input cards", str(len(cards))),
+        ("Dropped, no audio file", str(scanned.silent)),
         ("Passed", str(len(passed))),
     ]
     report += [
         (f"  Rejected {rule}", str(filtered[rule]))
         for rule in FILTER_KEYS
-        if filtered[rule] and rule not in ("C3", "C4")
+        if filtered[rule]
     ]
     coverable = sum(
         1 for row in coverage_rows if row["status"] not in UNCOVERABLE_STATUSES
     )
     share = counts["covered2"] / coverable if coverable else 0.0
     report += [
-        ("Rejected names", str(counts["rejected_c3"])),
-        ("Rejected loan words", str(counts["rejected_c4"])),
         ("Targets", str(len(targets))),
         ("Quota total", str(sum(quotas.values()))),
         ("Cards", str(len(kept))),

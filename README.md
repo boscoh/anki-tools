@@ -377,8 +377,8 @@ output file stem. The assigned target is bold in the sentence.
 
 - Defaults: 50 tier F words, 300 cards, 2 examples per word, and a tail of
   120 cards.
-- A card must pass the cull filter F1 to F9 and the guards C3 to C5: no name,
-  no loan word, and an audio file.
+- A card must pass the cull filter F1 to F9 and have an audio file in the input
+  media map. The input reader drops a card with no audio file.
 - The sentence window is 4 to 10 words, set by the French language profile.
 - See `specs/core-word-small-deck.md` sections 4 and 5.
 
@@ -409,8 +409,7 @@ cards, 43 have one, and 27 are `absent_sense`. All 20 gates pass.
   inside 出来.
 - The first run builds `data/mandarin_frequency.tsv` and runs gates Z1 to Z3.
 - Defaults: 50 tier F words, 300 cards, and 2 examples per word.
-- The sense rows are `vocab/mandarin_core_senses.tsv`. Rule C4 reads
-  `vocab/mandarin_loanwords.txt`.
+- The sense rows are `vocab/mandarin_core_senses.tsv`.
 - The deck writes the output note type with the `Core` and `CoreGloss` fields
   and bolds the assigned target.
 
@@ -426,8 +425,7 @@ stay `absent_sense`.
 - Defaults: 50 tier F words, 300 cards, 2 examples per word, and a tail of
   0 cards.
 - The sentence window is 4 to 10 words.
-- The sense rows are `vocab/spanish_core_senses.tsv`. Rule C4 reads
-  `vocab/spanish_loanwords.txt`.
+- The sense rows are `vocab/spanish_core_senses.tsv`.
 
 Measured result on 2026-10-24: 265 cards for 226 targets. 198 targets have two
 cards, 220 have one, and 6 are `absent_sense`. The cards hold 177 support

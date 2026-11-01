@@ -23,8 +23,7 @@ share of 0.82 and does not fail.
 
 The sense rows live in ``vocab/mandarin_core_senses.tsv``. Each tier F row
 holds the English words that the paired sentences of the deck use for the
-word. The first sense gives the ``CoreGloss``. The deck also holds nine loan
-words, and ``vocab/mandarin_loanwords.txt`` lists them for rule C4.
+word. The first sense gives the ``CoreGloss``.
 
 The audio of the deck is machine speech from Google TTS on all 5009 notes, and
 the model holds no native recording. The manifest and ``ATTRIBUTION.md`` must
@@ -77,7 +76,6 @@ ENGLISH_FIELD = "Sentence (Translation)"
 AUDIO_FIELD = "[a]"
 
 SENSE_PATH = MANDARIN.sense_path
-LOAN_PATH = Path("vocab/mandarin_loanwords.txt")
 NAMES_PATH = Path("vocab/mandarin_names.txt")
 
 # The reviewed tier F word count of the deck. Every row of
@@ -293,7 +291,6 @@ MANDARIN_LANGUAGE = LanguageDeckProfile(
 
 MANDARIN_CORE_PROFILE = MANDARIN_LANGUAGE.core(
     word_table=word_table,
-    loan_path=LOAN_PATH,
     hits=MANDARIN.hits,
     lemma_key=convert_to_simplified,
     templates=CORE_TEMPLATES,

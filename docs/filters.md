@@ -25,7 +25,6 @@ cap, and they have no concept quota.
 
 | Id               | Sentence pack                      | Cull deck                            | Core deck                                                                |
 | ---------------- | ---------------------------------- | ------------------------------------ | ------------------------------------------------------------------------ |
-| `english_link`   | an English link exists             | -                                    | -                                                                        |
 | `length_window`  | unit count inside the window       | the same                             | the same                                                                 |
 | `digit_marks`    | no digit, bracket, link, ellipsis  | the same                             | the same                                                                 |
 | `script`         | the language alphabet test         | the same                             | the same                                                                 |
@@ -33,9 +32,8 @@ cap, and they have no concept quota.
 | `marks`          | final, quote, and internal marks   | the same                             | the same                                                                 |
 | `unique`         | dedupe key is new                  | the same                             | the same                                                                 |
 | `sense`          | English gloss holds the sense      | the same, per target                 | the same, per target                                                     |
-| C3 to C5         | -                                  | -                                    | a name test, a loan word test, and the media map                         |
 
-The pack tests 8 ids, the cull 7, and the core 7 plus C3 to C5. The profile
+The pack tests 7 ids, the cull 7, and the core 7. The profile
 of the language gives the `repeat` test and the `unique` key to all three flows.
 The language states its own length rule: `unit_count` and the window
 (`min_units`, `max_units`). No flow tests the English length.
@@ -56,8 +54,9 @@ The cull runs one list in `filter_reason`, in the same order as the pack:
 The shape guard `check_sentence_shape` gives all rules except `unique`.
 `LENGTH_RULES`, `TEXT_RULES`, and `MARK_RULES` hold their ids.
 
-The core runs `filter_cards` with `filter_reason`, the function of the cull, then
-C3 to C5 in `filter_core_cards`.
+The core runs `filter_cards` with `filter_reason`, the function of the cull, in
+`filter_core_cards`. The input reader drops a card with no audio file before the
+filter (`drop_silent_cards`).
 
 The cull and the core store the first failed rule as the card `reason`. The
 pack records a pass count for every guard before the first failure.
@@ -78,9 +77,11 @@ pack records a pass count for every guard before the first failure.
 - `marks` is one filter with four checks: the last character is a final mark, the
   sentence has exactly one final mark, no quotation mark or dialogue dash, and at
   most one internal mark. A failure gives no sub-reason. `MARK_RULES` lists the id
-  that the cull takes from the pack shape guard. The cull and the core have no
-  `english_link` rule. They run `sense` after the filter, on each target of a
-  card (section 5, L9).
+  that the cull takes from the pack shape guard. The cull and the core run `sense`
+  after the filter, on each target of a card (section 5, L9).
+- The pack has no `english_link` rule. The pool reads only the linked sentences
+  that have an English text (ADR 0037). The report shows the count as
+  `english_paired`.
 - `digit_marks` is the digit, bracket, link, and ellipsis test. It has no language
   input. `script` is the alphabet test of the language profile. Both run in all
   three flows.
@@ -195,8 +196,8 @@ are tokenizer lemmas, and its languages have no compounds.
 | `gate_unchecked_sense` (K16)                             | a limit on the `sense` rule in every flow |
 | `gate_target_in_sentence` (K13)                          | test 1 of the rule                        |
 
-`sense` does not replace `english_link`, the shape rules,
-`unique`, C3 to C5, or the deck gates such as `gate_core_word`.
+`sense` does not replace the shape rules, `unique`, or the deck gates such as
+`gate_core_word`.
 
 S3 is done. `sense_failure(english, row, gloss)` in
 `sentence_pack/english_sense.py` returns `false_friend`, `sense`, or None. The

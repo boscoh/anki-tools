@@ -9,9 +9,11 @@ flow of ``anki_tools/ranking/coreflow.py``.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, Callable, Collection, Mapping, Sequence
+
+from anki_tools.apkg.package import AnkiPackage
 
 
 @dataclass(frozen=True)
@@ -30,7 +32,6 @@ class CoreProfile:
     :param word_table: Read the reviewed Swadesh rows as ``(index, form,
         english gloss)`` triples in table order.
     :param sense_path: TSV file of the sense rows.
-    :param loan_path: Text file of the loan word list.
     :param hits: Count the tier S forms that a sentence holds exactly once.
     :param highlight: Wrap the matched target tokens of a sentence in a bold
         tag, or None when the deck does not bold.
@@ -73,7 +74,6 @@ class CoreProfile:
 
     word_table: Callable[[], Sequence[tuple[int, str, str]]]
     sense_path: Path
-    loan_path: Path
     hits: Callable[[str, Collection[str]], Mapping[str, int]]
     highlight: Callable[[str, str], str] | None
     lemma_key: Callable[[str], str]
@@ -110,16 +110,33 @@ class ScanResult:
         returns them.
     :param ranks: Lemma to blended frequency rank.
     :param names: Name stoplist.
+    :param silent: Count of input cards dropped for a missing audio file.
     """
 
     cards: Any
     tokens: Any
     ranks: dict[str, int]
     names: set[str]
+    silent: int = 0
+
+
+def drop_silent_cards(cards: Sequence[Any], apkg_path: Path) -> list[Any]:
+    """Keep the input cards whose audio file is in the media map of the package.
+
+    The kept cards get new indices, so an index stays the position in the list.
+
+    :param cards: Input cards, as ``load_input_deck`` returns them.
+    :param apkg_path: Input APKG file.
+    :returns: The cards that have an audio file.
+    """
+    with AnkiPackage(apkg_path) as package:
+        media = set(package.get_media_mapping().values())
+    heard = [card for card in cards if card.audio in media]
+    return [replace(card, index=index) for index, card in enumerate(heard)]
 
 
 def scan(profile: CoreProfile, apkg_path: Path, spoken_weight: float) -> ScanResult:
-    """Run the five scan adapters of the profile in order.
+    """Read the input deck, drop the silent cards, and run the scan adapters.
 
     The lemma overrides of the profile repair the tokens after
     ``tokenize_deck``, so the target list and the sense guard see the
@@ -128,9 +145,12 @@ def scan(profile: CoreProfile, apkg_path: Path, spoken_weight: float) -> ScanRes
     :param profile: Language hooks of the scan.
     :param apkg_path: Input APKG file.
     :param spoken_weight: Weight of the spoken term in the frequency blend.
-    :returns: The cards, the tokens, the ranks, and the names.
+    :returns: The cards, the tokens, the ranks, the names, and the count of
+        input cards dropped for a missing audio file.
     """
-    cards = profile.load_input_deck(apkg_path)
+    loaded = profile.load_input_deck(apkg_path)
+    cards = drop_silent_cards(loaded, apkg_path)
+    silent = len(loaded) - len(cards)
     tokens = profile.tokenize_deck(cards)
     overrides = profile.lemma_overrides
     if overrides:
@@ -141,4 +161,6 @@ def scan(profile: CoreProfile, apkg_path: Path, spoken_weight: float) -> ScanRes
     frequency = profile.load_frequency()
     ranks = profile.frequency_ranks(frequency, spoken_weight)
     names = profile.read_names()
-    return ScanResult(cards=cards, tokens=tokens, ranks=ranks, names=names)
+    return ScanResult(
+        cards=cards, tokens=tokens, ranks=ranks, names=names, silent=silent
+    )

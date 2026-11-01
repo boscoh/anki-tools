@@ -20,7 +20,7 @@ from anki_tools.languages.mandarin.profile import MANDARIN
 def test_guard_table_matches_the_filter_order() -> None:
     keys = [key for key, _ in pool.SHAPE_GUARDS]
     keys += [key for key, _ in pool.FACT_GUARDS]
-    assert keys == pool.FILTER_KEYS[1:]
+    assert keys == pool.FILTER_KEYS
 
 
 def test_scaffold_relaxes_only_the_count_checks_of_marks() -> None:
@@ -34,7 +34,7 @@ def test_scaffold_relaxes_only_the_count_checks_of_marks() -> None:
 def test_record_pass_counts_every_guard_before_the_failure() -> None:
     counts = dict.fromkeys(pool.FILTER_KEYS, 0)
     pool.record_pass(counts, "marks")
-    assert set(pool.FILTER_KEYS[:5]) == {key for key, value in counts.items() if value}
+    assert set(pool.FILTER_KEYS[:4]) == {key for key, value in counts.items() if value}
     counts = dict.fromkeys(pool.FILTER_KEYS, 0)
     pool.record_pass(counts, None)
     assert all(value == 1 for value in counts.values())

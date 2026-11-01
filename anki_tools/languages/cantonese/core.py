@@ -48,7 +48,6 @@ ENGLISH_FIELD = "Back"
 AUDIO_FIELD = "Audio"
 
 SENSE_PATH = CANTONESE.sense_path
-LOAN_PATH = Path("vocab/cantonese_loanwords.txt")
 NAMES_PATH = Path("vocab/cantonese_names.tsv")
 
 # The tier F sense rows are not authored yet (anki-eiy). Raise this to 50 with
@@ -249,7 +248,6 @@ CANTONESE_LANGUAGE = LanguageDeckProfile(
 
 CANTONESE_CORE_PROFILE = CANTONESE_LANGUAGE.core(
     word_table=word_table,
-    loan_path=LOAN_PATH,
     hits=CANTONESE.hits,
     lemma_key=str.casefold,
     templates=CORE_TEMPLATES,
