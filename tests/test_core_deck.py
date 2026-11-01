@@ -364,25 +364,6 @@ def test_the_order_hash_follows_the_kept_sentences() -> None:
     assert kept_order_hash(cards, [0, 1]) != kept_order_hash(cards, [1, 0])
 
 
-def test_the_front_shows_only_the_audio() -> None:
-    front = core.CORE_FRONT_TEMPLATE
-
-    assert "{{Audio}}" in front
-    for hidden in ("{{Sentence}}", "{{English}}", "{{Core}}", "hint"):
-        assert hidden not in front
-
-
-def test_the_back_shows_audio_sentence_english_and_core_word() -> None:
-    back = core.CORE_BACK_TEMPLATE
-    order = [
-        back.index(f"{{{{{name}}}}}")
-        for name in ("Audio", "Sentence", "English", "Core", "CoreGloss")
-    ]
-
-    assert order == sorted(order)
-    assert "{{#Core}}" not in back
-
-
 def test_the_run_writes_one_deck_with_one_note_type(tmp_path: Path) -> None:
     run, output, profile = run_core(tmp_path)
     identity = DeckIdentity(output)

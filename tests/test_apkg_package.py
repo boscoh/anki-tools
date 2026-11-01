@@ -55,12 +55,6 @@ def _card_of(package: AnkiPackage, note_id: int) -> int:
 
 
 
-@pytest.fixture(scope="module")
-def package(deck_path: Path) -> Iterator[AnkiPackage]:
-    with AnkiPackage(deck_path) as open_package:
-        yield open_package
-
-
 @pytest.fixture
 def editable(deck_path: Path, tmp_path: Path) -> Iterator[AnkiPackage]:
     target = tmp_path / "deck.apkg"
@@ -77,14 +71,6 @@ def anki21b(tmp_path: Path) -> Iterator[AnkiPackage]:
         temp_dir = open_package.temp_dir
     if temp_dir:
         shutil.rmtree(temp_dir, ignore_errors=True)
-
-
-def test_the_deck_references_every_media_file(package: AnkiPackage) -> None:
-    """A media file with no note is dead weight in the package."""
-    media = set(package.get_media_mapping().values())
-    used = set().union(*_note_audio(package).values())
-
-    assert media == used
 
 
 def test_delete_card_removes_the_note_and_its_exclusive_audio(

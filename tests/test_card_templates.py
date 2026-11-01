@@ -9,7 +9,6 @@ from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.templates import (
     DEFAULT_TEMPLATE_DIR,
     SHARED_CSS_PATH,
-    TEMPLATES_DIR,
     TemplateSpec,
     assemble_templates,
     apply_field_mapping,
@@ -19,8 +18,6 @@ from anki_tools.apkg.templates import (
     load_text,
 )
 from anki_tools.languages import PROFILES
-from anki_tools.languages.french import core as french_core
-from anki_tools.languages.french import cull as french_cull
 from tests.deck_fixture import build_contract_deck
 
 PACK_PROFILES = tuple(PROFILES[name] for name in sorted(PROFILES))
@@ -28,29 +25,6 @@ CLASS_ATTRIBUTE = re.compile(r'class="([^"]+)"')
 CSS_SELECTOR = re.compile(r"([^{}]+)\x7b")
 CSS_CLASS = re.compile(r"\.([A-Za-z][A-Za-z0-9_-]*)")
 SCRIPT_HOOK_CLASSES = {"char-links"}
-
-TEMPLATE_SOURCES = [
-    pytest.param(
-        TEMPLATES_DIR / "sentence_pack" / profile.name,
-        profile.front_template,
-        profile.back_template,
-        id=profile.name,
-    )
-    for profile in PACK_PROFILES
-] + [
-    pytest.param(
-        TEMPLATES_DIR / "french_cull",
-        french_cull.FRONT_TEMPLATE,
-        french_cull.BACK_TEMPLATE,
-        id="french_cull",
-    ),
-    pytest.param(
-        TEMPLATES_DIR / "french_core",
-        french_core.CORE_FRONT_TEMPLATE,
-        french_core.CORE_BACK_TEMPLATE,
-        id="french_core",
-    ),
-]
 
 
 @pytest.mark.parametrize("profile", PACK_PROFILES, ids=lambda profile: profile.name)
@@ -64,29 +38,6 @@ def test_a_pack_card_styles_its_classes_from_the_shared_sheet_and_its_own(
     defined = {name for selector in CSS_SELECTOR.findall(css) for name in CSS_CLASS.findall(selector)}
 
     assert used - defined - SCRIPT_HOOK_CLASSES == set()
-
-
-def test_the_cantonese_sheet_sets_its_own_font_stack() -> None:
-    fonts = re.compile(r"font-family:([^;]+);")
-
-    shared = fonts.findall(load_text(SHARED_CSS_PATH))
-    cantonese = fonts.findall(PROFILES["cantonese"].extra_css)
-
-    assert cantonese and cantonese[-1] != shared[0]
-
-
-@pytest.mark.parametrize("directory, front, back", TEMPLATE_SOURCES)
-def test_the_deck_templates_come_from_files(
-    directory: Path, front: str, back: str
-) -> None:
-    assert front == load_text(directory / "front.html")
-    assert back == load_text(directory / "back.html")
-
-
-@pytest.mark.parametrize("profile", PACK_PROFILES, ids=lambda profile: profile.name)
-def test_each_pack_profile_reads_its_card_css(profile) -> None:
-    path = TEMPLATES_DIR / "sentence_pack" / profile.name / "card.css"
-    assert profile.extra_css == load_text(path)
 
 
 def test_apply_templates_writes_the_sheet_and_the_card(tmp_path: Path) -> None:

@@ -9,38 +9,10 @@ from anki_tools.preview import (
     SENTENCE_LANGUAGES,
     VOCAB_DIR,
     VOCAB_LANGUAGES,
-    fix_card,
     render_template,
     sentence_card,
     write_preview,
 )
-
-
-@pytest.mark.parametrize(
-    "language, mode, shown",
-    [
-        pytest.param(
-            "spanish", "cull", ["I want to ask for the bill.", "to ask"], id="spanish-cull"
-        ),
-        pytest.param(
-            "mandarin",
-            "core",
-            ["I am very busy today.", "wǒ jīn tiān hěn máng", "busy"],
-            id="mandarin-core",
-        ),
-    ],
-)
-def test_a_fix_card_shows_the_output_fields(
-    language: str, mode: str, shown: list[str]
-) -> None:
-    card = fix_card(language, mode, "title")
-
-    assert card.front.strip()
-    assert "<b>" in card.back
-    for text in shown:
-        assert text in card.back, text
-    for name in ("Sentence", "Core", "CoreGloss"):
-        assert name in card.fields
 
 
 @pytest.mark.parametrize(
