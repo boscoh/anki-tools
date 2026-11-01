@@ -23,7 +23,7 @@ from anki_tools.sentence_pack.english_sense import (
     sense_failure,
     sense_row,
 )
-from anki_tools.sentence_pack.profile import LanguageProfile, WordRow
+from anki_tools.sentence_pack.profile import LanguageProfile, SentenceShape, WordRow
 from anki_tools.sentence_pack.tatoeba import (
     read_audio,
     read_authors,
@@ -120,7 +120,7 @@ class ShapeInput:
     """Measured values of the shape guards.
 
     :param sentence: Prepared sentence text.
-    :param profile: Language profile.
+    :param profile: Shape values of the language.
     :param unit_len: Word or character count of the sentence.
     :param min_units: Minimum unit count of the window.
     :param max_units: Maximum unit count of the window.
@@ -130,7 +130,7 @@ class ShapeInput:
     """
 
     sentence: str
-    profile: LanguageProfile
+    profile: SentenceShape
     unit_len: int
     min_units: int
     max_units: int
@@ -185,7 +185,7 @@ SHAPE_GUARDS: tuple[tuple[str, Callable[[ShapeInput], bool]], ...] = (
 
 def shape_failure(
     sentence: str,
-    profile: LanguageProfile,
+    profile: SentenceShape,
     min_units: int,
     max_units: int,
     *,
@@ -196,7 +196,7 @@ def shape_failure(
     """Give the first failed shape guard.
 
     :param sentence: Prepared sentence text.
-    :param profile: Language profile.
+    :param profile: Shape values of the language.
     :param min_units: Minimum unit count of the window.
     :param max_units: Maximum unit count of the window.
     :param final_mark: Apply the final-mark checks of the ``marks`` guard.

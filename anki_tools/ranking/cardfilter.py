@@ -11,10 +11,9 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Any, Callable, Protocol, Sequence, cast
+from typing import Any, Callable, Protocol, Sequence
 
 from anki_tools.sentence_pack.guards import check_sentence_shape
-from anki_tools.sentence_pack.profile import LanguageProfile
 
 MARK_RULES = ("marks",)
 LENGTH_RULES = ("length_window",)
@@ -151,11 +150,10 @@ def filter_reason(
         profile.script_ok,
         profile.is_repeated,
     )
-    # The rank flows pass only the length, text, and mark keys, so the adapter
-    # gives those values and not the rest of a language profile.
+    # The rank flows pass only the length, text, and mark keys.
     reason = check_sentence_shape(
         card.sentence,
-        cast(LanguageProfile, shape),
+        shape,
         min_words,
         max_words,
         keys=LENGTH_RULES + TEXT_RULES + MARK_RULES,

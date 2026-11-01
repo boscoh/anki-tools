@@ -26,6 +26,29 @@ NOUN_INDICES = frozenset(
     }
 )  # fmt: skip
 
+
+class SentenceShape(Protocol):
+    """The profile values that the shape guards read."""
+
+    @property
+    def final_marks(self) -> str: ...
+
+    @property
+    def quote_marks(self) -> str: ...
+
+    @property
+    def internal_marks(self) -> str: ...
+
+    @property
+    def script_ok(self) -> Callable[[str], bool]: ...
+
+    @property
+    def is_repeated(self) -> Callable[[str], bool]: ...
+
+    @property
+    def unit_count(self) -> Callable[[str], int]: ...
+
+
 class WordRow(Protocol):
     """A row of a reviewed Swadesh word table."""
 

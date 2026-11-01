@@ -23,7 +23,7 @@ from typing import Collection, Iterable, Sequence
 
 from anki_tools.sentence_pack.english_sense import sense_row
 from anki_tools.sentence_pack.pool import shape_failure
-from anki_tools.sentence_pack.profile import LanguageProfile
+from anki_tools.sentence_pack.profile import SentenceShape
 
 Span = tuple[int, int]
 
@@ -82,7 +82,7 @@ def inside_spans(position: int, spans: Sequence[Span]) -> bool:
 
 def check_sentence_shape(
     sentence: str,
-    profile: LanguageProfile,
+    profile: SentenceShape,
     min_units: int,
     max_units: int,
     *,
@@ -92,7 +92,7 @@ def check_sentence_shape(
     """Apply the shape guards to one sentence.
 
     :param sentence: Prepared sentence text.
-    :param profile: Language profile of the language package.
+    :param profile: Shape values of the language.
     :param min_units: Minimum unit count of the window.
     :param max_units: Maximum unit count of the window.
     :param final_mark: Apply the final-mark checks of the ``marks`` guard.

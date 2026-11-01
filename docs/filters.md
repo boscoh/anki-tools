@@ -125,10 +125,6 @@ compare the reject counts of two flows directly.
 - Window: the pack, the core, and the cull use different windows (section 4.1).
 - Frames: a pack frame sentence runs the shape guards and a target-form test
   only. It skips `english_words`, `unique`, and the scaffold retry.
-- Type cast: `filter_reason` casts a `CardShape` to `LanguageProfile`. The type
-  checker cannot detect a shape guard that reads a new profile field. A shape
-  guard must read only `unit_count`, the mark sets, `script_ok`, and
-  `is_repeated`.
 
 The cull and core reports once left out `repeat`. Both report lists now hold it.
 `tests/test_gate_id_map.py` checks the rule ids.
