@@ -20,7 +20,7 @@ S18:多,多,many,S,18,2,2,covered
 S19:啲,啲,some,S,19,2,2,covered
 S20:少,少,few,S,20,2,1,partial
 S21:其他,其他,other,S,21,0,0,absent
-S22:一,一,one,S,22,2,0,absent_sense
+S22:一,一,one,S,22,2,2,covered
 S23:兩,兩,two,S,23,2,2,covered
 S24:三,三,three,S,24,2,2,covered
 S25:四,四,four,S,25,0,0,absent
@@ -36,7 +36,7 @@ S34:窄,窄,narrow,S,34,0,0,absent
 S35:薄,薄,thin,S,35,0,0,absent
 S36:女人,女人,woman,S,36,2,1,partial
 S37:男人,男人,man,S,37,2,2,covered
-S38:人,人,human being,S,38,2,0,absent_sense
+S38:人,人,human being,S,38,2,2,covered
 S39:細路,細路,child,S,39,0,0,absent
 S40:老婆,老婆,wife,S,40,2,1,partial
 S41:老公,老公,husband,S,41,0,0,absent
@@ -78,12 +78,12 @@ S76:嘴,嘴,mouth,S,76,0,0,absent
 S77:牙,牙,tooth,S,77,2,1,partial
 S78:脷,脷,tongue,S,78,0,0,absent
 S79:指甲,指甲,fingernail,S,79,0,0,absent
-S80:腳,腳,foot,S,80,2,0,absent_sense
+S80:腳,腳,foot,S,80,2,1,partial
 S81:腿,腿,leg,S,81,0,0,absent
 S82:膝頭,膝頭,knee,S,82,0,0,absent
 S83:手,手,hand,S,83,2,1,partial
 S84:翼,翼,wing,S,84,0,0,absent
-S85:肚,肚,belly,S,85,2,0,absent_sense
+S85:肚,肚,belly,S,85,2,1,partial
 S86:腸,腸,guts,S,86,0,0,absent
 S87:頸,頸,neck,S,87,2,0,absent_sense
 S88:背,背,back,S,88,0,0,absent
@@ -118,10 +118,10 @@ S116:刺,刺,to stab,S,116,0,0,absent
 S117:𢯎,𢯎,to scratch,S,117,0,0,absent
 S118:掘,掘,to dig,S,118,0,0,absent
 S119:游水,游水,to swim,S,119,2,2,covered
-S120:飛,飛,to fly,S,120,2,0,absent_sense
+S120:飛,飛,to fly,S,120,2,1,partial
 S121:行,行,to walk,S,121,2,1,partial
 S122:嚟,嚟,to come,S,122,2,2,covered
-S123:瞓,瞓,to lie down,S,123,2,0,absent_sense
+S123:瞓,瞓,to lie down,S,123,2,2,covered
 S124:坐,坐,to sit,S,124,2,2,covered
 S125:企,企,to stand,S,125,2,2,covered
 S126:轉,轉,to turn (intransitive),S,126,0,0,absent
@@ -140,7 +140,7 @@ S138:縫,縫,to sew,S,138,0,0,absent
 S139:數,數,to count,S,139,0,0,absent
 S140:講,講,to say,S,140,2,2,covered
 S141:唱,唱,to sing,S,141,2,2,covered
-S142:玩,玩,to play,S,142,2,0,absent_sense
+S142:玩,玩,to play,S,142,2,1,partial
 S143:浮,浮,to float,S,143,0,0,absent
 S144:流,流,to flow,S,144,0,0,absent
 S145:結冰,結冰,to freeze,S,145,0,0,absent
