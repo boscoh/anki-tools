@@ -190,6 +190,9 @@ class CullProfile:
     :param dedupe_key: Key of the ``unique`` rule.
     :param unit_count: Unit count of a sentence, the same count as the sentence
         pack.
+    :param min_units: Minimum unit count of the window, the same window as the
+        sentence pack.
+    :param max_units: Maximum unit count of the window.
     :param english_bounds: English word-count window of the ``english_words`` rule.
     :param input_model_name: Name of the input note model.
     :param input_sentence_field: Name of the sentence field of the input model.
@@ -228,6 +231,8 @@ class CullProfile:
     is_repeated: Callable[[str], bool]
     dedupe_key: Callable[[str], str]
     unit_count: Callable[[str], int]
+    min_units: int
+    max_units: int
     english_bounds: tuple[int, int]
 
     input_model_name: str
@@ -269,8 +274,10 @@ class CullRequest:
     :param max_cards: Card cap.
     :param target_words: Number of target words.
     :param spoken_weight: Weight of the Tatoeba term, 0 to 1.
-    :param min_words: Minimum word count of a card.
-    :param max_words: Maximum word count of a card.
+    :param min_words: Minimum unit count of a card, or None for the window of
+        the language profile.
+    :param max_words: Maximum unit count of a card, or None for the window of
+        the language profile.
     :param no_reserve: Run the frequency cull without the reserve cards.
     """
 
@@ -279,8 +286,8 @@ class CullRequest:
     max_cards: int = DEFAULT_MAX_CARDS
     target_words: int = DEFAULT_TARGET_WORDS
     spoken_weight: float = 0.5
-    min_words: int = 3
-    max_words: int = 12
+    min_words: int | None = None
+    max_words: int | None = None
     no_reserve: bool = False
 
 
@@ -1053,6 +1060,8 @@ def run_cull(request: CullRequest, profile: CullProfile) -> deck_writer.RunFiles
     """
     apkg_path = Path(request.input_path)
     output_path = Path(request.output_path)
+    min_words = profile.min_units if request.min_words is None else request.min_words
+    max_words = profile.max_units if request.max_words is None else request.max_words
     reserve_pack = profile.reserve_pack
     cards = coreflow.read_input_deck(
         apkg_path,
@@ -1083,8 +1092,8 @@ def run_cull(request: CullRequest, profile: CullProfile) -> deck_writer.RunFiles
     )
     passed, reasons = filter_cards(
         cards,
-        min_words=request.min_words,
-        max_words=request.max_words,
+        min_words=min_words,
+        max_words=max_words,
         card_rule=partial(filter_reason, profile=profile),
         dedupe_key=profile.dedupe_key,
     )
@@ -1254,8 +1263,8 @@ def run_cull(request: CullRequest, profile: CullProfile) -> deck_writer.RunFiles
                     "max_uses": DEFAULT_MAX_USES,
                     "exempt_top": 100,
                     "spoken_weight": request.spoken_weight,
-                    "min_words": request.min_words,
-                    "max_words": request.max_words,
+                    "min_words": min_words,
+                    "max_words": max_words,
                     "similarity": SIMILARITY,
                     "order": "coverage",
                 },

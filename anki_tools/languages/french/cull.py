@@ -151,6 +151,8 @@ FRENCH_LANGUAGE = LanguageDeckProfile(
     is_repeated=FRENCH.is_repeated,
     dedupe_key=FRENCH.dedupe_key,
     unit_count=FRENCH.unit_count,
+    min_units=FRENCH.min_units,
+    max_units=FRENCH.max_units,
     highlight=FRENCH.highlight,
 )
 

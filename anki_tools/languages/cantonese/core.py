@@ -68,9 +68,6 @@ DEFAULT_OPTIONS = CoreOptions(
 # tag must be a content tag so that a token can be a target.
 TOKEN_POS = "VERB"
 
-MIN_UNITS = 2
-MAX_UNITS = 7
-
 TEMPLATE_DIR = TEMPLATES_DIR / "cantonese_core"
 CORE_FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
 CORE_BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")
@@ -244,6 +241,8 @@ CANTONESE_LANGUAGE = LanguageDeckProfile(
     is_repeated=CANTONESE.is_repeated,
     dedupe_key=CANTONESE.dedupe_key,
     unit_count=CANTONESE.unit_count,
+    min_units=CANTONESE.min_units,
+    max_units=CANTONESE.max_units,
     highlight=CANTONESE.highlight,
     romanization_source="Jyutping",
 )
@@ -254,8 +253,6 @@ CANTONESE_CORE_PROFILE = CANTONESE_LANGUAGE.core(
     hits=CANTONESE.hits,
     lemma_key=str.casefold,
     templates=CORE_TEMPLATES,
-    min_units=MIN_UNITS,
-    max_units=MAX_UNITS,
     final_marks=CANTONESE.final_marks,
     quote_marks=CANTONESE.quote_marks,
     internal_marks=CANTONESE.internal_marks,

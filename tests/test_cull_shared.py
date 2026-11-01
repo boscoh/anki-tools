@@ -71,6 +71,8 @@ def _profile() -> cullflow.CullProfile:
         is_repeated=lambda sentence: False,
         dedupe_key=str,
         unit_count=lambda sentence: len(sentence.split()),
+        min_units=3,
+        max_units=12,
         english_bounds=(2, 12),
         input_model_name=MODEL_NAME,
         input_sentence_field="Text",

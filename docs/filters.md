@@ -94,22 +94,26 @@ pack records a pass count for every guard before the first failure.
 | ------------- | --------------------------------------------- | --------------------------------------------------- |
 | Pack          | `profile.unit_count`: words or Han characters | `profile.min_units` to `max_units`                  |
 | Pack scaffold | the same                                      | `profile.fallback_min_units` to `max_units`         |
-| Pack frames   | the same                                      | the core window, no scaffold retry                  |
-| Cull          | the same                                      | `CullRequest.min_words` to `max_words`, 3 to 12     |
-| Core          | the same                                      | `CoreProfile.min_units` to `max_units` of `core.py` |
+| Pack frames   | the same                                      | the same, no scaffold retry                         |
+| Cull          | the same                                      | `profile.min_units` to `max_units`                  |
+| Core          | the same                                      | `profile.min_units` to `max_units`                  |
 
 The pack also runs `exceeds_max_units` before the measure step. It rejects a
 sentence with more whitespace chunks than `max_units` and records `length_window`.
 
 Windows by language, as minimum to maximum:
 
-| Language  | Pack    | Pack scaffold minimum | Core    | Cull    |
-| --------- | ------- | --------------------- | ------- | ------- |
-| French    | 4 to 10 | 3                     | 5 to 9  | 3 to 12 |
-| Spanish   | 4 to 10 | 3                     | 4 to 10 | 3 to 12 |
-| Greek     | 4 to 10 | 3                     | -       | 3 to 12 |
-| Mandarin  | 4 to 7  | `FALLBACK_MIN_HAN`    | 2 to 8  | 3 to 12 |
-| Cantonese | 3 to 12 | `FALLBACK_MIN_HAN`    | 2 to 7  | 3 to 12 |
+| Language  | Pack, cull, and core | Pack scaffold minimum |
+| --------- | -------------------- | --------------------- |
+| French    | 4 to 10              | 3                     |
+| Spanish   | 4 to 10              | 3                     |
+| Greek     | 4 to 10              | 3                     |
+| Mandarin  | 4 to 7               | `FALLBACK_MIN_HAN`    |
+| Cantonese | 3 to 12              | `FALLBACK_MIN_HAN`    |
+
+Each language states the window once, in its pack profile. `CullRequest` can
+override it with `min_words` and `max_words`. The cull writes the window that
+it used to the manifest.
 
 The gate rechecks use the same windows: K5 reads `profile.min_units` and
 `max_units`, G5 reads `min_words` and `max_words` from the stored params, and
@@ -120,9 +124,9 @@ The gate rechecks use the same windows: K5 reads `profile.min_units` and
 These differences are deliberate, because the jobs differ. A reader must not
 compare the reject counts of two flows directly.
 
-- Window: the pack, the core, and the cull use different windows (section 4.1).
 - Frames: a pack frame sentence runs the shape guards and a target-form test
-  only. It skips `english_words`, `unique`, and the scaffold retry.
+  only. It skips `english_words`, `unique`, and the scaffold retry. This is
+  deliberate: a frame sentence is template text, not a Tatoeba pair.
 
 The cull and core reports once left out `repeat`. Both report lists now hold it.
 `tests/test_gate_id_map.py` checks the rule ids.

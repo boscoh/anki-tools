@@ -93,9 +93,6 @@ DEFAULT_OPTIONS = CoreOptions(
     outside_budget=200,
 )
 
-MIN_UNITS = 2
-MAX_UNITS = 8
-
 TEMPLATE_DIR = TEMPLATES_DIR / "mandarin_core"
 CORE_FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
 CORE_BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")
@@ -288,6 +285,8 @@ MANDARIN_LANGUAGE = LanguageDeckProfile(
     is_repeated=MANDARIN.is_repeated,
     dedupe_key=MANDARIN.dedupe_key,
     unit_count=MANDARIN.unit_count,
+    min_units=MANDARIN.min_units,
+    max_units=MANDARIN.max_units,
     highlight=MANDARIN.highlight,
     romanization_source="Sentence (Latin)",
 )
@@ -298,8 +297,6 @@ MANDARIN_CORE_PROFILE = MANDARIN_LANGUAGE.core(
     hits=MANDARIN.hits,
     lemma_key=convert_to_simplified,
     templates=CORE_TEMPLATES,
-    min_units=MIN_UNITS,
-    max_units=MAX_UNITS,
     final_marks=MANDARIN.final_marks,
     quote_marks=MANDARIN.quote_marks,
     internal_marks=MANDARIN.internal_marks,

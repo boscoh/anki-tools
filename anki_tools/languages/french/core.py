@@ -20,9 +20,6 @@ LOAN_PATH = Path("vocab/french_loanwords.txt")
 DEFAULT_CORE_WORDS = 50
 DEFAULT_OPTIONS = CoreOptions(tail_cards=120)
 
-MIN_UNITS = 5
-MAX_UNITS = 9
-
 
 TEMPLATE_DIR = TEMPLATES_DIR / "french_core"
 CORE_FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
@@ -46,8 +43,6 @@ FRENCH_CORE_PROFILE = cull.FRENCH_LANGUAGE.core(
     hits=FRENCH.hits,
     lemma_key=str.casefold,
     templates=CORE_TEMPLATES,
-    min_units=MIN_UNITS,
-    max_units=MAX_UNITS,
     final_marks=FRENCH.final_marks,
     quote_marks=FRENCH.quote_marks,
     internal_marks=FRENCH.internal_marks,

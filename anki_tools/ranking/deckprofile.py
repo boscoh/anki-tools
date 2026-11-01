@@ -58,6 +58,9 @@ class LanguageDeckProfile:
     :param dedupe_key: Key of the ``unique`` rule.
     :param unit_count: Unit count of a sentence, the same count as the sentence
         pack.
+    :param min_units: Minimum unit count of the window, the same window as the
+        sentence pack.
+    :param max_units: Maximum unit count of the window.
     :param english_bounds: English word-count window of the ``english_words``
         rule, the same window as the sentence pack.
     :param highlight: Bold hook, or None when the language does not bold.
@@ -81,6 +84,8 @@ class LanguageDeckProfile:
     is_repeated: Callable[[str], bool]
     dedupe_key: Callable[[str], str]
     unit_count: Callable[[str], int]
+    min_units: int
+    max_units: int
     english_bounds: tuple[int, int] = DEFAULT_ENGLISH_BOUNDS
     highlight: Callable[[str, str], str] | None = None
     romanization_source: str | None = None
@@ -108,6 +113,8 @@ class LanguageDeckProfile:
             "is_repeated": self.is_repeated,
             "dedupe_key": self.dedupe_key,
             "unit_count": self.unit_count,
+            "min_units": self.min_units,
+            "max_units": self.max_units,
             "english_bounds": self.english_bounds,
             "highlight": self.highlight,
             "romanization_source": self.romanization_source,
@@ -138,6 +145,8 @@ class LanguageDeckProfile:
             "is_repeated": self.is_repeated,
             "dedupe_key": self.dedupe_key,
             "unit_count": self.unit_count,
+            "min_units": self.min_units,
+            "max_units": self.max_units,
             "english_bounds": self.english_bounds,
             "highlight": self.highlight,
             "romanization_source": self.romanization_source,

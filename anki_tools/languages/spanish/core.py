@@ -59,9 +59,6 @@ DEFAULT_OPTIONS = CoreOptions(
     tail_cards=0, hard_top=50_000, similarity=SIMILARITY_THRESHOLD
 )
 
-MIN_UNITS = 4
-MAX_UNITS = 10
-
 TEMPLATE_DIR = TEMPLATES_DIR / "spanish_core"
 CORE_FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
 CORE_BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")
@@ -185,6 +182,8 @@ SPANISH_LANGUAGE = LanguageDeckProfile(
     is_repeated=SPANISH.is_repeated,
     dedupe_key=SPANISH.dedupe_key,
     unit_count=SPANISH.unit_count,
+    min_units=SPANISH.min_units,
+    max_units=SPANISH.max_units,
     highlight=SPANISH.highlight,
 )
 
@@ -195,8 +194,6 @@ SPANISH_CORE_PROFILE = SPANISH_LANGUAGE.core(
     hits=SPANISH.hits,
     lemma_key=str.casefold,
     templates=CORE_TEMPLATES,
-    min_units=MIN_UNITS,
-    max_units=MAX_UNITS,
     final_marks=SPANISH.final_marks,
     quote_marks=SPANISH.quote_marks,
     internal_marks=SPANISH.internal_marks,
