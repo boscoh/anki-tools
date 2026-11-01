@@ -1,7 +1,7 @@
 {
   "deck": "Swadesh Sentences French",
   "model": "Swadesh Sentences French",
-  "build_date": "2026-10-31",
+  "build_date": "2026-11-01",
   "source_dump_date": "2026-10-22",
   "counts": {
     "words": 207,
@@ -15,7 +15,6 @@
     "core_with_card": 0.9952
   },
   "voice": "gtts:fr",
-  "pack_license": "public",
   "audio_license_skipped": {
     "empty": 0,
     "CC BY-NC 4.0": 0
@@ -25,7 +24,7 @@
   "noun_gender_missing": 0,
   "files": {
     "source_csv": "sha256:014b1e7593affdd80cff7b101b90878bad8eb7a13a42de1361d00920a1b14604",
-    "sentences_csv": "sha256:5aefce0fe4e070d114a44671450fe0cd4f83ba9b66fc4e2839a39b050e4b6405"
+    "sentences_csv": "sha256:d540a72afff2c9c840fd788ad5d88dd8bdbd584b62b950674a65cb4454ed7436"
   },
   "licenses": [
     {
