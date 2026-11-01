@@ -328,14 +328,12 @@ def unit_count(sentence: str) -> int:
 
 
 def script_ok(sentence: str) -> bool:
-    """Check filter script: Latin letters and no digit.
+    """Check filter script: every letter is a French Latin letter.
 
     :param sentence: Prepared French sentence.
-    :returns: True when every letter is a French Latin letter and no digit exists.
+    :returns: True when every letter is a French Latin letter.
     """
     for char in sentence:
-        if char.isdigit():
-            return False
         if char.isalpha() and char.casefold() not in FRENCH_LETTERS:
             return False
     return True

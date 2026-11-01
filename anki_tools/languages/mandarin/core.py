@@ -283,6 +283,7 @@ MANDARIN_LANGUAGE = LanguageDeckProfile(
     clean_sentence=_sentence,
     card_css=card_css,
     sense_path=SENSE_PATH,
+    script_ok=MANDARIN.script_ok,
     highlight=MANDARIN.highlight,
     romanization_source="Sentence (Latin)",
 )

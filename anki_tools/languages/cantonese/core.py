@@ -240,6 +240,7 @@ CANTONESE_LANGUAGE = LanguageDeckProfile(
     clean_sentence=_sentence,
     card_css=card_css,
     sense_path=SENSE_PATH,
+    script_ok=CANTONESE.script_ok,
     highlight=CANTONESE.highlight,
     romanization_source="Jyutping",
 )

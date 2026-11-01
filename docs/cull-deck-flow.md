@@ -113,13 +113,13 @@ than the target list.
 ## 4. Sentence rules (C3)
 
 `filter_cards` applies F1 to F9 in order. The card rule is `filter_reason` of
-`cullflow.py`.
+`cardfilter.py`.
 
 | Key | The rule passes when                                            |
 | --- | --------------------------------------------------------------- |
 | F1  | the English text has 2 to 12 words                              |
 | F2  | the token count is inside the `min_words` to `max_words` window |
-| F3  | the text holds no digit, bracket, link, or ellipsis             |
+| F3  | the text passes `digit_marks` and `script`                      |
 | F4  | the last character is an accepted final mark                    |
 | F5  | the text holds exactly one final mark                           |
 | F6  | the text holds no quotation mark and no dialogue dash           |
@@ -127,15 +127,15 @@ than the target list.
 | F8  | the text holds no proper noun tag                               |
 | F9  | the sentence text is not kept yet                               |
 
-The English window F1, the script rule F3, and the proper-noun rule F8 are
-the shared rules of `anki_tools/ranking/cardfilter.py`. F2 and F4 to F7 come
-from the sentence shape guard `check_sentence_shape`, with the marks of the
-language profile. The shape guard names the mark rules F5 to F8, and
-`MARK_RULES` maps them to the card filter names F4 to F7.
+The English window F1 and the proper-noun rule F8 are shared rules of
+`anki_tools/ranking/cardfilter.py`. F2 to F7 come from the sentence shape guard
+`check_sentence_shape`, with the marks and the alphabet test of the language
+profile. The shape guard names the mark rules F5 to F8, and `MARK_RULES` maps
+them to the card filter names F4 to F7.
 
 The unit count of F2 is the token count of the card, not a text measure. The
-`CardShape` adapter gives the unit count and the three mark sets to the shape
-guard.
+`CardShape` adapter gives the unit count, the three mark sets, and the alphabet
+test to the shape guard.
 
 The run stores the first failed rule as the `reason` of the card. A passed
 card has the empty reason.

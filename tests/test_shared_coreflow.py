@@ -200,7 +200,7 @@ class TestFilterCoreCards:
             lambda sentence: False,
             min_units=1,
             max_units=9,
-            marks=spanish_core.SPANISH_CORE_PROFILE,
+            shape=spanish_core.SPANISH_CORE_PROFILE,
         )
 
         assert passed == [0]
@@ -218,7 +218,7 @@ class TestFilterCoreCards:
             lambda sentence: sentence.startswith("El"),
             min_units=1,
             max_units=9,
-            marks=spanish_core.SPANISH_CORE_PROFILE,
+            shape=spanish_core.SPANISH_CORE_PROFILE,
         )
 
         assert passed == []
@@ -236,7 +236,7 @@ class TestFilterCoreCards:
             lambda sentence: False,
             min_units=1,
             max_units=9,
-            marks=spanish_core.SPANISH_CORE_PROFILE,
+            shape=spanish_core.SPANISH_CORE_PROFILE,
         )
 
         assert passed == []
@@ -253,7 +253,7 @@ class TestFilterCoreCards:
                 lambda sentence: False,
                 min_units=1,
                 max_units=9,
-                marks=spanish_core.SPANISH_CORE_PROFILE,
+                shape=spanish_core.SPANISH_CORE_PROFILE,
             )
 
 
@@ -410,6 +410,14 @@ class TestCardFilter:
 
         assert passed == []
         assert reasons[0] == "digit_marks"
+
+    def test_script_rejects_a_foreign_letter(self) -> None:
+        passed, reasons = _filter_cards(
+            [_card("El perro come хлеб.")], [FILTER_TOKENS]
+        )
+
+        assert passed == []
+        assert reasons[0] == "script"
 
     def test_f4_rejects_a_missing_final_mark(self) -> None:
         passed, reasons = _filter_cards(

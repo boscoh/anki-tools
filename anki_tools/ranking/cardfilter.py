@@ -1,10 +1,10 @@
 """Shared card filter rules of the sentence decks.
 
-The cull and the core read their mark rules and their length window from the
-sentence shape guard with the values of the language profile. This module
-holds :func:`filter_reason`, which joins the two with the English window
-``english_words``, the ``digit_marks`` rule, the ``propn`` rule, and the
-``unique`` dedupe of :func:`filter_cards`.
+The cull and the core read their length window, text rules, and mark rules from
+the sentence shape guard with the values of the language profile. This module
+holds :func:`filter_reason`, which joins them with the English window
+``english_words``, the ``propn`` rule, and the ``unique`` dedupe of
+:func:`filter_cards`.
 """
 
 from __future__ import annotations
@@ -21,11 +21,8 @@ MAX_ENGLISH_WORDS = 12
 
 MARK_RULES = ("final_mark", "one_final_mark", "quote", "internal_mark")
 LENGTH_RULES = ("length_window",)
-BRACKET_MARKS = frozenset("[]{}<>")
-ELLIPSIS_MARKS = ("...", "…")
-URL_MARKS = ("http", "www.")
+TEXT_RULES = ("digit_marks", "script")
 
-_DIGIT_PATTERN = re.compile(r"\d")
 _WORD_PATTERN = re.compile(r"[^\W\d_]+")
 
 
@@ -44,7 +41,7 @@ def filter_cards(
     :param min_words: Minimum word count of a card.
     :param max_words: Maximum word count of a card.
     :param card_rule: Rule function of one card, :func:`filter_reason` with the
-        marks of the language.
+        profile of the language.
     :raises ValueError: The card list and the token list have different sizes.
     :returns: The input indices of the passed cards, and the reason per input
         index. A passed card has the empty string as its reason.
@@ -68,8 +65,8 @@ def filter_cards(
     return passed, reasons
 
 
-class Marks(Protocol):
-    """The mark sets of a language, as the cull profile and the core profile hold them."""
+class ShapeProfile(Protocol):
+    """The shape values of a language, as the cull profile and the core profile hold them."""
 
     @property
     def final_marks(self) -> str: ...
@@ -79,6 +76,9 @@ class Marks(Protocol):
 
     @property
     def internal_marks(self) -> str: ...
+
+    @property
+    def script_ok(self) -> Callable[[str], bool]: ...
 
 
 @dataclass(frozen=True)
@@ -92,12 +92,14 @@ class CardShape:
     :param final_marks: Accepted sentence-final marks of the language.
     :param quote_marks: Quotation marks and dialogue dashes of the language.
     :param internal_marks: Internal punctuation marks of the language.
+    :param script_ok: Alphabet test of the language.
     """
 
     units: int
     final_marks: str
     quote_marks: str
     internal_marks: str
+    script_ok: Callable[[str], bool]
 
     def unit_count(self, sentence: str) -> int:
         """Give the token count of the card.
@@ -113,19 +115,19 @@ def filter_reason(
     card_tokens: Sequence[tuple[str, str]],
     min_words: int,
     max_words: int,
-    profile: Marks,
+    profile: ShapeProfile,
 ) -> str:
     """Give the first failed filter rule of one card of the cull or the core.
 
-    The English window, the script rule, and the proper-noun rule come from this
-    module. The length window and the mark rules come from the sentence shape
-    guard, so the marks are the marks of the language profile.
+    The English window and the proper-noun rule come from this module. The length
+    window, the text rules, and the mark rules come from the sentence shape guard,
+    so the marks and the alphabet test are those of the language profile.
 
     :param card: Input card.
     :param card_tokens: Lemma and part of speech of the card sentence.
     :param min_words: Minimum token count of a card.
     :param max_words: Maximum token count of a card.
-    :param profile: Mark sets of the language.
+    :param profile: Mark sets and alphabet test of the language.
     :returns: The rule id from ``english_words`` to ``propn``, or the empty
         string on a pass.
     """
@@ -137,24 +139,18 @@ def filter_reason(
         profile.final_marks,
         profile.quote_marks,
         profile.internal_marks,
+        profile.script_ok,
     )
-    # The rank flows pass only the length key and the mark keys, so the adapter
+    # The rank flows pass only the length, text, and mark keys, so the adapter
     # gives those values and not the rest of a language profile.
-    guard_profile = cast(LanguageProfile, shape)
     reason = check_sentence_shape(
-        card.sentence, guard_profile, min_words, max_words, keys=LENGTH_RULES
+        card.sentence,
+        cast(LanguageProfile, shape),
+        min_words,
+        max_words,
+        keys=LENGTH_RULES + TEXT_RULES + MARK_RULES,
     )
-    if reason:
-        return reason
-    reason = script_rule(card.sentence)
-    if reason:
-        return reason
-    reason = check_sentence_shape(
-        card.sentence, guard_profile, min_words, max_words, keys=MARK_RULES
-    )
-    if reason:
-        return reason
-    return pos_rule(card_tokens)
+    return reason or pos_rule(card_tokens)
 
 
 def english_rule(card: Any) -> str:
@@ -166,23 +162,6 @@ def english_rule(card: Any) -> str:
     if MIN_ENGLISH_WORDS <= len(card.english.split()) <= MAX_ENGLISH_WORDS:
         return ""
     return "english_words"
-
-
-def script_rule(sentence: str) -> str:
-    """Give filter ``digit_marks``: no digit, bracket, link, or ellipsis.
-
-    :param sentence: Prepared sentence text.
-    :returns: ``digit_marks``, or the empty string on a pass.
-    """
-    lower = sentence.lower()
-    if (
-        _DIGIT_PATTERN.search(sentence)
-        or any(mark in sentence for mark in BRACKET_MARKS)
-        or any(mark in lower for mark in URL_MARKS)
-        or any(mark in sentence for mark in ELLIPSIS_MARKS)
-    ):
-        return "digit_marks"
-    return ""
 
 
 def pos_rule(card_tokens: Sequence[tuple[str, str]]) -> str:

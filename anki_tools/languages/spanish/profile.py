@@ -318,14 +318,12 @@ def unit_count(sentence: str) -> int:
 
 
 def script_ok(sentence: str) -> bool:
-    """Check filter script: Spanish Latin letters and no digit.
+    """Check filter script: every letter is a Spanish Latin letter.
 
     :param sentence: Prepared Spanish sentence.
-    :returns: True when every letter is a Spanish letter and no digit exists.
+    :returns: True when every letter is a Spanish letter.
     """
     for char in sentence:
-        if char.isdigit():
-            return False
         if char.isalpha() and char.casefold() not in SPANISH_LETTERS:
             return False
     return True

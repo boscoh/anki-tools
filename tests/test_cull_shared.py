@@ -67,6 +67,7 @@ def _profile() -> cullflow.CullProfile:
         final_marks=".?!",
         quote_marks='"«»“”',
         internal_marks=",;:",
+        script_ok=lambda sentence: True,
         input_model_name=MODEL_NAME,
         input_sentence_field="Text",
         input_english_field="Meaning",

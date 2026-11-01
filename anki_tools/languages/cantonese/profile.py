@@ -104,6 +104,7 @@ FINAL_MARKS = "。？！.!?"
 QUOTE_MARKS = '"“”「」『』'
 INTERNAL_MARKS = "，：；,:;"
 LATIN_OR_DIGIT = re.compile(r"[A-Za-z0-9０-９]")
+LATIN_LETTER = re.compile(r"[A-Za-z]")
 
 SENTENCE_FIELDS = [
     "target",
@@ -727,12 +728,12 @@ def zipf_words(sentence: str) -> list[str]:
 
 
 def script_ok(sentence: str) -> bool:
-    """Check filter script: no Latin letter and no digit.
+    """Check filter script: no Latin letter.
 
     :param sentence: Traditional Cantonese sentence.
-    :returns: True when the sentence has no Latin letter or digit.
+    :returns: True when the sentence has no Latin letter.
     """
-    return not LATIN_OR_DIGIT.search(sentence)
+    return not LATIN_LETTER.search(sentence)
 
 
 def unit_count(sentence: str) -> int:

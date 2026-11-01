@@ -90,7 +90,7 @@ ORPHAN_CONJUNCTIONS = (
     "虽然",
 )
 PREDICATE_TAG_PREFIXES = ("v", "a")
-LATIN_OR_DIGIT = re.compile(r"[A-Za-z0-9０-９]")
+LATIN_LETTER = re.compile(r"[A-Za-z]")
 
 SENTENCE_FIELDS = [
     "target",
@@ -1038,7 +1038,7 @@ MANDARIN = register(
         coverage_min=0.80,
         prepare_text=convert_to_simplified,
         unit_count=lambda sentence: len(get_chinese_chars(sentence)),
-        script_ok=lambda sentence: not LATIN_OR_DIGIT.search(sentence),
+        script_ok=lambda sentence: not LATIN_LETTER.search(sentence),
         is_repeated=is_repeated_zh_sentence,
         has_predicate=has_predicate,
         has_orphan=has_orphan_conjunction,

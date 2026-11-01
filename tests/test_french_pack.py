@@ -234,6 +234,10 @@ def test_proper_sentence_filters_f2_to_f10() -> None:
     )
     assert (
         check_sentence_shape("Le chien mange 42 fois ici.", french.FRENCH, 4, 10)
+        == "digit_marks"
+    )
+    assert (
+        check_sentence_shape("Le chien mange хлеб ici.", french.FRENCH, 4, 10)
         == "script"
     )
     assert check_sentence_shape("Oui oui oui oui.", french.FRENCH, 4, 10) == "repeat"

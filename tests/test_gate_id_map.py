@@ -6,6 +6,7 @@ from anki_tools.sentence_pack import pool
 PACK_KEYS = (
     "english_link",
     "length_window",
+    "digit_marks",
     "script",
     "repeat",
     "final_mark",
@@ -23,6 +24,7 @@ CULL_KEYS = (
     "english_words",
     "length_window",
     "digit_marks",
+    "script",
     "final_mark",
     "one_final_mark",
     "quote",

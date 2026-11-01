@@ -18,7 +18,7 @@ S16:唔,唔,not,S,16,2,2,covered
 S17:全部,全部,all,S,17,0,0,absent
 S18:多,多,many,S,18,2,2,covered
 S19:啲,啲,some,S,19,2,2,covered
-S20:少,少,few,S,20,2,2,covered
+S20:少,少,few,S,20,2,1,partial
 S21:其他,其他,other,S,21,0,0,absent
 S22:一,一,one,S,22,2,1,partial
 S23:兩,兩,two,S,23,2,2,covered
@@ -119,7 +119,7 @@ S117:𢯎,𢯎,to scratch,S,117,0,0,absent
 S118:掘,掘,to dig,S,118,0,0,absent
 S119:游水,游水,to swim,S,119,2,1,partial
 S120:飛,飛,to fly,S,120,2,2,covered
-S121:行,行,to walk,S,121,2,2,covered
+S121:行,行,to walk,S,121,2,1,partial
 S122:嚟,嚟,to come,S,122,2,2,covered
 S123:瞓,瞓,to lie down,S,123,2,0,absent_sense
 S124:坐,坐,to sit,S,124,2,2,covered

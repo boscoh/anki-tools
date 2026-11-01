@@ -19,12 +19,12 @@ name the flow with the id.
 
 One table shows the four flows at a glance:
 
-| Flow            | Command                              | Gate table               | Filter table         |
-| --------------- | ------------------------------------ | ------------------------ | -------------------- |
-| Sentence pack   | `anki swadesh pack <lang>`           | G1 to G21, 18 to 20 rows | 14 rule ids          |
-| Cull deck       | `anki fix <lang> <input> --select`   | G1 to G17                | 9 rule ids           |
-| Core deck       | `anki fix <lang> <input> --core`     | K1 to K21, 18 rows       | 9 rule ids, C1 to C5 |
-| Vocabulary deck | `anki swadesh vocab <lang>`          | none                     | none                 |
+| Flow            | Command                              | Gate table               | Filter table          |
+| --------------- | ------------------------------------ | ------------------------ | --------------------- |
+| Sentence pack   | `anki swadesh pack <lang>`           | G1 to G21, 18 to 20 rows | 15 rule ids           |
+| Cull deck       | `anki fix <lang> <input> --select`   | G1 to G17                | 10 rule ids           |
+| Core deck       | `anki fix <lang> <input> --core`     | K1 to K21, 18 rows       | 10 rule ids, C1 to C5 |
+| Vocabulary deck | `anki swadesh vocab <lang>`          | none                     | none                  |
 
 The filter column lives in `docs/filters.md`.
 
@@ -51,7 +51,8 @@ The reverse direction reads each check as a row and each flow as a column.
 | gate   | `gate_script`             | G9 (Yue) G17 (El)                | -                                 | -                                 | -               |
 | filter | `english_link`            | yes                              | -                                 | -                                 | -               |
 | filter | `length_window`           | yes                              | yes                               | yes                               | -               |
-| filter | `script`                  | yes                              | -                                 | -                                 | -               |
+| filter | `digit_marks`             | yes                              | yes                               | yes                               | -               |
+| filter | `script`                  | yes                              | yes                               | yes                               | -               |
 | filter | `repeat`                  | yes                              | -                                 | -                                 | -               |
 | filter | `final_mark`              | yes                              | yes                               | yes                               | -               |
 | filter | `one_final_mark`          | yes                              | yes                               | yes                               | -               |
@@ -63,7 +64,6 @@ The reverse direction reads each check as a row and each flow as a column.
 | filter | `unique`                  | yes                              | yes                               | yes                               | -               |
 | filter | `unknown`                 | yes                              | -                                 | -                                 | -               |
 | filter | `sense`                   | yes                              | -                                 | -                                 | -               |
-| filter | `digit_marks`             | -                                | yes                               | yes                               | -               |
 | filter | `propn`                   | -                                | yes                               | yes                               | -               |
 | filter | C1 to C5                  | -                                | -                                 | yes                               | -               |
 

@@ -127,6 +127,7 @@ GENDER_BY_ARTICLE = {
 GREEK_LETTER = re.compile(r"[\u0370-\u03ff\u1f00-\u1fff]")
 POLYTONIC = re.compile(r"[\u1f00-\u1fff]")
 DIGIT_OR_LATIN = re.compile(r"[A-Za-z0-9]")
+LATIN_LETTER = re.compile(r"[A-Za-z]")
 CARRIERS = ("{form}", "η {form}", "ο {form}", "το {form}", "τον {form}")
 
 SENTENCE_FIELDS = [
@@ -372,12 +373,12 @@ def unit_count(sentence: str) -> int:
 
 
 def script_ok(sentence: str) -> bool:
-    """Check filter script: Greek letters only, no Latin letter and no digit.
+    """Check filter script: Greek letters only, no Latin letter.
 
     :param sentence: Greek sentence.
     :returns: True when the sentence passes.
     """
-    return not DIGIT_OR_LATIN.search(sentence) and not POLYTONIC.search(sentence)
+    return not LATIN_LETTER.search(sentence) and not POLYTONIC.search(sentence)
 
 
 def has_orphan(sentence: str) -> bool:

@@ -181,6 +181,7 @@ SPANISH_LANGUAGE = LanguageDeckProfile(
     clean_sentence=_sentence,
     card_css=card_css,
     sense_path=SENSE_PATH,
+    script_ok=SPANISH.script_ok,
     highlight=SPANISH.highlight,
 )
 

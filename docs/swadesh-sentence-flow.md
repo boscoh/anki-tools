@@ -87,7 +87,7 @@ the measure step.
 | Key | Name                      | The guard passes when                                 |
 | --- | ------------------------- | ----------------------------------------------------- |
 | F2  | length window             | the unit count is inside the core or scaffold window  |
-| F3  | script                    | the text holds no Latin letter and no digit           |
+| F3  | digit marks and script    | the text passes `digit_marks` and `script`            |
 | F4  | no repeated pattern       | the text is not a repeated pattern                    |
 | F5  | final mark                | the last character is an accepted final mark          |
 | F6  | one final mark            | the text holds exactly one final mark                 |

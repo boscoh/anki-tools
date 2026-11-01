@@ -24,7 +24,7 @@ def test_guard_table_matches_the_filter_order() -> None:
 
 def test_scaffold_keys_skip_the_relaxed_filters() -> None:
     assert pool.SCAFFOLD_SHAPE_KEYS == frozenset(
-        {"length_window", "script", "repeat", "final_mark", "quote"}
+        {"length_window", "digit_marks", "script", "repeat", "final_mark", "quote"}
     )
     assert pool.SCAFFOLD_SHAPE_FAILURES == frozenset({"one_final_mark", "internal_mark"})
 
@@ -32,10 +32,29 @@ def test_scaffold_keys_skip_the_relaxed_filters() -> None:
 def test_record_pass_counts_every_guard_before_the_failure() -> None:
     counts = dict.fromkeys(pool.FILTER_KEYS, 0)
     pool.record_pass(counts, "final_mark")
-    assert set(pool.FILTER_KEYS[:4]) == {key for key, value in counts.items() if value}
+    assert set(pool.FILTER_KEYS[:5]) == {key for key, value in counts.items() if value}
     counts = dict.fromkeys(pool.FILTER_KEYS, 0)
     pool.record_pass(counts, None)
     assert all(value == 1 for value in counts.values())
+
+
+def test_digit_marks_is_one_guard_for_every_language() -> None:
+    for profile, sentence in (
+        (MANDARIN, "我想喝水2杯。"),
+        (GREEK, "Η γάτα έχει 3 μήνες."),
+        (FRENCH, "Le chat [noir] mange vite."),
+        (FRENCH, "Le chat mange…"),
+    ):
+        assert (
+            pool.shape_failure(sentence, profile, 1, 20, keys=frozenset({"digit_marks"}))
+            == "digit_marks"
+        )
+
+
+def test_script_tests_only_the_alphabet() -> None:
+    assert MANDARIN.script_ok("我想喝水2杯。")
+    assert not MANDARIN.script_ok("我想喝tea。")
+    assert FRENCH.script_ok("Il a 42 ans.")
 
 
 def test_shape_failure_applies_only_the_requested_keys() -> None:

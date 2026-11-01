@@ -50,6 +50,7 @@ class CoreProfile:
     :param final_marks: Accepted sentence-final marks of the language.
     :param quote_marks: Quotation marks and dialogue dashes of the language.
     :param internal_marks: Internal punctuation marks of the language.
+    :param script_ok: Alphabet test of the ``script`` rule.
     :param default_options: Selection settings of the core cover.
     :param frequency_source: Label of the frequency source for the manifest.
     :param lemma_overrides: Lemma repair map of the lemmatizer artefacts,
@@ -89,6 +90,7 @@ class CoreProfile:
     final_marks: str
     quote_marks: str
     internal_marks: str
+    script_ok: Callable[[str], bool]
     default_options: Any
     frequency_source: str
     lemma_overrides: Mapping[str, str] = field(default_factory=dict)

@@ -147,6 +147,7 @@ FRENCH_LANGUAGE = LanguageDeckProfile(
     clean_sentence=cullflow.plain_sentence,
     card_css=card_css,
     sense_path=SENSE_PATH,
+    script_ok=FRENCH.script_ok,
     highlight=FRENCH.highlight,
 )
 

@@ -2,7 +2,7 @@ word,rank,count,status,gloss
 tener,5,108,covered,have
 hacer,8,35,covered,do
 ir,9,10,covered,go
-querer,10,23,covered,want
+querer,10,24,covered,want
 decir,11,10,covered,
 ver,14,19,covered,
 saber,16,8,covered,
@@ -11,8 +11,8 @@ no,23,194,covered,
 venir,24,3,covered,
 gustar,25,22,covered,like
 creer,27,11,covered,believe
-pensar,28,6,covered,
-hablar,30,4,covered,talk
+pensar,28,5,covered,
+hablar,30,5,covered,talk
 encontrar,31,7,covered,
 mucho,32,28,covered,
 dejar,33,7,covered,leave
@@ -39,15 +39,15 @@ comprar,62,3,covered,
 empezar,63,3,covered,
 conocer,64,3,covered,
 comer,65,9,covered,
-dormir,67,3,covered,
+dormir,67,2,covered,
 trabajar,68,3,covered,
 morir,70,2,covered,
 llamar,71,2,covered,call
 acabar,73,5,covered,
 aprender,74,4,covered,
-caer,76,4,covered,
+caer,76,5,covered,
 escribir,79,1,partial,
-tanto,80,16,covered,so
+tanto,80,15,covered,so
 más,81,25,covered,more
 contar,83,2,covered,
 intentar,86,3,covered,
@@ -196,7 +196,7 @@ invitar,251,1,partial,
 partir,252,1,partial,
 descubrir,253,0,absent,
 verdad,254,4,covered,truth
-país,255,3,covered,
+país,255,4,covered,
 esconder,256,1,partial,
 pertenecer,257,1,partial,
 parar,258,2,covered,

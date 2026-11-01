@@ -61,6 +61,7 @@ FILTER_RULES = (
     "english_words",
     "length_window",
     "digit_marks",
+    "script",
     "final_mark",
     "one_final_mark",
     "quote",
@@ -181,6 +182,7 @@ class CullProfile:
     :param final_marks: Accepted sentence-final marks.
     :param quote_marks: Quotation marks and dialogue dashes of the mark rule.
     :param internal_marks: Internal punctuation marks of the mark rule.
+    :param script_ok: Alphabet test of the ``script`` rule.
     :param input_model_name: Name of the input note model.
     :param input_sentence_field: Name of the sentence field of the input model.
     :param input_english_field: Name of the English field of the input model.
@@ -214,6 +216,7 @@ class CullProfile:
     final_marks: str
     quote_marks: str
     internal_marks: str
+    script_ok: Callable[[str], bool]
 
     input_model_name: str
     input_sentence_field: str

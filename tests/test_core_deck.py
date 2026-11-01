@@ -77,7 +77,7 @@ def _filter(
         profile.has_orphan,
         min_units=1,
         max_units=9,
-        marks=profile,
+        shape=replace(profile, script_ok=lambda sentence: True),
     )
 
 

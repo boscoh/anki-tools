@@ -27,7 +27,8 @@ cap, and they have no concept quota.
 | ---------------- | ---------------------------------- | ------------------------------------ | ------------------------------------------------------------------------ |
 | `english_link`   | an English link exists             | -                                    | -                                                                        |
 | `length_window`  | unit count inside the window       | token count inside the length window | token count inside the length window                                     |
-| `script`         | the language script test           | -                                    | -                                                                        |
+| `digit_marks`    | no digit, bracket, link, ellipsis  | the same                             | the same                                                                 |
+| `script`         | the language alphabet test         | the same                             | the same                                                                 |
 | `repeat`         | no repeated pattern                | -                                    | -                                                                        |
 | `final_mark`     | the last character is a final mark | the same                             | the same                                                                 |
 | `one_final_mark` | exactly one final mark             | the same                             | the same                                                                 |
@@ -39,11 +40,10 @@ cap, and they have no concept quota.
 | `unique`         | dedupe key is new                  | the sentence text is unique          | the same                                                                 |
 | `unknown`        | unknown token budget               | -                                    | -                                                                        |
 | `sense`          | English gloss holds the sense      | -                                    | -                                                                        |
-| `digit_marks`    | -                                  | no digit, bracket, link, or ellipsis | the same                                                                 |
 | `propn`          | -                                  | no `PROPN` token                     | the same                                                                 |
 | C1 to C5         | -                                  | -                                    | a verb, an orphan test, a name test, a loan word test, and the media map |
 
-The pack tests 14 ids, the cull 9, and the core 14.
+The pack tests 15 ids, the cull 10, and the core 15.
 
 ## 3. Rule order
 
@@ -55,8 +55,9 @@ sentence that passes no guard becomes a candidate for the lowest-index word it
 covers.
 
 The cull runs one list in `filter_reason`: `english_words`, `length_window`,
-`digit_marks`, the mark rules, `propn`, then `unique`. The mark rules come from
-`check_sentence_shape`, and `MARK_RULES` holds their ids.
+`digit_marks`, `script`, the mark rules, `propn`, then `unique`. The shape guard
+`check_sentence_shape` gives all rules except `english_words`, `propn`, and
+`unique`. `LENGTH_RULES`, `TEXT_RULES`, and `MARK_RULES` hold their ids.
 
 The core runs `filter_cards` with `filter_reason`, the function of the cull, then
 C1 to C5 in `filter_core_cards`.
@@ -78,10 +79,10 @@ pack records a pass count for every guard before the first failure.
   mark inside the sentence stays, so a second final mark fails `one_final_mark`.
 - `MARK_RULES` lists the four mark ids that the cull takes from the pack shape
   guard. The pack has no `propn` rule. The cull has no `english_link`,
-  `script`, `repeat`, `predicate`, `orphan`, `unknown`, or `sense` rule.
-- `script` is the language profile test of the pack. `digit_marks` is the digit,
-  bracket, link, and ellipsis test of the rank flows. The two tests differ, so
-  they hold two ids.
+  `repeat`, `predicate`, `orphan`, `unknown`, or `sense` rule.
+- `digit_marks` is the digit, bracket, link, and ellipsis test. It has no language
+  input. `script` is the alphabet test of the language profile. Both run in all
+  three flows.
 
 ## 5. Decisions
 
@@ -93,6 +94,7 @@ pack records a pass count for every guard before the first failure.
 | L5    | one rule key namespace                | none                                           | rejected, ADR 0027                             |
 | L6    | one identical rule set for every flow | a different accepted set                       | rejected, the two jobs differ                  |
 | L7    | `length_window` to the gate layer     | none                                           | rejected, a gate never rejects a sentence      |
+| L8    | `digit_marks`, `script` in all flows  | the cull and the core gain an alphabet test    | done, `anki-sxzu`, ADR 0029                    |
 
 L3 added `final_marks`, `quote_marks`, and `internal_marks` to `CoreProfile`. It
 moved `CardShape` and `filter_reason` to `ranking/cardfilter.py`, and
@@ -101,6 +103,13 @@ with their own marks and their own token counts.
 
 L3 changed the passed set of the Cantonese core deck. ADR 0028 records the
 card counts.
+
+L8 split the old `script` test. Each language `script_ok` hook now tests only the
+alphabet, and `digit_marks` is one function in `sentence_pack/pool.py` for every
+flow. The pack, the cull, and the core run both guards through
+`check_sentence_shape`. `CullProfile` and `CoreProfile` hold `script_ok`. L8
+changed the Cantonese core deck by one card. ADR 0029 records the counts and the
+open pack rebuild.
 
 ## 6. Verification
 

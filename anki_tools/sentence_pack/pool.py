@@ -32,6 +32,7 @@ from wordfreq import zipf_frequency
 FILTER_KEYS = [
     "english_link",
     "length_window",
+    "digit_marks",
     "script",
     "repeat",
     "final_mark",
@@ -48,6 +49,7 @@ FILTER_KEYS = [
 FILTER_NAMES = {
     "english_link": "english link",
     "length_window": "length window",
+    "digit_marks": "no digit, bracket, link, or ellipsis",
     "script": "script",
     "repeat": "no repeated pattern",
     "final_mark": "final mark",
@@ -61,6 +63,9 @@ FILTER_NAMES = {
     "unknown": "unknown token budget",
     "sense": "english sense",
 }
+BRACKET_MARKS = frozenset("[]{}<>")
+ELLIPSIS_MARKS = ("...", "…")
+URL_MARKS = ("http", "www.")
 MIN_ENGLISH_WORDS = 2
 MAX_ENGLISH_WORDS = 12
 
@@ -144,6 +149,17 @@ def _passes_length(item: ShapeInput) -> bool:
     return item.min_units <= item.unit_len <= item.max_units
 
 
+def _passes_digit_marks(item: ShapeInput) -> bool:
+    sentence = item.sentence
+    lower = sentence.lower()
+    return not (
+        any(char.isdigit() for char in sentence)
+        or any(mark in sentence for mark in BRACKET_MARKS)
+        or any(mark in lower for mark in URL_MARKS)
+        or any(mark in sentence for mark in ELLIPSIS_MARKS)
+    )
+
+
 def _passes_script(item: ShapeInput) -> bool:
     return item.profile.script_ok(item.sentence)
 
@@ -174,6 +190,7 @@ def _passes_internal_marks(item: ShapeInput) -> bool:
 
 SHAPE_GUARDS: tuple[tuple[str, Callable[[ShapeInput], bool]], ...] = (
     ("length_window", _passes_length),
+    ("digit_marks", _passes_digit_marks),
     ("script", _passes_script),
     ("repeat", _passes_repeat),
     ("final_mark", _passes_final_mark),

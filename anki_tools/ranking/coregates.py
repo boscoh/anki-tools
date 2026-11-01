@@ -172,7 +172,7 @@ def gate_filter_recheck(files: CoreFiles) -> tuple[bool, str]:
         profile.has_orphan,
         min_units=profile.min_units,
         max_units=profile.max_units,
-        marks=profile,
+        shape=profile,
     )
     if len(kept) != len(cards):
         failed = [

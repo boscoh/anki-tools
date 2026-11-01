@@ -1,5 +1,5 @@
 {
-  "build_date": "2026-10-27T12:08:20+00:00",
+  "build_date": "2026-10-31T23:57:17+00:00",
   "source": {
     "input": "apkg/Spanish 9000 sentences with native audio.apkg",
     "deck": "Spanish 1000",
@@ -24,7 +24,7 @@
     "cards": 747,
     "frequency_cards": 573,
     "reserve": 174,
-    "content": 1567,
+    "content": 1566,
     "targets": 300,
     "covered": 278,
     "covered2": 168,
@@ -39,8 +39,8 @@
     "spoken_weight": 0.5
   },
   "files": {
-    "cull_csv": "sha256:7a23ec855ef61e3ca893a3947a769767e41a1a92251cbdb73a5b3d014a9d7d34",
-    "coverage_csv": "sha256:190d45dd5362bbbb084b8f44f0e36bbb143323ebd8e09772a1f88f32e8942bef",
+    "cull_csv": "sha256:c3779d7d07d50871c5539833e42dfdda5416532ebea713ac54c8e70c809330f6",
+    "coverage_csv": "sha256:04cf20c3864f193a09978ae69e2d3ab189aa4f1653b5fe54c8e8a6b844ef2856",
     "input_apkg": "sha256:f67605459feb506bcbbb95830a356ff349c21c28e136c8efc3d82d253ec244e9"
   },
   "licenses": {
@@ -49,8 +49,8 @@
     "audio": "Input audio: license of the source deck",
     "swadesh": "Swadesh word data: CC BY-SA 4.0"
   },
-  "kept_order": "sha256:6a11065aa1fd3e50458723f37b91447fe221a441682b4d784826835e232eb56b",
-  "reserve_pack": "apkg/swadesh_spanish_sentences.apkg",
+  "kept_order": "sha256:ae275a07b3c3abad7018f8cce8438602f3e45d334f23543eb1d1495acebf50ae",
+  "reserve_pack": "apkg/swadesh_sentences_spanish.apkg",
   "swadesh_exceptions": [
     "cola",
     "corteza",
