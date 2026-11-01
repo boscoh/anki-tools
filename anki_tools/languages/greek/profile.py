@@ -20,11 +20,7 @@ from wordfreq import zipf_frequency
 from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
 from anki_tools.gates import GateResult
 from anki_tools.languages.greek.rank import greek_text_dedup_key, word_similarity_el
-from anki_tools.sentence_pack.audit import (
-    AuditInputs,
-    run_pack_audit,
-    sample,
-)
+from anki_tools.sentence_pack.audit import run_pack_audit
 from anki_tools.sentence_pack.pack import (
     ATTRIBUTION_PATH,
     attribution_lines,
@@ -900,29 +896,11 @@ GREEK = register(
         attribution=greek_attribution,
         finalize_candidate=lambda card, target: card,
         sense_path=SENSE_PATH,
+        check_word_table=lambda table, word_csv, review_csv: check_word_table(
+            table, csv_path=word_csv, review_path=review_csv
+        ),
     )
 )
-
-
-def gate_word_table(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Greek gate P1: the reviewed word table passes every S1 check.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    table = inputs.table()
-    failures = check_word_table(
-        table,
-        csv_path=inputs.word_csv,
-        review_path=inputs.review_csv,
-    )
-    concepts = len({form.swadesh_index for form in table})
-    if failures:
-        return False, sample(failures)
-    return True, f"{concepts} concepts, {len(table)} forms"
 
 
 def greek_gates() -> tuple[tuple[str, Any], ...]:
@@ -945,6 +923,7 @@ def greek_gates() -> tuple[tuple[str, Any], ...]:
         gate_unique_forms,
         gate_unique_tatoeba_ids,
         gate_word_audio,
+        gate_word_table,
     )
 
     return (

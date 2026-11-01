@@ -35,7 +35,6 @@ from anki_tools.languages.mandarin.profile import (
     WordForm,
     known_words,
     build_attribution,
-    check_word_table,
     load_user_dictionary,
     load_word_table,
     make_candidate,
@@ -66,6 +65,7 @@ from anki_tools.sentence_pack.audit import (
     gate_target_once,
     gate_targets_in_table,
     gate_unique_forms,
+    gate_word_table,
     gate_unique_tatoeba_ids,
     gate_word_audio,
     print_audit,
@@ -285,17 +285,6 @@ def build_mandarin_pack(
     return result
 
 
-def _gate_p1(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
-    table = inputs.table()
-    failures = check_word_table(
-        table, csv_path=inputs.word_csv, review_path=inputs.review_csv
-    )
-    concepts = len({form.swadesh_index for form in table})
-    if failures:
-        return False, sample(failures)
-    return True, f"{concepts} concepts, {len(table)} forms"
-
-
 def _gate_p9(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
     rows = inputs.rows()
     bad = []
@@ -338,7 +327,7 @@ def _gate_p12(inputs: AuditInputs, profile: Any) -> tuple[bool, str]:
 
 
 GATES: tuple[tuple[str, GateCheck], ...] = (
-    ("P1", _gate_p1),
+    ("P1", gate_word_table),
     ("P2", gate_unique_forms),
     ("P3", gate_targets_in_table),
     ("P4", gate_unique_tatoeba_ids),

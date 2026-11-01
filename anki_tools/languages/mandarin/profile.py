@@ -895,6 +895,9 @@ MANDARIN = register(
         extra_manifest=_extra_manifest,
         attribution=write_attribution,
         sense_path=SENSE_PATH,
+        check_word_table=lambda table, word_csv, review_csv: check_word_table(
+            table, csv_path=word_csv, review_path=review_csv
+        ),
         finalize_candidate=lambda card, target: replace(
             card, pinyin=sentence_pinyin(card.sentence)
         ),

@@ -2,7 +2,7 @@
 
 | Field   | Value                                                  |
 | ------- | ------------------------------------------------------ |
-| Status  | Consolidation done; pack P1 and one output reader open |
+| Status  | Consolidation done; one output reader open             |
 | Date    | 2026-11-01                                             |
 | Owner   | anki-tools                                             |
 | Related | `docs/filters.md`, ADR 0021, ADR 0027, ADR 0057        |
@@ -46,7 +46,7 @@ parameter.
 
 | Check                  | Pack | Cull | Core | Plain meaning                                       |
 | ---------------------- | ---- | ---- | ---- | --------------------------------------------------- |
-| `gate_word_table`      | P1   | -    | -    | The word table is valid. Five copies exist (open).  |
+| `gate_word_table`      | P1   | -    | -    | The word table is valid.                            |
 | `gate_filter_recheck`  | P14  | R5   | K5   | Every kept card passes the filter rules.            |
 | `gate_similarity`      | -    | R6   | K6   | No two cards are almost the same sentence.          |
 
@@ -175,11 +175,8 @@ current fault, so both wait for a third consumer.
 
 ## 6. Open work
 
-Both items are in `anki-ujvj`.
+One item is in `anki-ujvj`.
 
-- Pack `P1`. Five language modules define `gate_word_table`. The French and
-  Spanish `check_word_table` take no `csv_path`, so one shared function needs a
-  profile hook for the path.
 - One output reader. The pack `read_apkg` returns a different shape from the
   rank `read_output`. One reader lets the pack share the audio check. This is
   the highest-risk item.

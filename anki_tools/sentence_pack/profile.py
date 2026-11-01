@@ -126,6 +126,8 @@ class LanguageProfile:
     :param finalize_candidate: Hook that fills the language-specific card fields.
     :param sense_path: TSV file of the sense rows: the English sense words, the
         and false-friend words of each target.
+    :param check_word_table: Hook that checks the word table, given the table,
+        the word CSV path, and the review CSV path. It gives the failure strings.
     :param highlight: Hook that marks the matched target tokens of a card
         sentence, None to wrap the first target substring.
     :param warm_tokens: Hook that tokenizes a whole sentence pool in one pass, so
@@ -194,6 +196,7 @@ class LanguageProfile:
     excluded_words: Callable[[Sequence[Any], Collection[str]], list[str]]
     finalize_candidate: Callable[[Any, str], Any]
     sense_path: Path
+    check_word_table: Callable[[Any, Path, Path], list[str]]
     highlight: Callable[[str, str], str] | None = None
     warm_tokens: Callable[[Iterable[str]], None] | None = None
 

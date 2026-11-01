@@ -1044,28 +1044,11 @@ FRENCH = register(
         finalize_candidate=lambda card, target: card,
         highlight=highlight,
         sense_path=SENSE_PATH,
+        check_word_table=lambda table, _word_csv, review_csv: check_word_table(
+            table, review_path=review_csv
+        ),
     )
 )
-
-
-def gate_word_table(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """French gate P1: the reviewed word table passes every S1 check.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    table = inputs.table()
-    failures = check_word_table(
-        table,
-        review_path=inputs.review_csv,
-    )
-    concepts = len({form.swadesh_index for form in table})
-    if failures:
-        return False, sample(failures)
-    return True, f"{concepts} concepts, {len(table)} forms"
 
 
 def gate_discontinuous(
@@ -1110,6 +1093,7 @@ def french_gates() -> tuple[tuple[str, Any], ...]:
         gate_unique_forms,
         gate_unique_tatoeba_ids,
         gate_word_audio,
+        gate_word_table,
     )
 
     return (

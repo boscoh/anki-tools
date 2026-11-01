@@ -912,6 +912,9 @@ CANTONESE = register(
         attribution=write_attribution,
         highlight=highlight,
         sense_path=SENSE_PATH,
+        check_word_table=lambda table, word_csv, review_csv: check_word_table(
+            table, csv_path=word_csv, review_path=review_csv
+        ),
         finalize_candidate=lambda card, _target: replace(
             card, jyutping=sentence_jyutping(card.sentence)
         ),
@@ -979,29 +982,6 @@ def write_sentence_review_csv(
     )
 
 
-def gate_word_table(
-    inputs: Any,
-    _profile: LanguageProfile,
-) -> tuple[bool, str]:
-    """Cantonese gate P1: the reviewed word table passes every S1 check.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text.
-    """
-    table = inputs.table()
-    failures = check_word_table(
-        table,
-        csv_path=inputs.word_csv,
-        review_path=inputs.review_csv,
-    )
-    concepts = len({form.swadesh_index for form in table})
-    if failures:
-        return False, " | ".join(failures[:3])
-    return True, f"{concepts} concepts, {len(table)} forms"
-
-
-
 def gate_jyutping(
     inputs: Any,
     _profile: LanguageProfile,
@@ -1060,6 +1040,7 @@ def cantonese_gates() -> tuple[tuple[str, Any], ...]:
         gate_unique_forms,
         gate_unique_tatoeba_ids,
         gate_word_audio,
+        gate_word_table,
     )
 
     return (

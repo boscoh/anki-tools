@@ -245,6 +245,25 @@ def scaffold_problem(sentence: str, profile: LanguageProfile) -> str | None:
     return None
 
 
+def gate_word_table(
+    inputs: AuditInputs, profile: LanguageProfile
+) -> tuple[bool, str]:
+    """Gate P1: the reviewed word table passes every S1 check.
+
+    :param inputs: Lazy file reader of the audit.
+    :param profile: Language profile.
+    :returns: Pass flag and detail text.
+    """
+    table = inputs.table()
+    failures = profile.check_word_table(
+        table, inputs.word_csv, inputs.review_csv
+    )
+    concepts = len({form.swadesh_index for form in table})
+    if failures:
+        return False, sample(failures)
+    return True, f"{concepts} concepts, {len(table)} forms"
+
+
 def gate_unique_forms(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
