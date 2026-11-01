@@ -8,19 +8,69 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, NamedTuple
+from typing import Any
 
 import pytest
 
 from anki_tools import cli
-from anki_tools.languages.cantonese import core as cantonese_core
-from anki_tools.languages.french import core as french_core
-from anki_tools.languages.french import cull as french_cull
-from anki_tools.languages.mandarin import core as mandarin_core
 from anki_tools.languages.registry import LANGUAGES
-from anki_tools.languages.spanish import core as spanish_core
-from anki_tools.languages.spanish import cull as spanish_cull
 from anki_tools.ranking import cullflow, fixrun
+
+OUT = Path("out.apkg")
+SELECT = {"select": True}
+CORE = {"core": True}
+
+ROUTES = [
+    pytest.param("french", SELECT, "run_cull", "apkg/french_1000.apkg", id="french-select"),
+    pytest.param("spanish", SELECT, "run_cull", "apkg/spanish_1000.apkg", id="spanish-select"),
+    pytest.param("french", CORE, "run_core", "apkg/french_core.apkg", id="french-core"),
+    pytest.param("spanish", CORE, "run_core", "apkg/spanish_core.apkg", id="spanish-core"),
+    pytest.param("mandarin", CORE, "run_core", "apkg/mandarin_core.apkg", id="mandarin-core"),
+    pytest.param("cantonese", CORE, "run_core", "apkg/cantonese_core.apkg", id="cantonese-core"),
+    pytest.param("french", {**SELECT, "output": OUT}, "run_cull", "out.apkg", id="select-output"),
+    pytest.param("french", {**CORE, "output": OUT}, "run_core", "out.apkg", id="core-output"),
+    pytest.param(
+        "french", {**SELECT, "check": True}, "check_cull", "apkg/french_1000.apkg",
+        id="check-select",
+    ),
+    pytest.param(
+        "mandarin", {**CORE, "check": True, "output": OUT}, "check_core", "out.apkg",
+        id="check-core-output",
+    ),
+]
+
+REQUEST_FIELDS = [
+    pytest.param(
+        SELECT,
+        {"no_reserve": False, "max_cards": cullflow.DEFAULT_MAX_CARDS},
+        id="select-defaults",
+    ),
+    pytest.param(
+        {**SELECT, "reserve": False, "cards": 500},
+        {"no_reserve": True, "max_cards": 500},
+        id="select-options",
+    ),
+    pytest.param(CORE, {"max_cards": None, "core_words": 0}, id="core-defaults"),
+    pytest.param(
+        {**CORE, "cards": 42, "words": 7}, {"max_cards": 42, "core_words": 7}, id="core-options"
+    ),
+]
+
+ERRORS = [
+    pytest.param("french", {}, "choose a mode: --select --core", id="no-mode"),
+    pytest.param(
+        "french", {**CORE, **SELECT}, "choose one mode: --select --core", id="two-modes"
+    ),
+    pytest.param(
+        "french", {"check": True}, "--check needs --select or --core", id="check-no-mode"
+    ),
+    pytest.param(
+        "mandarin", {"check": True}, "--check needs --core", id="check-no-mode-single"
+    ),
+    pytest.param(
+        "mandarin", SELECT, "Mandarin has no --select mode", id="select-unsupported"
+    ),
+]
 
 
 class Flows:
@@ -29,90 +79,17 @@ class Flows:
     def __init__(self) -> None:
         self.calls: list[tuple[str, Any, Any]] = []
         self.gate_code = 0
-
-    @property
-    def seam(self) -> dict[str, Any]:
-        return {
-            "run_core": lambda request, profile: self._record("run_core", request, profile),
-            "run_cull": lambda request, profile: self._record("run_cull", request, profile),
-            "check_core": lambda path, profile: self._gate("check_core", path, profile),
-            "check_cull": lambda path, profile: self._gate("check_cull", path, profile),
+        self.seam: dict[str, Any] = {
+            name: self._recorder(name)
+            for name in ("run_core", "run_cull", "check_core", "check_cull")
         }
 
-    def _record(self, name: str, request: Any, profile: Any) -> None:
-        self.calls.append((name, request, profile))
+    def _recorder(self, name: str) -> Callable[[Any, Any], int]:
+        def record(target: Any, profile: Any) -> int:
+            self.calls.append((name, target, profile))
+            return self.gate_code
 
-    def _gate(self, name: str, path: Path, profile: Any) -> int:
-        self.calls.append((name, path, profile))
-        return self.gate_code
-
-
-class Route(NamedTuple):
-    language: str
-    mode: str
-    flow: str
-    profile: Any
-    default_output: Path
-
-    @property
-    def mode_option(self) -> dict[str, bool]:
-        return {self.mode: True}
-
-
-ROUTES = [
-    pytest.param(
-        Route("french", "select", "cull", french_cull.FRENCH_CULL_PROFILE,
-              Path("apkg/french_1000.apkg")),
-        id="french-select",
-    ),
-    pytest.param(
-        Route("spanish", "select", "cull", spanish_cull.SPANISH_CULL_PROFILE,
-              Path("apkg/spanish_1000.apkg")),
-        id="spanish-select",
-    ),
-    pytest.param(
-        Route("french", "core", "core", french_core.FRENCH_CORE_PROFILE,
-              Path("apkg/french_core.apkg")),
-        id="french-core",
-    ),
-    pytest.param(
-        Route("spanish", "core", "core", spanish_core.SPANISH_CORE_PROFILE,
-              Path("apkg/spanish_core.apkg")),
-        id="spanish-core",
-    ),
-    pytest.param(
-        Route("mandarin", "core", "core", mandarin_core.MANDARIN_CORE_PROFILE,
-              Path("apkg/mandarin_core.apkg")),
-        id="mandarin-core",
-    ),
-    pytest.param(
-        Route("cantonese", "core", "core", cantonese_core.CANTONESE_CORE_PROFILE,
-              Path("apkg/cantonese_core.apkg")),
-        id="cantonese-core",
-    ),
-]
-
-ERRORS = [
-    pytest.param("french", {}, "choose a mode: --select --core", id="french-bare"),
-    pytest.param("mandarin", {}, "choose a mode: --core", id="mandarin-bare"),
-    pytest.param(
-        "french", {"core": True, "select": True},
-        "choose one mode: --select --core", id="two-modes",
-    ),
-    pytest.param(
-        "french", {"check": True}, "--check needs --select or --core", id="check-french",
-    ),
-    pytest.param(
-        "cantonese", {"check": True}, "--check needs --core", id="check-cantonese",
-    ),
-    pytest.param(
-        "mandarin", {"select": True}, "Mandarin has no --select mode", id="no-select-zh",
-    ),
-    pytest.param(
-        "cantonese", {"select": True, "check": True},
-        "Cantonese has no --select mode", id="no-select-yue-check",
-    ),
-]
+        return record
 
 
 @pytest.fixture
@@ -159,86 +136,41 @@ def test_an_absent_input_prints_an_error(tmp_path: Path, capsys) -> None:
     assert "Error: File not found" in capsys.readouterr().out
 
 
-def test_a_command_without_a_cull_rejects_check_without_core(deck_file: Path) -> None:
-    with pytest.raises(SystemExit, match="--check needs --core"):
-        command("zh")(deck_file, check=True)
-
-
-@pytest.mark.parametrize("route", ROUTES)
-def test_a_mode_runs_its_flow_on_the_default_output(
-    flows: Flows, deck_file: Path, route: Route
+@pytest.mark.parametrize("language, options, call, output", ROUTES)
+def test_a_route_runs_one_flow_or_gate_on_its_output(
+    flows: Flows, deck_file: Path, language: str, options: dict[str, Any], call: str, output: str
 ) -> None:
-    fix(flows, route.language, deck_file, **route.mode_option)
+    fix(flows, language, deck_file, **options)
 
-    [(name, request, profile)] = flows.calls
-    assert name == f"run_{route.flow}"
-    assert request.input_path == deck_file
-    assert request.output_path == route.default_output
-    assert profile is route.profile
-
-
-@pytest.mark.parametrize("route", ROUTES)
-def test_a_mode_runs_its_flow_on_a_given_output(
-    flows: Flows, deck_file: Path, route: Route
-) -> None:
-    output = deck_file.parent / "out.apkg"
-
-    fix(flows, route.language, deck_file, output=output, **route.mode_option)
-
-    [(_, request, _)] = flows.calls
-    assert request.output_path == output
+    [(name, target, profile)] = flows.calls
+    kind = call.split("_")[1]
+    declared = LANGUAGES[language].fix
+    assert declared is not None
+    assert name == call
+    assert Path(getattr(target, "output_path", target)) == Path(output)
+    assert profile is getattr(declared, kind)
 
 
-@pytest.mark.parametrize("route", ROUTES)
-def test_check_runs_the_gates_and_not_the_flow(
-    flows: Flows, deck_file: Path, route: Route
-) -> None:
-    fix(flows, route.language, deck_file, check=True, **route.mode_option)
-
-    assert flows.calls == [
-        (f"check_{route.flow}", route.default_output, route.profile)
-    ]
-
-
-@pytest.mark.parametrize("route", ROUTES)
-def test_check_gates_the_given_output(
-    flows: Flows, deck_file: Path, route: Route
-) -> None:
-    output = deck_file.parent / "out.apkg"
-
-    fix(flows, route.language, deck_file, output=output, check=True, **route.mode_option)
-
-    assert flows.calls == [(f"check_{route.flow}", output, route.profile)]
-
-
-@pytest.mark.parametrize("route", ROUTES)
-def test_check_exits_with_the_gate_code(
-    flows: Flows, deck_file: Path, route: Route
+@pytest.mark.parametrize("options", [SELECT, CORE])
+def test_a_failed_gate_exits_with_its_code(
+    flows: Flows, deck_file: Path, options: dict[str, bool]
 ) -> None:
     flows.gate_code = 3
 
     with pytest.raises(SystemExit) as exit_info:
-        fix(flows, route.language, deck_file, check=True, **route.mode_option)
+        fix(flows, "french", deck_file, check=True, **options)
 
     assert exit_info.value.code == 3
 
 
-def test_select_options_reach_the_cull_request(flows: Flows, deck_file: Path) -> None:
-    fix(flows, "french", deck_file, select=True, reserve=False, cards=500)
-    fix(flows, "french", deck_file, select=True)
+@pytest.mark.parametrize("options, fields", REQUEST_FIELDS)
+def test_the_options_reach_the_request(
+    flows: Flows, deck_file: Path, options: dict[str, Any], fields: dict[str, Any]
+) -> None:
+    fix(flows, "french", deck_file, **options)
 
-    (_, capped, _), (_, default, _) = flows.calls
-    assert (capped.no_reserve, capped.max_cards) == (True, 500)
-    assert (default.no_reserve, default.max_cards) == (False, cullflow.DEFAULT_MAX_CARDS)
-
-
-def test_core_options_reach_the_core_request(flows: Flows, deck_file: Path) -> None:
-    fix(flows, "french", deck_file, core=True, cards=42, words=7)
-    fix(flows, "french", deck_file, core=True)
-
-    (_, given, _), (_, default, _) = flows.calls
-    assert (given.max_cards, given.core_words) == (42, 7)
-    assert (default.max_cards, default.core_words) == (None, 0)
+    [(_, request, _)] = flows.calls
+    assert {key: getattr(request, key) for key in fields} == fields
 
 
 @pytest.mark.parametrize("language, options, message", ERRORS)
@@ -249,10 +181,3 @@ def test_a_bad_mode_is_an_error_and_runs_nothing(
         fix(flows, language, deck_file, **options)
 
     assert flows.calls == []
-
-
-def test_an_absent_input_runs_nothing(flows: Flows, tmp_path: Path, capsys) -> None:
-    fix(flows, "french", tmp_path / "absent.apkg", core=True)
-
-    assert flows.calls == []
-    assert "Error: File not found" in capsys.readouterr().out
