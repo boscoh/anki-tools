@@ -27,6 +27,7 @@ from anki_tools.languages.mandarin.characters import (
     is_repeated_zh_sentence,
 )
 from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
+from anki_tools.sentence_pack.english_sense import read_senses
 from anki_tools.sentence_pack.guards import (
     compound_spans,
     form_compounds,
@@ -465,12 +466,18 @@ def check_word_table(
 
 
 def load_user_dictionary(word_table: list[WordForm]) -> None:
-    """Add the word-table forms to the jieba user dictionary.
+    """Add the word-table forms and the compounds to the jieba user dictionary.
+
+    A compound is one token, so tier F never credits a part of it. For example,
+    听得到 does not credit 得到.
 
     :param word_table: Word table from :func:`load_word_table`.
     """
     for form in word_table:
         jieba.add_word(form.mandarin)
+    for row in read_senses(SENSE_PATH).values():
+        for compound in row.compounds:
+            jieba.add_word(compound)
 
 
 def known_words(word_table: list[WordForm]) -> set[str]:
