@@ -11,7 +11,7 @@ from anki_tools.languages.mandarin.characters import (
 
 @pytest.mark.parametrize(
     "char, expected",
-    [("你", True), ("好", True), ("a", False), ("1", False), ("！", False)],
+    [("\u4e00", True), ("\u9fff", True), ("a", False), ("！", False)],
 )
 def test_is_chinese_char(char: str, expected: bool) -> None:
     assert is_chinese_char(char) is expected

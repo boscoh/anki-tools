@@ -24,7 +24,6 @@ from tests.deck_fixture import (
 )
 
 SOUND = re.compile(r"\[sound:([^\]]+)\]")
-AUDIO_SUFFIXES = (".mp3", ".wav", ".ogg")
 
 
 def _note_audio(package: AnkiPackage) -> dict[int, set[str]]:
