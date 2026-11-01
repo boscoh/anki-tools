@@ -7,6 +7,7 @@ from anki_tools.sentence_pack import audit, pool
 from anki_tools.sentence_pack.guards import (
     check_sentence_shape,
     compound_spans,
+    form_compounds,
     inside_spans,
     occurrences,
 )
@@ -22,16 +23,17 @@ def test_guard_table_matches_the_filter_order() -> None:
     assert keys == pool.FILTER_KEYS[1:]
 
 
-def test_scaffold_keys_skip_the_relaxed_filters() -> None:
-    assert pool.SCAFFOLD_SHAPE_KEYS == frozenset(
-        {"length_window", "digit_marks", "script", "repeat", "final_mark", "quote"}
-    )
-    assert pool.SCAFFOLD_SHAPE_FAILURES == frozenset({"one_final_mark", "internal_mark"})
+def test_scaffold_relaxes_only_the_count_checks_of_marks() -> None:
+    two_final = "我要喝水。。"
+    assert pool.shape_failure(two_final, MANDARIN, 4, 7) == "marks"
+    assert pool.shape_failure(two_final, MANDARIN, 4, 7, scaffold=True) is None
+    quoted = "他说“我要喝水”。"
+    assert pool.shape_failure(quoted, MANDARIN, 4, 9, scaffold=True) == "marks"
 
 
 def test_record_pass_counts_every_guard_before_the_failure() -> None:
     counts = dict.fromkeys(pool.FILTER_KEYS, 0)
-    pool.record_pass(counts, "final_mark")
+    pool.record_pass(counts, "marks")
     assert set(pool.FILTER_KEYS[:5]) == {key for key, value in counts.items() if value}
     counts = dict.fromkeys(pool.FILTER_KEYS, 0)
     pool.record_pass(counts, None)
@@ -59,13 +61,8 @@ def test_script_tests_only_the_alphabet() -> None:
 
 def test_shape_failure_applies_only_the_requested_keys() -> None:
     sentence = "我要喝水"
-    assert check_sentence_shape(sentence, MANDARIN, 4, 7) == "final_mark"
-    assert (
-        pool.shape_failure(
-            sentence, MANDARIN, 4, 7, keys=pool.SCAFFOLD_SHAPE_KEYS
-        )
-        == "final_mark"
-    )
+    assert check_sentence_shape(sentence, MANDARIN, 4, 7) == "marks"
+    assert pool.shape_failure(sentence, MANDARIN, 4, 7, scaffold=True) == "marks"
     assert (
         pool.shape_failure(sentence, MANDARIN, 4, 7, keys=frozenset({"script"}))
         is None
@@ -74,13 +71,10 @@ def test_shape_failure_applies_only_the_requested_keys() -> None:
 
 def test_fact_failure_can_skip_the_sense_guard() -> None:
     measured = pool.FactInput(
-        predicate=True,
-        orphan=False,
         english_words=5,
         english_bounds=(2, 12),
         duplicate=False,
         unknown_words=0,
-        max_unknown=2,
         hits=("火",),
         sense_hits=(),
     )
@@ -115,14 +109,11 @@ def test_compound_spans_and_inside_spans() -> None:
     assert not inside_spans(4, spans)
 
 
-def test_false_friend_hook_is_set_for_the_chinese_packs() -> None:
-    assert MANDARIN.false_friend_spans is not None
-    assert CANTONESE.false_friend_spans is not None
-    assert FRENCH.false_friend_spans is None
-    assert GREEK.false_friend_spans is None
+def test_compounds_come_from_the_sense_file_of_the_chinese_packs() -> None:
+    assert form_compounds(MANDARIN.sense_path, "\u6765") == ("\u51fa\u6765", "\u8d77\u6765")
 
 
-def test_gate_no_false_friend_uses_the_profile_hook() -> None:
+def test_gate_no_false_friend_reads_the_compounds_of_the_record() -> None:
     bad = FakeInputs([{"sentence": "聽日係我生日。", "target": "聽"}], [])
     passed, _ = audit.gate_no_false_friend(bad, CANTONESE)  # type: ignore[arg-type]
     assert not passed

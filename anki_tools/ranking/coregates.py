@@ -1,4 +1,4 @@
-"""Shared gates K1 to K21 of the core deck.
+"""Shared gates K1 to K22 of the core deck.
 
 The gates read the output APKG, the two CSV files, and the manifest. A gate
 never writes a file. A language package supplies the
@@ -39,6 +39,7 @@ from anki_tools.ranking.gates import (
     gate_kept_order as _gate_kept_order,
     gate_manifest_hashes as _gate_manifest_hashes,
     gate_output_model,
+    gate_sense as _gate_sense,
     gate_similarity as _gate_similarity,
     gate_templates as _gate_templates,
     output_model_problems,
@@ -71,6 +72,7 @@ __all__ = [
     "gate_order",
     "gate_outside",
     "gate_output_model",
+    "gate_sense",
     "gate_unchecked_sense",
     "gate_similarity",
     "gate_tail",
@@ -159,7 +161,7 @@ def gate_outside(files: CoreFiles) -> tuple[bool, str]:
 
 
 def gate_filter_recheck(files: CoreFiles) -> tuple[bool, str]:
-    """K5: every kept card passes the shared filter rules and C1 to C5."""
+    """K5: every kept card passes the shared filter rules and C3 to C5."""
     output = files.output()
     cards = output["cards"]
     profile = files.profile
@@ -169,7 +171,6 @@ def gate_filter_recheck(files: CoreFiles) -> tuple[bool, str]:
         set(output["media"]),
         profile.read_names(),
         read_loanwords(profile.loan_path),
-        profile.has_orphan,
         min_units=profile.min_units,
         max_units=profile.max_units,
         shape=profile,
@@ -369,6 +370,16 @@ def gate_unchecked_sense(files: CoreFiles) -> tuple[bool, str]:
     return unchecked <= limit, f"{unchecked} unchecked, limit {limit}"
 
 
+def gate_sense(files: CoreFiles) -> tuple[bool, str]:
+    """K22: the core word of every kept card passes the sense test."""
+    tiers = {(row["word"], row["gloss"]): row["tier"] for row in files.coverage()}
+    return _gate_sense(
+        files,
+        files.profile.sense_path,
+        lambda word, gloss, _sentence: tiers.get((word, gloss), "F"),
+    )
+
+
 def gate_unranked(files: CoreFiles) -> tuple[bool, str]:
     """K20: the unranked tier F targets stay inside the limit."""
     count = int(files.manifest()["counts"].get("unranked", 0))
@@ -406,11 +417,12 @@ GATES: tuple[Gate, ...] = (
     Gate("K19", gate_core_word),
     Gate("K20", gate_unranked),
     Gate("K21", gate_output_model),
+    Gate("K22", gate_sense),
 )
 
 
 def check_core(output_path: Path, profile: CoreProfile) -> int:
-    """Run gates K1 to K21 on the files of a core output.
+    """Run gates K1 to K22 on the files of a core output.
 
     :param output_path: Output APKG file.
     :param profile: Language hooks.

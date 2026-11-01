@@ -130,8 +130,7 @@ than the target list.
 The English window F1 and the proper-noun rule F8 are shared rules of
 `anki_tools/ranking/cardfilter.py`. F2 to F7 come from the sentence shape guard
 `check_sentence_shape`, with the marks and the alphabet test of the language
-profile. The shape guard names the mark rules F5 to F8, and `MARK_RULES` maps
-them to the card filter names F4 to F7.
+profile. One card filter, `marks` (`MARK_RULES`), covers F4 to F7.
 
 The unit count of F2 is the token count of the card, not a text measure. The
 `CardShape` adapter gives the unit count, the three mark sets, and the alphabet
@@ -283,9 +282,7 @@ exceptions.
 G3 fails below `target_coverage_gate`, 0.98 for French and Spanish. G4 fails
 below `double_coverage_gate`, 0.95. The profile holds both values.
 
-G5 skips F8 for a reserve card. This is a deliberate exemption, not a second
-check: no Swadesh pack rule tests a name, and 8 of the 194 kept French reserve
-cards hold a `PROPN` token. G14 needs those cards, and it needs the Swadesh
+G14 needs the Swadesh
 count minus the exceptions of the profile, for
 example `intestins` in French. G15 needs the template set of the profile and
 each card class in the CSS. G16 checks the single note type, the field set, and

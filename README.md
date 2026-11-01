@@ -377,8 +377,8 @@ output file stem. The assigned target is bold in the sentence.
 
 - Defaults: 50 tier F words, 300 cards, 2 examples per word, and a tail of
   120 cards.
-- A card must pass the cull filter F1 to F9 and the guards C1 to C5: a
-  predicate, a main clause, no name, no loan word, and an audio file.
+- A card must pass the cull filter F1 to F9 and the guards C3 to C5: no name,
+  no loan word, and an audio file.
 - The sentence window is 5 to 9 words, set by the `min_units` and `max_units`
   fields of `CoreRequest`.
 - See `specs/core-word-small-deck.md` sections 4 and 5.

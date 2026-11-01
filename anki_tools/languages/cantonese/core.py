@@ -8,9 +8,9 @@ live in ``vocab/cantonese_core_senses.tsv``. The generic logic lives in
 ``anki_tools.ranking.coreflow`` and ``anki_tools.ranking.coregates``.
 
 A Cantonese sentence has no part-of-speech tagger, so every Han token gets the
-constant tag ``TOKEN_POS``. The tag is a content tag and passes rule C1.
+constant tag ``TOKEN_POS``. The tag is a content tag.
 
-The shared filter final_mark reads an ASCII final mark. The adapter gives the final
+The shared filter marks reads an ASCII final mark. The adapter gives the final
 mark of a sentence its ASCII form and writes that text back to the kept notes.
 The model also has an unused English sound field, which the output note type
 does not carry.
@@ -47,7 +47,7 @@ SENTENCE_FIELD = "Front"
 ENGLISH_FIELD = "Back"
 AUDIO_FIELD = "Audio"
 
-SENSE_PATH = Path("vocab/cantonese_core_senses.tsv")
+SENSE_PATH = CANTONESE.sense_path
 LOAN_PATH = Path("vocab/cantonese_loanwords.txt")
 NAMES_PATH = Path("vocab/cantonese_names.tsv")
 
@@ -64,8 +64,8 @@ DEFAULT_OPTIONS = CoreOptions(
 )
 
 
-# Every Han token gets this tag: Cifu and jieba give no part of speech, and rule
-# C1 accepts only a verb-like tag, which is a content tag too.
+# Every Han token gets this tag: Cifu and jieba give no part of speech, and the
+# tag must be a content tag so that a token can be a target.
 TOKEN_POS = "VERB"
 
 MIN_UNITS = 2
@@ -87,7 +87,7 @@ def _sentence(field_value: str) -> str:
 
     The function drops the bold tags that a previous core run wrote, prepares
     the Traditional text, and gives the final mark the ASCII form, because the
-    shared filter final_mark accepts only ``.``, ``?``, and ``!``.
+    shared filter marks accepts only ``.``, ``?``, and ``!``.
 
     :param field_value: Raw value of the sentence field.
     :returns: Traditional text with an ASCII final mark.
@@ -241,6 +241,8 @@ CANTONESE_LANGUAGE = LanguageDeckProfile(
     card_css=card_css,
     sense_path=SENSE_PATH,
     script_ok=CANTONESE.script_ok,
+    is_repeated=CANTONESE.is_repeated,
+    dedupe_key=CANTONESE.dedupe_key,
     highlight=CANTONESE.highlight,
     romanization_source="Jyutping",
 )
@@ -248,9 +250,7 @@ CANTONESE_LANGUAGE = LanguageDeckProfile(
 CANTONESE_CORE_PROFILE = CANTONESE_LANGUAGE.core(
     word_table=word_table,
     loan_path=LOAN_PATH,
-    has_orphan=CANTONESE.has_orphan,
     hits=CANTONESE.hits,
-    sense_filter=CANTONESE.sense_filter,
     lemma_key=str.casefold,
     templates=CORE_TEMPLATES,
     min_units=MIN_UNITS,

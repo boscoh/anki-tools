@@ -30,8 +30,8 @@ from anki_tools.sentence_pack.pack import (
     attribution_lines,
     write_attribution_section,
 )
-from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
-from anki_tools.sentence_pack.tokens import Token, TokenCache, has_finite_verb, tokenize
+from anki_tools.sentence_pack.profile import LanguageProfile, register
+from anki_tools.sentence_pack.tokens import Token, TokenCache, tokenize
 from anki_tools.sentence_pack.word_table import (
     check_form_labels,
     check_missing_indices,
@@ -59,6 +59,7 @@ WORD_REVIEW_PATH = Path("vocab/greek_word_review.csv")
 SENTENCES_PATH = Path("vocab/greek_sentences.csv")
 SENTENCE_REVIEW_PATH = Path("vocab/greek_sentences_review.csv")
 POOL_REPORT_PATH = Path("data/greek_pool_report.json")
+SENSE_PATH = Path("vocab/greek_core_senses.tsv")
 AUDIO_DIR = Path("audio/greek_sentences")
 MODULE_CACHE_PATH = Path("data/swadesh/greek_module.txt")
 
@@ -95,9 +96,6 @@ MIN_ZIPF = 3.0
 FINAL_MARKS = ".?!;"
 INTERNAL_MARKS = ",·:"
 QUOTE_MARKS = '«»"“”—–'
-ORPHAN_CONJUNCTIONS = ("και", "αλλά", "ή", "γιατί", "επειδή", "λοιπόν", "όμως")
-PREDICATE_MARKERS = frozenset({"είναι", "έχει", "έχουν", "δεν", "θα"})
-VERB_FORMS: set[str] = set()
 ARTICLES = (
     "ο",
     "η",
@@ -381,16 +379,6 @@ def script_ok(sentence: str) -> bool:
     return not LATIN_LETTER.search(sentence) and not POLYTONIC.search(sentence)
 
 
-def has_orphan(sentence: str) -> bool:
-    """Check filter orphan: a sentence-initial conjunction with no comma.
-
-    :param sentence: Greek sentence.
-    :returns: True when the leading conjunction has no main clause.
-    """
-    if "," in sentence or "·" in sentence:
-        return False
-    return sentence.casefold().startswith(ORPHAN_CONJUNCTIONS)
-
 
 @lru_cache(maxsize=4096)
 def carrier_lemmas(form: str) -> frozenset[str]:
@@ -477,41 +465,6 @@ def token_matches(sentence: str, form: str) -> int:
     )
 
 
-SENSE_CHECKS: dict[str, tuple[frozenset[str], frozenset[str]]] = {
-    "γλώσσα": (
-        frozenset({"tongue", "tongues"}),
-        frozenset({"language", "languages"}),
-    ),
-    "δέρμα": (
-        frozenset({"skin", "skins"}),
-        frozenset({"leather"}),
-    ),
-    "θάλασσα": (
-        frozenset({"sea", "seas"}),
-        frozenset({"messed", "mess"}),
-    ),
-    "νέος": (
-        frozenset({"new", "newer", "newest"}),
-        frozenset({"young", "younger", "youngest"}),
-    ),
-    "χρόνος": (
-        frozenset({"year", "years"}),
-        frozenset({"time", "times"}),
-    ),
-    "γυρίζω": (
-        frozenset({"turn", "turns", "turned", "turning"}),
-        frozenset({"return", "returns", "returned", "returning", "back", "home"}),
-    ),
-    "με": (
-        frozenset({"with"}),
-        frozenset({"me"}),
-    ),
-}
-
-
-sense_filter = make_sense_filter(SENSE_CHECKS)
-
-
 def hits(sentence: str, forms: Collection[str]) -> dict[str, int]:
     """Count the forms that the sentence contains exactly one time.
 
@@ -582,22 +535,6 @@ def count_unknown(sentence: str, known: Collection[str]) -> int:
     return unknown
 
 
-def has_predicate(sentence: str) -> bool:
-    """Check filter predicate: a finite verb, the marker fallback, or a word-list verb.
-
-    :param sentence: Greek sentence.
-    :returns: True when the sentence has a finite verb.
-    """
-    tokens = greek_tokens(sentence)
-    if has_finite_verb(list(tokens)):
-        return True
-    if any(surface_key(token.text) in PREDICATE_MARKERS for token in tokens):
-        return True
-    if not VERB_FORMS:
-        return False
-    return bool(hits(sentence, frozenset(VERB_FORMS)))
-
-
 def glossary(word: WordForm) -> str:
     """Build the card gloss of one Greek form.
 
@@ -639,7 +576,6 @@ def load_word_table(
     if len(rows) != len(labels):
         raise ValueError(f"{csv_path}: {len(rows)} rows but {len(labels)} labels")
     table: list[WordForm] = []
-    global VERB_FORMS
     for index, row in enumerate(rows, start=1):
         form = normalized(row.get("greek", ""))
         if not form:
@@ -656,7 +592,6 @@ def load_word_table(
                 zipf=zipf_frequency(form, "el"),
             )
         )
-    VERB_FORMS = {form.greek for form in table if form.english.startswith("to ")}
     return table
 
 
@@ -946,8 +881,6 @@ GREEK = register(
         final_marks=FINAL_MARKS,
         internal_marks=INTERNAL_MARKS,
         quote_marks=QUOTE_MARKS,
-        comma_marks=",·",
-        orphan_conjunctions=ORPHAN_CONJUNCTIONS,
         wordfreq_lang="el",
         tokenizer=TOKENIZER,
         warm_tokens=warm_tokens,
@@ -967,8 +900,6 @@ GREEK = register(
         unit_count=unit_count,
         script_ok=script_ok,
         is_repeated=lambda sentence: False,
-        has_predicate=has_predicate,
-        has_orphan=has_orphan,
         hits=hits,
         highlight=highlight,
         match_count=match_count,
@@ -991,7 +922,7 @@ GREEK = register(
         extra_manifest=greek_extra_manifest,
         attribution=greek_attribution,
         finalize_candidate=lambda card, target: card,
-        sense_filter=sense_filter,
+        sense_path=SENSE_PATH,
     )
 )
 

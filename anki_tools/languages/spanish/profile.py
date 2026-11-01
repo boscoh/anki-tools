@@ -57,10 +57,9 @@ from anki_tools.sentence_pack.pack import (
 from anki_tools.sentence_pack.profile import (
     LanguageProfile,
     NOUN_INDICES,
-    make_sense_filter,
     register,
 )
-from anki_tools.sentence_pack.tokens import Token, TokenCache, has_finite_verb, tokenize
+from anki_tools.sentence_pack.tokens import Token, TokenCache, tokenize
 
 WORD_CSV_PATH = Path("vocab/spanish_words.csv")
 SWADESH_PATH = Path("vocab/swadesh.txt")
@@ -68,6 +67,7 @@ WORD_REVIEW_PATH = Path("vocab/spanish_word_review.csv")
 SENTENCES_PATH = Path("vocab/spanish_sentences.csv")
 SENTENCE_REVIEW_PATH = Path("vocab/spanish_sentences_review.csv")
 POOL_REPORT_PATH = Path("data/spanish_pool_report.json")
+SENSE_PATH = Path("vocab/spanish_core_senses.tsv")
 AUDIO_DIR = Path("audio/spanish_sentences")
 MODULE_CACHE_PATH = Path("data/swadesh/spanish_module.txt")
 
@@ -102,24 +102,6 @@ OPEN_STATUS = "open"
 FINAL_MARKS = ".?!"
 INTERNAL_MARKS = ",;:"
 QUOTE_MARKS = '«»"“”—–'
-ORPHAN_CONJUNCTIONS = (
-    "y",
-    "e",
-    "o",
-    "u",
-    "ni",
-    "pero",
-    "sino",
-    "pues",
-    "porque",
-    "aunque",
-    "así que",
-    "ya que",
-    "puesto que",
-)
-PREDICATE_MARKERS = frozenset(
-    {"es", "son", "era", "eran", "fue", "soy", "eres", "somos", "está", "están", "hay", "ha", "han"}
-)
 SURFACE_ONLY = frozenset(
     {"yo", "tú", "él", "nosotros", "vosotros", "ellos", "este", "ese", "derecha", "izquierda"}
 )
@@ -345,21 +327,6 @@ def is_repeated_sentence(sentence: str) -> bool:
     return False
 
 
-def has_orphan(sentence: str) -> bool:
-    """Check filter orphan: a sentence-initial conjunction with no comma.
-
-    :param sentence: Prepared Spanish sentence.
-    :returns: True when the leading conjunction has no main clause.
-    """
-    if "," in sentence or ";" in sentence:
-        return False
-    tokens = [surface_key(token.text) for token in word_tokens(sentence)]
-    if not tokens:
-        return False
-    if tokens[0] in ORPHAN_CONJUNCTIONS:
-        return True
-    return " ".join(tokens[:2]) in ORPHAN_CONJUNCTIONS
-
 
 def _reflexive_stem(form: str) -> str:
     if len(form) > 5 and form.endswith("se"):
@@ -511,57 +478,6 @@ def token_matches(sentence: str, form: str) -> int:
     return sum(1 for token in tokens if _token_matches(token, keys, form))
 
 
-SENSE_CHECKS: dict[str, tuple[frozenset[str], frozenset[str]]] = {
-    "sal": (
-        frozenset({"salt", "salty"}),
-        frozenset({"leave", "out", "go", "get", "come", "exit"}),
-    ),
-    "cola": (
-        frozenset({"tail", "tails"}),
-        frozenset({"queue", "line", "cola", "coke", "glue", "wait", "waiting"}),
-    ),
-    "pluma": (
-        frozenset({"feather", "feathers", "plumage"}),
-        frozenset({"pen", "pens", "quill", "quills"}),
-    ),
-    "lengua": (
-        frozenset({"tongue", "tongues"}),
-        frozenset({"language", "languages"}),
-    ),
-    "hoja": (
-        frozenset({"leaf", "leaves"}),
-        frozenset({"sheet", "sheets", "page", "pages", "paper", "blade"}),
-    ),
-    "palo": (
-        frozenset({"stick", "sticks", "pole", "branch"}),
-        frozenset({"suit", "suits", "stroke", "strokes"}),
-    ),
-    "piel": (
-        frozenset({"skin", "skins"}),
-        frozenset({"leather", "fur", "furs", "hide"}),
-    ),
-    "carne": (
-        frozenset({"meat", "meats"}),
-        frozenset({"flesh", "beef"}),
-    ),
-    "pelo": (
-        frozenset({"hair", "hairs"}),
-        frozenset({"fur", "bit", "inch"}),
-    ),
-    "barriga": (
-        frozenset({"belly", "stomach", "tummy"}),
-        frozenset({"pregnant"}),
-    ),
-    "día": (
-        frozenset({"day", "days"}),
-        frozenset({"morning", "afternoon"}),
-    ),
-}
-
-
-sense_filter = make_sense_filter(SENSE_CHECKS)
-
-
 def hits(sentence: str, forms: Collection[str]) -> dict[str, int]:
     """Count the forms that the sentence contains exactly one time.
 
@@ -663,26 +579,6 @@ def count_unknown(sentence: str, known: Collection[str]) -> int:
     return sum(1 for token in word_tokens(sentence) if not (_token_keys(token) & keys))
 
 
-def has_predicate(sentence: str) -> bool:
-    """Check filter predicate: a finite verb, a marker, or a word-list verb.
-
-    :param sentence: Prepared Spanish sentence.
-    :returns: True when the sentence has a finite verb.
-    """
-    tokens = spanish_tokens(sentence)
-    if has_finite_verb(list(tokens)):
-        return True
-    surfaces = [surface_key(token.text) for token in tokens if not token.punctuation]
-    if any(surface in PREDICATE_MARKERS for surface in surfaces):
-        return True
-    infinitives = verb_forms()
-    return any(
-        surface_key(token.lemma) in infinitives
-        for token in tokens
-        if not token.punctuation
-    )
-
-
 def glossary(word: WordForm) -> str:
     """Build the card gloss of one Spanish form.
 
@@ -745,19 +641,6 @@ def load_word_table(
             )
         )
     return table
-
-
-@lru_cache(maxsize=1)
-def verb_forms() -> frozenset[str]:
-    """Give the infinitive forms of the word-list verbs.
-
-    :returns: Surface keys of the verb rows of the reviewed word table.
-    """
-    return frozenset(
-        surface_key(form.spanish)
-        for form in load_word_table()
-        if form.english.startswith("to ")
-    )
 
 
 @lru_cache(maxsize=1)
@@ -1084,8 +967,6 @@ SPANISH = register(
         final_marks=FINAL_MARKS,
         internal_marks=INTERNAL_MARKS,
         quote_marks=QUOTE_MARKS,
-        comma_marks=",",
-        orphan_conjunctions=ORPHAN_CONJUNCTIONS,
         wordfreq_lang="es",
         tokenizer=TOKENIZER,
         warm_tokens=warm_tokens,
@@ -1105,8 +986,6 @@ SPANISH = register(
         unit_count=unit_count,
         script_ok=script_ok,
         is_repeated=is_repeated_sentence,
-        has_predicate=has_predicate,
-        has_orphan=has_orphan,
         hits=hits,
         match_count=match_count,
         candidate_length=lambda card: card.word_len,
@@ -1131,7 +1010,7 @@ SPANISH = register(
         attribution=spanish_attribution,
         finalize_candidate=lambda card, target: card,
         highlight=highlight,
-        sense_filter=sense_filter,
+        sense_path=SENSE_PATH,
     )
 )
 

@@ -13,14 +13,15 @@ the English gloss of the row decide. The character span keeps the 25 forms that
 jieba merges into a longer token, for example 水 inside 喝水, and the guard
 rejects the cards where the form takes another sense. A character bigram holds
 143 one-character forms zero times, so the module does not use a bigram.
-``FALSE_FRIENDS`` blocks the spans where a form is a part of a longer word
-with another sense, so 来 does not hit inside 出来 and 起来.
+The ``compounds`` column of the sense file blocks the spans where a form is a
+part of a longer word with another sense, so 来 does not hit inside 出来 and
+起来.
 
 The card count sets the ceiling of the deck. The run holds 140 targets: 90
 tier S forms with a card and the 50 tier F words. Gate K3 reports a two-card
 share of 0.82 and does not fail.
 
-The tier F sense rows live in ``vocab/mandarin_core_senses.tsv``. Each row
+The sense rows live in ``vocab/mandarin_core_senses.tsv``. Each tier F row
 holds the English words that the paired sentences of the deck use for the
 word. The first sense gives the ``CoreGloss``. The deck also holds nine loan
 words, and ``vocab/mandarin_loanwords.txt`` lists them for rule C4.
@@ -29,13 +30,13 @@ The audio of the deck is machine speech from Google TTS on all 5009 notes, and
 the model holds no native recording. The manifest and ``ATTRIBUTION.md`` must
 name the engine before the deck ships.
 
-The shared filter final_mark reads an ASCII final mark. The adapter gives the final mark
+The shared filter marks reads an ASCII final mark. The adapter gives the final mark
 of a sentence its ASCII form and appends one when the text has none, then
 writes that text back to the kept notes.
 
 The jieba part-of-speech flags map to the shared content tags through
-:func:`anki_tools.languages.mandarin.profile.shared_pos`, so rule C1 needs a
-verb or an adjective and the tier F word list stays clear of function words.
+:func:`anki_tools.languages.mandarin.profile.shared_pos`, so the tier F word
+list stays clear of function words.
 """
 
 from __future__ import annotations
@@ -75,7 +76,7 @@ SENTENCE_FIELD = "Sentence"
 ENGLISH_FIELD = "Sentence (Translation)"
 AUDIO_FIELD = "[a]"
 
-SENSE_PATH = Path("vocab/mandarin_core_senses.tsv")
+SENSE_PATH = MANDARIN.sense_path
 LOAN_PATH = Path("vocab/mandarin_loanwords.txt")
 NAMES_PATH = Path("vocab/mandarin_names.txt")
 
@@ -114,7 +115,7 @@ def _sentence(field_value: str) -> str:
 
     The function drops the bold tags that a previous core run wrote, converts
     the text to Simplified Chinese, and gives the final mark the ASCII form.
-    The shared filter final_mark accepts only ``.``, ``?``, and ``!``, and most
+    The shared filter marks accepts only ``.``, ``?``, and ``!``, and most
     sentences of the deck end in no mark at all, so a text with no ASCII final
     mark gets a full stop.
 
@@ -284,6 +285,8 @@ MANDARIN_LANGUAGE = LanguageDeckProfile(
     card_css=card_css,
     sense_path=SENSE_PATH,
     script_ok=MANDARIN.script_ok,
+    is_repeated=MANDARIN.is_repeated,
+    dedupe_key=MANDARIN.dedupe_key,
     highlight=MANDARIN.highlight,
     romanization_source="Sentence (Latin)",
 )
@@ -291,9 +294,7 @@ MANDARIN_LANGUAGE = LanguageDeckProfile(
 MANDARIN_CORE_PROFILE = MANDARIN_LANGUAGE.core(
     word_table=word_table,
     loan_path=LOAN_PATH,
-    has_orphan=MANDARIN.has_orphan,
     hits=MANDARIN.hits,
-    sense_filter=MANDARIN.sense_filter,
     lemma_key=convert_to_simplified,
     templates=CORE_TEMPLATES,
     min_units=MIN_UNITS,

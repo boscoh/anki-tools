@@ -20,8 +20,9 @@ import pytest
 from anki_tools.languages.spanish import core as spanish_core
 from anki_tools.ranking import cardfilter, coreflow
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
-from anki_tools.ranking.corelist import CoreTarget, SenseWords
+from anki_tools.ranking.corelist import CoreTarget
 from anki_tools.ranking.scan import CoreProfile
+from anki_tools.sentence_pack.english_sense import SenseRow, read_senses
 
 SPANISH_TOKENIZER = "es_core_news_sm"
 WORD_PATTERN = re.compile(r"[^\W\d_]+")
@@ -50,6 +51,7 @@ def _target(
     form: str = "",
     gloss: str = "",
     senses: frozenset[str] = frozenset(),
+    false_friends: frozenset[str] = frozenset(),
 ) -> CoreTarget:
     return CoreTarget(
         key=key,
@@ -57,7 +59,7 @@ def _target(
         position=position,
         form=form or key.split(":")[-1],
         gloss=gloss,
-        senses=senses,
+        sense=SenseRow(senses=senses, false_friends=false_friends),
     )
 
 
@@ -72,30 +74,6 @@ def _profile(**overrides: object) -> CoreProfile:
     values: dict[str, object] = {"hits": _hits}
     values.update(overrides)
     return replace(spanish_core.SPANISH_CORE_PROFILE, **values)
-
-
-class TestSense:
-    def test_holds_tier_s_sense_needs_the_gloss_word(self) -> None:
-        target = _target("S1:agua", form="agua", gloss="water")
-
-        assert coreflow.holds_tier_s_sense(target, "I drink water.")
-        assert not coreflow.holds_tier_s_sense(target, "I drink wine.")
-
-    def test_sense_match_accepts_a_sense_hit(self) -> None:
-        assert coreflow.sense_match(
-            "I saw the dog.", frozenset({"dog"}), frozenset()
-        )
-
-    def test_sense_match_rejects_a_false_friend(self) -> None:
-        assert not coreflow.sense_match(
-            "I have time.", frozenset({"time"}), frozenset({"have"})
-        )
-        assert not coreflow.sense_match(
-            "I saw it.", frozenset({"time"}), frozenset()
-        )
-
-    def test_sense_match_accepts_an_empty_sense_set(self) -> None:
-        assert coreflow.sense_match("anything", frozenset(), frozenset())
 
 
 def _hit_fixture() -> tuple[
@@ -147,12 +125,20 @@ class TestCoreHits:
         assert failures == {"F:beber": 1}
         assert present == {"F:beber": True}
 
-    def test_a_sense_filter_blocks_the_form_hit(self) -> None:
-        cards, tokens, targets = _hit_fixture()
-        profile = _profile(sense_filter=lambda form, english: form == "agua")
+    def test_a_tier_s_false_friend_blocks_the_form_hit(self) -> None:
+        cards, tokens, _targets = _hit_fixture()
+        targets = [
+            _target(
+                "S1:agua",
+                position=1,
+                form="agua",
+                gloss="water",
+                false_friends=frozenset({"drink"}),
+            )
+        ]
 
         hits, failures, present = coreflow.core_hits(
-            cards, tokens, [0], targets, profile
+            cards, tokens, [0], targets, _profile()
         )
 
         assert "S1:agua" not in hits[0]
@@ -197,7 +183,6 @@ class TestFilterCoreCards:
             {"a.mp3"},
             [],
             [],
-            lambda sentence: False,
             min_units=1,
             max_units=9,
             shape=spanish_core.SPANISH_CORE_PROFILE,
@@ -205,24 +190,6 @@ class TestFilterCoreCards:
 
         assert passed == [0]
         assert reasons == [""]
-
-    def test_c2_rejects_an_orphan_conjunction(self) -> None:
-        cards = [_card()]
-
-        passed, reasons = coreflow.filter_core_cards(
-            cards,
-            [FILTER_TOKENS],
-            {"a.mp3"},
-            [],
-            [],
-            lambda sentence: sentence.startswith("El"),
-            min_units=1,
-            max_units=9,
-            shape=spanish_core.SPANISH_CORE_PROFILE,
-        )
-
-        assert passed == []
-        assert reasons[0] == "C2"
 
     def test_c5_rejects_a_card_whose_audio_is_absent(self) -> None:
         cards = [_card(audio="other.mp3")]
@@ -233,7 +200,6 @@ class TestFilterCoreCards:
             {"a.mp3"},
             [],
             [],
-            lambda sentence: False,
             min_units=1,
             max_units=9,
             shape=spanish_core.SPANISH_CORE_PROFILE,
@@ -250,7 +216,6 @@ class TestFilterCoreCards:
                 set(),
                 [],
                 [],
-                lambda sentence: False,
                 min_units=1,
                 max_units=9,
                 shape=spanish_core.SPANISH_CORE_PROFILE,
@@ -349,9 +314,6 @@ class TestManifestCounts:
 
 
 class TestFiles:
-    def test_read_senses_of_a_missing_file_is_empty(self, tmp_path: Path) -> None:
-        assert coreflow.read_senses(tmp_path / "absent.tsv") == {}
-
     def test_read_loanwords_of_a_missing_file_is_empty(self, tmp_path: Path) -> None:
         assert coreflow.read_loanwords(tmp_path / "absent.txt") == frozenset()
 
@@ -361,9 +323,9 @@ class TestFiles:
             "word\tsenses\tfalse_friends\nBeber\tDrink,Eat\tHave\n", encoding="utf-8"
         )
 
-        assert coreflow.read_senses(path) == {
-            "beber": SenseWords(
-                frozenset({"drink", "eat"}), frozenset({"have"}), "drink"
+        assert read_senses(path) == {
+            ("F", "beber"): SenseRow(
+                frozenset({"drink", "eat"}), frozenset({"have"}), (), "drink"
             )
         }
 
@@ -377,6 +339,7 @@ def _filter_cards(
         card_rule=partial(
             cardfilter.filter_reason, profile=spanish_core.SPANISH_CORE_PROFILE
         ),
+        dedupe_key=spanish_core.SPANISH_CORE_PROFILE.dedupe_key,
     )
 
 
@@ -425,7 +388,7 @@ class TestCardFilter:
         )
 
         assert passed == []
-        assert reasons[0] == "final_mark"
+        assert reasons[0] == "marks"
 
     def test_f5_rejects_two_final_marks(self) -> None:
         passed, reasons = _filter_cards(
@@ -433,7 +396,7 @@ class TestCardFilter:
         )
 
         assert passed == []
-        assert reasons[0] == "one_final_mark"
+        assert reasons[0] == "marks"
 
     def test_f6_rejects_a_quote_mark(self) -> None:
         passed, reasons = _filter_cards(
@@ -441,7 +404,7 @@ class TestCardFilter:
         )
 
         assert passed == []
-        assert reasons[0] == "quote"
+        assert reasons[0] == "marks"
 
     def test_f7_rejects_two_internal_marks(self) -> None:
         passed, reasons = _filter_cards(
@@ -449,17 +412,7 @@ class TestCardFilter:
         )
 
         assert passed == []
-        assert reasons[0] == "internal_mark"
-
-    def test_f8_rejects_a_proper_noun(self) -> None:
-        tokens = [("parís", "PROPN"), ("ser", "VERB"), ("grande", "ADJ")]
-
-        passed, reasons = _filter_cards(
-            [_card("París es grande.")], [tokens]
-        )
-
-        assert passed == []
-        assert reasons[0] == "propn"
+        assert reasons[0] == "marks"
 
     def test_f9_rejects_a_duplicate_sentence(self) -> None:
         cards = [_card(), _card(index=1)]

@@ -43,9 +43,7 @@ def word_table() -> list[tuple[int, str, str]]:
 FRENCH_CORE_PROFILE = cull.FRENCH_LANGUAGE.core(
     word_table=word_table,
     loan_path=LOAN_PATH,
-    has_orphan=FRENCH.has_orphan,
     hits=FRENCH.hits,
-    sense_filter=FRENCH.sense_filter,
     lemma_key=str.casefold,
     templates=CORE_TEMPLATES,
     min_units=MIN_UNITS,

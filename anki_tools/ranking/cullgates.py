@@ -1,4 +1,4 @@
-"""Shared gates G1 to G17 of the cull deck.
+"""Shared gates G1 to G18 of the cull deck.
 
 The gates read the output APKG, the two CSV files, and the manifest. A gate
 never writes a file. A language package supplies a
@@ -36,6 +36,7 @@ from anki_tools.ranking.gates import (
     gate_kept_order as _gate_kept_order,
     gate_manifest_hashes as _gate_manifest_hashes,
     gate_output_model,
+    gate_sense as _gate_sense,
     gate_similarity as _gate_similarity,
     gate_templates as _gate_templates,
     read_csv,
@@ -202,15 +203,10 @@ def gate_filter_recheck(files: CullFiles) -> tuple[bool, str]:
             index=0,
         )
         reason = filter_reason(card, card_tokens, min_words, max_words, files.profile)
-        # A reserve card is exempt from the propn rule, and no pack rule
-        # replaces that check: no pack rule tests a name. 8 of the 194 French
-        # reserve cards hold a PROPN token, and G14 needs every reserve
-        # concept.
-        if reason == "propn" and row.get("source") == SWADESH_SOURCE:
-            reason = ""
-        if not reason and card.sentence in seen:
+        key = files.profile.dedupe_key(card.sentence)
+        if not reason and key in seen:
             reason = "unique"
-        seen.add(card.sentence)
+        seen.add(key)
         if reason:
             problems.append(f"{reason} {card.sentence[:40]}")
     if problems:
@@ -303,6 +299,18 @@ def gate_card_templates(files: CullFiles) -> tuple[bool, str]:
     return _gate_templates(files, _css_class_problems)
 
 
+def gate_sense(files: CullFiles) -> tuple[bool, str]:
+    """G18: the core word of every kept card passes the sense test."""
+    swadesh = {
+        row["sentence"] for row in files.rows() if row.get("source") == SWADESH_SOURCE
+    }
+    return _gate_sense(
+        files,
+        files.profile.sense_path,
+        lambda _word, _gloss, sentence: "S" if sentence in swadesh else "F",
+    )
+
+
 GATES: tuple[Gate, ...] = (
     Gate("G1", gate_card_cap),
     Gate("G2", gate_use_cap),
@@ -321,11 +329,12 @@ GATES: tuple[Gate, ...] = (
     Gate("G15", gate_card_templates),
     Gate("G16", gate_output_model),
     Gate("G17", gate_core_word),
+    Gate("G18", gate_sense),
 )
 
 
 def check_cull(output_path: Path, profile: CullProfile) -> int:
-    """Run gates G1 to G17 on the files of a cull output.
+    """Run gates G1 to G18 on the files of a cull output.
 
     :param output_path: Output APKG file.
     :param profile: Language hooks.

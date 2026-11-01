@@ -68,6 +68,8 @@ def _profile() -> cullflow.CullProfile:
         quote_marks='"«»“”',
         internal_marks=",;:",
         script_ok=lambda sentence: True,
+        is_repeated=lambda sentence: False,
+        dedupe_key=str,
         input_model_name=MODEL_NAME,
         input_sentence_field="Text",
         input_english_field="Meaning",
@@ -185,7 +187,7 @@ def test_a_han_profile_keeps_one_character_lemmas_and_a_han_final_mark() -> None
     assert [target.lemma for target in targets] == ["水"]
     assert content == 1
     assert cullflow.filter_reason(cards[0], tokens[0], 1, 12, profile) == ""
-    assert cullflow.filter_reason(cards[0], tokens[0], 1, 12, _profile()) == "final_mark"
+    assert cullflow.filter_reason(cards[0], tokens[0], 1, 12, _profile()) == "marks"
 
 
 def _card(

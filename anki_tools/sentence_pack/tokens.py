@@ -268,15 +268,3 @@ def words(name: str, text: str) -> list[str]:
     :returns: Token texts with the punctuation tokens removed.
     """
     return [token.text for token in tokenize(name, text) if not token.punctuation]
-
-
-def has_finite_verb(tokens: list[Token]) -> bool:
-    """Check the predicate rule: a finite verb or auxiliary.
-
-    :param tokens: Tokens of the sentence.
-    :returns: True when one token is a finite verb.
-    """
-    return any(
-        token.pos in ("VERB", "AUX") and "VerbForm=Fin" in token.morph
-        for token in tokens
-    )

@@ -15,14 +15,12 @@ from anki_tools.languages.mandarin.profile import (
     known_words,
     count_form_occurrences,
     han_tokens,
-    has_orphan_conjunction,
-    has_predicate,
-    sense_filter,
     sentence_hits,
     sentence_pinyin,
     write_sentence_csv,
     write_sentence_review_csv,
 )
+from anki_tools.sentence_pack.english_sense import sense_failure, sense_row
 from anki_tools.languages.mandarin.stages import (
     mandarin_candidate_pool,
     mandarin_rank_key_parts,
@@ -172,10 +170,10 @@ class TestSentenceShape:
             ("我要喝水我要喝水我要喝水。", "length_window"),
             ("我要喝水ABCD。", "script"),
             ("走走走走。", "repeat"),
-            ("我要喝水", "final_mark"),
-            ("我要喝水。。", "one_final_mark"),
-            ("他说“我要喝水”。", "quote"),
-            ("我，要，喝水。", "internal_mark"),
+            ("我要喝水", "marks"),
+            ("我要喝水。。", "marks"),
+            ("他说“我要喝水”。", "marks"),
+            ("我，要，喝水。", "marks"),
         ],
     )
     def test_rejects_in_order(self, sentence: str, expected: str) -> None:
@@ -184,13 +182,6 @@ class TestSentenceShape:
     def test_fallback_window_accepts_short_sentence(self) -> None:
         assert mandarin_shape_failure("火灭了。") == "length_window"
         assert mandarin_shape_failure("火灭了。", min_han=3) is None
-
-    def test_predicate_and_conjunction(self) -> None:
-        assert has_predicate("我要喝水。") is True
-        assert has_predicate("那只小狗。") is False
-        assert has_orphan_conjunction("因为下雨。") is True
-        assert has_orphan_conjunction("因为下雨，我没去。") is False
-        assert has_orphan_conjunction("我要喝水。") is False
 
 
 class TestTokenChecks:
@@ -226,13 +217,17 @@ class TestTokenChecks:
         assert count_form_occurrences("他的数学很好。", "数") == 0
         assert sentence_hits("一切都好。", ["切", "好"]) == {"好": 1}
 
-    def test_sense_filter_rejects_false_friend_english(self) -> None:
-        assert sense_filter("抓", "He grabbed a handful of rice.")
-        assert not sense_filter("抓", "I scratched my arm.")
-        assert sense_filter("数", "What are those numbers?")
-        assert not sense_filter("数", "I counted to ten.")
-        assert sense_filter("挤", "This room is cramped.")
-        assert not sense_filter("挤", "Squeeze the lemon.")
+    def test_sense_rows_reject_false_friend_english(self) -> None:
+        def fails(form: str, english: str) -> bool:
+            row = sense_row(MANDARIN.sense_path, "S", form)
+            return sense_failure(english, row, "") == "false_friend"
+
+        assert fails("抓", "He grabbed a handful of rice.")
+        assert not fails("抓", "I scratched my arm.")
+        assert fails("数", "What are those numbers?")
+        assert not fails("数", "I counted to ten.")
+        assert fails("挤", "This room is cramped.")
+        assert not fails("挤", "Squeeze the lemon.")
 
 
 class TestRankingKey:
@@ -269,14 +264,9 @@ class TestCandidatePool:
         assert counts["length_window"] == 12
         assert counts["script"] == 11
         assert counts["repeat"] == 10
-        assert counts["final_mark"] == 9
-        assert counts["one_final_mark"] == 8
-        assert counts["quote"] == 7
-        assert counts["internal_mark"] == 6
-        assert counts["predicate"] == 5
-        assert counts["orphan"] == 4
-        assert counts["english_words"] == 3
-        assert counts["unique"] == 2
+        assert counts["marks"] == 6
+        assert counts["english_words"] == 5
+        assert counts["unique"] == 4
         assert report["pool_candidates"] == len(pool)
         assert report["core_sentences"] == len(pool)
 
@@ -325,11 +315,6 @@ class TestCandidatePool:
         assert shared_parts(without_audio, profile(True))[1] == 1  # type: ignore[arg-type]
         assert shared_parts(with_audio, profile(False))[1] == 0  # type: ignore[arg-type]
         assert shared_parts(without_audio, profile(False))[1] == 0  # type: ignore[arg-type]
-
-    def test_unknown_budget(self, pool_table: list[WordForm], pool_data: Path) -> None:
-        _, strict = mandarin_candidate_pool(pool_table, data_dir=pool_data, max_unknown=0)
-        _, loose = mandarin_candidate_pool(pool_table, data_dir=pool_data, max_unknown=2)
-        assert strict["counts"]["unknown"] <= loose["counts"]["unknown"]
 
     def test_fallback_scaffold(
         self, pool_table: list[WordForm], pool_data: Path

@@ -34,10 +34,9 @@ from anki_tools.sentence_pack.pack import (
 from anki_tools.sentence_pack.profile import (
     LanguageProfile,
     NOUN_INDICES,
-    make_sense_filter,
     register,
 )
-from anki_tools.sentence_pack.tokens import Token, TokenCache, has_finite_verb, tokenize
+from anki_tools.sentence_pack.tokens import Token, TokenCache, tokenize
 
 from anki_tools.sentence_pack.word_table import (
     check_form_labels,
@@ -67,6 +66,7 @@ WORD_REVIEW_PATH = Path("vocab/french_word_review.csv")
 SENTENCES_PATH = Path("vocab/french_sentences.csv")
 SENTENCE_REVIEW_PATH = Path("vocab/french_sentences_review.csv")
 POOL_REPORT_PATH = Path("data/french_pool_report.json")
+SENSE_PATH = Path("vocab/french_core_senses.tsv")
 AUDIO_DIR = Path("audio/french_sentences")
 MODULE_CACHE_PATH = Path("data/swadesh/french_module.txt")
 
@@ -101,18 +101,6 @@ OPEN_STATUS = "open"
 FINAL_MARKS = ".?!"
 INTERNAL_MARKS = ",;:"
 QUOTE_MARKS = '«»"“”—–'
-ORPHAN_CONJUNCTIONS = (
-    "et",
-    "mais",
-    "ou",
-    "car",
-    "donc",
-    "puis",
-    "parce que",
-    "puisque",
-    "bien que",
-)
-PREDICATE_MARKERS = frozenset({"est", "sont", "était", "a", "ont"})
 DISCONTINUOUS_FORMS = frozenset({"ne pas"})
 CARRIERS = ("{form}", "le {form}", "je {form}", "il {form}")
 ELIDED_CLITICS = (
@@ -355,21 +343,6 @@ def is_repeated_sentence(sentence: str) -> bool:
     return False
 
 
-def has_orphan(sentence: str) -> bool:
-    """Check filter orphan: a sentence-initial conjunction with no comma.
-
-    :param sentence: Prepared French sentence.
-    :returns: True when the leading conjunction has no main clause.
-    """
-    if "," in sentence or ";" in sentence:
-        return False
-    tokens = [surface_key(token.text) for token in word_tokens(sentence)]
-    if not tokens:
-        return False
-    if tokens[0] in ORPHAN_CONJUNCTIONS:
-        return True
-    return " ".join(tokens[:2]) in ORPHAN_CONJUNCTIONS
-
 
 @lru_cache(maxsize=8192)
 def carrier_keys(form: str) -> frozenset[str]:
@@ -508,53 +481,6 @@ def token_matches(sentence: str, form: str) -> int:
     return sum(1 for token in tokens if _token_matches(token, keys))
 
 
-SENSE_CHECKS: dict[str, tuple[frozenset[str], frozenset[str]]] = {
-    "queue": (
-        frozenset({"tail", "tails"}),
-        frozenset({"queue", "queues", "queuing", "queued", "line", "lines", "wait", "waiting"}),
-    ),
-    "sentir": (
-        frozenset({"smell", "smells", "smelled", "smelt", "smelling", "scent", "scents"}),
-        frozenset({"feel", "feels", "felt", "feeling"}),
-    ),
-    "voler": (
-        frozenset({"fly", "flies", "flew", "flying", "flown", "flight"}),
-        frozenset({"steal", "steals", "stole", "stolen", "stealing", "rob", "robbed", "theft"}),
-    ),
-    "tirer": (
-        frozenset({"pull", "pulls", "pulled", "pulling", "drag", "drags", "dragged"}),
-        frozenset({"shoot", "shoots", "shot", "shooting"}),
-    ),
-    "langue": (
-        frozenset({"tongue", "tongues"}),
-        frozenset({"language", "languages"}),
-    ),
-    "plume": (
-        frozenset({"feather", "feathers", "plumage"}),
-        frozenset({"pen", "pens", "quill", "quills"}),
-    ),
-    "foie": (
-        frozenset({"liver", "livers"}),
-        frozenset({"chicken", "scared", "afraid", "fear", "frightened", "feet"}),
-    ),
-    "gonfler": (
-        frozenset({"swell", "swells", "swelled", "swollen", "swelling", "inflate", "inflated"}),
-        frozenset({"bold", "nerve", "cheeky", "cheek", "gall"}),
-    ),
-    "rond": (
-        frozenset({"round", "rounded", "circle", "circular"}),
-        frozenset({"dime", "dimes", "penny", "pennies", "money", "cash", "coin", "coins"}),
-    ),
-    "droit": (
-        frozenset({"straight"}),
-        frozenset({"right", "rights", "allowed", "entitled", "permit", "permission"}),
-    ),
-}
-
-
-sense_filter = make_sense_filter(SENSE_CHECKS)
-
-
 def hits(sentence: str, forms: Collection[str]) -> dict[str, int]:
     """Count the forms that the sentence contains exactly one time.
 
@@ -670,31 +596,6 @@ def count_unknown(sentence: str, known: Collection[str]) -> int:
     )
 
 
-def has_predicate(sentence: str) -> bool:
-    """Check filter predicate: a finite verb, a marker, or a word-list verb.
-
-    :param sentence: Prepared French sentence.
-    :returns: True when the sentence has a finite verb.
-    """
-    tokens = french_tokens(sentence)
-    if has_finite_verb(list(tokens)):
-        return True
-    surfaces = [surface_key(token.text) for token in tokens if not token.punctuation]
-    if any(surface in PREDICATE_MARKERS for surface in surfaces):
-        return True
-    if any(
-        surfaces[index] == "y" and surfaces[index + 1] == "a"
-        for index in range(len(surfaces) - 1)
-    ):
-        return True
-    infinitives = verb_forms()
-    return any(
-        surface_key(token.lemma) in infinitives
-        for token in tokens
-        if not token.punctuation
-    )
-
-
 def glossary(word: WordForm) -> str:
     """Build the card gloss of one French form.
 
@@ -757,19 +658,6 @@ def load_word_table(
             )
         )
     return table
-
-
-@lru_cache(maxsize=1)
-def verb_forms() -> frozenset[str]:
-    """Give the infinitive forms of the word-list verbs.
-
-    :returns: Surface keys of the verb rows of the reviewed word table.
-    """
-    return frozenset(
-        surface_key(form.french)
-        for form in load_word_table()
-        if form.english.startswith("to ")
-    )
 
 
 @lru_cache(maxsize=1)
@@ -1097,8 +985,6 @@ FRENCH = register(
         final_marks=FINAL_MARKS,
         internal_marks=INTERNAL_MARKS,
         quote_marks=QUOTE_MARKS,
-        comma_marks=",",
-        orphan_conjunctions=ORPHAN_CONJUNCTIONS,
         wordfreq_lang="fr",
         tokenizer=TOKENIZER,
         warm_tokens=warm_tokens,
@@ -1118,8 +1004,6 @@ FRENCH = register(
         unit_count=unit_count,
         script_ok=script_ok,
         is_repeated=is_repeated_sentence,
-        has_predicate=has_predicate,
-        has_orphan=has_orphan,
         hits=hits,
         match_count=match_count,
         candidate_length=lambda card: card.word_len,
@@ -1144,7 +1028,7 @@ FRENCH = register(
         attribution=french_attribution,
         finalize_candidate=lambda card, target: card,
         highlight=highlight,
-        sense_filter=sense_filter,
+        sense_path=SENSE_PATH,
     )
 )
 

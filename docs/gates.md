@@ -21,9 +21,9 @@ One table shows the four flows at a glance:
 
 | Flow            | Command                              | Gate table               | Filter table          |
 | --------------- | ------------------------------------ | ------------------------ | --------------------- |
-| Sentence pack   | `anki swadesh pack <lang>`           | G1 to G21, 18 to 20 rows | 15 rule ids           |
-| Cull deck       | `anki fix <lang> <input> --select`   | G1 to G17                | 10 rule ids           |
-| Core deck       | `anki fix <lang> <input> --core`     | K1 to K21, 18 rows       | 10 rule ids, C1 to C5 |
+| Sentence pack   | `anki swadesh pack <lang>`           | G1 to G21, 18 to 20 rows | 9 rule ids            |
+| Cull deck       | `anki fix <lang> <input> --select`   | G1 to G18                | 7 rule ids            |
+| Core deck       | `anki fix <lang> <input> --core`     | K1 to K22, 19 rows       | 7 rule ids, C3 to C5  |
 | Vocabulary deck | `anki swadesh vocab <lang>`          | none                     | none                  |
 
 The filter column lives in `docs/filters.md`.
@@ -44,7 +44,7 @@ The reverse direction reads each check as a row and each flow as a column.
 | gate   | `gate_core_word`          | -                                | G17                               | K19                               | -               |
 | gate   | `gate_output_model`       | -                                | G16                               | K21                               | -               |
 | gate   | `gate_attribution`        | G12 (Fr Es El Yue)               | -                                 | -                                 | -               |
-| gate   | `gate_no_sense_mismatch`  | G21 (Fr Es Yue) G20 (El) G18 (zh) | -                                 | -                                 | -               |
+| gate   | `gate_sense`              | G21 (Fr Es Yue) G20 (El) G18 (zh) | G18                               | K22                               | -               |
 | gate   | `gate_typography`         | G17 (Fr Es)                      | -                                 | -                                 | -               |
 | gate   | `gate_no_blocked_license` | G18 (Fr Es)                      | -                                 | -                                 | -               |
 | gate   | `gate_no_false_friend`    | G17 (zh) G20 (Yue)               | -                                 | -                                 | -               |
@@ -53,19 +53,12 @@ The reverse direction reads each check as a row and each flow as a column.
 | filter | `length_window`           | yes                              | yes                               | yes                               | -               |
 | filter | `digit_marks`             | yes                              | yes                               | yes                               | -               |
 | filter | `script`                  | yes                              | yes                               | yes                               | -               |
-| filter | `repeat`                  | yes                              | -                                 | -                                 | -               |
-| filter | `final_mark`              | yes                              | yes                               | yes                               | -               |
-| filter | `one_final_mark`          | yes                              | yes                               | yes                               | -               |
-| filter | `quote`                   | yes                              | yes                               | yes                               | -               |
-| filter | `internal_mark`           | yes                              | yes                               | yes                               | -               |
-| filter | `predicate`               | yes                              | -                                 | -                                 | -               |
-| filter | `orphan`                  | yes                              | -                                 | -                                 | -               |
+| filter | `repeat`                  | yes                              | yes                               | yes                               | -               |
+| filter | `marks`                   | yes                              | yes                               | yes                               | -               |
 | filter | `english_words`           | yes                              | yes                               | yes                               | -               |
 | filter | `unique`                  | yes                              | yes                               | yes                               | -               |
-| filter | `unknown`                 | yes                              | -                                 | -                                 | -               |
 | filter | `sense`                   | yes                              | -                                 | -                                 | -               |
-| filter | `propn`                   | -                                | yes                               | yes                               | -               |
-| filter | C1 to C5                  | -                                | -                                 | yes                               | -               |
+| filter | C3 to C5                  | -                                | -                                 | yes                               | -               |
 
 Language codes: Fr French, Es Spanish, El Greek, Yue Cantonese, zh Mandarin.
 A filter id names one check in every flow that runs it. Each flow keeps its own
@@ -109,8 +102,8 @@ second flow.
 | Sentence pack, Greek           | G1 to G8, G10 to G18, G20          | 18   |
 | Sentence pack, Mandarin        | G1 to G18                          | 18   |
 | Sentence pack, Cantonese       | G1 to G18, G20, G21                | 20   |
-| Cull deck                      | G1 to G17                          | 17   |
-| Core deck                      | K1, K2, K4 to K14, K16, K18 to K21 | 18   |
+| Cull deck                      | G1 to G18                          | 18   |
+| Core deck                      | K1, K2, K4 to K14, K16, K18 to K22 | 19   |
 | Vocabulary deck                | none                               | 0    |
 
 A removed row leaves a gap in the numbering. Each flow doc gives the check of
@@ -136,7 +129,7 @@ table lives in one flow only, and the flow doc holds it.
 | Core word       | `gate_core_word`          | cull G17, core K19                                                    |
 | Output model    | `gate_output_model`       | cull G16, core K21                                                    |
 | Attribution     | `gate_attribution`        | pack G12 of French, Spanish, Greek, Cantonese                         |
-| English sense   | `gate_no_sense_mismatch`  | pack G21 of French, Spanish, Cantonese; G20 of Greek; G18 of Mandarin |
+| English sense   | `gate_sense`              | cull G18, core K22; pack G21 Fr Es Yue, G20 El, G18 zh                |
 | Typography      | `gate_typography`         | pack G17 of French, Spanish                                           |
 | Blocked license | `gate_no_blocked_license` | pack G18 of French, Spanish                                           |
 | False friend    | `gate_no_false_friend`    | pack G17 of Mandarin, pack G20 of Cantonese                           |
@@ -158,8 +151,14 @@ cull G3, cull G4, and core K2. They stay separate.
   `K6` use the lemma Jaccard value.
 - The pack manifest has a second shape. `sentence_pack/pack.py` writes it, and
   `G11` reads it. The rank manifest comes from `ranking/assemble.py`.
-- Cull `G5` exempts `propn` for a reserve card. No pack rule tests a name, and
-  `G14` needs those cards.
+- `gate_sense` is one function in `ranking/gates.py` for the cull and the core.
+  It reads the `Core` word and the card English of every note, and it takes tier
+  S for a cull reserve card and for a Swadesh coverage row, tier F otherwise. The
+  pack still runs its own `gate_no_sense_mismatch` and `gate_no_false_friend`;
+  they read the sentence CSV and the language hooks, so they stay until the pack
+  filter moves to `sense_failure`. Core `K13` and `K16` stay: `gate_sense` does
+  not test that the form is in the sentence, and it does not count unchecked
+  targets.
 - Core `K1` checks a three-way count agreement. Cull `G1` checks the cap or the
   pool end. The two functions stay separate.
 - Mandarin `G12` checks the native audio authors, not every sentence author, so
@@ -236,6 +235,6 @@ unless the change removes a report-only row.
 | `anki_tools/gate_files.py`               | the lazy file reader                                  |
 | `anki_tools/ranking/gates.py`            | the report and the shared rank checks                 |
 | `anki_tools/sentence_pack/audit.py`      | `AuditInputs`, `as_gates`, and the shared pack checks |
-| `anki_tools/ranking/cullgates.py`        | cull gates G1 to G17                                  |
-| `anki_tools/ranking/coregates.py`        | core gates K1 to K21                                  |
+| `anki_tools/ranking/cullgates.py`        | cull gates G1 to G18                                  |
+| `anki_tools/ranking/coregates.py`        | core gates K1 to K22                                  |
 | `anki_tools/languages/<lang>/profile.py` | the language gates                                    |

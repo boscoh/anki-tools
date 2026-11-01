@@ -48,7 +48,7 @@ FRONT_TEMPLATE = load_text(TEMPLATE_DIR / "front.html")
 BACK_TEMPLATE = load_text(TEMPLATE_DIR / "back.html")
 CARD_TEMPLATES = ((FRONT_TEMPLATE, BACK_TEMPLATE),)
 
-SENSE_PATH = Path("vocab/french_core_senses.tsv")
+SENSE_PATH = FRENCH.sense_path
 LICENSES = {
     "tatoeba": "Tatoeba sentence text: CC BY 2.0 FR",
     "wordfreq": "wordfreq list: Apache License 2.0",
@@ -148,6 +148,8 @@ FRENCH_LANGUAGE = LanguageDeckProfile(
     card_css=card_css,
     sense_path=SENSE_PATH,
     script_ok=FRENCH.script_ok,
+    is_repeated=FRENCH.is_repeated,
+    dedupe_key=FRENCH.dedupe_key,
     highlight=FRENCH.highlight,
 )
 

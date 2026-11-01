@@ -27,14 +27,19 @@ from anki_tools.languages.mandarin.characters import (
     is_repeated_zh_sentence,
 )
 from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
-from anki_tools.sentence_pack.guards import compound_spans, inside_spans, occurrences
+from anki_tools.sentence_pack.guards import (
+    compound_spans,
+    form_compounds,
+    inside_spans,
+    occurrences,
+)
 from anki_tools.sentence_pack.pack import (
     ATTRIBUTION_PATH,
     audio_license_source,
     tts_engine_name,
     write_attribution_section,
 )
-from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
+from anki_tools.sentence_pack.profile import LanguageProfile, register
 from anki_tools.sentence_pack.select import rank_order
 
 from anki_tools.sentence_pack.word_table import (
@@ -60,6 +65,7 @@ DEFAULT_REVIEW_PATH = Path("vocab/swadesh_review.csv")
 SENTENCES_PATH = Path("vocab/mandarin_sentences.csv")
 SENTENCE_REVIEW_PATH = Path("vocab/mandarin_sentences_review.csv")
 POOL_REPORT_PATH = Path("data/mandarin_pool_report.json")
+SENSE_PATH = Path("vocab/mandarin_core_senses.tsv")
 AUDIO_DIR = Path("audio/mandarin_sentences")
 AUDIO_TSV_PATH = Path("data/tatoeba/cmn_sentences_with_audio.tsv")
 
@@ -79,17 +85,6 @@ MAX_ENGLISH_WORDS = 12
 FINAL_MARKS = "。？！.!?"
 QUOTE_MARKS = '"“”「」『』'
 INTERNAL_MARKS = "，：；,:;"
-ORPHAN_CONJUNCTIONS = (
-    "因为",
-    "所以",
-    "但是",
-    "可是",
-    "而且",
-    "然后",
-    "不过",
-    "虽然",
-)
-PREDICATE_TAG_PREFIXES = ("v", "a")
 LATIN_LETTER = re.compile(r"[A-Za-z]")
 
 SENTENCE_FIELDS = [
@@ -611,52 +606,6 @@ def count_form_tokens(sentence: str, form: str) -> int:
     return sum(1 for word in han_tokens(sentence) if word == form)
 
 
-FALSE_FRIENDS: dict[str, tuple[str, ...]] = {
-    "切": ("一切",),
-    "闻": ("新闻", "传闻"),
-    "数": ("数学", "数大", "数字", "岁数", "人数"),
-    "烧": ("发烧",),
-    "抓": ("抓住", "抓到", "抓紧"),
-    "挖": ("挖苦",),
-    "挤": ("挤满",),
-    "来": ("出来", "起来"),
-}
-
-
-SENSE_CHECKS: dict[str, tuple[frozenset[str], frozenset[str]]] = {
-    "抓": (
-        frozenset({"scratch", "scratches", "scratched", "scratching", "itch"}),
-        frozenset({
-            "grab", "grabs", "grabbed", "grabbing", "catch", "catches",
-            "caught", "catching", "seize", "seizes", "seized", "arrest",
-            "arrests", "arrested",
-        }),
-    ),
-    "数": (
-        frozenset({"count", "counts", "counted", "counting"}),
-        frozenset({"math", "maths", "mathematics", "arithmetic", "number", "numbers"}),
-    ),
-    "挤": (
-        frozenset({"squeeze", "squeezes", "squeezed", "squeezing"}),
-        frozenset({"crowded", "crowd", "crowds", "cramped", "packed"}),
-    ),
-}
-
-
-def false_friend_spans(sentence: str, form: str) -> list[tuple[int, int]]:
-    """Give the spans where the form takes a different sense.
-
-    :param sentence: Simplified Chinese sentence.
-    :param form: Word-table form.
-    :returns: ``(start, end)`` offsets in the Han character stream.
-    """
-    chars = "".join(get_chinese_chars(sentence))
-    return compound_spans(chars, FALSE_FRIENDS.get(form, ()))
-
-
-sense_filter = make_sense_filter(SENSE_CHECKS)
-
-
 def form_occurrences(sentence: str, form: str) -> list[int]:
     """Give the offsets of the form occurrences that keep the Swadesh sense.
 
@@ -667,7 +616,7 @@ def form_occurrences(sentence: str, form: str) -> list[int]:
     if not form:
         return []
     chars = "".join(get_chinese_chars(sentence))
-    blocked = false_friend_spans(sentence, form)
+    blocked = compound_spans(chars, form_compounds(SENSE_PATH, form))
     return [
         position
         for position in occurrences(chars, form)
@@ -744,25 +693,6 @@ def single_hits(sentence: str, forms: Iterable[str]) -> dict[str, int]:
         if form and form[0] in present and len(form_occurrences(sentence, form)) == 1
     }
 
-
-def has_predicate(sentence: str) -> bool:
-    """Check filter predicate: jieba tags at least one token as ``v*`` or ``a*``.
-
-    :param sentence: Simplified Chinese sentence.
-    :returns: True when the sentence has a predicate tag.
-    """
-    return any(tag.startswith(PREDICATE_TAG_PREFIXES) for _, tag in _tokens(sentence))
-
-
-def has_orphan_conjunction(sentence: str) -> bool:
-    """Check filter orphan: a sentence-initial conjunction with no comma.
-
-    :param sentence: Simplified Chinese sentence.
-    :returns: True when the leading conjunction has no main clause.
-    """
-    if any(mark in sentence for mark in "，,"):
-        return False
-    return sentence.startswith(ORPHAN_CONJUNCTIONS)
 
 
 def _tone_parts(syllable: str) -> tuple[str, int]:
@@ -1019,8 +949,6 @@ MANDARIN = register(
         final_marks=FINAL_MARKS,
         internal_marks=INTERNAL_MARKS,
         quote_marks=QUOTE_MARKS,
-        comma_marks="，,",
-        orphan_conjunctions=ORPHAN_CONJUNCTIONS,
         wordfreq_lang="zh",
         highlight=highlight,
         tokenizer="",
@@ -1040,8 +968,6 @@ MANDARIN = register(
         unit_count=lambda sentence: len(get_chinese_chars(sentence)),
         script_ok=lambda sentence: not LATIN_LETTER.search(sentence),
         is_repeated=is_repeated_zh_sentence,
-        has_predicate=has_predicate,
-        has_orphan=has_orphan_conjunction,
         hits=single_hits,
         match_count=count_form_occurrences,
         candidate_length=lambda card: card.han_len,
@@ -1060,8 +986,7 @@ MANDARIN = register(
         excluded_words=_excluded_words,
         extra_manifest=_extra_manifest,
         attribution=write_attribution,
-        sense_filter=sense_filter,
-        false_friend_spans=false_friend_spans,
+        sense_path=SENSE_PATH,
         finalize_candidate=lambda card, target: replace(
             card, pinyin=sentence_pinyin(card.sentence)
         ),

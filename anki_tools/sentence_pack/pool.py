@@ -1,12 +1,12 @@
 """Candidate sentence pool (stage S2).
 
 The pool applies the ordered guards, from ``english_link`` through ``unique``,
-then the unknown-token budget and the English sense test. The guard tables give
+then the English sense test. The guard tables give
 the order, and each report count is the number of sentences that pass the
 guard. A sentence that fails no guard becomes a candidate for the lowest-index
 word it covers. With ``fallback``, a sentence in the wider window that fails
-only ``one_final_mark`` or ``internal_mark`` becomes a scaffold candidate for a
-word that has no core candidate.
+only the one-final-mark and internal-mark checks of ``marks`` becomes a scaffold
+candidate for a word that has no core candidate.
 """
 
 from __future__ import annotations
@@ -18,7 +18,11 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Collection, Sequence
 
-from anki_tools.sentence_pack.english_sense import holds_sense
+from anki_tools.sentence_pack.english_sense import (
+    FALSE_FRIEND,
+    sense_failure,
+    sense_row,
+)
 from anki_tools.sentence_pack.profile import LanguageProfile, WordRow
 from anki_tools.sentence_pack.tatoeba import (
     read_audio,
@@ -35,15 +39,9 @@ FILTER_KEYS = [
     "digit_marks",
     "script",
     "repeat",
-    "final_mark",
-    "one_final_mark",
-    "quote",
-    "internal_mark",
-    "predicate",
-    "orphan",
+    "marks",
     "english_words",
     "unique",
-    "unknown",
     "sense",
 ]
 FILTER_NAMES = {
@@ -52,15 +50,9 @@ FILTER_NAMES = {
     "digit_marks": "no digit, bracket, link, or ellipsis",
     "script": "script",
     "repeat": "no repeated pattern",
-    "final_mark": "final mark",
-    "one_final_mark": "one final mark",
-    "quote": "no quotation mark",
-    "internal_mark": "at most one internal mark",
-    "predicate": "predicate",
-    "orphan": "no orphan conjunction",
+    "marks": "final mark, no quotation mark, at most one internal mark",
     "english_words": "english word count",
     "unique": "unique text",
-    "unknown": "unknown token budget",
     "sense": "english sense",
 }
 BRACKET_MARKS = frozenset("[]{}<>")
@@ -134,7 +126,9 @@ class ShapeInput:
     :param unit_len: Word or character count of the sentence.
     :param min_units: Minimum unit count of the window.
     :param max_units: Maximum unit count of the window.
-    :param final_mark: Apply the ``final_mark`` and ``one_final_mark`` guards.
+    :param final_mark: Apply the final-mark checks of the ``marks`` guard.
+    :param scaffold: Skip the one-final-mark and internal-mark checks of the
+        ``marks`` guard.
     """
 
     sentence: str
@@ -143,6 +137,7 @@ class ShapeInput:
     min_units: int
     max_units: int
     final_mark: bool = True
+    scaffold: bool = False
 
 
 def _passes_length(item: ShapeInput) -> bool:
@@ -168,24 +163,17 @@ def _passes_repeat(item: ShapeInput) -> bool:
     return not item.profile.is_repeated(item.sentence)
 
 
-def _passes_final_mark(item: ShapeInput) -> bool:
-    return not item.final_mark or (
-        bool(item.sentence) and item.sentence[-1] in item.profile.final_marks
-    )
-
-
-def _passes_one_final_mark(item: ShapeInput) -> bool:
-    return not item.final_mark or (
-        count_marks(item.sentence, item.profile.final_marks) == 1
-    )
-
-
-def _passes_quote(item: ShapeInput) -> bool:
-    return not any(char in item.profile.quote_marks for char in item.sentence)
-
-
-def _passes_internal_marks(item: ShapeInput) -> bool:
-    return count_marks(item.sentence, item.profile.internal_marks) <= 1
+def _passes_marks(item: ShapeInput) -> bool:
+    sentence = item.sentence
+    profile = item.profile
+    if any(char in profile.quote_marks for char in sentence):
+        return False
+    if item.final_mark:
+        if not sentence or sentence[-1] not in profile.final_marks:
+            return False
+        if not item.scaffold and count_marks(sentence, profile.final_marks) != 1:
+            return False
+    return item.scaffold or count_marks(sentence, profile.internal_marks) <= 1
 
 
 SHAPE_GUARDS: tuple[tuple[str, Callable[[ShapeInput], bool]], ...] = (
@@ -193,14 +181,7 @@ SHAPE_GUARDS: tuple[tuple[str, Callable[[ShapeInput], bool]], ...] = (
     ("digit_marks", _passes_digit_marks),
     ("script", _passes_script),
     ("repeat", _passes_repeat),
-    ("final_mark", _passes_final_mark),
-    ("one_final_mark", _passes_one_final_mark),
-    ("quote", _passes_quote),
-    ("internal_mark", _passes_internal_marks),
-)
-SCAFFOLD_SHAPE_FAILURES = frozenset(("one_final_mark", "internal_mark"))
-SCAFFOLD_SHAPE_KEYS = frozenset(
-    key for key, _ in SHAPE_GUARDS if key not in SCAFFOLD_SHAPE_FAILURES
+    ("marks", _passes_marks),
 )
 
 
@@ -211,6 +192,7 @@ def shape_failure(
     max_units: int,
     *,
     final_mark: bool = True,
+    scaffold: bool = False,
     keys: Collection[str] = (),
 ) -> str | None:
     """Give the first failed shape guard.
@@ -219,7 +201,8 @@ def shape_failure(
     :param profile: Language profile.
     :param min_units: Minimum unit count of the window.
     :param max_units: Maximum unit count of the window.
-    :param final_mark: Apply the ``final_mark`` and ``one_final_mark`` guards.
+    :param final_mark: Apply the final-mark checks of the ``marks`` guard.
+    :param scaffold: Relax the ``marks`` guard to the scaffold tier.
     :param keys: Guard keys to apply, empty for every key.
     :returns: The first failed guard key, or None when the guards pass.
     """
@@ -230,6 +213,7 @@ def shape_failure(
         min_units=min_units,
         max_units=max_units,
         final_mark=final_mark,
+        scaffold=scaffold,
     )
     for key, test in SHAPE_GUARDS:
         if (not keys or key in keys) and not test(data):
@@ -243,34 +227,20 @@ def shape_failure(
 class FactInput:
     """Measured values of the fact guards.
 
-    :param predicate: True when the sentence has a predicate tag.
-    :param orphan: True when the sentence starts with an orphan conjunction.
     :param english_words: Word count of the English translation.
     :param english_bounds: Accepted English word-count window.
     :param duplicate: True when the dedupe key is already kept.
     :param unknown_words: Token count outside the known set.
-    :param max_unknown: Unknown token budget.
     :param hits: Forms that the form filter keeps.
     :param sense_hits: Forms whose paired English holds the card sense.
     """
 
-    predicate: bool
-    orphan: bool
     english_words: int
     english_bounds: tuple[int, int]
     duplicate: bool
     unknown_words: int
-    max_unknown: int
     hits: tuple[str, ...]
     sense_hits: tuple[str, ...]
-
-
-def _passes_predicate(item: FactInput) -> bool:
-    return item.predicate
-
-
-def _passes_orphan(item: FactInput) -> bool:
-    return not item.orphan
 
 
 def _passes_english(item: FactInput) -> bool:
@@ -282,20 +252,13 @@ def _passes_unique(item: FactInput) -> bool:
     return not item.duplicate
 
 
-def _passes_unknown(item: FactInput) -> bool:
-    return item.unknown_words <= item.max_unknown
-
-
 def _passes_sense(item: FactInput) -> bool:
     return not item.hits or bool(item.sense_hits)
 
 
 FACT_GUARDS: tuple[tuple[str, Callable[[FactInput], bool]], ...] = (
-    ("predicate", _passes_predicate),
-    ("orphan", _passes_orphan),
     ("english_words", _passes_english),
     ("unique", _passes_unique),
-    ("unknown", _passes_unknown),
     ("sense", _passes_sense),
 )
 SCAFFOLD_SKIP_GUARDS = frozenset(("sense",))
@@ -470,7 +433,6 @@ def build_candidate_pool(
     data_dir: Path = Path("data/tatoeba"),
     min_units: int | None = None,
     max_units: int | None = None,
-    max_unknown: int = 2,
     fallback: bool = False,
     known_words: Collection[str] = (),
     make_candidate: Callable[..., Any],
@@ -485,9 +447,8 @@ def build_candidate_pool(
     :param data_dir: Directory with the Tatoeba TSV files.
     :param min_units: Minimum unit count for a core candidate.
     :param max_units: Maximum unit count.
-    :param max_unknown: Unknown token budget per sentence.
     :param fallback: Add scaffold candidates for forms with no core candidate.
-    :param known_words: Known word set of the unknown-token filter.
+    :param known_words: Known word set that counts the unknown tokens.
     :param make_candidate: Callable that builds a card object from the facts.
     :param frames_path: Optional CSV file of manual frame sentences. A frame
         passes the same guards as a Tatoeba sentence.
@@ -536,15 +497,16 @@ def build_candidate_pool(
             continue
         unit_len = profile.unit_count(sentence)
         shape = shape_failure(sentence, profile, min_units, max_units)
-        relax_shape = (
-            shape_failure(
-                sentence, profile, profile.fallback_min_units, max_units
-            )
-            if fallback
-            else None
-        )
         relax_ok = fallback and (
-            relax_shape is None or relax_shape in SCAFFOLD_SHAPE_FAILURES
+            shape is None
+            or shape_failure(
+                sentence,
+                profile,
+                profile.fallback_min_units,
+                max_units,
+                scaffold=True,
+            )
+            is None
         )
         if shape is not None and not relax_ok:
             record_pass(counts, shape)
@@ -554,33 +516,27 @@ def build_candidate_pool(
         if len(warm_buffer) >= WARM_BATCH:
             _warm(profile, warm_buffer)
             warm_buffer.clear()
-        predicate = profile.has_predicate(sentence)
-        orphan = profile.has_orphan(sentence)
         unknown_words = profile.count_unknown(sentence, known_words)
         english_words = len(english_text.split())
         dedupe = profile.dedupe_key(sentence)
 
         hits = tuple(sorted(profile.hits(sentence, form_set)))
-        if profile.sense_filter is not None:
-            hits = tuple(
-                form
-                for form in hits
-                if not profile.sense_filter(form, english_text)
+        failures = {
+            form: sense_failure(
+                english_text,
+                sense_row(profile.sense_path, "S", form),
+                gloss_by_form.get(form, ""),
             )
-        sense_hits = tuple(
-            form
             for form in hits
-            if holds_sense(gloss_by_form.get(form, ""), english_text)
-        )
+        }
+        sense_hits = tuple(form for form in hits if failures[form] is None)
+        hits = tuple(form for form in hits if failures[form] != FALSE_FRIEND)
 
         measured = FactInput(
-            predicate=predicate,
-            orphan=orphan,
             english_words=english_words,
             english_bounds=(MIN_ENGLISH_WORDS, MAX_ENGLISH_WORDS),
             duplicate=dedupe in seen,
             unknown_words=unknown_words,
-            max_unknown=max_unknown,
             hits=hits,
             sense_hits=sense_hits,
         )
@@ -657,13 +613,10 @@ def build_candidate_pool(
             continue
         dedupe = profile.dedupe_key(sentence)
         measured = FactInput(
-            predicate=profile.has_predicate(sentence),
-            orphan=profile.has_orphan(sentence),
             english_words=len(frame_english.split()),
             english_bounds=(MIN_ENGLISH_WORDS, MAX_ENGLISH_WORDS),
             duplicate=dedupe in seen,
             unknown_words=profile.count_unknown(sentence, known_words),
-            max_unknown=max_unknown,
             hits=hits,
             sense_hits=hits,
         )
@@ -732,7 +685,6 @@ def build_candidate_pool(
         "data_dir": str(data_dir),
         "min_units": min_units,
         "max_units": max_units,
-        "max_unknown": max_unknown,
         "fallback": fallback,
         "english_ids": len(wanted_english),
         "total_linked": total,

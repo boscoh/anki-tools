@@ -13,6 +13,7 @@ from anki_tools.sentence_pack.audit import (
     AuditInputs,
     gate_filter_recheck,
 )
+from anki_tools.sentence_pack.english_sense import sense_failure, sense_row
 from anki_tools.sentence_pack.guards import check_sentence_shape
 from anki_tools.languages.french import profile as french
 
@@ -179,13 +180,18 @@ def test_form_key_rule_with_pluie_manger_and_elision() -> None:
     assert french.token_matches("La voiture est en panne.", "eau") == 0
 
 
-def test_sense_filter_rejects_false_friend_english() -> None:
-    assert french.sense_filter("queue", "I didn't wait in line.")
-    assert not french.sense_filter("queue", "The dog wagged its tail.")
-    assert french.sense_filter("sentir", "I feel fine.")
-    assert not french.sense_filter("sentir", "I smell smoke.")
-    assert french.sense_filter("voler", "I've been robbed.")
-    assert not french.sense_filter("voler", "The birds were flying.")
+def _false_friend(form: str, english: str) -> bool:
+    row = sense_row(french.SENSE_PATH, "S", form)
+    return sense_failure(english, row, "") == "false_friend"
+
+
+def test_sense_rows_reject_false_friend_english() -> None:
+    assert _false_friend("queue", "I didn't wait in line.")
+    assert not _false_friend("queue", "The dog wagged its tail.")
+    assert _false_friend("sentir", "I feel fine.")
+    assert not _false_friend("sentir", "I smell smoke.")
+    assert _false_friend("voler", "I've been robbed.")
+    assert not _false_friend("voler", "The birds were flying.")
 
 
 def test_form_key_rule_for_pairs_and_elided_clitics() -> None:
@@ -241,23 +247,13 @@ def test_proper_sentence_filters_f2_to_f10() -> None:
         == "script"
     )
     assert check_sentence_shape("Oui oui oui oui.", french.FRENCH, 4, 10) == "repeat"
-    assert check_sentence_shape("Le chien mange vite", french.FRENCH, 4, 10) == "final_mark"
-    assert (
-        check_sentence_shape("Le chien mange. Il aboie.", french.FRENCH, 4, 10)
-        == "one_final_mark"
-    )
-    assert (
-        check_sentence_shape('Il dit "oui" au chien.', french.FRENCH, 4, 10) == "quote"
-    )
-    assert (
-        check_sentence_shape("Le chien, le chat, l'oiseau.", french.FRENCH, 4, 10)
-        == "internal_mark"
-    )
-    assert french.has_predicate("Le chien mange vite.") is True
-    assert french.has_predicate("Trois chiens.") is False
-    assert french.has_predicate("Il y a un chien.") is True
-    assert french.has_orphan("Et il y a un chien.") is True
-    assert french.has_orphan("Et il y a un chien, dit-il.") is False
+    for sentence in (
+        "Le chien mange vite",
+        "Le chien mange. Il aboie.",
+        'Il dit "oui" au chien.',
+        "Le chien, le chat, l'oiseau.",
+    ):
+        assert check_sentence_shape(sentence, french.FRENCH, 4, 10) == "marks"
 
 
 def _pool_dir(tmp_path: Path) -> Path:
@@ -316,17 +312,19 @@ def test_pool_uses_the_french_filters(tmp_path: Path) -> None:
     counts = report["counts"]
     texts = {candidate.sentence for candidate in candidates}
 
-    assert texts == {"Je voudrais un verre d'eau.", "Le chien mange vite, il aboie."}
+    assert texts == {
+        "Je voudrais un verre d'eau.",
+        "Le chien mange vite, il aboie.",
+        "Et le chien mange vite.",
+    }
     assert counts["english_link"] == 7
     assert counts["length_window"] == 6
     assert counts["script"] == 5
-    assert counts["quote"] == 4
-    assert counts["internal_mark"] == 3
-    assert counts["orphan"] == 2
-    assert counts["english_words"] == 2
-    assert counts["unique"] == 2
+    assert counts["marks"] == 3
+    assert counts["english_words"] == 3
+    assert counts["unique"] == 3
     assert report["forms_with_core_candidate"] == 2
-    assert report["pool_candidates"] == 2
+    assert report["pool_candidates"] == 3
 
 
 def test_set_cover_on_a_small_fixture() -> None:
@@ -408,7 +406,7 @@ def test_scaffold_cards_take_the_g14_exemption(tmp_path: Path) -> None:
     inputs = _audit_inputs(tmp_path, table, core)
     passed, message = gate_filter_recheck(inputs, french.FRENCH)
     assert not passed
-    assert "one_final_mark" in message
+    assert "marks" in message
 
 
 def test_gate_19_rejects_a_discontinuous_target_without_both_parts(

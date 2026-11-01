@@ -53,6 +53,8 @@ class LanguageDeckProfile:
     :param card_css: CSS of the written deck.
     :param sense_path: Sense file of the target words.
     :param script_ok: Alphabet test of the ``script`` rule.
+    :param is_repeated: Test of the ``repeat`` rule.
+    :param dedupe_key: Key of the ``unique`` rule.
     :param highlight: Bold hook, or None when the language does not bold.
     :param romanization_source: Input field of the romanization line, or None
         when the language has none.
@@ -71,6 +73,8 @@ class LanguageDeckProfile:
     card_css: Callable[[], str]
     sense_path: Path
     script_ok: Callable[[str], bool]
+    is_repeated: Callable[[str], bool]
+    dedupe_key: Callable[[str], str]
     highlight: Callable[[str, str], str] | None = None
     romanization_source: str | None = None
 
@@ -94,6 +98,8 @@ class LanguageDeckProfile:
             "card_css": self.card_css,
             "sense_path": self.sense_path,
             "script_ok": self.script_ok,
+            "is_repeated": self.is_repeated,
+            "dedupe_key": self.dedupe_key,
             "highlight": self.highlight,
             "romanization_source": self.romanization_source,
         }
@@ -120,6 +126,8 @@ class LanguageDeckProfile:
             "card_css": self.card_css,
             "sense_path": self.sense_path,
             "script_ok": self.script_ok,
+            "is_repeated": self.is_repeated,
+            "dedupe_key": self.dedupe_key,
             "highlight": self.highlight,
             "romanization_source": self.romanization_source,
         }

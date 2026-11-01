@@ -43,7 +43,7 @@ SENTENCE_FIELD = "SpanishSentence"
 ENGLISH_FIELD = "EnglishSentence"
 AUDIO_FIELD = "Audio"
 
-SENSE_PATH = Path("vocab/spanish_core_senses.tsv")
+SENSE_PATH = SPANISH.sense_path
 LOAN_PATH = Path("vocab/spanish_loanwords.txt")
 
 DEFAULT_CORE_WORDS = 50
@@ -182,6 +182,8 @@ SPANISH_LANGUAGE = LanguageDeckProfile(
     card_css=card_css,
     sense_path=SENSE_PATH,
     script_ok=SPANISH.script_ok,
+    is_repeated=SPANISH.is_repeated,
+    dedupe_key=SPANISH.dedupe_key,
     highlight=SPANISH.highlight,
 )
 
@@ -189,9 +191,7 @@ SPANISH_CORE_PROFILE = SPANISH_LANGUAGE.core(
     tokenize_deck=tokenize_deck,
     word_table=word_table,
     loan_path=LOAN_PATH,
-    has_orphan=SPANISH.has_orphan,
     hits=SPANISH.hits,
-    sense_filter=SPANISH.sense_filter,
     lemma_key=str.casefold,
     templates=CORE_TEMPLATES,
     min_units=MIN_UNITS,

@@ -18,8 +18,10 @@ does not import another language package for it.
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Collection, Iterable, Sequence
 
+from anki_tools.sentence_pack.english_sense import sense_row
 from anki_tools.sentence_pack.pool import shape_failure
 from anki_tools.sentence_pack.profile import LanguageProfile
 
@@ -57,6 +59,17 @@ def compound_spans(text: str, compounds: Iterable[str]) -> list[Span]:
     ]
 
 
+def form_compounds(path: Path, form: str) -> tuple[str, ...]:
+    """Give the compounds in which a form takes another sense.
+
+    :param path: Sense file of the language.
+    :param form: Word-table form.
+    :returns: Compound strings of the ``compounds`` column, empty when none.
+    """
+    row = sense_row(path, "S", form)
+    return row.compounds if row else ()
+
+
 def inside_spans(position: int, spans: Sequence[Span]) -> bool:
     """Tell whether a form start sits inside one blocked span.
 
@@ -82,7 +95,7 @@ def check_sentence_shape(
     :param profile: Language profile of the language package.
     :param min_units: Minimum unit count of the window.
     :param max_units: Maximum unit count of the window.
-    :param final_mark: Apply the ``final_mark`` and ``one_final_mark`` guards.
+    :param final_mark: Apply the final-mark checks of the ``marks`` guard.
     :param keys: Guard keys to apply, empty for every key.
     :returns: The first failed guard key, or None when all guards pass.
     """

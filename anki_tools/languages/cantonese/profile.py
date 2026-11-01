@@ -7,9 +7,7 @@ language name.
 
 The sentence text uses Traditional characters. :func:`prepare_text` converts a
 simplified Tatoeba row to Traditional, and the word table uses Traditional
-forms too. A Cantonese sentence has no part-of-speech tagger, so filters predicate and
-orphan always pass. ``specs/cantonese-swadesh-sentence-pack.md`` records that
-decision.
+forms too.
 """
 
 from __future__ import annotations
@@ -43,10 +41,11 @@ from anki_tools.sentence_pack.pack import (
 )
 from anki_tools.sentence_pack.guards import (
     compound_spans,
+    form_compounds,
     inside_spans,
     occurrences,
 )
-from anki_tools.sentence_pack.profile import LanguageProfile, make_sense_filter, register
+from anki_tools.sentence_pack.profile import LanguageProfile, register
 from anki_tools.sentence_pack.select import rank_order
 from anki_tools.sentence_pack.word_table import (
     check_form_count,
@@ -85,6 +84,7 @@ DEFAULT_VARIANT_ROWS_PATH = Path("vocab/cantonese_variant_rows.csv")
 SENTENCES_PATH = Path("vocab/cantonese_sentences.csv")
 SENTENCE_REVIEW_PATH = Path("vocab/cantonese_sentences_review.csv")
 POOL_REPORT_PATH = Path("data/cantonese_pool_report.json")
+SENSE_PATH = Path("vocab/cantonese_core_senses.tsv")
 AUDIO_DIR = Path("audio/cantonese_sentences")
 AUDIO_TSV_PATH = Path("data/tatoeba/yue_sentences_with_audio.tsv")
 MODULE_CACHE_PATH = Path("data/swadesh/cantonese_module.txt")
@@ -558,53 +558,6 @@ def _token_at(spans: Sequence[tuple[str, int, int]], position: int) -> str:
     return ""
 
 
-FALSE_FRIENDS: dict[str, tuple[str, ...]] = {
-    "切": ("趕得切", "一切"),
-    "聽": ("聽日",),
-    "數": ("着數", "數學", "彩數", "多數"),
-    "燒": ("發燒",),
-    "揸": ("揸車",),
-}
-
-
-SENSE_CHECKS: dict[str, tuple[frozenset[str], frozenset[str]]] = {
-    "揸": (
-        frozenset({
-            "hold", "holds", "held", "holding", "grip", "grips",
-            "grasp", "grasps", "clutch", "clutches",
-        }),
-        frozenset({
-            "drive", "drives", "drove", "driving", "driver", "fly",
-            "flies", "flew", "flying", "pilot", "plane", "planes",
-        }),
-    ),
-    "燒": (
-        frozenset({"burn", "burns", "burned", "burnt", "burning", "fire"}),
-        frozenset({"fever", "fevers", "temperature", "temperatures"}),
-    ),
-    "數": (
-        frozenset({"count", "counts", "counted", "counting"}),
-        frozenset({
-            "math", "maths", "mathematics", "arithmetic", "number",
-            "numbers",
-        }),
-    ),
-}
-
-
-def false_friend_spans(sentence: str, form: str) -> list[tuple[int, int]]:
-    """Give the spans where the form sits inside a different-sense compound.
-
-    :param sentence: Traditional Cantonese sentence.
-    :param form: Word-table form.
-    :returns: ``(start, end)`` offsets of each matching compound.
-    """
-    return compound_spans(sentence, FALSE_FRIENDS.get(form, ()))
-
-
-sense_filter = make_sense_filter(SENSE_CHECKS)
-
-
 def form_offsets(sentence: str, form: str) -> list[int]:
     """Find the form occurrences that count as a target hit.
 
@@ -624,7 +577,7 @@ def form_offsets(sentence: str, form: str) -> list[int]:
     starts = {start for _, start, _ in spans}
     ends = {end for _, _, end in spans}
     targets = table_forms()
-    blocked = false_friend_spans(sentence, form)
+    blocked = compound_spans(sentence, form_compounds(SENSE_PATH, form))
     found: list[int] = []
     for position in occurrences(sentence, form):
         if inside_spans(position, blocked):
@@ -686,23 +639,6 @@ def highlight(sentence: str, form: str) -> str:
         )
     return sentence
 
-
-def has_predicate(_sentence: str) -> bool:
-    """Filter predicate is off, because jieba has no Cantonese tagger.
-
-    :param sentence: Traditional Cantonese sentence.
-    :returns: Always True.
-    """
-    return True
-
-
-def has_orphan_conjunction(_sentence: str) -> bool:
-    """Filter orphan is off, because no Cantonese rule tested it.
-
-    :param sentence: Traditional Cantonese sentence.
-    :returns: Always False.
-    """
-    return False
 
 
 def count_unknown(sentence: str, known: Collection[str]) -> int:
@@ -992,8 +928,6 @@ CANTONESE = register(
         final_marks=FINAL_MARKS,
         internal_marks=INTERNAL_MARKS,
         quote_marks=QUOTE_MARKS,
-        comma_marks="，,",
-        orphan_conjunctions=(),
         wordfreq_lang="zh",
         tokenizer="",
         native_audio=True,
@@ -1012,8 +946,6 @@ CANTONESE = register(
         unit_count=unit_count,
         script_ok=script_ok,
         is_repeated=is_repeated_zh_sentence,
-        has_predicate=has_predicate,
-        has_orphan=has_orphan_conjunction,
         hits=single_hits,
         match_count=count_form_occurrences,
         candidate_length=lambda card: card.han_len,
@@ -1031,8 +963,7 @@ CANTONESE = register(
         extra_manifest=extra_manifest,
         attribution=write_attribution,
         highlight=highlight,
-        sense_filter=sense_filter,
-        false_friend_spans=false_friend_spans,
+        sense_path=SENSE_PATH,
         finalize_candidate=lambda card, _target: replace(
             card, jyutping=sentence_jyutping(card.sentence)
         ),

@@ -29,13 +29,9 @@ class CoreProfile:
     :param read_names: Read the name stoplist.
     :param word_table: Read the reviewed Swadesh rows as ``(index, form,
         english gloss)`` triples in table order.
-    :param sense_path: TSV file of the tier F sense rows.
+    :param sense_path: TSV file of the sense rows.
     :param loan_path: Text file of the loan word list.
-    :param has_orphan: Tell whether a sentence starts with an orphan
-        conjunction.
     :param hits: Count the tier S forms that a sentence holds exactly once.
-    :param sense_filter: Reject a form whose paired English holds a
-        false-friend sense, or None when the language has no such filter.
     :param highlight: Wrap the matched target tokens of a sentence in a bold
         tag, or None when the deck does not bold.
     :param lemma_key: Normalize a lemma before the tier F sense guard.
@@ -51,6 +47,8 @@ class CoreProfile:
     :param quote_marks: Quotation marks and dialogue dashes of the language.
     :param internal_marks: Internal punctuation marks of the language.
     :param script_ok: Alphabet test of the ``script`` rule.
+    :param is_repeated: Test of the ``repeat`` rule.
+    :param dedupe_key: Key of the ``unique`` rule.
     :param default_options: Selection settings of the core cover.
     :param frequency_source: Label of the frequency source for the manifest.
     :param lemma_overrides: Lemma repair map of the lemmatizer artefacts,
@@ -74,9 +72,7 @@ class CoreProfile:
     word_table: Callable[[], Sequence[tuple[int, str, str]]]
     sense_path: Path
     loan_path: Path
-    has_orphan: Callable[[str], bool]
     hits: Callable[[str, Collection[str]], Mapping[str, int]]
-    sense_filter: Callable[[str, str], bool] | None
     highlight: Callable[[str, str], str] | None
     lemma_key: Callable[[str], str]
     input_model_name: str
@@ -91,6 +87,8 @@ class CoreProfile:
     quote_marks: str
     internal_marks: str
     script_ok: Callable[[str], bool]
+    is_repeated: Callable[[str], bool]
+    dedupe_key: Callable[[str], str]
     default_options: Any
     frequency_source: str
     lemma_overrides: Mapping[str, str] = field(default_factory=dict)

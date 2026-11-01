@@ -35,11 +35,12 @@ from anki_tools.sentence_pack.pack import (
     WORD_PREFIX,
     load_audio_index,
 )
-from anki_tools.sentence_pack.guards import check_sentence_shape
-from anki_tools.sentence_pack.pool import (
-    SCAFFOLD_SHAPE_KEYS,
-    shape_failure,
+from anki_tools.sentence_pack.guards import (
+    check_sentence_shape,
+    compound_spans,
+    form_compounds,
 )
+from anki_tools.sentence_pack.pool import shape_failure
 from anki_tools.sentence_pack.profile import (
     LanguageProfile,
     WordRow,
@@ -227,10 +228,6 @@ def core_problem(sentence: str, profile: LanguageProfile) -> str | None:
     )
     if key is not None:
         return f"{key} failed"
-    if not profile.has_predicate(sentence):
-        return "predicate tag"
-    if profile.has_orphan(sentence):
-        return "orphan conjunction"
     return None
 
 
@@ -246,7 +243,7 @@ def scaffold_problem(sentence: str, profile: LanguageProfile) -> str | None:
         profile,
         profile.fallback_min_units,
         profile.max_units,
-        keys=SCAFFOLD_SHAPE_KEYS,
+        scaffold=True,
     )
     if key == "length_window":
         return (
@@ -255,10 +252,6 @@ def scaffold_problem(sentence: str, profile: LanguageProfile) -> str | None:
         )
     if key is not None:
         return f"{key} failed"
-    if not profile.has_predicate(sentence):
-        return "predicate tag"
-    if profile.has_orphan(sentence):
-        return "orphan conjunction"
     return None
 
 
@@ -653,14 +646,12 @@ def gate_no_false_friend(
     :param profile: Language profile.
     :returns: Pass flag and detail text.
     """
-    if profile.false_friend_spans is None:
-        return True, "the language has no false-friend guard"
     rows = inputs.rows()
     bad: list[str] = []
     for row in rows:
         sentence = row.get("sentence", "")
         target = row.get("target", "")
-        if profile.false_friend_spans(sentence, target):
+        if compound_spans(sentence, form_compounds(profile.sense_path, target)):
             bad.append(f"{target} in {sentence}")
     if bad:
         return False, (
@@ -682,7 +673,7 @@ def gate_no_sense_mismatch(
     gloss_by_form = {
         profile.form_text(form): form.english for form in inputs.table()
     }
-    bad = sense_mismatches(rows, gloss_by_form, profile.sense_filter)
+    bad = sense_mismatches(rows, gloss_by_form, profile.sense_path)
     if bad:
         return False, (
             f"{len(bad)} card(s) use the target in a different sense: {sample(bad)}"

@@ -50,7 +50,7 @@ K3  filter
         |
         +--> F1 to F9  shared card filter
         |
-        +--> C1 to C5  predicate, clause, name, loan word, audio
+        +--> C3 to C5  name, loan word, audio
         |
         v
 K4  selection: seed, depth, completion, top-up, tail
@@ -111,9 +111,10 @@ default is 50.
 | S    | a form  | `profile.hits` finds the form, by the pack match rule |
 | F    | a lemma | a content token of the card has the lemma             |
 
-The tier S hit also needs the English sense. The form must pass
-`sense_filter`, if the language has one, and `holds_tier_s_sense`. The tier F
-hit needs `sense_match` against the sense row of the target.
+Both tiers call `sense_failure` of `anki_tools/sentence_pack/english_sense.py`
+with the sense row of the target. A tier S form passes the false-friend words of
+its row and the Swadesh gloss. A tier F lemma needs a sense word of its row and
+no false-friend word. The pack and the audit call the same function.
 
 A hit that fails the sense test adds to the `sense_failures` count of the
 target. The card stays in the filter result, but it gets no credit for that
@@ -122,7 +123,7 @@ target.
 ## 4. Sentence rules (K3)
 
 A card must pass every rule. `filter_cards` applies F1 to F9, and
-`filter_core_cards` applies C1 to C5.
+`filter_core_cards` applies C3 to C5.
 
 ### 4.1 Shared card filter
 
@@ -142,8 +143,6 @@ A card must pass every rule. `filter_cards` applies F1 to F9, and
 
 | Key | The rule passes when                                          |
 | --- | ------------------------------------------------------------- |
-| C1  | the card has a `VERB`, `AUX`, or `ADJ` token                  |
-| C2  | the sentence starts with no orphan conjunction                |
 | C3  | no whole word of the name list occurs in the sentence         |
 | C4  | no word of the loan word list occurs in the sentence          |
 | C5  | the card audio file exists in the media map of the input APKG |
@@ -152,7 +151,7 @@ C3 and C4 are whole-word tests. Thus the name `tom` does not reject
 `tomber`.
 
 The run stores the first failed rule as the `reason` of the card. The reason
-value is one of F1 to F9 or C1 to C5. A passed card has the empty reason.
+value is one of F1 to F9 or C3 to C5. A passed card has the empty reason.
 
 ## 5. Selection (K4)
 
@@ -304,7 +303,7 @@ The coverage status of a target is one of these values:
 | ---------- | --------------- | ----------------------------------------------------- |
 | size       | K1, K4          | card count, outside set and rare outside words        |
 | coverage   | K2, K11         | covered targets, coverage CSV                         |
-| rules      | K5, K6          | F1 to F9 and C1 to C5, similarity                     |
+| rules      | K5, K6          | F1 to F9 and C3 to C5, similarity                     |
 | files      | K7, K8, K12     | audio files, counts, manifest hashes                  |
 | identity   | K9, K10         | deck name, note type, kept order                      |
 | cards      | K13, K14        | target in the text, templates and CSS                 |

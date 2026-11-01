@@ -40,7 +40,7 @@ S2  candidate pool
         |
         +--> F2 to F8  shape guards (cheap tests, stop at the first failure)
         |
-        +--> measure  predicate, orphan, unknown words, hits, sense hits
+        +--> measure  unknown words, hits, sense hits
         |
         +--> F9 to sense  fact guards (stop at the first failure)
         |
@@ -103,8 +103,6 @@ The pool measures the sentence only after the shape guards pass.
 
 | Value        | Meaning                                                            |
 | ------------ | ------------------------------------------------------------------ |
-| `predicate`  | the tokenizer gives at least one verb or adjective tag             |
-| `orphan`     | the sentence starts with a conjunction and has no main clause      |
 | `unknown`    | the token count outside the known word set                         |
 | `english`    | the word count of the paired English text                          |
 | `hits`       | the forms that appear one time, after the form false-friend filter |
@@ -120,11 +118,8 @@ Thus a second build does not tokenize the same sentence again.
 
 | Key       | Name                  | The guard passes when                               |
 | --------- | --------------------- | --------------------------------------------------- |
-| F9        | predicate             | the sentence has a predicate tag                    |
-| F10       | no orphan conjunction | the sentence has a main clause                      |
 | F11       | English word count    | the English text has 2 to 12 words                  |
 | F12       | unique text           | the dedupe key is not kept yet                      |
-| `unknown` | unknown token budget  | the unknown token count is at most `max_unknown`    |
 | `sense`   | English sense         | the sentence has no hit, or one hit holds the sense |
 
 ### 3.4 Decision
@@ -195,13 +190,16 @@ needs a card. Thus one sentence never becomes two cards.
 ## 5. Language guards
 
 Two form-level guards add language data. The shared scan code is in
-`anki_tools/sentence_pack/guards.py`. The data is in the language module.
+`anki_tools/sentence_pack/guards.py`. The data is the sense file of the
+language, `vocab/<language>_core_senses.tsv`. A row with `tier` `S` holds a
+Swadesh form, and a row with a blank tier holds a tier F lemma of the core and
+the cull. `read_senses` keys a row by tier and word, so the two never collide.
 
 ### 5.1 False-friend compound
 
-The `FALSE_FRIENDS` table maps a word-table form to compounds that use the
-form in a different sense. An occurrence inside one of those compounds does not
-count as a hit.
+The `compounds` column of a tier S row lists the compounds that use the form in
+a different sense. An occurrence inside one of those compounds does not count as
+a hit.
 
 | Pack      | Example        | Result                        |
 | --------- | -------------- | ----------------------------- |
@@ -216,22 +214,22 @@ them to the sentence text.
 
 ### 5.2 Form sense filter
 
-The `SENSE_CHECKS` table maps a form to two word sets: the sense words and the
-false-friend words. `make_sense_filter` builds the filter. The filter rejects a
-form when the paired English holds a false-friend word and no sense word.
+The `senses` and `false_friends` columns of a tier S row hold two word sets.
+`sense_failure` returns `false_friend` when the paired English holds a
+false-friend word and no sense word.
 
 | Pack      | Form | The filter rejects when the English holds |
 | --------- | ---- | ----------------------------------------- |
 | Mandarin  | 抓   | grab, catch, arrest, with no scratch word |
 | Cantonese | 揸   | drive, fly, pilot, with no hold word      |
 
-The S2 measure step applies this filter to the hits. A form that the filter
-rejects does not enter the hit list.
+The S2 measure step applies this test to the hits. A form that fails it does
+not enter the hit list.
 
 ### 5.3 English gloss sense
 
-`holds_sense` compares the English of a sentence with the Swadesh gloss of the
-card word. The S2 `sense` guard rejects a sentence when every hit fails this
+`sense_failure` also compares the English of a sentence with the Swadesh gloss
+of the card word. The S2 `sense` guard rejects a sentence when every hit fails this
 test. The guard keeps a sentence that has no hit.
 
 ### 5.4 Whole-token match
@@ -311,5 +309,5 @@ values and the gate functions of that language.
 - The audit shape checks use the same guard table. The core check applies all
   shape keys. The scaffold check applies `SCAFFOLD_SHAPE_KEYS`.
 - A shared gate function lives in `audit.py`. A language gate function lives
-  in the language module. The language profile gives the `false_friend_spans`
-  and `sense_filter` hooks that the shared gates call.
+  in the language module. The language profile gives the `sense_path` that the
+  shared gates read.

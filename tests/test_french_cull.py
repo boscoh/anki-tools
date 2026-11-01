@@ -134,21 +134,16 @@ class TestNames:
         ("digit_marks", "Le chat [noir] mange.", ENGLISH, BASE_TOKENS),
         ("digit_marks", "Voir www.exemple.fr.", ENGLISH, BASE_TOKENS),
         ("digit_marks", "Le chat mange...", ENGLISH, BASE_TOKENS),
-        ("final_mark", "Le chat mange vite", ENGLISH, BASE_TOKENS),
-        ("one_final_mark", "Le chat mange. Le chien dort.", ENGLISH, BASE_TOKENS),
-        ("quote", "Le chat « mange » vite.", ENGLISH, BASE_TOKENS),
-        ("quote", "— Le chat mange vite.", ENGLISH, BASE_TOKENS),
+        ("repeat", "Oui oui oui.", ENGLISH, BASE_TOKENS),
+        ("marks", "Le chat mange vite", ENGLISH, BASE_TOKENS),
+        ("marks", "Le chat mange. Le chien dort.", ENGLISH, BASE_TOKENS),
+        ("marks", "Le chat « mange » vite.", ENGLISH, BASE_TOKENS),
+        ("marks", "— Le chat mange vite.", ENGLISH, BASE_TOKENS),
         (
-            "internal_mark",
+            "marks",
             "Le chat, le chien, et l'oiseau mangent.",
             ENGLISH,
             BASE_TOKENS,
-        ),
-        (
-            "propn",
-            "Paris est une ville.",
-            ENGLISH,
-            [("paris", "PROPN"), ("etre", "AUX"), ("ville", "NOUN")],
         ),
     ],
 )
@@ -189,10 +184,29 @@ def test_filter_cards_rejects_a_duplicate_text() -> None:
         card_rule=partial(
             cullflow.filter_reason, profile=cull_fr.FRENCH_CULL_PROFILE
         ),
+        dedupe_key=cull_fr.FRENCH_CULL_PROFILE.dedupe_key,
     )
 
     assert passed == [0, 1]
     assert reasons == ["", "", "unique"]
+
+
+def test_filter_cards_rejects_a_duplicate_that_differs_in_marks() -> None:
+    cards = [_card("Le chat mange vite.", index=0), _card("Le chat mange vite!", index=1)]
+
+    passed, reasons = cullflow.filter_cards(
+        cards,
+        [BASE_TOKENS, BASE_TOKENS],
+        MIN_WORDS,
+        MAX_WORDS,
+        card_rule=partial(
+            cullflow.filter_reason, profile=cull_fr.FRENCH_CULL_PROFILE
+        ),
+        dedupe_key=cull_fr.FRENCH_CULL_PROFILE.dedupe_key,
+    )
+
+    assert passed == [0]
+    assert reasons == ["", "unique"]
 
 
 
@@ -528,7 +542,7 @@ def test_run_gates_passes_on_a_tiny_output(
     )
 
     assert [gate for gate, _passed, _message in rows] == [
-        f"G{number}" for number in range(1, 18)
+        f"G{number}" for number in range(1, 19)
     ]
     for gate, passed, message in rows:
         assert passed, f"{gate}: {message}"

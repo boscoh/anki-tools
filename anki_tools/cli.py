@@ -572,7 +572,6 @@ def pack(
     stage: Literal["fetch", "sentences", "audio", "all"] = "all",
     per_word: int = 2,
     max_cards: int = 450,
-    max_unknown: int = 2,
     min_words: int | None = None,
     max_words: int | None = None,
     native_audio: str = "none",
@@ -591,7 +590,6 @@ def pack(
     :param stage: Last stage to run: fetch, sentences, audio, or all.
     :param per_word: Card limit per word form.
     :param max_cards: Hard card cap.
-    :param max_unknown: Unknown token budget per sentence.
     :param min_words: Minimum word count of a card. The profile default
         applies when empty.
     :param max_words: Maximum word count of a card. The profile default
@@ -618,7 +616,6 @@ def pack(
         entry.profile,
         per_word=per_word,
         max_cards=max_cards,
-        max_unknown=max_unknown,
         min_words=min_words,
         max_words=max_words,
     )
@@ -664,7 +661,6 @@ def _language_sentences(
     profile,
     per_word: int,
     max_cards: int,
-    max_unknown: int,
     min_words: int | None,
     max_words: int | None,
 ) -> None:
@@ -674,7 +670,6 @@ def _language_sentences(
     :param profile: Language profile of the pack.
     :param per_word: Card limit per word form.
     :param max_cards: Hard card cap.
-    :param max_unknown: Unknown token budget per sentence.
     :param min_words: Minimum word count of a core card.
     :param max_words: Maximum word count of a card.
     """
@@ -690,7 +685,6 @@ def _language_sentences(
         profile,
         min_units=profile.min_units if min_words is None else min_words,
         max_units=profile.max_units if max_words is None else max_words,
-        max_unknown=max_unknown,
         fallback=True,
         known_words=known,
         make_candidate=module.make_candidate,

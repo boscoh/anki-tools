@@ -26,8 +26,12 @@ from anki_tools.ranking.coreflow import (
     InputCard,
     kept_order_hash,
     outside_lemmas,
-    sense_match,
     size_check,
+)
+from anki_tools.sentence_pack.english_sense import (
+    SenseRow,
+    read_senses,
+    sense_failure,
 )
 from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.ranking.corelist import TargetWord, build_core_targets
@@ -74,7 +78,6 @@ def _filter(
         {"a.mp3"},
         names,
         loanwords,
-        profile.has_orphan,
         min_units=1,
         max_units=9,
         shape=replace(profile, script_ok=lambda sentence: True),
@@ -95,7 +98,7 @@ def _target(
         position=position,
         form=form or key.split(":")[-1],
         gloss=gloss,
-        senses=senses,
+        sense=SenseRow(senses=senses),
     )
 
 
@@ -260,9 +263,7 @@ class TestBuildTargets:
     def test_a_frequency_lemma_gets_its_first_sense_as_the_gloss(self) -> None:
         frequency = [TargetWord("faire", 1, 3, 1.0, 1.0)]
         senses = {
-            "faire": corelist.SenseWords(
-                frozenset({"do", "make"}), frozenset(), "do"
-            )
+            ("F", "faire"): SenseRow(frozenset({"do", "make"}), first="do")
         }
 
         targets, _dropped = build_core_targets([], frequency, senses, 1)
@@ -271,24 +272,6 @@ class TestBuildTargets:
 
 
 class TestFilter:
-    def test_c1_rejects_a_sentence_without_a_predicate(self) -> None:
-        cards = [_card("Très bon.", english="Very good.")]
-        tokens = [[("très", "ADV"), ("bon", "ADJ")]]
-
-        passed, reasons = _filter(cards, tokens)
-
-        assert reasons[0] == ""
-        assert passed == [0]
-
-    def test_c1_uses_a_verb_or_adjective(self) -> None:
-        cards = [_card("Trois chats.")]
-        tokens = [[("trois", "NUM"), ("chat", "NOUN")]]
-
-        passed, reasons = _filter(cards, tokens)
-
-        assert passed == []
-        assert reasons[0] == "C1"
-
     def test_c3_matches_a_whole_name(self) -> None:
         cards = [_card("Tomber est facile.")]
         tokens = [[("tomber", "VERB"), ("être", "AUX"), ("facile", "ADJ")]]
@@ -304,7 +287,7 @@ class TestFilter:
         passed, reasons = _filter(cards, tokens, ["tom"])
 
         assert passed == []
-        assert reasons[0] in {"C3", "propn"}
+        assert reasons[0] == "C3"
 
     def test_c4_rejects_a_loan_word(self) -> None:
         cards = [_card("Le week-end est court.")]
@@ -354,18 +337,18 @@ class TestFilter:
 
 class TestSense:
     def test_a_hit_needs_a_sense_word(self) -> None:
-        assert not sense_match(
-            "I saw it.", frozenset({"time"}), frozenset()
-        )
-        assert sense_match("What time is it?", frozenset({"time"}), frozenset())
+        row = SenseRow(senses=frozenset({"time"}))
+        assert sense_failure("I saw it.", row) == "sense"
+        assert sense_failure("What time is it?", row) is None
 
     def test_a_false_friend_blocks_the_hit(self) -> None:
-        assert not sense_match(
-            "I have time.", frozenset({"time"}), frozenset({"have"})
+        row = SenseRow(
+            senses=frozenset({"time"}), false_friends=frozenset({"have"})
         )
+        assert sense_failure("I have time.", row) == "false_friend"
 
     def test_an_unchecked_target_accepts_every_hit(self) -> None:
-        assert sense_match("anything", frozenset(), frozenset())
+        assert sense_failure("anything", SenseRow()) is None
 
     def test_the_sense_file_and_the_loan_list_load(self, tmp_path: Path) -> None:
         senses = tmp_path / "senses.tsv"
@@ -375,8 +358,8 @@ class TestSense:
         loans = tmp_path / "loans.txt"
         loans.write_text("# a comment\nweek-end\n", encoding="utf-8")
 
-        assert coreflow.read_senses(senses) == {
-            "pas": corelist.SenseWords(frozenset({"not"}), frozenset(), "not")
+        assert read_senses(senses) == {
+            ("F", "pas"): SenseRow(frozenset({"not"}), first="not")
         }
         assert coreflow.read_loanwords(loans) == frozenset({"week-end"})
 

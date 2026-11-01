@@ -64,8 +64,6 @@ class LanguageProfile:
     :param final_marks: Accepted sentence-final marks.
     :param internal_marks: Internal punctuation marks of filter internal_mark.
     :param quote_marks: Quotation marks and dialogue dashes of filter quote.
-    :param comma_marks: Marks that rescue a sentence-initial conjunction.
-    :param orphan_conjunctions: Sentence-initial conjunctions of filter orphan.
     :param wordfreq_lang: `wordfreq` language code.
     :param tokenizer: spaCy model name, empty when the language has no model.
     :param native_audio: True when a native Tatoeba tier exists.
@@ -84,8 +82,6 @@ class LanguageProfile:
     :param unit_count: Hook that counts the words of a sentence.
     :param script_ok: Hook for filter script, the script test.
     :param is_repeated: Hook for filter repeat, the repeated-pattern test.
-    :param has_predicate: Hook for filter predicate, the predicate test.
-    :param has_orphan: Hook for filter orphan, the orphan-conjunction test.
     :param hits: Hook that counts the one-time target forms of a sentence.
     :param match_count: Hook that counts the target matches of a sentence.
     :param candidate_length: Hook that gives the unit length of a card.
@@ -105,12 +101,10 @@ class LanguageProfile:
     :param excluded_words: Hook that lists the forms without a card, given the
         word table and the card target set.
     :param finalize_candidate: Hook that fills the language-specific card fields.
+    :param sense_path: TSV file of the sense rows: the English sense words, the
+        false-friend words, and the compounds of each target.
     :param highlight: Hook that marks the matched target tokens of a card
         sentence, None to wrap the first target substring.
-    :param sense_filter: Hook that rejects a form whose paired English holds a
-        false-friend sense, given the form and the English text.
-    :param false_friend_spans: Hook that gives the spans where a form sits in a
-        different-sense compound, given the sentence and the form.
     :param warm_tokens: Hook that tokenizes a whole sentence pool in one pass, so
         the per-sentence cache is warm before the guards run.
     """
@@ -141,8 +135,6 @@ class LanguageProfile:
     final_marks: str
     internal_marks: str
     quote_marks: str
-    comma_marks: str
-    orphan_conjunctions: tuple[str, ...]
     wordfreq_lang: str
     tokenizer: str
     native_audio: bool
@@ -161,8 +153,6 @@ class LanguageProfile:
     unit_count: Callable[[str], int]
     script_ok: Callable[[str], bool]
     is_repeated: Callable[[str], bool]
-    has_predicate: Callable[[str], bool]
-    has_orphan: Callable[[str], bool]
     hits: Callable[[str, Collection[str]], dict[str, int]]
     match_count: Callable[[str, str], int]
     candidate_length: Callable[[Any], int]
@@ -180,9 +170,8 @@ class LanguageProfile:
     card_order: Callable[[Any, dict[str, str]], tuple]
     excluded_words: Callable[[Sequence[Any], Collection[str]], list[str]]
     finalize_candidate: Callable[[Any, str], Any]
+    sense_path: Path
     highlight: Callable[[str, str], str] | None = None
-    sense_filter: Callable[[str, str], bool] | None = None
-    false_friend_spans: Callable[[str, str], Sequence[tuple[int, int]]] | None = None
     warm_tokens: Callable[[Iterable[str]], None] | None = None
 
     def target_length(self, candidate: Any) -> int:
@@ -221,28 +210,6 @@ def duplicate_limit(profile: LanguageProfile) -> float:
     :returns: Jaccard value of the duplicate guard.
     """
     return profile.similarity_limit
-
-
-def make_sense_filter(
-    checks: dict[str, tuple[frozenset[str], frozenset[str]]],
-) -> Callable[[str, str], bool]:
-    """Build a filter that rejects a false-friend English sense.
-
-    :param checks: Mapping from form to ``(sense words, false-friend words)``.
-    :returns: A function that returns True when the English holds a
-        false-friend word and no sense word.
-    """
-
-    def sense_filter(form: str, english: str) -> bool:
-        sense, false = checks.get(form, (frozenset(), frozenset()))
-        if not false:
-            return False
-        words = {word.strip(".,!?;:") for word in english.lower().split()}
-        if words & sense:
-            return False
-        return bool(words & false)
-
-    return sense_filter
 
 
 PROFILES: dict[str, LanguageProfile] = {}
