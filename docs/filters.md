@@ -235,11 +235,7 @@ Open work after L9:
 
 | Issue       | Problem                                                                      |
 | ----------- | ---------------------------------------------------------------------------- |
-| `anki-o1vk` | a fresh Mandarin core build fails K6; the build and K6 use two lemma sets    |
 | `anki-xrfk` | Spanish cull G5: one card fails `length_window`                              |
-
-The "Distinct lemmas" line of the cull report still counts a lemma that failed
-`sense`. The line has no issue yet.
 
 ## 6. Verification
 

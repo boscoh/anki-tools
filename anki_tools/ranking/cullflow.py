@@ -1150,13 +1150,13 @@ def run_cull(request: CullRequest, profile: CullProfile) -> deck_writer.RunFiles
     dropped_no_core = len(ordered) - len(kept)
 
     rejected = Counter(reasons)
-    kept_lemmas = set().union(*reserve_sets) if reserve_sets else set()
-    kept_lemmas.update(
-        lemma
-        for index in kept
-        for lemma, pos in tokens[index]
-        if is_content(pos, profile.content_pos)
+    kept_sets = sense_lemma_sets(
+        [cards[index].english for index in kept],
+        [tokens[index] for index in kept],
+        profile.content_pos,
+        senses,
     )
+    kept_lemmas = set().union(*reserve_sets, *kept_sets)
     covered = sum(1 for target in targets if selection.uses[target.lemma])
     twice = sum(1 for target in targets if selection.uses[target.lemma] >= 2)
     exempt = selection.exempt

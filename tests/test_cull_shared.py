@@ -816,3 +816,29 @@ def test_gate_card_cap_counts_the_no_core_drop() -> None:
     passed, message = cullgates.gate_card_cap(files(923, 76))  # type: ignore
     assert not passed
     assert "923 kept + 76 dropped" in message
+
+
+def test_the_distinct_lemma_count_leaves_a_lemma_that_fails_the_sense_test(
+    tmp_path: Path,
+) -> None:
+    senses = tmp_path / "senses.tsv"
+    senses.write_text("word\tsenses\tfalse_friends\nkat\tdog\t\n", encoding="utf-8")
+    contents = {}
+    for name, sense_path in (
+        ("plain", Path("vocab/test_core_senses.tsv")),
+        ("sense", senses),
+    ):
+        run = cullflow.run_cull(
+            cullflow.CullRequest(
+                input_path=_tiny_deck(tmp_path),
+                output_path=tmp_path / f"{name}.apkg",
+                max_cards=3,
+                target_words=2,
+            ),
+            replace(_profile(), sense_path=sense_path),
+        )
+        assert run.manifest_path is not None
+        manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
+        contents[name] = manifest["counts"]["content"]
+
+    assert contents["sense"] == contents["plain"] - 1
