@@ -1,5 +1,5 @@
 {
-  "build_date": "2026-10-31T23:53:26+00:00",
+  "build_date": "2026-11-01T06:34:28+00:00",
   "source": {
     "input": "apkg/6000_French_Sentences_w_Audio.apkg",
     "deck": "French Core",
@@ -23,44 +23,40 @@
     "lambda_seed": 0.01,
     "simple_units": 7,
     "similarity": 0.67,
-    "min_units": 5,
-    "max_units": 9,
+    "min_units": 4,
+    "max_units": 10,
     "spoken_weight": 0.5,
     "bold_target": true,
-    "max_unchecked_sense": 0,
-    "max_unranked": 0,
     "name": "French Core"
   },
   "counts": {
-    "cards": 273,
-    "targets": 209,
-    "absent": 48,
-    "absent_sense": 5,
+    "cards": 276,
+    "targets": 216,
+    "absent": 41,
+    "absent_sense": 4,
     "unchecked": 0,
     "unranked": 0,
-    "covered1": 204,
-    "covered2": 183,
+    "covered1": 212,
+    "covered2": 190,
     "full": 231,
-    "outside": 247,
-    "outside_rare": 18,
-    "tail_words": 242,
-    "sense_rows": 209,
-    "dropped_no_core": 27,
-    "bolded": 273,
+    "outside": 246,
+    "outside_rare": 16,
+    "tail_words": 240,
+    "sense_rows": 216,
+    "dropped_no_core": 24,
+    "bolded": 276,
     "unbolded": 0,
     "rows": 5928,
-    "rejected_c3": 25,
-    "rejected_c4": 32,
-    "sense_failures": 3296
+    "sense_failures": 3748
   },
   "frequency": {
     "path": "data/french_frequency.tsv",
     "spoken_weight": 0.5
   },
   "files": {
-    "core_csv": "sha256:5fdb1449e2b0f11f4958118c3e89c502baee4e2ba858d6c379320d6b81d16aac",
-    "coverage_csv": "sha256:91157dc3e690fa464cfd70ab1605c175a1e13817e9fe47d63795d16931c4669e",
+    "core_csv": "sha256:ce8208b07ba59d2e520d38f4d3214848c4776b605da7c5780b24a545292f8ae6",
+    "coverage_csv": "sha256:2e7f2c6eb2d39ab71ad4a7367731020f184fd4f37e985ba7068697a056be2f84",
     "input_apkg": "sha256:230dd01bcf6223bcb8a5ea303eee01fd4a55e19ce418d0bf66a81193037024b5"
   },
-  "kept_order": "sha256:18b563596df2136751279f13fe106f6f05d853c68e860a38a3d6c1cada133190"
+  "kept_order": "sha256:69c4f3853858f3aa45ca2fe1d370a10f3be54cc937642e6f1b548a3d997617af"
 }

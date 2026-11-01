@@ -29,14 +29,14 @@ S27:grand,grand,big,S,27,2,2,covered
 S28:long,long,long,S,28,2,2,covered
 S29:large,large,wide,S,29,2,1,partial
 S30:épais,épais,thick,S,30,2,1,partial
-S31:lourd,lourd,heavy,S,31,0,0,absent
+S31:lourd,lourd,heavy,S,31,2,1,partial
 S32:petit,petit,small,S,32,2,2,covered
 S33:court,court,short,S,33,2,2,covered
 S34:étroit,étroit,narrow,S,34,0,0,absent
 S35:mince,mince,thin,S,35,2,1,partial
 S36:femme,femme,woman,S,36,2,2,covered
 S37:homme,homme,man,S,37,2,2,covered
-S38:être humain,être humain,human being,S,38,0,0,absent
+S38:être humain,être humain,human being,S,38,2,1,partial
 S39:enfant,enfant,child,S,39,2,2,covered
 S40:épouse,épouse,wife,S,40,2,2,covered
 S41:mari,mari,husband,S,41,2,2,covered
@@ -67,16 +67,16 @@ S65:os,os,bone,S,65,0,0,absent
 S66:graisse,graisse,fat (noun),S,66,0,0,absent
 S67:œuf,œuf,egg,S,67,2,2,covered
 S68:corne,corne,horn,S,68,0,0,absent
-S69:queue,queue,tail,S,69,2,1,partial
+S69:queue,queue,tail,S,69,2,2,covered
 S70:plume,plume,feather,S,70,0,0,absent
 S71:cheveux,cheveux,hair,S,71,2,2,covered
-S72:tête,tête,head,S,72,2,1,partial
+S72:tête,tête,head,S,72,2,2,covered
 S73:oreille,oreille,ear,S,73,2,2,covered
 S74:œil,œil,eye,S,74,2,2,covered
 S75:nez,nez,nose,S,75,2,2,covered
-S76:bouche,bouche,mouth,S,76,2,2,covered
+S76:bouche,bouche,mouth,S,76,2,0,absent_sense
 S77:dent,dent,tooth,S,77,2,2,covered
-S78:langue,langue,tongue,S,78,2,1,partial
+S78:langue,langue,tongue,S,78,2,2,covered
 S79:ongle,ongle,fingernail,S,79,2,1,partial
 S80:pied,pied,foot,S,80,2,2,covered
 S81:jambe,jambe,leg,S,81,2,2,covered
@@ -96,7 +96,7 @@ S94:mordre,mordre,to bite,S,94,0,0,absent
 S95:sucer,sucer,to suck,S,95,0,0,absent
 S96:cracher,cracher,to spit,S,96,0,0,absent
 S97:vomir,vomir,to vomit,S,97,0,0,absent
-S98:souffler,souffler,to blow,S,98,0,0,absent
+S98:souffler,souffler,to blow,S,98,2,1,partial
 S99:respirer,respirer,to breathe,S,99,2,1,partial
 S100:rire,rire,to laugh,S,100,2,2,covered
 S101:voir,voir,to see,S,101,2,2,covered
@@ -111,20 +111,20 @@ S109:mourir,mourir,to die,S,109,2,2,covered
 S110:tuer,tuer,to kill,S,110,2,2,covered
 S111:se battre,se battre,to fight,S,111,2,2,covered
 S112:chasser,chasser,to hunt,S,112,0,0,absent
-S113:frapper,frapper,to hit,S,113,2,1,partial
+S113:frapper,frapper,to hit,S,113,2,2,covered
 S114:couper,couper,to cut,S,114,2,2,covered
 S115:fendre,fendre,to split,S,115,0,0,absent
 S116:poignarder,poignarder,to stab,S,116,0,0,absent
-S117:gratter,gratter,to scratch,S,117,0,0,absent
+S117:gratter,gratter,to scratch,S,117,2,1,partial
 S118:creuser,creuser,to dig,S,118,0,0,absent
 S119:nager,nager,to swim,S,119,2,2,covered
 S120:voler,voler,to fly,S,120,2,2,covered
 S121:marcher,marcher,to walk,S,121,2,2,covered
 S122:venir,venir,to come,S,122,2,2,covered
 S123:s'étendre,s'étendre,to lie down,S,123,2,1,partial
-S124:s'asseoir,s'asseoir,to sit,S,124,2,1,partial
+S124:s'asseoir,s'asseoir,to sit,S,124,2,2,covered
 S125:se lever,se lever,to stand,S,125,2,1,partial
-S126:tourner,tourner,to turn (intransitive),S,126,2,2,covered
+S126:tourner,tourner,to turn (intransitive),S,126,2,1,partial
 S127:tomber,tomber,to fall,S,127,2,2,covered
 S128:donner,donner,to give,S,128,2,2,covered
 S129:tenir,tenir,to hold,S,129,2,2,covered
@@ -142,7 +142,7 @@ S140:dire,dire,to say,S,140,2,2,covered
 S141:chanter,chanter,to sing,S,141,2,2,covered
 S142:jouer,jouer,to play,S,142,2,2,covered
 S143:flotter,flotter,to float,S,143,0,0,absent
-S144:couler,couler,to flow,S,144,2,0,absent_sense
+S144:couler,couler,to flow,S,144,2,1,partial
 S145:geler,geler,to freeze,S,145,0,0,absent
 S146:gonfler,gonfler,to swell,S,146,0,0,absent
 S147:soleil,soleil,sun,S,147,2,2,covered
@@ -152,9 +152,9 @@ S150:eau,eau,water,S,150,2,2,covered
 S151:pluie,pluie,rain,S,151,2,2,covered
 S152:rivière,rivière,river,S,152,2,2,covered
 S153:lac,lac,lake,S,153,2,2,covered
-S154:mer,mer,sea,S,154,2,1,partial
+S154:mer,mer,sea,S,154,2,2,covered
 S155:sel,sel,salt,S,155,0,0,absent
-S156:pierre,pierre,stone,S,156,0,0,absent
+S156:pierre,pierre,stone,S,156,2,2,covered
 S157:sable,sable,sand,S,157,0,0,absent
 S158:poussière,poussière,dust,S,158,0,0,absent
 S159:terre,terre,earth,S,159,2,2,covered
@@ -167,7 +167,7 @@ S165:glace,glace,ice,S,165,2,2,covered
 S166:fumée,fumée,smoke,S,166,2,2,covered
 S167:feu,feu,fire,S,167,2,2,covered
 S168:cendre,cendre,ash,S,168,0,0,absent
-S169:brûler,brûler,to burn,S,169,0,0,absent
+S169:brûler,brûler,to burn,S,169,2,1,partial
 S170:route,route,road,S,170,2,2,covered
 S171:montagne,montagne,mountain,S,171,2,2,covered
 S172:rouge,rouge,red,S,172,2,2,covered
@@ -178,7 +178,7 @@ S176:noir,noir,black,S,176,2,2,covered
 S177:nuit,nuit,night,S,177,2,2,covered
 S178:jour,jour,day,S,178,2,2,covered
 S179:année,année,year,S,179,2,2,covered
-S180:chaud,chaud,warm,S,180,0,0,absent
+S180:chaud,chaud,warm,S,180,2,1,partial
 S181:froid,froid,cold,S,181,2,2,covered
 S182:plein,plein,full,S,182,2,1,partial
 S183:nouveau,nouveau,new,S,183,2,2,covered
@@ -187,7 +187,7 @@ S185:bon,bon,good,S,185,2,2,covered
 S186:mauvais,mauvais,bad,S,186,2,2,covered
 S187:pourri,pourri,rotten,S,187,0,0,absent
 S188:sale,sale,dirty,S,188,2,2,covered
-S189:droit,droit,straight,S,189,2,0,absent_sense
+S189:droit,droit,straight,S,189,2,1,partial
 S190:rond,rond,round,S,190,0,0,absent
 S191:tranchant,tranchant,sharp,S,191,0,0,absent
 S192:émoussé,émoussé,dull,S,192,0,0,absent
@@ -196,8 +196,8 @@ S194:mouillé,mouillé,wet,S,194,0,0,absent
 S195:sec,sec,dry,S,195,0,0,absent
 S196:juste,juste,correct,S,196,2,2,covered
 S197:près,près,near,S,197,2,2,covered
-S198:loin,loin,far,S,198,2,1,partial
-S199:droite,droite,right,S,199,2,1,partial
+S198:loin,loin,far,S,198,2,2,covered
+S199:droite,droite,right,S,199,2,2,covered
 S200:gauche,gauche,left,S,200,2,2,covered
 S201:à,à,at,S,201,2,2,covered
 S202:dans,dans,in,S,202,2,2,covered
