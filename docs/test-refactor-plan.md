@@ -2,7 +2,7 @@
 
 | Field   | Value                                                          |
 | ------- | -------------------------------------------------------------- |
-| Status  | Cull tests, B1 to B3 and B9 done; B4 to B8 and B10 open        |
+| Status  | All batches done; one gap and the next cut open                |
 | Date    | 2026-11-01                                                     |
 | Owner   | anki-tools                                                     |
 | Related | `~/.pi/agent/skills/refactor-tests/SKILL.md`                   |
@@ -36,9 +36,9 @@ cuts.
 7. **Do not pin snapshots.** Row counts, constants, profile paths, file hashes,
    and call order record the code. They do not specify behavior.
 8. **Measure the cut.** Report lines, tests, and mocks before and after. A
-   cut batch must not add lines. `test_cli_fix.py` grew from 176 to 258 lines
-   in B9, because the batch also filled gaps. Fill gaps in B10, and cut the
-   B9 rows to one row for each route and error.
+   cut batch must not add lines. Report gap lines apart from cut lines. B9 grew
+   `test_cli_fix.py` from 176 to 258 lines, because it also filled gaps. A
+   follow-up cut it to 183.
 
 ## 2. Done
 
@@ -73,6 +73,76 @@ and small-table files. The counts cover only the files each batch touched.
   `ast_fixture.py`, and removed the data-file dependency of `test_card_preview`.
   Lines rose by 4: the table rows cost more than the removed bodies saved.
 - 13 deliberate breaks across the three batches. A test caught each one.
+
+Batches B4 to B7 and the B9 follow-up came next (commits `ebd8d2b`, `65b571a`,
+`4e7d347`, `baa575e`, `d60656d`). Each count covers the files the batch touched.
+A fixture line count is separate, because the fixtures are shared.
+
+| Batch  | Lines before | Lines after | Fixture lines | Tests before | Tests after | Mocks before | Mocks after |
+| ------ | ------------ | ----------- | ------------- | ------------ | ----------- | ------------ | ----------- |
+| B4     | 1093         | 871         | in the count  | 49           | 29          | 0            | 0           |
+| B5     | 689          | 555         | +64           | 49           | 30          | 0            | 0           |
+| B6     | 738          | 692         | +96           | 23           | 13          | 34           | 0           |
+| B7     | 606          | 513         | +63           | 28           | 28          | 7            | 0           |
+| B9 (2) | 258          | 183         | none          | 46           | 26          | 0            | 0           |
+
+- B4 folded `test_assemble.py` into the `run_core` tests and tabled the core
+  tests. `kept_order_hash` is now checked against the real sha256.
+- B5 made one shape-rule table, `shape_fixture.py`, for the files that repeated it.
+- B6 runs the Mandarin audit through `run_pack_audit(load_table=, probe=)`. It
+  has no `monkeypatch` left. Two breaks in `pack.py` survived at first; one new
+  test now catches both.
+- B7 removed every patch of an internal function. Only `load_model`, gTTS, sleep,
+  urlopen, and the `ROOT` constant stay patched.
+- B9 follow-up: `test_cli_fix.py` went from 258 to 183 lines. It is still longer
+  than the 176 lines of the start, because it now covers four languages.
+- 44 deliberate breaks across these batches. A test caught every one, after the
+  two B6 survivors got a test.
+- Three worker commits swept in another worker's half-edited file. Commit
+  `3e9e7bb` fails alone because it imports `shape_fixture.py` before it exists.
+  Bisect from `65b571a` onward.
+
+Batches B8 and B10 finished the plan (commits `03cc7ad`, `b2b774f`, `f9ff560`).
+
+| Batch | Lines before | Lines after | Fixture lines | Tests before | Tests after | Mocks before | Mocks after |
+| ----- | ------------ | ----------- | ------------- | ------------ | ----------- | ------------ | ----------- |
+| B8    | 1339         | 1153        | +51           | 65           | 49          | 1            | 0           |
+| B10   | 0            | 298         | 0             | 0            | 6 files     | 0            | 0           |
+
+- B8 moved every shape-rule copy into `shape_fixture.py` and added
+  `tatoeba_fixture.py`. It replaced the pinned review-file indexes with a check
+  that the file is closed and agrees with the word table.
+- B10 added one table or one end-to-end test for each gap: pack build, core
+  flow for Mandarin and Cantonese, rank CSV, `delete_model`, preview, and card
+  CSS. The B10 lines are gap lines, not cut lines.
+- 15 more deliberate breaks. A test caught each one. Two B8 survivors got a
+  table row.
+
+### Result
+
+The whole suite, from the first audit to the end:
+
+| Item                    | Start | End   |
+| ----------------------- | ----- | ----- |
+| Test and fixture files  | 44    | 55    |
+| Lines in `tests/`       | 7 800 | 7 403 |
+| Test functions          | 374   | 270   |
+| Tests collected         | 416   | 568   |
+| `monkeypatch.setattr`   | 22    | 9     |
+| Run time                | 6 s   | 8 s   |
+
+- **Fewer, smaller tests.** Functions fell by 28% and lines by 5%. The line
+  count includes 8 fixture files and the 298 gap lines of B10. Without the gap
+  lines the cut is about 9%.
+- **More cases.** Table rows count as separate cases, so the collected count
+  rose. Other people also added tests during the work, for example
+  `test_french_lemma.py`. The start numbers include none of that.
+- **Mocks.** The 9 that remain patch an edge (`load_model`, gTTS, sleep, urlopen,
+  the `ROOT` path) or one constant in `test_cull_shared.py`:
+  `DEFAULT_MAX_USES`.
+- **The goal is not met yet.** A suite of 270 functions and 568 cases is smaller
+  and better, but it is not "very small". The next cut needs a decision on
+  value, not on form. See section 11.
 
 ## 3. Scope of the rest
 
@@ -147,16 +217,16 @@ One worker run per batch. Run B1 first.
 | B1    | Fixtures only: `deck_fixture`, `conftest`; update four apkg test files        | low            | done    |
 | B2    | Pure-function files: `card_templates`, `char_links`, and five more            | low            | done    |
 | B3    | Small tables: `extract_sentences`, `duplicates`, and five more                | low            | done    |
-| B4    | `test_core_deck`; fold in `test_assemble`; fix `test_core_similarity`         | medium         | open    |
-| B5    | Rule tables: `shared_coreflow`, `gate_id_map`, and two more                   | medium         | open    |
-| B6    | Mandarin audit and deck, through `run_pack_audit(load_table=, probe=)`        | medium         | open    |
-| B7    | Remove mocks: `tokens_cache`, `swadesh_build`, and two more                   | medium         | open    |
-| B8    | `mandarin_sentence_selection`, `french_pack`, `tatoeba_fixture`               | medium         | open    |
+| B4    | `test_core_deck`; fold in `test_assemble`; fix `test_core_similarity`         | medium         | done    |
+| B5    | Rule tables: `shared_coreflow`, `gate_id_map`, and two more                   | medium         | done    |
+| B6    | Mandarin audit and deck, through `run_pack_audit(load_table=, probe=)`        | medium         | done    |
+| B7    | Remove mocks: `tokens_cache`, `swadesh_build`, and two more                   | medium         | done    |
+| B8    | `mandarin_sentence_selection`, `french_pack`, `tatoeba_fixture`               | medium         | done    |
 | B9    | `test_cli_fix`                                                                | needs decision | done    |
-| B10   | New tests for the gaps in section 8                                           | medium         | open    |
+| B10   | New tests for the gaps in section 8                                           | medium         | done    |
 
-Check the per-file counts again before B4 and B5. Other people edit those
-files.
+Other people edit the same files. Check the per-file counts before you start a
+new batch.
 
 ### Decision for B9
 
@@ -167,26 +237,17 @@ languages. ADR 0050 records the seam.
 
 ## 8. Gaps
 
-A surviving break is a behavior that no test checks. Twelve are real. Two are
-equivalent changes and need no test.
+The audit found 14 surviving breaks. Twelve were real gaps. Two were equivalent
+changes and need no test. B4, B6, B7, B9 and B10 closed all twelve. One gap is
+open:
 
-| Area                  | No test for                                                                              |
-| --------------------- | ---------------------------------------------------------------------------------------- |
-| Mandarin audit gates  | G3 target, G6 `>=` boundary, G7 duration, G8 media, G13 fields, G16 file                |
-| Core selection        | Duplicate-lemma guard, `outside_budget`, `lambda_repeat`, ubiquitous-share boundary      |
-| Manifest              | The `kept_order_hash` value                                                              |
-| Rank pipeline         | `extract_sentences`, similarity penalties, `structural_score`, `write_ranking_csv`       |
-| Pack build            | Generic `build_pack`; French, Greek, Spanish, Cantonese flows                            |
-| Core flow             | Mandarin and Cantonese `run_core`                                                        |
-| CLI                   | `zh`, `yue`, `es` routes; the "no --select mode" error; `--words`; `--output` for core   |
-| Audio                 | Validation failure, retry exhausted, unreadable ffprobe output                           |
-| Swadesh vocab         | `--prune`; the missing-audio path                                                        |
-| APKG                  | `delete_model` success path                                                              |
-| Card preview          | `write_preview`, `build_sections`, `vocab_card` (B3 removed the data-file tests)         |
-| Card templates        | Shared CSS holds the common classes and the Cantonese font stack (B2 removed the greps)  |
+| Area         | No test for                                                          | Needs                                                               |
+| ------------ | -------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Card preview | Preview build without the real `vocab/*.csv` files                   | A `vocab_dir` argument on `build_sections`, `vocab_card`, `write_preview` |
 
-B10 adds one black-box test for each row. Start with the audit gates and the
-core selection, because a mutation test already proves those gaps.
+The `--prune` option no longer exists, so its gap is void. `build_mandarin_pack`
+needs no test of its own: it wraps `build_pack`, which `test_mandarin_deck.py`
+and `test_pack_build.py` run.
 
 ## 9. Rules for every batch
 
@@ -200,3 +261,12 @@ core selection, because a mutation test already proves those gaps.
 
 The fix-route ADR is `0050-fix-route-takes-its-flows.md`. ADR 0049 is the
 sense-exceptions ADR.
+
+## 11. Next
+
+| Step | Action                                                                                         |
+| ---- | ---------------------------------------------------------------------------------------------- |
+| 1    | Decide on the `vocab_dir` seam for the preview. It needs one short ADR.                        |
+| 2    | Remove the `DEFAULT_MAX_USES` patch in `test_cull_shared.py`: set `max_uses` through the manifest. |
+| 3    | Run the skill again on the whole suite. Ask for each test: what bug does it catch? Cut the rest. |
+| 4    | Add a mutation score to the gate list: run the breaks in this plan as a script, not by hand.   |
