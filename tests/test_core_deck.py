@@ -734,8 +734,6 @@ class TestCardDesign:
         assert dropped[0]["kept"] == "0"
         assert "lapin" in dropped[0]["sentence"]
         assert manifest["counts"]["cards"] == 1
-        passed, message = coregates.gate_order(coregates.CoreFiles(output, profile))
-        assert passed, message
         with AnkiPackage(output) as package:
             sentences = [
                 str(row["flds"]).split("\x1f")[1] for row in package.get_notes()

@@ -102,14 +102,17 @@ def _profile() -> cullflow.CullProfile:
 
 def _tiny_deck(tmp_path: Path) -> Path:
     source = tmp_path / "input.apkg"
+    audio = tmp_path / "in.mp3"
+    audio.write_bytes(b"ID3")
     AnkiPackage.create(
         source,
         "Source Deck",
         fields=FIELDS,
         cards=[
-            {"Text": sentence, "Audio": "", "Meaning": english}
+            {"Text": sentence, "Audio": "[sound:in.mp3]", "Meaning": english}
             for sentence, english in SENTENCES
         ],
+        media_files=[str(audio)],
         model_name=MODEL_NAME,
     )
     return source

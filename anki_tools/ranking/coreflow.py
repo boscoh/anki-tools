@@ -16,7 +16,6 @@ from __future__ import annotations
 import hashlib
 import re
 from collections import Counter
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, replace
 from functools import partial
 from pathlib import Path
@@ -44,10 +43,7 @@ from anki_tools.ranking.corelist import (
 )
 from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.ranking.scan import CoreProfile, scan
-from anki_tools.sentence_pack.audio import probe_duration
 from anki_tools.sentence_pack.english_sense import read_senses, sense_failure
-
-AUDIO_PROBE_WORKERS = 8
 
 CORE_COLUMNS: tuple[str, ...] = (
     "note_id",
@@ -490,6 +486,8 @@ def read_input_deck(
 ) -> list[InputCard]:
     """Read one card per note of the sentence model in an APKG file.
 
+    A note without a sound tag is skipped.
+
     :param path: Input APKG file.
     :param model_name: Name of the note model.
     :param sentence_field: Name of the sentence field.
@@ -523,12 +521,14 @@ def read_input_deck(
         for note_id, row in chosen.items():
             values = row["flds"].split("\x1f")
             sound = _SOUND_PATTERN.search(values[audio])
+            if sound is None:
+                continue
             cards.append(
                 InputCard(
                     note_id=note_id,
                     sentence=clean_sentence(values[sentence]),
                     english=values[english].strip(),
-                    audio=sound.group(1) if sound else "",
+                    audio=sound.group(1),
                     index=len(cards),
                 )
             )
@@ -631,58 +631,6 @@ def note_values(
         return values, 0, len(values)
     return values, bolded, len(values) - bolded
 
-def _media_probe_path(path: Path) -> Path:
-    """Give a readable path for an audio file, decompressing zstd media."""
-    head = path.read_bytes()[:4] if path.exists() else b""
-    if head != b"\x28\xb5\x2f\xfd":
-        return path
-    import io
-
-    import zstandard
-
-    dctx = zstandard.ZstdDecompressor()
-    with dctx.stream_reader(io.BytesIO(path.read_bytes())) as reader:
-        data = reader.read()
-    target = path.with_name(path.name + ".probe")
-    target.write_bytes(data)
-    return target
-
-
-def probe_audio(
-    media_dir: str | None, media: dict[str, str], names: Collection[str]
-) -> dict[str, float | None]:
-    """Probe the duration of the audio files of the kept cards.
-
-    :param media_dir: Directory with the unpacked media files.
-    :param media: Media file id to name mapping.
-    :param names: File names to probe.
-    :returns: File name to duration in seconds. The value is None when the
-        file is missing or is not a valid MP3.
-    """
-    if not media_dir:
-        return {}
-    paths = {
-        name: Path(media_dir) / file_id
-        for file_id, name in media.items()
-        if name in names
-    }
-
-    def probe(item: tuple[str, Path]) -> tuple[str, float | None]:
-        name, path = item
-        if not path.exists():
-            return name, None
-        probe_path = _media_probe_path(path)
-        try:
-            return name, probe_duration(probe_path)
-        except RuntimeError:
-            return name, None
-        finally:
-            if probe_path != path:
-                probe_path.unlink(missing_ok=True)
-
-    with ThreadPoolExecutor(max_workers=AUDIO_PROBE_WORKERS) as pool:
-        return dict(pool.map(probe, sorted(paths.items())))
-
 
 _BOLD_TAG = re.compile(r"</?b>")
 
@@ -742,8 +690,8 @@ def read_output(path: Path) -> dict[str, Any]:
     :param path: Output APKG file.
     :raises RuntimeError: The package holds two or more note types.
     :returns: Cards, note count, field names, model names, deck names, media
-        names, the card ordinals, the card templates and CSS per model, the note
-        type kind, and the audio duration per file.
+        names, the card ordinals, the card templates and CSS per model, and the
+        note type kind.
     """
     cards = read_output_deck(path)
     with AnkiPackage(path) as package:
@@ -752,8 +700,6 @@ def read_output(path: Path) -> dict[str, Any]:
         name = model.get("name")
         notes = package.get_notes()
         media = package.get_media_mapping()
-        names = {card.audio for card in cards if card.audio}
-        durations = probe_audio(package.media_dir(), media, names)
         decks = {deck.get("name") for deck in package.get_decks().values()}
         ords = [int(row["ord"]) for row in package.get_cards()]
     return {
@@ -763,7 +709,6 @@ def read_output(path: Path) -> dict[str, Any]:
         "note_models": {name},
         "decks": decks,
         "media": set(media.values()),
-        "audio": durations,
         "ords": ords,
         "templates": {
             name: [

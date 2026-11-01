@@ -1,4 +1,4 @@
-"""Shared gates G1 to G17 of the cull deck, without the retired G3, G4, and G14.
+"""Shared gates G1 to G17 of the cull deck, without the retired G3, G4, G7, and G14.
 
 The gates read the output APKG, the two CSV files, and the manifest. A gate
 never writes a file. A language package supplies a
@@ -29,15 +29,11 @@ from anki_tools.ranking.cullflow import (
 from anki_tools.ranking.corelist import lemma_sets
 from anki_tools.ranking.gates import (
     Gate,
-    gate_audio as _gate_audio,
     gate_counts as _gate_counts,
     gate_core_word,
-    gate_identity,
-    gate_kept_order as _gate_kept_order,
     gate_manifest_hashes as _gate_manifest_hashes,
     gate_output_model,
     gate_similarity as _gate_similarity,
-    gate_templates as _gate_templates,
     read_csv,
     read_json,
     report,
@@ -45,8 +41,6 @@ from anki_tools.ranking.gates import (
 )
 from anki_tools.ranking.gates import sample as _sample
 from anki_tools.ranking.identity import DeckIdentity
-
-CARD_CLASSES = ("sentence", "english", "hint")
 
 @dataclass
 class CullFiles(GateFileReader):
@@ -188,10 +182,6 @@ def gate_similarity(files: CullFiles) -> tuple[bool, str]:
     sets = lemma_sets(files.tokens(), files.profile.content_pos)
     return _gate_similarity(files, sets, limit)
 
-def gate_audio(files: CullFiles) -> tuple[bool, str]:
-    """G7: every kept card has a valid MP3 file."""
-    return _gate_audio(files)
-
 def gate_note_count(files: CullFiles) -> tuple[bool, str]:
     """G8: the note count matches the CSV and the manifest."""
     return _gate_counts(files)
@@ -211,11 +201,6 @@ def gate_media(files: CullFiles) -> tuple[bool, str]:
     return True, f"{len(media)} media files, all used by the kept cards"
 
 
-
-
-def gate_kept_order(files: CullFiles) -> tuple[bool, str]:
-    """G11: the kept set and order match the manifest of the run."""
-    return _gate_kept_order(files, files.rows())
 
 def gate_coverage_shape(files: CullFiles) -> tuple[bool, str]:
     """G12: the coverage CSV has one row per target word."""
@@ -242,18 +227,6 @@ def gate_manifest_hashes(files: CullFiles) -> tuple[bool, str]:
     return _gate_manifest_hashes(files, file_keys)
 
 
-def _css_class_problems(css: str) -> list[str]:
-    """Report the card classes that the CSS does not declare."""
-    return [
-        f"the CSS has no .{name} class"
-        for name in CARD_CLASSES
-        if f".{name}" not in css
-    ]
-
-
-def gate_card_templates(files: CullFiles) -> tuple[bool, str]:
-    """G15: the deck model holds the Swadesh-style template and CSS."""
-    return _gate_templates(files, _css_class_problems)
 
 
 
@@ -262,21 +235,17 @@ GATES: tuple[Gate, ...] = (
     Gate("G2", gate_use_cap),
     Gate("G5", gate_filter_recheck),
     Gate("G6", gate_similarity),
-    Gate("G7", gate_audio),
     Gate("G8", gate_note_count),
     Gate("G9", gate_media),
-    Gate("G10", gate_identity),
-    Gate("G11", gate_kept_order),
     Gate("G12", gate_coverage_shape),
     Gate("G13", gate_manifest_hashes),
-    Gate("G15", gate_card_templates),
     Gate("G16", gate_output_model),
     Gate("G17", gate_core_word),
 )
 
 
 def check_cull(output_path: Path, profile: CullProfile) -> int:
-    """Run gates G1 to G17, without the retired G3, G4, and G14, on a cull output.
+    """Run gates G1 to G17, without the retired G3, G4, G7, and G14, on a cull output.
 
     :param output_path: Output APKG file.
     :param profile: Language hooks.

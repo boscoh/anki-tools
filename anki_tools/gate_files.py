@@ -92,6 +92,3 @@ class GateFileReader:
 
     def media(self) -> set[str]:
         return self._load("media")
-
-    def rank_rows(self) -> list[dict[str, str]]:
-        return self._load("rank")

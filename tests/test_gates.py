@@ -30,7 +30,6 @@ def _output_files(kind: int) -> Any:
         "note_models": {model},
         "decks": {model},
         "media": set(),
-        "audio": {},
         "ords": [0],
         "templates": {model: [("", "")]},
         "css": {model: ""},

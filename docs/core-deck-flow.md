@@ -23,8 +23,8 @@ One command runs the stages in order: `anki fix <language> --core`. The
 | K5    | order   | K4                                        | card order, assigned target per card        |
 | K6    | write   | K0, K4, K5                                | APKG and four side files                    |
 
-The gates K1 to K21 run after K6. The table holds 17 rows: K3, K15, and K17
-are gone, and gates K4 and K22 are retired (ADR 0038, ADR 0039). The flow step K4
+The gates K1 to K21 run after K6. The table holds 13 rows: K3, K15, and K17
+are gone, and gates K4, K7, K9, K10, K14, and K22 are retired (ADR 0038, 0039, 0040, 0041). The flow step K4
 is the selection.
 
 The `--cards` and `--words` values change the tier F target count and the
@@ -301,9 +301,8 @@ The coverage status of a target is one of these values:
 | size       | K1                 | card count                                                          |
 | coverage   | K2, K11            | covered targets, coverage CSV                                       |
 | rules      | K5, K6             | F1 to F9, similarity                                                |
-| files      | K7, K8, K12        | audio files, counts, manifest hashes                                |
-| identity   | K9, K10            | deck name, note type, kept order                                    |
-| cards      | K13, K14           | target in the text, templates and CSS                               |
+| files      | K8, K12            | counts, manifest hashes                                             |
+| cards      | K13                | target in the text                                                  |
 | sense      | K16, K19, K20      | unchecked target, core word and gloss, unranked word                |
 | shape      | K18                | each tail card brings a new content lemma                           |
 | note type  | K21                | one note type, the output fields, one card per note                 |
@@ -312,7 +311,7 @@ The build report holds the value of K3 and K15, Covered twice, and the count of
 cards that K1 drops for a missing audio file. A report line does not fail the
 run.
 
-K14 checks the templates and the CSS of the language profile. K19 checks that
+K19 checks that
 every note holds a
 `Core`, a `CoreGloss`, and a bold core word, that the gloss is the coverage
 gloss of the core word, and
@@ -325,7 +324,7 @@ gate repeats it.
 | Path                                            | Content                                    |
 | ----------------------------------------------- | ------------------------------------------ |
 | `anki_tools/ranking/coreflow.py`                | K0 to K6 flow, output field values         |
-| `anki_tools/ranking/coregates.py`               | gates K1 to K21, 17 rows                   |
+| `anki_tools/ranking/coregates.py`               | gates K1 to K21, 16 rows                   |
 | `anki_tools/gates.py`                           | gate value, row, runner, reader contract   |
 | `anki_tools/ranking/gates.py`                   | report, shared gates                       |
 | `anki_tools/ranking/assemble.py`                | deck, side files, manifest, report         |

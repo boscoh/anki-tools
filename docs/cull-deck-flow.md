@@ -24,7 +24,7 @@ One command runs the stages in order: `anki fix <language> --select`. The
 | C4    | select    | C1, C2, C3, reserve pack | kept cards and reserve cards                |
 | C5    | write     | C0, C4                   | APKG and three side files                   |
 
-The gates G1, G2, G5 to G13, and G15 to G17 run after C5. G3, G4, G14, and G18 are retired.
+The gates G1, G2, G5, G6, G8, G9, G12, G13, G16, and G17 run after C5. G3, G4, G7, G10, G11, G14, G15, and G18 are retired.
 
 The `--cards` and `--reserve` values change the request. The other
 `CullRequest` fields, such as `max_uses` and `target_words`, keep their
@@ -34,6 +34,9 @@ The input fields come from the profile: `input_model_name`,
 `input_sentence_field`, `input_english_field`, and `input_audio_field`. C0
 keeps the lowest card of each note. It cleans the sentence with
 `clean_sentence`.
+
+C0 drops a note with no sound tag. It also drops a card whose audio file is not
+in the media map of the input APKG (`drop_silent_cards` in `ranking/scan.py`).
 
 ## 2. Flow diagram
 
@@ -71,7 +74,7 @@ C4  selection
 C5  APKG, .cull.csv, .coverage.csv, .manifest.json
         |
         v
-    gates G1, G2, G5 to G13, G15 to G17
+    gates G1, G2, G5, G6, G8, G9, G12, G13, G16, G17
 ```
 
 ## 3. Target words (C1 and C2)
@@ -274,18 +277,15 @@ exceptions.
 | size      | G1, G2       | card count against the cap, lemma uses against the cap    |
 | coverage  | G12          | coverage CSV rows                                         |
 | rules     | G5, G6       | F1 to F9 on every kept card, similarity                   |
-| files     | G7, G8, G9   | audio files, note count, media set                        |
-| identity  | G10, G11     | deck name, note type, kept order                          |
+| files     | G8, G9       | note count, media set                                     |
 | manifest  | G13          | the two CSV hashes                                        |
-| templates | G15          | the cull templates and the CSS classes                    |
 | note type | G16, G17     | one note type, its fields, the core word, gloss, and bold |
 
-G3, G4, and G14 are retired (ADR 0033, ADR 0035). Their ids are not reused. The
+G3, G4, G7, G10, G11, G14, and G15 are retired (ADR 0033, 0035, 0040, 0041). Their ids are not reused. The
 report and the coverage CSV still give the targets with one card and with two
 cards, and the Swadesh count of the reserve concepts. No gate tests them.
 
-G15 needs the template set of the profile and
-each card class in the CSS. G16 checks the single note type, the field set, and
+G16 checks the single note type, the field set, and
 one card per note. G17 checks that every note holds a `Core`, a `CoreGloss`,
 and a bold core word, and that the gloss is the coverage gloss of that word.
 G18 is retired (ADR 0039). The `sense` filter is the one sense test, and no gate
@@ -309,7 +309,7 @@ it.
 | Path                                      | Content                                        |
 | ----------------------------------------- | ---------------------------------------------- |
 | `anki_tools/ranking/cullflow.py`          | C0 to C5 flow, profile, selection, values      |
-| `anki_tools/ranking/cullgates.py`         | gates G1, G2, G5 to G13, and G15 to G17        |
+| `anki_tools/ranking/cullgates.py`         | gates G1 to G17, 13 rows                       |
 | `anki_tools/gates.py`                     | gate value, row, runner, reader contract       |
 | `anki_tools/ranking/gates.py`             | report, shared gates                           |
 | `anki_tools/ranking/assemble.py`          | deck, side files, manifest, report             |

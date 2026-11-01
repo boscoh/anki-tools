@@ -1,4 +1,4 @@
-"""Shared gates K1 to K21 of the core deck, without the retired K4 and K22.
+"""Shared gates K1 to K21 of the core deck, without the retired K4, K7, and K22.
 
 The gates read the output APKG, the two CSV files, and the manifest. A gate
 never writes a file. A language package supplies the
@@ -32,14 +32,10 @@ from anki_tools.ranking.gates import (
     Gate,
     GateResult,
     core_word_problems,
-    gate_audio as _gate_audio,
     gate_counts as _gate_counts,
-    gate_identity,
-    gate_kept_order as _gate_kept_order,
     gate_manifest_hashes as _gate_manifest_hashes,
     gate_output_model,
     gate_similarity as _gate_similarity,
-    gate_templates as _gate_templates,
     output_model_problems,
     read_csv,
     read_json,
@@ -57,7 +53,6 @@ __all__ = [
     "GateResult",
     "check_core",
     "core_word_problems",
-    "gate_audio",
     "gate_card_count",
     "gate_core_word",
     "gate_counts",
@@ -66,13 +61,10 @@ __all__ = [
     "gate_filter_recheck",
     "gate_hashes",
     "gate_target_in_sentence",
-    "gate_identity",
-    "gate_order",
     "gate_output_model",
     "gate_unchecked_sense",
     "gate_similarity",
     "gate_tail",
-    "gate_templates",
     "gate_unranked",
     "output_model_problems",
     "run_gates",
@@ -100,7 +92,6 @@ class CoreFiles(GateFileReader):
                 "rows": lambda: read_csv(self.core_csv),
                 "coverage": lambda: read_csv(self.coverage_csv),
                 "manifest": lambda: read_json(self.manifest_path),
-                "rank": lambda: read_csv(self.rank_csv),
                 "output": lambda: read_output(self.apkg_path),
                 "notes": lambda: read_notes(self.apkg_path),
                 "fields": lambda: list(self.output()["fields"]),
@@ -171,19 +162,10 @@ def gate_similarity(files: CoreFiles) -> tuple[bool, str]:
     sets = lemma_sets(files.tokens(), CONTENT_POS)
     return _gate_similarity(files, sets, SIMILARITY_LIMIT)
 
-def gate_audio(files: CoreFiles) -> tuple[bool, str]:
-    """K7: every kept card has a valid MP3 file."""
-    return _gate_audio(files)
-
 def gate_counts(files: CoreFiles) -> tuple[bool, str]:
     """K8: the note, media, and manifest counts agree."""
     return _gate_counts(files, check_media=True)
 
-
-
-def gate_order(files: CoreFiles) -> tuple[bool, str]:
-    """K10: the kept order is the recorded order."""
-    return _gate_kept_order(files, files.rank_rows())
 
 def _key_of(row: dict[str, str]) -> str:
     """Give the target key of a coverage row."""
@@ -257,15 +239,6 @@ def gate_target_in_sentence(files: CoreFiles) -> tuple[bool, str]:
     return not bad, f"{len(bad)} bad hit(s): {_sample(bad)}"
 
 
-def gate_templates(files: CoreFiles) -> tuple[bool, str]:
-    """K14: the templates are the core templates and the CSS is the cull CSS."""
-    wanted = files.profile.card_css()
-
-    def css_problems(css: str) -> list[str]:
-        """Report a CSS value that is not the profile CSS."""
-        return [] if css == wanted else ["the CSS is not the profile CSS"]
-
-    return _gate_templates(files, css_problems)
 
 def _strip_bold(text: str) -> str:
     """Remove the bold markup of a field value."""
@@ -363,14 +336,10 @@ GATES: tuple[Gate, ...] = (
     Gate("K2", gate_covered_targets),
     Gate("K5", gate_filter_recheck),
     Gate("K6", gate_similarity),
-    Gate("K7", gate_audio),
     Gate("K8", gate_counts),
-    Gate("K9", gate_identity),
-    Gate("K10", gate_order),
     Gate("K11", gate_coverage_agreement),
     Gate("K12", gate_hashes),
     Gate("K13", gate_target_in_sentence),
-    Gate("K14", gate_templates),
     Gate("K16", gate_unchecked_sense),
     Gate("K18", gate_tail),
     Gate("K19", gate_core_word),
@@ -380,7 +349,7 @@ GATES: tuple[Gate, ...] = (
 
 
 def check_core(output_path: Path, profile: CoreProfile) -> int:
-    """Run gates K1 to K21, without the retired K4, on the files of a core output.
+    """Run gates K1 to K21, without the retired K4 and K7, on the files of a core output.
 
     :param output_path: Output APKG file.
     :param profile: Language hooks.

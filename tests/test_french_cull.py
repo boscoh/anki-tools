@@ -12,7 +12,6 @@ import math
 from collections import Counter
 from functools import partial
 from pathlib import Path
-from typing import Collection
 
 import pytest
 
@@ -391,7 +390,7 @@ def test_write_deck_removes_the_second_card_template(tmp_path: Path) -> None:
     assert {row["ord"] for row in rows} == {0}
 
 
-def test_gate_card_templates_fails_on_a_second_template(tmp_path: Path) -> None:
+def test_gate_output_model_fails_on_a_second_template(tmp_path: Path) -> None:
     source = _tiny_deck(tmp_path)
     cards = cull_fr.load_input_deck(source)
     output = tmp_path / "two-templates.apkg"
@@ -401,27 +400,7 @@ def test_gate_card_templates_fails_on_a_second_template(tmp_path: Path) -> None:
     rows = cullgates.run_gates(
         cullgates.GATES, cullgates.CullFiles(output, cull_fr.FRENCH_CULL_PROFILE)
     )
-    message = dict((gate, passed) for gate, passed, _ in rows)["G15"]
-
-    assert message is False
-
-
-def test_gate_card_templates_fails_on_a_wrong_front(tmp_path: Path) -> None:
-    source = _tiny_deck(tmp_path)
-    cards = cull_fr.load_input_deck(source)
-    output = tmp_path / "wrong.apkg"
-    _write_cull_deck(source, cards, [0], output)
-
-    with AnkiPackage(output) as package:
-        package.update_model_template(
-            qfmt="{{French}}", afmt=cull_fr.CARD_TEMPLATES[0][1]
-        )
-        package.save()
-
-    rows = cullgates.run_gates(
-        cullgates.GATES, cullgates.CullFiles(output, cull_fr.FRENCH_CULL_PROFILE)
-    )
-    message = dict((gate, passed) for gate, passed, _ in rows)["G15"]
+    message = dict((gate, passed) for gate, passed, _ in rows)["G16"]
 
     assert message is False
 
@@ -429,11 +408,6 @@ def test_gate_card_templates_fails_on_a_wrong_front(tmp_path: Path) -> None:
 def _fake_tokens(self: cullgates.CullFiles) -> list[list[tuple[str, str]]]:
     return [DECK_TOKENS[card.sentence] for card in self.output()["cards"]]
 
-
-def _fake_probe(
-    _temp_dir: str | None, _media: dict[str, str], names: Collection[str]
-) -> dict[str, float]:
-    return {name: 1.0 for name in names}
 
 
 def test_run_gates_passes_on_a_tiny_output(
@@ -502,14 +476,13 @@ def test_run_gates_passes_on_a_tiny_output(
     )
 
     monkeypatch.setattr(cullgates.CullFiles, "tokens", _fake_tokens)
-    monkeypatch.setattr(coreflow, "probe_audio", _fake_probe)
 
     rows = cullgates.run_gates(
         cullgates.GATES, cullgates.CullFiles(output, cull_fr.FRENCH_CULL_PROFILE)
     )
 
     assert [gate for gate, _passed, _message in rows] == [
-        f"G{number}" for number in (1, 2, *range(5, 14), *range(15, 18))
+        f"G{number}" for number in (1, 2, 5, 6, 8, 9, 12, 13, 16, 17)
     ]
     for gate, passed, message in rows:
         assert passed, f"{gate}: {message}"

@@ -29,8 +29,9 @@ The core flow no longer has the rules C3, C4, and C5. The ids are not reused.
 
 C5 is a fact about the input file, not a rule about a sentence. A card with no
 audio file is not a card of the deck. The input reader is the place to drop it,
-before the filter, the tokens, and the targets see it. Gate K7 still checks the
-audio of the output, so K5 no longer needs to check the media map.
+before the filter, the tokens, and the targets see it. Gate K7 checked the
+audio of the output, so K5 did not need to check the media map. ADR 0040 retires
+K7. The core K8 gate now checks the media set.
 
 The name and loan word lists were hand lists that a person had to keep in step
 with the data. The owner decided that the core deck does not need them.

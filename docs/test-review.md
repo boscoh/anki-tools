@@ -101,7 +101,6 @@ path. These functions have no test now:
 | Function                  | What it does                                                    |
 | ------------------------- | --------------------------------------------------------------- |
 | `validate_audio`          | Header and duration check                                       |
-| `probe_audio`             | ffprobe duration. `test_french_cull.py` replaces it with a fake |
 | `fetch_tts`               | gTTS download with retry                                        |
 | `write_mp3s`, `tts_bytes` | Write and encode                                                |
 

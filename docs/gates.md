@@ -22,8 +22,8 @@ One table shows the four flows at a glance:
 | Flow            | Command                              | Gate table               | Filter table          |
 | --------------- | ------------------------------------ | ------------------------ | --------------------- |
 | Sentence pack   | `anki swadesh pack <lang>`           | G1 to G19, 15 to 16 rows | 7 rule ids            |
-| Cull deck       | `anki fix <lang> <input> --select`   | G1 to G17, 14 rows       | 7 rule ids            |
-| Core deck       | `anki fix <lang> <input> --core`     | K1 to K21, 17 rows       | 7 rule ids            |
+| Cull deck       | `anki fix <lang> <input> --select`   | G1 to G17, 10 rows       | 7 rule ids            |
+| Core deck       | `anki fix <lang> <input> --core`     | K1 to K21, 13 rows       | 7 rule ids            |
 | Vocabulary deck | `anki swadesh vocab <lang>`          | none                     | none                  |
 
 The filter column lives in `docs/filters.md`.
@@ -35,12 +35,8 @@ The reverse direction reads each check as a row and each flow as a column.
 | gate   | `gate_word_table`         | G1                               | -                                 | -                                 | -               |
 | gate   | `gate_filter_recheck`     | G14                              | G5                                | K5                                | -               |
 | gate   | `gate_similarity`         | -                                | G6                                | K6                                | -               |
-| gate   | `gate_audio`              | -                                | G7                                | K7                                | -               |
 | gate   | `gate_counts`             | -                                | G8                                | K8                                | -               |
-| gate   | `gate_identity`           | -                                | G10                               | K9                                | -               |
-| gate   | `gate_kept_order`         | -                                | G11                               | K10                               | -               |
 | gate   | `gate_manifest_hashes`    | -                                | G13                               | K12                               | -               |
-| gate   | `gate_templates`          | -                                | G15                               | K14                               | -               |
 | gate   | `gate_core_word`          | -                                | G17                               | K19                               | -               |
 | gate   | `gate_output_model`       | -                                | G16                               | K21                               | -               |
 | filter | `length_window`           | yes                              | yes                               | yes                               | -               |
@@ -87,18 +83,18 @@ second flow.
 
 ## 3. The gate tables
 
-| Flow                           | Ids                                 | Rows |
-| ------------------------------ | ----------------------------------- | ---- |
-| Sentence pack, French, Spanish | G1 to G8, G10, G11, G13 to G16, G19 | 15   |
-| Sentence pack, Greek           | G1 to G8, G10, G11, G13 to G16, G18 | 15   |
-| Sentence pack, Mandarin        | G1 to G16                           | 16   |
-| Sentence pack, Cantonese       | G1 to G8, G10, G11, G13 to G18      | 16   |
-| Cull deck                      | G1, G2, G5 to G13, G15 to G17       | 14   |
-| Core deck                      | K1, K2, K5 to K14, K16, K18 to K21  | 17   |
-| Vocabulary deck                | none                                | 0    |
+| Flow                           | Ids                                             | Rows |
+| ------------------------------ | ----------------------------------------------- | ---- |
+| Sentence pack, French, Spanish | G1 to G8, G10, G11, G13 to G16, G19             | 15   |
+| Sentence pack, Greek           | G1 to G8, G10, G11, G13 to G16, G18             | 15   |
+| Sentence pack, Mandarin        | G1 to G16                                       | 16   |
+| Sentence pack, Cantonese       | G1 to G8, G10, G11, G13 to G18                  | 16   |
+| Cull deck                      | G1, G2, G5, G6, G8, G9, G12, G13, G16, G17      | 10   |
+| Core deck                      | K1, K2, K5, K6, K8, K11 to K13, K16, K18 to K21 | 13   |
+| Vocabulary deck                | none                                            | 0    |
 
-A removed row leaves a gap in the numbering. Cull G3, G4, G14, and G18 and core K4
-and K22 are retired (ADR 0033, 0035, 0038, 0039). Pack gates for sense,
+A removed row leaves a gap in the numbering. Cull G3, G4, G7, G10, G11, G14, G15, and G18 and core
+K4, K7, K9, K10, K14, and K22 are retired (ADR 0033, 0035, 0038, 0039, 0040, 0041). Pack gates for sense,
 attribution, typography, license, and script are retired too (ADR 0039). Their
 ids are not reused. Each flow doc gives the check of
 each row: `docs/swadesh-sentence-flow.md`, `docs/cull-deck-flow.md`,
@@ -114,12 +110,8 @@ table lives in one flow only, and the flow doc holds it.
 | Word table      | `gate_word_table`         | pack G1, five copies, open                                            |
 | Filter recheck  | `gate_filter_recheck`     | pack G14, cull G5, core K5, one name and three bodies                 |
 | Similarity      | `gate_similarity`         | cull G6, core K6, one rule and two limits                             |
-| Audio valid     | `gate_audio`              | cull G7, core K7                                                      |
 | Media count     | `gate_counts`             | cull G8 `gate_note_count`, core K8                                    |
-| Identity        | `gate_identity`           | cull G10, core K9                                                     |
-| Order           | `gate_kept_order`         | cull G11, core K10 `gate_order`                                       |
 | Manifest hashes | `gate_manifest_hashes`    | cull G13, core K12 `gate_hashes`                                      |
-| Templates       | `gate_templates`          | cull G15 `gate_card_templates`, core K14                              |
 | Core word       | `gate_core_word`          | cull G17, core K19                                                    |
 | Output model    | `gate_output_model`       | cull G16, core K21                                                    |
 
@@ -223,6 +215,6 @@ unless the change removes a report-only row.
 | `anki_tools/gate_files.py`               | the lazy file reader                                  |
 | `anki_tools/ranking/gates.py`            | the report and the shared rank checks                 |
 | `anki_tools/sentence_pack/audit.py`      | `AuditInputs`, `as_gates`, and the shared pack checks |
-| `anki_tools/ranking/cullgates.py`        | cull gates G1, G2, G5 to G13, and G15 to G17          |
-| `anki_tools/ranking/coregates.py`        | core gates K1 to K21, without K4                      |
+| `anki_tools/ranking/cullgates.py`        | cull gates G1 to G17, 10 rows                         |
+| `anki_tools/ranking/coregates.py`        | core gates K1 to K21, 13 rows                         |
 | `anki_tools/languages/<lang>/profile.py` | the language gates                                    |
