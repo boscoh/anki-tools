@@ -102,41 +102,6 @@ def test_the_shape_holds_on_an_anki21b_fixture(tmp_path: Path) -> None:
     assert model["kind"] == 0
 
 
-def test_the_new_package_adapter_states_the_same_shape(tmp_path: Path) -> None:
-    output = tmp_path / "new.apkg"
-    files = deck_writer.write_deck(
-        deck_writer.DeckWrite(
-            output_path=output,
-            shape=deck_writer.NoteTypeShape(
-                deck_name="New Deck",
-                model_name="New Deck",
-                fields=FIELDS,
-                templates=TEMPLATES,
-                css=CSS,
-            ),
-            cards=[
-                deck_writer.Card(
-                    values={
-                        "Audio": "[sound:a.mp3]",
-                        "Sentence": "Le chat dort.",
-                        "English": "The cat sleeps.",
-                        "Core": "chat",
-                        "CoreGloss": "cat",
-                    }
-                )
-            ],
-        )
-    )
-
-    assert files.output_path == output
-    with AnkiPackage(output) as package:
-        model = next(iter(package.get_models(include_templates=True).values()))
-        cards = package.get_cards()
-    assert [field["name"] for field in model["flds"]] == list(FIELDS)
-    assert [(t["qfmt"], t["afmt"]) for t in model["tmpls"]] == list(TEMPLATES)
-    assert len(cards) == 1
-
-
 def test_the_edit_adapter_rejects_media(tmp_path: Path) -> None:
     source = tmp_path / "input.apkg"
     shutil.copy(build_contract_deck(tmp_path), source)

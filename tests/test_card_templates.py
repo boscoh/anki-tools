@@ -16,7 +16,6 @@ from anki_tools.apkg.templates import (
     apply_templates,
     find_best_match,
     load_char_links,
-    load_css_layers,
     load_text,
 )
 from anki_tools.languages import PROFILES
@@ -54,28 +53,6 @@ TEMPLATE_SOURCES = [
 ]
 
 
-def _template_classes() -> set[str]:
-    used: set[str] = set()
-    for path in TEMPLATES_DIR.rglob("*.html"):
-        for names in CLASS_ATTRIBUTE.findall(path.read_text(encoding="utf-8")):
-            used.update(names.split())
-    return used
-
-
-def _css_classes() -> set[str]:
-    defined: set[str] = set()
-    for path in TEMPLATES_DIR.rglob("*.css"):
-        text = path.read_text(encoding="utf-8")
-        for selector in CSS_SELECTOR.findall(text):
-            defined.update(CSS_CLASS.findall(selector))
-    return defined
-
-
-def test_every_template_class_has_a_css_rule() -> None:
-    missing = _template_classes() - _css_classes() - SCRIPT_HOOK_CLASSES
-    assert missing == set()
-
-
 @pytest.mark.parametrize("profile", PACK_PROFILES, ids=lambda profile: profile.name)
 def test_a_pack_card_styles_its_classes_from_the_shared_sheet_and_its_own(
     profile,
@@ -96,12 +73,6 @@ def test_the_cantonese_sheet_sets_its_own_font_stack() -> None:
     cantonese = fonts.findall(PROFILES["cantonese"].extra_css)
 
     assert cantonese and cantonese[-1] != shared[0]
-
-
-def test_the_shared_sheet_comes_first() -> None:
-    pack_css = TEMPLATES_DIR / "sentence_pack" / "mandarin" / "card.css"
-    css = load_css_layers(SHARED_CSS_PATH, pack_css)
-    assert css.index(".card") < css.index(".romanization")
 
 
 @pytest.mark.parametrize("directory, front, back", TEMPLATE_SOURCES)

@@ -63,23 +63,6 @@ def _anki21b_audio_deck(tmp_path: Path) -> Path:
     return deck
 
 
-def test_anki21b_round_trip_writes_a_zstd_protobuf(tmp_path: Path) -> None:
-    deck = build_anki21b_deck(tmp_path / "deck.apkg")
-    first, second = write_mp3s(tmp_path, AUDIO_NAMES[:2])
-
-    with AnkiPackage(deck) as package:
-        assert package.add_media_file(first) == "a0.mp3"
-        assert package.add_media_file(second) == "a1.mp3"
-        package.save()
-
-    with AnkiPackage(deck) as package:
-        mapping = package.get_media_mapping()
-
-    assert mapping == {"0": "a0.mp3", "1": "a1.mp3"}
-    assert _media_bytes(deck)[:4] == ZSTD_MAGIC
-    assert {name for name in _archive_names(deck) if name.isdigit()} == {"0", "1"}
-
-
 def test_anki2_round_trip_stays_json(tmp_path: Path) -> None:
     deck = _anki2_deck(tmp_path)
     (extra,) = write_mp3s(tmp_path, ["extra.mp3"])

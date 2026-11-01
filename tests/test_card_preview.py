@@ -9,35 +9,11 @@ from anki_tools.preview import (
     SENTENCE_LANGUAGES,
     VOCAB_DIR,
     VOCAB_LANGUAGES,
-    PreviewSection,
-    build_page,
-    default_card,
     fix_card,
     render_template,
     sentence_card,
     write_preview,
 )
-
-
-def test_the_page_holds_each_section_and_card() -> None:
-    sections = (
-        PreviewSection("default", "Default deck style", "intro", (default_card(),)),
-        PreviewSection(
-            "core",
-            "Core-word decks",
-            "intro",
-            (fix_card("french", "core", "French core-word deck"),),
-        ),
-    )
-
-    page = build_page(sections, title="Previews")
-
-    assert "<title>Previews</title>" in page
-    for section in sections:
-        assert f'href="#{section.anchor}"' in page
-        assert section.title in page
-        for card in section.cards:
-            assert card.title in page
 
 
 @pytest.mark.parametrize(

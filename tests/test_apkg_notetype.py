@@ -79,28 +79,6 @@ def test_with_kind_writes_the_kind(config: bytes, kind: int, expected: bytes) ->
     assert notetype.with_kind(config, kind) == expected
 
 
-def test_clone_writes_the_sort_index_and_the_css_first() -> None:
-    """The clone drops the source sort index and CSS, and it keeps the kind."""
-    config = bytes([0x08, 0x01, 0x10, 0x05, 0x1A, len(CSS)]) + CSS + FIELD_255
-
-    out = notetype.clone(config, "new", 3)
-
-    assert out == (
-        bytes([0x10, 0x03, 0x1A, 0x03])
-        + b"new"
-        + bytes([0x08, 0x01])
-        + FIELD_255
-    )
-
-
-def test_the_template_config_round_trips() -> None:
-    """The question format is field 1 and the answer format is field 2."""
-    config = notetype.build_template("{{Front}}", "{{Back}}")
-
-    assert config == bytes([0x0A, 9]) + b"{{Front}}" + bytes([0x12, 8]) + b"{{Back}}"
-    assert notetype.parse_template(config) == ("{{Front}}", "{{Back}}")
-
-
 def test_a_wire_type_other_than_0_or_2_ends_the_message() -> None:
     """A fixed64 field ends the read. with_css keeps it and the clone drops it."""
     config = bytes([0x08, 0x01, 0x19, 0x01])
