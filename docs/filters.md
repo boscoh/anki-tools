@@ -213,8 +213,10 @@ holds its tier S rows only.
 
 S4 is done. `gate_sense` in `ranking/gates.py` is cull `G18` and core `K22`. It
 calls `sense_failure` on the `Core` word and the English of every kept note. The
-pack gates `gate_no_sense_mismatch` and `gate_no_false_friend`, core `K13`, and
-core `K16` stay until the pack filter uses `sense_failure`. A cull deck built
+pack filter, the cull, and the core call the same function. The pack gates
+`gate_no_sense_mismatch` and `gate_no_false_friend`, core `K13`, and core `K16`
+stay as separate gates: they test the sentence CSV, the form in the sentence, and
+the count of unchecked targets. A cull deck built
 before S2 can fail `G18`, because it kept cards that no sense test checked.
 
 The English table `vocab/english_senses.json` stays. It gives the sense words of a

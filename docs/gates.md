@@ -56,7 +56,7 @@ The reverse direction reads each check as a row and each flow as a column.
 | filter | `repeat`                  | yes                              | yes                               | yes                               | -               |
 | filter | `marks`                   | yes                              | yes                               | yes                               | -               |
 | filter | `unique`                  | yes                              | yes                               | yes                               | -               |
-| filter | `sense`                   | yes                              | -                                 | -                                 | -               |
+| filter | `sense`                   | yes                              | yes                               | yes                               | -               |
 | filter | C3 to C5                  | -                                | -                                 | yes                               | -               |
 
 Language codes: Fr French, Es Spanish, El Greek, Yue Cantonese, zh Mandarin.
@@ -155,11 +155,11 @@ targets with one card or two cards (ADR 0033).
 - `gate_sense` is one function in `ranking/gates.py` for the cull and the core.
   It reads the `Core` word and the card English of every note, and it takes tier
   S for a cull reserve card and for a Swadesh coverage row, tier F otherwise. The
-  pack still runs its own `gate_no_sense_mismatch` and `gate_no_false_friend`;
-  they read the sentence CSV and the language hooks, so they stay until the pack
-  filter moves to `sense_failure`. Core `K13` and `K16` stay: `gate_sense` does
-  not test that the form is in the sentence, and it does not count unchecked
-  targets.
+  pack filter, the cull, and the core all call `sense_failure`. The pack gate
+  `gate_no_sense_mismatch` calls it too. The pack gate `gate_no_false_friend`
+  reads the compounds of the record, and it stays a separate gate. Core `K13` and
+  `K16` stay: `gate_sense` does not test that the form is in the sentence, and it
+  does not count unchecked targets.
 - Core `K1` checks a three-way count agreement. Cull `G1` checks the cap or the
   pool end. The two functions stay separate.
 - Mandarin `G12` checks the native audio authors, not every sentence author, so
