@@ -41,7 +41,7 @@ of the language gives the `repeat` test and the `unique` key to all three flows.
 It also gives the `english_words` window, 2 to 12 words by default, so the three
 flows use one window (`DEFAULT_ENGLISH_BOUNDS`, `english_bounds`).
 The cull and the core apply `sense` to a card and target pair, not to a whole card.
-Section 5, L9, states the target meaning of `sense`; the code does not yet do it.
+Section 5, L9, states the meaning of `sense` and the status of the code.
 
 ## 3. Rule order
 
@@ -142,7 +142,7 @@ The cull and core reports once left out `repeat`. Both report lists now hold it.
 | L6    | one identical rule set for every flow | a different accepted set                       | rejected, the two jobs differ                  |
 | L7    | `length_window` to the gate layer     | none                                           | rejected, a gate never rejects a sentence      |
 | L8    | `digit_marks`, `script` in all flows  | the cull and the core gain an alphabet test    | done, `anki-sxzu`, ADR 0029                    |
-| L9    | one `sense` rule in every flow        | the cull and the core drop a failed target     | done, S1 to S5, ADR 0030                       |
+| L9    | one `sense` rule in every flow        | the cull and the core drop a failed target     | done, S1 to S5, ADR 0030 and 0031              |
 
 L3 added `final_marks`, `quote_marks`, and `internal_marks` to `CoreProfile`. It
 moved `CardShape` and `filter_reason` to `ranking/cardfilter.py`, and
@@ -172,9 +172,9 @@ target when three tests hold:
 | Core | card and target pair | drops the target; rejects the card with no target left |
 | Cull | card and target pair | the same as the core                                   |
 
-Today only the pack runs `sense` as a filter. The core runs tests 1 to 3 inside
-`core_hits`. The cull runs none of them, so `card_cores` writes a `Core` word and a
-`CoreGloss` that no check confirmed.
+All three flows now run `sense` through `sense_failure`. The pack rejects a
+sentence. The core and the cull drop a target, and the cull drops a lemma that
+fails the test (ADR 0030). The status of each part is in the work items below.
 
 One record per target word holds the data, in one file per language:
 
@@ -223,17 +223,27 @@ Swadesh gloss, and WordNet builds it.
 
 Work items:
 
-| Id | Task                                                                  | Behavior change        |
+| Id | Task                                                                  | Status                 |
 | -- | --------------------------------------------------------------------- | ---------------------- |
-| S1 | write this section                                                    | none                   |
+| S1 | write this section                                                    | done                   |
 | S2 | cull: remove a lemma that fails `sense_failure` in `select_cards`     | done, ADR 0030         |
-| S3 | one shared function and one record; move the dicts into the TSV files | none                   |
-| S4 | one `sense` recheck gate in the cull and the core (G18, K22), done    | an old deck can fail   |
-| S5 | sense rows for all 300 cull targets, and a Cantonese file             | data                   |
+| S3 | one shared function and one record; move the dicts into the TSV files | done                   |
+| S4 | one `sense` recheck gate in the cull and the core (G18, K22)          | done                   |
+| S5 | sense rows for all 300 cull targets, and a Cantonese file             | done, ADR 0031         |
 
 A compound-only sentence has no hit, so it is not a candidate and the pack counts
 no failure for it. In S3, `read_senses` must not read a tier S row as a tier F
 target, because the record file then holds both.
+
+Open work after L9:
+
+| Issue       | Problem                                                                      |
+| ----------- | ---------------------------------------------------------------------------- |
+| `anki-cfr6` | the French cull fails G2 and G4 after the sense test removes a lemma         |
+| `anki-o1vk` | a fresh Mandarin core build fails K6; the build and K6 use two lemma sets    |
+
+The "Distinct lemmas" line of the cull report still counts a lemma that failed
+`sense`. The line has no issue yet.
 
 ## 6. Verification
 
