@@ -399,7 +399,7 @@ def test_gate_card_templates_fails_on_a_second_template(tmp_path: Path) -> None:
     _add_second_template(output)
 
     rows = cullgates.run_gates(
-        cullgates.GATES, cullgates.cull_files(output, cull_fr.FRENCH_CULL_PROFILE)
+        cullgates.GATES, cullgates.CullFiles(output, cull_fr.FRENCH_CULL_PROFILE)
     )
     message = dict((gate, passed) for gate, passed, _ in rows)["G15"]
 
@@ -419,7 +419,7 @@ def test_gate_card_templates_fails_on_a_wrong_front(tmp_path: Path) -> None:
         package.save()
 
     rows = cullgates.run_gates(
-        cullgates.GATES, cullgates.cull_files(output, cull_fr.FRENCH_CULL_PROFILE)
+        cullgates.GATES, cullgates.CullFiles(output, cull_fr.FRENCH_CULL_PROFILE)
     )
     message = dict((gate, passed) for gate, passed, _ in rows)["G15"]
 
@@ -505,7 +505,7 @@ def test_run_gates_passes_on_a_tiny_output(
     monkeypatch.setattr(coreflow, "probe_audio", _fake_probe)
 
     rows = cullgates.run_gates(
-        cullgates.GATES, cullgates.cull_files(output, cull_fr.FRENCH_CULL_PROFILE)
+        cullgates.GATES, cullgates.CullFiles(output, cull_fr.FRENCH_CULL_PROFILE)
     )
 
     assert [gate for gate, _passed, _message in rows] == [

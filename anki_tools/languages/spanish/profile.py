@@ -29,7 +29,6 @@ from anki_tools.sentence_pack.word_table import (
     read_csv_rows,
     read_swadesh_labels as shared_read_swadesh_labels,
     read_word_review as shared_read_word_review,
-    summarize_word_table,
 )
 from anki_tools.sentence_pack.cards import (
     build_sentence_row,
@@ -739,28 +738,6 @@ def form_problem(form: str) -> str | None:
     return None
 
 
-def word_table_report(table: list[WordForm]) -> dict[str, Any]:
-    """Summarize the Spanish word table.
-
-    :param table: Word table from :func:`load_word_table`.
-    :returns: Counts, the low Zipf forms, and the noun gender coverage.
-    """
-    return summarize_word_table(
-        table,
-        form_key=lambda form: form.spanish,
-        zipf_min=MIN_ZIPF,
-        extra=_report_extras,
-    )
-
-
-def _report_extras(table: list[WordForm]) -> dict[str, Any]:
-    nouns = [form for form in table if form.swadesh_index in NOUN_INDICES]
-    return {
-        "nouns": len(nouns),
-        "nouns_with_gender": sum(1 for form in nouns if form.gender),
-    }
-
-
 def make_candidate(
     facts: Any, target: str, tier: str, covered: frozenset[str]
 ) -> Candidate:
@@ -1053,26 +1030,6 @@ def gate_pair_parts(
     if bad:
         return False, f"{len(bad)} card(s) lose a part: {sample(bad)}"
     return True, f"{checked} pair card(s) keep their parts"
-
-
-def gate_noun_gender(
-    inputs: AuditInputs, profile: LanguageProfile
-) -> tuple[bool, str]:
-    """Spanish gate G20: report the noun rows with an empty gender.
-
-    :param inputs: Lazy file reader of the audit.
-    :param profile: Language profile.
-    :returns: Pass flag and detail text. A reported count is not a failure.
-    """
-    table = inputs.table()
-    nouns = [form for form in table if form.swadesh_index in NOUN_INDICES]
-    empty = sorted(form.spanish for form in nouns if not form.gender)
-    if empty:
-        return True, (
-            f"{len(empty)} of {len(nouns)} noun row(s) have no gender: "
-            f"{sample(empty)}"
-        )
-    return True, f"{len(nouns)} noun row(s) have a gender"
 
 
 def spanish_gates() -> tuple[tuple[str, Any], ...]:

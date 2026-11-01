@@ -27,7 +27,6 @@ from anki_tools.apkg.templates import (
 )
 from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.languages import LANGUAGES
-from anki_tools.languages.registry import vocab_languages
 
 ROOT = Path(__file__).parent.parent
 
@@ -349,7 +348,3 @@ def build_vocab_deck(language: str, prune: bool = True) -> deck_writer.RunFiles 
     layout = _build_layout(config, entries)
     return _pack_apkg(config, entries, layout, prune)
 
-
-def vocab_language_names() -> tuple[str, ...]:
-    """Give the languages that have a vocabulary deck."""
-    return tuple(vocab_languages())

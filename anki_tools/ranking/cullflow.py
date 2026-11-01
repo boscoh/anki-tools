@@ -509,36 +509,6 @@ def reserve_lemma_sets(
     return lemma_sets(nlp_tokens, profile.content_pos)
 
 
-def dedupe_reserve(
-    reserve: Sequence[ReserveCard],
-    reserve_sets: Sequence[set[str]],
-    cards: Sequence[InputCard],
-    tokens: Sequence[Sequence[tuple[str, str]]],
-    similarity: float = 0.67,
-    *,
-    content_pos: frozenset[str],
-) -> list[ReserveCard]:
-    """Drop the reserve cards that the input deck already holds.
-
-    A reserve card is a duplicate when its sentence is in the input deck, or
-    when its lemma Jaccard against an input card reaches the limit.
-
-    :param reserve: Reserve cards.
-    :param reserve_sets: Content lemmas per reserve card.
-    :param cards: Input cards.
-    :param tokens: Lemma and part of speech per input card.
-    :param similarity: Lemma Jaccard limit of a duplicate pair.
-    :param content_pos: Parts of speech that count as content, empty for every
-        token.
-    :raises ValueError: A card list and its token list differ in size.
-    :returns: The reserve cards that the input deck does not hold, in order.
-    """
-    kept, _sets = dedupe_reserve_sets(
-        reserve, reserve_sets, cards, tokens, similarity, content_pos=content_pos
-    )
-    return kept
-
-
 def dedupe_reserve_sets(
     reserve: Sequence[ReserveCard],
     reserve_sets: Sequence[set[str]],

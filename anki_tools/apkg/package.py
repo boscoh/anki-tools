@@ -243,14 +243,6 @@ class AnkiPackage:
         """
         return self._db_format
 
-    @property
-    def _is_anki21(self) -> bool:
-        """Backward compatibility property for Anki 2.1+ formats.
-
-        :returns: True if format is anki21 or anki21b.
-        """
-        return self._db_format in ("anki21", "anki21b")
-
     def media_dir(self) -> str | None:
         """Give the directory with the unpacked media files.
 
@@ -1007,7 +999,6 @@ class AnkiPackage:
         .. code-block:: python
 
             filename = pkg.add_media_file("/path/to/audio.mp3")
-            pkg._add_audio_to_card(note_id, 0, filename)
         """
         return media.add(self, file_path, filename)
 
@@ -1151,47 +1142,6 @@ class AnkiPackage:
             [card[column] for column in card_columns],
         )
         conn.commit()
-        self._modified = True
-
-    def _add_audio_to_card(
-        self, note_id: int, field_index: int, audio_filename: str
-    ) -> None:
-        """
-        Add an audio reference to a card field.
-
-        :param note_id: The note ID.
-        :param field_index: Zero-based index of the field to add audio to.
-        :param audio_filename: Audio filename (e.g., ``"hello.mp3"``).
-        :raises ValueError: If note not found or field_index out of range.
-        """
-        cursor = self.conn.cursor()
-        cursor.execute("SELECT flds FROM notes WHERE id = ?", (note_id,))
-        row = cursor.fetchone()
-        if not row:
-            raise ValueError(f"Note {note_id} not found")
-
-        fields = row[0].split("\x1f")
-        if field_index >= len(fields):
-            raise ValueError(f"Field index {field_index} out of range")
-
-        # Add audio tag if not already present
-        audio_tag = f"[sound:{audio_filename}]"
-        if audio_tag not in fields[field_index]:
-            fields[field_index] += " " + audio_tag
-
-        updated_flds = "\x1f".join(fields)
-
-        mod_time = int(time.time() * 1000)
-
-        cursor.execute(
-            """
-            UPDATE notes 
-            SET flds = ?, mod = ?
-            WHERE id = ?
-        """,
-            (updated_flds, mod_time, note_id),
-        )
-        self.conn.commit()
         self._modified = True
 
     def _get_audio_files_for_note(self, note_id: int) -> set[str]:

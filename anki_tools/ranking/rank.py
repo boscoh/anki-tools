@@ -18,8 +18,6 @@ import re
 from dataclasses import dataclass, field
 from typing import Callable, Sequence
 
-from wordfreq import iter_wordlist
-
 from anki_tools.apkg.package import AnkiPackage
 
 # =============================================================================
@@ -195,33 +193,6 @@ def extract_sentences(
 # =============================================================================
 # Phase 2: Frequency Data Loading
 # =============================================================================
-
-
-def load_wordfreq_data(
-    lang: str,
-    *,
-    lower_keys: bool = False,
-    char_filter: Callable[[str], bool] | None = None,
-) -> FrequencyData:
-    """Load the ``wordfreq`` list of one language.
-
-    :param lang: ``wordfreq`` language code, for example ``fr``.
-    :param lower_keys: Store the words with lowercase keys.
-    :param char_filter: Fill the character ranks from the letters that pass
-        this test. No character ranks are built when it is None.
-    :returns: Filled :class:`FrequencyData`.
-    """
-    data = FrequencyData()
-    for rank, word in enumerate(iter_wordlist(lang, wordlist="best"), 1):
-        key = word.lower() if lower_keys else word
-        data.word_freq[key] = rank
-    if char_filter is not None:
-        for word, rank in data.word_freq.items():
-            for char in word:
-                if char_filter(char) and char not in data.char_freq:
-                    data.char_freq[char] = rank
-    print(f"Loaded {len(data.word_freq)} words from wordfreq")
-    return data
 
 
 

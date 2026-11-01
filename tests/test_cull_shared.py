@@ -739,7 +739,7 @@ def test_gate_output_model_reports_a_spare_field(tmp_path: Path) -> None:
     _add_spare_field(output, "Difficulty")
 
     passed, message = cullgates.gate_output_model(
-        cullgates.cull_files(output, profile)
+        cullgates.CullFiles(output, profile)
     )
 
     assert not passed
@@ -749,7 +749,7 @@ def test_gate_output_model_reports_a_spare_field(tmp_path: Path) -> None:
 def test_gate_core_word_reports_an_empty_core(tmp_path: Path) -> None:
     profile = _sense_profile(tmp_path)
     output = _run_tiny_cull(tmp_path, profile)
-    files = cullgates.cull_files(output, profile)
+    files = cullgates.CullFiles(output, profile)
     passed, message = cullgates.gate_core_word(files)
     notes = files.notes()
     fields = files.output()["fields"]

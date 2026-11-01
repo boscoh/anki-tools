@@ -51,7 +51,6 @@ from anki_tools.sentence_pack.word_table import (
     form_positions as shared_form_positions,
     read_csv_rows,
     read_swadesh_labels,
-    summarize_word_table,
 )
 from anki_tools.sentence_pack.cards import (
     build_sentence_row,
@@ -466,53 +465,6 @@ def check_word_table(
     return failures
 
 
-def word_table_report(table: list[WordForm]) -> dict[str, Any]:
-    """Summarize the word table.
-
-    :param table: Word table from :func:`load_word_table`.
-    :returns: Counts of words and forms, the low Zipf forms, and the forms
-        with no candidate sentence. ``uncovered`` stays empty until S2.
-    """
-    return summarize_word_table(
-        table,
-        form_key=lambda form: form.mandarin,
-        zipf_min=MIN_ZIPF,
-        extra=_report_extras,
-    )
-
-
-def _report_extras(table: list[WordForm]) -> dict[str, Any]:
-    return {
-        "primary_forms": sum(1 for form in table if form.variant == "primary"),
-        "alternate_forms": sum(1 for form in table if form.variant == "alternate"),
-        "core_forms": sum(1 for form in table if form.tier == "core"),
-        "uncovered": [],
-    }
-
-
-def print_word_table_report(report: dict[str, Any]) -> None:
-    """Print a word table report.
-
-    :param report: Mapping from :func:`word_table_report`.
-    """
-    print(
-        f"words={report['words']} forms={report['forms']} "
-        f"unique={report['unique_forms']} "
-        f"primary={report['primary_forms']} "
-        f"alternate={report['alternate_forms']}"
-    )
-    print(
-        f"zipf<{MIN_ZIPF}: {report['zipf_below_3']} "
-        f"uncovered={len(report['uncovered'])}"
-    )
-    low_forms = report.get("low_zipf_forms", [])
-    if low_forms:
-        print(
-            "low zipf forms: "
-            + ", ".join(f"{form} {score}" for form, score in low_forms)
-        )
-
-
 def load_user_dictionary(word_table: list[WordForm]) -> None:
     """Add the word-table forms to the jieba user dictionary.
 
@@ -592,16 +544,6 @@ def tokens_with_pos(sentence: str) -> list[tuple[str, str]]:
         for word, flag in _tokens(sentence)
         if word and all(is_chinese_char(char) for char in word)
     ]
-
-
-def count_form_tokens(sentence: str, form: str) -> int:
-    """Count the tokens of a sentence that equal one form.
-
-    :param sentence: Simplified Chinese sentence.
-    :param form: Word-table form.
-    :returns: Token count of the form.
-    """
-    return sum(1 for word in han_tokens(sentence) if word == form)
 
 
 def form_occurrences(sentence: str, form: str) -> list[int]:

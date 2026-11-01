@@ -41,7 +41,6 @@ from anki_tools.sentence_pack.word_table import (
     read_csv_rows,
     read_swadesh_labels as shared_read_swadesh_labels,
     read_word_review as shared_read_word_review,
-    summarize_word_table,
 )
 from anki_tools.sentence_pack.cards import (
     build_sentence_row,
@@ -661,28 +660,6 @@ def check_word_table(
             f"{form.swadesh_index} and no review row"
         )
     return failures
-
-
-def word_table_report(table: list[WordForm]) -> dict[str, Any]:
-    """Summarize the Greek word table.
-
-    :param table: Word table from :func:`load_word_table`.
-    :returns: Counts, the low Zipf forms, and the uncovered forms.
-    """
-    return summarize_word_table(
-        table,
-        form_key=lambda form: form.greek,
-        zipf_min=MIN_ZIPF,
-        extra=_report_extras,
-    )
-
-
-def _report_extras(table: list[WordForm]) -> dict[str, Any]:
-    return {
-        "gender_forms": sum(1 for form in table if form.gender),
-        "shared_forms": sum(1 for form in table if form.variant == "shared"),
-        "uncovered": [],
-    }
 
 
 def make_candidate(

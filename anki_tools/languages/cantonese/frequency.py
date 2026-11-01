@@ -394,21 +394,6 @@ def han_tokens(tokenizer: Tokenizer, text: str) -> list[str]:
     return [token for token in tokenizer.lcut(text) if _HAN.search(token)]
 
 
-def spoken_token_coverage(
-    tokenizer: Tokenizer, texts: list[str], cifu: dict[str, CifuEntry]
-) -> float:
-    """Share of Han tokens that have a spoken count in Cifu (gate G2).
-
-    :param tokenizer: Cantonese tokenizer.
-    :param texts: Sentence texts.
-    :param cifu: Cifu entries.
-    :returns: A value between 0 and 1.
-    """
-    tokens = [token for text in texts for token in han_tokens(tokenizer, text)]
-    if not tokens:
-        return 0.0
-    return sum(1 for t in tokens if t in cifu and cifu[t].spoken > 0) / len(tokens)
-
 
 # =============================================================================
 # Apple Daily written frequency download and rank tables

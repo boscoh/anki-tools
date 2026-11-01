@@ -40,7 +40,7 @@ Shared ranking code only. No language data.
 | Path                              | Content                                               |
 | --------------------------------- | ----------------------------------------------------- |
 | `anki_tools/ranking/rank.py`      | Sentence data, frequency tables, shared score drivers |
-| `anki_tools/ranking/latin.py`     | Shared Latin-script text helpers and word metrics     |
+| `anki_tools/ranking/latin.py`     | Shared Latin-script text helpers                      |
 | `anki_tools/ranking/reorder.py`   | Reorder a deck from a ranking CSV                     |
 | `anki_tools/ranking/cover.py`     | Generic greedy cover over items with changing gains   |
 | `anki_tools/ranking/core.py`      | Core-word value, cost, passes, and order              |

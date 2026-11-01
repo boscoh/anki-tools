@@ -86,15 +86,6 @@ def _sentences(output: dict[str, Any]) -> list[str]:
     return [card.sentence for card in output["cards"]]
 
 
-def cull_files(apkg_path: Path, profile: CullProfile) -> CullFiles:
-    """Build the file reader of an output APKG.
-
-    :param apkg_path: Output APKG file.
-    :param profile: Language hooks.
-    :returns: A lazy reader for the APKG and its three side files.
-    """
-    return CullFiles(apkg_path, profile)
-
 
 
 

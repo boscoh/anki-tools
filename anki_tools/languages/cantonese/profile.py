@@ -57,7 +57,6 @@ from anki_tools.sentence_pack.word_table import (
     read_csv_rows,
     read_swadesh_labels as shared_read_swadesh_labels,
     read_word_review as shared_read_word_review,
-    summarize_word_table,
 )
 from anki_tools.sentence_pack.cards import (
     build_sentence_row,
@@ -460,26 +459,6 @@ def check_word_table(
     return failures
 
 
-def word_table_report(table: list[WordForm]) -> dict[str, Any]:
-    """Summarize the Cantonese word table.
-
-    :param table: Word table from :func:`load_word_table`.
-    :returns: Counts and the low Zipf forms.
-    """
-    return summarize_word_table(
-        table,
-        form_key=lambda form: form.cantonese,
-        zipf_min=MIN_ZIPF,
-        extra=_report_extras,
-    )
-
-
-def _report_extras(table: list[WordForm]) -> dict[str, Any]:
-    return {
-        "phrase_forms": sum(1 for form in table if form.form_kind == "phrase"),
-    }
-
-
 def _tokenizer_from_cifu() -> jieba.Tokenizer:
     path = cifu_path()
     if not path.exists():
@@ -531,15 +510,6 @@ def han_spans(sentence: str) -> tuple[tuple[str, int, int], ...]:
         for word, start, end in tokenizer().tokenize(sentence)
         if word and all(is_chinese_char(char) for char in word)
     )
-
-
-def han_stream(sentence: str) -> str:
-    """Join the Han characters of a sentence.
-
-    :param sentence: Traditional Cantonese sentence.
-    :returns: The Han characters in order, with no punctuation.
-    """
-    return "".join(get_chinese_chars(sentence))
 
 
 @lru_cache(maxsize=1)

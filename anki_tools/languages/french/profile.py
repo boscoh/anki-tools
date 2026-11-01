@@ -47,7 +47,6 @@ from anki_tools.sentence_pack.word_table import (
     read_csv_rows,
     read_swadesh_labels as shared_read_swadesh_labels,
     read_word_review as shared_read_word_review,
-    summarize_word_table,
 )
 from anki_tools.sentence_pack.cards import (
     build_sentence_row,
@@ -753,28 +752,6 @@ def form_problem(form: str) -> str | None:
         if not char.isalpha():
             return f"character outside the French set: {char}"
     return None
-
-
-def word_table_report(table: list[WordForm]) -> dict[str, Any]:
-    """Summarize the French word table.
-
-    :param table: Word table from :func:`load_word_table`.
-    :returns: Counts, the low Zipf forms, and the noun gender coverage.
-    """
-    return summarize_word_table(
-        table,
-        form_key=lambda form: form.french,
-        zipf_min=MIN_ZIPF,
-        extra=_report_extras,
-    )
-
-
-def _report_extras(table: list[WordForm]) -> dict[str, Any]:
-    nouns = [form for form in table if form.swadesh_index in NOUN_INDICES]
-    return {
-        "nouns": len(nouns),
-        "nouns_with_gender": sum(1 for form in nouns if form.gender),
-    }
 
 
 def make_candidate(
