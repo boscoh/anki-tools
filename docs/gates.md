@@ -20,7 +20,7 @@ checks. A doc row, a report line, and an issue must name the flow with the id.
 | --------------- | ---------------------------------- | ----------------------------------------------- | ----- |
 | Sentence pack   | `anki swadesh pack <lang>`         | G1 to G19, one list for each language           | 15-16 |
 | Cull deck       | `anki fix <lang> <input> --select` | G1, G2, G5, G6                                  | 4     |
-| Core deck       | `anki fix <lang> <input> --core`   | K5, K6, K13                                     | 3     |
+| Core deck       | `anki fix <lang> <input> --core`   | K5, K6, K13, K23                                | 4     |
 | Vocabulary deck | `anki swadesh vocab <lang>`        | none                                            | 0     |
 
 The pack lists differ by language:
@@ -57,10 +57,14 @@ parameter.
 | G1  | `gate_card_cap`           | The deck has the cap number of cards, or the pool ends.   |
 | G2  | `gate_use_cap`            | No lemma appears in more cards than the cap.              |
 | K13 | `gate_target_in_sentence` | Each card sentence holds its target word.                 |
+| K23 | `gate_coverage_floor`     | The share of targets with a kept card reaches the floor.  |
 
-The pack has more checks, for example G10 coverage. The cull and the core have
-no coverage gate (ADR 0045, ADR 0046). They have no gate on the share of targets
-with one card or two cards (ADR 0033).
+The pack has more checks, for example G10 coverage. The cull has no coverage
+gate (ADR 0045, ADR 0046). The core has one floor gate, K23 (ADR 0048). The
+floor is `coverage_floor` in the language core profile: the current share
+rounded down to 0.05. It is a ratchet, and a drop below it means the selection
+or the input got worse. Neither flow has a gate on the share of targets with one
+card or two cards (ADR 0033).
 
 ### Retired ids
 
@@ -69,7 +73,7 @@ A removed row leaves a gap in the numbering. The ids are not reused.
 | Flow | Retired ids                                                    | ADR                          |
 | ---- | -------------------------------------------------------------- | ---------------------------- |
 | Cull | G3, G4, G7 to G18                                              | 0033, 0035, 0039 to 0045     |
-| Core | K1 to K4, K7 to K12, K14 to K22                                | 0038 to 0044, 0046           |
+| Core | K1 to K4, K7 to K12, K14 to K22                               | 0038 to 0044, 0046           |
 | Pack | sense, attribution, typography, license, and script gates      | 0039                         |
 
 ## 3. The gate contract

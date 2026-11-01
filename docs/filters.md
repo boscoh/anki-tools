@@ -165,7 +165,7 @@ row by tier and word. A blank `tier` is `F`.
   no failure for it.
 - Greek has no core flow. `vocab/greek_core_senses.tsv` holds tier S rows only.
 - `vocab/english_senses.json` gives the sense words of a Swadesh gloss. WordNet
-  builds it.
+  builds it from the first synset of each gloss word (ADR 0048).
 
 `sense` does not replace the shape rules or `unique`. Core `K13` (form in the
 sentence) stays.

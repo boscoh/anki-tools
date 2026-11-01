@@ -128,3 +128,27 @@ def test_read_senses_of_a_missing_file_is_empty(tmp_path: Path) -> None:
 def test_sense_stage_is_in_the_filter_report() -> None:
     assert "sense" in FILTER_KEYS
     assert FILTER_NAMES["sense"] == "english sense"
+
+
+GLOSS_SIZE_BOUND = 125
+
+
+@pytest.mark.parametrize(
+    ("gloss", "loose"),
+    [
+        ("big", ["bad", "adult", "great", "heavy"]),
+        ("fish", ["angle", "angling"]),
+        ("sun", ["insolate", "sunday"]),
+    ],
+)
+def test_gloss_list_rejects_loose_words(gloss: str, loose: list[str]) -> None:
+    words = load_senses()[gloss].words
+    assert not words.intersection(loose)
+
+
+def test_gloss_list_size_is_bounded() -> None:
+    sizes = {
+        gloss: len(sense.words) + len(sense.phrases)
+        for gloss, sense in load_senses().items()
+    }
+    assert max(sizes.values()) <= GLOSS_SIZE_BOUND, sizes

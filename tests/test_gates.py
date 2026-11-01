@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 from anki_tools.gate_files import GateFileReader
-from anki_tools.ranking import gates
+from anki_tools.ranking import coregates, gates
 
 
 class _Files:
@@ -78,3 +79,27 @@ def test_the_report_prints_one_table(capsys) -> None:
 
     assert "FAIL" in failed
     assert "1 of 1 gates failed: G1" in failed
+
+
+class _CoverageFiles:
+    """Reader with one coverage table and one profile floor."""
+
+    def __init__(self, counts: list[str], floor: float) -> None:
+        self._rows = [{"count": count} for count in counts]
+        self.profile = SimpleNamespace(coverage_floor=floor)
+
+    def coverage(self) -> list[dict[str, str]]:
+        return self._rows
+
+
+@pytest.mark.parametrize(
+    ("counts", "passed"),
+    [(["2", "1", "1", "0", "0"], True), (["2", "1", "0", "0", "0"], False)],
+)
+def test_coverage_floor_counts_absent_targets_as_not_covered(
+    counts: list[str], passed: bool
+) -> None:
+    ok, message = coregates.gate_coverage_floor(_CoverageFiles(counts, 0.6))
+
+    assert ok is passed
+    assert "floor 0.60" in message

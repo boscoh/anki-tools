@@ -1,4 +1,4 @@
-"""Shared gates K5, K6, and K13 of the core deck. The other ids K1 to K22 are retired.
+"""Shared gates K5, K6, K13, and K23 of the core deck. The ids K1 to K22 are retired.
 
 The gates read the output APKG, the two CSV files, and the manifest. A gate
 never writes a file. A language package supplies the
@@ -42,6 +42,7 @@ __all__ = [
     "Gate",
     "GateResult",
     "check_core",
+    "gate_coverage_floor",
     "gate_filter_recheck",
     "gate_target_in_sentence",
     "gate_similarity",
@@ -162,17 +163,33 @@ def gate_target_in_sentence(files: CoreFiles) -> tuple[bool, str]:
                 bad.append(f"{word} in {card.sentence}")
     return not bad, f"{len(bad)} bad hit(s): {_sample(bad)}"
 
+def gate_coverage_floor(files: CoreFiles) -> tuple[bool, str]:
+    """K23: the share of coverage rows with a kept card reaches the floor.
+
+    The floor is the ``coverage_floor`` of the language profile. It is a
+    ratchet: a drop below it means the selection or the input got worse. An
+    absent target counts as not covered.
+    """
+    coverage = files.coverage()
+    covered = sum(1 for row in coverage if int(row["count"]) >= 1)
+    floor = files.profile.coverage_floor
+    share = covered / len(coverage) if coverage else 0.0
+    return (
+        share >= floor,
+        f"{covered} of {len(coverage)} target(s) covered, share {share:.3f}, floor {floor:.2f}",
+    )
 
 
 GATES: tuple[Gate, ...] = (
     Gate("K5", gate_filter_recheck),
     Gate("K6", gate_similarity),
     Gate("K13", gate_target_in_sentence),
+    Gate("K23", gate_coverage_floor),
 )
 
 
 def check_core(output_path: Path, profile: CoreProfile) -> int:
-    """Run gates K5, K6, and K13 on the files of a core output.
+    """Run gates K5, K6, K13, and K23 on the files of a core output.
 
     :param output_path: Output APKG file.
     :param profile: Language hooks.

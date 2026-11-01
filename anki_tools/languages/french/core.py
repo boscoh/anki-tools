@@ -45,4 +45,5 @@ FRENCH_CORE_PROFILE = cull.FRENCH_LANGUAGE.core(
     internal_marks=FRENCH.internal_marks,
     default_options=DEFAULT_OPTIONS,
     frequency_source=str(cull.FREQUENCY_PATH),
+    coverage_floor=0.80,
 )

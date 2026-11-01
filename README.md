@@ -346,7 +346,7 @@ The flags:
 - `--words` adds content lemmas in blended frequency order.
 - `--cards` sets the card cap.
 - `--output` sets the path. The default is `apkg/<language>_core.apkg`.
-- `--check` runs the gates K5, K6, and K13 on the built deck.
+- `--check` runs the gates K5, K6, K13, and K23 on the built deck.
 
 The core list starts with the reviewed Swadesh forms of the language. The
 selection is a greedy cover. Each card has a value from the target examples

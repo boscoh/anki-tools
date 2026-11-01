@@ -140,7 +140,7 @@ def exception_surfaces(fname: str) -> dict[str, set[str]]:
     """
     surfaces: dict[str, set[str]] = collections.defaultdict(set)
     for line in wn.open(fname):
-        parts = line.strip().split()
+        parts = str(line).strip().split()
         if len(parts) < 2:
             continue
         for base in parts[1:]:
@@ -251,10 +251,13 @@ def gloss_forms(
         synsets = []
         for text in (part, part.replace(" ", "_")):
             synsets += wn.synsets(text, pos=pos) if pos else wn.synsets(text)
-        for synset in synsets:
+        for synset in synsets[:1]:
             found_words, found_phrases = expand(synset, exceptions)
             words |= found_words
             phrases |= found_phrases
+        if " " not in part:
+            for part_pos in (pos,) if pos else (wn.NOUN, wn.VERB, wn.ADJ):
+                words |= inflections(part, part_pos, exceptions)
     if " " in base:
         phrases.add(base)
     else:

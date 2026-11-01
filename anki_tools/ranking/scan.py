@@ -54,6 +54,9 @@ class CoreProfile:
         pack.
     :param default_options: Selection settings of the core cover.
     :param frequency_source: Label of the frequency source for the manifest.
+    :param coverage_floor: Lowest share of core targets that hold at least one
+        kept card. Gate K23 reads it. It is a ratchet: set it to the current
+        share, rounded down to 0.05.
     :param lemma_overrides: Lemma repair map of the lemmatizer artefacts,
         applied by :func:`scan` to the tokens of every card.
     :param finalize: Post-processing step of the written deck, called with
@@ -90,6 +93,7 @@ class CoreProfile:
     unit_count: Callable[[str], int]
     default_options: Any
     frequency_source: str
+    coverage_floor: float
     lemma_overrides: Mapping[str, str] = field(default_factory=dict)
     finalize: Callable[[Any], None] | None = None
     romanization_source: str | None = None

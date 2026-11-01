@@ -197,5 +197,6 @@ SPANISH_CORE_PROFILE = SPANISH_LANGUAGE.core(
     internal_marks=SPANISH.internal_marks,
     default_options=DEFAULT_OPTIONS,
     frequency_source=str(FREQUENCY_PATH),
+    coverage_floor=0.85,
     lemma_overrides=LEMMA_OVERRIDES,
 )
