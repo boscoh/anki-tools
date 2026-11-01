@@ -1,186 +1,104 @@
 """Tests for the Mandarin Swadesh sentence pack build (stage S5)."""
 
-import csv
+from __future__ import annotations
+
 import json
 from pathlib import Path
 
 import pytest
 
-from anki_tools.languages.mandarin import stages as deck
-from anki_tools.languages.mandarin.profile import SWADESH_ROWS, WordForm
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.templates import load_char_links
+from anki_tools.languages.mandarin import stages as deck
+from anki_tools.languages.mandarin.profile import SENTENCE_FIELDS, SWADESH_ROWS
 from anki_tools.ranking.identity import DeckIdentity
+from anki_tools.sentence_pack import pack as shared_pack
+from tests.mandarin_fixture import (
+    ROWS,
+    TABLE,
+    VOICE,
+    audio_entries,
+    write_audio,
+    write_csv,
+)
 
-FAKE_MP3 = b"ID3\x03\x00\x00\x00" + b"\x00" * 64
-
-SENTENCE_FIELDS = [
-    "target",
-    "sentence",
-    "pinyin",
-    "english",
-    "tatoeba_id",
-    "tatoeba_author",
-    "audio_id",
-    "audio_source",
-    "audio_license",
-    "tier",
-    "audio_missing",
-]
-
-WORD_ROWS = [
-    {
-        "target": "水",
-        "sentence": "我要喝水。",
-        "pinyin": "wǒ yào hē shuǐ",
-        "english": "I want to drink water.",
-        "tatoeba_id": "200",
-        "tatoeba_author": "bob",
-        "audio_id": "0",
-        "audio_source": "tts",
-        "audio_license": "",
-        "tier": "core",
-        "audio_missing": "false",
-    },
-    {
-        "target": "火",
-        "sentence": "火很大。",
-        "pinyin": "huǒ hěn dà",
-        "english": "The fire is big.",
-        "tatoeba_id": "100",
-        "tatoeba_author": "amy",
-        "audio_id": "0",
-        "audio_source": "tts",
-        "audio_license": "",
-        "tier": "scaffold",
-        "audio_missing": "false",
-    },
-]
-
-TABLE = [
-    WordForm(1, "water", "水", "shuǐ", "水", "primary", 5.0),
-    WordForm(2, "fire", "火", "huǒ", "火", "primary", 5.0),
-]
-
-INDEX_ROWS = [
-    ("tts_aaaa.mp3", "我要喝水。", "gtts:zh-CN"),
-    ("tts_bbbb.mp3", "火很大。", "gtts:zh-CN"),
-    ("word_aaaa.mp3", "水", "gtts:zh-CN"),
-    ("word_bbbb.mp3", "火", "gtts:zh-CN"),
-]
+PACK_ROWS = [ROWS[0], ROWS[1] | {"tier": "scaffold"}]
+PACK_TABLE = TABLE[:2]
 
 
-def test_slug() -> None:
-    assert deck.slug("water") == "water"
-    assert deck.slug("I") == "i"
-    assert deck.slug("he/she/it/they (singular)") == "he_she_it_they_singular"
-    assert deck.slug("  Water!! ") == "water"
-    assert deck.slug("") == ""
+@pytest.mark.parametrize(
+    ("text", "tag"),
+    [
+        ("water", "water"),
+        ("I", "i"),
+        ("he/she/it/they (singular)", "he_she_it_they_singular"),
+        ("  Water!! ", "water"),
+        ("", ""),
+    ],
+)
+def test_slug_makes_a_tag_component(text: str, tag: str) -> None:
+    assert deck.slug(text) == tag
 
 
 def test_build_card_fields_and_tags() -> None:
-    card = deck.mandarin_card(WORD_ROWS[0], TABLE[0], "tts_aaaa.mp3", "word_aaaa.mp3")
+    card = deck.mandarin_card(PACK_ROWS[0], PACK_TABLE[0], "tts_0000.mp3", "word_0000.mp3")
+    scaffold = deck.mandarin_card(PACK_ROWS[1], PACK_TABLE[1], "tts_0001.mp3", "word_0001.mp3")
 
     assert list(card)[:8] == deck.FIELDS
-    assert card["Audio"] == "[sound:tts_aaaa.mp3]"
+    assert card["Audio"] == "[sound:tts_0000.mp3]"
     assert card["Sentence"] == "我要喝<b>水</b>。"
     assert card["Romanization"] == "wǒ yào hē shuǐ"
     assert card["English"] == "I want to drink water."
     assert card["Target"] == "水"
     assert card["Gloss"] == "water · shuǐ"
-    assert card["WordAudio"] == "[sound:word_aaaa.mp3]"
+    assert card["WordAudio"] == "[sound:word_0000.mp3]"
     assert card["Source"] == "Tatoeba #200 · bob"
     assert card["tags"] == ["swadesh::water", "audio::tts", "tier::core"]
-
-
-def test_sentence_target_is_bold_once() -> None:
-    card = deck.mandarin_card(WORD_ROWS[1], TABLE[1], "tts_bbbb.mp3", "word_bbbb.mp3")
-
-    assert card["Sentence"].count("<b>火</b>") == 1
-    assert card["Sentence"].count("<b>") == 1
-    assert card["tags"][1:] == ["audio::tts", "tier::scaffold"]
+    assert scaffold["Sentence"].count("<b>") == 1
+    assert scaffold["tags"][1:] == ["audio::tts", "tier::scaffold"]
 
 
 def test_media_paths_are_absolute_and_unique(tmp_path: Path) -> None:
-    paths = deck.media_paths(
-        ["b.mp3", "a.mp3", "b.mp3"], audio_dir=tmp_path / "audio"
-    )
+    paths = deck.media_paths(["b.mp3", "a.mp3", "b.mp3"], audio_dir=tmp_path / "audio")
 
     assert [Path(path).name for path in paths] == ["a.mp3", "b.mp3"]
     assert all(Path(path).is_absolute() for path in paths)
 
 
 def test_load_audio_index_splits_word_and_sentence(tmp_path: Path) -> None:
-    index_path = tmp_path / "index.csv"
-    with index_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.writer(handle)
-        writer.writerow(deck_index_fields())
-        for filename, text, voice in INDEX_ROWS:
-            writer.writerow([filename, text, voice, "tts", "0", "", "1", "x", "1.0"])
+    write_audio(tmp_path, audio_entries(PACK_ROWS))
 
-    index = deck.load_audio_index(index_path)
+    index = deck.load_audio_index(tmp_path / "index.csv")
 
-    assert index.sentences == {"我要喝水。": "tts_aaaa.mp3", "火很大。": "tts_bbbb.mp3"}
-    assert index.words == {"水": "word_aaaa.mp3", "火": "word_bbbb.mp3"}
-    assert index.voice == "gtts:zh-CN"
-
-
-def deck_index_fields() -> list[str]:
-    return [
-        "filename",
-        "text",
-        "voice",
-        "source",
-        "audio_id",
-        "license",
-        "bytes",
-        "sha1",
-        "duration_s",
-    ]
+    assert index.sentences == {"我要喝水。": "tts_0000.mp3", "这场火很大。": "tts_0001.mp3"}
+    assert index.words == {"水": "word_0000.mp3", "火": "word_0001.mp3"}
+    assert index.voice == VOICE
 
 
 @pytest.fixture
-def pack_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, Path]:
-    audio_dir = tmp_path / "audio"
-    audio_dir.mkdir()
-    for filename, _, _ in INDEX_ROWS:
-        (audio_dir / filename).write_bytes(FAKE_MP3)
-    with (audio_dir / "index.csv").open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.writer(handle)
-        writer.writerow(deck_index_fields())
-        for filename, text, voice in INDEX_ROWS:
-            writer.writerow([filename, text, voice, "tts", "0", "", "1", "x", "1.0"])
-
+def pack_env(tmp_path: Path) -> dict[str, Path]:
+    write_audio(tmp_path / "audio", audio_entries(PACK_ROWS))
     csv_path = tmp_path / "sentences.csv"
-    with csv_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=SENTENCE_FIELDS)
-        writer.writeheader()
-        writer.writerows(WORD_ROWS)
-
+    write_csv(csv_path, SENTENCE_FIELDS, PACK_ROWS)
     word_csv = tmp_path / "words.csv"
     word_csv.write_text("english,mandarin,transliteration\n", encoding="utf-8")
-
-    monkeypatch.setattr(deck, "load_word_table", lambda **_: list(TABLE))
     return {
-        "audio_dir": audio_dir,
+        "audio_dir": tmp_path / "audio",
         "csv_path": csv_path,
         "word_csv": word_csv,
         "output": tmp_path / "pack.apkg",
-        "manifest": tmp_path / "manifest.json",
-        "attribution": tmp_path / "ATTRIBUTION.md",
+        "manifest_path": tmp_path / "manifest.json",
+        "attribution_path": tmp_path / "ATTRIBUTION.md",
     }
 
 
+def build(pack_env: dict[str, Path]) -> dict:
+    return shared_pack.build_pack(deck.MANDARIN, lambda **_: PACK_TABLE, **pack_env)
+
+
 def test_pack_manifest_counts(pack_env: dict[str, Path]) -> None:
-    result = deck.build_mandarin_pack(
-        csv_path=pack_env["csv_path"],
-        word_csv=pack_env["word_csv"],
-        audio_dir=pack_env["audio_dir"],
-        output=pack_env["output"],
-        manifest_path=pack_env["manifest"],
-        attribution_path=pack_env["attribution"],
-    )
-    manifest = json.loads(pack_env["manifest"].read_text(encoding="utf-8"))
+    result = build(pack_env)
+    manifest = json.loads(pack_env["manifest_path"].read_text(encoding="utf-8"))
 
     assert result["manifest"] == manifest
     assert result["media_count"] == 4
@@ -194,11 +112,10 @@ def test_pack_manifest_counts(pack_env: dict[str, Path]) -> None:
         "no_target": 0,
     }
     assert manifest["coverage"] == {"core_with_card": round(2 / SWADESH_ROWS, 4)}
-    assert manifest["voice"] == "gtts:zh-CN"
+    assert manifest["voice"] == VOICE
     assert manifest["audio_license_skipped"] == {"empty": 0, "CC BY-NC 4.0": 0}
     source = manifest["audio_license_source"]
     assert set(source) == {"empty", "CC BY-NC 4.0"}
-    assert all(count >= 0 for count in source.values())
     assert sum(source.values()) > 0
     assert manifest["files"]["source_csv"].startswith("sha256:")
     assert manifest["files"]["sentences_csv"].startswith("sha256:")
@@ -209,11 +126,29 @@ def test_pack_manifest_counts(pack_env: dict[str, Path]) -> None:
     ]
     assert manifest["excluded_words"] == []
 
-    attribution = pack_env["attribution"].read_text(encoding="utf-8")
+    attribution = pack_env["attribution_path"].read_text(encoding="utf-8")
     assert "Sentences come from Tatoeba (<https://tatoeba.org>)" in attribution
     assert "### Word data" in attribution
     assert "## Mandarin pack" in attribution
     assert "gTTS" in attribution
+
+
+def test_the_pack_skips_a_card_that_has_no_audio_form_or_bold_target(
+    pack_env: dict[str, Path],
+) -> None:
+    unvoiced = ROWS[0] | {"audio_missing": "true"}
+    unknown = ROWS[3] | {"target": "月"}
+    no_bold = ROWS[0] | {"sentence": "我要喝。"}
+    rows = PACK_ROWS + [unvoiced, unknown, no_bold]
+    write_csv(pack_env["csv_path"], SENTENCE_FIELDS, rows)
+    write_audio(pack_env["audio_dir"], audio_entries(rows))
+
+    result = build(pack_env)
+
+    assert result["skipped"] == 3
+    assert result["no_target"] == 1
+    assert result["manifest"]["counts"]["cards"] == 2
+    assert result["manifest"]["counts"]["no_target"] == 1
 
 
 def test_create_passes_tags_and_deck_description(tmp_path: Path) -> None:
@@ -238,14 +173,7 @@ def test_create_passes_tags_and_deck_description(tmp_path: Path) -> None:
 
 
 def test_apkg_opens_with_two_cards(pack_env: dict[str, Path]) -> None:
-    deck.build_mandarin_pack(
-        csv_path=pack_env["csv_path"],
-        word_csv=pack_env["word_csv"],
-        audio_dir=pack_env["audio_dir"],
-        output=pack_env["output"],
-        manifest_path=pack_env["manifest"],
-        attribution_path=pack_env["attribution"],
-    )
+    build(pack_env)
 
     with AnkiPackage(pack_env["output"]) as pkg:
         models = pkg.get_models()

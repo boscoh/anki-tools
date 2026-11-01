@@ -1,187 +1,117 @@
 """Tests for the Mandarin Swadesh quality gates (G1 to G16)."""
 
-import csv
+from __future__ import annotations
+
 import hashlib
 import json
 from pathlib import Path
+from typing import Any, Sequence
 
 import pytest
 
-from anki_tools.languages.mandarin import stages as audit
-from anki_tools.languages.mandarin.profile import (
-    FIELDS,
-    SENTENCE_FIELDS,
-    WordForm,
-)
-from anki_tools.languages.mandarin.stages import print_audit, run_audit
 from anki_tools.apkg.package import AnkiPackage
+from anki_tools.gates import GateResult
+from anki_tools.languages.mandarin.profile import FIELDS, SENTENCE_FIELDS, WordForm
+from anki_tools.languages.mandarin.stages import GATES, MANDARIN, print_audit
 from anki_tools.ranking.identity import DeckIdentity, default_output
+from anki_tools.sentence_pack.audio import MAX_DURATION_S, MIN_DURATION_S
+from anki_tools.sentence_pack.audit import run_pack_audit
+from tests.deck_fixture import write_mp3s
+from tests.mandarin_fixture import (
+    ROWS,
+    TABLE,
+    audio_entries,
+    card,
+    write_audio,
+    write_csv,
+)
 
 PACK_PATH = default_output("mandarin", "pack")
 MODEL_NAME = DeckIdentity(PACK_PATH).model_name
-FAKE_MP3 = b"ID3\x03\x00\x00\x00" + b"\x00" * 64
-INDEX_FIELDS = [
-    "filename",
-    "text",
-    "voice",
-    "source",
-    "audio_id",
-    "license",
-    "bytes",
-    "sha1",
-    "duration_s",
-]
-REVIEW_FIELDS = [
-    "lang",
-    "index",
-    "english",
-    "current",
-    "canonical",
-    "issue",
-    "fix",
-    "status",
-]
-
-TABLE = [
-    WordForm(1, "water", "水", "shuǐ", "水", "primary", 5.0),
-    WordForm(2, "fire", "火", "huǒ", "火", "primary", 5.0),
-    WordForm(3, "mountain", "山", "shān", "山", "primary", 5.0),
-    WordForm(4, "dog", "狗", "gǒu", "狗", "primary", 5.0),
-    WordForm(5, "bird", "鸟", "niǎo", "鸟", "primary", 5.0),
-]
-
-CARDS = [
-    {
-        "target": "水",
-        "sentence": "我要喝水。",
-        "pinyin": "wǒ yào hē shuǐ",
-        "english": "I want to drink water.",
-        "tatoeba_id": "200",
-        "tatoeba_author": "bob",
-        "audio_source": "tts",
-        "tier": "core",
-        "audio_missing": "false",
-    },
-    {
-        "target": "火",
-        "sentence": "这场火很大。",
-        "pinyin": "zhè chǎng huǒ hěn dà",
-        "english": "This fire is big.",
-        "tatoeba_id": "300",
-        "tatoeba_author": "amy",
-        "audio_source": "tts",
-        "tier": "core",
-        "audio_missing": "false",
-    },
-    {
-        "target": "山",
-        "sentence": "山上有雪。",
-        "pinyin": "shān shàng yǒu xuě",
-        "english": "There is snow on the mountain.",
-        "tatoeba_id": "400",
-        "tatoeba_author": "bob",
-        "audio_source": "tts",
-        "tier": "core",
-        "audio_missing": "false",
-    },
-    {
-        "target": "狗",
-        "sentence": "那只狗很黑。",
-        "pinyin": "nà zhī gǒu hěn hēi",
-        "english": "That dog is black.",
-        "tatoeba_id": "500",
-        "tatoeba_author": "amy",
-        "audio_source": "tts",
-        "tier": "core",
-        "audio_missing": "false",
-    },
-]
-
-
-def _write_csv(path: Path, fieldnames: list[str], rows: list[dict[str, str]]) -> None:
-    with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(rows)
+REVIEW_FIELDS = ["lang", "index", "english", "current", "canonical", "issue", "fix", "status"]
 
 
 def _sha256(path: Path) -> str:
     return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _probe(duration: float):
+    return lambda _path: duration
+
+
+def _unreadable(_path: Path) -> float:
+    raise RuntimeError("ffprobe failed")
+
+
+def _overlap_pair(shared: int) -> tuple[str, str]:
+    """Give two 100-character sentences whose character Jaccard is ``shared / 100``."""
+    chars = [chr(0x5000 + index) for index in range(100)]
+    only_first = chars[shared : shared + 16]
+    return "".join(chars[:shared] + only_first), "".join(chars[:shared] + chars[shared + 16 :])
+
+
+def write_apkg(
+    env: dict[str, Path],
+    notes: int = len(ROWS),
+    fields: Sequence[str] = FIELDS,
+    model_name: str = MODEL_NAME,
+    drop: tuple[str, ...] = (),
+    extra: tuple[str, ...] = (),
+) -> None:
+    """Write the pack APKG with the MP3 files of the audio directory, less ``drop``, plus ``extra``."""
+    audio_dir = env["audio_dir"]
+    write_mp3s(audio_dir, list(extra))
+    media = [
+        str(path)
+        for path in sorted(audio_dir.glob("*.mp3"))
+        if path.name not in drop
+    ]
+    AnkiPackage.create(
+        env["apkg_path"],
+        DeckIdentity(PACK_PATH).title,
+        fields=list(fields),
+        cards=[{field: "" for field in fields} for _ in range(notes)],
+        media_files=media,
+        model_name=model_name,
+    )
+
+
 def build_env(
     tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
     *,
-    table: list[WordForm] | None = None,
-    cards: list[dict[str, str]] | None = None,
-    model_name: str = MODEL_NAME,
+    table: list[WordForm] = TABLE,
+    rows: list[dict[str, str]] = ROWS,
     review_status: str = "fixed",
-    skip_sentence_audio: frozenset[str] = frozenset(),
-    skip_word_audio: frozenset[str] = frozenset(),
+    no_file: frozenset[str] = frozenset(),
+    no_index: frozenset[str] = frozenset(),
 ) -> dict[str, Path]:
-    """Write one small pack and patch the word table and ffprobe.
+    """Write one small pack that passes every gate but G1.
 
     :param tmp_path: Test directory.
-    :param monkeypatch: Pytest patch helper for the module imports.
     :param table: Word table that the audit reads.
-    :param cards: Card rows of the sentence CSV.
-    :param model_name: Note model name of the APKG file.
+    :param rows: Card rows of the sentence CSV.
     :param review_status: Status value of the review row.
-    :param skip_sentence_audio: Sentences with an index row but no file.
-    :param skip_word_audio: Targets with no word audio row and no file.
-    :returns: The keyword paths of :func:`run_audit`.
+    :param no_file: Texts with an index row but no MP3 file.
+    :param no_index: Texts with neither an index row nor a file.
+    :returns: The keyword paths of ``run_pack_audit``.
     """
-    forms = list(TABLE if table is None else table)
-    rows = [dict(card) for card in (CARDS if cards is None else cards)]
-    monkeypatch.setattr(audit, "load_word_table", lambda **_: list(forms))
-    monkeypatch.setattr(audit, "probe_duration", lambda *_: 1.5)
-
     audio_dir = tmp_path / "audio"
-    audio_dir.mkdir()
-    index_rows: list[list[str]] = []
-    media: list[str] = []
-    for number, sentence in enumerate(dict.fromkeys(row["sentence"] for row in rows)):
-        name = f"tts_{number:04d}.mp3"
-        path = audio_dir / name
-        if sentence not in skip_sentence_audio:
-            path.write_bytes(FAKE_MP3)
-            media.append(str(path))
-        index_rows.append(
-            [name, sentence, "gtts:zh-CN", "tts", "0", "", "1", "x", "1.5"]
-        )
-    for number, target in enumerate(dict.fromkeys(row["target"] for row in rows)):
-        if target in skip_word_audio:
-            continue
-        name = f"word_{number:04d}.mp3"
-        path = audio_dir / name
-        path.write_bytes(FAKE_MP3)
-        media.append(str(path))
-        index_rows.append([name, target, "gtts:zh-CN", "tts", "0", "", "1", "x", "1.5"])
-    with (audio_dir / "index.csv").open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.writer(handle)
-        writer.writerow(INDEX_FIELDS)
-        writer.writerows(index_rows)
+    entries = [entry for entry in audio_entries(rows) if entry[1] not in no_index]
+    write_audio(audio_dir, entries, no_file)
 
     sentences_csv = tmp_path / "sentences.csv"
-    _write_csv(sentences_csv, SENTENCE_FIELDS, rows)
-
+    write_csv(sentences_csv, SENTENCE_FIELDS, rows)
     word_csv = tmp_path / "words.csv"
-    _write_csv(
+    write_csv(
         word_csv,
         ["english", "mandarin", "transliteration"],
         [
-            {
-                "english": form.english,
-                "mandarin": form.mandarin,
-                "transliteration": form.pinyin,
-            }
-            for form in forms
+            {"english": form.english, "mandarin": form.mandarin, "transliteration": form.pinyin}
+            for form in table
         ],
     )
-
     review_csv = tmp_path / "swadesh_review.csv"
-    _write_csv(
+    write_csv(
         review_csv,
         REVIEW_FIELDS,
         [
@@ -197,42 +127,29 @@ def build_env(
             }
         ],
     )
-
     manifest_path = tmp_path / "manifest.json"
-    manifest = {
-        "counts": {
-            "words": len(forms),
-            "cards": len(rows),
-            "scaffold": sum(1 for row in rows if row.get("tier") == "scaffold"),
-            "native_audio": sum(
-                1 for row in rows if row.get("audio_source") == "native"
-            ),
-            "tts_audio": sum(1 for row in rows if row.get("audio_source") == "tts"),
-        },
-        "files": {
-            "source_csv": _sha256(word_csv),
-            "sentences_csv": _sha256(sentences_csv),
-        },
-    }
-    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
-
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "counts": {
+                    "words": len(table),
+                    "cards": len(rows),
+                    "scaffold": sum(row["tier"] == "scaffold" for row in rows),
+                    "native_audio": sum(row["audio_source"] == "native" for row in rows),
+                    "tts_audio": sum(row["audio_source"] == "tts" for row in rows),
+                },
+                "files": {
+                    "source_csv": _sha256(word_csv),
+                    "sentences_csv": _sha256(sentences_csv),
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
     attribution_path = tmp_path / "ATTRIBUTION.md"
-    attribution_path.write_text(
-        "# Attribution\n\nSentences: Tatoeba.\n", encoding="utf-8"
-    )
-
-    apkg_path = tmp_path / PACK_PATH.name
-    AnkiPackage.create(
-        apkg_path,
-        DeckIdentity(PACK_PATH).title,
-        fields=FIELDS,
-        cards=[{field: "" for field in FIELDS} for _ in rows],
-        media_files=media,
-        model_name=model_name,
-    )
-
-    return {
-        "apkg_path": apkg_path,
+    attribution_path.write_text("# Attribution\n\nSentences: Tatoeba.\n", encoding="utf-8")
+    env = {
+        "apkg_path": tmp_path / PACK_PATH.name,
         "sentences_csv": sentences_csv,
         "word_csv": word_csv,
         "review_csv": review_csv,
@@ -240,26 +157,42 @@ def build_env(
         "manifest_path": manifest_path,
         "attribution_path": attribution_path,
     }
+    write_apkg(env, notes=len(rows))
+    return env
 
 
-def _gate(results: list[tuple[str, bool, str]], gate_id: str) -> tuple[bool, str]:
-    return next(
-        (passed, message) for gate, passed, message in results if gate == gate_id
+def run(
+    env: dict[str, Path], table: list[WordForm] = TABLE, probe=_probe(1.5)
+) -> list[GateResult]:
+    return run_pack_audit(
+        MANDARIN, GATES, load_table=lambda **_: list(table), probe=probe, **env
     )
 
 
+def audit(
+    tmp_path: Path,
+    *,
+    table: list[WordForm] = TABLE,
+    probe=_probe(1.5),
+    apkg: dict[str, Any] | None = None,
+    **build: Any,
+) -> list[GateResult]:
+    env = build_env(tmp_path, table=table, **build)
+    if apkg:
+        write_apkg(env, **apkg)
+    return run(env, table, probe)
+
+
+def _gate(results: list[GateResult], gate_id: str) -> tuple[bool, str]:
+    return next((passed, message) for gate, passed, message in results if gate == gate_id)
+
+
 def _card(**changes: str) -> dict[str, str]:
-    card = dict(CARDS[0])
-    card.update(changes)
-    return card
+    return ROWS[0] | changes
 
 
-def test_base_pack_fails_only_the_word_table_gate(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    env = build_env(tmp_path, monkeypatch)
-
-    results = run_audit(**env)
+def test_base_pack_fails_only_the_word_table_gate(tmp_path: Path) -> None:
+    results = run(build_env(tmp_path))
     failed = [gate for gate, passed, _ in results if not passed]
 
     assert [gate for gate, _, _ in results] == [f"G{number}" for number in range(1, 17)]
@@ -268,196 +201,194 @@ def test_base_pack_fails_only_the_word_table_gate(
 
 
 def test_print_audit_returns_zero_on_pass(capsys: pytest.CaptureFixture[str]) -> None:
-    code = print_audit([("G1", True, "207 concepts"), ("G2", True, "211 unique forms")])
+    code = print_audit(
+        [GateResult("G1", True, "207 concepts"), GateResult("G2", True, "211 unique forms")]
+    )
 
     assert code == 0
     assert "all 2 gates passed" in capsys.readouterr().out
 
 
-def test_g2_rejects_a_duplicate_form(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+MOON = card("月", "月亮很大。", "yuè liang hěn dà", "The moon is big.", "900", "bob")
+SIMILAR_AT_LIMIT = _overlap_pair(67)
+SIMILAR_BELOW_LIMIT = _overlap_pair(66)
+
+
+@pytest.mark.parametrize(
+    ("setup", "gate", "ok", "fragments"),
+    [
+        pytest.param(
+            {"table": TABLE + [WordForm(5, "bird", "水", "shuǐ", "水", "alternate", 5.0)]},
+            "G2", False, ("duplicate form", "水"),
+            id="G2 a duplicate form",
+        ),
+        pytest.param(
+            {"rows": ROWS + [MOON]},
+            "G3", False, ("月 is not in the word table",),
+            id="G3 a target outside the table",
+        ),
+        pytest.param(
+            {
+                "table": TABLE + [WordForm(6, "moon", "月", "yuè", "月", "shared", 5.0)],
+                "rows": ROWS + [MOON],
+            },
+            "G3", False, ("月 is a shared form",),
+            id="G3 a target on a shared form",
+        ),
+        pytest.param(
+            {"rows": ROWS + [_card(sentence="这里没有水。", pinyin="zhè lǐ méi yǒu shuǐ")]},
+            "G4", False, ("duplicate Tatoeba id", "200"),
+            id="G4 a repeated Tatoeba id",
+        ),
+        pytest.param(
+            {"rows": ROWS + [_card(sentence="水里有水。", pinyin="shuǐ lǐ yǒu shuǐ", tatoeba_id="600")]},
+            "G5", False, ("水 x2",),
+            id="G5 a target that appears twice",
+        ),
+        pytest.param(
+            {"rows": ROWS + [_card(sentence="我要水。", pinyin="wǒ yào shuǐ", tatoeba_id="700")]},
+            "G6", False, ("0.67 limit", "0.75"),
+            id="G6 a similar pair",
+        ),
+        pytest.param(
+            {
+                "rows": ROWS
+                + [
+                    _card(sentence=SIMILAR_AT_LIMIT[0], tatoeba_id="701"),
+                    _card(target="火", sentence=SIMILAR_AT_LIMIT[1], tatoeba_id="702"),
+                ]
+            },
+            "G6", False, ("= 0.67",),
+            id="G6 a pair at the limit",
+        ),
+        pytest.param(
+            {
+                "rows": ROWS
+                + [
+                    _card(sentence=SIMILAR_BELOW_LIMIT[0], tatoeba_id="701"),
+                    _card(target="火", sentence=SIMILAR_BELOW_LIMIT[1], tatoeba_id="702"),
+                ]
+            },
+            "G6", True, ("stay below",),
+            id="G6 a pair below the limit",
+        ),
+        pytest.param(
+            {"no_file": frozenset({"我要喝水。"})},
+            "G7", False, ("tts_0000.mp3", "missing"),
+            id="G7 a missing sentence file",
+        ),
+        pytest.param(
+            {"probe": _probe(MIN_DURATION_S - 0.01)},
+            "G7", False, ("0.39 s",),
+            id="G7 just under the shortest duration",
+        ),
+        pytest.param(
+            {"probe": _probe(MIN_DURATION_S)}, "G7", True, ("sentence files",),
+            id="G7 the shortest duration",
+        ),
+        pytest.param(
+            {"probe": _probe(MAX_DURATION_S)}, "G7", True, ("sentence files",),
+            id="G7 the longest duration",
+        ),
+        pytest.param(
+            {"probe": _probe(MAX_DURATION_S + 0.01)},
+            "G7", False, ("15.01 s",),
+            id="G7 just over the longest duration",
+        ),
+        pytest.param(
+            {"probe": _unreadable}, "G7", False, ("is not readable",),
+            id="G7 an unreadable file",
+        ),
+        pytest.param(
+            {"apkg": {"extra": ("stray.mp3",)}},
+            "G8", False, ("media files, cards use",),
+            id="G8 an extra media file",
+        ),
+        pytest.param(
+            {"apkg": {"drop": ("word_0000.mp3",), "extra": ("stray.mp3",)}},
+            "G8", False, ("media names differ", "word_0000.mp3", "stray.mp3"),
+            id="G8 the same count with other names",
+        ),
+        pytest.param(
+            {
+                "table": TABLE
+                + [
+                    WordForm(index, f"concept{index}", form, "pinyin", form, "alternate", 5.0)
+                    for index, form in enumerate(("雨", "雪", "风", "云", "星"), start=6)
+                ]
+            },
+            "G10", False, ("core coverage 4/10 = 0.400", "0.80 minimum"),
+            id="G10 low core coverage",
+        ),
+        pytest.param(
+            {"apkg": {"model_name": "Basic"}},
+            "G13", False, (MODEL_NAME, "not found"),
+            id="G13 a wrong model name",
+        ),
+        pytest.param(
+            {"apkg": {"notes": 5}}, "G13", False, ("5 notes but 4 cards",),
+            id="G13 a wrong note count",
+        ),
+        pytest.param(
+            {"apkg": {"fields": FIELDS[:-1]}}, "G13", False, ("model fields",),
+            id="G13 a wrong field list",
+        ),
+        pytest.param(
+            {"review_status": "open"}, "G15", False, ("1 open review row",),
+            id="G15 an open review row",
+        ),
+        pytest.param(
+            {"no_file": frozenset({"水"})},
+            "G16", False, ("word_0000.mp3 for 水 is missing",),
+            id="G16 a missing word file",
+        ),
+        pytest.param(
+            {"no_index": frozenset({"水"})},
+            "G16", False, ("水 has no word file in the index",),
+            id="G16 a word with no index row",
+        ),
+    ],
+)
+def test_the_gate_verdict_follows_the_pack(
+    tmp_path: Path,
+    setup: dict[str, Any],
+    gate: str,
+    ok: bool,
+    fragments: tuple[str, ...],
 ) -> None:
-    table = list(TABLE) + [WordForm(5, "bird", "水", "shuǐ", "水", "alternate", 5.0)]
-    env = build_env(tmp_path, monkeypatch, table=table)
+    passed, message = _gate(audit(tmp_path, **setup), gate)
 
-    passed, message = _gate(run_audit(**env), "G2")
-
-    assert passed is False
-    assert "duplicate form" in message
-    assert "水" in message
+    assert passed is ok
+    for fragment in fragments:
+        assert fragment in message
 
 
-def test_g4_rejects_a_repeated_tatoeba_id(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+@pytest.mark.parametrize(
+    ("section", "key", "value", "fragment"),
+    [
+        pytest.param("counts", "cards", 999, "counts.cards: manifest 999 != 4", id="a bad count"),
+        pytest.param("files", "sentences_csv", "sha256:deadbeef", "files.sentences_csv", id="a bad hash"),
+    ],
+)
+def test_g11_rejects_a_manifest_that_differs_from_the_pack(
+    tmp_path: Path, section: str, key: str, value: Any, fragment: str
 ) -> None:
-    cards = list(CARDS) + [
-        _card(
-            target="水",
-            sentence="这里没有水。",
-            pinyin="zhè lǐ méi yǒu shuǐ",
-            tatoeba_id="200",
-        )
-    ]
-    env = build_env(tmp_path, monkeypatch, cards=cards)
-
-    passed, message = _gate(run_audit(**env), "G4")
-
-    assert passed is False
-    assert "duplicate Tatoeba id" in message
-    assert "200" in message
-
-
-def test_g5_rejects_a_target_that_appears_twice(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    cards = list(CARDS) + [
-        _card(
-            target="水",
-            sentence="水里有水。",
-            pinyin="shuǐ lǐ yǒu shuǐ",
-            tatoeba_id="600",
-        )
-    ]
-    env = build_env(tmp_path, monkeypatch, cards=cards)
-
-    passed, message = _gate(run_audit(**env), "G5")
-
-    assert passed is False
-    assert "水 x2" in message
-
-
-def test_g6_rejects_a_similar_card_pair(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    cards = list(CARDS) + [
-        _card(target="水", sentence="我要水。", pinyin="wǒ yào shuǐ", tatoeba_id="700")
-    ]
-    env = build_env(tmp_path, monkeypatch, cards=cards)
-
-    passed, message = _gate(run_audit(**env), "G6")
-
-    assert passed is False
-    assert "0.67 limit" in message
-    assert "0.75" in message
-
-
-def test_g7_rejects_a_missing_sentence_file(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    env = build_env(
-        tmp_path, monkeypatch, skip_sentence_audio=frozenset({"我要喝水。"})
-    )
-
-    passed, message = _gate(run_audit(**env), "G7")
-
-    assert passed is False
-    assert "tts_0000.mp3" in message
-    assert "missing" in message
-
-
-def test_g10_rejects_low_core_coverage(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    table = list(TABLE) + [
-        WordForm(index, f"concept{index}", form, "pinyin", form, "alternate", 5.0)
-        for index, form in enumerate(("雨", "雪", "风", "云", "星"), start=6)
-    ]
-    env = build_env(tmp_path, monkeypatch, table=table)
-
-    passed, message = _gate(run_audit(**env), "G10")
-
-    assert passed is False
-    assert "core coverage 4/10 = 0.400" in message
-    assert "0.80 minimum" in message
-
-
-def test_g11_rejects_a_bad_manifest_count(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    env = build_env(tmp_path, monkeypatch)
+    env = build_env(tmp_path)
     manifest = json.loads(env["manifest_path"].read_text(encoding="utf-8"))
-    manifest["counts"]["cards"] = 999
+    manifest[section][key] = value
     env["manifest_path"].write_text(json.dumps(manifest), encoding="utf-8")
 
-    passed, message = _gate(run_audit(**env), "G11")
+    passed, message = _gate(run(env), "G11")
 
     assert passed is False
-    assert "counts.cards: manifest 999 != 4" in message
+    assert fragment in message
 
 
-def test_g11_rejects_a_bad_file_hash(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    env = build_env(tmp_path, monkeypatch)
-    manifest = json.loads(env["manifest_path"].read_text(encoding="utf-8"))
-    manifest["files"]["sentences_csv"] = "sha256:deadbeef"
-    env["manifest_path"].write_text(json.dumps(manifest), encoding="utf-8")
-
-    passed, message = _gate(run_audit(**env), "G11")
-
-    assert passed is False
-    assert "files.sentences_csv" in message
-
-
-def test_g13_rejects_a_wrong_model_name(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    env = build_env(tmp_path, monkeypatch, model_name="Basic")
-
-    passed, message = _gate(run_audit(**env), "G13")
-
-    assert passed is False
-    assert MODEL_NAME in message
-    assert "not found" in message
-
-
-def test_g13_rejects_a_wrong_note_count(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    env = build_env(tmp_path, monkeypatch)
-    AnkiPackage.create(
-        env["apkg_path"],
-        MODEL_NAME,
-        fields=FIELDS,
-        cards=[{field: "" for field in FIELDS} for _ in range(5)],
-        model_name=MODEL_NAME,
-    )
-
-    passed, message = _gate(run_audit(**env), "G13")
-
-    assert passed is False
-    assert "5 notes but 4 cards" in message
-
-
-def test_g15_rejects_an_open_review_row(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    env = build_env(tmp_path, monkeypatch, review_status="open")
-
-    passed, message = _gate(run_audit(**env), "G15")
-
-    assert passed is False
-    assert "1 open review row" in message
-
-
-def test_g15_rejects_a_missing_review_file(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    env = build_env(tmp_path, monkeypatch)
+def test_g15_rejects_a_missing_review_file(tmp_path: Path) -> None:
+    env = build_env(tmp_path)
     env["review_csv"].unlink()
 
-    passed, message = _gate(run_audit(**env), "G15")
+    passed, message = _gate(run(env), "G15")
 
     assert passed is False
     assert "review file missing" in message
-
-
-def test_g16_rejects_a_missing_word_file(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    env = build_env(tmp_path, monkeypatch, skip_word_audio=frozenset({"水"}))
-
-    passed, message = _gate(run_audit(**env), "G16")
-
-    assert passed is False
-    assert "水 has no word file" in message
