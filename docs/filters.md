@@ -143,7 +143,7 @@ The cull and core reports once left out `repeat`. Both report lists now hold it.
 | L6    | one identical rule set for every flow | a different accepted set                       | rejected, the two jobs differ                  |
 | L7    | `length_window` to the gate layer     | none                                           | rejected, a gate never rejects a sentence      |
 | L8    | `digit_marks`, `script` in all flows  | the cull and the core gain an alphabet test    | done, `anki-sxzu`, ADR 0029                    |
-| L9    | one `sense` rule in every flow        | the cull and the core drop a failed target     | in progress, S1, S2, S3, S5 done; S4 open      |
+| L9    | one `sense` rule in every flow        | the cull and the core drop a failed target     | done, S1 to S5, ADR 0030                       |
 
 L3 added `final_marks`, `quote_marks`, and `internal_marks` to `CoreProfile`. It
 moved `CardShape` and `filter_reason` to `ranking/cardfilter.py`, and
@@ -216,8 +216,8 @@ holds its tier S rows only.
 S4 is done. `gate_sense` in `ranking/gates.py` is cull `G18` and core `K22`. It
 calls `sense_failure` on the `Core` word and the English of every kept note. The
 pack gates `gate_no_sense_mismatch` and `gate_no_false_friend`, core `K13`, and
-core `K16` stay until S2 lands and the pack filter uses `sense_failure`. A cull
-deck built before S2 can fail `G18`, because the cull has no sense test.
+core `K16` stay until the pack filter uses `sense_failure`. A cull deck built
+before S2 can fail `G18`, because it kept cards that no sense test checked.
 
 The English table `vocab/english_senses.json` stays. It gives the sense words of a
 Swadesh gloss, and WordNet builds it.
