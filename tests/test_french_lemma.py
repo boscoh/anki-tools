@@ -13,6 +13,8 @@ from anki_tools.languages.french import cull as cull_fr
         ("Je veux partir.", "veux", "vouloir"),
         ("Tu peux venir.", "peux", "pouvoir"),
         ("Il prend le train.", "prend", "prendre"),
+        ("Je fais du pain.", "fais", "faire"),
+        ("Ne fais pas ça.", "fais", "faire"),
         ("C'est un fait.", "fait", "fait"),
     ],
 )

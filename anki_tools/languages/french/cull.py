@@ -83,6 +83,8 @@ LEMMA_OVERRIDES = {
     "trouve": "trouver",
     "donne": "donner",
     "laisse": "laisser",
+    "fai": "faire",
+    "fais": "faire",
 }
 
 
