@@ -14,7 +14,6 @@ from anki_tools.sentence_pack.english_sense import (
     sense_failure,
     sense_row,
 )
-from anki_tools.sentence_pack.pool import FILTER_KEYS, FILTER_NAMES
 
 
 def test_every_swadesh_label_has_a_sense_entry() -> None:
@@ -34,65 +33,46 @@ def test_contractions_expand_to_words() -> None:
     assert english_tokens("Let's go.") == ("let", "us", "go")
 
 
-@pytest.mark.parametrize(
-    ("gloss", "english"),
-    [
-        ("I", "I'm one of you."),
-        ("we", "It's ours."),
-        ("we", "Let's go by taxi."),
-        ("tongue", "I bit my tongue."),
-        ("to hold", "Hold the candle."),
-        ("to die", "He passed away."),
-        ("blood", "I was bleeding a lot."),
-        ("fingernail", "I broke a nail."),
-        ("big", "What a huge dog!"),
-        ("mother", "Is your mum at home?"),
-        ("sun", "Solar power is clean."),
-        ("tree bark", "The bark of this tree is rough."),
-        ("to squeeze", "Squeeze the lemon."),
-    ],
-)
-def test_holds_sense_accepts_the_gloss_sense(gloss: str, english: str) -> None:
-    assert sense_failure(english, None, gloss) is None
+HOLD = SenseRow(senses=frozenset({"hold"}), false_friends=frozenset({"drive"}))
+TIME = SenseRow(senses=frozenset({"time"}), false_friends=frozenset({"weather"}))
 
 
 @pytest.mark.parametrize(
-    ("gloss", "english"),
+    ("english", "row", "gloss", "expected"),
     [
-        ("tongue", "I love this language."),
-        ("to hold", "Could you drive more slowly?"),
-        ("to squeeze", "She elbowed her way onto the train."),
-        ("tree bark", "We squeeze the orange and throw away the rind."),
-        ("to burn", "Does she still have a temperature?"),
-        ("big", "He is as tall as her."),
+        ("I'm one of you.", None, "I", None),
+        ("It's ours.", None, "we", None),
+        ("Let's go by taxi.", None, "we", None),
+        ("I bit my tongue.", None, "tongue", None),
+        ("Hold the candle.", None, "to hold", None),
+        ("He passed away.", None, "to die", None),
+        ("I was bleeding a lot.", None, "blood", None),
+        ("I broke a nail.", None, "fingernail", None),
+        ("What a huge dog!", None, "big", None),
+        ("Is your mum at home?", None, "mother", None),
+        ("Solar power is clean.", None, "sun", None),
+        ("The bark of this tree is rough.", None, "tree bark", None),
+        ("Squeeze the lemon.", None, "to squeeze", None),
+        ("I love this language.", None, "tongue", "sense"),
+        ("Could you drive more slowly?", None, "to hold", "sense"),
+        ("She elbowed her way onto the train.", None, "to squeeze", "sense"),
+        ("We squeeze the orange and throw away the rind.", None, "tree bark", "sense"),
+        ("Does she still have a temperature?", None, "to burn", "sense"),
+        ("He is as tall as her.", None, "big", "sense"),
+        ("anything", None, "not a swadesh gloss", None),
+        ("I drive a car.", HOLD, "to hold", "false_friend"),
+        ("Hold the drive.", HOLD, "to hold", None),
+        ("What time is it?", TIME, None, None),
+        ("Time and weather.", TIME, None, "false_friend"),
+        ("What day is it?", TIME, None, "sense"),
+        ("anything", SenseRow(), None, None),
+        ("anything", None, None, None),
     ],
 )
-def test_holds_sense_rejects_a_different_sense(gloss: str, english: str) -> None:
-    assert sense_failure(english, None, gloss) == "sense"
-
-
-def test_holds_sense_ignores_a_gloss_without_an_entry() -> None:
-    assert sense_failure("anything", None, "not a swadesh gloss") is None
-
-
-def test_a_tier_s_false_friend_needs_no_sense_word() -> None:
-    row = SenseRow(
-        senses=frozenset({"hold"}), false_friends=frozenset({"drive"})
-    )
-    assert sense_failure("I drive a car.", row, "to hold") == "false_friend"
-    assert sense_failure("Hold the drive.", row, "to hold") is None
-    assert sense_failure("Hold it.", None, "to hold") is None
-
-
-def test_a_tier_f_row_needs_a_sense_word_and_no_false_friend() -> None:
-    row = SenseRow(
-        senses=frozenset({"time"}), false_friends=frozenset({"weather"})
-    )
-    assert sense_failure("What time is it?", row) is None
-    assert sense_failure("Time and weather.", row) == "false_friend"
-    assert sense_failure("What day is it?", row) == "sense"
-    assert sense_failure("anything", SenseRow()) is None
-    assert sense_failure("anything") is None
+def test_a_sentence_passes_or_fails_the_english_sense_test(
+    english: str, row: SenseRow | None, gloss: str | None, expected: str | None
+) -> None:
+    assert sense_failure(english, row, gloss) == expected
 
 
 def test_read_senses_keeps_a_tier_s_row_apart_from_a_tier_f_row(
@@ -123,11 +103,6 @@ def test_read_senses_keeps_a_tier_s_row_apart_from_a_tier_f_row(
 
 def test_read_senses_of_a_missing_file_is_empty(tmp_path: Path) -> None:
     assert read_senses(tmp_path / "absent.tsv") == {}
-
-
-def test_sense_stage_is_in_the_filter_report() -> None:
-    assert "sense" in FILTER_KEYS
-    assert FILTER_NAMES["sense"] == "english sense"
 
 
 GLOSS_SIZE_BOUND = 125

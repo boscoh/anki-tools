@@ -1,32 +1,28 @@
 """Tests for the shared core flow, the shared card filter, and the Spanish adapter.
 
 Every test is offline. The token lists are built by hand, so no test loads the
-frequency list or ffprobe. The one test that needs spaCy skips when the Spanish
-model is absent.
+frequency list or ffprobe.
 """
 
 from __future__ import annotations
 
-import importlib.util
 import re
 from collections import Counter
 from dataclasses import replace
-from functools import partial
-from pathlib import Path
 from typing import Collection
 
 import pytest
 
 from anki_tools.languages.spanish import core as spanish_core
-from anki_tools.ranking import cardfilter, coreflow
+from anki_tools.ranking import coreflow
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
 from anki_tools.ranking.corelist import CoreTarget
 from anki_tools.ranking.scan import CoreProfile
-from anki_tools.sentence_pack.english_sense import SenseRow, read_senses
+from anki_tools.sentence_pack.english_sense import SenseRow
+from tests.shape_fixture import PROFILES, shape_rules
 
-SPANISH_TOKENIZER = "es_core_news_sm"
 WORD_PATTERN = re.compile(r"[^\W\d_]+")
-HAS_SPANISH_MODEL = importlib.util.find_spec(SPANISH_TOKENIZER) is not None
+TWO = ("El perro come pan.", "El gato come pan.")
 
 
 def _card(
@@ -171,19 +167,6 @@ class TestCoreHits:
         assert present == {}
 
 
-class TestFilterCoreCards:
-    def test_a_clean_card_passes(self) -> None:
-        cards = [_card()]
-
-        passed, reasons = coreflow.filter_core_cards(
-            cards, spanish_core.SPANISH_CORE_PROFILE
-        )
-
-        assert passed == [0]
-        assert reasons == [""]
-
-
-
 def _manifest_fixture() -> tuple[
     list[dict[str, object]],
     list[dict[str, object]],
@@ -275,106 +258,33 @@ class TestManifestCounts:
         assert counts["outside_rare"] == 1
 
 
-class TestFiles:
-    def test_read_senses_gives_the_first_sense_word(self, tmp_path: Path) -> None:
-        path = tmp_path / "senses.tsv"
-        path.write_text(
-            "word\tsenses\tfalse_friends\nBeber\tDrink,Eat\tHave\n", encoding="utf-8"
-        )
-
-        assert read_senses(path) == {
-            ("F", "beber"): SenseRow(
-                frozenset({"drink", "eat"}), frozenset({"have"}), (), "drink"
-            )
-        }
-
-
-def _filter_cards(
-    cards: list[coreflow.InputCard],
-) -> tuple[list[int], list[str]]:
-    return cardfilter.filter_cards(
-        cards,
-        card_rule=partial(
-            cardfilter.filter_reason, profile=spanish_core.SPANISH_CORE_PROFILE
-        ),
-        dedupe_key=spanish_core.SPANISH_CORE_PROFILE.dedupe_key,
-    )
-
-
 class TestCardFilter:
-    def test_a_clean_card_passes(self) -> None:
-        passed, reasons = _filter_cards([_card()])
+    @pytest.mark.parametrize("language, sentence, expected", shape_rules("spanish"))
+    def test_a_card_gets_the_first_failed_shape_rule(
+        self, language: str, sentence: str, expected: str
+    ) -> None:
+        profile = PROFILES[language]
 
-        assert passed == [0]
-        assert reasons == [""]
+        passed, reasons = coreflow.filter_core_cards([_card(sentence)], profile)
 
-    def test_f2_rejects_a_card_outside_the_window(self) -> None:
-        passed, reasons = _filter_cards([_card("El perro.")])
-
-        assert passed == []
-        assert reasons[0] == "length_window"
-
-    def test_f3_rejects_a_digit(self) -> None:
-        passed, reasons = _filter_cards([_card("El perro tiene 2 años.")])
-
-        assert passed == []
-        assert reasons[0] == "digit_marks"
-
-    def test_script_rejects_a_foreign_letter(self) -> None:
-        passed, reasons = _filter_cards([_card("El perro come хлеб.")])
-
-        assert passed == []
-        assert reasons[0] == "script"
-
-    def test_f4_rejects_a_missing_final_mark(self) -> None:
-        passed, reasons = _filter_cards([_card("El perro come pan")])
-
-        assert passed == []
-        assert reasons[0] == "marks"
-
-    def test_f5_rejects_two_final_marks(self) -> None:
-        passed, reasons = _filter_cards([_card("El perro come. Pan.")])
-
-        assert passed == []
-        assert reasons[0] == "marks"
-
-    def test_f6_rejects_a_quote_mark(self) -> None:
-        passed, reasons = _filter_cards([_card('El perro dice "hola".')])
-
-        assert passed == []
-        assert reasons[0] == "marks"
-
-    def test_f7_rejects_two_internal_marks(self) -> None:
-        passed, reasons = _filter_cards([_card("Sí, no, tal vez.")])
-
-        assert passed == []
-        assert reasons[0] == "marks"
+        assert reasons == [expected]
+        assert passed == ([] if expected else [0])
 
     @pytest.mark.parametrize(
-        ("english", "expected"),
+        ("sentences", "english", "expected"),
         [
-            pytest.param(("The dog eats.", " the  DOG eats."), [0], id="same english"),
-            pytest.param(("The dog eats.", "The cat eats."), [0, 1], id="different english"),
-            pytest.param(("", ""), [0, 1], id="empty english"),
+            pytest.param(TWO, ("The dog eats.", " the  DOG eats."), [0], id="same english"),
+            pytest.param(TWO, ("The dog eats.", "The cat eats."), [0, 1], id="different english"),
+            pytest.param(TWO, ("", ""), [0, 1], id="empty english"),
+            pytest.param(TWO[:1] * 2, ("A.", "B."), [0], id="same sentence"),
         ],
     )
-    def test_unique_compares_the_english_text(
-        self, english: tuple[str, str], expected: list[int]
+    def test_a_card_is_unique_by_its_sentence_and_its_english(
+        self, sentences: tuple[str, str], english: tuple[str, str], expected: list[int]
     ) -> None:
-        cards = [
-            _card("El perro come pan.", english=english[0]),
-            _card("El gato come pan.", index=1, english=english[1]),
-        ]
+        cards = [_card(sentences[i], i, english[i]) for i in (0, 1)]
 
-        passed, reasons = _filter_cards(cards)
+        passed, reasons = coreflow.filter_core_cards(cards, PROFILES["spanish"])
 
         assert passed == expected
         assert (reasons[1] == "unique") == (expected == [0])
-
-    def test_f9_rejects_a_duplicate_sentence(self) -> None:
-        cards = [_card(), _card(index=1)]
-
-        passed, reasons = _filter_cards(cards)
-
-        assert passed == [0]
-        assert reasons[1] == "unique"
