@@ -2,7 +2,6 @@
 
 import csv
 import sys
-import wave
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -100,15 +99,14 @@ def test_validate_audio_checks_the_header_and_the_duration(
     assert duration == (pytest.approx(seconds) if valid else 0.0)
 
 
-def test_probe_duration_reads_a_real_file(tmp_path: Path) -> None:
-    path = tmp_path / "tone.wav"
-    with wave.open(str(path), "wb") as handle:
-        handle.setnchannels(1)
-        handle.setsampwidth(2)
-        handle.setframerate(8000)
-        handle.writeframes(b"\x00\x00" * 4000)
+def test_probe_duration_reads_the_first_line_of_the_ffprobe_output(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        audio.subprocess, "run", lambda *_args, **_kwargs: SimpleNamespace(stdout="0.5\n")
+    )
 
-    assert audio.probe_duration(path) == pytest.approx(0.5, abs=0.01)
+    assert audio.probe_duration(Path("one.mp3")) == 0.5
 
 
 def test_generate_audio_retries_a_failed_native_fetch(
