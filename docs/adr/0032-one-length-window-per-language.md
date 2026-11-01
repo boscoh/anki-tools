@@ -6,7 +6,8 @@ The pack, the cull, and the core each had their own length window. The pack read
 counted units in three ways, and the `english_words` gate had one window for the pack
 and another for the cull and the core.
 
-Status: accepted. ADR 0034 supersedes the English window (`english_bounds`) part.
+Status: accepted. ADR 0034 supersedes the English window (`english_bounds`) and the
+`--min-words` and `--max-words` flags.
 
 ## Decision
 
@@ -21,15 +22,8 @@ The language profile states the window once.
   cull, and the core share this order.
 - `fallback_min_units` is the scaffold minimum. It stays pack-only.
 
-A run can replace one end of the unit window. The flags are `--min-words` and
-`--max-words`. They exist on `anki swadesh pack` and on `anki fix <lang>` in the
-`--select` and `--core` modes. An empty flag keeps the profile value.
-`CullRequest` and `CoreRequest` carry the values as `min_words` and `max_words`. Both
-default to `None`.
-
-Each run writes the window that it used to the manifest. Gate G5 (cull) and gate K5
-(core) read the window from the stored params. K5 falls back to the profile for a
-manifest without the params. A deck built with a flag therefore passes `--check`.
+The flags `--min-words` and `--max-words` replaced one end of the window for a run.
+ADR 0034 removes them.
 
 ## Windows
 
@@ -55,8 +49,7 @@ CSV files:
 | Cantonese core | 2 to 7     | 3 to 12    | 3 of 125                 |
 | Spanish core   | 4 to 10    | 4 to 10    | 0 of 267                 |
 
-The Mandarin window is much tighter than before. The flags let a user keep the old
-window for one run, for example `--min-words 2 --max-words 8`.
+The Mandarin window is much tighter than before.
 
 A card that fails both a shape rule and `english_words` now has the shape rule id as
 its reason.

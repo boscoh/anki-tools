@@ -53,6 +53,13 @@ K3  filter
         +--> C3 to C5  name, loan word, audio
         |
         v
+    target hits (`core_hits`)
+        |
+        +--> compounds: Mandarin and Cantonese, a compound hides a hit
+        |
+        +--> sense: sense_failure per target; a failed target leaves the card
+        |
+        v
 K4  selection: seed, depth, completion, top-up, tail
         |
         +--> quota per target, value minus outside cost

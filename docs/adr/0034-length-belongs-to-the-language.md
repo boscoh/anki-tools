@@ -23,6 +23,17 @@ of the English text. `FactInput` holds `duplicate`, `unknown_words`, `hits`, and
 
 The Mandarin window stays at 4 to 7 Han characters.
 
+The window has no run override. The flags `--min-words` and `--max-words` of ADR
+0032 are gone from `anki fix` and `anki swadesh pack`, with the `min_words` and
+`max_words` fields of `CullRequest` and `CoreRequest`. Every flow reads
+`profile.min_units` and `profile.max_units`: `filter_reason(card, profile)` and
+`filter_cards` take no window argument. The gates G5 and K5 read the profile too,
+not the manifest. To change a window, edit the language profile. The manifests
+still record the window of the run.
+
+The shape guard `shape_failure` keeps its window arguments, because the scaffold
+retry passes `fallback_min_units` as the minimum.
+
 The Cantonese window moves from 3 to 12 to 4 to 7 Han characters, the Mandarin
 window. Both languages use `unit_count` over Han characters. `PREFERRED_MAX_HAN`
 moves from 8 to 7. The input deck of the Cantonese core holds 999 cards. A trial

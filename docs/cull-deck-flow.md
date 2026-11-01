@@ -60,6 +60,9 @@ C3  filter
         v
 C4  selection
         |
+        +--> sense: sense_failure per lemma; a failed lemma leaves the card
+        |    lemma set (ADR 0030)
+        |
         +--> gain of each card, minus the used and capped lemmas
         |
         +--> reject a card too close to a kept card
@@ -117,8 +120,8 @@ than the target list.
 
 | Key | The rule passes when                                            |
 | --- | --------------------------------------------------------------- |
-| F1  | the English text has 2 to 12 words                              |
-| F2  | the token count is inside the `min_words` to `max_words` window |
+| F1  | retired: the English text length (ADR 0034)                     |
+| F2  | the unit count is inside the `min_units` to `max_units` window  |
 | F3  | the text passes `digit_marks` and `script`                      |
 | F4  | the last character is an accepted final mark                    |
 | F5  | the text holds exactly one final mark                           |
@@ -127,14 +130,13 @@ than the target list.
 | F8  | the text holds no proper noun tag                               |
 | F9  | the sentence text is not kept yet                               |
 
-The English window F1 and the proper-noun rule F8 are shared rules of
-`anki_tools/ranking/cardfilter.py`. F2 to F7 come from the sentence shape guard
-`check_sentence_shape`, with the marks and the alphabet test of the language
-profile. One card filter, `marks` (`MARK_RULES`), covers F4 to F7.
+The proper-noun rule F8 is a shared rule of `anki_tools/ranking/cardfilter.py`. F2
+to F7 come from the sentence shape guard `check_sentence_shape`, with the window,
+the marks, and the alphabet test of the language profile. One card filter,
+`marks` (`MARK_RULES`), covers F4 to F7.
 
-The unit count of F2 is the token count of the card, not a text measure. The
-`CardShape` adapter gives the unit count, the three mark sets, and the alphabet
-test to the shape guard.
+The unit count of F2 is `profile.unit_count`, and the window is `profile.min_units`
+to `profile.max_units`. The language module states both (ADR 0034).
 
 The run stores the first failed rule as the `reason` of the card. A passed
 card has the empty reason.

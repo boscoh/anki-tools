@@ -78,9 +78,9 @@ pack records a pass count for every guard before the first failure.
 - `marks` is one filter with four checks: the last character is a final mark, the
   sentence has exactly one final mark, no quotation mark or dialogue dash, and at
   most one internal mark. A failure gives no sub-reason. `MARK_RULES` lists the id
-  that the cull takes from the pack shape
-  guard. The cull has no `english_link`,
-  `sense` rule.
+  that the cull takes from the pack shape guard. The cull and the core have no
+  `english_link` rule. They run `sense` after the filter, on each target of a
+  card (section 5, L9).
 - `digit_marks` is the digit, bracket, link, and ellipsis test. It has no language
   input. `script` is the alphabet test of the language profile. Both run in all
   three flows.
@@ -108,15 +108,10 @@ Windows by language, as minimum to maximum:
 | Mandarin  | 4 to 7               | `FALLBACK_MIN_HAN`    |
 | Cantonese | 4 to 7               | `FALLBACK_MIN_HAN`    |
 
-Each language states the window once, in its pack profile. The pack command has
-`--min-words` and `--max-words`. The `fix` select and core modes have the same
-two flags. Each flag replaces one end of the profile window for that run. Both
-modes write the window that they used to the manifest.
-
-The gate rechecks read the window of the run: K5 and G5 read `min_units` and
-`max_units`, or `min_words` and `max_words`, from the stored params. K5 falls
-back to the profile for an old manifest. `scaffold_problem` reads the scaffold
-window.
+Each language states the window once, in its profile. No flag changes it. The
+pack, the cull, and the core read `profile.min_units` and `profile.max_units`,
+and the gates G5 and K5 read the same values. `scaffold_problem` reads the scaffold
+window. The run manifest records the window that the run used.
 
 ### 4.2 Known differences between flows
 
