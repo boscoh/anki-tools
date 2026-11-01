@@ -188,6 +188,8 @@ class CullProfile:
     :param script_ok: Alphabet test of the ``script`` rule.
     :param is_repeated: Test of the ``repeat`` rule.
     :param dedupe_key: Key of the ``unique`` rule.
+    :param unit_count: Unit count of a sentence, the same count as the sentence
+        pack.
     :param english_bounds: English word-count window of the ``english_words`` rule.
     :param input_model_name: Name of the input note model.
     :param input_sentence_field: Name of the sentence field of the input model.
@@ -225,6 +227,7 @@ class CullProfile:
     script_ok: Callable[[str], bool]
     is_repeated: Callable[[str], bool]
     dedupe_key: Callable[[str], str]
+    unit_count: Callable[[str], int]
     english_bounds: tuple[int, int]
 
     input_model_name: str
@@ -1080,7 +1083,6 @@ def run_cull(request: CullRequest, profile: CullProfile) -> deck_writer.RunFiles
     )
     passed, reasons = filter_cards(
         cards,
-        tokens,
         min_words=request.min_words,
         max_words=request.max_words,
         card_rule=partial(filter_reason, profile=profile),

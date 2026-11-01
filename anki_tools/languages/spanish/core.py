@@ -184,6 +184,7 @@ SPANISH_LANGUAGE = LanguageDeckProfile(
     script_ok=SPANISH.script_ok,
     is_repeated=SPANISH.is_repeated,
     dedupe_key=SPANISH.dedupe_key,
+    unit_count=SPANISH.unit_count,
     highlight=SPANISH.highlight,
 )
 

@@ -167,7 +167,6 @@ def gate_filter_recheck(files: CoreFiles) -> tuple[bool, str]:
     profile = files.profile
     kept, _reasons = filter_core_cards(
         cards,
-        files.tokens(),
         set(output["media"]),
         profile.read_names(),
         read_loanwords(profile.loan_path),

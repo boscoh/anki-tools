@@ -66,7 +66,6 @@ def _card(
 
 def _filter(
     cards: Sequence[InputCard],
-    tokens: Sequence[Sequence[tuple[str, str]]],
     names: Sequence[str] = (),
     loanwords: Sequence[str] = (),
 ) -> tuple[list[int], list[str]]:
@@ -74,7 +73,6 @@ def _filter(
     profile = core.FRENCH_CORE_PROFILE
     return coreflow.filter_core_cards(
         cards,
-        tokens,
         {"a.mp3"},
         names,
         loanwords,
@@ -274,62 +272,55 @@ class TestBuildTargets:
 class TestFilter:
     def test_c3_matches_a_whole_name(self) -> None:
         cards = [_card("Tomber est facile.")]
-        tokens = [[("tomber", "VERB"), ("être", "AUX"), ("facile", "ADJ")]]
 
-        passed, _reasons = _filter(cards, tokens, ["tom"])
+        passed, _reasons = _filter(cards, ["tom"])
 
         assert passed == [0]
 
     def test_c3_rejects_a_name_word(self) -> None:
         cards = [_card("Tom mange une pomme.")]
-        tokens = [[("tom", "PROPN"), ("manger", "VERB"), ("un", "DET"), ("pomme", "NOUN")]]
 
-        passed, reasons = _filter(cards, tokens, ["tom"])
+        passed, reasons = _filter(cards, ["tom"])
 
         assert passed == []
         assert reasons[0] == "C3"
 
     def test_c4_rejects_a_loan_word(self) -> None:
         cards = [_card("Le week-end est court.")]
-        tokens = [[("le", "DET"), ("week", "NOUN"), ("est", "AUX"), ("court", "ADJ")]]
 
-        passed, reasons = _filter(cards, tokens, [], ["week-end"])
+        passed, reasons = _filter(cards, [], ["week-end"])
 
         assert passed == []
         assert reasons[0] == "C4"
 
     def test_c4_rejects_a_han_loan_word_as_a_span(self) -> None:
         cards = [_card("我想喝咖啡?", english="I want coffee.")]
-        tokens = [[("我", "PRON"), ("想", "VERB"), ("喝", "VERB"), ("咖啡", "NOUN")]]
 
-        passed, reasons = _filter(cards, tokens, [], ["咖啡"])
+        passed, reasons = _filter(cards, [], ["咖啡"])
 
         assert passed == []
         assert reasons[0] == "C4"
 
     def test_c4_keeps_a_han_sentence_without_a_loan_word(self) -> None:
         cards = [_card("我想喝茶?", english="I want tea.")]
-        tokens = [[("我", "PRON"), ("想", "VERB"), ("喝", "VERB"), ("茶", "NOUN")]]
 
-        passed, reasons = _filter(cards, tokens, [], ["咖啡"])
+        passed, reasons = _filter(cards, [], ["咖啡"])
 
         assert passed == [0]
         assert reasons[0] == ""
 
     def test_c3_rejects_a_han_name_as_a_span(self) -> None:
         cards = [_card("我爱北京?", english="I love Beijing.")]
-        tokens = [[("我", "PRON"), ("爱", "VERB"), ("北京", "NOUN")]]
 
-        passed, reasons = _filter(cards, tokens, ["北京"])
+        passed, reasons = _filter(cards, ["北京"])
 
         assert passed == []
         assert reasons[0] == "C3"
 
     def test_c5_rejects_a_card_without_audio(self) -> None:
         cards = [_card("Le chat mange.", audio="missing.mp3")]
-        tokens = [[("le", "DET"), ("chat", "NOUN"), ("manger", "VERB")]]
 
-        passed, reasons = _filter(cards, tokens)
+        passed, reasons = _filter(cards)
 
         assert passed == []
         assert reasons[0] == "C5"

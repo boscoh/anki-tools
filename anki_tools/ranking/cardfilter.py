@@ -10,10 +10,10 @@ profile. :func:`filter_cards` adds the ``unique`` dedupe.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
 from typing import Any, Callable, Protocol, Sequence
 
 from anki_tools.sentence_pack.guards import check_sentence_shape
+from anki_tools.sentence_pack.profile import SentenceShape
 
 MARK_RULES = ("marks",)
 LENGTH_RULES = ("length_window",)
@@ -24,7 +24,6 @@ _WORD_PATTERN = re.compile(r"[^\W\d_]+")
 
 def filter_cards(
     cards: Sequence[Any],
-    tokens: Sequence[Sequence[tuple[str, str]]],
     min_words: int = 3,
     max_words: int = 12,
     *,
@@ -34,24 +33,20 @@ def filter_cards(
     """Apply the shared filter rules.
 
     :param cards: Input cards.
-    :param tokens: Lemma and part of speech per card.
     :param min_words: Minimum word count of a card.
     :param max_words: Maximum word count of a card.
     :param card_rule: Rule function of one card, :func:`filter_reason` with the
         profile of the language.
     :param dedupe_key: Key of filter ``unique``, from the language profile.
-    :raises ValueError: The card list and the token list have different sizes.
     :returns: The input indices of the passed cards, and the reason per input
         index. A passed card has the empty string as its reason.
     """
-    if len(cards) != len(tokens):
-        raise ValueError("The card list and the token list differ in size.")
 
     reasons = [""] * len(cards)
     passed: list[int] = []
     seen: set[str] = set()
     for index, card in enumerate(cards):
-        reason = card_rule(card, tokens[index], min_words, max_words)
+        reason = card_rule(card, min_words, max_words)
         if reason:
             reasons[index] = reason
             continue
@@ -64,23 +59,8 @@ def filter_cards(
     return passed, reasons
 
 
-class ShapeProfile(Protocol):
-    """The shape values of a language, as the cull profile and the core profile hold them."""
-
-    @property
-    def final_marks(self) -> str: ...
-
-    @property
-    def quote_marks(self) -> str: ...
-
-    @property
-    def internal_marks(self) -> str: ...
-
-    @property
-    def script_ok(self) -> Callable[[str], bool]: ...
-
-    @property
-    def is_repeated(self) -> Callable[[str], bool]: ...
+class ShapeProfile(SentenceShape, Protocol):
+    """The values of a language that the cull and the core read, as their profiles hold them."""
 
     @property
     def dedupe_key(self) -> Callable[[str], str]: ...
@@ -89,40 +69,8 @@ class ShapeProfile(Protocol):
     def english_bounds(self) -> tuple[int, int]: ...
 
 
-@dataclass(frozen=True)
-class CardShape:
-    """Shape-guard values of one card.
-
-    The rank flows measure the length window with the tokenizer output, so the
-    unit count comes from the card and not from the sentence text.
-
-    :param units: Token count of the card sentence.
-    :param final_marks: Accepted sentence-final marks of the language.
-    :param quote_marks: Quotation marks and dialogue dashes of the language.
-    :param internal_marks: Internal punctuation marks of the language.
-    :param script_ok: Alphabet test of the language.
-    :param is_repeated: Repeated-pattern test of the language.
-    """
-
-    units: int
-    final_marks: str
-    quote_marks: str
-    internal_marks: str
-    script_ok: Callable[[str], bool]
-    is_repeated: Callable[[str], bool]
-
-    def unit_count(self, sentence: str) -> int:
-        """Give the token count of the card.
-
-        :param sentence: Prepared sentence text.
-        :returns: The token count of the card.
-        """
-        return self.units
-
-
 def filter_reason(
     card: Any,
-    card_tokens: Sequence[tuple[str, str]],
     min_words: int,
     max_words: int,
     profile: ShapeProfile,
@@ -131,29 +79,20 @@ def filter_reason(
 
     The shape guard runs first, as in the sentence pack. The length window, the
     text rules, and the mark rules come from the sentence shape guard, so the
-    marks and the alphabet test are those of the language profile. The English
-    window of the language profile runs last.
+    unit count, the marks, and the alphabet test are those of the language
+    profile. The English window of the language profile runs last.
 
     :param card: Input card.
-    :param card_tokens: Lemma and part of speech of the card sentence.
-    :param min_words: Minimum token count of a card.
-    :param max_words: Maximum token count of a card.
-    :param profile: Mark sets and alphabet test of the language.
+    :param min_words: Minimum unit count of a card.
+    :param max_words: Maximum unit count of a card.
+    :param profile: Shape values and English window of the language.
     :returns: The rule id from ``length_window`` to ``english_words``, or the
         empty string on a pass.
     """
-    shape = CardShape(
-        len(card_tokens),
-        profile.final_marks,
-        profile.quote_marks,
-        profile.internal_marks,
-        profile.script_ok,
-        profile.is_repeated,
-    )
     # The rank flows pass only the length, text, and mark keys.
     reason = check_sentence_shape(
         card.sentence,
-        shape,
+        profile,
         min_words,
         max_words,
         keys=LENGTH_RULES + TEXT_RULES + MARK_RULES,

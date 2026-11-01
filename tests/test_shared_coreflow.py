@@ -170,8 +170,6 @@ class TestCoreHits:
         assert hits == {0: ()}
         assert present == {}
 
-FILTER_TOKENS = [("el", "DET"), ("perro", "NOUN"), ("comer", "VERB"), ("pan", "NOUN")]
-
 
 class TestFilterCoreCards:
     def test_a_clean_card_passes(self) -> None:
@@ -179,7 +177,6 @@ class TestFilterCoreCards:
 
         passed, reasons = coreflow.filter_core_cards(
             cards,
-            [FILTER_TOKENS],
             {"a.mp3"},
             [],
             [],
@@ -196,7 +193,6 @@ class TestFilterCoreCards:
 
         passed, reasons = coreflow.filter_core_cards(
             cards,
-            [FILTER_TOKENS],
             {"a.mp3"},
             [],
             [],
@@ -208,18 +204,6 @@ class TestFilterCoreCards:
         assert passed == []
         assert reasons[0] == "C5"
 
-    def test_a_size_mismatch_raises(self) -> None:
-        with pytest.raises(ValueError, match="differ in size"):
-            coreflow.filter_core_cards(
-                [_card()],
-                [],
-                set(),
-                [],
-                [],
-                min_units=1,
-                max_units=9,
-                shape=spanish_core.SPANISH_CORE_PROFILE,
-            )
 
 
 def _manifest_fixture() -> tuple[
@@ -331,11 +315,10 @@ class TestFiles:
 
 
 def _filter_cards(
-    cards: list[coreflow.InputCard], tokens: list[list[tuple[str, str]]]
+    cards: list[coreflow.InputCard],
 ) -> tuple[list[int], list[str]]:
     return cardfilter.filter_cards(
         cards,
-        tokens,
         card_rule=partial(
             cardfilter.filter_reason, profile=spanish_core.SPANISH_CORE_PROFILE
         ),
@@ -345,71 +328,55 @@ def _filter_cards(
 
 class TestCardFilter:
     def test_a_clean_card_passes(self) -> None:
-        passed, reasons = _filter_cards([_card()], [FILTER_TOKENS])
+        passed, reasons = _filter_cards([_card()])
 
         assert passed == [0]
         assert reasons == [""]
 
     def test_f1_rejects_a_short_english_line(self) -> None:
-        passed, reasons = _filter_cards(
-            [_card(english="Hi.")], [FILTER_TOKENS]
-        )
+        passed, reasons = _filter_cards([_card(english="Hi.")])
 
         assert passed == []
         assert reasons[0] == "english_words"
 
     def test_f2_rejects_a_card_outside_the_window(self) -> None:
-        passed, reasons = _filter_cards(
-            [_card()], [[("el", "DET"), ("perro", "NOUN")]]
-        )
+        passed, reasons = _filter_cards([_card("El perro.")])
 
         assert passed == []
         assert reasons[0] == "length_window"
 
     def test_f3_rejects_a_digit(self) -> None:
-        passed, reasons = _filter_cards(
-            [_card("El perro tiene 2 años.")], [FILTER_TOKENS]
-        )
+        passed, reasons = _filter_cards([_card("El perro tiene 2 años.")])
 
         assert passed == []
         assert reasons[0] == "digit_marks"
 
     def test_script_rejects_a_foreign_letter(self) -> None:
-        passed, reasons = _filter_cards(
-            [_card("El perro come хлеб.")], [FILTER_TOKENS]
-        )
+        passed, reasons = _filter_cards([_card("El perro come хлеб.")])
 
         assert passed == []
         assert reasons[0] == "script"
 
     def test_f4_rejects_a_missing_final_mark(self) -> None:
-        passed, reasons = _filter_cards(
-            [_card("El perro come pan")], [FILTER_TOKENS]
-        )
+        passed, reasons = _filter_cards([_card("El perro come pan")])
 
         assert passed == []
         assert reasons[0] == "marks"
 
     def test_f5_rejects_two_final_marks(self) -> None:
-        passed, reasons = _filter_cards(
-            [_card("El perro come. Pan.")], [FILTER_TOKENS]
-        )
+        passed, reasons = _filter_cards([_card("El perro come. Pan.")])
 
         assert passed == []
         assert reasons[0] == "marks"
 
     def test_f6_rejects_a_quote_mark(self) -> None:
-        passed, reasons = _filter_cards(
-            [_card('El perro dice "hola".')], [FILTER_TOKENS]
-        )
+        passed, reasons = _filter_cards([_card('El perro dice "hola".')])
 
         assert passed == []
         assert reasons[0] == "marks"
 
     def test_f7_rejects_two_internal_marks(self) -> None:
-        passed, reasons = _filter_cards(
-            [_card("Sí, no, tal vez.")], [FILTER_TOKENS]
-        )
+        passed, reasons = _filter_cards([_card("Sí, no, tal vez.")])
 
         assert passed == []
         assert reasons[0] == "marks"
@@ -417,11 +384,7 @@ class TestCardFilter:
     def test_f9_rejects_a_duplicate_sentence(self) -> None:
         cards = [_card(), _card(index=1)]
 
-        passed, reasons = _filter_cards(cards, [FILTER_TOKENS] * 2)
+        passed, reasons = _filter_cards(cards)
 
         assert passed == [0]
         assert reasons[1] == "unique"
-
-    def test_a_size_mismatch_raises(self) -> None:
-        with pytest.raises(ValueError, match="differ in size"):
-            _filter_cards([_card()], [])

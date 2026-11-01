@@ -49,6 +49,8 @@ class CoreProfile:
     :param script_ok: Alphabet test of the ``script`` rule.
     :param is_repeated: Test of the ``repeat`` rule.
     :param dedupe_key: Key of the ``unique`` rule.
+    :param unit_count: Unit count of a sentence, the same count as the sentence
+        pack.
     :param english_bounds: English word-count window of the ``english_words`` rule.
     :param default_options: Selection settings of the core cover.
     :param frequency_source: Label of the frequency source for the manifest.
@@ -90,6 +92,7 @@ class CoreProfile:
     script_ok: Callable[[str], bool]
     is_repeated: Callable[[str], bool]
     dedupe_key: Callable[[str], str]
+    unit_count: Callable[[str], int]
     english_bounds: tuple[int, int]
     default_options: Any
     frequency_source: str

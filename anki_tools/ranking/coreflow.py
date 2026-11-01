@@ -211,7 +211,6 @@ def _holds_word(sentence: str, words: Collection[str]) -> bool:
 
 def filter_core_cards(
     cards: Sequence[Any],
-    tokens: Sequence[Sequence[tuple[str, str]]],
     media: set[str],
     names: Collection[str],
     loanwords: Collection[str],
@@ -223,22 +222,17 @@ def filter_core_cards(
     """Apply the shared filter rules and C3 to C5 to the cards.
 
     :param cards: Input cards.
-    :param tokens: Lemma and part of speech per card.
     :param media: File names of the input media map.
     :param names: Name list of rule C3.
     :param loanwords: Loan word list of rule C4.
     :param min_units: First unit count of the window.
     :param max_units: Last unit count of the window.
-    :param shape: Mark sets and alphabet test of the language profile.
-    :raises ValueError: The card list and the token list differ in size.
+    :param shape: Shape values and English window of the language profile.
     :returns: The input indices that pass, and the reason per input index. A
         passed card has the empty string as its reason.
     """
-    if len(cards) != len(tokens):
-        raise ValueError("The card list and the token list differ in size.")
     passed, cull_reasons = filter_cards(
         cards,
-        tokens,
         min_words=min_units,
         max_words=max_units,
         card_rule=partial(filter_reason, profile=shape),
@@ -963,7 +957,6 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
     )
     passed, reasons = filter_core_cards(
         cards,
-        tokens,
         media,
         names,
         loanwords,

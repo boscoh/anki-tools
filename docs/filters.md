@@ -26,7 +26,7 @@ cap, and they have no concept quota.
 | Id               | Sentence pack                      | Cull deck                            | Core deck                                                                |
 | ---------------- | ---------------------------------- | ------------------------------------ | ------------------------------------------------------------------------ |
 | `english_link`   | an English link exists             | -                                    | -                                                                        |
-| `length_window`  | unit count inside the window       | token count inside the length window | token count inside the length window                                     |
+| `length_window`  | unit count inside the window       | the same                             | the same                                                                 |
 | `digit_marks`    | no digit, bracket, link, ellipsis  | the same                             | the same                                                                 |
 | `script`         | the language alphabet test         | the same                             | the same                                                                 |
 | `repeat`         | no repeated pattern                | the same                             | the same                                                                 |
@@ -69,8 +69,8 @@ pack records a pass count for every guard before the first failure.
 
 - `length_window` is in all three flows. It is a filter, not a gate. The test is
   one function: `_passes_length` in `sentence_pack/pool.py`. The pack counts
-  units with `profile.unit_count`. The cull and the core pass the token count
-  through `CardShape.unit_count` in `filter_reason`.
+  units with `profile.unit_count`. The cull and the core use the same hook from
+  their profile, so the three flows count one unit.
 - A scaffold sentence skips the one-final-mark and internal-mark checks of `marks`,
   and it skips the `sense` guard (`shape_failure(scaffold=True)`,
   `SCAFFOLD_SKIP_GUARDS`).
@@ -95,8 +95,8 @@ pack records a pass count for every guard before the first failure.
 | Pack          | `profile.unit_count`: words or Han characters | `profile.min_units` to `max_units`                  |
 | Pack scaffold | the same                                      | `profile.fallback_min_units` to `max_units`         |
 | Pack frames   | the same                                      | the core window, no scaffold retry                  |
-| Cull          | spaCy tokens with `is_alpha`                  | `CullRequest.min_words` to `max_words`, 3 to 12     |
-| Core          | spaCy tokens with `is_alpha`                  | `CoreProfile.min_units` to `max_units` of `core.py` |
+| Cull          | the same                                      | `CullRequest.min_words` to `max_words`, 3 to 12     |
+| Core          | the same                                      | `CoreProfile.min_units` to `max_units` of `core.py` |
 
 The pack also runs `exceeds_max_units` before the measure step. It rejects a
 sentence with more whitespace chunks than `max_units` and records `length_window`.
@@ -120,8 +120,6 @@ The gate rechecks use the same windows: K5 reads `profile.min_units` and
 These differences are deliberate, because the jobs differ. A reader must not
 compare the reject counts of two flows directly.
 
-- Count: the pack counts words or Han characters. The cull and the core count
-  spaCy tokens. French elision (`l'eau`) and Chinese text give different counts.
 - Window: the pack, the core, and the cull use different windows (section 4.1).
 - Frames: a pack frame sentence runs the shape guards and a target-form test
   only. It skips `english_words`, `unique`, and the scaffold retry.

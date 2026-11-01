@@ -27,7 +27,6 @@ from anki_tools.ranking.coverage import write_rows
 from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.sentence_pack import pool
 ENGLISH = "A short English line."
-BASE_TOKENS = [("le", "DET"), ("chat", "NOUN"), ("mange", "VERB"), ("vite", "ADV")]
 MIN_WORDS = 3
 MAX_WORDS = 12
 DECK_NAME = "French 1000 Core Sentences"
@@ -128,34 +127,27 @@ class TestNames:
 
 
 @pytest.mark.parametrize(
-    ("rule", "sentence", "english", "tokens"),
+    ("rule", "sentence", "english"),
     [
-        ("english_words", "Le chat mange vite.", "Hi", BASE_TOKENS),
-        ("length_window", "Chat mange.", ENGLISH, [("chat", "NOUN"), ("mange", "VERB")]),
-        ("digit_marks", "Le chat a 3 ans.", ENGLISH, BASE_TOKENS),
-        ("digit_marks", "Le chat [noir] mange.", ENGLISH, BASE_TOKENS),
-        ("digit_marks", "Voir www.exemple.fr.", ENGLISH, BASE_TOKENS),
-        ("digit_marks", "Le chat mange...", ENGLISH, BASE_TOKENS),
-        ("repeat", "Oui oui oui.", ENGLISH, BASE_TOKENS),
-        ("marks", "Le chat mange vite", ENGLISH, BASE_TOKENS),
-        ("marks", "Le chat mange. Le chien dort.", ENGLISH, BASE_TOKENS),
-        ("marks", "Le chat « mange » vite.", ENGLISH, BASE_TOKENS),
-        ("marks", "— Le chat mange vite.", ENGLISH, BASE_TOKENS),
-        (
-            "marks",
-            "Le chat, le chien, et l'oiseau mangent.",
-            ENGLISH,
-            BASE_TOKENS,
-        ),
+        ("english_words", "Le chat mange vite.", "Hi"),
+        ("length_window", "Chat mange.", ENGLISH),
+        ("digit_marks", "Le chat a 3 ans.", ENGLISH),
+        ("digit_marks", "Le chat [noir] mange.", ENGLISH),
+        ("digit_marks", "Voir le site www.exemple.fr.", ENGLISH),
+        ("digit_marks", "Le chat mange...", ENGLISH),
+        ("repeat", "Oui oui oui.", ENGLISH),
+        ("marks", "Le chat mange vite", ENGLISH),
+        ("marks", "Le chat mange. Le chien dort.", ENGLISH),
+        ("marks", "Le chat « mange » vite.", ENGLISH),
+        ("marks", "— Le chat mange vite.", ENGLISH),
+        ("marks", "Le chat, le chien, et l'oiseau mangent.", ENGLISH),
     ],
 )
-def test_one_card_per_filter_rule(
-    rule: str, sentence: str, english: str, tokens: list[tuple[str, str]]
-) -> None:
+def test_one_card_per_filter_rule(rule: str, sentence: str, english: str) -> None:
     card = _card(sentence, english=english)
 
     assert cullflow.filter_reason(
-        card, tokens, MIN_WORDS, MAX_WORDS, cull_fr.FRENCH_CULL_PROFILE
+        card, MIN_WORDS, MAX_WORDS, cull_fr.FRENCH_CULL_PROFILE
     ) == rule
 
 
@@ -182,7 +174,7 @@ def test_the_pack_and_the_cull_agree_on_the_english_window(
 
     pack_reason = pool.fact_failure(measured) or ""
     cull_reason = cullflow.filter_reason(
-        card, BASE_TOKENS, MIN_WORDS, MAX_WORDS, cull_fr.FRENCH_CULL_PROFILE
+        card, MIN_WORDS, MAX_WORDS, cull_fr.FRENCH_CULL_PROFILE
     )
 
     assert pack_reason == cull_reason == expected
@@ -193,7 +185,7 @@ def test_a_shape_failure_wins_over_the_english_window() -> None:
 
     assert (
         cullflow.filter_reason(
-            card, BASE_TOKENS, MIN_WORDS, MAX_WORDS, cull_fr.FRENCH_CULL_PROFILE
+            card, MIN_WORDS, MAX_WORDS, cull_fr.FRENCH_CULL_PROFILE
         )
         == "marks"
     )
@@ -204,7 +196,7 @@ def test_a_clean_card_passes_every_rule() -> None:
 
     assert (
         cullflow.filter_reason(
-            card, BASE_TOKENS, MIN_WORDS, MAX_WORDS, cull_fr.FRENCH_CULL_PROFILE
+            card, MIN_WORDS, MAX_WORDS, cull_fr.FRENCH_CULL_PROFILE
         )
         == ""
     )
@@ -216,11 +208,9 @@ def test_filter_cards_rejects_a_duplicate_text() -> None:
         _card("Le chien dort bien.", index=1),
         _card("Le chat mange vite.", index=2),
     ]
-    tokens = [BASE_TOKENS, BASE_TOKENS, BASE_TOKENS]
 
     passed, reasons = cullflow.filter_cards(
         cards,
-        tokens,
         MIN_WORDS,
         MAX_WORDS,
         card_rule=partial(
@@ -238,7 +228,6 @@ def test_filter_cards_rejects_a_duplicate_that_differs_in_marks() -> None:
 
     passed, reasons = cullflow.filter_cards(
         cards,
-        [BASE_TOKENS, BASE_TOKENS],
         MIN_WORDS,
         MAX_WORDS,
         card_rule=partial(

@@ -243,6 +243,7 @@ CANTONESE_LANGUAGE = LanguageDeckProfile(
     script_ok=CANTONESE.script_ok,
     is_repeated=CANTONESE.is_repeated,
     dedupe_key=CANTONESE.dedupe_key,
+    unit_count=CANTONESE.unit_count,
     highlight=CANTONESE.highlight,
     romanization_source="Jyutping",
 )

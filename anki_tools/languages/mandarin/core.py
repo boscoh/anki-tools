@@ -287,6 +287,7 @@ MANDARIN_LANGUAGE = LanguageDeckProfile(
     script_ok=MANDARIN.script_ok,
     is_repeated=MANDARIN.is_repeated,
     dedupe_key=MANDARIN.dedupe_key,
+    unit_count=MANDARIN.unit_count,
     highlight=MANDARIN.highlight,
     romanization_source="Sentence (Latin)",
 )

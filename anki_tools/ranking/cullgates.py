@@ -191,10 +191,9 @@ def gate_filter_recheck(files: CullFiles) -> tuple[bool, str]:
     min_words = int(files.params().get("min_words", 0))
     max_words = int(files.params().get("max_words", 0))
     rows = _kept_rows(files)
-    tokens = files.profile.tokenize_texts([row["sentence"] for row in rows])
     problems: list[str] = []
     seen: set[str] = set()
-    for row, card_tokens in zip(rows, tokens, strict=True):
+    for row in rows:
         card = InputCard(
             note_id=0,
             sentence=row["sentence"],
@@ -202,7 +201,7 @@ def gate_filter_recheck(files: CullFiles) -> tuple[bool, str]:
             audio="",
             index=0,
         )
-        reason = filter_reason(card, card_tokens, min_words, max_words, files.profile)
+        reason = filter_reason(card, min_words, max_words, files.profile)
         key = files.profile.dedupe_key(card.sentence)
         if not reason and key in seen:
             reason = "unique"
