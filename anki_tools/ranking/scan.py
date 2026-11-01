@@ -56,10 +56,6 @@ class CoreProfile:
     :param frequency_source: Label of the frequency source for the manifest.
     :param lemma_overrides: Lemma repair map of the lemmatizer artefacts,
         applied by :func:`scan` to the tokens of every card.
-    :param outside_set_ratio: Largest accepted outside set, as a share of
-        the targets.
-    :param outside_rare_ratio: Largest accepted rare outside count, as a
-        share of the outside set.
     :param finalize: Post-processing step of the written deck, called with
         the run, or None when the language needs none.
     :param romanization_source: Input field of the romanization line, for
@@ -95,8 +91,6 @@ class CoreProfile:
     default_options: Any
     frequency_source: str
     lemma_overrides: Mapping[str, str] = field(default_factory=dict)
-    outside_set_ratio: float = 1.3
-    outside_rare_ratio: float = 0.1
     finalize: Callable[[Any], None] | None = None
     romanization_source: str | None = None
 

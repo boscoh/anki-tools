@@ -7,7 +7,7 @@ from its own body: `1.3 * targets` for the outside set and `0.1 * outside` for
 the rare outside words. The shared flow applied the same four numbers to every
 language.
 
-Status: accepted. ADR 0033 retires gates G3 and G4 and the two cull coverage fields. The core ratios stay.
+Status: accepted. ADR 0033 retires gates G3 and G4 and the two cull coverage fields. ADR 0038 retires gate K4 and the two core ratios.
 
 ## Decision
 

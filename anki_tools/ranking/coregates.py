@@ -69,7 +69,6 @@ __all__ = [
     "gate_target_in_sentence",
     "gate_identity",
     "gate_order",
-    "gate_outside",
     "gate_output_model",
     "gate_sense",
     "gate_unchecked_sense",
@@ -143,20 +142,6 @@ def gate_covered_targets(files: CoreFiles) -> tuple[bool, str]:
     ok = covered == targets
     return ok, f"covered {covered} of {targets}"
 
-
-
-def gate_outside(files: CoreFiles) -> tuple[bool, str]:
-    """K4: the outside set and the rare outside words stay small."""
-    counts = files.manifest()["counts"]
-    targets = max(1, counts["targets"])
-    outside = counts["outside"]
-    profile = files.profile
-    ok_set = outside <= profile.outside_set_ratio * targets
-    ok_rare = counts["outside_rare"] <= profile.outside_rare_ratio * max(1, outside)
-    return (
-        ok_set and ok_rare,
-        f"outside {outside} of {targets} targets, rare {counts['outside_rare']}",
-    )
 
 
 def gate_filter_recheck(files: CoreFiles) -> tuple[bool, str]:
@@ -387,7 +372,6 @@ def gate_tail(files: CoreFiles) -> tuple[bool, str]:
 GATES: tuple[Gate, ...] = (
     Gate("K1", gate_card_count),
     Gate("K2", gate_covered_targets),
-    Gate("K4", gate_outside),
     Gate("K5", gate_filter_recheck),
     Gate("K6", gate_similarity),
     Gate("K7", gate_audio),

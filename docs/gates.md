@@ -23,7 +23,7 @@ One table shows the four flows at a glance:
 | --------------- | ------------------------------------ | ------------------------ | --------------------- |
 | Sentence pack   | `anki swadesh pack <lang>`           | G1 to G21, 18 to 20 rows | 7 rule ids            |
 | Cull deck       | `anki fix <lang> <input> --select`   | G1 to G18, 15 rows       | 7 rule ids            |
-| Core deck       | `anki fix <lang> <input> --core`     | K1 to K22, 19 rows       | 7 rule ids            |
+| Core deck       | `anki fix <lang> <input> --core`     | K1 to K22, 18 rows       | 7 rule ids            |
 | Vocabulary deck | `anki swadesh vocab <lang>`          | none                     | none                  |
 
 The filter column lives in `docs/filters.md`.
@@ -100,11 +100,11 @@ second flow.
 | Sentence pack, Mandarin        | G1 to G18                          | 18   |
 | Sentence pack, Cantonese       | G1 to G18, G20, G21                | 20   |
 | Cull deck                      | G1, G2, G5 to G13, G15 to G18      | 15   |
-| Core deck                      | K1, K2, K4 to K14, K16, K18 to K22 | 19   |
+| Core deck                      | K1, K2, K5 to K14, K16, K18 to K22 | 18   |
 | Vocabulary deck                | none                               | 0    |
 
-A removed row leaves a gap in the numbering. Cull G3, G4, and G14 are retired
-(ADR 0033, ADR 0035). Their ids are not reused. Each flow doc gives the check of
+A removed row leaves a gap in the numbering. Cull G3, G4, and G14 and core K4 are
+retired (ADR 0033, ADR 0035, ADR 0038). Their ids are not reused. Each flow doc gives the check of
 each row: `docs/swadesh-sentence-flow.md`, `docs/cull-deck-flow.md`,
 `docs/core-deck-flow.md`.
 
@@ -176,8 +176,9 @@ function behind an id:
   `gate_target_in_sentence` and `gate_card_count` is `gate_card_cap`.
 - A row that could not fail left the table. Its value is a report line or a
   manifest value: core `K3` is Covered twice, core `K15` is part of `K19`,
-  core `K17` is Rejected names and Rejected loan words, and pack `G20` is the
-  manifest value `noun_gender_missing`.
+  core `K17` is Rejected names and Rejected loan words, core `K4` is the outside
+  counts of the manifest, and pack `G20` is the manifest value
+  `noun_gender_missing`.
 
 Rejected:
 

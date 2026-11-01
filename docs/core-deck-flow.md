@@ -23,8 +23,8 @@ One command runs the stages in order: `anki fix <language> --core`. The
 | K5    | order   | K4                                        | card order, assigned target per card        |
 | K6    | write   | K0, K4, K5                                | APKG and four side files                    |
 
-The gates K1 to K22 run after K6. The table holds 19 rows: K3, K15, and K17
-are gone.
+The gates K1 to K22 run after K6. The table holds 18 rows: K3, K15, and K17
+are gone, and gate K4 is retired (ADR 0038). The flow step K4 is the selection.
 
 The `--cards` and `--words` values change the tier F target count and the
 card cap. The other `CoreRequest` fields keep their defaults.
@@ -297,7 +297,7 @@ The coverage status of a target is one of these values:
 
 | Group      | Gates              | Checks                                                              |
 | ---------- | ------------------ | ------------------------------------------------------------------- |
-| size       | K1, K4             | card count, outside set and rare outside words                      |
+| size       | K1                 | card count                                                          |
 | coverage   | K2, K11            | covered targets, coverage CSV                                       |
 | rules      | K5, K6             | F1 to F9, similarity                                                |
 | files      | K7, K8, K12        | audio files, counts, manifest hashes                                |
@@ -324,7 +324,7 @@ every card passes the sense test. A word with no sense row passes.
 | Path                                            | Content                                    |
 | ----------------------------------------------- | ------------------------------------------ |
 | `anki_tools/ranking/coreflow.py`                | K0 to K6 flow, output field values         |
-| `anki_tools/ranking/coregates.py`               | gates K1 to K22, 19 rows                   |
+| `anki_tools/ranking/coregates.py`               | gates K1 to K22, 18 rows                   |
 | `anki_tools/gates.py`                           | gate value, row, runner, reader contract   |
 | `anki_tools/ranking/gates.py`                   | report, shared gates                       |
 | `anki_tools/ranking/assemble.py`                | deck, side files, manifest, report         |
