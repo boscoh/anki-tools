@@ -1,57 +1,77 @@
-"""Tests for the deck field resolution of ``extract_sentences``."""
+"""Tests for the deck field resolution of ``extract_sentences``.
+
+Each field of the deck holds its own name, so the text of the sentence names the
+field that the extraction chose.
+"""
 
 from __future__ import annotations
 
-from anki_tools.ranking.rank import _resolve_extract_fields
+from pathlib import Path
+from typing import Any
+
+import pytest
+
+from anki_tools.apkg.package import AnkiPackage
+from anki_tools.ranking.rank import Sentence, extract_sentences
 
 
-def test_text_field_wins() -> None:
-    text, _, _ = _resolve_extract_fields(["Front", "Back"], "Back", (), ())
-    assert text == "Back"
+def _extract(
+    tmp_path: Path,
+    fields: list[str],
+    options: dict[str, Any] | None = None,
+    values: dict[str, str] | None = None,
+) -> Sentence:
+    path = tmp_path / "deck.apkg"
+    card = {name: name for name in fields} | (values or {})
+    AnkiPackage.create(path, "Deck", fields=fields, cards=[card])
+    (sentence,) = extract_sentences(str(path), **(options or {}))
+    return sentence
 
 
-def test_text_candidate_beats_fallback() -> None:
-    text, _, _ = _resolve_extract_fields(["Front", "French"], None, ("French",), ())
-    assert text == "French"
+@pytest.mark.parametrize(
+    "fields, options, text, romanization",
+    [
+        pytest.param(["Front", "Back"], {"text_field": "Back"}, "Back", "", id="text-field-wins"),
+        pytest.param(
+            ["Front", "French"],
+            {"text_candidates": ("French",)},
+            "French",
+            "",
+            id="candidate-beats-fallback",
+        ),
+        pytest.param(["Front", "Sentence"], {}, "Sentence", "", id="sentence-fallback"),
+        pytest.param(["Front", "Back"], {}, "Front", "", id="front-fallback"),
+        pytest.param(
+            ["Front", "French"], {}, "Front", "", id="language-field-name-is-no-fallback"
+        ),
+        pytest.param(["Back"], {}, "Back", "", id="first-field-is-the-last-resort"),
+        pytest.param(
+            ["Front", "Pinyin"],
+            {"romanization_candidates": ("Pinyin",)},
+            "Front",
+            "Pinyin",
+            id="romanization-candidate",
+        ),
+        pytest.param(
+            ["Front", "Romanization"], {}, "Front", "Romanization", id="romanization-fallback"
+        ),
+        pytest.param(["Front", "Jyutping"], {}, "Front", "", id="no-romanization-field"),
+    ],
+)
+def test_the_extraction_picks_the_text_and_romanization_fields(
+    tmp_path: Path,
+    fields: list[str],
+    options: dict[str, Any],
+    text: str,
+    romanization: str,
+) -> None:
+    sentence = _extract(tmp_path, fields, options)
+
+    assert sentence.text == text
+    assert sentence.romanization == romanization
 
 
-def test_fallback_order() -> None:
-    text, _, _ = _resolve_extract_fields(["Front", "Sentence"], None, (), ())
-    assert text == "Sentence"
-    text, _, _ = _resolve_extract_fields(["Front", "Back"], None, (), ())
-    assert text == "Front"
+def test_the_counter_field_sets_the_original_order(tmp_path: Path) -> None:
+    sentence = _extract(tmp_path, ["Front", "[counter 2]"], values={"[counter 2]": "7"})
 
-
-def test_language_field_name_is_no_fallback() -> None:
-    """The shared resolver holds no language field name of its own."""
-    text, _, _ = _resolve_extract_fields(["Front", "French"], None, (), ())
-    assert text == "Front"
-
-
-def test_first_field_is_the_last_resort() -> None:
-    text, _, _ = _resolve_extract_fields(["Back"], None, (), ())
-    assert text == "Back"
-    text, _, _ = _resolve_extract_fields([], None, (), ())
-    assert text == "Front"
-
-
-def test_romanization_candidate() -> None:
-    _, _, romanization = _resolve_extract_fields(
-        ["Front", "Pinyin"], None, (), ("Pinyin",)
-    )
-    assert romanization == "Pinyin"
-
-
-def test_romanization_fallback() -> None:
-    _, _, romanization = _resolve_extract_fields(["Front", "Romanization"], None, (), ())
-    assert romanization == "Romanization"
-
-
-def test_no_romanization_field() -> None:
-    _, _, romanization = _resolve_extract_fields(["Front", "Jyutping"], None, (), ())
-    assert romanization is None
-
-
-def test_order_field() -> None:
-    _, order, _ = _resolve_extract_fields(["Front", "[counter 2]"], None, (), ())
-    assert order == "[counter 2]"
+    assert sentence.original_order == 7

@@ -6,28 +6,37 @@ import pytest
 
 from anki_tools.ranking.duplicates import at_limit, jaccard
 
-
-def test_empty_sets_give_zero() -> None:
-    assert jaccard(set(), set()) == 0.0
-    assert jaccard({"chat"}, set()) == 0.0
-    assert jaccard(set(), {"chat"}) == 0.0
+CAT_DOG = {"chat", "chien"}
 
 
-def test_disjoint_sets_give_zero() -> None:
-    assert jaccard({"chat", "chien"}, {"boire", "lait"}) == 0.0
+@pytest.mark.parametrize(
+    "left, right, expected",
+    [
+        pytest.param(set(), set(), 0.0, id="both-empty"),
+        pytest.param({"chat"}, set(), 0.0, id="right-empty"),
+        pytest.param(set(), {"chat"}, 0.0, id="left-empty"),
+        pytest.param(CAT_DOG, {"boire", "lait"}, 0.0, id="disjoint"),
+        pytest.param(CAT_DOG, {"chien", "chat"}, 1.0, id="equal"),
+        pytest.param(CAT_DOG, {"chat", "lait"}, pytest.approx(1 / 3), id="shared-over-union"),
+    ],
+)
+def test_jaccard_is_the_shared_lemmas_over_the_union(
+    left: set[str], right: set[str], expected: float
+) -> None:
+    assert jaccard(left, right) == expected
 
 
-def test_equal_sets_give_one() -> None:
-    assert jaccard({"chat", "chien"}, {"chien", "chat"}) == 1.0
-
-
-def test_shared_lemma_over_the_union() -> None:
-    assert jaccard({"chat", "chien"}, {"chat", "lait"}) == pytest.approx(1 / 3)
-
-
-def test_at_limit_includes_the_boundary() -> None:
-    assert at_limit({"chat", "chien"}, {"chat", "lait"}, 1 / 3)
-    assert at_limit({"chat", "chien"}, {"chat", "chien"}, 1.0)
-    assert not at_limit({"chat", "chien"}, {"chat", "chien"}, 1.1)
-    assert not at_limit({"chat", "chien"}, {"boire", "lait"}, 0.1)
-    assert not at_limit(set(), set(), 0.1)
+@pytest.mark.parametrize(
+    "left, right, limit, expected",
+    [
+        pytest.param(CAT_DOG, {"chat", "lait"}, 1 / 3, True, id="boundary-is-included"),
+        pytest.param(CAT_DOG, CAT_DOG, 1.0, True, id="equal-at-one"),
+        pytest.param(CAT_DOG, CAT_DOG, 1.1, False, id="above-the-limit"),
+        pytest.param(CAT_DOG, {"boire", "lait"}, 0.1, False, id="disjoint"),
+        pytest.param(set(), set(), 0.1, False, id="empty"),
+    ],
+)
+def test_at_limit_includes_the_boundary(
+    left: set[str], right: set[str], limit: float, expected: bool
+) -> None:
+    assert at_limit(left, right, limit) is expected

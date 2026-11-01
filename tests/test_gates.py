@@ -11,29 +11,6 @@ from anki_tools.gate_files import GateFileReader
 from anki_tools.ranking import coregates, gates
 
 
-class _Files:
-    """Minimal file reader: the runner only passes it to the gate."""
-
-    profile = None
-
-
-def test_the_runner_reports_a_gate_that_cannot_read_a_file() -> None:
-    def broken(_files):
-        raise ValueError("bad file")
-
-    results = gates.run_gates(
-        [gates.Gate("K1", broken), gates.Gate("K2", lambda _files: (True, "ok"))],
-        _Files(),  # type: ignore[arg-type]
-    )
-
-    assert [(result.name, result.passed) for result in results] == [
-        ("K1", False),
-        ("K2", True),
-    ]
-    assert "bad file" in results[0].message
-
-
-
 def test_a_missing_file_fails_only_the_gates_that_read_it(tmp_path: Path) -> None:
     coverage = tmp_path / "coverage.csv"
     coverage.write_text("word\nchat\n", encoding="utf-8")

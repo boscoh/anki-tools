@@ -8,8 +8,9 @@ sit on a cycle.
 
 from __future__ import annotations
 
-import ast
 from pathlib import Path
+
+from tests.ast_fixture import imported_names
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -24,21 +25,10 @@ def _modules() -> dict[str, Path]:
     return found
 
 
-def _imports(path: Path, known: set[str]) -> set[str]:
-    names = set()
-    for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
-        if isinstance(node, ast.ImportFrom) and node.module:
-            names.add(node.module)
-            names.update(f"{node.module}.{alias.name}" for alias in node.names)
-        elif isinstance(node, ast.Import):
-            names.update(alias.name for alias in node.names)
-    return {name for name in names if name in known}
-
-
 def test_the_import_graph_has_no_cycle() -> None:
     modules = _modules()
     known = set(modules)
-    graph = {name: _imports(path, known) - {name} for name, path in modules.items()}
+    graph = {name: (imported_names(path) & known) - {name} for name, path in modules.items()}
 
     resolved: set[str] = set()
     while True:

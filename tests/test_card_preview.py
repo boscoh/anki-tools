@@ -1,90 +1,118 @@
 """Tests for the browser card preview builder."""
 
-from pathlib import Path
+import pytest
 
 from anki_tools.languages import LANGUAGES, profile_languages, vocab_languages
 from anki_tools.preview import (
     SENTENCE_LANGUAGES,
     VOCAB_LANGUAGES,
-    build_sections,
+    PreviewSection,
+    build_page,
+    default_card,
+    fix_card,
     render_template,
-    write_preview,
+    sentence_card,
 )
 
 
-def test_write_preview_writes_every_section(tmp_path: Path) -> None:
-    output = tmp_path / "cards.html"
-
-    cards, sections = write_preview(output)
-
-    text = output.read_text(encoding="utf-8")
-    assert cards == 19
-    assert sections == 5
-    assert "Anki card previews" in text
-    for title in (
-        "Default deck style",
-        "Swadesh sentence packs",
-        "1000-card culls",
-        "Core-word decks",
-        "Swadesh vocabulary decks",
-    ):
-        assert title in text
-
-
-
-def test_every_fix_card_writes_the_output_fields() -> None:
-    sections = {section.anchor: section for section in build_sections()}
-    cards = sections["core"].cards + sections["culls"].cards
-
-    assert len(cards) == 6
-    for card in cards:
-        assert "Sentence" in card.fields
-        assert "Core" in card.fields
-        assert "CoreGloss" in card.fields
-        assert card.front.strip()
-        assert "I am very busy today." in card.back or "ask" in card.back
-        assert "<b>" in card.back
-
-    by_title = {card.title: card for card in cards}
-    mandarin = by_title["Mandarin core-word deck"]
-    cantonese = by_title["Cantonese core-word deck"]
-    assert "Romanization" in mandarin.fields
-    assert "wǒ jīn tiān hěn máng" in mandarin.back
-    assert "ngo5 gam1 jat6 hou2 mong4" in cantonese.back
-
-def test_vocabulary_cards_hold_only_card_content() -> None:
-    vocab = next(section for section in build_sections() if section.anchor == "vocab")
-    by_title = {card.title: card for card in vocab.cards}
-
-    assert by_title["Spanish vocabulary"].fields == "audio, spanish, english"
-    assert by_title["Greek vocabulary"].fields == "audio, greek, english"
-
-
-def test_the_sentence_pack_cards_bold_the_target() -> None:
-    section = next(
-        section for section in build_sections()
-        if section.anchor == "sentence-packs"
+def test_the_page_holds_each_section_and_card() -> None:
+    sections = (
+        PreviewSection("default", "Default deck style", "intro", (default_card(),)),
+        PreviewSection(
+            "core",
+            "Core-word decks",
+            "intro",
+            (fix_card("french", "core", "French core-word deck"),),
+        ),
     )
-    by_title = {card.title: card for card in section.cards}
 
-    assert "<b>Je</b>" in by_title["French sentence"].back
-    assert "<b>Yo</b>" in by_title["Spanish sentence"].back
-    assert "<b>εσύ</b>" in by_title["Greek sentence"].back
+    page = build_page(sections, title="Previews")
 
-
-def test_render_template_hides_and_shows_sections() -> None:
-    template = "{{#Tag}}yes{{/Tag}}{{^Tag}}no{{/Tag}}"
-
-    assert render_template(template, {"Tag": "x"}) == "yes"
-    assert render_template(template, {"Tag": ""}) == "no"
+    assert "<title>Previews</title>" in page
+    for section in sections:
+        assert f'href="#{section.anchor}"' in page
+        assert section.title in page
+        for card in section.cards:
+            assert card.title in page
 
 
-def test_render_template_handles_filters_and_triple_braces() -> None:
-    template = "{{text:Front}} {{{Back}}} {{! note}}"
+@pytest.mark.parametrize(
+    "language, mode, shown",
+    [
+        pytest.param(
+            "french", "cull", ["I won't ask you anything else today.", "not"], id="french-cull"
+        ),
+        pytest.param(
+            "spanish", "cull", ["I want to ask for the bill.", "to ask"], id="spanish-cull"
+        ),
+        pytest.param(
+            "french", "core", ["I won't ask you anything else today.", "not"], id="french-core"
+        ),
+        pytest.param(
+            "spanish", "core", ["I want to ask for the bill.", "to ask"], id="spanish-core"
+        ),
+        pytest.param(
+            "mandarin",
+            "core",
+            ["I am very busy today.", "wǒ jīn tiān hěn máng", "busy"],
+            id="mandarin-core",
+        ),
+        pytest.param(
+            "cantonese",
+            "core",
+            ["I am very busy today.", "ngo5 gam1 jat6 hou2 mong4", "busy"],
+            id="cantonese-core",
+        ),
+    ],
+)
+def test_a_fix_card_shows_the_output_fields(
+    language: str, mode: str, shown: list[str]
+) -> None:
+    card = fix_card(language, mode, "title")
 
-    result = render_template(template, {"Front": "a", "Back": "b"})
+    assert card.front.strip()
+    assert "<b>" in card.back
+    for text in shown:
+        assert text in card.back, text
+    for name in ("Sentence", "Core", "CoreGloss"):
+        assert name in card.fields
 
-    assert result == "a b "
+
+@pytest.mark.parametrize(
+    "language, sentence, target, bold",
+    [
+        ("french", "Je suis ici.", "Je", "<b>Je</b>"),
+        ("spanish", "Yo estoy aquí.", "Yo", "<b>Yo</b>"),
+        ("greek", "εσύ είσαι εδώ.", "εσύ", "<b>εσύ</b>"),
+    ],
+)
+def test_the_sentence_pack_card_bolds_the_target(
+    language: str, sentence: str, target: str, bold: str
+) -> None:
+    row = {
+        "sentence": sentence,
+        "target": target,
+        "english": "You are here.",
+        "tatoeba_id": "1",
+        "tatoeba_author": "someone",
+    }
+
+    assert bold in sentence_card(language, "title", row).back
+
+
+@pytest.mark.parametrize(
+    "template, fields, expected",
+    [
+        ("{{#Tag}}yes{{/Tag}}{{^Tag}}no{{/Tag}}", {"Tag": "x"}, "yes"),
+        ("{{#Tag}}yes{{/Tag}}{{^Tag}}no{{/Tag}}", {"Tag": ""}, "no"),
+        ("{{text:Front}} {{{Back}}} {{! note}}", {"Front": "a", "Back": "b"}, "a b "),
+    ],
+    ids=["section-shown", "section-hidden", "filter-triple-brace-and-comment"],
+)
+def test_render_template_fills_the_mustache_tags(
+    template: str, fields: dict[str, str], expected: str
+) -> None:
+    assert render_template(template, fields) == expected
 
 
 def test_the_language_lists_follow_the_registry() -> None:
