@@ -1,5 +1,7 @@
 """Tests for the ordered guard tables and the language guard hooks."""
 
+import pytest
+
 from anki_tools.sentence_pack import pool
 from anki_tools.sentence_pack.guards import (
     check_sentence_shape,
@@ -9,9 +11,10 @@ from anki_tools.sentence_pack.guards import (
     occurrences,
 )
 from anki_tools.languages.cantonese.profile import form_offsets
-from anki_tools.languages.french.profile import FRENCH
-from anki_tools.languages.greek.profile import GREEK
+from anki_tools.languages.french.profile import hits as french_hits
 from anki_tools.languages.mandarin.profile import MANDARIN, count_form_occurrences
+from anki_tools.languages.spanish.profile import hits as spanish_hits
+from tests.shape_fixture import PROFILES, shape_rules
 
 
 def test_guard_table_matches_the_filter_order() -> None:
@@ -37,32 +40,24 @@ def test_record_pass_counts_every_guard_before_the_failure() -> None:
     assert all(value == 1 for value in counts.values())
 
 
-def test_digit_marks_is_one_guard_for_every_language() -> None:
-    for profile, sentence in (
-        (MANDARIN, "我想喝水2杯。"),
-        (GREEK, "Η γάτα έχει 3 μήνες."),
-        (FRENCH, "Le chat [noir] mange vite."),
-        (FRENCH, "Le chat mange…"),
-    ):
-        assert (
-            pool.shape_failure(sentence, profile, 1, 20, keys=frozenset({"digit_marks"}))
-            == "digit_marks"
-        )
+@pytest.mark.parametrize("language, sentence, expected", shape_rules("french", "greek", "mandarin"))
+def test_a_sentence_gets_the_first_failed_shape_guard(
+    language: str, sentence: str, expected: str
+) -> None:
+    profile = PROFILES[language]
 
+    failure = pool.shape_failure(sentence, profile, profile.min_units, profile.max_units)
 
-def test_script_tests_only_the_alphabet() -> None:
-    assert MANDARIN.script_ok("我想喝水2杯。")
-    assert not MANDARIN.script_ok("我想喝tea。")
-    assert FRENCH.script_ok("Il a 42 ans.")
+    assert (failure or "") == expected
 
 
 def test_shape_failure_applies_only_the_requested_keys() -> None:
     sentence = "我要喝水"
     assert check_sentence_shape(sentence, MANDARIN, 4, 7) == "marks"
     assert pool.shape_failure(sentence, MANDARIN, 4, 7, scaffold=True) == "marks"
+    assert pool.shape_failure(sentence, MANDARIN, 4, 7, keys=frozenset({"script"})) is None
     assert (
-        pool.shape_failure(sentence, MANDARIN, 4, 7, keys=frozenset({"script"}))
-        is None
+        pool.shape_failure("我想喝水2杯。", MANDARIN, 4, 7, keys=frozenset({"script"})) is None
     )
 
 
@@ -99,4 +94,18 @@ def test_compound_rows_block_insect_and_can_hear() -> None:
     assert form_offsets("\u87f2\u597d\u7d30", "\u87f2") == [0]
     assert count_form_occurrences("\u6211\u542c\u5f97\u5230\u3002", "\u5f97\u5230") == 0
     assert count_form_occurrences("\u6211\u5f97\u5230\u4e86\u3002", "\u5f97\u5230") == 1
+
+
+@pytest.mark.parametrize(
+    ("hits", "sentence", "form", "expected"),
+    [
+        (french_hits, "Quelque chose ne va pas.", "quelques", {}),
+        (french_hits, "Je lis quelque livre.", "quelques", {"quelques": 1}),
+        (spanish_hits, "Lo hice otra vez.", "otro", {}),
+        (spanish_hits, "Lo hice otra vez.", "otra", {}),
+        (spanish_hits, "Quiero otra casa.", "otra", {"otra": 1}),
+    ],
+)
+def test_latin_hits_block_the_compounds_column(hits, sentence, form, expected) -> None:
+    assert hits(sentence, frozenset({form})) == expected
 
