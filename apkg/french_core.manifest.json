@@ -1,5 +1,5 @@
 {
-  "build_date": "2026-11-01T07:00:45+00:00",
+  "build_date": "2026-11-01T07:47:02+00:00",
   "source": {
     "input": "apkg/6000_French_Sentences_w_Audio.apkg",
     "deck": "French Core",
@@ -31,32 +31,32 @@
   },
   "counts": {
     "cards": 277,
-    "targets": 216,
-    "absent": 41,
-    "absent_sense": 4,
+    "targets": 217,
+    "absent": 40,
+    "absent_sense": 5,
     "unchecked": 0,
     "unranked": 0,
     "covered1": 212,
-    "covered2": 187,
+    "covered2": 188,
     "full": 228,
-    "outside": 246,
-    "outside_rare": 18,
-    "tail_words": 247,
-    "sense_rows": 216,
+    "outside": 244,
+    "outside_rare": 17,
+    "tail_words": 257,
+    "sense_rows": 217,
     "dropped_no_core": 23,
     "bolded": 277,
     "unbolded": 0,
     "rows": 5928,
-    "sense_failures": 3613
+    "sense_failures": 3656
   },
   "frequency": {
     "path": "data/french_frequency.tsv",
     "spoken_weight": 0.5
   },
   "files": {
-    "core_csv": "sha256:50860e83bc0cd4aea222442ec826d0ad46953d94b3174eacb8d452ebf8be018b",
-    "coverage_csv": "sha256:4e2d73f36825e367344b28a01ed88a0f18e7dc89ea23dae3beac5b4c776e6dbb",
+    "core_csv": "sha256:09d97bf007eea434a966fe4539145980bbe9f2dcec8a5285768a2dc61893aba7",
+    "coverage_csv": "sha256:eab8b5d88ed54618dfc4945917cb914b42b3c12de4a7baea4e2064cf7735326b",
     "input_apkg": "sha256:230dd01bcf6223bcb8a5ea303eee01fd4a55e19ce418d0bf66a81193037024b5"
   },
-  "kept_order": "sha256:e48eab124d07cdbc40e342b1af0a4bea25b9d1adfbaefcfa8c8748892015bc79"
+  "kept_order": "sha256:3378721f8b1e3b006c38b2fa6c4caefaa96b84a756cfc7bf675be5261624f8c6"
 }
