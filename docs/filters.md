@@ -31,13 +31,15 @@ cap, and they have no concept quota.
 | `script`         | the language alphabet test         | the same                             | the same                                                                 |
 | `repeat`         | no repeated pattern                | the same                             | the same                                                                 |
 | `marks`          | final, quote, and internal marks   | the same                             | the same                                                                 |
-| `english_words`  | English text has 2 to 12 words     | the same                             | the same                                                                 |
+| `english_words`  | English words inside the window    | the same                             | the same                                                                 |
 | `unique`         | dedupe key is new                  | the same                             | the same                                                                 |
 | `sense`          | English gloss holds the sense      | the same, per target                 | the same, per target                                                     |
 | C3 to C5         | -                                  | -                                    | a name test, a loan word test, and the media map                         |
 
 The pack tests 9 ids, the cull 8, and the core 8 plus C3 to C5. The profile
 of the language gives the `repeat` test and the `unique` key to all three flows.
+It also gives the `english_words` window, 2 to 12 words by default, so the three
+flows use one window (`DEFAULT_ENGLISH_BOUNDS`, `english_bounds`).
 The cull and the core apply `sense` to a card and target pair, not to a whole card.
 Section 5, L9, states the target meaning of `sense`; the code does not yet do it.
 
@@ -50,10 +52,12 @@ reads the tokens and the facts. Then `FACT_GUARDS` holds `english_words` to `sen
 sentence that passes no guard becomes a candidate for the lowest-index word it
 covers.
 
-The cull runs one list in `filter_reason`: `english_words`, `length_window`,
-`digit_marks`, `script`, `repeat`, the mark rules, then `unique`. The shape guard
-`check_sentence_shape` gives all rules except `english_words` and
-`unique`. `LENGTH_RULES`, `TEXT_RULES`, and `MARK_RULES` hold their ids.
+The cull runs one list in `filter_reason`, in the same order as the pack:
+`length_window`, `digit_marks`, `script`, `repeat`, the mark rules,
+`english_words`, then `unique`. The shape guard `check_sentence_shape` gives all
+rules except `english_words` and `unique`. `LENGTH_RULES`, `TEXT_RULES`, and
+`MARK_RULES` hold their ids. The window of `english_words` is
+`profile.english_bounds`, the same window as the pack.
 
 The core runs `filter_cards` with `filter_reason`, the function of the cull, then
 C3 to C5 in `filter_core_cards`.
@@ -116,9 +120,6 @@ The gate rechecks use the same windows: K5 reads `profile.min_units` and
 These differences are deliberate, because the jobs differ. A reader must not
 compare the reject counts of two flows directly.
 
-- Order: the pack runs the shape guards and then `english_words`. The cull and
-  the core run `english_words` first. A sentence that fails both gets a different
-  stored reason in each flow.
 - Count: the pack counts words or Han characters. The cull and the core count
   spaCy tokens. French elision (`l'eau`) and Chinese text give different counts.
 - Window: the pack, the core, and the cull use different windows (section 4.1).

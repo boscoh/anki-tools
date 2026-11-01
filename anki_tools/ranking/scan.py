@@ -49,6 +49,7 @@ class CoreProfile:
     :param script_ok: Alphabet test of the ``script`` rule.
     :param is_repeated: Test of the ``repeat`` rule.
     :param dedupe_key: Key of the ``unique`` rule.
+    :param english_bounds: English word-count window of the ``english_words`` rule.
     :param default_options: Selection settings of the core cover.
     :param frequency_source: Label of the frequency source for the manifest.
     :param lemma_overrides: Lemma repair map of the lemmatizer artefacts,
@@ -89,6 +90,7 @@ class CoreProfile:
     script_ok: Callable[[str], bool]
     is_repeated: Callable[[str], bool]
     dedupe_key: Callable[[str], str]
+    english_bounds: tuple[int, int]
     default_options: Any
     frequency_source: str
     lemma_overrides: Mapping[str, str] = field(default_factory=dict)

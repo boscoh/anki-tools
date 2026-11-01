@@ -21,9 +21,11 @@ from anki_tools.apkg import deck_writer
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.shape import OutputShape, write_package
 from anki_tools.languages.french import cull as cull_fr
+from anki_tools.languages.french.profile import FRENCH
 from anki_tools.ranking import assemble, coreflow, corelist, cullflow, cullgates
 from anki_tools.ranking.coverage import write_rows
 from anki_tools.ranking.identity import DeckIdentity
+from anki_tools.sentence_pack import pool
 ENGLISH = "A short English line."
 BASE_TOKENS = [("le", "DET"), ("chat", "NOUN"), ("mange", "VERB"), ("vite", "ADV")]
 MIN_WORDS = 3
@@ -155,6 +157,46 @@ def test_one_card_per_filter_rule(
     assert cullflow.filter_reason(
         card, tokens, MIN_WORDS, MAX_WORDS, cull_fr.FRENCH_CULL_PROFILE
     ) == rule
+
+
+@pytest.mark.parametrize(
+    ("english", "expected"),
+    [
+        ("Hi", "english_words"),
+        (ENGLISH, ""),
+        ("one two three four five six seven eight nine ten eleven twelve thirteen", "english_words"),
+    ],
+)
+def test_the_pack_and_the_cull_agree_on_the_english_window(
+    english: str, expected: str
+) -> None:
+    card = _card("Le chat mange vite.", english=english)
+    measured = pool.FactInput(
+        english_words=len(english.split()),
+        english_bounds=FRENCH.english_bounds(),
+        duplicate=False,
+        unknown_words=0,
+        hits=(),
+        sense_hits=(),
+    )
+
+    pack_reason = pool.fact_failure(measured) or ""
+    cull_reason = cullflow.filter_reason(
+        card, BASE_TOKENS, MIN_WORDS, MAX_WORDS, cull_fr.FRENCH_CULL_PROFILE
+    )
+
+    assert pack_reason == cull_reason == expected
+
+
+def test_a_shape_failure_wins_over_the_english_window() -> None:
+    card = _card("Le chat mange vite", english="Hi")
+
+    assert (
+        cullflow.filter_reason(
+            card, BASE_TOKENS, MIN_WORDS, MAX_WORDS, cull_fr.FRENCH_CULL_PROFILE
+        )
+        == "marks"
+    )
 
 
 def test_a_clean_card_passes_every_rule() -> None:

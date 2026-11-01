@@ -70,6 +70,7 @@ def _profile() -> cullflow.CullProfile:
         script_ok=lambda sentence: True,
         is_repeated=lambda sentence: False,
         dedupe_key=str,
+        english_bounds=(2, 12),
         input_model_name=MODEL_NAME,
         input_sentence_field="Text",
         input_english_field="Meaning",

@@ -58,8 +58,6 @@ FILTER_NAMES = {
 BRACKET_MARKS = frozenset("[]{}<>")
 ELLIPSIS_MARKS = ("...", "…")
 URL_MARKS = ("http", "www.")
-MIN_ENGLISH_WORDS = 2
-MAX_ENGLISH_WORDS = 12
 
 WARM_BATCH = 512
 
@@ -534,7 +532,7 @@ def build_candidate_pool(
 
         measured = FactInput(
             english_words=english_words,
-            english_bounds=(MIN_ENGLISH_WORDS, MAX_ENGLISH_WORDS),
+            english_bounds=profile.english_bounds(),
             duplicate=dedupe in seen,
             unknown_words=unknown_words,
             hits=hits,
@@ -614,7 +612,7 @@ def build_candidate_pool(
         dedupe = profile.dedupe_key(sentence)
         measured = FactInput(
             english_words=len(frame_english.split()),
-            english_bounds=(MIN_ENGLISH_WORDS, MAX_ENGLISH_WORDS),
+            english_bounds=profile.english_bounds(),
             duplicate=dedupe in seen,
             unknown_words=profile.count_unknown(sentence, known_words),
             hits=hits,

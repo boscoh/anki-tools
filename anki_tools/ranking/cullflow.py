@@ -188,6 +188,7 @@ class CullProfile:
     :param script_ok: Alphabet test of the ``script`` rule.
     :param is_repeated: Test of the ``repeat`` rule.
     :param dedupe_key: Key of the ``unique`` rule.
+    :param english_bounds: English word-count window of the ``english_words`` rule.
     :param input_model_name: Name of the input note model.
     :param input_sentence_field: Name of the sentence field of the input model.
     :param input_english_field: Name of the English field of the input model.
@@ -224,6 +225,7 @@ class CullProfile:
     script_ok: Callable[[str], bool]
     is_repeated: Callable[[str], bool]
     dedupe_key: Callable[[str], str]
+    english_bounds: tuple[int, int]
 
     input_model_name: str
     input_sentence_field: str
