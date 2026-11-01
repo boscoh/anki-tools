@@ -1,6 +1,6 @@
 """Tests for the fix commands: the select, core, and check routes.
 
-``fixrun.run_fix`` takes its flows and gates as keyword arguments (ADR 0049).
+``fixrun.run_fix`` takes its flows and gates as keyword arguments (ADR 0050).
 The route tests pass recorders and read the calls. Nothing patches repo code.
 """
 
