@@ -9,15 +9,9 @@ PACK_KEYS = (
     "digit_marks",
     "script",
     "repeat",
-    "final_mark",
-    "one_final_mark",
-    "quote",
-    "internal_mark",
-    "predicate",
-    "orphan",
+    "marks",
     "english_words",
     "unique",
-    "unknown",
     "sense",
 )
 CULL_KEYS = (
@@ -25,14 +19,11 @@ CULL_KEYS = (
     "length_window",
     "digit_marks",
     "script",
-    "final_mark",
-    "one_final_mark",
-    "quote",
-    "internal_mark",
-    "propn",
+    "repeat",
+    "marks",
     "unique",
 )
-CORE_RULE_KEYS = CULL_KEYS + ("C1", "C2", "C3", "C4", "C5")
+CORE_RULE_KEYS = CULL_KEYS + ("C3", "C4", "C5")
 
 
 def test_pack_keys_keep_the_pack_order() -> None:
@@ -54,6 +45,12 @@ def test_the_guard_tables_cover_the_pack_keys_after_english_link() -> None:
 
 
 def test_the_cull_mark_keys_are_the_pack_mark_keys() -> None:
-    pack_mark_keys = {"final_mark", "one_final_mark", "quote", "internal_mark"}
-    assert set(cardfilter.MARK_RULES) == pack_mark_keys
+    assert cardfilter.MARK_RULES == ("marks",)
+    assert "marks" in pool.FILTER_KEYS
     assert cardfilter.LENGTH_RULES == ("length_window",)
+
+
+def test_the_cull_report_lists_every_filter_reason_key() -> None:
+    shape_keys = cardfilter.LENGTH_RULES + cardfilter.TEXT_RULES + cardfilter.MARK_RULES
+    assert set(shape_keys) <= set(cullflow.FILTER_RULES)
+    assert set(shape_keys) <= set(coreflow.FILTER_KEYS)

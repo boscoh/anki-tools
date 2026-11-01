@@ -78,14 +78,9 @@ FILTER_KEYS = (
     "length_window",
     "digit_marks",
     "script",
-    "final_mark",
-    "one_final_mark",
-    "quote",
-    "internal_mark",
-    "propn",
+    "repeat",
+    "marks",
     "unique",
-    "C1",
-    "C2",
     "C3",
     "C4",
     "C5",
@@ -270,11 +265,6 @@ def core_hits(
     return hits, dict(sense_failures), present
 
 
-def _has_predicate(tokens: Sequence[tuple[str, str]]) -> bool:
-    """Give rule C1: the sentence has a verb, auxiliary, or adjective."""
-    return any(pos in {"VERB", "AUX", "ADJ"} for _lemma, pos in tokens)
-
-
 _HAN_PATTERN = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
 
 
@@ -306,20 +296,18 @@ def filter_core_cards(
     media: set[str],
     names: Collection[str],
     loanwords: Collection[str],
-    has_orphan: Any,
     *,
     min_units: int,
     max_units: int,
     shape: ShapeProfile,
 ) -> tuple[list[int], list[str]]:
-    """Apply the shared filter rules and C1 to C5 to the cards.
+    """Apply the shared filter rules and C3 to C5 to the cards.
 
     :param cards: Input cards.
     :param tokens: Lemma and part of speech per card.
     :param media: File names of the input media map.
     :param names: Name list of rule C3.
     :param loanwords: Loan word list of rule C4.
-    :param has_orphan: Language hook of rule C2.
     :param min_units: First unit count of the window.
     :param max_units: Last unit count of the window.
     :param shape: Mark sets and alphabet test of the language profile.
@@ -335,16 +323,13 @@ def filter_core_cards(
         min_words=min_units,
         max_words=max_units,
         card_rule=partial(filter_reason, profile=shape),
+        dedupe_key=shape.dedupe_key,
     )
     reasons = list(cull_reasons)
     kept: list[int] = []
     for index in passed:
         card = cards[index]
-        if not _has_predicate(tokens[index]):
-            reasons[index] = "C1"
-        elif has_orphan(card.sentence):
-            reasons[index] = "C2"
-        elif _holds_word(card.sentence, names):
+        if _holds_word(card.sentence, names):
             reasons[index] = "C3"
         elif _holds_word(card.sentence, loanwords):
             reasons[index] = "C4"
@@ -1063,7 +1048,6 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
         media,
         names,
         loanwords,
-        profile.has_orphan,
         min_units=min_units,
         max_units=max_units,
         shape=profile,

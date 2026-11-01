@@ -62,11 +62,8 @@ FILTER_RULES = (
     "length_window",
     "digit_marks",
     "script",
-    "final_mark",
-    "one_final_mark",
-    "quote",
-    "internal_mark",
-    "propn",
+    "repeat",
+    "marks",
     "unique",
 )
 EXEMPT_GAIN = 0.1
@@ -183,6 +180,8 @@ class CullProfile:
     :param quote_marks: Quotation marks and dialogue dashes of the mark rule.
     :param internal_marks: Internal punctuation marks of the mark rule.
     :param script_ok: Alphabet test of the ``script`` rule.
+    :param is_repeated: Test of the ``repeat`` rule.
+    :param dedupe_key: Key of the ``unique`` rule.
     :param input_model_name: Name of the input note model.
     :param input_sentence_field: Name of the sentence field of the input model.
     :param input_english_field: Name of the English field of the input model.
@@ -217,6 +216,8 @@ class CullProfile:
     quote_marks: str
     internal_marks: str
     script_ok: Callable[[str], bool]
+    is_repeated: Callable[[str], bool]
+    dedupe_key: Callable[[str], str]
 
     input_model_name: str
     input_sentence_field: str
@@ -1065,6 +1066,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> deck_writer.RunFiles
         min_words=request.min_words,
         max_words=request.max_words,
         card_rule=partial(filter_reason, profile=profile),
+        dedupe_key=profile.dedupe_key,
     )
     reserve: list[ReserveCard] = []
     reserve_sets: list[set[str]] = []
