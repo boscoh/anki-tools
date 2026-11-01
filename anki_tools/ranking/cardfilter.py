@@ -21,6 +21,15 @@ TEXT_RULES = ("digit_marks", "script", "repeat")
 _WORD_PATTERN = re.compile(r"[^\W\d_]+")
 
 
+def english_key(english: str) -> str:
+    """Give the dedupe key of an English text.
+
+    :param english: English text of a card.
+    :returns: The casefolded text with single spaces. It is empty for an empty text.
+    """
+    return " ".join(english.casefold().split())
+
+
 def filter_cards(
     cards: Sequence[Any],
     *,
@@ -32,7 +41,9 @@ def filter_cards(
     :param cards: Input cards.
     :param card_rule: Rule function of one card, :func:`filter_reason` with the
         profile of the language.
-    :param dedupe_key: Key of filter ``unique``, from the language profile.
+    :param dedupe_key: Sentence key of filter ``unique``, from the language
+        profile. A card also fails ``unique`` when its :func:`english_key` is
+        not empty and an earlier passed card has the same one.
     :returns: The input indices of the passed cards, and the reason per input
         index. A passed card has the empty string as its reason.
     """
@@ -40,16 +51,19 @@ def filter_cards(
     reasons = [""] * len(cards)
     passed: list[int] = []
     seen: set[str] = set()
+    seen_english: set[str] = set()
     for index, card in enumerate(cards):
         reason = card_rule(card)
         if reason:
             reasons[index] = reason
             continue
         key = dedupe_key(card.sentence)
-        if key in seen:
+        english = english_key(card.english)
+        if key in seen or (english and english in seen_english):
             reasons[index] = "unique"
             continue
         seen.add(key)
+        seen_english.add(english)
         passed.append(index)
     return passed, reasons
 

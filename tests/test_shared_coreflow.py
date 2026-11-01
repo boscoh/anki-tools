@@ -15,6 +15,8 @@ from functools import partial
 from pathlib import Path
 from typing import Collection
 
+import pytest
+
 from anki_tools.languages.spanish import core as spanish_core
 from anki_tools.ranking import cardfilter, coreflow
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
@@ -99,7 +101,7 @@ class TestCoreHits:
         assert present == {"S1:agua": True, "F:beber": True}
 
     def test_a_tier_s_hit_without_the_gloss_is_a_sense_failure(self) -> None:
-        cards, tokens, targets = _hit_fixture()
+        _fixture_cards, tokens, targets = _hit_fixture()
         cards = [_card("Yo bebo agua.", english="I drink wine.")]
 
         hits, failures, _present = coreflow.core_hits(
@@ -347,6 +349,27 @@ class TestCardFilter:
 
         assert passed == []
         assert reasons[0] == "marks"
+
+    @pytest.mark.parametrize(
+        ("english", "expected"),
+        [
+            pytest.param(("The dog eats.", " the  DOG eats."), [0], id="same english"),
+            pytest.param(("The dog eats.", "The cat eats."), [0, 1], id="different english"),
+            pytest.param(("", ""), [0, 1], id="empty english"),
+        ],
+    )
+    def test_unique_compares_the_english_text(
+        self, english: tuple[str, str], expected: list[int]
+    ) -> None:
+        cards = [
+            _card("El perro come pan.", english=english[0]),
+            _card("El gato come pan.", index=1, english=english[1]),
+        ]
+
+        passed, reasons = _filter_cards(cards)
+
+        assert passed == expected
+        assert (reasons[1] == "unique") == (expected == [0])
 
     def test_f9_rejects_a_duplicate_sentence(self) -> None:
         cards = [_card(), _card(index=1)]

@@ -34,7 +34,7 @@ All three flows run the same seven rule ids.
 | `script`        | the alphabet test of the language                 | the profile hook `script_ok`                   |
 | `repeat`        | no repeated pattern                               | the profile gives the test                     |
 | `marks`         | final, quote, and internal marks                  | four checks, no sub-reason                     |
-| `unique`        | the dedupe key is new                             | the profile gives the key                      |
+| `unique`        | the dedupe key is new                             | section 2.1; the profile gives the key         |
 | `sense`         | the English holds the sense of the target         | per target in the cull and the core; section 6 |
 
 The `marks` rule has four checks:
@@ -45,6 +45,20 @@ The `marks` rule has four checks:
 4. The sentence has at most one internal mark.
 
 No flow tests the English length.
+
+### 2.1 The unique rule
+
+The cull and the core reject a card as `unique` when one of two keys is not new:
+
+1. The sentence key from the profile `dedupe_key`.
+2. The English key from `english_key` in `ranking/cardfilter.py`: the English
+   text, casefolded, with single spaces.
+
+A card with an empty English text never matches on the English key. Only a
+passed card adds its keys, so a rejected card blocks no later card. Cull `G5`
+and core `K5` call `filter_cards`, so they use the same rule (ADR 0047). The
+pack has its own sentence dedupe in `sentence_pack/pool.py` and does not test
+the English key.
 
 ## 3. Rule order
 

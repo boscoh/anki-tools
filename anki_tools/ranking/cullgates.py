@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +25,7 @@ from anki_tools.ranking.cullflow import (
     FREQUENCY_SOURCE,
     SIMILARITY,
     CullProfile,
+    filter_cards,
     filter_reason,
     frequency_senses,
     sense_lemma_sets,
@@ -158,23 +160,26 @@ def gate_filter_recheck(files: CullFiles) -> tuple[bool, str]:
     A reserve card has its own length window, so the gate skips it.
     """
     rows = [row for row in _kept_rows(files) if row.get("source") == FREQUENCY_SOURCE]
-    problems: list[str] = []
-    seen: set[str] = set()
-    for row in rows:
-        card = InputCard(
+    cards = [
+        InputCard(
             note_id=0,
             sentence=row["sentence"],
             english=row["english"],
             audio="",
-            index=0,
+            index=index,
         )
-        reason = filter_reason(card, files.profile)
-        key = files.profile.dedupe_key(card.sentence)
-        if not reason and key in seen:
-            reason = "unique"
-        seen.add(key)
-        if reason:
-            problems.append(f"{reason} {card.sentence[:40]}")
+        for index, row in enumerate(rows)
+    ]
+    _passed, reasons = filter_cards(
+        cards,
+        card_rule=partial(filter_reason, profile=files.profile),
+        dedupe_key=files.profile.dedupe_key,
+    )
+    problems = [
+        f"{reason} {card.sentence[:40]}"
+        for card, reason in zip(cards, reasons)
+        if reason
+    ]
     if problems:
         return False, f"{len(problems)} kept card(s) fail: {_sample(problems)}"
     return True, f"{len(rows)} kept cards pass the shared filter rules"

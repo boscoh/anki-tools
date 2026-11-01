@@ -133,7 +133,10 @@ def test_the_pack_and_the_cull_agree_on_the_shape_rules(sentence: str) -> None:
 def test_filter_cards_rejects_a_duplicate_text(
     sentences: list[str], reasons: list[str]
 ) -> None:
-    cards = [card(sentence, index=index) for index, sentence in enumerate(sentences)]
+    cards = [
+        card(sentence, index=index, english=f"English {sentence}")
+        for index, sentence in enumerate(sentences)
+    ]
 
     passed, found = cullflow.filter_cards(
         cards,

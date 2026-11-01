@@ -117,7 +117,8 @@ when a pack check must serve a second flow.
   the manifest. Cull `G1` reads the cap from the manifest, because the user sets
   it with `--cards` (ADR 0046).
 - Cull `G5` skips the reserve rows. They have their own length window
-  (ADR 0046).
+  (ADR 0046). It calls `filter_cards`, so it uses the same `unique` rule as the
+  producer: the sentence key and the English key (ADR 0047).
 - Mandarin `G12` checks the native audio authors, not every sentence author, so
   it holds its own function.
 
