@@ -47,6 +47,7 @@ from anki_tools.ranking.cover import greedy_cover
 from anki_tools.ranking.coverage import write_rows
 from anki_tools.ranking.duplicates import at_limit
 from anki_tools.ranking.identity import DeckIdentity
+from anki_tools.sentence_pack.english_sense import read_senses
 from anki_tools.sentence_pack.tokens import load_model
 
 DEFAULT_MAX_CARDS = 1000
@@ -1044,8 +1045,9 @@ def run_cull(request: CullRequest, profile: CullProfile) -> deck_writer.RunFiles
         profile.clean_sentence,
     )
     glosses = {
-        lemma: words.first
-        for lemma, words in coreflow.read_senses(profile.sense_path).items()
+        lemma: row.first
+        for (tier, lemma), row in read_senses(profile.sense_path).items()
+        if tier == "F"
     }
     frequency = profile.load_frequency()
     ranks = profile.frequency_ranks(frequency, request.spoken_weight)

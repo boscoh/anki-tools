@@ -143,7 +143,7 @@ The cull and core reports once left out `repeat`. Both report lists now hold it.
 | L6    | one identical rule set for every flow | a different accepted set                       | rejected, the two jobs differ                  |
 | L7    | `length_window` to the gate layer     | none                                           | rejected, a gate never rejects a sentence      |
 | L8    | `digit_marks`, `script` in all flows  | the cull and the core gain an alphabet test    | done, `anki-sxzu`, ADR 0029                    |
-| L9    | one `sense` rule in every flow        | the cull and the core drop a failed target     | proposed, work items S1 to S5                  |
+| L9    | one `sense` rule in every flow        | the cull and the core drop a failed target     | in progress, S1, S3, S5 done; S2, S4 open      |
 
 L3 added `final_marks`, `quote_marks`, and `internal_marks` to `CoreProfile`. It
 moved `CardShape` and `filter_reason` to `ranking/cardfilter.py`, and
@@ -197,13 +197,21 @@ are tokenizer lemmas, and its languages have no compounds.
 | -------------------------------------------------------- | ----------------------------------------- |
 | `sense_filter` hook, `make_sense_filter`, `SENSE_CHECKS` | removed; the record holds `false_friends` |
 | `false_friend_spans` hook, `FALSE_FRIENDS`               | removed; the record holds `compounds`     |
-| `holds_sense`, `holds_tier_s_sense`, `sense_match`       | one function                              |
+| `holds_sense`, `holds_tier_s_sense`, `sense_match`       | one function, `sense_failure`             |
 | `gate_no_sense_mismatch`, `gate_no_false_friend`         | one `sense` recheck gate in every flow    |
 | `gate_unchecked_sense` (K16)                             | a limit on the `sense` rule in every flow |
 | `gate_target_in_sentence` (K13)                          | test 1 of the rule                        |
 
 `sense` does not replace `english_link`, `english_words`, the shape rules,
 `unique`, C3 to C5, or the deck gates such as `gate_core_word`.
+
+S3 is done. `sense_failure(english, row, gloss)` in
+`sentence_pack/english_sense.py` returns `false_friend`, `sense`, or None. The
+pack, the core, and the audit call it. A tier S form passes a Swadesh `gloss`;
+a tier F lemma passes none. `read_senses` keys a row by tier and word, and the
+TSV has the columns `word`, `senses`, `false_friends`, `compounds`, `tier`. A
+blank `tier` is `F`. Greek has no core flow, so `vocab/greek_core_senses.tsv`
+holds its tier S rows only.
 
 The English table `vocab/english_senses.json` stays. It gives the sense words of a
 Swadesh gloss, and WordNet builds it.
@@ -213,7 +221,7 @@ Work items:
 | Id | Task                                                                  | Behavior change        |
 | -- | --------------------------------------------------------------------- | ---------------------- |
 | S1 | write this section                                                    | none                   |
-| S2 | cull: remove a lemma that fails `sense_match` in `select_cards`       | kept cards change; ADR |
+| S2 | cull: remove a lemma that fails `sense_failure` in `select_cards`     | kept cards change; ADR |
 | S3 | one shared function and one record; move the dicts into the TSV files | none                   |
 | S4 | one `sense` recheck gate in the cull and the core                     | an old deck can fail   |
 | S5 | sense rows for all 300 cull targets, and a Cantonese file             | data                   |

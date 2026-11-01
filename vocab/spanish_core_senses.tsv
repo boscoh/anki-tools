@@ -1,4 +1,4 @@
-word	senses	false_friends
+word	senses	false_friends	compounds	tier
 tener	have,has,had,having,got,get,ve	
 ir	go,goes,going,went,gone	
 hacer	do,does,did,done,doing,make,makes,made,making	
@@ -305,3 +305,14 @@ gran	great,big,large,grand,tall
 semana	week,weeks	
 coche	car,cars,carriage	
 ahí	there	
+sal	salt,salty	leave,out,go,get,come,exit		S
+cola	tail,tails	queue,line,cola,coke,glue,wait,waiting		S
+pluma	feather,feathers,plumage	pen,pens,quill,quills		S
+lengua	tongue,tongues	language,languages		S
+hoja	leaf,leaves	sheet,sheets,page,pages,paper,blade		S
+palo	stick,sticks,pole,branch	suit,suits,stroke,strokes		S
+piel	skin,skins	leather,fur,furs,hide		S
+carne	meat,meats	flesh,beef		S
+pelo	hair,hairs	fur,bit,inch		S
+barriga	belly,stomach,tummy	pregnant		S
+día	day,days	morning,afternoon		S

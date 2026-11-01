@@ -13,7 +13,6 @@ assembler in ``anki_tools/ranking/assemble.py``. The shared gates live in
 
 from __future__ import annotations
 
-import csv
 import hashlib
 import re
 from collections import Counter
@@ -37,11 +36,11 @@ from anki_tools.ranking.cardfilter import (
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
 from anki_tools.ranking.core import select as select_core
 from anki_tools.ranking.core import target_quotas
-from anki_tools.ranking.corelist import CONTENT_POS, CoreTarget, SenseWords, build_core_targets, build_targets
+from anki_tools.ranking.corelist import CONTENT_POS, CoreTarget, build_core_targets, build_targets
 from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.ranking.scan import CoreProfile, scan
 from anki_tools.sentence_pack.audio import probe_duration
-from anki_tools.sentence_pack.english_sense import english_tokens
+from anki_tools.sentence_pack.english_sense import read_senses, sense_failure
 
 AUDIO_PROBE_WORKERS = 8
 
@@ -117,50 +116,6 @@ class CoreRequest:
     max_cards: int | None = None
 
 
-def read_senses(path: Path) -> dict[str, SenseWords]:
-    """Read the sense file of the tier F targets.
-
-    The file has the columns ``word``, ``senses``, and ``false_friends``. The
-    two word columns hold comma-separated English words. A missing file gives
-    no rows, so every tier F target is unchecked.
-
-    :param path: TSV file.
-    :returns: Lemma to its sense words, false-friend words, and first sense.
-    """
-    table: dict[str, SenseWords] = {}
-    source = Path(path)
-    if not source.exists():
-        return table
-    with source.open(encoding="utf-8", newline="") as handle:
-        for row in csv.DictReader(handle, delimiter="\t"):
-            word = (row.get("word") or "").strip().casefold()
-            if not word:
-                continue
-            senses = _word_set(row.get("senses") or "")
-            table[word] = SenseWords(
-                senses=senses,
-                false_friends=_word_set(row.get("false_friends") or ""),
-                first=_first_word(row.get("senses") or ""),
-            )
-    return table
-
-
-def _word_set(text: str) -> frozenset[str]:
-    """Split a comma-separated word list and casefold it."""
-    return frozenset(
-        part.strip().casefold() for part in text.split(",") if part.strip()
-    )
-
-
-def _first_word(text: str) -> str:
-    """Give the first word of a comma-separated list, casefolded."""
-    for part in text.split(","):
-        word = part.strip().casefold()
-        if word:
-            return word
-    return ""
-
-
 def read_loanwords(path: Path) -> frozenset[str]:
     """Read the loan word list of rule C4.
 
@@ -176,37 +131,6 @@ def read_loanwords(path: Path) -> frozenset[str]:
         if text and not text.startswith("#"):
             words.add(text.casefold())
     return frozenset(words)
-
-
-def sense_match(
-    english: str,
-    senses: frozenset[str],
-    false_friends: frozenset[str],
-) -> bool:
-    """Test one hit against the English sense of the target.
-
-    :param english: Paired English sentence.
-    :param senses: Sense words of the target. An empty set accepts the hit and
-        makes the target unchecked.
-    :param false_friends: False-friend words of the target.
-    :returns: True when the English shows the sense.
-    """
-    if not senses:
-        return True
-    tokens = set(english_tokens(english))
-    return bool(senses & tokens) and not bool(false_friends & tokens)
-
-
-def holds_tier_s_sense(target: CoreTarget, english: str) -> bool:
-    """Test a tier S hit against the Swadesh gloss of the row.
-
-    :param target: Tier S target.
-    :param english: Paired English sentence.
-    :returns: True when the English shows the gloss.
-    """
-    from anki_tools.sentence_pack.english_sense import holds_sense
-
-    return holds_sense(target.gloss, english)
 
 
 def core_hits(
@@ -243,24 +167,19 @@ def core_hits(
         for form in profile.hits(card.sentence, form_set):
             for target in by_form[form]:
                 present[target.key] = True
-                if profile.sense_filter is not None and profile.sense_filter(
-                    form, card.english
-                ):
+                if sense_failure(card.english, target.sense, target.gloss):
                     sense_failures[target.key] += 1
-                    continue
-                if holds_tier_s_sense(target, card.english):
-                    found.append(target.key)
                 else:
-                    sense_failures[target.key] += 1
+                    found.append(target.key)
         for lemma, pos in tokens[index]:
             if pos not in CONTENT_POS:
                 continue
             for target in by_lemma.get(profile.lemma_key(lemma), ()):
                 present[target.key] = True
-                if sense_match(card.english, target.senses, target.false_friends):
-                    found.append(target.key)
-                else:
+                if sense_failure(card.english, target.sense):
                     sense_failures[target.key] += 1
+                else:
+                    found.append(target.key)
         hits[index] = tuple(sorted(set(found)))
     return hits, dict(sense_failures), present
 

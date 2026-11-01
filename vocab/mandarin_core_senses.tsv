@@ -1,4 +1,4 @@
-word	senses	false_friends
+word	senses	false_friends	compounds	tier
 没有	no,not,have,nothing,without	
 这个	this	
 自己	yourself,myself	
@@ -49,3 +49,11 @@ word	senses	false_friends
 认识	know,meet	
 了解	understand	
 感觉	feel,feels,felt,feeling	
+切			一切	S
+闻			新闻,传闻	S
+数	count,counts,counted,counting	math,maths,mathematics,arithmetic,number,numbers	数学,数大,数字,岁数,人数	S
+烧			发烧	S
+抓	scratch,scratches,scratched,scratching,itch	grab,grabs,grabbed,grabbing,catch,catches,caught,catching,seize,seizes,seized,arrest,arrests,arrested	抓住,抓到,抓紧	S
+挖			挖苦	S
+挤	squeeze,squeezes,squeezed,squeezing	crowded,crowd,crowds,cramped,packed	挤满	S
+来			出来,起来	S

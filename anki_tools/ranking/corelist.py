@@ -10,10 +10,14 @@ from __future__ import annotations
 
 import math
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Collection, Sequence
 
-from anki_tools.sentence_pack.english_sense import english_tokens, load_senses
+from anki_tools.sentence_pack.english_sense import (
+    SenseRow,
+    english_tokens,
+    load_senses,
+)
 
 CONTENT_POS = frozenset({"NOUN", "VERB", "ADJ", "ADV"})
 CONTENT_SHARE = 0.5
@@ -54,20 +58,6 @@ class TargetWord:
 
 
 @dataclass(frozen=True)
-class SenseWords:
-    """English sense data of one tier F target.
-
-    :param senses: English sense words of the target.
-    :param false_friends: English false-friend words of the target.
-    :param first: First sense word of the file, used as the card gloss.
-    """
-
-    senses: frozenset[str]
-    false_friends: frozenset[str]
-    first: str
-
-
-@dataclass(frozen=True)
 class CoreTarget:
     """One word and one sense that the deck teaches.
 
@@ -78,8 +68,7 @@ class CoreTarget:
     :param gloss: English gloss of the target: the Swadesh gloss of a tier S
         target, the first sense word of a tier F target, or empty when the
         target is unchecked.
-    :param senses: English sense words, empty when the target is unchecked.
-    :param false_friends: English false-friend words of the target.
+    :param sense: Sense row of the target, empty when the target is unchecked.
     """
 
     key: str
@@ -87,8 +76,7 @@ class CoreTarget:
     position: int
     form: str
     gloss: str
-    senses: frozenset[str] = frozenset()
-    false_friends: frozenset[str] = frozenset()
+    sense: SenseRow = SenseRow()
 
     @property
     def word(self) -> str:
@@ -98,7 +86,7 @@ class CoreTarget:
     @property
     def checked(self) -> bool:
         """Tell whether the target has a sense test."""
-        return self.tier == "S" or bool(self.senses)
+        return self.tier == "S" or bool(self.sense.senses)
 
 
 def build_targets(
@@ -197,7 +185,7 @@ def glosses_share_sense(english_a: str, english_b: str) -> bool:
 def build_core_targets(
     table: Sequence[tuple[int, str, str]],
     frequency_targets: Sequence[TargetWord],
-    senses: dict[str, SenseWords],
+    senses: dict[tuple[str, str], SenseRow],
     core_words: int,
 ) -> tuple[list[CoreTarget], list[CoreTarget]]:
     """Build the core list of tier S and tier F targets.
@@ -208,7 +196,7 @@ def build_core_targets(
 
     :param table: Reviewed Swadesh rows as ``(index, form, english gloss)``.
     :param frequency_targets: Tier F candidates in rank order.
-    :param senses: Sense data of the tier F targets.
+    :param senses: Sense rows of the language, keyed by tier and word.
     :param core_words: Count of tier F targets to add.
     :returns: The core list in order, and the tier S rows that a merge dropped.
     """
@@ -222,6 +210,7 @@ def build_core_targets(
             position=0,
             form=form,
             gloss=english,
+            sense=senses.get(("S", form.casefold()), SenseRow()),
         )
         kept = by_form.get(form)
         if kept:
@@ -246,7 +235,7 @@ def build_core_targets(
             break
         if word.lemma in lemmas:
             continue
-        sense = senses.get(word.lemma, SenseWords(frozenset(), frozenset(), ""))
+        sense = senses.get(("F", word.lemma), SenseRow())
         items.append(
             CoreTarget(
                 key=f"F:{word.lemma}",
@@ -254,21 +243,12 @@ def build_core_targets(
                 position=0,
                 form=word.lemma,
                 gloss=sense.first,
-                senses=sense.senses,
-                false_friends=sense.false_friends,
+                sense=sense,
             )
         )
         added += 1
     positioned = [
-        CoreTarget(
-            key=target.key,
-            tier=target.tier,
-            position=index,
-            form=target.form,
-            gloss=target.gloss,
-            senses=target.senses,
-            false_friends=target.false_friends,
-        )
+        replace(target, position=index)
         for index, target in enumerate(items, start=1)
     ]
     return positioned, dropped

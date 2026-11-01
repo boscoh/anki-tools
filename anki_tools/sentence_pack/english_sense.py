@@ -12,12 +12,13 @@ none at all.
 
 from __future__ import annotations
 
+import csv
 import json
 import re
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Callable, Iterable, Mapping, Sequence
+from typing import Iterable, Mapping, Sequence
 
 SENSE_PATH = Path("vocab/english_senses.json")
 
@@ -35,6 +36,26 @@ CONTRACTION_PATTERN = re.compile(
     "|".join(re.escape(key) for key in CONTRACTIONS)
 )
 TOKEN_PATTERN = re.compile(r"[a-z0-9]+")
+
+
+FALSE_FRIEND = "false_friend"
+SENSE = "sense"
+
+
+@dataclass(frozen=True)
+class SenseRow:
+    """The sense data of one target word.
+
+    :param senses: English words that show the sense.
+    :param false_friends: English words that show another sense.
+    :param compounds: Sentence strings in which the word takes another sense.
+    :param first: First sense word of the file, used as the card gloss.
+    """
+
+    senses: frozenset[str] = frozenset()
+    false_friends: frozenset[str] = frozenset()
+    compounds: tuple[str, ...] = ()
+    first: str = ""
 
 
 @dataclass(frozen=True)
@@ -97,20 +118,98 @@ def _phrase_matches(tokens: Sequence[str], phrase: Sequence[frozenset[str]]) -> 
     )
 
 
-def holds_sense(
+def _split(text: str) -> list[str]:
+    return [part.strip() for part in text.split(",") if part.strip()]
+
+
+@lru_cache(maxsize=16)
+def read_senses(path: Path) -> dict[tuple[str, str], SenseRow]:
+    """Read the sense file of a language.
+
+    The columns are ``word``, ``senses``, ``false_friends``, ``compounds``, and
+    ``tier``. The word lists hold comma-separated values. A blank ``tier`` is
+    ``F``, a frequency lemma. ``S`` is a Swadesh form. A missing file gives no
+    rows. The result is cached, so the caller must not change it.
+
+    :param path: TSV file.
+    :returns: ``(tier, casefolded word)`` to its row.
+    """
+    table: dict[tuple[str, str], SenseRow] = {}
+    source = Path(path)
+    if not source.exists():
+        return table
+    with source.open(encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle, delimiter="\t"):
+            word = (row.get("word") or "").strip().casefold()
+            if not word:
+                continue
+            senses = _split((row.get("senses") or "").casefold())
+            tier = (row.get("tier") or "").strip().upper() or "F"
+            table[tier, word] = SenseRow(
+                senses=frozenset(senses),
+                false_friends=frozenset(
+                    _split((row.get("false_friends") or "").casefold())
+                ),
+                compounds=tuple(_split(row.get("compounds") or "")),
+                first=senses[0] if senses else "",
+            )
+    return table
+
+
+def sense_row(path: Path, tier: str, word: str) -> SenseRow | None:
+    """Give the row of one word.
+
+    :param path: Sense file.
+    :param tier: ``S`` for a Swadesh form, ``F`` for a frequency lemma.
+    :param word: Form or lemma.
+    :returns: The row, or None when the file has none.
+    """
+    return read_senses(path).get((tier, word.casefold()))
+
+
+def sense_failure(
+    english: str,
+    row: SenseRow | None = None,
+    gloss: str | None = None,
+    senses: Mapping[str, GlossSense] | None = None,
+) -> str | None:
+    """Test the English of a card against the sense of its target.
+
+    A tier S form has a Swadesh gloss. The row rejects the English when it
+    holds a false-friend word and no sense word. Then the English must show the
+    gloss sense; a gloss with no table entry does not reject.
+
+    A tier F lemma has no gloss. A row with no sense words accepts every
+    English. Otherwise the English must hold a sense word and no false-friend
+    word.
+
+    :param english: Paired English sentence.
+    :param row: Sense row of the target, or None.
+    :param gloss: Swadesh gloss of a tier S form, None for a tier F lemma.
+    :param senses: Gloss table, loaded from the data file when empty.
+    :returns: ``"false_friend"``, ``"sense"``, or None when the sense holds.
+    """
+    tokens = set(english_tokens(english))
+    if gloss is None:
+        if row is None or not row.senses:
+            return None
+        if row.false_friends & tokens:
+            return FALSE_FRIEND
+        return None if row.senses & tokens else SENSE
+    if (
+        row is not None
+        and row.false_friends & tokens
+        and not row.senses & tokens
+    ):
+        return FALSE_FRIEND
+    return None if _holds_gloss(gloss, english, senses) else SENSE
+
+
+def _holds_gloss(
     gloss: str,
     english: str,
-    senses: Mapping[str, GlossSense] | None = None,
+    senses: Mapping[str, GlossSense] | None,
 ) -> bool:
-    """Tell whether the English shows the sense of the gloss.
-
-    A gloss with no table entry does not reject a card.
-
-    :param gloss: English Swadesh gloss of the card word.
-    :param english: Paired English sentence.
-    :param senses: Sense table, loaded from the data file when empty.
-    :returns: True when the English holds a form of the gloss sense.
-    """
     table = load_senses() if senses is None else senses
     sense = table.get(gloss.casefold())
     if sense is None:
@@ -126,24 +225,25 @@ def holds_sense(
 def sense_mismatches(
     rows: Iterable[Mapping[str, str]],
     gloss_by_form: Mapping[str, str],
-    false_friend: Callable[[str, str], bool] | None = None,
+    sense_path: Path,
     senses: Mapping[str, GlossSense] | None = None,
 ) -> list[str]:
     """List the cards whose English does not show the word sense.
 
     :param rows: Card rows with ``target``, ``sentence``, and ``english``.
     :param gloss_by_form: Mapping from a card target to its Swadesh gloss.
-    :param false_friend: Language filter for a form-level false friend.
-    :param senses: Sense table, loaded from the data file when empty.
+    :param sense_path: Sense file of the language.
+    :param senses: Gloss table, loaded from the data file when empty.
     :returns: One ``target in sentence`` text per bad card.
     """
-    table = load_senses() if senses is None else senses
-    bad: list[str] = []
-    for row in rows:
-        target = row.get("target", "")
-        english = row.get("english", "")
-        if false_friend is not None and false_friend(target, english):
-            bad.append(f"{target} in {row.get('sentence', '')}")
-        elif not holds_sense(gloss_by_form.get(target, ""), english, table):
-            bad.append(f"{target} in {row.get('sentence', '')}")
-    return bad
+    return [
+        f"{target} in {row.get('sentence', '')}"
+        for row in rows
+        for target in [row.get("target", "")]
+        if sense_failure(
+            row.get("english", ""),
+            sense_row(sense_path, "S", target),
+            gloss_by_form.get(target, ""),
+            senses,
+        )
+    ]

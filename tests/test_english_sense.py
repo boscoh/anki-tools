@@ -8,10 +8,13 @@ import pytest
 
 from anki_tools.sentence_pack import english_sense
 from anki_tools.sentence_pack.english_sense import (
+    SenseRow,
     english_tokens,
-    holds_sense,
     load_senses,
+    read_senses,
+    sense_failure,
     sense_mismatches,
+    sense_row,
 )
 from anki_tools.sentence_pack.pool import FILTER_KEYS, FILTER_NAMES
 
@@ -52,7 +55,7 @@ def test_contractions_expand_to_words() -> None:
     ],
 )
 def test_holds_sense_accepts_the_gloss_sense(gloss: str, english: str) -> None:
-    assert holds_sense(gloss, english)
+    assert sense_failure(english, None, gloss) is None
 
 
 @pytest.mark.parametrize(
@@ -67,12 +70,61 @@ def test_holds_sense_accepts_the_gloss_sense(gloss: str, english: str) -> None:
     ],
 )
 def test_holds_sense_rejects_a_different_sense(gloss: str, english: str) -> None:
-    assert not holds_sense(gloss, english)
+    assert sense_failure(english, None, gloss) == "sense"
 
 
 def test_holds_sense_ignores_a_gloss_without_an_entry() -> None:
-    assert holds_sense("not a swadesh gloss", "anything")
+    assert sense_failure("anything", None, "not a swadesh gloss") is None
 
+
+def test_a_tier_s_false_friend_needs_no_sense_word() -> None:
+    row = SenseRow(
+        senses=frozenset({"hold"}), false_friends=frozenset({"drive"})
+    )
+    assert sense_failure("I drive a car.", row, "to hold") == "false_friend"
+    assert sense_failure("Hold the drive.", row, "to hold") is None
+    assert sense_failure("Hold it.", None, "to hold") is None
+
+
+def test_a_tier_f_row_needs_a_sense_word_and_no_false_friend() -> None:
+    row = SenseRow(
+        senses=frozenset({"time"}), false_friends=frozenset({"weather"})
+    )
+    assert sense_failure("What time is it?", row) is None
+    assert sense_failure("Time and weather.", row) == "false_friend"
+    assert sense_failure("What day is it?", row) == "sense"
+    assert sense_failure("anything", SenseRow()) is None
+    assert sense_failure("anything") is None
+
+
+def test_read_senses_keeps_a_tier_s_row_apart_from_a_tier_f_row(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "senses.tsv"
+    path.write_text(
+        "word\tsenses\tfalse_friends\tcompounds\ttier\n"
+        "Voler\tFly\tSteal\t\tS\n"
+        "voler\tsteal,rob\t\t\n"
+        "\u6570\t\t\t\u6570\u5b66,\u4eba\u6570\tS\n",
+        encoding="utf-8",
+    )
+    assert read_senses(path) == {
+        ("S", "voler"): SenseRow(
+            frozenset({"fly"}), frozenset({"steal"}), (), "fly"
+        ),
+        ("F", "voler"): SenseRow(
+            frozenset({"steal", "rob"}), frozenset(), (), "steal"
+        ),
+        ("S", "\u6570"): SenseRow(
+            frozenset(), frozenset(), ("\u6570\u5b66", "\u4eba\u6570"), ""
+        ),
+    }
+    assert sense_row(path, "S", "VOLER") == read_senses(path)["S", "voler"]
+    assert sense_row(path, "F", "absent") is None
+
+
+def test_read_senses_of_a_missing_file_is_empty(tmp_path: Path) -> None:
+    assert read_senses(tmp_path / "absent.tsv") == {}
 
 def test_sense_mismatches_reports_bad_cards() -> None:
     senses = {
@@ -84,7 +136,9 @@ def test_sense_mismatches_reports_bad_cards() -> None:
         {"target": "langue", "sentence": "J'ai mordu ma langue.", "english": "I bit my tongue."},
         {"target": "langue", "sentence": "J'aime cette langue.", "english": "I love this language."},
     ]
-    bad = sense_mismatches(rows, {"langue": "tongue"}, senses=senses)
+    bad = sense_mismatches(
+        rows, {"langue": "tongue"}, Path("absent.tsv"), senses=senses
+    )
     assert bad == ["langue in J'aime cette langue."]
 
 
