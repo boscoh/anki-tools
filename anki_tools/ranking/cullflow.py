@@ -672,7 +672,9 @@ def select_cards(
     """Select the kept cards with the greedy cover of spec section 8.
 
     A lemma that fails the sense test against the English of a card leaves the
-    lemma set of that card. It adds no gain, use, similarity, or target entry.
+    lemma set of that card. It adds no gain, use, or target entry. The
+    similarity test keeps the full lemma set, because a duplicate is a property
+    of the text.
 
     :param cards: Input cards.
     :param tokens: Lemma and part of speech per card.
@@ -698,6 +700,7 @@ def select_cards(
     if len(reserved) != len(reserved_sets):
         raise ValueError("The reserve list and the lemma set list differ in size.")
 
+    full_sets = lemma_sets(tokens, content_pos)
     sets = sense_lemma_sets(
         [card.english for card in cards], tokens, content_pos, senses
     )
@@ -741,7 +744,7 @@ def select_cards(
         return (-value, len(tokens[index]), index)
 
     def reject(index: int) -> str | None:
-        if _is_similar(sets[index], sets, shared, similarity):
+        if _is_similar(full_sets[index], full_sets, shared, similarity):
             return "similar"
         return None
 
@@ -749,6 +752,7 @@ def select_cards(
         picked[index] = value
         for lemma in sets[index]:
             uses[lemma] += 1
+        for lemma in full_sets[index]:
             shared.setdefault(lemma, []).append(index)
 
     kept, reasons = greedy_cover(

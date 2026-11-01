@@ -80,3 +80,28 @@ def test_a_lemma_without_a_row_counts() -> None:
     )
 
     assert result.card_targets == {0: ("car",)}
+
+
+def test_similarity_uses_the_full_lemma_sets() -> None:
+    cards = [
+        _card(0, "The shoes are expensive."),
+        _card(1, "I face the wall."),
+    ]
+    tokens = [
+        [(lemma, "NOUN") for lemma in ("car", "a", "b", "c", "d", "e")],
+        [(lemma, "NOUN") for lemma in ("car", "a", "b", "c", "d", "f")],
+    ]
+
+    result = cullflow.select_cards(
+        cards,
+        tokens,
+        [_target("car", 5)],
+        {"car": 5},
+        max_cards=10,
+        exempt_top=0,
+        content_pos=CONTENT_POS,
+        senses=SENSES,
+    )
+
+    assert result.kept == [0]
+    assert result.reasons == {1: "similar"}
