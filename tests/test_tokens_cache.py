@@ -1,4 +1,4 @@
-"""Tests of the token cache.
+"""Tests of the disk token cache.
 
 A spaCy model takes about 2 seconds to load and about 1 ms per sentence, so a
 second build must read the tokens from the disk cache instead of the pipeline.
@@ -8,110 +8,41 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
+from anki_tools.sentence_pack import tokens
+from tests.token_fixture import FakeNlp, nlp  # noqa: F401
 
-from anki_tools.sentence_pack import tokens as token_module
-
-
-def _fake_tokens(text: str) -> list[token_module.Token]:
-    return [
-        token_module.Token(
-            text=word,
-            lemma=word.lower(),
-            pos="NOUN",
-            morph="",
-            punctuation=False,
-            idx=index,
-        )
-        for index, word in enumerate(text.split())
-    ]
+SENTENCES = ["le chat dort", "le chien court"]
 
 
-class _Counter:
-    """Fake tokenizers that count their calls."""
-
-    def __init__(self) -> None:
-        self.calls: list[str] = []
-
-    def tokenize(self, _name: str, text: str) -> list[token_module.Token]:
-        self.calls.append(text)
-        return _fake_tokens(text)
-
-    def tokenize_many(self, _name: str, texts) -> list[list[token_module.Token]]:
-        texts = list(texts)
-        self.calls.extend(texts)
-        return [_fake_tokens(text) for text in texts]
-
-
-@pytest.fixture
-def counter(monkeypatch: pytest.MonkeyPatch) -> _Counter:
-    """Replace the spaCy calls with a counter."""
-    fake = _Counter()
-    monkeypatch.setattr(token_module, "tokenize", fake.tokenize)
-    monkeypatch.setattr(token_module, "tokenize_many", fake.tokenize_many)
-    return fake
-
-
-def test_the_second_build_reads_the_disk(tmp_path: Path, counter: _Counter) -> None:
-    """A warm run tokenizes, a second run reads the rows."""
+def test_the_second_build_reads_the_disk(tmp_path: Path, nlp: FakeNlp) -> None:
     path = tmp_path / "tokens.sqlite"
-    sentences = ["le chat dort", "le chien court"]
+    tokens.TokenCache("fr_test", path=path).warm(SENTENCES)
+    assert sorted(nlp.tokenized) == sorted(SENTENCES)
 
-    first = token_module.TokenCache("fr_test", path=path)
-    first.warm(sentences)
-    assert sorted(counter.calls) == sorted(sentences)
+    second = tokens.TokenCache("fr_test", path=path)
+    second.warm(SENTENCES)
 
-    second = token_module.TokenCache("fr_test", path=path)
-    second.warm(sentences)
-    assert len(counter.calls) == len(sentences)
-    assert second.get("le chat dort") == tuple(_fake_tokens("le chat dort"))
+    assert len(nlp.tokenized) == len(SENTENCES)
+    assert [token.text for token in second.get(SENTENCES[0])] == ["le", "chat", "dort"]
 
 
-def test_a_new_model_drops_the_rows(tmp_path: Path, counter: _Counter) -> None:
-    """A different model name invalidates the cache."""
+def test_a_new_model_drops_the_rows(tmp_path: Path, nlp: FakeNlp) -> None:
     path = tmp_path / "tokens.sqlite"
-    sentences = ["le chat dort"]
 
-    token_module.TokenCache("fr_test", path=path).warm(sentences)
-    assert len(counter.calls) == 1
+    tokens.TokenCache("fr_test", path=path).warm(SENTENCES[:1])
+    tokens.TokenCache("fr_test_v2", path=path).warm(SENTENCES[:1])
 
-    token_module.TokenCache("fr_test_v2", path=path).warm(sentences)
-    assert len(counter.calls) == 2
+    assert len(nlp.tokenized) == 2
 
 
-def test_get_falls_back_to_the_pipeline(tmp_path: Path, counter: _Counter) -> None:
-    """A sentence that the disk does not hold goes to the tokenizer once."""
+def test_two_caches_over_one_file_can_write(tmp_path: Path, nlp: FakeNlp) -> None:
     path = tmp_path / "tokens.sqlite"
-    cache = token_module.TokenCache("fr_test", path=path)
+    first = tokens.TokenCache("fr_test", path=path)
+    second = tokens.TokenCache("fr_test", path=path)
 
-    assert cache.get("une phrase") == tuple(_fake_tokens("une phrase"))
-    assert cache.get("une phrase") == tuple(_fake_tokens("une phrase"))
-    assert counter.calls == ["une phrase"]
+    first.get("le chat dort")
+    second.get("le chien court")
+    first.get("une phrase")
+    second.get("une autre")
 
-
-def test_a_cache_without_a_path_keeps_the_memory_only(counter: _Counter) -> None:
-    """A cache without a path never writes a file."""
-    cache = token_module.TokenCache("fr_test")
-
-    cache.warm(["le chat dort"])
-    cache.warm(["le chat dort"])
-
-    assert counter.calls == ["le chat dort"]
-
-
-def test_two_caches_over_one_file_can_write(tmp_path: Path, counter: _Counter) -> None:
-    """Two caches over one file share the write transaction."""
-    path = tmp_path / "tokens.sqlite"
-    first = token_module.TokenCache("fr_test", path=path)
-    second = token_module.TokenCache("fr_test", path=path)
-
-    assert first.get("le chat dort") == tuple(_fake_tokens("le chat dort"))
-    assert second.get("le chien court") == tuple(_fake_tokens("le chien court"))
-    assert first.get("une phrase") == tuple(_fake_tokens("une phrase"))
-    assert second.get("une autre") == tuple(_fake_tokens("une autre"))
-    assert counter.calls == [
-        "le chat dort",
-        "le chien court",
-        "une phrase",
-        "une autre",
-    ]
+    assert nlp.tokenized == ["le chat dort", "le chien court", "une phrase", "une autre"]

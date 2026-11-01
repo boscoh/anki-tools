@@ -2,72 +2,10 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterator
-
-import pytest
-
 from anki_tools.sentence_pack import tokens
+from tests.token_fixture import FakeNlp, nlp  # noqa: F401
 
 MODEL = "fake_model"
-MARKS = frozenset({",", ".", "?"})
-
-
-class FakeMorph:
-    def __init__(self, text: str) -> None:
-        self.text = text
-
-    def __str__(self) -> str:
-        return "" if self.text in MARKS else "VerbForm=Fin"
-
-
-class FakeToken:
-    def __init__(self, text: str, idx: int) -> None:
-        self.text = text
-        self.lemma_ = text.casefold()
-        self.pos_ = "PUNCT" if text in MARKS else "VERB"
-        self.morph = FakeMorph(text)
-        self.is_punct = text in MARKS
-        self.idx = idx
-
-
-class FakeDoc:
-    def __init__(self, text: str) -> None:
-        self.tokens = _split(text)
-
-    def __iter__(self) -> Iterator[FakeToken]:
-        return iter(self.tokens)
-
-
-class FakeNlp:
-    def __init__(self) -> None:
-        self.single_calls: list[str] = []
-        self.batch_calls: list[tuple[list[str], int]] = []
-
-    def __call__(self, text: str) -> FakeDoc:
-        self.single_calls.append(text)
-        return FakeDoc(text)
-
-    def pipe(self, texts, batch_size: int):
-        texts = list(texts)
-        self.batch_calls.append((texts, batch_size))
-        for text in texts:
-            yield FakeDoc(text)
-
-
-def _split(text: str) -> list[FakeToken]:
-    found = []
-    idx = 0
-    for word in text.split():
-        found.append(FakeToken(word, idx))
-        idx += len(word) + 1
-    return found
-
-
-@pytest.fixture
-def nlp(monkeypatch: pytest.MonkeyPatch) -> FakeNlp:
-    fake = FakeNlp()
-    monkeypatch.setattr(tokens, "load_model", lambda _name: fake)
-    return fake
 
 
 class TestTokenizeMany:

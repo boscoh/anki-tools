@@ -1,6 +1,7 @@
 """Tests for the fetch, validate, and probe path of the sentence pack audio stage."""
 
 import csv
+import sys
 import wave
 from pathlib import Path
 from types import SimpleNamespace
@@ -9,29 +10,29 @@ from typing import Any
 import pytest
 
 from anki_tools.sentence_pack import audio
+from tests.deck_fixture import MP3_STUB
 
 VOICE = "xx-XX-TestNeural"
 GTTS_VOICE = "xx-tld"
 RATE = audio.RATE_NORMAL
-MP3_BYTES = b"ID3\x03\x00\x00\x00" + b"\x00" * 64
 ROWS = [
     {
-        "target": "alpha",
-        "sentence": "alpha beta.",
+        "target": target,
+        "sentence": sentence,
         "audio_id": "0",
         "audio_source": "tts",
         "audio_license": "",
         "audio_missing": "true",
-    },
-    {
-        "target": "gamma",
-        "sentence": "gamma delta.",
-        "audio_id": "0",
-        "audio_source": "tts",
-        "audio_license": "",
-        "audio_missing": "true",
-    },
+    }
+    for target, sentence in (("alpha", "alpha beta."), ("gamma", "gamma delta."))
 ]
+
+
+def write_rows(path: Path, rows: list[dict[str, str]]) -> None:
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
 
 
 def make_profile(tmp_path: Path, native: bool = False) -> Any:
@@ -45,12 +46,16 @@ def make_profile(tmp_path: Path, native: bool = False) -> Any:
     )
 
 
-def write_synthesizer(calls: list[str]) -> Any:
+def write_synthesizer(calls: list[str], data: bytes = MP3_STUB) -> Any:
     def synthesize(text: str, dest: Path, **_: object) -> None:
         calls.append(text)
-        dest.write_bytes(MP3_BYTES)
+        dest.write_bytes(data)
 
     return synthesize
+
+
+def failing_synthesizer(text: str, dest: Path, **_: object) -> None:
+    raise RuntimeError("engine down")
 
 
 class FakeResponse:
@@ -67,24 +72,32 @@ class FakeResponse:
         return None
 
 
-def test_validate_audio_accepts_good_header(tmp_path: Path) -> None:
-    path = tmp_path / "good.mp3"
-    path.write_bytes(MP3_BYTES)
-
-    ok, duration = audio.validate_audio(path, probe=lambda target: 1.2)
-
-    assert ok
-    assert duration == pytest.approx(1.2)
+@pytest.fixture
+def sleeps(monkeypatch: pytest.MonkeyPatch) -> list[float]:
+    slept: list[float] = []
+    monkeypatch.setattr(audio.time, "sleep", slept.append)
+    return slept
 
 
-def test_validate_audio_rejects_bad_duration(tmp_path: Path) -> None:
-    path = tmp_path / "long.mp3"
-    path.write_bytes(MP3_BYTES)
+@pytest.mark.parametrize(
+    ("data", "seconds", "valid"),
+    [
+        pytest.param(MP3_STUB, 1.2, True, id="good file"),
+        pytest.param(MP3_STUB, 30.0, False, id="too long"),
+        pytest.param(MP3_STUB, 0.1, False, id="too short"),
+        pytest.param(b"not an mp3", 1.2, False, id="no mp3 header"),
+    ],
+)
+def test_validate_audio_checks_the_header_and_the_duration(
+    tmp_path: Path, data: bytes, seconds: float, valid: bool
+) -> None:
+    path = tmp_path / "one.mp3"
+    path.write_bytes(data)
 
-    ok, duration = audio.validate_audio(path, probe=lambda target: 30.0)
+    ok, duration = audio.validate_audio(path, probe=lambda target: seconds)
 
-    assert not ok
-    assert duration == 0.0
+    assert ok is valid
+    assert duration == (pytest.approx(seconds) if valid else 0.0)
 
 
 def test_probe_duration_reads_a_real_file(tmp_path: Path) -> None:
@@ -99,19 +112,17 @@ def test_probe_duration_reads_a_real_file(tmp_path: Path) -> None:
 
 
 def test_generate_audio_retries_a_failed_native_fetch(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, sleeps: list[float]
 ) -> None:
     attempts: list[str] = []
-    sleeps: list[float] = []
 
     def flaky_urlopen(request: Any, timeout: float = 0) -> FakeResponse:
         attempts.append(request.full_url)
         if len(attempts) == 1:
             raise OSError("network down")
-        return FakeResponse(MP3_BYTES)
+        return FakeResponse(MP3_STUB)
 
     monkeypatch.setattr(audio.urllib.request, "urlopen", flaky_urlopen)
-    monkeypatch.setattr(audio.time, "sleep", sleeps.append)
 
     rows = [dict(ROWS[0], audio_id="42", audio_license="CC BY 2.0 FR")]
     result = audio.generate_audio(
@@ -126,20 +137,47 @@ def test_generate_audio_retries_a_failed_native_fetch(
 
     assert result["native"] == 1
     assert result["failed"] == 0
-    assert len(attempts) == 2
-    assert attempts[0] == audio.TATOEBA_AUDIO_URL.format(audio_id=42)
+    assert attempts == [audio.TATOEBA_AUDIO_URL.format(audio_id=42)] * 2
     assert sleeps == [audio.RETRY_DELAYS[0]]
-    assert (tmp_path / "audio" / "ta_42.mp3").read_bytes() == MP3_BYTES
+    assert (tmp_path / "audio" / "ta_42.mp3").read_bytes() == MP3_STUB
+
+
+@pytest.mark.parametrize(
+    ("synthesize", "error"),
+    [
+        pytest.param(write_synthesizer([], b"not an mp3"), "validation failed", id="bad file"),
+        pytest.param(failing_synthesizer, "RuntimeError: engine down", id="engine error"),
+    ],
+)
+def test_generate_audio_marks_a_card_missing_after_the_retries(
+    tmp_path: Path, sleeps: list[float], synthesize: Any, error: str
+) -> None:
+    csv_path = tmp_path / "sentences.csv"
+    audio_dir = tmp_path / "audio"
+    write_rows(csv_path, ROWS[:1])
+
+    result = audio.generate_audio(
+        audio.load_sentence_rows(csv_path),
+        make_profile(tmp_path),
+        audio_dir=audio_dir,
+        rate_limit=0.0,
+        csv_path=csv_path,
+        synthesize=synthesize,
+        probe=lambda path: 1.0,
+    )
+
+    assert result["failed"] == 2
+    assert [failure["error"] for failure in result["failures"]] == [error, error]
+    assert sleeps == list(audio.RETRY_DELAYS) * 2
+    assert list(audio_dir.glob("*.mp3")) == []
+    assert audio.load_sentence_rows(csv_path)[0]["audio_missing"] == "true"
 
 
 def test_generate_audio_writes_files_index_and_csv(tmp_path: Path) -> None:
     calls: list[str] = []
     audio_dir = tmp_path / "audio"
     csv_path = tmp_path / "sentences.csv"
-    with csv_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(ROWS[0]))
-        writer.writeheader()
-        writer.writerows(ROWS)
+    write_rows(csv_path, ROWS)
 
     result = audio.generate_audio(
         audio.load_sentence_rows(csv_path),
@@ -187,9 +225,9 @@ def test_synthesize_tts_writes_engine_bytes(
             saved.append((text, lang))
 
         def save(self, dest: str) -> None:
-            Path(dest).write_bytes(MP3_BYTES)
+            Path(dest).write_bytes(MP3_STUB)
 
-    monkeypatch.setattr(audio, "tts_engine", lambda: "gtts")
+    monkeypatch.setitem(sys.modules, "edge_tts", None)
     monkeypatch.setattr("gtts.gTTS", FakeGtts)
     dest = tmp_path / "one.mp3"
 
@@ -197,5 +235,5 @@ def test_synthesize_tts_writes_engine_bytes(
         "alpha", dest, voice=VOICE, rate=RATE, profile=make_profile(tmp_path)
     )
 
-    assert dest.read_bytes() == MP3_BYTES
+    assert dest.read_bytes() == MP3_STUB
     assert saved == [("alpha", "xx")]
