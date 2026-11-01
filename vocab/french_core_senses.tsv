@@ -50,3 +50,254 @@ livre	book,books,pound,pounds,deliver
 pays	country,countries,land,lands	
 falloir	must,need,needs,necessary,should,have	
 mal	bad,badly,hurt,hurts,pain,wrong,ill,evil	
+tout	all,every,everything,everyone,whole,entire,any,very,quite	
+dire	to say (dire),say,says,said,saying,tell,tells,told,telling	
+voir	to see (voir),see,sees,saw,seen,seeing,look,watch,watched,visit	
+savoir	to know (savoir),know,knows,knew,known,knowing,learn,able	
+bon	good,well,fine,right,okay,ok,nice,tasty,delicious	
+autre	other,others,another,else,different	
+peu	few,little,bit,hardly,barely,slightly	
+là	there,here,then	
+beaucoup	many,much,lot,lots,very,greatly,plenty	
+penser	to think (penser),think,thinks,thought,thinking,believe,mind	
+ici	here,around	
+comment	how,what	
+venir	to come (venir),come,comes,came,coming,arrive,just	
+jour	day (m),day,days,daylight,daytime	
+grand	big,large,great,tall,high,huge,grown	
+manger	eat,eats,ate,eaten,eating,meal	
+homme	man (m),man,men,human,mankind,husband,guy	
+nouveau	new,again,another,recent	
+petit	small,little,short,young,tiny,minor	
+enfant	child (m),child,children,kid,kids,baby	
+femme	woman (f),woman,women,wife,female,lady	
+juste	correct,just,fair,only,right,correct,barely,exactly	
+moins	less,fewer,least,minus,except,before,fewest	
+donc	so,therefore,thus,then,consequently	
+premier	first,earliest,prime,initial,foremost	
+donner	to give (donner),give,gives,gave,given,giving,hand,provide	
+croire	believe,believes,believed,believing,think,thought,trust	
+argent	money,silver,cash	
+acheter	buy,buys,bought,buying,purchase,purchased	
+partir	leave,leaves,left,leaving,go,goes,went,gone,depart	
+maintenant	now,currently,today	
+mieux	better,best,rather	
+regarder	look,looks,looked,looking,watch,watched,watching,see	
+rendre	return,returned,make,makes,made,render,pay	
+porte	door,doors,gate,carry,wear	
+année	year (f),year,years	
+voiture	car,cars,vehicle,carriage	
+ami	friend,friends,boyfriend,pal	
+dernier	last,latest,final,previous,past	
+train	train,trains,pace,speed	
+ville	city,town,cities,towns	
+langue	tongue (f),language,languages,tongue	
+moment	moment,time,while,instant,minute	
+fille	girl,girls,daughter,daughters	
+an	year,years	
+connaître	know,knows,knew,known,knowing,meet,familiar	
+eau	water (f),water,waters	
+rester	stay,stays,stayed,staying,remain,remains,remained,left,keep	
+attendre	wait,waits,waited,waiting,expect,expected,await	
+lire	read,reads,reading	
+problème	problem,problems,trouble,issue,issues	
+laisser	leave,leaves,left,leaving,let,lets,letting,allow	
+père	father (m),father,fathers,dad,daddy	
+entendre	to hear (entendre),hear,hears,heard,hearing,listen,understand	
+demander	ask,asks,asked,asking,request,wonder,demand,wanted	
+ainsi	thus,so,like,way,such,hence	
+veux	want,wants,wanted,wanting,wish,will	
+mort	dead,death,died,die,deceased,dying	
+histoire	story,stories,history,tale,affair	
+travailler	work,works,worked,working,study	
+question	question,questions,matter,issue	
+mère	mother (f),mother,mothers,mom,mum	
+aider	help,helps,helped,helping,assist,aid	
+air	air,look,tune,appearance	
+nom	name (m),name,names,noun	
+part	part,share,portion,piece,side	
+apprendre	learn,learns,learned,learnt,learning,teach,taught,hear	
+soir	evening,night,tonight,evenings	
+école	school,schools,class	
+nuit	night,nights,dark,overnight	
+souvent	often,frequently,usually,much	
+perdre	lose,loses,lost,losing,waste,miss	
+comprendre	understand,understands,understood,understanding,include,realize,get	
+reste	rest,remainder,remaining,remains,left,leftovers,stay	
+hier	yesterday	
+vivre	to live (vivre),live,lives,lived,living,alive,life	
+assez	enough,quite,rather,fairly,pretty,sufficient	
+main	hand (f),hand,hands	
+place	place,room,seat,square,space,position,spot	
+raison	reason,reasons,right,cause,sense	
+mot	word,words,note	
+combien	much,many,how	
+demain	tomorrow	
+devenir	become,becomes,became,becoming,get,gets,got,turn,grow	
+point	point,points,dot,spot,period,not,stitch	
+fin	end,ends,finish,ending,fine,thin,purpose	
+tête	head,heads,mind,face	
+appeler	call,calls,called,calling,name,named,phone,ring	
+jeune	young,younger,youth,youngest	
+partie	part,game,party,match,portion	
+compte	account,count,bill,number,reckon,tally	
+mois	month,months	
+chien	dog (m),dog,dogs	
+jouer	to play (jouer),play,plays,played,playing,act,gamble	
+vrai	true,real,right,genuine,truth,correct	
+merci	thanks,thank,mercy,grateful	
+sortir	out,exit,leave,leaves,left,date	
+droit	straight,right,rights,straight,law,upright,direct	
+meilleur	better,best	
+demande	request,demand,question,application,ask,asks	
+coup	blow,hit,shot,stroke,knock,punch,time,kick	
+commencer	begin,begins,began,begun,beginning,start,starts,started,starting	
+peur	fear,afraid,scared,scare,fright,fears	
+semaine	week,weeks	
+idée	idea,ideas,thought,notion	
+essayer	try,tries,tried,trying,attempt,test	
+cas	case,cases,instance,event	
+famille	family,families,relatives	
+cours	course,class,lesson,rate,price,flow	
+oublier	forget,forgets,forgot,forgotten,forgetting,leave	
+écrire	write,writes,wrote,written,writing,spell	
+aide	help,aid,assistance,helper,assistant	
+arrêter	stop,stops,stopped,stopping,quit,arrest,arrested	
+sentir	to smell (sentir),feel,feels,felt,feeling,smell,smells,smelled,sense	
+matin	morning,mornings	
+seulement	only,just,merely,solely,alone	
+côté	side,sides,next,beside,aspect,way	
+peux	can,could,may,able	
+bas	low,down,bottom,below,stocking,stockings,under	
+état	state,condition,status,states,shape	
+prix	price,prices,prize,cost,award,fare	
+terre	earth (f),earth,land,ground,soil,world,floor	
+sûr	sure,safe,certain,secure,reliable,confident	
+fort	strong,loud,loudly,hard,fort,good,very	
+lieu	place,places,location,site,venue	
+sera	will,be,shall,become	
+tant	much,many,such,until	
+frère	brother,brothers,sibling	
+heureux	happy,glad,lucky,fortunate,pleased	
+anglais	english,british	
+vieux	old,older,elderly,aged,ancient	
+fils	son,sons,boy	
+bel	beautiful,handsome,fine,nice,pretty	
+amour	love,loves,passion,affection	
+chambre	room,bedroom,rooms,chamber	
+donne	give,gives,gave,given,giving,provide	
+difficile	difficult,hard,tough,tricky,demanding	
+tomber	to fall (tomber),fall,falls,fell,fallen,falling,drop,dropped	
+longtemps	long,while,ages	
+politique	politics,political,policy,policies	
+long	long,longer,lengthy,slow,tall	
+beau	beautiful,handsome,nice,fine,good,lovely,pretty	
+boire	to drink (boire),drink,drinks,drank,drunk,drinking,have	
+utiliser	use,uses,used,using,utilize	
+gros	big,fat,large,thick,heavy,gross,bulky	
+jeu	game,games,play,set,gambling	
+tard	late,later,latest	
+sens	sense,meaning,direction,way,feeling	
+changer	change,changes,changed,changing,switch,exchange,swap	
+sembler	seem,seems,seemed,seeming,appear,look,looks	
+cœur	heart (m),heart,hearts,core,courage	
+chercher	look,search,seek,find,fetch,get,pick,looking,looked	
+guerre	war,wars,warfare	
+vite	fast,quickly,quick,soon,hurry,quicker	
+film	film,movie,movies,films,picture	
+dormir	sleep,sleeps,slept,sleeping,asleep,rest	
+près	near,close,nearby,nearly,almost,next	
+rencontrer	meet,meets,met,meeting,encounter	
+aime	love,loves,loved,like,likes,liked,enjoy	
+accord	agreement,agree,deal,consent,accord,okay,chord	
+mourir	to die (mourir),die,dies,died,dying,death,perish,dead	
+vérité	truth,truths,true,fact	
+également	also,equally,too,likewise,well,same	
+journée	day,days,daytime,afternoon	
+genre	kind,type,sort,genre,gender,sorts	
+suite	continuation,sequel,rest,follow,suite,result,series	
+possible	possible,possibly,able,can,feasible,may	
+loin	far,away,distant,faraway	
+laisse	leave,leaves,left,leaving,let,lets,leash	
+propre	own,clean,proper,neat,fresh	
+cause	cause,causes,reason,because,sake,case	
+nombreux	many,numerous,large,several,plenty	
+chat	cat,cats,kitten	
+autant	much,many,equally,just	
+affaire	affair,business,matter,case,deal,thing,bargain	
+tenir	to hold (tenir),hold,holds,held,holding,keep,keeps,kept,carry,grip	
+important	important,big,significant,major,serious,considerable	
+sujet	subject,topic,theme,matter,issue	
+plaire	please,pleases,pleased,like,appeal	
+mauvais	bad,wrong,poor,evil,worse,worst,nasty,ill	
+groupe	group,groups,band,team	
+lors	when,during,time,then	
+ouvrir	open,opens,opened,opening,unlock	
+parent	parent,parents,relative,relatives,mother,father	
+revenir	return,returns,returned,returning,back,again	
+société	society,company,firm,companies,societies,business	
+équipe	team,teams,crew,squad,staff	
+prend	take,takes,took,taken,taking,have,get	
+manière	way,manner,ways,method,style	
+lettre	letter,letters,note,mail	
+parle	speak,speaks,spoke,spoken,speaking,talk,talks,talked,talking	
+façon	way,manner,ways,fashion,method,how	
+finir	finish,finishes,finished,finishing,end,ends,ended,complete,done	
+nouvelle	new,news,story	
+vue	view,sight,views,vision,eyesight,seen	
+payer	pay,pays,paid,paying,afford	
+occuper	occupy,occupies,occupied,busy,handle	
+porter	carry,carries,carried,carrying,wear,wears,wore,worn,wearing,bear	
+ensemble	together,whole,set,all,both,group	
+nombre	number,numbers,amount,quantity	
+tel	such,like,so,as	
+tôt	early,soon,earlier	
+presque	almost,nearly,practically,close	
+gagner	win,wins,won,winning,earn,earns,earned,gain,beat	
+loi	law,laws,act,rule	
+répondre	answer,answers,answered,answering,reply,respond,replied	
+étudier	study,studies,studied,studying,learn	
+œil	eye,eyes	
+oeil	eye,eyes	
+rue	street,streets,road	
+enfin	finally,last,lastly,eventually,well	
+projet	project,plan,plans,draft,scheme	
+chemin	way,path,road,route,trail,track	
+pied	foot (m),foot,feet,leg,paw,foothold	
+suivre	follow,follows,followed,following,take,pursue,attend	
+plutôt	rather,quite,instead,fairly,pretty,more	
+photo	photo,picture,pictures,photograph,photos	
+tour	tour,turn,trip,tower,trick,walk,round	
+tellement	so,much,such,really,very	
+musique	music,tune	
+quell	what,which,how	
+lit	bed,beds,read,sleeping	
+effet	effect,effects,impact,result	
+sœur	sister,sisters,sibling,nun	
+erreur	error,mistake,errors,mistakes,fault,wrong	
+café	coffee,cafe,coffeehouse,bar,cafes	
+attention	attention,care,careful,caution,notice,heed,watch	
+espérer	hope,hopes,hoped,hoping,expect,wish	
+conduire	drive,drives,drove,driven,driving,lead,led,take,conduct	
+conseil	advice,council,counsel,tip,board,suggestion	
+général	general,generally,common,overall	
+face	face,faces,facing,front,side	
+route	road (f),road,route,way,highway,roads	
+prochain	next,upcoming,near,coming,following	
+prêt	ready,loan,prepared,lend,set	
+rapport	report,relationship,relation,connection,link,regard,yield	
+fête	party,festival,holiday,celebration,feast,fair,birthday	
+feu	fire (m),fire,light,lights,burn	
+système	system,systems,method,scheme	
+pièce	room,piece,coin,part,play,document	
+phrase	sentence,sentences,phrase,clause	
+confiance	trust,confidence,trusting,faith,confident	
+plein	full,filled,packed,plenty,whole,lots	
+trouve	find,finds,found,finding,think,located,locate	
+chance	chance,luck,lucky,opportunity,fortune	
+parti	left,gone,party,away,leave	
+peine	pain,trouble,sorrow,difficulty,sadness,hardly,penalty,sentence,effort	
+parfois	sometimes,occasionally,times	
+article	article,articles,item,piece,product	
+service	service,services,help,favor,duty,department	
+président	president,chairman,chair,head	
