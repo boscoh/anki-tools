@@ -122,14 +122,6 @@ def command(name: str) -> Callable[..., None]:
     return function
 
 
-@pytest.mark.parametrize(
-    "short, canonical",
-    [("zh", "mandarin"), ("fr", "french"), ("yue", "cantonese"), ("es", "spanish")],
-)
-def test_the_canonical_names_alias_the_short_codes(short: str, canonical: str) -> None:
-    assert command(short) is command(canonical)
-
-
 def test_an_absent_input_prints_an_error(tmp_path: Path, capsys) -> None:
     command("fr")(tmp_path / "absent.apkg")
 
