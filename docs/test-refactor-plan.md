@@ -2,7 +2,7 @@
 
 | Field   | Value                                                          |
 | ------- | -------------------------------------------------------------- |
-| Status  | All batches done; one gap and the next cut open                |
+| Status  | All batches and the cut by value done; one seam open           |
 | Date    | 2026-11-01                                                     |
 | Owner   | anki-tools                                                     |
 | Related | `~/.pi/agent/skills/refactor-tests/SKILL.md`                   |
@@ -39,6 +39,10 @@ cuts.
    cut batch must not add lines. Report gap lines apart from cut lines. B9 grew
    `test_cli_fix.py` from 176 to 258 lines, because it also filled gaps. A
    follow-up cut it to 183.
+9. **Cut by value, not by feel.** Run many mutants. Record which test kills which.
+   Delete a test only when another test kills the same mutants. Keep a test that
+   alone kills a mutant. Then run the matrix again to prove that no mutant lost
+   its killer.
 
 ## 2. Done
 
@@ -122,27 +126,50 @@ Batches B8 and B10 finished the plan (commits `03cc7ad`, `b2b774f`, `f9ff560`).
 
 The whole suite, from the first audit to the end:
 
-| Item                    | Start | End   |
-| ----------------------- | ----- | ----- |
-| Test and fixture files  | 44    | 55    |
-| Lines in `tests/`       | 7 800 | 7 403 |
-| Test functions          | 374   | 270   |
-| Tests collected         | 416   | 568   |
-| `monkeypatch.setattr`   | 22    | 9     |
-| Run time                | 6 s   | 8 s   |
+| Item                    | Start | After B10 | End   |
+| ----------------------- | ----- | --------- | ----- |
+| Test and fixture files  | 44    | 55        | 53    |
+| Lines in `tests/`       | 7 800 | 7 403     | 6 747 |
+| Test functions          | 374   | 270       | 225   |
+| Tests collected         | 416   | 568       | 500   |
+| `monkeypatch.setattr`   | 22    | 9         | 8     |
+| Run time                | 6 s   | 8 s       | 8 s   |
 
-- **Fewer, smaller tests.** Functions fell by 28% and lines by 5%. The line
-  count includes 8 fixture files and the 298 gap lines of B10. Without the gap
-  lines the cut is about 9%.
-- **More cases.** Table rows count as separate cases, so the collected count
-  rose. Other people also added tests during the work, for example
-  `test_french_lemma.py`. The start numbers include none of that.
-- **Mocks.** The 9 that remain patch an edge (`load_model`, gTTS, sleep, urlopen,
-  the `ROOT` path) or one constant in `test_cull_shared.py`:
-  `DEFAULT_MAX_USES`.
-- **The goal is not met yet.** A suite of 270 functions and 568 cases is smaller
-  and better, but it is not "very small". The next cut needs a decision on
-  value, not on form. See section 11.
+- **Fewer, smaller tests.** Functions fell by 40% and lines by 14%. The count
+  includes the fixture files and the 298 gap lines of B10.
+- **More cases than at the start.** Table rows count as separate cases. Other
+  people also added tests during the work, for example `test_french_lemma.py`.
+- **Mocks.** The 8 that remain patch an edge: gTTS, sleep, urlopen, `ROOT`, and
+  `load_model`.
+- **Every cut test had a reason.** The cuts in section 2.1 kept all 507 mutants
+  killed.
+
+### 2.1 Cut by value
+
+Commits `1559851`, `7326f5a`, `a9bdb54`, `9a39eb5`, `cb00fbf`, `199f0d6`. A
+scratch copy of the repo held 822 mutants, made by a script and by hand. The run
+recorded which test kills which mutant. A test whose kills another test also
+makes was deleted.
+
+| Result                                  | Value |
+| --------------------------------------- | ----- |
+| Mutants                                 | 822   |
+| Killed                                  | 507   |
+| Survived                                | 312   |
+| Timeout (infinite loop)                 | 3     |
+| Tests deleted                           | 41    |
+| Lines removed                           | 634   |
+| Mutants that lost their last killer     | 0     |
+
+- All 41 deleted tests were redundant. No test was deleted for killing nothing.
+  Each test that killed nothing had one hand-written mutant that only it killed.
+- The script does not change strings, regexes, templates or return values. The
+  first matrix marked such tests as dead by mistake. Add those mutators before
+  the next run.
+- Tests that guard a layout or data invariant stay, for example
+  `test_import_graph`, `test_language_layout`, and the review-file check.
+- The 312 survivors were not checked one by one. Some are equivalent changes.
+  Section 8 lists the ones that matter.
 
 ## 3. Scope of the rest
 
@@ -249,6 +276,21 @@ The `--prune` option no longer exists, so its gap is void. `build_mandarin_pack`
 needs no test of its own: it wraps `build_pack`, which `test_mandarin_deck.py`
 and `test_pack_build.py` run.
 
+The cut by value found more surviving mutants. No test kills any sampled
+mutant in these modules:
+
+| Module                                   | Mutants, none killed |
+| ---------------------------------------- | -------------------- |
+| `ranking/reorder.py`                     | 16 of 19             |
+| `ranking/latin.py`                       | 5 of 5               |
+| `cache.py`                               | 4 of 4               |
+| Spanish `core.py`, `frequency.py`, `cull.py` | 4, 4 and 3 of the same |
+| Greek rank module, Mandarin `frequency.py` and `pinyin.py` | all sampled |
+
+Test the behavior of each module, or delete the module if nothing uses it. The
+`reorder.py` row that matters most: no test checks that `delete_card` runs for a
+removed card.
+
 ## 9. Rules for every batch
 
 - Run `uv run pytest -q` before and after. The suite stays green.
@@ -267,6 +309,7 @@ sense-exceptions ADR.
 | Step | Action                                                                                         |
 | ---- | ---------------------------------------------------------------------------------------------- |
 | 1    | Decide on the `vocab_dir` seam for the preview. It needs one short ADR.                        |
-| 2    | Remove the `DEFAULT_MAX_USES` patch in `test_cull_shared.py`: set `max_uses` through the manifest. |
-| 3    | Run the skill again on the whole suite. Ask for each test: what bug does it catch? Cut the rest. |
-| 4    | Add a mutation score to the gate list: run the breaks in this plan as a script, not by hand.   |
+| 2    | Add string, regex and return-value mutators. Run the matrix on the cull, sentence-select and Mandarin files that were in flux. |
+| 3    | Cut `test_english_sense`, `test_mandarin_sentence_selection`, `test_sentence_pack_guards` and `test_mandarin_compound_tokens`. The first cut skipped them. |
+| 4    | Turn the matrix script into a repo tool, `uv run python -m tools.mutants`. Run it before a release. |
+| 5    | Decide for each module in the gap table (section 8) whether to test it or delete it.           |
