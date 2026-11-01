@@ -1,0 +1,13 @@
+language,deck,note_id,class,confidence,sentence,english,note
+spanish,core,1548089871941,translation,high,Ese perro parece completamente una persona.,This dog is almost human.,'completamente' vs 'almost'; sentence also odd
+spanish,core,1548089871606,translation,medium,Es la última persona que quiero ver.,He is the last man I want to see.,English adds gender 'He/man'; Spanish says persona
+spanish,core,1548089872699,translation,medium,Los caballos son animales.,A horse is an animal.,plural vs singular; stilted example
+spanish,core,1548089875353,translation,medium,Estamos cortos de dinero.,We ran short of money.,present vs past tense
+spanish,core,1548089871546,translation,medium,Sé que está en mi corazón.,I know it in my heart.,English drops 'que está'; context-bound line
+spanish,core,1548089880429,register,medium,Tom se frotó la cara.,Tom rubbed his face.,"proper name Tom, story fragment"
+spanish,cull,192,register,medium,Será difícil convencer a Tom de que nos ayude.,It'll be hard to convince Tom to help us.,"proper name Tom, needs context; id = 0-based row index"
+spanish,cull,83,translation,medium,La vi en la iglesia.,I met her at the church.,"'vi' = saw, not met; id = row index"
+spanish,cull,896,translation,high,Yo no cato el marisco.,Yo no pruebo el marisco.,"english column holds Spanish, not English; 'catar' also odd; id = row index"
+spanish,cull,351,translation,medium,Mi padre me sugirió aprender piano.,My father encouraged me to study the piano.,"sugirió=suggested, not encouraged; id = row index"
+spanish,cull,74,register,medium,¿Es bueno para vos comer hígado?,Is eating liver good for you?,voseo (Rioplatense) unexpected for learners; id = row index
+spanish,cull,350,register,medium,¿Es usted aquí profesor o alumno?,Are you a teacher here or a student?,stilted word order/'aquí' placement; id = row index

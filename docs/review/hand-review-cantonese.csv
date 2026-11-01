@@ -1,0 +1,8 @@
+language,deck,note_id,class,confidence,sentence,english,note
+cantonese,cantonese_core,1621761269575,register,high,"屌，我地老喇!","Fuck, we are old!","Vulgar profanity as a first example; offensive for a learner deck"
+cantonese,cantonese_core,1621761269575,other,medium,"屌，我地老喇!","Fuck, we are old!","Non-standard 我地 instead of 我哋 (the deck elsewhere uses 哋)"
+cantonese,cantonese_core,1621761269692,register,high,佢好大波.,She has big boobs.,"Vulgar slang for breasts; not a suitable learner example"
+cantonese,cantonese_core,1621761270117,register,medium,佢哋嘗試殺我.,They tried to kill me.,"嘗試 is written register; spoken would be 想/試圖; violent context"
+cantonese,cantonese_core,1621761270244,register,medium,我洗緊碗而家.,I'm washing the dishes.,"Time word at the end is unnatural; spoken order is 我而家洗緊碗"
+cantonese,cantonese_core,1621761270215,target,medium,佢哋好襯.,They are a good couple.,"Target S185:好 is the adverb very in 好襯 (sense is empty in CSV), not the adjective good"
+cantonese,cantonese_core,1621761270215,translation,medium,佢哋好襯.,They are a good couple.,"襯 means match/suit each other well; English adds couple, which is an interpretation"

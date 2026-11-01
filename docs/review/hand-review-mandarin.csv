@@ -1,0 +1,7 @@
+language,deck,note_id,class,confidence,sentence,english,note
+mandarin,mandarin_core,1734873752615,target,medium,没什么大不了的.,It's no big deal.,"Target S27:大 is credited inside the fixed chunk 大不了 (not 'big' sense); 什么 is the real teachable item."
+mandarin,mandarin_core,1734873754023,register,medium,我无法呼吸.,I can't breathe.,"无法 is written/subtitle register; spoken first example would be 我不能呼吸 / 我喘不过气。"
+mandarin,mandarin_core,1734873752466,other,medium,好 非常好.,"Good, very good.","Space used instead of a comma (好，非常好); punctuation fault in the Chinese sentence."
+mandarin,mandarin_core,1734873753685,register,medium,给我起来.,Get up!,"给我+verb is a harsh/emphatic command; 给我 is untranslated so English loses the force; not a neutral first example."
+mandarin,mandarin_core,1734873751843,register,medium,给我坐下.,Sit down.,"Same 给我+imperative pattern: rude/commanding; neutral 请坐/坐下 is the normal first example."
+mandarin,mandarin_core,1734873753691,register,medium,杀了他们.,Kill them!,"Violent command, context-bound subtitle line; not a good first example for a learner."
