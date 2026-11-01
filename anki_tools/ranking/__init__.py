@@ -1,1 +1,1 @@
-"""Shared sentence ranking and deck reordering."""
+"""Shared sentence ranking helpers."""

@@ -41,7 +41,6 @@ Shared ranking code only. No language data.
 | --------------------------------- | ----------------------------------------------------- |
 | `anki_tools/ranking/rank.py`      | Sentence data, frequency tables, shared score drivers |
 | `anki_tools/ranking/latin.py`     | Shared Latin-script text helpers                      |
-| `anki_tools/ranking/reorder.py`   | Reorder a deck from a ranking CSV                     |
 | `anki_tools/ranking/cover.py`     | Generic greedy cover over items with changing gains   |
 | `anki_tools/ranking/core.py`      | Core-word value, cost, passes, and order              |
 | `anki_tools/ranking/identity.py`  | The output stem, deck title, note type, and side paths |

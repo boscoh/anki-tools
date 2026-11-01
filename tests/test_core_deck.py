@@ -411,7 +411,9 @@ def test_the_run_writes_the_side_files_the_manifest_and_the_report(
 
     assert run.sides["core.csv"] == identity.side("core.csv")
     assert run.sides["coverage.csv"] == identity.side("coverage.csv")
-    assert "rank.csv" not in run.sides
+    with AnkiPackage(output) as package:
+        dues = [row["due"] for row in package.conn.execute("SELECT due FROM cards")]
+    assert dues == [1]
     assert manifest["source"] == {
         "input": str(tmp_path / "input.apkg"),
         "deck": identity.title,

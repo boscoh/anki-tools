@@ -314,7 +314,7 @@ mutant in these modules:
 
 | Module                                   | Mutants, none killed |
 | ---------------------------------------- | -------------------- |
-| `ranking/reorder.py`                     | 16 of 19             |
+| `ranking/reorder.py` (deleted, ADR 0058)  | 16 of 19             |
 | `ranking/latin.py`                       | 5 of 5               |
 | `cache.py`                               | 4 of 4               |
 | Spanish `core.py`, `frequency.py`, `cull.py` | 4, 4 and 3 of the same |

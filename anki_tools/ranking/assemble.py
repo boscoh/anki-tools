@@ -8,19 +8,15 @@ and the report layout once. The identity module names every artifact.
 
 from __future__ import annotations
 
-import csv
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping, Protocol, Sequence
 
 from anki_tools.apkg import deck_writer
+from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.templates import TemplateSpec, assemble_templates
 from anki_tools.ranking.identity import DeckIdentity
-from anki_tools.ranking.reorder import reorder_deck
-
-#: Columns of the rank CSV that ``reorder_deck`` reads.
-RANK_COLUMNS = ("rank", "note_id", "sentence", "kept")
 
 #: Field names of the output note type, in order, without the romanization.
 OUTPUT_FIELDS: tuple[str, ...] = ("Audio", "Sentence", "English", "Core", "CoreGloss")
@@ -143,8 +139,8 @@ class DeckRun:
     :param manifest: Manifest values of the mode.
     :param report: Report lines of the mode: a label and a value, or a raw
         line when the label is None.
-    :param rank_rows: ``(rank, note_id, sentence, kept)`` row per kept card for
-        a run that reorders the deck, or None.
+    :param card_order: Note ids of the kept cards in rank order for a run that
+        sets the due values, or None.
     :param reserve: Reserve cards to add to the output note type.
     :param reserve_pack_path: Pack with the reserve media files.
     :param reserve_values: Callable that gives the field values of one reserve
@@ -158,7 +154,7 @@ class DeckRun:
     coverage_table: deck_writer.SideTable
     manifest: ManifestValues
     report: Sequence[tuple[str | None, str]]
-    rank_rows: Sequence[tuple[int, int, str, int]] | None = None
+    card_order: Sequence[int] | None = None
     reserve: Sequence[Any] = ()
     reserve_pack_path: Path | None = None
     reserve_values: Callable[[Any], Sequence[str]] | None = None
@@ -204,7 +200,7 @@ def write_run(run: DeckRun, profile: DeckProfile) -> deck_writer.RunFiles:
         },
         reserve=_reserve(run),
     )
-    files = _write_reordered(job, run)
+    files = _write_ordered(job, run)
     deck_writer.print_run(run.report, files)
     return files
 
@@ -229,47 +225,28 @@ def _reserve(run: DeckRun) -> deck_writer.ReserveCards | None:
     )
 
 
-def _write_reordered(
+def _write_ordered(
     job: deck_writer.DeckWrite, run: DeckRun
 ) -> deck_writer.RunFiles:
-    """Write the run, then reorder the deck when the run states a rank table.
+    """Write the run, then set the due value of each new card to its rank.
 
     :param job: Stated write of the run.
     :param run: Selected cards and stated values of the run.
     :returns: The written paths.
     """
-    if run.rank_rows is None:
-        return deck_writer.write_deck(job)
-    rank_csv = run.identity.side("rank.csv")
-    write_rank_csv(run.rank_rows, rank_csv)
-    temporary = job.output_path.with_name(job.output_path.stem + ".tmp.apkg")
-    deck_writer.write_deck(
-        replace(job, output_path=temporary, sides=(), manifest=None)
-    )
-    reorder_deck(str(temporary), str(job.output_path), str(rank_csv))
-    temporary.unlink(missing_ok=True)
-    sides = deck_writer.write_sides(job)
-    return deck_writer.RunFiles(
-        output_path=job.output_path,
-        manifest_path=job.manifest_path,
-        sides=sides,
-    )
-
-
-def write_rank_csv(rows: Sequence[tuple[int, int, str, int]], path: Path) -> None:
-    """Write the ranking CSV that ``reorder_deck`` reads.
-
-    :param rows: ``(rank, note_id, sentence, kept)`` row per kept card.
-    :param path: Output CSV file.
-    """
-    target = Path(path)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    with target.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.writer(handle)
-        writer.writerow(RANK_COLUMNS)
-        for row in rows:
-            writer.writerow(row)
-
+    files = deck_writer.write_deck(job)
+    if run.card_order is not None:
+        rank = {note_id: rank for rank, note_id in enumerate(run.card_order, 1)}
+        with AnkiPackage(job.output_path) as package:
+            cards = sorted(
+                (card for card in package.get_new_cards() if card["nid"] in rank),
+                key=lambda card: rank[card["nid"]],
+            )
+            package.set_card_due(
+                {card["id"]: due for due, card in enumerate(cards, 1)}
+            )
+            package.save()
+    return files
 
 
 def manifest_payload(run: DeckRun) -> dict[str, Any]:

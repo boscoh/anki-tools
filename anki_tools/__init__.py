@@ -9,7 +9,6 @@ Modules:
     apkg.templates  - Card template partials
     ranking.rank    - Shared sentence ranking helpers
     ranking.latin   - Shared Latin-script text helpers
-    ranking.reorder - Deck reordering based on ranking
     languages       - One package per language: profile, frequency, cull
     sentence_pack   - Shared Swadesh sentence pack stages
     cli             - Command-line interface
@@ -28,7 +27,6 @@ from anki_tools.ranking.rank import (
     extract_sentences,
     write_ranking_csv,
 )
-from anki_tools.ranking.reorder import load_ranking, reorder_deck
 
 _LAZY: dict[str, tuple[str, str]] = {
     "fix_pinyin": ("anki_tools.languages.mandarin.pinyin", "fix_pinyin"),
@@ -67,7 +65,5 @@ __all__ = [
     "extract_sentences",
     "write_ranking_csv",
     "char_similarity_zh",
-    "reorder_deck",
-    "load_ranking",
     "fix_pinyin",
 ]

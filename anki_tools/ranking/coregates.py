@@ -66,7 +66,7 @@ class CoreFiles(GateFileReader):
     def __post_init__(self) -> None:
         """Set the paths and the loader table."""
         self.apkg_path = Path(self.apkg_path)
-        self.core_csv, self.coverage_csv, self.manifest_path, self.rank_csv = (
+        self.core_csv, self.coverage_csv, self.manifest_path = (
             DeckIdentity(self.apkg_path).core_sides()
         )
         super().__init__(

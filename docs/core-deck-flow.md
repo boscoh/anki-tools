@@ -72,7 +72,7 @@ K4  selection: seed, depth, completion, top-up, tail
 K5  order: target position, example number, new words, units
         |
         v
-K6  APKG, .core.csv, .coverage.csv, .manifest.json, .rank.csv
+K6  APKG, .core.csv, .coverage.csv, .manifest.json
         |
         v
     gates K5, K6, K13, K23, K24
@@ -252,7 +252,6 @@ then uses the lowest-position target that the card holds.
 | `<stem>.core.csv`      | one row per input card: kept, pass, value, cost, reason |
 | `<stem>.coverage.csv`  | one row per target: key, word, gloss, quota, count      |
 | `<stem>.manifest.json` | params, counts, frequency source, file hashes           |
-| `<stem>.rank.csv`      | the intermediate ranking file of `reorder_deck`         |
 
 `identity.default_output(language, "core")` gives `apkg/<language>_core.apkg`.
 
@@ -273,7 +272,7 @@ The field set is `output_fields(profile)`: `Audio`, `Sentence`, `English`, the
 `Romanization` field when the language has a romanization, `Core`, and
 `CoreGloss`. The writer moves the kept notes to
 the new note type, then deletes the input note type and every other note type.
-`reorder_deck` applies the order of the rank CSV to the output deck.
+`assemble.write_run` sets the `due` value of each new card to its rank.
 
 The writer writes the assigned target inside a `<b>` tag in each sentence
 field. `coreflow.note_values` writes `Core`, `CoreGloss`, and the bold sentence.
@@ -330,7 +329,6 @@ The `sense` filter is the one sense test (ADR 0039); no gate repeats it.
 | `anki_tools/ranking/corelist.py`                | tier S and tier F target list, sense rows  |
 | `anki_tools/ranking/cardfilter.py`              | shared filter rules F1 to F9               |
 | `anki_tools/ranking/scan.py`                    | `CoreProfile` and the scan adapters        |
-| `anki_tools/ranking/reorder.py`                 | reorder the deck from the rank CSV         |
 | `anki_tools/ranking/duplicates.py`              | Jaccard value and the limit test           |
 | `anki_tools/ranking/fixrun.py`                  | the shared `fix` route                     |
 | `anki_tools/languages/<language>/core.py`       | one `CoreProfile` per language             |

@@ -90,7 +90,7 @@ The shared options:
 The frequency term and the similarity limit are values of the language module,
 so no flag can change them.
 
-The core mode writes `.rank.csv` beside the APKG. The cull and core modes
+The cull and core modes
 also write the CSV files and the manifest that the "French 1000-Card Cull"
 and "Core-Word Decks" sections list.
 
@@ -360,7 +360,6 @@ The command writes the deck and four side files beside it:
 | `.core.csv`      | one row per input card: `kept`, `pass`, `reason`, `targets`, `assigned`           |
 | `.coverage.csv`  | one row per target: `key`, `word`, `tier`, `position`, `quota`, `count`, `status` |
 | `.manifest.json` | counts, options, frequency source, and hashes                                     |
-| `.rank.csv`      | the ranking CSV of `reorder_deck`                                                 |
 
 A target `status` is `covered` for two or more cards, `partial` for one card,
 `absent` for no candidate, `absent_sense` when every candidate fails the sense
@@ -528,8 +527,6 @@ from anki_tools import (
     extract_sentences,    # Extract sentences from a deck
     write_ranking_csv,    # Write a ranking to a CSV file
     char_similarity_zh,   # Calculate a character similarity
-    reorder_deck,         # Reorder a deck by its ranking
-    load_ranking,         # Load a ranking from a CSV file
 )
 ```
 

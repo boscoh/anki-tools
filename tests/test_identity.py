@@ -14,7 +14,6 @@ def test_the_side_files_take_the_output_stem() -> None:
         "french_core.core.csv",
         "french_core.coverage.csv",
         "french_core.manifest.json",
-        "french_core.rank.csv",
     ]
     assert [path.name for path in identity.cull_sides()] == [
         "french_core.cull.csv",

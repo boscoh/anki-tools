@@ -245,8 +245,8 @@ language supplies one profile and no flow code.
 _Avoid_: cull config, cull settings
 
 **Ranking CSV**:
-The table with one row for each target and its candidates. The reorder step reads
-it and writes the deck.
+The table with one row for each target and its candidates. `write_ranking_csv`
+writes it for inspection. No step reads it.
 _Avoid_: report, export
 
 ## Languages

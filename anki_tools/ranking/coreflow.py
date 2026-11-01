@@ -975,10 +975,7 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
                 kept_order=kept_order_hash(cards, kept),
             ),
             report=report,
-            rank_rows=[
-                (rank, cards[index].note_id, cards[index].sentence, 1)
-                for rank, index in enumerate(kept, start=1)
-            ],
+            card_order=[cards[index].note_id for index in kept],
         ),
         profile,
     )

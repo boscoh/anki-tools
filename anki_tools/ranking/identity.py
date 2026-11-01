@@ -72,13 +72,12 @@ class DeckIdentity:
         """
         return Path(self.output_path).with_name(f"{self.stem}.{suffix}")
 
-    def core_sides(self) -> tuple[Path, Path, Path, Path]:
-        """Give the card CSV, the coverage CSV, the manifest, and the rank CSV."""
+    def core_sides(self) -> tuple[Path, Path, Path]:
+        """Give the card CSV, the coverage CSV, and the manifest."""
         return (
             self.side("core.csv"),
             self.side("coverage.csv"),
             self.side("manifest.json"),
-            self.side("rank.csv"),
         )
 
     def cull_sides(self) -> tuple[Path, Path, Path]:

@@ -273,7 +273,7 @@ def write_ranking_csv(
     structural_blend: float = STRUCTURAL_COMPLEXITY_BLEND,
     similar_to_threshold: float = SIMILARITY_CONSIDER_DELETE_PENALTY,
 ) -> None:
-    """Write the ranking CSV for reorder_deck and for inspection.
+    """Write the ranking CSV for inspection.
 
     Columns: rank, note_id, sentence, romanization (if present), original_order, frequency,
     complexity, grammar, structural, similarity, similar_to, final_score, and
