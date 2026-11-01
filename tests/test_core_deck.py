@@ -861,3 +861,28 @@ class TestCardDesign:
 
         assert not passed
         assert "Difficulty" in message
+
+
+class TestMandarinRepeatRule:
+    def test_the_build_filter_rejects_a_repeated_phrase(self) -> None:
+        from anki_tools.languages.mandarin.core import MANDARIN_CORE_PROFILE as profile
+
+        cards = [
+            InputCard(1, "起来 起来.", "Get up! Get up!", "a.mp3", 0),
+            InputCard(2, "起来吧.", "Get up.", "a.mp3", 1),
+        ]
+        tokens = [[("起来", "")] * 2, [("起来", ""), ("吧", "")]]
+
+        kept, reasons = coreflow.filter_core_cards(
+            cards,
+            tokens,
+            {"a.mp3"},
+            [],
+            [],
+            min_units=profile.min_units,
+            max_units=profile.max_units,
+            shape=profile,
+        )
+
+        assert kept == [1]
+        assert reasons[0] == "repeat"
