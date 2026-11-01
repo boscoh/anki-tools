@@ -1,130 +1,130 @@
 word,rank,count,status,gloss
-tener,5,96,covered,have
-hacer,8,27,covered,do
-ir,9,5,covered,go
-querer,10,23,covered,want
-decir,11,8,covered,to say (decir)
-ver,14,15,covered,to see (ver)
-saber,16,5,covered,know
-dar,21,5,covered,to give (dar)
-no,23,189,covered,no
-venir,24,2,covered,come
-gustar,25,23,covered,like
-creer,27,12,covered,believe
-pensar,28,5,covered,think
-hablar,30,5,covered,talk
-encontrar,31,4,covered,find
-mucho,32,19,covered,many
-dejar,33,8,covered,leave
-esperar,34,3,covered,wait
-volver,37,4,covered,return
-llegar,38,4,covered,arrive
+tener,5,150,covered,have
+hacer,8,45,covered,do
+ir,9,13,covered,go
+querer,10,37,covered,want
+decir,11,13,covered,to say (decir)
+ver,14,24,covered,to see (ver)
+saber,16,11,covered,know
+dar,21,8,covered,to give (dar)
+no,23,283,covered,no
+venir,24,4,covered,come
+gustar,25,37,covered,like
+creer,27,14,covered,believe
+pensar,28,7,covered,think
+hablar,30,9,covered,talk
+encontrar,31,7,covered,find
+mucho,32,31,covered,many
+dejar,33,15,covered,leave
+esperar,34,4,covered,wait
+volver,37,5,covered,return
+llegar,38,5,covered,arrive
 pasar,40,3,covered,happen
-parecer,41,5,covered,seem
-sentir,43,4,covered,feel
-quedar,44,1,partial,stay
-poner,45,4,covered,put
-salir,46,2,covered,leave
-llevar,47,3,covered,take
-necesitar,50,5,covered,need
-tomar,53,2,covered,take
-vivir,54,8,covered,to live (vivir)
+parecer,41,8,covered,seem
+sentir,43,9,covered,feel
+quedar,44,3,covered,stay
+poner,45,5,covered,put
+salir,46,3,covered,leave
+llevar,47,6,covered,take
+necesitar,50,6,covered,need
+tomar,53,3,covered,take
+vivir,54,14,covered,to live (vivir)
 entender,55,2,covered,understand
 leer,57,2,covered,read
 pedir,58,2,covered,ask
-seguir,59,4,covered,follow
-jugar,60,6,covered,to play (jugar)
+seguir,59,5,covered,follow
+jugar,60,9,covered,to play (jugar)
 perder,61,0,absent,lose
-comprar,62,4,covered,buy
-empezar,63,4,covered,begin
-conocer,64,2,covered,know
-comer,65,7,covered,eat
+comprar,62,6,covered,buy
+empezar,63,5,covered,begin
+conocer,64,4,covered,know
+comer,65,10,covered,eat
 dormir,67,2,covered,to sleep (dormir)
-trabajar,68,4,covered,work
-morir,70,2,covered,to die (morir)
+trabajar,68,6,covered,work
+morir,70,4,covered,to die (morir)
 llamar,71,2,covered,call
-acabar,73,3,covered,finish
-aprender,74,3,covered,learn
+acabar,73,5,covered,finish
+aprender,74,4,covered,learn
 caer,76,4,covered,to fall (caer)
-escribir,79,0,absent,write
-tanto,80,12,covered,so
-más,81,23,covered,more
+escribir,79,1,partial,write
+tanto,80,18,covered,so
+más,81,29,covered,more
 contar,83,2,covered,to count (contar)
-intentar,86,2,covered,try
+intentar,86,5,covered,try
 estudiar,87,0,absent,study
-preguntar,88,1,partial,ask
+preguntar,88,2,covered,ask
 entrar,89,2,covered,enter
-ayudar,90,1,partial,help
-ganar,92,1,partial,win
+ayudar,90,3,covered,help
+ganar,92,2,covered,win
 buscar,93,0,absent,look
 cambiar,94,1,partial,change
-tocar,95,3,covered,touch
-pagar,96,2,covered,pay
+tocar,95,4,covered,touch
+pagar,96,5,covered,pay
 mirar,97,3,covered,look
-usar,98,2,covered,use
-comenzar,99,1,partial,begin
+usar,98,5,covered,use
+comenzar,99,2,covered,begin
 terminar,100,2,covered,finish
 tratar,101,2,covered,try
 recordar,102,1,partial,remember
 escuchar,103,0,absent,listen
-beber,104,2,covered,to drink (beber)
+beber,104,4,covered,to drink (beber)
 amar,106,0,absent,love
-solo,107,5,covered,alone
-abrir,110,0,absent,open
+solo,107,8,covered,alone
+abrir,110,1,partial,open
 traer,111,0,absent,bring
 costar,113,0,absent,cost
-olvidar,115,0,absent,forget
-encantar,116,0,absent,love
+olvidar,115,2,covered,forget
+encantar,116,1,partial,love
 conducir,117,0,absent,drive
-correr,118,1,partial,run
+correr,118,2,covered,run
 existir,120,1,partial,exist
 decidir,121,0,absent,decide
-conseguir,122,0,absent,get
-buen,123,5,covered,good
+conseguir,122,1,partial,get
+buen,123,11,covered,good
 importar,125,1,partial,matter
 echar,126,0,absent,throw
-aquí,127,12,covered,here
-bien,128,4,covered,well
+aquí,127,15,covered,here
+bien,128,8,covered,well
 visitar,129,1,partial,visit
 cantar,130,1,partial,to sing (cantar)
 mantener,131,1,partial,keep
 romper,133,1,partial,break
 poco,134,5,covered,few
-ya,135,1,partial,already
+ya,135,8,covered,already
 ocurrir,136,0,absent,happen
-sentar,138,1,partial,sit
+sentar,138,2,covered,sit
 soler,139,3,covered,usually
 matar,140,1,partial,to kill (matar)
-convertir,141,0,absent,become
+convertir,141,1,partial,become
 cerrar,142,0,absent,close
-levantar,143,0,absent,raise
+levantar,143,1,partial,raise
 preferir,144,1,partial,prefer
 recibir,145,2,covered,receive
-quitar,146,1,partial,remove
+quitar,146,2,covered,remove
 nuevo,147,4,covered,new
 caminar,148,2,covered,to walk (caminar)
-sacar,149,1,partial,take
+sacar,149,2,covered,take
 llover,150,2,covered,rain
 andar,151,2,covered,walk
-desear,152,1,partial,wish
+desear,152,2,covered,wish
 vez,153,4,covered,time
 casa,154,4,covered,house
 vender,155,1,partial,sell
 día,156,5,covered,day (m)
-aceptar,157,1,partial,accept
+aceptar,157,2,covered,accept
 servir,158,2,covered,serve
 lograr,159,1,partial,achieve
 francés,160,4,covered,french
-llorar,161,1,partial,cry
-despertar,162,0,absent,wake
-enseñar,163,2,covered,teach
+llorar,161,2,covered,cry
+despertar,162,1,partial,wake
+enseñar,163,3,covered,teach
 primero,164,4,covered,first
 robar,165,3,covered,steal
 responder,166,2,covered,answer
 tiempo,167,4,covered,time
 sonar,168,2,covered,sound
-casar,169,1,partial,marry
-faltar,170,1,partial,miss
+casar,169,2,covered,marry
+faltar,170,2,covered,miss
 considerar,171,2,covered,consider
 mostrar,172,1,partial,show
 hoy,175,4,covered,today
@@ -133,31 +133,31 @@ elegir,177,1,partial,choose
 año,178,4,covered,year (m)
 subir,179,1,partial,go
 viajar,181,2,covered,travel
-nacer,183,0,absent,born
+nacer,183,1,partial,born
 coger,184,2,covered,take
-funcionar,187,1,partial,work
+funcionar,187,3,covered,work
 lugar,188,3,covered,place
 demasiado,189,4,covered,too
 inglés,190,3,covered,english
-permitir,191,1,partial,allow
-mentir,192,1,partial,lie
+permitir,191,2,covered,allow
+mentir,192,2,covered,lie
 ahora,193,4,covered,now
 preparar,194,1,partial,prepare
 confiar,195,1,partial,trust
-explicar,196,1,partial,explain
+explicar,196,2,covered,explain
 nunca,198,4,covered,never
-significar,199,1,partial,mean
+significar,199,2,covered,mean
 negar,200,3,covered,deny
 volar,201,1,partial,to fly (volar)
 evitar,202,2,covered,avoid
-fumar,203,3,covered,smoke
+fumar,203,4,covered,smoke
 mejor,204,4,covered,better
-probar,205,1,partial,try
+probar,205,2,covered,try
 cortar,207,3,covered,to cut (cortar)
 presentar,208,1,partial,present
-cenar,209,1,partial,dine
-regresar,210,0,absent,return
-preocupar,211,1,partial,worry
+cenar,209,2,covered,dine
+regresar,210,1,partial,return
+preocupar,211,2,covered,worry
 valer,212,2,covered,worth
 nadar,213,1,partial,to swim (nadar)
 prestar,214,1,partial,lend
@@ -167,52 +167,52 @@ resolver,218,2,covered,solve
 aparecer,219,1,partial,appear
 temer,221,1,partial,fear
 libro,222,4,covered,book
-suponer,223,1,partial,suppose
+suponer,223,2,covered,suppose
 cumplir,224,0,absent,fulfill
 crecer,225,1,partial,grow
 mañana,226,4,covered,tomorrow
 soportar,227,1,partial,stand
-alcanzar,229,1,partial,reach
+alcanzar,229,2,covered,reach
 favor,230,4,covered,favor
-joven,231,1,partial,young
+joven,231,2,covered,young
 detener,232,1,partial,stop
 enviar,233,2,covered,send
 abandonar,234,2,covered,abandon
 traducir,235,1,partial,translate
-así,236,3,covered,so
+así,236,4,covered,so
 suceder,237,1,partial,happen
 mujer,238,4,covered,woman (f)
 utilizar,239,3,covered,use
 lavar,240,1,partial,to wash (lavar)
-bajar,243,1,partial,go
+bajar,243,2,covered,go
 hombre,244,6,covered,man (m)
 persona,245,4,covered,human being (f)
 acordar,246,1,partial,agree
 trabajo,247,4,covered,job
-mover,248,2,covered,move
+mover,248,3,covered,move
 bailar,249,1,partial,dance
 padre,250,4,covered,father (m)
-invitar,251,1,partial,invite
-partir,252,1,partial,leave
-descubrir,253,0,absent,discover
-verdad,254,3,covered,truth
-país,255,3,covered,country
+invitar,251,2,covered,invite
+partir,252,0,absent,leave
+descubrir,253,1,partial,discover
+verdad,254,4,covered,truth
+país,255,4,covered,country
 esconder,256,1,partial,hide
-pertenecer,257,1,partial,belong
-parar,258,2,covered,stop
-seguro,259,2,covered,sure
+pertenecer,257,2,covered,belong
+parar,258,3,covered,stop
+seguro,259,4,covered,sure
 mundo,261,5,covered,world
 reconocer,262,1,partial,recognize
 apagar,263,1,partial,turn
 cosa,264,4,covered,thing
-odiar,265,1,partial,hate
-limpiar,266,1,partial,to wipe (limpiar)
+odiar,265,2,covered,hate
+limpiar,266,2,covered,to wipe (limpiar)
 dinero,267,4,covered,money
 mejorar,268,1,partial,improve
 amigo,271,4,covered,friend
 niño,272,4,covered,child (m)
 ofrecer,273,1,partial,offer
-pequeño,274,3,covered,small
+pequeño,274,4,covered,small
 obtener,275,1,partial,get
 ayer,276,4,covered,yesterday
 hora,277,4,covered,hour
@@ -222,23 +222,23 @@ cruzar,281,1,partial,cross
 pintar,282,2,covered,paint
 oler,283,2,covered,to smell (oler)
 gente,284,4,covered,people
-alegrar,286,2,covered,glad
+alegrar,286,3,covered,glad
 cuidar,287,1,partial,care
 último,290,1,partial,last
 guardar,292,1,partial,keep
 cocinar,293,2,covered,cook
-pasado,294,3,covered,past
+pasado,294,4,covered,past
 contener,295,2,covered,contain
 continuar,296,0,absent,continue
 merecer,297,1,partial,deserve
 recoger,298,0,absent,pick
-actuar,299,1,partial,act
-meter,300,1,partial,put
+actuar,299,2,covered,act
+meter,300,2,covered,put
 noche,302,5,covered,night (f)
 acercar,303,0,absent,close
-interesar,304,1,partial,interest
-escapar,305,1,partial,escape
-besar,306,1,partial,kiss
+interesar,304,2,covered,interest
+escapar,305,2,covered,escape
+besar,306,2,covered,kiss
 sufrir,307,1,partial,suffer
 construir,308,0,absent,build
 problema,309,4,covered,problem
@@ -251,7 +251,7 @@ demostrar,316,0,absent,show
 alto,317,3,covered,high
 único,318,1,partial,only
 arreglar,319,1,partial,fix
-devolver,320,1,partial,return
+devolver,320,2,covered,return
 respetar,321,0,absent,respect
 mandar,322,2,covered,send
 gritar,323,1,partial,shout
@@ -261,19 +261,19 @@ prometer,326,1,partial,promise
 tardar,328,1,partial,take
 manejar,329,1,partial,drive
 todavía,330,4,covered,still
-tarde,331,3,covered,late
+tarde,331,4,covered,late
 permanecer,332,1,partial,stay
 comprender,333,1,partial,understand
 depender,334,0,absent,depend
 formar,335,1,partial,form
-japonés,336,1,partial,japanese
+japonés,336,2,covered,japanese
 admitir,337,1,partial,admit
 celebrar,339,1,partial,celebrate
-rápido,340,2,covered,fast
-durar,341,0,absent,last
+rápido,340,3,covered,fast
+durar,341,1,partial,last
 superar,344,1,partial,overcome
-asegurar,345,1,partial,assure
-agradecer,346,2,covered,thank
+asegurar,345,2,covered,assure
+agradecer,346,3,covered,thank
 agua,348,4,covered,water (f)
 divertir,349,1,partial,amuse
 feliz,351,4,covered,happy
@@ -281,21 +281,21 @@ engañar,352,1,partial,cheat
 perro,353,5,covered,dog (m)
 parte,355,0,absent,part
 despedir,356,1,partial,fire
-hijo,357,3,covered,son
-pelear,359,1,partial,to fight (pelear)
+hijo,357,4,covered,son
+pelear,359,2,covered,to fight (pelear)
 compartir,360,1,partial,share
 fin,362,2,covered,end
-oir,363,1,partial,hear
+oir,363,2,covered,hear
 madre,364,4,covered,mother (f)
 dirigir,365,0,absent,direct
 impedir,366,2,covered,prevent
 ciudad,367,3,covered,city
-palabra,368,1,partial,word
+palabra,368,2,covered,word
 junto,369,1,partial,together
-también,370,2,covered,too
+también,370,3,covered,too
 habitación,371,4,covered,room
 descansar,372,1,partial,rest
-gran,373,3,covered,great
+gran,373,4,covered,great
 semana,374,4,covered,week
 coche,375,4,covered,car
-ahí,377,2,covered,there
+ahí,377,3,covered,there
