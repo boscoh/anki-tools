@@ -1,14 +1,14 @@
 word	senses	false_friends	compounds	tier
-pas	not	
-ne	not	
-faire	do,does,did,done,doing,make,makes,made,making	
-plus	more,most,else,longer,further	
-pouvoir	can,could,able,may,might,power	
+pas	not,cannot,no,never,nothing,nobody,none,without,neither,nor	
+ne	not,never,no,nothing,nobody,nor,neither,cannot,without,none,nowhere,only,just,hardly,seldom,rarely	
+faire	do,does,did,done,doing,make,makes,made,making,take,takes,took,taken,taking,give,gives,gave,given,giving,go,goes,went,going,gone,play,plays,played,playing,pretend,pretends,pretended,pretending,shopping,weather,hot,cold,cause,causes,caused	
+plus	more,most,else,longer,further,than,again,anymore,ever,either,neither,nor,over,plus,older,oldest,younger,youngest,harder,hardest,later,earlier,stronger,strongest,higher,highest,faster,fastest,smarter,smartest,bigger,biggest,larger,largest,taller,tallest,nearer,nearest,closer,closest,greater,greatest,easier,laziest	
+pouvoir	can,could,able,may,might,power,cannot,ca,allowed,permitted,afford,possible,possibly,maybe,perhaps,unable,impossible	
 aller	go,goes,going,went,gone	
-bien	well,good,fine,okay,ok,alright,right	
-vouloir	want,wants,wanted,wanting,wish,like,would	
+bien	well,good,fine,okay,ok,alright,right,very,much,many,quite,far,than,though,although,goods,indeed,really,certainly	
+vouloir	want,wants,wanted,wanting,wish,like,would,please,wo,will,willing,unwilling,wished,wishes,wishing,wanna	
 ça	it,that,this,its	
-devoir	must,have,has,should,ought,owe,duty,homework	
+devoir	must,have,has,should,ought,owe,duty,homework,owes,owed,owing,due,debt,supposed,gotta	
 même	same,even,self,myself,yourself,himself,herself,itself,themselves	
 très	very,really,so,too,quite	
 fait	fact,facts,done,made,make,makes,deed	
@@ -22,13 +22,13 @@ jamais	never,ever
 chose	thing,things,something,anything,nothing,everything	
 parler	speak,speaks,speaking,spoke,spoken,talk,talks,talked,talking,tell,say,says,said	
 as	have,has,had,got	
-prendre	take,takes,took,taken,taking,get,gets,got,catch	
+prendre	take,takes,took,taken,taking,get,gets,got,catch,caught,catches,catching,pick,picks,picked,picking,grab,grabbed,make,made,have,had	
 pourquoi	why,reason	
 toujours	always,still,forever,ever	
 monde	world,people,everyone,everybody	
 non	no,not,nope	
 vie	life,lives,living,alive	
-personne	nobody,person,persons,anyone,anybody,someone,somebody,none	
+personne	nobody,person,persons,anyone,anybody,someone,somebody,none,people,one	
 fois	time,times,once,twice	
 été	summer,been,was,were,be	
 passer	pass,passes,passed,spend,spent,happen,happens,happened,come,comes,came,stop,drop	
@@ -38,7 +38,7 @@ trop	too,overly,much,many
 maison	house,home,homes,houses	
 déjà	already,yet,before,ever	
 alors	then,so,well,therefore,now	
-arriver	arrive,arrives,arrived,arriving,happen,happens,happened,manage,get,come	
+arriver	arrive,arrives,arrived,arriving,happen,happens,happened,manage,get,come,came,comes,coming,got,gets,occur,occurred,reach,reached,reaching,able,can,cannot,ca	
 seul	alone,only,lonely,single,myself,yourself	
 besoin	need,needs,needed,necessary,must,want	
 heure	hour,hours,time,clock	
@@ -48,12 +48,12 @@ français	french,france
 travail	work,works,working,job,jobs,labor	
 livre	book,books,pound,pounds,deliver	
 pays	country,countries,land,lands	
-falloir	must,need,needs,necessary,should,have	
+falloir	must,need,needs,necessary,should,have,takes,take,took,require,requires,required,requiring	
 mal	bad,badly,hurt,hurts,pain,wrong,ill,evil	
-tout	all,every,everything,everyone,whole,entire,any,very,quite	
+tout	all,every,everything,everyone,whole,entire,any,very,quite,everybody,whatever,whoever,anything,anyone,completely,entirely,totally,wholly,altogether,both	
 dire	to say (dire),say,says,said,saying,tell,tells,told,telling	
 voir	to see (voir),see,sees,saw,seen,seeing,look,watch,watched,visit	
-savoir	to know (savoir),know,knows,knew,known,knowing,learn,able	
+savoir	to know (savoir),know,knows,knew,known,knowing,learn,able,can,cannot,ca,could	
 bon	good,well,fine,right,okay,ok,nice,tasty,delicious	
 autre	other,others,another,else,different	
 peu	few,little,bit,hardly,barely,slightly	

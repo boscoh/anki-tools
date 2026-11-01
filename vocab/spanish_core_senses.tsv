@@ -1,40 +1,40 @@
 word	senses	false_friends	compounds	tier
-tener	have,has,had,having,got,get,ve	
+tener	have,has,had,having,got,get,ve,must,need,needs,needed,afraid,old,own,owns,hold,feel,feels,felt,aged,doubt	
 ir	go,goes,going,went,gone	
-hacer	do,does,did,done,doing,make,makes,made,making	
+hacer	do,does,did,done,doing,make,makes,made,making,ago,become,becomes,became,becoming,hot,cold,give,gave,given,giving,hurt,take,took,taken,taking,pretend,pretended	
 bien	well,good,fine,ok,okay,best,right,alright	
-querer	want,wants,wanted,wanting,love,loves,loved,wish	
-más	more,most,again,else,further,longer	
+querer	want,wants,wanted,wanting,love,loves,loved,wish,like,likes	
+más	more,most,again,else,further,longer,than,later,louder,harder,closer,shorter,younger,better,best,heavier,nearest,taller,tallest,stronger,darker,anymore,over,closest,cheaper,busiest	
 ya	already,now,anymore,yet,still,more	
 ahora	now,just	
 así	so,way,how,this,that,thus	
 creer	believe,believes,believed,think,thinks,thought,thinking	
-vez	time,times,once,again	
+vez	time,times,once,again,ever,twice,sometimes,sometime,seldom	
 pasar	happen,happened,happens,happening,pass,passed,spend,spent	
-tanto	so,as,much,many,such	
+tanto	so,as,much,many,such,how,long	
 gracias	thanks,thank,thanked,grateful	
 sólo	only,just,but,merely	
 esperar	wait,waits,waiting,waited,hope,hopes,hoped,expect,expecting	
-solo	alone,own,lone,lonely	only,just
+solo	alone,own,lone,lonely,myself,yourself,himself,herself,themselves,ourselves	only,just
 sentir	feel,feels,felt,feeling,sorry,regret	
 hablar	talk,talks,talking,talked,speak,speaks,speaking,spoke,spoken	
 cosa	thing,things,stuff,matter,anything,something,everything	
 entonces	then,therefore,so	
 casa	house,houses,home	
 verdad	truth,true,really,right,fact	
-tiempo	time,times,weather,while	
-dejar	leave,leaves,left,let,lets,quit,stop,allow	
+tiempo	time,times,weather,while,long,longer,ages	
+dejar	leave,leaves,left,let,lets,quit,stop,allow,give,gave,cease,ceases,ceased,dropped,drop,put	
 nunca	never,ever	
 mejor	better,best	
 necesitar	need,needs,needed,needing	
 favor	favor,favour,please,kindness	
 mirar	look,looks,looking,looked,watch,stare	
-volver	return,returns,returned,back,come,comes,came,become,turn,turned	
+volver	return,returns,returned,back,come,comes,came,become,turn,turned,again,anymore,getting,gone	
 vida	life,lives,living,alive	
 chico	boy,boys,kid,kids,guy,guys,child	
 también	too,also,well	
 parecer	seem,seems,seemed,appear,appears,appeared,look,looks	
-gustar	like,likes,liked,love,loves,enjoy,enjoys	
+gustar	like,likes,liked,love,loves,enjoy,enjoys,fond,appreciate,wish	
 hecho	done,fact,facts,made,built,deed	
 siempre	always,usual,ever,constant	
 amigo	friend,friends	
@@ -42,7 +42,7 @@ primero	first
 antes	before,sooner,earlier,first	
 llegar	arrive,arrives,arrived,arriving,come,comes,came,late	
 llamar	call,calls,called,calling,name,named	
-llevar	take,takes,taking,took,taken,carry,carries,wears,wear,drive,bring	
+llevar	take,takes,taking,took,taken,carry,carries,wears,wear,drive,bring,wearing,wore,worn,carried,carrying,been	
 seguro	sure,certain,safe,surely,fine	
 trabajo	job,jobs,work,works,working	
 acuerdo	agreement,agree,agreed,deal,agreements	
@@ -50,16 +50,16 @@ tomar	take,takes,taking,took,taken,drink,drinks,have
 salir	leave,leaves,left,leaving,go,goes,going,went,gone,out,come,comes,coming,came,rush,rushed,start	
 gente	people,person,persons,folks,crowd,crowds,everyone,everybody	
 decir	to say (decir),say,says,said,saying,tell,tells,told,telling	
-ver	to see (ver),see,sees,saw,seen,seeing,look,watch,watched	
-saber	know,knows,knew,known,knowing,taste,able	
-dar	to give (dar),give,gives,gave,given,giving,hand,provide	
-no	no,not,don't,doesn't,didn't,never	
+ver	to see (ver),see,sees,saw,seen,seeing,look,watch,watched,looks,looked,looking,watches,watching	
+saber	know,knows,knew,known,knowing,taste,able,tastes,tasted,tasting	
+dar	to give (dar),give,gives,gave,given,giving,hand,provide,take,took,taken,taking	
+no	no,not,don't,doesn't,didn't,never,nothing,nobody,none,cannot,nor,neither,without,nowhere	
 venir	come,comes,came,coming,arrive	
 pensar	think,thinks,thought,thinking,plan,believe	
 encontrar	find,finds,found,finding,meet,met,locate	
-mucho	many,much,lot,lots,very,plenty	
+mucho	many,much,lot,lots,very,plenty,too,really,pretty,quite,great,greatly,deeply,far	
 quedar	stay,stays,stayed,remain,remains,remained,left,meet,fit	
-poner	put,puts,putting,place,placed,set,sets,lay	
+poner	put,puts,putting,place,placed,set,sets,lay,laid,become,became,becomes,get,got,gets	
 vivir	to live (vivir),live,lives,lived,living,alive	
 entender	understand,understands,understood,understanding,get,got	
 leer	read,reads,reading	
@@ -99,7 +99,7 @@ beber	to drink (beber),drink,drinks,drank,drunk,drinking
 amar	love,loves,loved,loving	
 abrir	open,opens,opened,opening	
 traer	bring,brings,brought,bringing,carry,fetch	
-costar	cost,costs,costing,hard,difficult	
+costar	cost,costs,costing,hard,difficult,much,difficulty,trouble,take,took,takes,long	
 olvidar	forget,forgets,forgot,forgotten,forgetting	
 encantar	love,loves,loved,delight,enchant	
 conducir	drive,drives,drove,driven,driving,lead	
@@ -205,7 +205,7 @@ persona	human being (f),person,people,persons,someone,individual
 acordar	agree,agreed,remember,decide,decided	
 mover	move,moves,moved,moving,shift	
 bailar	dance,dances,danced,dancing	
-padre	father (m),father,fathers,dad,priest	
+padre	father (m),father,fathers,dad,priest,parents	
 invitar	invite,invites,invited,inviting,treat	
 partir	leave,leaves,left,leaving,depart,split,break	
 descubrir	discover,discovers,discovered,find,found,uncover	
