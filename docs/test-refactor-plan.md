@@ -5,7 +5,7 @@
 | Status  | Cull tests, B1 to B3 and B9 done; B4 to B8 and B10 open        |
 | Date    | 2026-11-01                                                     |
 | Owner   | anki-tools                                                     |
-| Related | `.agents/skills/refactor-tests/SKILL.md`                       |
+| Related | `~/.pi/agent/skills/refactor-tests/SKILL.md`                   |
 
 ## 1. Goal
 
