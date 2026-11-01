@@ -16,18 +16,16 @@ import pytest
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.shape import OutputShape, write_package
 from anki_tools.languages.french import cull as cull_fr
-from anki_tools.languages.french.profile import FRENCH
 from anki_tools.ranking import (
     assemble,
-    cardfilter,
     coreflow,
     cullflow,
     cullgates,
 )
 from anki_tools.ranking.identity import DeckIdentity
-from anki_tools.sentence_pack import pool
 from tests.cull_fixture import card, freq_row, tiny_deck
 from tests.deck_fixture import _add_second_template
+from tests.shape_fixture import shape_rules
 
 PROFILE = cull_fr.FRENCH_CULL_PROFILE
 DECK_FIELDS = ["French", "sound", "Back", "freq ranks"]
@@ -80,39 +78,11 @@ def test_read_names_skips_blanks_and_comments(tmp_path: Path) -> None:
     assert cullflow.read_names(path) == {"paris", "zoe"}
 
 
-@pytest.mark.parametrize(
-    ("rule", "sentence"),
-    [
-        pytest.param("", "Le chat mange vite.", id="a clean card passes"),
-        pytest.param("length_window", "Chat mange.", id="too short"),
-        pytest.param("digit_marks", "Le chat a 3 ans.", id="digit"),
-        pytest.param("digit_marks", "Le chat [noir] mange.", id="bracket"),
-        pytest.param("digit_marks", "Voir le site www.exemple.fr.", id="url"),
-        pytest.param("digit_marks", "Le chat mange vite...", id="ellipsis"),
-        pytest.param("repeat", "Oui oui oui oui.", id="repeated word"),
-        pytest.param("marks", "Le chat mange vite", id="no final mark"),
-        pytest.param("marks", "Le chat mange. Le chien dort.", id="two sentences"),
-        pytest.param("marks", "Le chat « mange » vite.", id="quotes"),
-        pytest.param("marks", "— Le chat mange vite.", id="dialogue dash"),
-        pytest.param("marks", "Le chat, le chien, et l'oiseau mangent.", id="commas"),
-    ],
-)
-def test_one_card_per_filter_rule(rule: str, sentence: str) -> None:
-    assert cullflow.filter_reason(card(sentence), PROFILE) == rule
-
-
-@pytest.mark.parametrize(
-    "sentence",
-    ["Le chat mange vite.", "Chat mange.", "Le chat mange vite", "Oui oui oui."],
-)
-def test_the_pack_and_the_cull_agree_on_the_shape_rules(sentence: str) -> None:
-    keys = cardfilter.LENGTH_RULES + cardfilter.TEXT_RULES + cardfilter.MARK_RULES
-
-    pack_reason = pool.shape_failure(
-        sentence, FRENCH, FRENCH.min_units, FRENCH.max_units, keys=keys
-    )
-
-    assert (pack_reason or "") == cullflow.filter_reason(card(sentence), PROFILE)
+@pytest.mark.parametrize("language, sentence, expected", shape_rules("french"))
+def test_a_card_gets_the_first_failed_shape_rule(
+    language: str, sentence: str, expected: str
+) -> None:
+    assert cullflow.filter_reason(card(sentence), PROFILE) == expected
 
 
 @pytest.mark.parametrize(
@@ -150,7 +120,12 @@ def test_filter_cards_rejects_a_duplicate_text(
 
 def _tiny_deck(tmp_path: Path) -> Path:
     rows = [
-        {"French": sentence, "sound": f"[sound:a{index}.mp3]", "Back": english, "freq ranks": ""}
+        {
+            "French": sentence,
+            "sound": f"[sound:a{index}.mp3]",
+            "Back": english,
+            "freq ranks": "",
+        }
         for index, (sentence, english) in enumerate(zip(DECK_SENTENCES, DECK_ENGLISH))
     ]
     audio = [f"a{index}.mp3" for index in range(len(rows))]
@@ -189,7 +164,9 @@ def _write_cull_deck(
 def _output_model(output: Path) -> dict:
     with AnkiPackage(output) as package:
         models = package.get_models(include_templates=True)
-    return next(m for m in models.values() if m.get("name") == DeckIdentity(output).title)
+    return next(
+        m for m in models.values() if m.get("name") == DeckIdentity(output).title
+    )
 
 
 def test_write_deck_keeps_the_notes_media_and_profile_templates(tmp_path: Path) -> None:
@@ -212,7 +189,9 @@ def test_write_deck_keeps_the_notes_media_and_profile_templates(tmp_path: Path) 
         DECK_SENTENCES[2],
     ]
     assert templates == list(assemble.deck_templates(PROFILE))
-    assert all(selector in model["css"] for selector in (".sentence", ".english", ".hint"))
+    assert all(
+        selector in model["css"] for selector in (".sentence", ".english", ".hint")
+    )
 
 
 def test_write_deck_removes_the_second_card_template(tmp_path: Path) -> None:
@@ -225,7 +204,9 @@ def test_write_deck_removes_the_second_card_template(tmp_path: Path) -> None:
 
     with AnkiPackage(output) as package:
         rows = package.get_cards()
-    assert [template["name"] for template in _output_model(output)["tmpls"]] == ["Card 1"]
+    assert [template["name"] for template in _output_model(output)["tmpls"]] == [
+        "Card 1"
+    ]
     assert {row["ord"] for row in rows} == {0}
     assert len(rows) == 2
 

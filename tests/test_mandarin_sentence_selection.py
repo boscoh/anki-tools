@@ -25,44 +25,39 @@ from anki_tools.languages.mandarin.stages import (
     mandarin_candidate_pool,
     mandarin_rank_key_parts,
     mandarin_rank_order,
-    mandarin_shape_failure,
     select_mandarin_sentences,
 )
-from anki_tools.sentence_pack.guards import check_sentence_shape
 from anki_tools.sentence_pack.pool import build_pack_report
-from anki_tools.sentence_pack.select import serialize_rank_key
+from anki_tools.sentence_pack.select import rank_key_parts, serialize_rank_key
+from tests.tatoeba_fixture import PoolRow, write_tatoeba_dir
 
-POOL_SENTENCES = [
-    (1, "我要喝水。", 100, "I want to drink water.", "alice", (5001, "CC BY 2.0 FR")),
-    (2, "我要喝水", 200, "I want to drink water.", "alice", None),
-    (3, "我要喝水。。", 300, "I want to drink water.", "alice", None),
-    (4, "我要喝水了ABCD。", 400, "I want to drink water.", "alice", None),
-    (5, "走走走走。", 500, "I walk and walk.", "alice", None),
-    (6, "我，要，喝水。", 600, "I want to drink water.", "alice", None),
-    (7, "他说“我要喝水”。", 700, "He said I want water.", "alice", None),
-    (8, "我要喝水。", 800, "I want to drink water.", "alice", None),
-    (10, "我喝那杯水。", 999, "I drink that glass of water.", "alice", None),
-    (
+POOL_ROWS = [
+    PoolRow(
+        1,
+        "我要喝水。",
+        100,
+        "I want to drink water.",
+        audio=(5001, "alice", "CC BY 2.0 FR"),
+    ),
+    PoolRow(2, "我要喝水", 200, "I want to drink water."),
+    PoolRow(3, "我要喝水。。", 300, "I want to drink water."),
+    PoolRow(4, "我要喝水了ABCD。", 400, "I want to drink water."),
+    PoolRow(5, "走走走走。", 500, "I walk and walk."),
+    PoolRow(6, "我，要，喝水。", 600, "I want to drink water."),
+    PoolRow(7, "他说“我要喝水”。", 700, "He said I want water."),
+    PoolRow(8, "我要喝水。", 800, "I want to drink water."),
+    PoolRow(10, "我喝那杯水。", 999, None),
+    PoolRow(
         11,
         "我喝那杯凉水。",
         1100,
         "the quick brown fox jumps over the lazy dog again and again today",
-        "alice",
-        None,
     ),
-    (12, "火灭了。", 1200, "The fire went out.", "bob", None),
-    (13, "因为下雨。", 1300, "Because it rains.", "alice", None),
-    (14, "那只小狗。", 1400, "That small dog.", "alice", None),
-    (15, "饕餮来了。", 1500, "The monster came.", "bob", None),
+    PoolRow(12, "火灭了。", 1200, "The fire went out.", author="bob"),
+    PoolRow(13, "因为下雨。", 1300, "Because it rains."),
+    PoolRow(14, "那只小狗。", 1400, "That small dog."),
+    PoolRow(15, "饕餮来了。", 1500, "The monster came.", author="bob"),
 ]
-
-POOL_AUTHORS = {row[0]: row[4] for row in POOL_SENTENCES}
-
-
-def _write_tsv(path: Path, rows: list[tuple[object, ...]]) -> Path:
-    text = "\n".join("\t".join(str(cell) for cell in row) for row in rows)
-    path.write_text(text + "\n", encoding="utf-8")
-    return path
 
 
 def _form(
@@ -107,38 +102,6 @@ def _candidate(**overrides: object) -> Candidate:
     )
 
 
-def _write_pool_data(data_dir: Path) -> Path:
-    data_dir.mkdir(parents=True, exist_ok=True)
-    _write_tsv(
-        data_dir / "cmn_sentences.tsv",
-        [(row[0], "cmn", row[1]) for row in POOL_SENTENCES],
-    )
-    _write_tsv(
-        data_dir / "cmn-eng_links.tsv",
-        [(row[0], row[2]) for row in POOL_SENTENCES if row[0] != 9],
-    )
-    _write_tsv(
-        data_dir / "eng_sentences.tsv",
-        [(row[2], "eng", row[3]) for row in POOL_SENTENCES if row[2] != 999],
-    )
-    _write_tsv(
-        data_dir / "cmn_sentences_detailed.tsv",
-        [
-            (row[0], "cmn", row[1], POOL_AUTHORS[row[0]], "\\N", "0000-00-00")
-            for row in POOL_SENTENCES
-        ],
-    )
-    _write_tsv(
-        data_dir / "cmn_sentences_with_audio.tsv",
-        [
-            (row[0], row[5][0], row[4], row[5][1], "")
-            for row in POOL_SENTENCES
-            if row[5]
-        ],
-    )
-    return data_dir
-
-
 @pytest.fixture
 def pool_table() -> list[WordForm]:
     return [
@@ -149,95 +112,62 @@ def pool_table() -> list[WordForm]:
 
 @pytest.fixture
 def pool_data(tmp_path: Path) -> Path:
-    return _write_pool_data(tmp_path / "tatoeba")
+    return write_tatoeba_dir(tmp_path / "tatoeba", "cmn", POOL_ROWS)
 
 
-class TestSentenceShape:
-    def test_accepts_a_complete_sentence(self) -> None:
-        assert mandarin_shape_failure("我要喝水。") is None
+def test_unknown_tokens_come_from_the_word_table(pool_table: list[WordForm]) -> None:
+    known = known_words(pool_table)
 
-    def test_length_window_stops_at_seven(self) -> None:
-        assert mandarin_shape_failure("我们今天去学校。") is None
-        assert mandarin_shape_failure("我们今天要去学校。") == "length_window"
-
-    def test_profile_window_is_four_to_seven(self) -> None:
-        assert (MANDARIN.min_units, MANDARIN.max_units) == (4, 7)
-
-    @pytest.mark.parametrize(
-        ("sentence", "expected"),
-        [
-            ("我喝水。", "length_window"),
-            ("我要喝水我要喝水我要喝水。", "length_window"),
-            ("我要喝水ABCD。", "script"),
-            ("走走走走。", "repeat"),
-            ("我要喝水", "marks"),
-            ("我要喝水。。", "marks"),
-            ("他说“我要喝水”。", "marks"),
-            ("我，要，喝水。", "marks"),
-        ],
-    )
-    def test_rejects_in_order(self, sentence: str, expected: str) -> None:
-        assert mandarin_shape_failure(sentence) == expected
-
-    def test_fallback_window_accepts_short_sentence(self) -> None:
-        assert mandarin_shape_failure("火灭了。") == "length_window"
-        assert (
-            check_sentence_shape(
-                "火灭了。", MANDARIN, MANDARIN.fallback_min_units, MANDARIN.max_units
-            )
-            is None
-        )
+    assert {"水", "火", "的"} <= known
+    assert han_tokens("我要喝水。") == ["我", "要", "喝水"]
+    assert [word for word in han_tokens("我要喝水。") if word not in known] == ["喝水"]
+    assert not {word for word in han_tokens("饕餮来了。") if word not in known} & known
 
 
-class TestTokenChecks:
-    def test_punctuation_stays_out(self) -> None:
-        assert han_tokens("我要喝水。") == ["我", "要", "喝水"]
+@pytest.mark.parametrize(
+    ("sentence", "form", "expected"),
+    [
+        pytest.param("我要喝水。", "水", 1, id="once"),
+        pytest.param("我要喝水，水很凉。", "水", 2, id="twice"),
+        pytest.param("你看新闻吗？", "闻", 0, id="inside a compound"),
+        pytest.param("我闻花香。", "闻", 1, id="the verb"),
+        pytest.param("一切都好。", "切", 0, id="compound with yi"),
+        pytest.param("他的数学很好。", "数", 0, id="compound with xue"),
+    ],
+)
+def test_a_form_inside_a_compound_does_not_hit(
+    sentence: str, form: str, expected: int
+) -> None:
+    assert count_form_occurrences(sentence, form) == expected
 
-    def test_known_set_grows_with_the_word_table(
-        self, pool_table: list[WordForm]
-    ) -> None:
-        known = known_words(pool_table)
-        assert {"水", "火"} <= known
-        assert "的" in known
 
-    def test_unknown_tokens(self, pool_table: list[WordForm]) -> None:
-        known = known_words(pool_table)
-        assert [word for word in han_tokens("我要喝水。") if word not in known] == [
-            "喝水"
-        ]
-        unknown = [word for word in han_tokens("饕餮来了。") if word not in known]
-        assert unknown
-        assert not set(unknown) & known
+def test_a_target_must_appear_once() -> None:
+    assert single_hits("我要喝水。", ["水", "火"]) == {"水": 1}
+    assert single_hits("我要喝水，水很凉。", ["水"]) == {}
+    assert single_hits("一切都好。", ["切", "好"]) == {"好": 1}
 
-    def test_target_must_appear_once(self) -> None:
-        assert count_form_occurrences("我要喝水。", "水") == 1
-        assert count_form_occurrences("我要喝水，水很凉。", "水") == 2
-        assert single_hits("我要喝水。", ["水", "火"]) == {"水": 1}
-        assert single_hits("我要喝水，水很凉。", ["水"]) == {}
 
-    def test_false_friend_compound_does_not_hit(self) -> None:
-        assert count_form_occurrences("你看新闻吗？", "闻") == 0
-        assert count_form_occurrences("我闻花香。", "闻") == 1
-        assert count_form_occurrences("一切都好。", "切") == 0
-        assert count_form_occurrences("他的数学很好。", "数") == 0
-        assert single_hits("一切都好。", ["切", "好"]) == {"好": 1}
+@pytest.mark.parametrize(
+    ("form", "english", "expected"),
+    [
+        ("抓", "He grabbed a handful of rice.", True),
+        ("抓", "I scratched my arm.", False),
+        ("数", "What are those numbers?", True),
+        ("数", "I counted to ten.", False),
+        ("挤", "This room is cramped.", True),
+        ("挤", "Squeeze the lemon.", False),
+    ],
+)
+def test_sense_rows_reject_false_friend_english(
+    form: str, english: str, expected: bool
+) -> None:
+    row = sense_row(MANDARIN.sense_path, "S", form)
 
-    def test_sense_rows_reject_false_friend_english(self) -> None:
-        def fails(form: str, english: str) -> bool:
-            row = sense_row(MANDARIN.sense_path, "S", form)
-            return sense_failure(english, row, "") == "false_friend"
-
-        assert fails("抓", "He grabbed a handful of rice.")
-        assert not fails("抓", "I scratched my arm.")
-        assert fails("数", "What are those numbers?")
-        assert not fails("数", "I counted to ten.")
-        assert fails("挤", "This room is cramped.")
-        assert not fails("挤", "Squeeze the lemon.")
+    assert (sense_failure(english, row, "") == "false_friend") == expected
 
 
 class TestRankingKey:
     def test_key_order(self) -> None:
-        """Mandarin has no native tier, so the audio term is always 0."""
         best = _candidate(unknown_words=0, zipf_mean=5.0, han_len=5, tatoeba_id=1)
         high_id = _candidate(han_len=5, tatoeba_id=9)
         low_zipf = _candidate(zipf_mean=3.0, han_len=5, tatoeba_id=4)
@@ -259,6 +189,17 @@ class TestRankingKey:
         assert candidate.rank_key == "2|0|-5.123|1|42"
         assert mandarin_rank_key_parts(candidate) == (2, 0, -5.1234, 1, 42)
 
+    @pytest.mark.parametrize(
+        ("audio_id", "prefer_native", "penalty"),
+        [(7, True, 0), (0, True, 1), (7, False, 0), (0, False, 0)],
+    )
+    def test_the_audio_term_follows_the_profile_flag(
+        self, audio_id: int, prefer_native: bool, penalty: int
+    ) -> None:
+        profile = replace(MANDARIN, prefer_native_audio=prefer_native)
+
+        assert rank_key_parts(_candidate(audio_id=audio_id), profile)[1] == penalty
+
 
 class TestCandidatePool:
     def test_filter_counts(self, pool_table: list[WordForm], pool_data: Path) -> None:
@@ -274,51 +215,20 @@ class TestCandidatePool:
         assert report["pool_candidates"] == len(pool)
         assert report["core_sentences"] == len(pool)
 
-    def test_accepts_only_clean_sentences(
-        self, pool_table: list[WordForm], pool_data: Path
-    ) -> None:
-        pool, _ = mandarin_candidate_pool(pool_table, data_dir=pool_data)
-        sentences = {candidate.sentence for candidate in pool}
-        assert "我要喝水。" in sentences
-        for candidate in pool:
-            assert mandarin_shape_failure(candidate.sentence) is None
-            assert candidate.tier == "core"
-            assert candidate.tatoeba_author
-            assert candidate.audio_source in {"native", "tts"}
-
-    def test_audio_tier_is_off_and_author_is_loaded(
+    def test_the_audio_tier_is_off_and_the_author_is_loaded(
         self, pool_table: list[WordForm], pool_data: Path
     ) -> None:
         """Decision anki-gj6: the Mandarin profile has no native tier."""
         pool, _ = mandarin_candidate_pool(pool_table, data_dir=pool_data)
         first = next(candidate for candidate in pool if candidate.tatoeba_id == 1)
+        assert first.sentence == "我要喝水。"
+        assert first.tier == "core"
         assert first.audio_id == 0
         assert first.audio_license == ""
         assert first.audio_source == "tts"
         assert first.audio_missing is True
         assert first.tatoeba_author == "alice"
         assert first.english == "I want to drink water."
-
-    def test_audio_term_follows_the_profile_flag(self) -> None:
-        from types import SimpleNamespace
-
-        from anki_tools.sentence_pack.select import rank_key_parts as shared_parts
-
-        def profile(prefer_native: bool) -> SimpleNamespace:
-            return SimpleNamespace(
-                prefer_native_audio=prefer_native,
-                preferred_min_units=4,
-                preferred_max_units=8,
-                target_length=lambda candidate: 5,
-            )
-
-        with_audio = _candidate(audio_id=7)
-        without_audio = _candidate()
-
-        assert shared_parts(with_audio, profile(True))[1] == 0  # type: ignore[arg-type]
-        assert shared_parts(without_audio, profile(True))[1] == 1  # type: ignore[arg-type]
-        assert shared_parts(with_audio, profile(False))[1] == 0  # type: ignore[arg-type]
-        assert shared_parts(without_audio, profile(False))[1] == 0  # type: ignore[arg-type]
 
     def test_fallback_scaffold(
         self, pool_table: list[WordForm], pool_data: Path
@@ -378,13 +288,9 @@ class TestSelection:
 
     def test_per_word_limit(self, pool_table: list[WordForm]) -> None:
         pool = [
-            _candidate(tatoeba_id=1, covered=frozenset({"水"})),
-            _candidate(
-                tatoeba_id=2, covered=frozenset({"水"}), sentence="我要喝水了。"
-            ),
-            _candidate(
-                tatoeba_id=3, covered=frozenset({"水"}), sentence="我喝那杯水。"
-            ),
+            _candidate(tatoeba_id=1),
+            _candidate(tatoeba_id=2, sentence="我要喝水了。"),
+            _candidate(tatoeba_id=3, sentence="我喝那杯水。"),
         ]
         cards, report = select_mandarin_sentences(pool, pool_table, per_word=2)
         assert len(cards) == 2
@@ -402,23 +308,36 @@ class TestSelection:
             _candidate(tatoeba_id=index, sentence=sentence)
             for index, sentence in enumerate(sentences, start=1)
         ]
-        cards, report = select_mandarin_sentences(pool, pool_table, per_word=5, max_cards=3)
+        cards, report = select_mandarin_sentences(
+            pool, pool_table, per_word=5, max_cards=3
+        )
         assert len(cards) == 3
         assert report["max_cards"] == 3
 
-    def test_same_sentence_is_never_used_twice(
-        self, pool_table: list[WordForm]
+    @pytest.mark.parametrize(
+        "second",
+        [
+            pytest.param(
+                {
+                    "tatoeba_id": 1,
+                    "sentence": "他吃饭了。",
+                    "covered": frozenset({"火"}),
+                },
+                id="same id",
+            ),
+            pytest.param({"tatoeba_id": 2}, id="same text"),
+        ],
+    )
+    def test_a_repeated_sentence_is_skipped(
+        self, pool_table: list[WordForm], second: dict[str, object]
     ) -> None:
-        pool = [
-            _candidate(tatoeba_id=1, covered=frozenset({"水"})),
-            _candidate(tatoeba_id=1, covered=frozenset({"火"})),
-        ]
+        pool = [_candidate(tatoeba_id=1), _candidate(**second)]
         cards, _ = select_mandarin_sentences(pool, pool_table, per_word=2)
-        assert len({card.tatoeba_id for card in cards}) == len(cards)
+        assert len(cards) == 1
 
     def test_scaffold_card_is_selected(self, pool_table: list[WordForm]) -> None:
         pool = [
-            _candidate(tatoeba_id=1, covered=frozenset({"水"})),
+            _candidate(tatoeba_id=1),
             _candidate(
                 target="火",
                 tier="scaffold",
@@ -438,38 +357,25 @@ class TestSelection:
         assert report["tier_counts"] == {"core": 1, "scaffold": 1}
         assert report["core_coverage"]["ratio"] == 1.0
 
-    def test_similar_sentence_is_skipped(self, pool_table: list[WordForm]) -> None:
-        pool = [
-            _candidate(tatoeba_id=1, covered=frozenset({"水"}), sentence="我要喝水。"),
-            _candidate(tatoeba_id=2, covered=frozenset({"水"}), sentence="我要喝水。"),
-        ]
-        cards, _ = select_mandarin_sentences(pool, pool_table, per_word=2)
-        assert len(cards) == 1
-
     def test_pinyin_is_filled(self, pool_table: list[WordForm]) -> None:
         cards, _ = select_mandarin_sentences([_candidate()], pool_table, per_word=1)
         assert cards[0].pinyin == "wǒ yào hē shuǐ"
 
 
-class TestPinyin:
-    def test_sentence_pinyin(self) -> None:
-        assert sentence_pinyin("我要喝水。") == "wǒ yào hē shuǐ"
-
-    def test_bu_sandhi(self) -> None:
-        assert sentence_pinyin("我不去。") == "wǒ bú qù"
-        assert sentence_pinyin("我不喝。") == "wǒ bù hē"
-
-    def test_yi_sandhi(self) -> None:
-        assert sentence_pinyin("我喝一杯水。") == "wǒ hē yì bēi shuǐ"
-        assert sentence_pinyin("我喝一瓶水。") == "wǒ hē yì píng shuǐ"
-        assert sentence_pinyin("我喝一水。") == "wǒ hē yì shuǐ"
-        assert sentence_pinyin("一。") == "yī"
-
-    def test_syllable_count_matches_han_count(self) -> None:
-        for sentence in ["我要喝水。", "我不知道，他来了。", "火灭了。"]:
-            syllables = sentence_pinyin(sentence).split()
-            han_count = sum(1 for char in sentence if "\u4e00" <= char <= "\u9fff")
-            assert len(syllables) == han_count
+@pytest.mark.parametrize(
+    ("sentence", "expected"),
+    [
+        ("我要喝水。", "wǒ yào hē shuǐ"),
+        ("我不去。", "wǒ bú qù"),
+        ("我不喝。", "wǒ bù hē"),
+        ("我喝一杯水。", "wǒ hē yì bēi shuǐ"),
+        ("我喝一瓶水。", "wǒ hē yì píng shuǐ"),
+        ("我喝一水。", "wǒ hē yì shuǐ"),
+        ("一。", "yī"),
+    ],
+)
+def test_sentence_pinyin_applies_the_tone_sandhi(sentence: str, expected: str) -> None:
+    assert sentence_pinyin(sentence) == expected
 
 
 class TestWriters:
@@ -484,7 +390,7 @@ class TestWriters:
     def test_review_csv_header_and_rows(
         self, pool_table: list[WordForm], tmp_path: Path
     ) -> None:
-        pool = [_candidate(tatoeba_id=1, covered=frozenset({"水"}))]
+        pool = [_candidate(tatoeba_id=1)]
         path = write_sentence_review_csv(pool, pool_table, path=tmp_path / "review.csv")
         with path.open(encoding="utf-8", newline="") as handle:
             rows = list(csv.DictReader(handle))

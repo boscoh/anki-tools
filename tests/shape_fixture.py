@@ -40,17 +40,26 @@ SHAPE_RULES = [
     ShapeRule("french", "Le chien mange 42 fois ici.", "digit_marks"),
     ShapeRule("french", "Le chat [noir] mange vite.", "digit_marks"),
     ShapeRule("french", "Le chat mange vite…", "digit_marks"),
+    ShapeRule("french", "Voir le site www.exemple.fr.", "digit_marks"),
     ShapeRule("french", "Le chien mange хлеб ici.", "script"),
     ShapeRule("french", "Oui oui oui oui.", "repeat"),
     ShapeRule("french", "Le chien mange vite", "marks"),
     ShapeRule("french", "Le chien, le chat, l'oiseau.", "marks"),
+    ShapeRule("french", "Le chien mange. Il aboie.", "marks"),
+    ShapeRule("french", "Le chien « mange » vite.", "marks"),
+    ShapeRule("french", "— Le chien mange vite.", "marks"),
     ShapeRule("greek", "Η γάτα έχει 3 μήνες.", "digit_marks"),
     ShapeRule("mandarin", "我要喝水。", ""),
+    ShapeRule("mandarin", "我们今天去学校。", ""),
     ShapeRule("mandarin", "我喝水。", "length_window"),
+    ShapeRule("mandarin", "我们今天要去学校。", "length_window"),
     ShapeRule("mandarin", "我想喝水2杯。", "digit_marks"),
     ShapeRule("mandarin", "我要喝水ABCD。", "script"),
     ShapeRule("mandarin", "走走走走。", "repeat"),
+    ShapeRule("mandarin", "走走走走", "repeat"),
     ShapeRule("mandarin", "我要喝水。。", "marks"),
+    ShapeRule("mandarin", "我要喝水", "marks"),
+    ShapeRule("mandarin", "我，要，喝水。", "marks"),
     ShapeRule("mandarin", "他说“我要喝水”。", "marks"),
 ]
 
@@ -58,7 +67,9 @@ SHAPE_RULES = [
 def shape_rules(*languages: str) -> list[object]:
     """Give the rows of the languages as ``parametrize`` rows with ids."""
     return [
-        pytest.param(*rule, id=f"{rule.language}-{rule.expected or 'pass'}-{rule.sentence}")
+        pytest.param(
+            *rule, id=f"{rule.language}-{rule.expected or 'pass'}-{rule.sentence}"
+        )
         for rule in SHAPE_RULES
         if rule.language in languages
     ]
