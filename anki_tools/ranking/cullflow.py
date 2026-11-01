@@ -64,7 +64,6 @@ UNRANKED_ORDER = 1_000_000
 TATOEBA_BATCH = 1000
 TOKENIZE_BATCH = 256
 FILTER_RULES = (
-    "english_words",
     "length_window",
     "digit_marks",
     "script",
@@ -193,7 +192,6 @@ class CullProfile:
     :param min_units: Minimum unit count of the window, the same window as the
         sentence pack.
     :param max_units: Maximum unit count of the window.
-    :param english_bounds: English word-count window of the ``english_words`` rule.
     :param input_model_name: Name of the input note model.
     :param input_sentence_field: Name of the sentence field of the input model.
     :param input_english_field: Name of the English field of the input model.
@@ -212,8 +210,6 @@ class CullProfile:
     :param frequency_path: Frequency file of the language.
     :param wordfreq_lang: ``wordfreq`` language code.
     :param licenses: License text per data source.
-    :param target_coverage_gate: Gate share of the targets with one card.
-    :param double_coverage_gate: Gate share of the targets with two cards.
     """
 
     tokenize_texts: Callable[[Iterable[str]], list[list[tuple[str, str]]]]
@@ -233,7 +229,6 @@ class CullProfile:
     unit_count: Callable[[str], int]
     min_units: int
     max_units: int
-    english_bounds: tuple[int, int]
 
     input_model_name: str
     input_sentence_field: str
@@ -256,9 +251,6 @@ class CullProfile:
     wordfreq_lang: str
 
     licenses: Mapping[str, str]
-
-    target_coverage_gate: float
-    double_coverage_gate: float
 
     romanization_source: str | None = None
     highlight: Callable[[str, str], str] | None = None

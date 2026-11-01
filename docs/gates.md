@@ -22,7 +22,7 @@ One table shows the four flows at a glance:
 | Flow            | Command                              | Gate table               | Filter table          |
 | --------------- | ------------------------------------ | ------------------------ | --------------------- |
 | Sentence pack   | `anki swadesh pack <lang>`           | G1 to G21, 18 to 20 rows | 9 rule ids            |
-| Cull deck       | `anki fix <lang> <input> --select`   | G1 to G18                | 7 rule ids            |
+| Cull deck       | `anki fix <lang> <input> --select`   | G1, G2, G5 to G18        | 7 rule ids            |
 | Core deck       | `anki fix <lang> <input> --core`     | K1 to K22, 19 rows       | 7 rule ids, C3 to C5  |
 | Vocabulary deck | `anki swadesh vocab <lang>`          | none                     | none                  |
 
@@ -102,11 +102,12 @@ second flow.
 | Sentence pack, Greek           | G1 to G8, G10 to G18, G20          | 18   |
 | Sentence pack, Mandarin        | G1 to G18                          | 18   |
 | Sentence pack, Cantonese       | G1 to G18, G20, G21                | 20   |
-| Cull deck                      | G1 to G18                          | 18   |
+| Cull deck                      | G1, G2, G5 to G18                  | 16   |
 | Core deck                      | K1, K2, K4 to K14, K16, K18 to K22 | 19   |
 | Vocabulary deck                | none                               | 0    |
 
-A removed row leaves a gap in the numbering. Each flow doc gives the check of
+A removed row leaves a gap in the numbering. Cull G3 and G4 are retired (ADR
+0033). Their ids are not reused. Each flow doc gives the check of
 each row: `docs/swadesh-sentence-flow.md`, `docs/cull-deck-flow.md`,
 `docs/core-deck-flow.md`.
 
@@ -139,8 +140,9 @@ The cull and core rows call the one function of `ranking/gates.py` and pass
 their own values. The similarity limit, the manifest file keys, the CSS check,
 and the kept rows are parameters.
 
-The coverage family holds four checks that measure different things: pack G10,
-cull G3, cull G4, and core K2. They stay separate.
+The coverage family holds three checks that measure different things: pack G10,
+cull G12, and core K2. They stay separate. The cull has no gate on the share of
+targets with one card or two cards (ADR 0033).
 
 ## 5. Deliberate differences
 
@@ -148,7 +150,7 @@ cull G3, cull G4, and core K2. They stay separate.
   sentence CSV. The cull and core gates read the output APKG, the output CSVs,
   and the manifest.
 - Pack `G6` uses `profile.similarity` on the sentence text. Cull `G6` and core
-  `K6` use the lemma Jaccard value.
+  `K6` use the lemma Jaccard value on the full lemma set of a card.
 - The pack manifest has a second shape. `sentence_pack/pack.py` writes it, and
   `G11` reads it. The rank manifest comes from `ranking/assemble.py`.
 - `gate_sense` is one function in `ranking/gates.py` for the cull and the core.
@@ -235,6 +237,6 @@ unless the change removes a report-only row.
 | `anki_tools/gate_files.py`               | the lazy file reader                                  |
 | `anki_tools/ranking/gates.py`            | the report and the shared rank checks                 |
 | `anki_tools/sentence_pack/audit.py`      | `AuditInputs`, `as_gates`, and the shared pack checks |
-| `anki_tools/ranking/cullgates.py`        | cull gates G1 to G18                                  |
+| `anki_tools/ranking/cullgates.py`        | cull gates G1, G2, and G5 to G18                      |
 | `anki_tools/ranking/coregates.py`        | core gates K1 to K22                                  |
 | `anki_tools/languages/<lang>/profile.py` | the language gates                                    |

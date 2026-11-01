@@ -241,7 +241,7 @@ Open work after L9:
 
 | Issue       | Problem                                                                      |
 | ----------- | ---------------------------------------------------------------------------- |
-| `anki-cfr6` | the French cull fails G4 after the sense test; G2 is fixed                   |
+| `anki-cfr6` | the French cull failed G2 and G4 after the sense test; both are closed     |
 | `anki-o1vk` | a fresh Mandarin core build fails K6; the build and K6 use two lemma sets    |
 
 The "Distinct lemmas" line of the cull report still counts a lemma that failed

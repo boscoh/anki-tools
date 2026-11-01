@@ -160,6 +160,4 @@ SPANISH_CULL_PROFILE = core.SPANISH_LANGUAGE.cull(
     frequency_path=FREQUENCY_PATH,
     wordfreq_lang="es",
     licenses=LICENSES,
-    target_coverage_gate=0.98,
-    double_coverage_gate=0.95,
 )

@@ -24,7 +24,7 @@ One command runs the stages in order: `anki fix <language> --select`. The
 | C4    | select    | C1, C2, C3, reserve pack | kept cards and reserve cards                |
 | C5    | write     | C0, C4                   | APKG and three side files                   |
 
-The gates G1 to G18 run after C5.
+The gates G1, G2, and G5 to G18 run after C5. G3 and G4 are retired.
 
 The `--cards` and `--reserve` values change the request. The other
 `CullRequest` fields, such as `max_uses` and `target_words`, keep their
@@ -68,7 +68,7 @@ C4  selection
 C5  APKG, .cull.csv, .coverage.csv, .manifest.json
         |
         v
-    gates G1 to G18
+    gates G1, G2, G5 to G18
 ```
 
 ## 3. Target words (C1 and C2)
@@ -270,7 +270,7 @@ exceptions.
 | Group     | Gates        | Checks                                                    |
 | --------- | ------------ | --------------------------------------------------------- |
 | size      | G1, G2       | card count against the cap, lemma uses against the cap    |
-| coverage  | G3, G4, G12  | covered targets, two-card share, coverage CSV rows        |
+| coverage  | G12          | coverage CSV rows                                         |
 | rules     | G5, G6       | F1 to F9 on every kept card, similarity                   |
 | files     | G7, G8, G9   | audio files, note count, media set                        |
 | identity  | G10, G11     | deck name, note type, kept order                          |
@@ -280,8 +280,9 @@ exceptions.
 | note type | G16, G17     | one note type, its fields, the core word, gloss, and bold |
 | sense     | G18          | the core word of each card passes the sense test          |
 
-G3 fails below `target_coverage_gate`, 0.98 for French and Spanish. G4 fails
-below `double_coverage_gate`, 0.95. The profile holds both values.
+G3 and G4 are retired (ADR 0033). Their ids are not reused. The report and the
+coverage CSV still give the targets with one card and with two cards, but no
+gate tests the share.
 
 G14 needs the Swadesh
 count minus the exceptions of the profile, for
@@ -301,12 +302,16 @@ when the pool has no more cards. A kept card without a core word leaves the
 deck, so the gate compares the count before that drop. A small input deck does
 not fail G1.
 
+The similarity test of `select_cards` and G6 use the full lemma sets of the
+cards. A duplicate is a property of the text, so the sense test does not change
+it.
+
 ## 9. File map
 
 | Path                                      | Content                                        |
 | ----------------------------------------- | ---------------------------------------------- |
 | `anki_tools/ranking/cullflow.py`          | C0 to C5 flow, profile, selection, values      |
-| `anki_tools/ranking/cullgates.py`         | gates G1 to G18                                |
+| `anki_tools/ranking/cullgates.py`         | gates G1, G2, and G5 to G18                    |
 | `anki_tools/gates.py`                     | gate value, row, runner, reader contract       |
 | `anki_tools/ranking/gates.py`             | report, shared gates                           |
 | `anki_tools/ranking/assemble.py`          | deck, side files, manifest, report             |

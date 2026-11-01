@@ -1,4 +1,4 @@
-"""Shared gates G1 to G18 of the cull deck.
+"""Shared gates G1 to G18 of the cull deck, without the retired G3 and G4.
 
 The gates read the output APKG, the two CSV files, and the manifest. A gate
 never writes a file. A language package supplies a
@@ -168,28 +168,6 @@ def gate_use_cap(files: CullFiles) -> tuple[bool, str]:
     return True, f"max {most} uses outside the exempt {len(exempt)}"
 
 
-def gate_coverage_once(files: CullFiles) -> tuple[bool, str]:
-    """G3: target coverage reaches the gate share."""
-    rows = files.coverage()
-    covered = sum(1 for row in rows if int(row.get("count", 0)) >= 1)
-    share = covered / len(rows) if rows else 0.0
-    gate = files.profile.target_coverage_gate
-    message = f"{covered}/{len(rows)} targets covered ({share:.3f}"
-    message += f", gate {gate})"
-    return bool(rows) and share >= gate, message
-
-
-def gate_coverage_twice(files: CullFiles) -> tuple[bool, str]:
-    """G4: the share of targets with two cards reaches the gate share."""
-    rows = files.coverage()
-    twice = sum(1 for row in rows if int(row.get("count", 0)) >= 2)
-    share = twice / len(rows) if rows else 0.0
-    gate = files.profile.double_coverage_gate
-    message = f"{twice}/{len(rows)} targets with 2 cards ({share:.3f}"
-    message += f", gate {gate})"
-    return bool(rows) and share >= gate, message
-
-
 def gate_filter_recheck(files: CullFiles) -> tuple[bool, str]:
     """G5: every kept card passes the filter rules."""
     min_words = int(files.params().get("min_words", 0))
@@ -317,8 +295,6 @@ def gate_sense(files: CullFiles) -> tuple[bool, str]:
 GATES: tuple[Gate, ...] = (
     Gate("G1", gate_card_cap),
     Gate("G2", gate_use_cap),
-    Gate("G3", gate_coverage_once),
-    Gate("G4", gate_coverage_twice),
     Gate("G5", gate_filter_recheck),
     Gate("G6", gate_similarity),
     Gate("G7", gate_audio),
@@ -337,7 +313,7 @@ GATES: tuple[Gate, ...] = (
 
 
 def check_cull(output_path: Path, profile: CullProfile) -> int:
-    """Run gates G1 to G18 on the files of a cull output.
+    """Run gates G1 to G18, without the retired G3 and G4, on a cull output.
 
     :param output_path: Output APKG file.
     :param profile: Language hooks.

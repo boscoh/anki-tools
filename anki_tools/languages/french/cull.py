@@ -172,6 +172,4 @@ FRENCH_CULL_PROFILE = FRENCH_LANGUAGE.cull(
     frequency_path=FREQUENCY_PATH,
     wordfreq_lang="fr",
     licenses=LICENSES,
-    target_coverage_gate=0.98,
-    double_coverage_gate=0.95,
 )

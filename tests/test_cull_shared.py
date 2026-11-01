@@ -73,7 +73,6 @@ def _profile() -> cullflow.CullProfile:
         unit_count=lambda sentence: len(sentence.split()),
         min_units=3,
         max_units=12,
-        english_bounds=(2, 12),
         input_model_name=MODEL_NAME,
         input_sentence_field="Text",
         input_english_field="Meaning",
@@ -96,8 +95,6 @@ def _profile() -> cullflow.CullProfile:
         frequency_path=Path("data/test_frequency.tsv"),
         wordfreq_lang="xx",
         licenses={"data": "test license"},
-        target_coverage_gate=0.98,
-        double_coverage_gate=0.95,
         highlight=lambda sentence, word: sentence.replace(
             word, f"<b>{word}</b>", 1
         ),

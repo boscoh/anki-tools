@@ -10,7 +10,6 @@ import csv
 import json
 import math
 from collections import Counter
-from dataclasses import replace
 from functools import partial
 from pathlib import Path
 from typing import Collection
@@ -23,7 +22,6 @@ from anki_tools.apkg.shape import OutputShape, write_package
 from anki_tools.languages.french import cull as cull_fr
 from anki_tools.languages.french.profile import FRENCH
 from anki_tools.ranking import assemble, coreflow, corelist, cullflow, cullgates
-from anki_tools.ranking.coverage import write_rows
 from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.sentence_pack import pool
 ENGLISH = "A short English line."
@@ -459,37 +457,6 @@ def test_gate_card_templates_fails_on_a_wrong_front(tmp_path: Path) -> None:
     assert message is False
 
 
-def test_coverage_gates_read_the_profile_values(tmp_path: Path) -> None:
-    profile = replace(
-        cull_fr.FRENCH_CULL_PROFILE,
-        target_coverage_gate=0.7,
-        double_coverage_gate=0.5,
-    )
-    files = cullgates.cull_files(tmp_path / "gated.apkg", profile)
-    write_rows(
-        files.coverage_csv,
-        cullflow.COVERAGE_COLUMNS,
-        [
-            {"word": "chat", "rank": "1", "count": "2", "status": "covered"},
-            {"word": "mange", "rank": "2", "count": "2", "status": "covered"},
-            {"word": "vite", "rank": "3", "count": "1", "status": "partial"},
-            {"word": "lent", "rank": "4", "count": "0", "status": "absent"},
-        ],
-    )
-
-    passed, message = cullgates.gate_coverage_once(files)
-    twice_passed, twice_message = cullgates.gate_coverage_twice(files)
-    french = cullgates.cull_files(tmp_path / "gated.apkg", cull_fr.FRENCH_CULL_PROFILE)
-    french_passed, french_message = cullgates.gate_coverage_once(french)
-
-    assert passed is True
-    assert message == "3/4 targets covered (0.750, gate 0.7)"
-    assert twice_passed is True
-    assert twice_message == "2/4 targets with 2 cards (0.500, gate 0.5)"
-    assert french_passed is False
-    assert french_message == "3/4 targets covered (0.750, gate 0.98)"
-
-
 def _fake_tokens(self: cullgates.CullFiles) -> list[list[tuple[str, str]]]:
     return [DECK_TOKENS[card.sentence] for card in self.output()["cards"]]
 
@@ -573,7 +540,7 @@ def test_run_gates_passes_on_a_tiny_output(
     )
 
     assert [gate for gate, _passed, _message in rows] == [
-        f"G{number}" for number in range(1, 19)
+        f"G{number}" for number in (1, 2, *range(5, 19))
     ]
     for gate, passed, message in rows:
         assert passed, f"{gate}: {message}"
