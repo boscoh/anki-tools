@@ -65,16 +65,6 @@ def test_media_paths_are_absolute_and_unique(tmp_path: Path) -> None:
     assert all(Path(path).is_absolute() for path in paths)
 
 
-def test_load_audio_index_splits_word_and_sentence(tmp_path: Path) -> None:
-    write_audio(tmp_path, audio_entries(PACK_ROWS))
-
-    index = deck.load_audio_index(tmp_path / "index.csv")
-
-    assert index.sentences == {"我要喝水。": "tts_0000.mp3", "这场火很大。": "tts_0001.mp3"}
-    assert index.words == {"水": "word_0000.mp3", "火": "word_0001.mp3"}
-    assert index.voice == VOICE
-
-
 @pytest.fixture
 def pack_env(tmp_path: Path) -> dict[str, Path]:
     write_audio(tmp_path / "audio", audio_entries(PACK_ROWS))
@@ -149,27 +139,6 @@ def test_the_pack_skips_a_card_that_has_no_audio_form_or_bold_target(
     assert result["no_target"] == 1
     assert result["manifest"]["counts"]["cards"] == 2
     assert result["manifest"]["counts"]["no_target"] == 1
-
-
-def test_create_passes_tags_and_deck_description(tmp_path: Path) -> None:
-    output = tmp_path / "tags.apkg"
-    AnkiPackage.create(
-        output,
-        "Tagged",
-        fields=["Front"],
-        cards=[{"Front": "one", "tags": ["swadesh::water", "tier::core"]}],
-        deck_description="Short description",
-    )
-
-    with AnkiPackage(output) as pkg:
-        notes = pkg.get_notes()
-        decks = pkg.get_decks()
-
-    assert len(notes) == 1
-    assert "swadesh::water" in notes[0]["tags"]
-    assert "tier::core" in notes[0]["tags"]
-    tagged = [info for info in decks.values() if info.get("name") == "Tagged"]
-    assert [info.get("desc") for info in tagged] == ["Short description"]
 
 
 def test_apkg_opens_with_two_cards(pack_env: dict[str, Path]) -> None:

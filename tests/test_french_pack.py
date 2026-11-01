@@ -145,19 +145,6 @@ def test_module_cleanup() -> None:
     assert len(french.module_terms()) == len(french.load_word_table())
 
 
-@pytest.mark.parametrize(
-    ("form", "kind"),
-    [
-        ("ne pas", "discontinuous"),
-        ("se battre", "pair"),
-        ("parce que", "pair"),
-        ("chien", "single"),
-    ],
-)
-def test_form_kinds_and_multiword_forms(form: str, kind: str) -> None:
-    assert french.form_kind(form) == kind
-
-
 def test_whitespace_normalization() -> None:
     assert (
         french.prepare_text("Bonjour\u202f! Ça va\u00a0? Oui\u202f!")

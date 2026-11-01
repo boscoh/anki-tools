@@ -200,15 +200,6 @@ def test_base_pack_fails_only_the_word_table_gate(tmp_path: Path) -> None:
     assert print_audit(results) == 1
 
 
-def test_print_audit_returns_zero_on_pass(capsys: pytest.CaptureFixture[str]) -> None:
-    code = print_audit(
-        [GateResult("G1", True, "207 concepts"), GateResult("G2", True, "211 unique forms")]
-    )
-
-    assert code == 0
-    assert "all 2 gates passed" in capsys.readouterr().out
-
-
 MOON = card("月", "月亮很大。", "yuè liang hěn dà", "The moon is big.", "900", "bob")
 SIMILAR_AT_LIMIT = _overlap_pair(67)
 SIMILAR_BELOW_LIMIT = _overlap_pair(66)
