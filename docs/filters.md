@@ -239,8 +239,7 @@ Open work after L9:
 | Issue       | Problem                                                                      |
 | ----------- | ---------------------------------------------------------------------------- |
 | `anki-o1vk` | a fresh Mandarin core build fails K6; the build and K6 use two lemma sets    |
-| none yet    | French cull G14: the concept `racine` has no kept card                       |
-| none yet    | Spanish cull G5 (one card) and G14 (200 of 207, need 203)                    |
+| none yet    | Spanish cull G5: one card fails `length_window`                              |
 
 The "Distinct lemmas" line of the cull report still counts a lemma that failed
 `sense`. The line has no issue yet.

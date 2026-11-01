@@ -24,7 +24,7 @@ One command runs the stages in order: `anki fix <language> --select`. The
 | C4    | select    | C1, C2, C3, reserve pack | kept cards and reserve cards                |
 | C5    | write     | C0, C4                   | APKG and three side files                   |
 
-The gates G1, G2, and G5 to G18 run after C5. G3 and G4 are retired.
+The gates G1, G2, G5 to G13, and G15 to G18 run after C5. G3, G4, and G14 are retired.
 
 The `--cards` and `--reserve` values change the request. The other
 `CullRequest` fields, such as `max_uses` and `target_words`, keep their
@@ -68,7 +68,7 @@ C4  selection
 C5  APKG, .cull.csv, .coverage.csv, .manifest.json
         |
         v
-    gates G1, G2, G5 to G18
+    gates G1, G2, G5 to G13, G15 to G18
 ```
 
 ## 3. Target words (C1 and C2)
@@ -275,18 +275,15 @@ exceptions.
 | files     | G7, G8, G9   | audio files, note count, media set                        |
 | identity  | G10, G11     | deck name, note type, kept order                          |
 | manifest  | G13          | the two CSV hashes                                        |
-| swadesh   | G14          | the merged deck covers the reserve concepts               |
 | templates | G15          | the cull templates and the CSS classes                    |
 | note type | G16, G17     | one note type, its fields, the core word, gloss, and bold |
 | sense     | G18          | the core word of each card passes the sense test          |
 
-G3 and G4 are retired (ADR 0033). Their ids are not reused. The report and the
-coverage CSV still give the targets with one card and with two cards, but no
-gate tests the share.
+G3, G4, and G14 are retired (ADR 0033, ADR 0035). Their ids are not reused. The
+report and the coverage CSV still give the targets with one card and with two
+cards, and the Swadesh count of the reserve concepts. No gate tests them.
 
-G14 needs the Swadesh
-count minus the exceptions of the profile, for
-example `intestins` in French. G15 needs the template set of the profile and
+G15 needs the template set of the profile and
 each card class in the CSS. G16 checks the single note type, the field set, and
 one card per note. G17 checks that every note holds a `Core`, a `CoreGloss`,
 and a bold core word, and that the gloss is the coverage gloss of that word.
@@ -311,7 +308,7 @@ it.
 | Path                                      | Content                                        |
 | ----------------------------------------- | ---------------------------------------------- |
 | `anki_tools/ranking/cullflow.py`          | C0 to C5 flow, profile, selection, values      |
-| `anki_tools/ranking/cullgates.py`         | gates G1, G2, and G5 to G18                    |
+| `anki_tools/ranking/cullgates.py`         | gates G1, G2, G5 to G13, and G15 to G18        |
 | `anki_tools/gates.py`                     | gate value, row, runner, reader contract       |
 | `anki_tools/ranking/gates.py`             | report, shared gates                           |
 | `anki_tools/ranking/assemble.py`          | deck, side files, manifest, report             |

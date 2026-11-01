@@ -22,7 +22,7 @@ One table shows the four flows at a glance:
 | Flow            | Command                              | Gate table               | Filter table          |
 | --------------- | ------------------------------------ | ------------------------ | --------------------- |
 | Sentence pack   | `anki swadesh pack <lang>`           | G1 to G21, 18 to 20 rows | 9 rule ids            |
-| Cull deck       | `anki fix <lang> <input> --select`   | G1, G2, G5 to G18        | 7 rule ids            |
+| Cull deck       | `anki fix <lang> <input> --select`   | G1 to G18, 15 rows       | 7 rule ids            |
 | Core deck       | `anki fix <lang> <input> --core`     | K1 to K22, 19 rows       | 7 rule ids, C3 to C5  |
 | Vocabulary deck | `anki swadesh vocab <lang>`          | none                     | none                  |
 
@@ -101,12 +101,12 @@ second flow.
 | Sentence pack, Greek           | G1 to G8, G10 to G18, G20          | 18   |
 | Sentence pack, Mandarin        | G1 to G18                          | 18   |
 | Sentence pack, Cantonese       | G1 to G18, G20, G21                | 20   |
-| Cull deck                      | G1, G2, G5 to G18                  | 16   |
+| Cull deck                      | G1, G2, G5 to G13, G15 to G18      | 15   |
 | Core deck                      | K1, K2, K4 to K14, K16, K18 to K22 | 19   |
 | Vocabulary deck                | none                               | 0    |
 
-A removed row leaves a gap in the numbering. Cull G3 and G4 are retired (ADR
-0033). Their ids are not reused. Each flow doc gives the check of
+A removed row leaves a gap in the numbering. Cull G3, G4, and G14 are retired
+(ADR 0033, ADR 0035). Their ids are not reused. Each flow doc gives the check of
 each row: `docs/swadesh-sentence-flow.md`, `docs/cull-deck-flow.md`,
 `docs/core-deck-flow.md`.
 

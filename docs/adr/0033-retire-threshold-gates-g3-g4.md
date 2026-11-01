@@ -15,8 +15,8 @@ The cull no longer has gates G3 and G4. The code removes `gate_coverage_once`,
   keep their numbers (ADR 0027).
 - The coverage CSV and the "Targets with 2" line of the cull report stay. Only
   the pass or fail test goes away.
-- G2 (use cap), G14 (Swadesh count), and core K2 stay. Their pass values come
-  from a rule or a count, not from a chosen share.
+- G2 (use cap) and core K2 stay. Their pass values come from a rule, not from a
+  chosen share. ADR 0035 later retires G14.
 
 ## Reason
 
@@ -28,7 +28,8 @@ the use cap. A failed value showed no fault to fix.
 
 ## Consequences
 
-The cull `--check` runs 16 gates: G1, G2, and G5 to G18. A deck with a low
+The cull `--check` runs 16 gates: G1, G2, and G5 to G18 (ADR 0035 later removes
+G14). A deck with a low
 coverage share now passes. The reader sees the share in the report and in the
 coverage CSV.
 

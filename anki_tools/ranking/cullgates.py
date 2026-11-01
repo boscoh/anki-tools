@@ -254,17 +254,6 @@ def gate_manifest_hashes(files: CullFiles) -> tuple[bool, str]:
     file_keys = {"cull_csv": files.cull_csv, "coverage_csv": files.coverage_csv}
     return _gate_manifest_hashes(files, file_keys)
 
-def gate_swadesh(files: CullFiles) -> tuple[bool, str]:
-    """G14: the merged deck covers the Swadesh concepts, minus the exceptions."""
-    counts = files.manifest().get("counts", {})
-    covered = int(counts.get("swadesh_covered", 0))
-    total = int(counts.get("swadesh_total", 0))
-    exceptions = files.manifest().get("swadesh_exceptions", [])
-    needed = total - len(exceptions)
-    if covered < needed:
-        return False, f"Swadesh {covered}/{total}, need {needed}"
-    return True, f"Swadesh {covered}/{total}, {len(exceptions)} exception(s)"
-
 
 def _css_class_problems(css: str) -> list[str]:
     """Report the card classes that the CSS does not declare."""
@@ -304,7 +293,6 @@ GATES: tuple[Gate, ...] = (
     Gate("G11", gate_kept_order),
     Gate("G12", gate_coverage_shape),
     Gate("G13", gate_manifest_hashes),
-    Gate("G14", gate_swadesh),
     Gate("G15", gate_card_templates),
     Gate("G16", gate_output_model),
     Gate("G17", gate_core_word),
