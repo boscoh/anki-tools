@@ -1,5 +1,5 @@
 {
-  "build_date": "2026-10-31T23:57:17+00:00",
+  "build_date": "2026-11-01T03:09:35+00:00",
   "source": {
     "input": "apkg/Spanish 9000 sentences with native audio.apkg",
     "deck": "Spanish 1000",
@@ -20,18 +20,18 @@
   },
   "counts": {
     "input": 9263,
-    "passed": 6421,
-    "cards": 747,
-    "frequency_cards": 573,
+    "passed": 7892,
+    "cards": 703,
+    "frequency_cards": 529,
     "reserve": 174,
-    "content": 1566,
+    "content": 1476,
     "targets": 300,
-    "covered": 278,
-    "covered2": 168,
+    "covered": 266,
+    "covered2": 156,
     "swadesh_covered": 200,
     "swadesh_total": 207,
-    "dropped_no_core": 253,
-    "bolded": 573,
+    "dropped_no_core": 297,
+    "bolded": 529,
     "unbolded": 0
   },
   "frequency": {
@@ -39,8 +39,8 @@
     "spoken_weight": 0.5
   },
   "files": {
-    "cull_csv": "sha256:c3779d7d07d50871c5539833e42dfdda5416532ebea713ac54c8e70c809330f6",
-    "coverage_csv": "sha256:04cf20c3864f193a09978ae69e2d3ab189aa4f1653b5fe54c8e8a6b844ef2856",
+    "cull_csv": "sha256:661e8361630661ba2310bf48311814f343872c70fa61ee4bc243afc2e56b134e",
+    "coverage_csv": "sha256:06ba6e412894f7945c58768f52e82cb210aca200bdc24087e0f8299ddb5c922c",
     "input_apkg": "sha256:f67605459feb506bcbbb95830a356ff349c21c28e136c8efc3d82d253ec244e9"
   },
   "licenses": {
@@ -49,7 +49,7 @@
     "audio": "Input audio: license of the source deck",
     "swadesh": "Swadesh word data: CC BY-SA 4.0"
   },
-  "kept_order": "sha256:ae275a07b3c3abad7018f8cce8438602f3e45d334f23543eb1d1495acebf50ae",
+  "kept_order": "sha256:2ba6407e83e546b615f751a88ae8fa7e917457e4ef1823bae768f68fef464312",
   "reserve_pack": "apkg/swadesh_sentences_spanish.apkg",
   "swadesh_exceptions": [
     "cola",
