@@ -73,13 +73,35 @@ def load_input_deck(path: Path) -> list[InputCard]:
     )
 
 
+# The small spaCy model leaves these verb forms as their own lemma, which splits one target in two.
+LEMMA_OVERRIDES = {
+    "veux": "vouloir",
+    "peux": "pouvoir",
+    "aime": "aimer",
+    "prend": "prendre",
+    "parle": "parler",
+    "trouve": "trouver",
+    "donne": "donner",
+    "laisse": "laisser",
+}
+
+
+def base_lemma(lemma: str) -> str:
+    """Give the infinitive of a verb form that the French model leaves alone.
+
+    :param lemma: Lowercased lemma from the French spaCy model.
+    :returns: The overriding lemma, or ``lemma`` itself.
+    """
+    return LEMMA_OVERRIDES.get(lemma, lemma)
+
+
 def tokenize_texts(texts: Iterable[str]) -> list[list[tuple[str, str]]]:
     """Tokenize sentence texts with the French spaCy model.
 
     :param texts: Sentence texts.
     :returns: One list of ``(lemma, part of speech)`` pairs per text.
     """
-    return cullflow.tokenize_texts(texts, model=TOKENIZER)
+    return cullflow.tokenize_texts(texts, model=TOKENIZER, lemma_map=base_lemma)
 
 def load_or_build_frequency(
     frequency_path: Path = FREQUENCY_PATH, tatoeba_path: Path = TATOEBA_PATH

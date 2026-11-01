@@ -1,301 +1,301 @@
 word,rank,count,status,gloss
-pas,11,173,covered,not
-ne,15,164,covered,not
-faire,28,46,covered,do
-plus,33,45,covered,more
-tout,35,43,covered,all
-pouvoir,45,66,covered,can
-aller,47,26,covered,go
-dire,51,22,covered,to say (dire)
-bien,52,17,covered,well
-vouloir,56,42,covered,want
-voir,60,15,covered,to see (voir)
-devoir,61,46,covered,must
-même,64,5,covered,same
-très,67,17,covered,very
-fait,68,5,covered,fact
-savoir,69,14,covered,to know (savoir)
-taire,74,0,absent,quiet
-temps,79,6,covered,time
-aimer,80,15,covered,love
-bon,81,19,covered,good
-aussi,83,7,covered,also
-autre,84,9,covered,other
-toi,86,7,covered,you
-encore,87,6,covered,again
-jamais,88,13,covered,never
-chose,89,14,covered,thing
-parler,92,10,covered,speak
-as,93,2,covered,have
-prendre,94,19,covered,take
-pourquoi,95,3,covered,why
-toujours,96,12,covered,always
-peu,97,10,covered,few
-là,99,1,partial,there
+pas,10,176,covered,not
+ne,13,169,covered,not
+faire,24,44,covered,do
+tout,29,41,covered,all
+plus,33,42,covered,more
+pouvoir,34,72,covered,can
+aller,39,26,covered,go
+vouloir,46,45,covered,want
+dire,47,22,covered,to say (dire)
+devoir,52,48,covered,must
+bien,53,17,covered,well
+voir,56,16,covered,to see (voir)
+savoir,57,15,covered,to know (savoir)
+taire,58,0,absent,quiet
+aimer,60,16,covered,love
+très,66,14,covered,very
+même,68,6,covered,same
+prendre,70,24,covered,take
+parler,71,11,covered,speak
+temps,72,4,covered,time
+bon,76,19,covered,good
+chose,78,13,covered,thing
+toi,80,7,covered,you
+pourquoi,81,4,covered,why
+penser,82,5,covered,to think (penser)
+jamais,83,12,covered,never
+fait,84,6,covered,fact
+autre,85,9,covered,other
+as,86,2,covered,have
+encore,89,7,covered,again
+venir,90,7,covered,to come (venir)
+ici,91,10,covered,here
+toujours,92,9,covered,always
+beaucoup,93,16,covered,many
+comment,94,3,covered,how
+aussi,95,6,covered,also
+peu,96,10,covered,few
 monde,101,10,covered,world
-beaucoup,102,18,covered,many
-penser,103,5,covered,to think (penser)
-ici,104,10,covered,here
-comment,105,4,covered,how
-venir,109,6,covered,to come (venir)
-jour,111,7,covered,day (m)
-non,112,3,covered,no
-vie,115,12,covered,life
-personne,116,17,covered,nobody
-fois,117,9,covered,time
-été,118,1,partial,summer
-grand,119,7,covered,big
-passer,120,8,covered,pass
-vraiment,121,5,covered,really
-trouver,122,7,covered,find
-trop,123,13,covered,too
-maison,124,17,covered,house
-manger,126,14,covered,eat
-déjà,127,3,covered,already
-homme,130,8,covered,man (m)
-nouveau,131,14,covered,new
-alors,132,1,partial,then
-arriver,136,7,covered,arrive
-seul,138,8,covered,alone
-petit,139,8,covered,small
-besoin,140,3,covered,need
-heure,141,4,covered,hour
-mettre,144,5,covered,put
-gens,145,4,covered,people
-enfant,146,10,covered,child (m)
+trouver,102,10,covered,find
+là,103,1,partial,there
+jour,104,7,covered,day (m)
+passer,106,8,covered,pass
+manger,108,14,covered,eat
+personne,110,18,covered,nobody
+maison,111,18,covered,house
+vie,113,12,covered,life
+arriver,114,8,covered,arrive
+grand,115,9,covered,big
+vraiment,117,5,covered,really
+fois,120,12,covered,time
+trop,121,12,covered,too
+donner,122,8,covered,to give (donner)
+nouveau,123,14,covered,new
+homme,124,10,covered,man (m)
+heure,126,4,covered,hour
+seul,127,8,covered,alone
+non,128,3,covered,no
+besoin,129,3,covered,need
+enfant,130,10,covered,child (m)
+déjà,131,3,covered,already
+petit,132,7,covered,small
+falloir,133,10,covered,must
+mettre,134,5,covered,put
+laisser,135,12,covered,leave
+livre,136,8,covered,book
+acheter,141,2,covered,buy
+croire,142,0,absent,believe
+femme,143,5,covered,woman (f)
+travail,146,10,covered,work
 français,147,4,covered,french
-travail,151,11,covered,work
-femme,152,4,covered,woman (f)
-juste,154,7,covered,correct
-livre,155,8,covered,book
-pays,156,5,covered,country
-falloir,157,9,covered,must
-mal,158,4,covered,bad
-moins,161,2,covered,less
-donc,162,0,absent,so
-premier,163,10,covered,first
-donner,164,8,covered,to give (donner)
-croire,165,0,absent,believe
-argent,167,7,covered,money
-acheter,168,2,covered,buy
-partir,169,0,absent,leave
-maintenant,170,4,covered,now
-mieux,172,8,covered,better
-regarder,173,4,covered,look
-rendre,176,2,covered,return
-porte,177,5,covered,door
-année,178,8,covered,year (f)
-voiture,180,7,covered,car
-ami,181,7,covered,friend
-dernier,182,5,covered,last
-train,183,6,covered,train
-ville,184,5,covered,city
-langue,185,2,covered,tongue (f)
-moment,186,1,partial,moment
-fille,189,8,covered,girl
-an,190,1,partial,year
-connaître,191,3,covered,know
-eau,192,4,covered,water (f)
-rester,193,3,covered,stay
-attendre,195,2,covered,wait
-lire,196,3,covered,read
-problème,198,4,covered,problem
-laisser,199,4,covered,leave
-père,200,4,covered,father (m)
-entendre,202,4,covered,to hear (entendre)
-demander,203,4,covered,ask
-ainsi,204,2,covered,thus
-veux,205,1,partial,want
-mort,207,4,covered,dead
-histoire,209,4,covered,story
-travailler,210,4,covered,work
-question,211,4,covered,question
-mère,212,4,covered,mother (f)
-aider,214,4,covered,help
-air,215,4,covered,air
-nom,216,4,covered,name (m)
-part,217,1,partial,part
-apprendre,218,4,covered,learn
-soir,219,4,covered,evening
-école,220,4,covered,school
-nuit,222,4,covered,night
-souvent,223,4,covered,often
-perdre,224,4,covered,lose
-comprendre,225,4,covered,understand
-reste,226,2,covered,rest
-hier,228,4,covered,yesterday
-vivre,229,4,covered,to live (vivre)
-assez,230,4,covered,enough
-main,231,4,covered,hand (f)
-place,232,2,covered,place
-raison,233,3,covered,reason
-mot,234,3,covered,word
-combien,235,2,covered,much
-demain,236,4,covered,tomorrow
-devenir,237,4,covered,become
-point,238,3,covered,point
-fin,239,3,covered,end
-tête,240,2,covered,head
-appeler,241,3,covered,call
-jeune,242,4,covered,young
-partie,243,2,covered,part
-compte,244,2,covered,account
-mois,246,4,covered,month
-chien,247,4,covered,dog (m)
-jouer,248,4,covered,to play (jouer)
-vrai,249,4,covered,true
-merci,250,2,covered,thanks
-sortir,251,4,covered,out
-droit,253,3,covered,straight
-meilleur,256,4,covered,better
-demande,257,2,covered,request
-coup,259,1,partial,blow
-commencer,261,3,covered,begin
-peur,262,4,covered,fear
-semaine,263,4,covered,week
-idée,264,4,covered,idea
-essayer,265,4,covered,try
-cas,266,1,partial,case
-famille,267,4,covered,family
-cours,268,4,covered,course
-oublier,269,3,covered,forget
-écrire,271,4,covered,write
-aide,272,1,partial,help
-arrêter,274,4,covered,stop
-sentir,275,4,covered,to smell (sentir)
-matin,276,4,covered,morning
-seulement,277,4,covered,only
-côté,278,3,covered,side
-peux,279,3,covered,can
-bas,280,3,covered,low
-état,281,1,partial,state
-prix,282,4,covered,price
-terre,283,3,covered,earth (f)
-sûr,284,4,covered,sure
-fort,285,4,covered,strong
-lieu,286,2,covered,place
-sera,287,1,partial,will
-tant,288,1,partial,much
-frère,289,4,covered,brother
-heureux,291,3,covered,happy
-anglais,292,4,covered,english
-vieux,294,4,covered,old
+gens,148,4,covered,people
+argent,149,7,covered,money
+regarder,150,4,covered,look
+alors,151,1,partial,then
+partir,154,0,absent,leave
+rendre,156,2,covered,return
+mal,157,4,covered,bad
+maintenant,158,4,covered,now
+ami,159,7,covered,friend
+été,160,1,partial,summer
+voiture,162,7,covered,car
+juste,163,6,covered,correct
+pays,164,4,covered,country
+train,165,6,covered,train
+langue,166,3,covered,tongue (f)
+connaître,167,4,covered,know
+premier,168,7,covered,first
+porte,171,5,covered,door
+rester,172,2,covered,stay
+attendre,173,2,covered,wait
+mieux,175,8,covered,better
+dernier,176,6,covered,last
+entendre,177,4,covered,to hear (entendre)
+lire,179,3,covered,read
+demander,180,2,covered,ask
+an,181,1,partial,year
+travailler,182,7,covered,work
+moins,183,2,covered,less
+fille,184,9,covered,girl
+année,186,8,covered,year (f)
+aider,187,4,covered,help
+eau,188,4,covered,water (f)
+apprendre,189,4,covered,learn
+problème,191,4,covered,problem
+père,192,4,covered,father (m)
+perdre,193,4,covered,lose
+ville,194,4,covered,city
+donc,195,1,partial,so
+comprendre,196,4,covered,understand
+air,197,3,covered,air
+école,198,4,covered,school
+moment,199,2,covered,moment
+combien,200,2,covered,much
+mère,201,4,covered,mother (f)
+appeler,202,3,covered,call
+hier,205,4,covered,yesterday
+devenir,206,4,covered,become
+vivre,207,4,covered,to live (vivre)
+question,210,4,covered,question
+mot,211,3,covered,word
+demain,212,4,covered,tomorrow
+nuit,213,4,covered,night
+chien,214,4,covered,dog (m)
+main,216,4,covered,hand (f)
+soir,217,4,covered,evening
+mort,218,4,covered,dead
+souvent,220,4,covered,often
+nom,221,4,covered,name (m)
+histoire,222,4,covered,story
+commencer,224,4,covered,begin
+jouer,226,4,covered,to play (jouer)
+sortir,227,4,covered,out
+essayer,228,4,covered,try
+assez,229,4,covered,enough
+oublier,230,3,covered,forget
+raison,231,3,covered,reason
+part,232,1,partial,part
+sentir,234,4,covered,to smell (sentir)
+écrire,235,4,covered,write
+jeune,236,4,covered,young
+peur,237,4,covered,fear
+reste,238,2,covered,rest
+arrêter,240,4,covered,stop
+meilleur,241,4,covered,better
+ainsi,242,2,covered,thus
+tête,244,2,covered,head
+bel,245,4,covered,beautiful
+idée,246,4,covered,idea
+point,247,3,covered,point
+semaine,248,4,covered,week
+heureux,249,2,covered,happy
+place,250,2,covered,place
+boire,251,4,covered,to drink (boire)
+aide,252,1,partial,help
+sembler,253,3,covered,seem
+tomber,254,3,covered,to fall (tomber)
+matin,255,4,covered,morning
+vrai,256,4,covered,true
+demande,257,1,partial,request
+compte,258,2,covered,account
+frère,259,4,covered,brother
+vieux,260,4,covered,old
+droit,261,3,covered,straight
+sûr,263,4,covered,sure
+anglais,265,4,covered,english
+coup,266,1,partial,blow
+fin,267,4,covered,end
+merci,269,2,covered,thanks
+mois,270,4,covered,month
+terre,271,3,covered,earth (f)
+difficile,272,4,covered,difficult
+utiliser,273,4,covered,use
+dormir,274,2,covered,sleep
+fort,275,4,covered,strong
+famille,276,4,covered,family
+chambre,277,4,covered,room
+bas,278,3,covered,low
+partie,280,2,covered,part
+longtemps,281,3,covered,long
+seulement,282,4,covered,only
+amour,283,1,partial,love
+beau,284,1,partial,beautiful
+changer,285,3,covered,change
+rencontrer,286,3,covered,meet
+chercher,287,1,partial,look
+mourir,288,4,covered,to die (mourir)
+long,290,4,covered,long
+plaire,291,2,covered,please
+côté,292,3,covered,side
+cœur,294,2,covered,heart (m)
 fils,295,4,covered,son
-bel,297,4,covered,beautiful
-amour,298,2,covered,love
-chambre,299,4,covered,room
-donne,300,0,absent,give
-difficile,301,4,covered,difficult
-tomber,304,3,covered,to fall (tomber)
-longtemps,305,3,covered,long
-politique,306,1,partial,politics
-long,307,4,covered,long
-beau,308,1,partial,beautiful
-boire,309,4,covered,to drink (boire)
-utiliser,310,4,covered,use
-gros,311,4,covered,big
-jeu,312,1,partial,game
-tard,313,3,covered,late
-sens,315,2,covered,sense
-changer,316,3,covered,change
-sembler,317,3,covered,seem
-cœur,318,2,covered,heart (m)
-chercher,319,1,partial,look
-guerre,320,4,covered,war
-vite,321,4,covered,fast
-film,323,4,covered,film
-dormir,325,2,covered,sleep
-près,326,4,covered,near
-rencontrer,333,3,covered,meet
-aime,334,1,partial,love
-accord,336,2,covered,agreement
-mourir,337,4,covered,to die (mourir)
-vérité,338,4,covered,truth
-également,339,1,partial,also
-journée,341,4,covered,day
-genre,342,2,covered,kind
-suite,343,1,partial,continuation
-possible,345,2,covered,possible
-loin,346,2,covered,far
-laisse,347,4,covered,leave
-propre,348,4,covered,own
-cause,350,2,covered,cause
-nombreux,351,4,covered,many
-chat,352,4,covered,cat
-autant,353,3,covered,much
-affaire,354,4,covered,affair
-tenir,355,4,covered,to hold (tenir)
-important,359,3,covered,important
-sujet,360,3,covered,subject
-plaire,361,2,covered,please
-mauvais,362,4,covered,bad
-groupe,364,2,covered,group
-lors,365,1,partial,when
-ouvrir,369,2,covered,open
-parent,370,4,covered,parent
-revenir,371,3,covered,return
-société,372,4,covered,society
-équipe,373,3,covered,team
-prend,376,3,covered,take
-manière,377,1,partial,way
-lettre,378,4,covered,letter
-parle,379,0,absent,speak
-façon,380,3,covered,way
-finir,381,3,covered,finish
-nouvelle,382,2,covered,new
-vue,385,3,covered,view
-payer,386,4,covered,pay
-occuper,387,2,covered,occupy
-porter,389,4,covered,carry
-ensemble,390,1,partial,together
-nombre,391,2,covered,number
-tel,392,4,covered,such
-tôt,393,4,covered,early
-presque,394,3,covered,almost
-gagner,397,2,covered,win
-loi,398,2,covered,law
-répondre,400,1,partial,answer
-étudier,401,4,covered,study
-oeil,403,4,covered,eye
-rue,405,2,covered,street
-enfin,406,1,partial,finally
-projet,407,3,covered,project
-chemin,408,4,covered,way
-pied,409,3,covered,foot (m)
-suivre,410,2,covered,follow
-plutôt,411,2,covered,rather
-photo,412,3,covered,photo
-tour,413,1,partial,tour
-tellement,414,2,covered,so
-musique,415,4,covered,music
-quell,416,4,covered,what
-lit,417,3,covered,bed
-effet,418,0,absent,effect
-sœur,419,4,covered,sister
-erreur,420,4,covered,error
-café,421,4,covered,coffee
-attention,422,3,covered,attention
-espérer,423,4,covered,hope
-conduire,424,2,covered,drive
-conseil,426,2,covered,advice
-général,428,2,covered,general
-face,429,3,covered,face
-route,431,4,covered,road (f)
-prochain,432,4,covered,next
-prêt,433,1,partial,ready
-rapport,434,3,covered,report
-fête,437,2,covered,party
-feu,443,3,covered,fire (m)
-système,444,2,covered,system
-pièce,445,4,covered,room
-phrase,446,2,covered,sentence
-confiance,447,2,covered,trust
-plein,448,3,covered,full
-trouve,449,0,absent,find
-chance,450,4,covered,chance
-parti,451,1,partial,left
-peine,452,1,partial,pain
-parfois,453,4,covered,sometimes
-article,454,2,covered,article
-service,458,2,covered,service
-président,459,1,partial,president
+chat,296,4,covered,cat
+cours,298,4,covered,course
+parent,300,4,covered,parent
+vérité,303,4,covered,truth
+tenir,306,4,covered,to hold (tenir)
+tard,308,3,covered,late
+tant,310,1,partial,much
+vite,313,3,covered,fast
+ouvrir,314,2,covered,open
+occuper,315,2,covered,occupy
+revenir,316,3,covered,return
+lieu,317,2,covered,place
+mauvais,318,4,covered,bad
+cas,319,1,partial,case
+finir,320,3,covered,finish
+prix,321,4,covered,price
+gros,322,4,covered,big
+lettre,323,4,covered,letter
+film,324,4,covered,film
+étudier,325,4,covered,study
+quell,326,4,covered,what
+oeil,327,4,covered,eye
+propre,328,4,covered,own
+état,329,1,partial,state
+affaire,331,4,covered,affair
+nombreux,332,4,covered,many
+guerre,333,4,covered,war
+journée,334,4,covered,day
+porter,336,4,covered,carry
+payer,337,4,covered,pay
+jeu,338,1,partial,game
+tôt,340,4,covered,early
+important,341,3,covered,important
+espérer,342,4,covered,hope
+sens,343,2,covered,sense
+conduire,344,3,covered,drive
+gagner,345,2,covered,win
+près,346,4,covered,near
+sujet,348,2,covered,subject
+café,350,4,covered,coffee
+répondre,351,1,partial,answer
+accord,352,2,covered,agreement
+sœur,353,4,covered,sister
+politique,354,2,covered,politics
+possible,356,2,covered,possible
+loin,357,2,covered,far
+suivre,358,3,covered,follow
+phrase,359,2,covered,sentence
+tel,360,4,covered,such
+chemin,361,4,covered,way
+pied,362,3,covered,foot (m)
+erreur,363,4,covered,error
+cause,364,2,covered,cause
+préférer,365,3,covered,
+manière,366,1,partial,way
+garçon,367,4,covered,
+prochain,370,4,covered,next
+lit,371,3,covered,bed
+autant,372,3,covered,much
+presque,373,3,covered,almost
+froid,374,4,covered,
+fête,375,4,covered,party
+rentrer,376,2,covered,
+prêt,377,2,covered,ready
+photo,379,3,covered,photo
+asseoir,381,4,covered,
+arbre,382,4,covered,
+pièce,383,4,covered,room
+attention,385,3,covered,attention
+genre,386,2,covered,kind
+retourner,387,2,covered,
+souvenir,388,3,covered,
+sera,389,1,partial,will
+suite,390,1,partial,continuation
+rue,392,2,covered,street
+façon,393,4,covered,way
+vue,394,3,covered,view
+téléphone,396,4,covered,
+tellement,397,2,covered,so
+soleil,398,3,covered,
+route,401,4,covered,road (f)
+fai,402,2,covered,
+décider,403,4,covered,
+musique,404,4,covered,music
+confiance,406,2,covered,trust
+feu,407,3,covered,fire (m)
+recevoir,408,4,covered,
+chance,409,3,covered,chance
+noir,410,4,covered,
+envoyer,411,4,covered,
+vendre,412,3,covered,
+facile,413,4,covered,
+lever,414,3,covered,
+préparer,416,2,covered,
+blanc,419,4,covered,
+table,420,3,covered,
+équipe,421,3,covered,team
+également,422,1,partial,also
+plutôt,423,3,covered,rather
+simplement,424,3,covered,
+groupe,425,2,covered,group
+bureau,426,4,covered,
+plein,427,3,covered,full
+peine,428,1,partial,pain
+cher,429,2,covered,
+réponse,430,2,covered,
+projet,431,2,covered,project
+ensemble,432,1,partial,together
+étranger,433,4,covered,
