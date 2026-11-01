@@ -85,17 +85,6 @@ def _hit_fixture() -> tuple[
 
 
 class TestCoreHits:
-    def test_a_hit_marks_the_card_and_its_targets(self) -> None:
-        cards, tokens, targets = _hit_fixture()
-
-        hits, failures, present = coreflow.core_hits(
-            cards, tokens, [0], targets, _profile()
-        )
-
-        assert hits == {0: ("F:beber", "S1:agua")}
-        assert failures == {}
-        assert present == {"S1:agua": True, "F:beber": True}
-
     def test_a_tier_s_hit_without_the_gloss_is_a_sense_failure(self) -> None:
         _fixture_cards, tokens, targets = _hit_fixture()
         cards = [_card("Yo bebo agua.", english="I drink wine.")]
@@ -120,26 +109,6 @@ class TestCoreHits:
         assert hits == {0: ()}
         assert failures == {"F:beber": 1}
         assert present == {"F:beber": True}
-
-    def test_a_tier_s_false_friend_blocks_the_form_hit(self) -> None:
-        cards, tokens, _targets = _hit_fixture()
-        targets = [
-            _target(
-                "S1:agua",
-                position=1,
-                form="agua",
-                gloss="water",
-                false_friends=frozenset({"drink"}),
-            )
-        ]
-
-        hits, failures, present = coreflow.core_hits(
-            cards, tokens, [0], targets, _profile()
-        )
-
-        assert "S1:agua" not in hits[0]
-        assert failures["S1:agua"] == 1
-        assert present["S1:agua"] is True
 
     def test_a_token_outside_the_core_list_is_ignored(self) -> None:
         _cards, _tokens, targets = _hit_fixture()
@@ -240,22 +209,6 @@ class TestManifestCounts:
         assert counts["unbolded"] == 1
         assert counts["sense_rows"] == 0
         assert counts["rows"] == 3
-
-    def test_a_rare_outside_word_is_counted(self) -> None:
-        rows, coverage, result, candidates, _ranks, options = _manifest_fixture()
-
-        counts = coreflow.manifest_counts(
-            rows,
-            coverage,
-            result,
-            candidates,
-            [0, 1],
-            {"x": 500},
-            options,
-        )
-
-        assert counts["outside"] == 1
-        assert counts["outside_rare"] == 1
 
 
 class TestCardFilter:

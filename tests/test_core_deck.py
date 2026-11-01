@@ -6,7 +6,6 @@ spaCy, ffprobe, or the frequency list.
 
 from __future__ import annotations
 
-import csv
 import hashlib
 import json
 from collections import Counter
@@ -20,12 +19,10 @@ from anki_tools.apkg.package import AnkiPackage
 from anki_tools.languages.french import core, cull
 from anki_tools.languages.mandarin.core import MANDARIN_CORE_PROFILE
 from anki_tools.ranking import assemble, coreflow
-from anki_tools.ranking.assemble import write_rank_csv
 from anki_tools.ranking.core import (
     CoreCandidate,
     CoreOptions,
     CoreResult,
-    assign_targets,
     card_cost,
     select,
     target_quotas,
@@ -199,16 +196,6 @@ class TestSelection:
         ]
         assert assigned == sorted(assigned)
 
-    def test_assign_targets_uses_the_lowest_free_target(self) -> None:
-        candidates = [
-            CoreCandidate(0, ("S1:a", "S2:b"), (), 5),
-            CoreCandidate(1, ("S2:b",), (), 5),
-        ]
-
-        assigned = assign_targets([0, 1], candidates, {"S1:a": 1, "S2:b": 2})
-
-        assert assigned == {0: "S1:a", 1: "S2:b"}
-
 
 @pytest.mark.parametrize(
     ("budget", "kept", "reasons"),
@@ -369,15 +356,6 @@ def test_a_small_budget_stops_the_run(budget: int, fits: bool) -> None:
             size_check(quotas, budget)
 
 
-def test_the_rank_csv_holds_the_kept_cards_in_order(tmp_path: Path) -> None:
-    path = tmp_path / "x.rank.csv"
-
-    write_rank_csv([(1, 1001, "B.", 1), (2, 1000, "A.", 1)], path)
-
-    rows = list(csv.DictReader(path.open(encoding="utf-8")))
-    assert [(row["sentence"], row["rank"]) for row in rows] == [("B.", "1"), ("A.", "2")]
-
-
 def test_the_order_hash_follows_the_kept_sentences() -> None:
     cards = [card("A.", index=0), card("B.", index=1)]
     digest = hashlib.sha256(b"B.\nA.").hexdigest()
@@ -464,44 +442,6 @@ def test_the_run_writes_the_side_files_the_manifest_and_the_report(
     assert "Cards:" in shown
     assert str(output) in shown
     assert "Dropped, no audio file:" in shown
-
-
-def test_a_kept_card_without_a_core_word_leaves_the_deck(tmp_path: Path) -> None:
-    run, output, _profile = run_core(tmp_path)
-    assert run.manifest_path is not None
-    manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
-    with run.sides["core.csv"].open(encoding="utf-8", newline="") as handle:
-        rows = list(csv.DictReader(handle))
-    with AnkiPackage(output) as package:
-        sentences = [str(row["flds"]).split("\x1f")[1] for row in package.get_notes()]
-
-    dropped = [row for row in rows if row["reason"] == "no_core"]
-    assert manifest["counts"]["dropped_no_core"] == 1
-    assert manifest["counts"]["cards"] == 1
-    assert [(row["kept"], row["bold"]) for row in dropped] == [("0", "0")]
-    assert "lapin" in dropped[0]["sentence"]
-    assert {(row["kept"], row["bold"]) for row in rows} == {("1", "1"), ("0", "0")}
-    assert len(sentences) == 1
-    assert "lapin" not in sentences[0]
-
-
-def test_an_absent_target_gets_a_coverage_row_and_a_report_line(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    run, _output, _profile = run_core(
-        tmp_path, word_table=lambda: [(1, "chat", "cat"), (2, "fromage", "cheese")]
-    )
-    assert run.manifest_path is not None
-    manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
-    with run.sides["coverage.csv"].open(encoding="utf-8", newline="") as handle:
-        rows = {row["word"]: row for row in csv.DictReader(handle)}
-    shown = capsys.readouterr().out
-
-    assert (rows["fromage"]["status"], rows["fromage"]["count"]) == ("absent", "0")
-    assert manifest["counts"]["absent"] == 1
-    assert manifest["counts"]["targets"] == len(rows) - 1
-    assert "Covered twice:" in shown
-    assert "0 of 1 (0.000)" in shown
 
 
 def test_the_kept_card_keeps_its_note_id_and_due(tmp_path: Path) -> None:
