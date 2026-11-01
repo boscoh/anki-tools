@@ -217,7 +217,8 @@ them to the sentence text.
 
 The `senses` and `false_friends` columns of a tier S row hold two word sets.
 `sense_failure` returns `false_friend` when the paired English holds a
-false-friend word and no sense word.
+false-friend word and no sense word. A sense word passes the form without the
+gloss test.
 
 | Pack      | Form | The filter rejects when the English holds |
 | --------- | ---- | ----------------------------------------- |

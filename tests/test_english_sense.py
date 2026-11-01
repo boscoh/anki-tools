@@ -35,6 +35,7 @@ def test_contractions_expand_to_words() -> None:
 
 HOLD = SenseRow(senses=frozenset({"hold"}), false_friends=frozenset({"drive"}))
 TIME = SenseRow(senses=frozenset({"time"}), false_friends=frozenset({"weather"}))
+BELLY = SenseRow(senses=frozenset({"stomachache"}))
 
 
 @pytest.mark.parametrize(
@@ -62,6 +63,10 @@ TIME = SenseRow(senses=frozenset({"time"}), false_friends=frozenset({"weather"})
         ("anything", None, "not a swadesh gloss", None),
         ("I drive a car.", HOLD, "to hold", "false_friend"),
         ("Hold the drive.", HOLD, "to hold", None),
+        ("I have a stomachache.", None, "belly", "sense"),
+        ("I have a stomachache.", BELLY, "belly", None),
+        ("I have a stomach.", BELLY, "belly", None),
+        ("I have a headache.", BELLY, "belly", "sense"),
         ("What time is it?", TIME, None, None),
         ("Time and weather.", TIME, None, "false_friend"),
         ("What day is it?", TIME, None, "sense"),

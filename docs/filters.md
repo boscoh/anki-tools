@@ -134,7 +134,9 @@ when three tests hold:
 
 1. The form or the lemma is in the sentence.
 2. The form is not inside a compound that gives a different meaning.
-3. The English holds a sense word of the target and no false-friend word.
+3. The English holds a sense word of the target and no false-friend word. A
+   tier S form also passes on a `senses` word alone, or on its Swadesh gloss when
+   it holds no false-friend word (ADR 0049).
 
 | Flow | Unit                 | A failed test                                          |
 | ---- | -------------------- | ------------------------------------------------------ |

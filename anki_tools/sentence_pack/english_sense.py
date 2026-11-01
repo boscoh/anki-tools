@@ -175,9 +175,10 @@ def sense_failure(
 ) -> str | None:
     """Test the English of a card against the sense of its target.
 
-    A tier S form has a Swadesh gloss. The row rejects the English when it
-    holds a false-friend word and no sense word. Then the English must show the
-    gloss sense; a gloss with no table entry does not reject.
+    A tier S form has a Swadesh gloss. The English passes when it holds a sense
+    word of the row. Otherwise the row rejects it when it holds a false-friend
+    word. Then the English must show the gloss sense; a gloss with no table
+    entry does not reject.
 
     A tier F lemma has no gloss. A row with no sense words accepts every
     English. Otherwise the English must hold a sense word and no false-friend
@@ -196,12 +197,11 @@ def sense_failure(
         if row.false_friends & tokens:
             return FALSE_FRIEND
         return None if row.senses & tokens else SENSE
-    if (
-        row is not None
-        and row.false_friends & tokens
-        and not row.senses & tokens
-    ):
-        return FALSE_FRIEND
+    if row is not None:
+        if row.senses & tokens:
+            return None
+        if row.false_friends & tokens:
+            return FALSE_FRIEND
     return None if _holds_gloss(gloss, english, senses) else SENSE
 
 

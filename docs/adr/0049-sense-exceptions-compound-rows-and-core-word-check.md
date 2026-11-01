@@ -81,3 +81,14 @@ G6. The core `coverage_floor` values do not change. The share of Cantonese is
 - A new false match in Mandarin or Cantonese needs one `compounds` entry. A
   false match in French or Spanish needs a code change.
 - K13 now fails when the `Core` field and the sentence disagree.
+
+## Amendment: a tier S `senses` word passes the form (anki-jkeq)
+
+`sense_failure` for a tier S form first passes the English when it holds a
+`senses` word of the row. Otherwise a `false_friends` word rejects it, then the
+gloss test runs. Before, a `senses` word only cancelled a false-friend hit. A
+card that held a false-friend word and no sense word is still `false_friend`.
+The cull and the tier F test do not change. Rebuilding the Spanish and French
+core decks and the Spanish cull gives byte-identical CSVs; the Cantonese core
+deck also gives identical CSVs, because no row has a `senses` word the gloss
+misses yet.

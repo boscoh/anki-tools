@@ -123,8 +123,8 @@ default is 50.
 | F    | a lemma | a content token of the card has the lemma             |
 
 Both tiers call `sense_failure` of `anki_tools/sentence_pack/english_sense.py`
-with the sense row of the target. A tier S form passes the false-friend words of
-its row and the Swadesh gloss. A tier F lemma needs a sense word of its row and
+with the sense row of the target. A tier S form passes on a sense word of its
+row, or on the Swadesh gloss when it holds no false-friend word. A tier F lemma needs a sense word of its row and
 no false-friend word. The pack and the cull call the same function.
 
 A hit that fails the sense test adds to the `sense_failures` count of the
