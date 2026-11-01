@@ -46,7 +46,8 @@ Decisions:
   Mandarin tier S `hits` match the character stream on purpose, so 水 hits
   inside 喝水.
 - Cantonese: the `elif` branch of `form_offsets` is deliberate. The sense table
-  lists `insect` as a sense of 蟲, so the credit matches the table. A strict
+  once credited 蟲 inside 昆蟲; the tier S `compounds` row for 蟲 now blocks
+  that credit (the dead tier F row listing `insect` was deleted). A strict
   whole-token rule was tried and reverted. The Cantonese tokenizer gives tokens
   such as 蟲好 and 好忙, so a whole-token rule rejects true hits. It changed the
   core deck from 116 targets and 109 cards to 90 targets and 89 cards, and it
