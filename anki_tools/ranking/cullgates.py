@@ -25,9 +25,9 @@ from anki_tools.ranking.cullflow import (
     coverage_status,
     filter_reason,
     frequency_senses,
-    lemma_sets,
     sense_lemma_sets,
 )
+from anki_tools.ranking.corelist import lemma_sets
 from anki_tools.ranking.gates import (
     Gate,
     gate_audio as _gate_audio,

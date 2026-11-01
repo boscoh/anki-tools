@@ -36,7 +36,13 @@ from anki_tools.ranking.cardfilter import (
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
 from anki_tools.ranking.core import select as select_core
 from anki_tools.ranking.core import target_quotas
-from anki_tools.ranking.corelist import CONTENT_POS, CoreTarget, build_core_targets, build_targets
+from anki_tools.ranking.corelist import (
+    CONTENT_POS,
+    CoreTarget,
+    build_core_targets,
+    build_targets,
+    lemma_sets,
+)
 from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.ranking.scan import CoreProfile, scan
 from anki_tools.sentence_pack.audio import probe_duration
@@ -971,12 +977,14 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
     size_check(quotas, options.max_cards)
 
     core_forms = frozenset(target.form.casefold() for target in targets)
+    full_sets = lemma_sets(tokens, CONTENT_POS)
     candidates = [
         CoreCandidate(
             index=index,
             targets=hits[index],
             outside=outside_lemmas(index, tokens, core_forms),
             units=len(tokens[index]),
+            lemmas=frozenset(full_sets[index]),
         )
         for index in passed
     ]

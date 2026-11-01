@@ -88,17 +88,14 @@ class CoreCandidate:
     :param targets: Target keys of the card, after the sense guard.
     :param outside: Content lemmas of the card that are not targets.
     :param units: Word or Han character count of the card.
+    :param lemmas: Content lemmas of the card, the set of the duplicate test.
     """
 
     index: int
     targets: tuple[str, ...]
     outside: tuple[str, ...]
     units: int
-
-    @property
-    def lemmas(self) -> frozenset[str]:
-        """Give the content lemmas of the card, targets and outside words."""
-        return frozenset(self.targets) | frozenset(self.outside)
+    lemmas: frozenset[str] = frozenset()
 
 
 @dataclass

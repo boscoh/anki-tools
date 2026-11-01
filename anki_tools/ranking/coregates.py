@@ -28,7 +28,7 @@ from anki_tools.ranking.coreflow import (
     read_loanwords,
     read_output,
 )
-from anki_tools.ranking.corelist import CONTENT_POS
+from anki_tools.ranking.corelist import CONTENT_POS, lemma_sets
 from anki_tools.ranking.gates import (
     Gate,
     GateResult,
@@ -193,10 +193,7 @@ def gate_filter_recheck(files: CoreFiles) -> tuple[bool, str]:
 
 def gate_similarity(files: CoreFiles) -> tuple[bool, str]:
     """K6: no kept pair reaches the lemma Jaccard limit."""
-    sets = [
-        {lemma for lemma, pos in card_tokens if pos in CONTENT_POS}
-        for card_tokens in files.tokens()
-    ]
+    sets = lemma_sets(files.tokens(), CONTENT_POS)
     return _gate_similarity(files, sets, SIMILARITY_LIMIT)
 
 def gate_audio(files: CoreFiles) -> tuple[bool, str]:

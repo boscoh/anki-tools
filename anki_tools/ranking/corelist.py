@@ -39,6 +39,25 @@ def is_content(pos: str, content_pos: frozenset[str]) -> bool:
     return not content_pos or pos in content_pos
 
 
+def lemma_sets(
+    tokens: Sequence[Sequence[tuple[str, str]]],
+    content_pos: frozenset[str],
+) -> list[set[str]]:
+    """Collect the content lemmas of every card.
+
+    The cull, the core build, and gates G6 and K6 use this set for duplicates.
+
+    :param tokens: Lemma and part of speech per card.
+    :param content_pos: Parts of speech that count as content, empty for every
+        token.
+    :returns: One set of content lemmas per card.
+    """
+    return [
+        {lemma for lemma, pos in card_tokens if is_content(pos, content_pos)}
+        for card_tokens in tokens
+    ]
+
+
 @dataclass(frozen=True)
 class TargetWord:
     """One target word of the frequency fill.

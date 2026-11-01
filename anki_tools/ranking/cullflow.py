@@ -43,7 +43,13 @@ from anki_tools.ranking.cardfilter import (
     filter_reason,
 )
 from anki_tools.ranking.coreflow import InputCard
-from anki_tools.ranking.corelist import UNRANKED_RANK, TargetWord, build_targets, is_content
+from anki_tools.ranking.corelist import (
+    UNRANKED_RANK,
+    TargetWord,
+    build_targets,
+    is_content,
+    lemma_sets,
+)
 from anki_tools.ranking.cover import greedy_cover
 from anki_tools.ranking.coverage import write_rows
 from anki_tools.ranking.duplicates import at_limit
@@ -441,23 +447,6 @@ def _reserve_cards(package: AnkiPackage, model_name: str) -> list[ReserveCard]:
             audio=coreflow.sound_name(values[index[RESERVE_AUDIO_FIELD]]),
         )
     return list(chosen.values())
-
-
-def lemma_sets(
-    tokens: Sequence[Sequence[tuple[str, str]]],
-    content_pos: frozenset[str],
-) -> list[set[str]]:
-    """Collect the content lemmas of every card.
-
-    :param tokens: Lemma and part of speech per card.
-    :param content_pos: Parts of speech that count as content, empty for every
-        token.
-    :returns: One set of content lemmas per card.
-    """
-    return [
-        {lemma for lemma, pos in card_tokens if is_content(pos, content_pos)}
-        for card_tokens in tokens
-    ]
 
 
 def frequency_senses(sense_path: Path) -> dict[str, SenseRow]:
