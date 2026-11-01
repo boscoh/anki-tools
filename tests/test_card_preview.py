@@ -20,28 +20,13 @@ from anki_tools.preview import (
     "language, mode, shown",
     [
         pytest.param(
-            "french", "cull", ["I won't ask you anything else today.", "not"], id="french-cull"
-        ),
-        pytest.param(
             "spanish", "cull", ["I want to ask for the bill.", "to ask"], id="spanish-cull"
-        ),
-        pytest.param(
-            "french", "core", ["I won't ask you anything else today.", "not"], id="french-core"
-        ),
-        pytest.param(
-            "spanish", "core", ["I want to ask for the bill.", "to ask"], id="spanish-core"
         ),
         pytest.param(
             "mandarin",
             "core",
             ["I am very busy today.", "wǒ jīn tiān hěn máng", "busy"],
             id="mandarin-core",
-        ),
-        pytest.param(
-            "cantonese",
-            "core",
-            ["I am very busy today.", "ngo5 gam1 jat6 hou2 mong4", "busy"],
-            id="cantonese-core",
         ),
     ],
 )

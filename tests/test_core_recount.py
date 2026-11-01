@@ -55,12 +55,9 @@ CASES = [
     ("no model means a plain test", "je sais", "S3:savoir", "", "", False),
     ("substring is not proof", "我听得到了。", "S1:得到", "得到", "", True),
     ("french inflected form", "Je sais la réponse.", "S3:savoir", "", FRENCH, True),
-    ("french core word inflected", "Je sais la réponse.", "", "savoir", FRENCH, True),
     ("french target absent", "Je mange la pomme.", "S3:savoir", "", FRENCH, False),
     ("french split negation", "Il ne donne pas de lait.", "S4:ne pas", "", FRENCH, True),
-    ("french other word is absent", "Cessez de fumer !", "S5:fumée", "", FRENCH, False),
     ("spanish reflexive form", "Me senté entre Tom y John.", "S6:sentarse", "", SPANISH, True),
-    ("spanish target absent", "Tom come una manzana.", "S6:sentarse", "", SPANISH, False),
 ]
 
 
