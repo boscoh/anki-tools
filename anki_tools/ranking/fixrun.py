@@ -11,6 +11,7 @@ modes cross it.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, replace
 from pathlib import Path
 
@@ -18,6 +19,11 @@ from anki_tools.ranking import coreflow, cullflow, identity
 from anki_tools.ranking.coregates import check_core
 from anki_tools.ranking.cullgates import check_cull
 from anki_tools.ranking.scan import CoreProfile
+
+RunCore = Callable[[coreflow.CoreRequest, CoreProfile], object]
+RunCull = Callable[[cullflow.CullRequest, cullflow.CullProfile], object]
+CheckCore = Callable[[Path, CoreProfile], int]
+CheckCull = Callable[[Path, cullflow.CullProfile], int]
 
 
 @dataclass(frozen=True)
@@ -54,6 +60,10 @@ def run_fix(
     reserve: bool = True,
     words: int = 0,
     check: bool = False,
+    run_core: RunCore = coreflow.run_core,
+    run_cull: RunCull = cullflow.run_cull,
+    check_core: CheckCore = check_core,
+    check_cull: CheckCull = check_cull,
 ) -> None:
     """Run the mode of a fix command, or its gates when ``check`` is set.
 
@@ -66,6 +76,10 @@ def run_fix(
     :param reserve: Select mode: add the Swadesh reserve cards.
     :param words: Core mode: tier F words after the Swadesh set.
     :param check: Run the gates on the output and do not run the mode again.
+    :param run_core: Core flow. A test passes a recorder.
+    :param run_cull: Cull flow. A test passes a recorder.
+    :param check_core: Core gates. A test passes a recorder.
+    :param check_cull: Cull gates. A test passes a recorder.
     :raises SystemExit: No mode is set, two modes are set, or a gate fails.
     """
     apkg_path = Path(apkg_path)
@@ -79,10 +93,14 @@ def run_fix(
     if core and select:
         raise SystemExit(f"Error: choose one mode: {' '.join(language.modes)}")
     if core:
-        _run_core(language, apkg_path, output, cards, words, check)
+        _run_core(
+            language, apkg_path, output, cards, words, check, run_core, check_core
+        )
         return
     if select and language.cull is not None:
-        _run_cull(language, apkg_path, output, cards, reserve, check)
+        _run_cull(
+            language, apkg_path, output, cards, reserve, check, run_cull, check_cull
+        )
         return
     raise SystemExit(f"Error: {language.label} has no --select mode.")
 
@@ -94,6 +112,8 @@ def _run_core(
     cards: int | None,
     words: int,
     check: bool,
+    run_core: RunCore,
+    check_core: CheckCore,
 ) -> None:
     """Build the core deck of a deck command, or run its gates."""
     profile = language.core
@@ -112,7 +132,7 @@ def _run_core(
         core_words=words,
         max_cards=cards,
     )
-    coreflow.run_core(request, profile)
+    run_core(request, profile)
 
 
 def _run_cull(
@@ -122,6 +142,8 @@ def _run_cull(
     cards: int | None,
     reserve: bool,
     check: bool,
+    run_cull: RunCull,
+    check_cull: CheckCull,
 ) -> None:
     """Build the cull deck of a deck command, or run its gates."""
     profile = language.cull
@@ -140,4 +162,4 @@ def _run_cull(
     )
     if cards is not None:
         request = replace(request, max_cards=cards)
-    cullflow.run_cull(request, profile)
+    run_cull(request, profile)
