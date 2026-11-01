@@ -405,3 +405,18 @@ def test_sentence_csv_columns() -> None:
         header = next(csv.reader(handle))
 
     assert header == french.SENTENCE_FIELDS
+
+
+@pytest.mark.parametrize(
+    ("sentence", "form", "credited"),
+    [
+        ("Cessez de fumer si vous voulez vivre longtemps !", "fumée", False),
+        ("Mon père s'est arrêté de fumer récemment.", "fumée", False),
+        ("Il y a de la fumée dans la cuisine.", "fumée", True),
+        ("Il ne faut pas fumer ici.", "fumer", True),
+    ],
+)
+def test_a_noun_form_is_not_credited_by_its_verb(
+    sentence: str, form: str, credited: bool
+) -> None:
+    assert (form in french.hits(sentence, [form])) is credited

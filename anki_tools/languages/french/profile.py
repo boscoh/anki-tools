@@ -101,7 +101,8 @@ FINAL_MARKS = ".?!"
 INTERNAL_MARKS = ",;:"
 QUOTE_MARKS = '«»"“”—–'
 DISCONTINUOUS_FORMS = frozenset({"ne pas"})
-CARRIERS = ("{form}", "le {form}", "je {form}", "il {form}")
+CARRIERS_NOUN = ("{form}", "le {form}")
+CARRIERS_VERB = ("{form}", "le {form}", "je {form}", "il {form}")
 ELIDED_CLITICS = (
     "l'",
     "d'",
@@ -343,15 +344,33 @@ def is_repeated_sentence(sentence: str) -> bool:
 
 
 
+@lru_cache(maxsize=1)
+def verb_heads() -> frozenset[str]:
+    """Give the verb forms of the word table and each token of a verb phrase.
+
+    :returns: Surface keys that the carrier step reads as verbs.
+    """
+    heads: set[str] = set()
+    for row in load_word_table():
+        if row.english.startswith("to "):
+            heads.add(surface_key(row.french))
+            heads.update(surface_key(part) for part in form_parts(row.french))
+    return frozenset(heads)
+
+
 @lru_cache(maxsize=8192)
 def carrier_keys(form: str) -> frozenset[str]:
     """Read the target keys of one form from its carrier phrases.
+
+    Only a verb form gets the subject-pronoun carriers, so a noun such as
+    ``fumée`` is not read as the verb ``fumer``.
 
     :param form: Word-table form or one part of it.
     :returns: Normalized surfaces of the form and of the carrier head words.
     """
     keys = {surface_key(form)}
-    for carrier in CARRIERS:
+    carriers = CARRIERS_VERB if surface_key(form) in verb_heads() else CARRIERS_NOUN
+    for carrier in carriers:
         tokens = [
             token
             for token in tokenize(TOKENIZER, carrier.format(form=form))

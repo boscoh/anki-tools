@@ -164,7 +164,7 @@ S162:ciel,ciel,sky,S,162,2,2,covered
 S163:vent,vent,wind,S,163,2,2,covered
 S164:neige,neige,snow,S,164,2,2,covered
 S165:glace,glace,ice,S,165,2,2,covered
-S166:fumée,fumée,smoke,S,166,2,2,covered
+S166:fumée,fumée,smoke,S,166,2,0,absent_sense
 S167:feu,feu,fire,S,167,2,2,covered
 S168:cendre,cendre,ash,S,168,0,0,absent
 S169:brûler,brûler,to burn,S,169,2,1,partial
