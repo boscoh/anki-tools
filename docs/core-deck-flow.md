@@ -23,7 +23,7 @@ One command runs the stages in order: `anki fix <language> --core`. The
 | K5    | order   | K4                                        | card order, assigned target per card        |
 | K6    | write   | K0, K4, K5                                | APKG and four side files                    |
 
-The gates K1 to K21 run after K6. The table holds 18 rows: K3, K15, and K17
+The gates K1 to K22 run after K6. The table holds 19 rows: K3, K15, and K17
 are gone.
 
 The `--cards` and `--words` values change the tier F target count and the
@@ -66,7 +66,7 @@ K5  order: target position, example number, new words, units
 K6  APKG, .core.csv, .coverage.csv, .manifest.json, .rank.csv
         |
         v
-    gates K1 to K21
+    gates K1 to K22
 ```
 
 ## 3. Core list (K2)
@@ -299,17 +299,17 @@ The coverage status of a target is one of these values:
 
 `--check` reads the output files only. The gates fall in these groups:
 
-| Group      | Gates           | Checks                                                |
-| ---------- | --------------- | ----------------------------------------------------- |
-| size       | K1, K4          | card count, outside set and rare outside words        |
-| coverage   | K2, K11         | covered targets, coverage CSV                         |
-| rules      | K5, K6          | F1 to F9 and C3 to C5, similarity                     |
-| files      | K7, K8, K12     | audio files, counts, manifest hashes                  |
-| identity   | K9, K10         | deck name, note type, kept order                      |
-| cards      | K13, K14        | target in the text, templates and CSS                 |
-| sense      | K16, K19, K20   | unchecked target, core word and gloss, unranked word  |
-| shape      | K18             | each tail card brings a new content lemma             |
-| note type  | K21             | one note type, the output fields, one card per note   |
+| Group      | Gates              | Checks                                                              |
+| ---------- | ------------------ | ------------------------------------------------------------------- |
+| size       | K1, K4             | card count, outside set and rare outside words                      |
+| coverage   | K2, K11            | covered targets, coverage CSV                                       |
+| rules      | K5, K6             | F1 to F9 and C3 to C5, similarity                                   |
+| files      | K7, K8, K12        | audio files, counts, manifest hashes                                |
+| identity   | K9, K10            | deck name, note type, kept order                                    |
+| cards      | K13, K14           | target in the text, templates and CSS                               |
+| sense      | K16, K19, K20, K22 | unchecked target, core word and gloss, unranked word, English sense |
+| shape      | K18                | each tail card brings a new content lemma                           |
+| note type  | K21                | one note type, the output fields, one card per note                 |
 
 The build report holds the values of K3, K15, and K17: Covered twice, Rejected
 names, and Rejected loan words. A report line does not fail the run.
@@ -319,14 +319,15 @@ every note holds a
 `Core`, a `CoreGloss`, and a bold core word, that the gloss is the coverage
 gloss of the core word, and
 that the gloss has no comma. K21 checks the single note type, the field set,
-and one card per note.
+and one card per note. K22 is `gate_sense`. It checks that the core word of
+every card passes the sense test. A word with no sense row passes.
 
 ## 9. File map
 
 | Path                                            | Content                                    |
 | ----------------------------------------------- | ------------------------------------------ |
 | `anki_tools/ranking/coreflow.py`                | K0 to K6 flow, output field values         |
-| `anki_tools/ranking/coregates.py`               | gates K1 to K21, 18 rows                   |
+| `anki_tools/ranking/coregates.py`               | gates K1 to K22, 19 rows                   |
 | `anki_tools/gates.py`                           | gate value, row, runner, reader contract   |
 | `anki_tools/ranking/gates.py`                   | report, shared gates                       |
 | `anki_tools/ranking/assemble.py`                | deck, side files, manifest, report         |

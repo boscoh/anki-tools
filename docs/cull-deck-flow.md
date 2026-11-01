@@ -24,7 +24,7 @@ One command runs the stages in order: `anki fix <language> --select`. The
 | C4    | select    | C1, C2, C3, reserve pack | kept cards and reserve cards                |
 | C5    | write     | C0, C4                   | APKG and three side files                   |
 
-The gates G1 to G17 run after C5.
+The gates G1 to G18 run after C5.
 
 The `--cards` and `--reserve` values change the request. The other
 `CullRequest` fields, such as `max_uses` and `target_words`, keep their
@@ -68,7 +68,7 @@ C4  selection
 C5  APKG, .cull.csv, .coverage.csv, .manifest.json
         |
         v
-    gates G1 to G17
+    gates G1 to G18
 ```
 
 ## 3. Target words (C1 and C2)
@@ -278,6 +278,7 @@ exceptions.
 | swadesh   | G14          | the merged deck covers the reserve concepts               |
 | templates | G15          | the cull templates and the CSS classes                    |
 | note type | G16, G17     | one note type, its fields, the core word, gloss, and bold |
+| sense     | G18          | the core word of each card passes the sense test          |
 
 G3 fails below `target_coverage_gate`, 0.98 for French and Spanish. G4 fails
 below `double_coverage_gate`, 0.95. The profile holds both values.
@@ -288,6 +289,8 @@ example `intestins` in French. G15 needs the template set of the profile and
 each card class in the CSS. G16 checks the single note type, the field set, and
 one card per note. G17 checks that every note holds a `Core`, a `CoreGloss`,
 and a bold core word, and that the gloss is the coverage gloss of that word.
+G18 is `gate_sense`. It checks that the core word of every card passes the
+sense test. A word with no sense row passes.
 
 G1 passes when the kept count plus `counts.dropped_no_core` reaches the cap, or
 when the pool has no more cards. A kept card without a core word leaves the
@@ -299,7 +302,7 @@ not fail G1.
 | Path                                      | Content                                        |
 | ----------------------------------------- | ---------------------------------------------- |
 | `anki_tools/ranking/cullflow.py`          | C0 to C5 flow, profile, selection, values      |
-| `anki_tools/ranking/cullgates.py`         | gates G1 to G17                                |
+| `anki_tools/ranking/cullgates.py`         | gates G1 to G18                                |
 | `anki_tools/gates.py`                     | gate value, row, runner, reader contract       |
 | `anki_tools/ranking/gates.py`             | report, shared gates                           |
 | `anki_tools/ranking/assemble.py`          | deck, side files, manifest, report             |
