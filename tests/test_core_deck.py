@@ -860,13 +860,11 @@ class TestMandarinRepeatRule:
 
         cards = [
             InputCard(1, "起来 起来.", "Get up! Get up!", "a.mp3", 0),
-            InputCard(2, "起来吧.", "Get up.", "a.mp3", 1),
+            InputCard(2, "起来吧大家.", "Get up.", "a.mp3", 1),
         ]
-        tokens = [[("起来", "")] * 2, [("起来", ""), ("吧", "")]]
 
         kept, reasons = coreflow.filter_core_cards(
             cards,
-            tokens,
             {"a.mp3"},
             [],
             [],
