@@ -8,7 +8,7 @@ from typing import Any
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.ranking import coreflow, corelist, cullflow
-from tests.deck_fixture import MP3_STUB
+from tests.deck_fixture import write_mp3s
 
 ENGLISH = "A short English line."
 CONTENT_POS = corelist.CONTENT_POS
@@ -75,11 +75,7 @@ def tiny_deck(
     filename: str = "input.apkg",
 ) -> Path:
     """Write a source deck of ``rows`` with one stub MP3 for each name in ``audio``."""
-    media = []
-    for audio_name in audio:
-        path = tmp_path / audio_name
-        path.write_bytes(MP3_STUB)
-        media.append(str(path))
+    media = [str(path) for path in write_mp3s(tmp_path, audio)]
     source = tmp_path / filename
     AnkiPackage.create(
         source,

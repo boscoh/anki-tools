@@ -12,15 +12,15 @@ from pathlib import Path
 
 import pytest
 
-from anki_tools.apkg import deck_writer
+from anki_tools.apkg import deck_writer, notetype
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.shape import OutputShape, write_package
 from anki_tools.ranking.identity import DeckIdentity
 from tests.deck_fixture import MODEL_NAME as ANKI2_INPUT_MODEL
-from tests.deck_fixture import build_contract_deck
-from tests.test_apkg_package import (
+from tests.deck_fixture import (
     ANKI21B_NOTE_TYPE_NAME,
     build_anki21b_deck,
+    build_contract_deck,
 )
 
 FIELDS = ("Audio", "Sentence", "English", "Core", "CoreGloss")
@@ -52,36 +52,6 @@ def _write(input_path: Path, output: Path, input_model: str) -> OutputShape:
     shape = _shape(input_model, DeckIdentity(output).model_name)
     write_package(input_path, output, shape, _values(input_path, 2))
     return shape
-
-
-def _varint(data: bytes, pos: int) -> tuple[int, int]:
-    value = 0
-    shift = 0
-    while True:
-        byte = data[pos]
-        pos += 1
-        value |= (byte & 0x7F) << shift
-        if not byte & 0x80:
-            return value, pos
-        shift += 7
-
-
-def _config_field(config: bytes, wanted: int) -> int | None:
-    pos = 0
-    while pos < len(config):
-        tag = config[pos]
-        pos += 1
-        field, wire = tag >> 3, tag & 7
-        if wire == 0:
-            value, pos = _varint(config, pos)
-            if field == wanted:
-                return value
-        elif wire == 2:
-            length, pos = _varint(config, pos)
-            pos += length
-        else:
-            return None
-    return None
 
 
 def _assert_shape(output: Path, shape: OutputShape) -> None:
@@ -127,8 +97,8 @@ def test_the_shape_holds_on_an_anki21b_fixture(tmp_path: Path) -> None:
             "SELECT config FROM notetypes WHERE name = ?", (shape.model_name,)
         ).fetchone()
         model = next(iter(package.get_models().values()))
-    assert _config_field(row["config"] or b"", 1) == 0
-    assert _config_field(row["config"] or b"", 2) == 1
+    config = notetype.parse(row["config"] or b"")
+    assert (config.kind, config.sort_field_idx) == (0, 1)
     assert model["kind"] == 0
 
 

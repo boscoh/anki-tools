@@ -30,6 +30,7 @@ from tests.cull_fixture import (
     target,
     tiny_deck,
 )
+from tests.deck_fixture import write_mp3s
 
 SENTENCES = [
     ("kat ser stor.", "cat is big."),
@@ -475,8 +476,7 @@ RESERVE_PACK_FIELDS = [
 
 
 def _reserve_pack(tmp_path: Path) -> Path:
-    audio = tmp_path / "reserve.mp3"
-    audio.write_bytes(b"ID3\x03\x00\x00\x00\x00\x00\x00" + bytes(40))
+    (audio,) = write_mp3s(tmp_path, ["reserve.mp3"])
     path = tmp_path / "reserve.apkg"
     AnkiPackage.create(
         path,

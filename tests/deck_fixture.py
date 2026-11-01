@@ -8,18 +8,21 @@ builders write the deck into a temporary directory instead.
 from __future__ import annotations
 
 import json
+import sqlite3
+import zipfile
 from pathlib import Path
+
+import pytest
 
 from anki_tools.apkg.package import AnkiPackage
 
 FIELDS = ["Hanzi", "English", "Audio"]
 MP3_STUB = b"ID3\x03\x00\x00\x00\x00\x00\x00" + bytes(40)
-RANKING_NOTES = 120
 DECK_NAME = "Test Deck"
 MODEL_NAME = "Test Sentence"
 
 
-def _write_mp3s(directory: Path, names: list[str]) -> list[Path]:
+def write_mp3s(directory: Path, names: list[str]) -> list[Path]:
     """Write one tiny MP3 file for each name."""
     paths = []
     for name in names:
@@ -95,27 +98,87 @@ def build_contract_deck(directory: Path) -> Path:
         for index, name in enumerate(audio, start=1)
     ]
     path = directory / "contract.apkg"
-    _create(path, cards, _write_mp3s(directory, names))
+    _create(path, cards, write_mp3s(directory, names))
     _add_second_template(path, len(cards) - 1)
     return path
 
 
-def build_ranking_deck(directory: Path, count: int = RANKING_NOTES) -> Path:
-    """Write a deck of ``count`` notes with one distinct sentence each.
+ANKI21B_NOTE_TYPE = "1700000000001"
+ANKI21B_NOTE_TYPE_NAME = "Shared sentences"
+ANKI21B_FIELDS = ("Sentence", "English", "Audio")
+ANKI21B_SCHEMA = """
+CREATE TABLE col (id integer primary key, crt integer, decks text);
+CREATE TABLE notetypes (
+    id integer primary key, name text, mtime_secs integer, usn integer, config blob
+);
+CREATE TABLE fields (ntid integer, ord integer, name text, config blob);
+CREATE TABLE templates (
+    ntid integer, ord integer, name text, mtime_secs integer, usn integer,
+    config blob
+);
+CREATE TABLE notes (
+    id integer primary key, mid integer, flds text, tags text,
+    mod integer, usn integer, sfld text, csum integer
+);
+CREATE TABLE cards (id integer primary key, nid integer, did integer, ord integer);
+CREATE TABLE decks (id integer primary key, name text);
+CREATE TABLE revlog (id integer primary key);
+CREATE TABLE graves (usn integer, oid integer, type integer);
+"""
 
-    :param directory: Directory for the deck and its media files.
-    :param count: Note count. The rank tests reduce 120 notes to 100.
-    :returns: The APKG path.
+
+def _anki21b_database(path: Path) -> None:
+    """Fill a SQLite file with the tables of the anki21b schema."""
+    connection = sqlite3.connect(path)
+    connection.executescript(ANKI21B_SCHEMA)
+    connection.execute("INSERT INTO col VALUES (1, 0, '{}')")
+    connection.execute(
+        "INSERT INTO notetypes VALUES (?, 'Shared sentences', 0, -1, '')",
+        (int(ANKI21B_NOTE_TYPE),),
+    )
+    connection.executemany(
+        "INSERT INTO fields VALUES (?, ?, ?, '')",
+        [
+            (int(ANKI21B_NOTE_TYPE), ord_, name)
+            for ord_, name in enumerate(ANKI21B_FIELDS)
+        ],
+    )
+    connection.execute(
+        "INSERT INTO templates VALUES (?, 0, 'Card 1', 0, -1, '')",
+        (int(ANKI21B_NOTE_TYPE),),
+    )
+    for index, sentence in enumerate(("Hola.", "Adios.")):
+        connection.execute(
+            "INSERT INTO notes VALUES (?, ?, ?, '', 0, 0, '', 0)",
+            (
+                index + 1,
+                int(ANKI21B_NOTE_TYPE),
+                "\x1f".join([sentence, "English.", f"a{index}.mp3"]),
+            ),
+        )
+        connection.execute(
+            "INSERT INTO cards VALUES (?, ?, 1, 0)", (10 + index, index + 1)
+        )
+    connection.execute("INSERT INTO decks VALUES (1, 'Source')")
+    connection.commit()
+    connection.close()
+
+
+def build_anki21b_deck(path: Path) -> Path:
+    """Write a minimal APKG file in the anki21b database format.
+
+    :param path: Path of the new APKG file.
+    :raises ImportError: The ``zstandard`` package is absent.
+    :returns: The same path, after the write.
     """
-    names = [f"line{index}.mp3" for index in range(count)]
-    cards = [
-        {
-            "Hanzi": f"第{index}句话",
-            "English": f"Line {index}",
-            "Audio": f"[sound:line{index}.mp3]",
-        }
-        for index in range(count)
-    ]
-    path = directory / "ranking.apkg"
-    _create(path, cards, _write_mp3s(directory, names))
+    zstandard = pytest.importorskip("zstandard")
+    database = path.with_name("collection.db")
+    _anki21b_database(database)
+    compressed = path.with_name("collection.anki21b")
+    with database.open("rb") as source, compressed.open("wb") as target:
+        zstandard.ZstdCompressor().copy_stream(source, target)
+    database.unlink()
+    with zipfile.ZipFile(path, "w") as archive:
+        archive.write(compressed, "collection.anki21b")
+    compressed.unlink()
     return path

@@ -47,6 +47,7 @@ from anki_tools.ranking.core import (
 )
 from anki_tools.ranking import coregates
 from anki_tools.ranking.scan import CoreProfile, drop_silent_cards
+from tests.deck_fixture import write_mp3s
 
 
 def _card(
@@ -430,11 +431,10 @@ class TestCoverageFile:
 def _tiny_deck(tmp_path: Path) -> Path:
     sentences = ["Le chat dort.", "Le chat mange.", "Le lapin court."]
     english = ["The cat sleeps.", "The cat eats.", "The rabbit runs."]
-    media = []
-    for index in range(len(sentences)):
-        path = tmp_path / f"a{index}.mp3"
-        path.write_bytes(b"ID3\x03\x00\x00\x00\x00\x00\x00" + bytes(40))
-        media.append(str(path))
+    media = [
+        str(path)
+        for path in write_mp3s(tmp_path, [f"a{index}.mp3" for index in range(len(sentences))])
+    ]
     rows = [
         {
             "French": sentence,

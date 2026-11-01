@@ -8,6 +8,7 @@ from anki_tools.apkg.shape import OutputShape, write_package
 from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.languages.cantonese import core
 from anki_tools.ranking import assemble, coreflow
+from tests.deck_fixture import write_mp3s
 
 
 def test_profile_holds_the_deck_paths():
@@ -25,8 +26,7 @@ def test_profile_holds_the_deck_paths():
 
 def _build_output(tmp_path, jyutping: str) -> tuple[Path, int]:
     """Write the core package of one note and give its path and note id."""
-    audio = tmp_path / "a.mp3"
-    audio.write_bytes(b"ID3\x03\x00\x00\x00\x00\x00\x00" + bytes(40))
+    (audio,) = write_mp3s(tmp_path, ["a.mp3"])
     source = tmp_path / "input.apkg"
     AnkiPackage.create(
         source,

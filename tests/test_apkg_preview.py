@@ -4,15 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from anki_tools.preview_apkg import write_apkg_preview
-from tests.deck_fixture import build_contract_deck
-
-
-@pytest.fixture(scope="module")
-def deck_path(tmp_path_factory: pytest.TempPathFactory) -> Path:
-    return build_contract_deck(tmp_path_factory.mktemp("preview"))
 
 
 def test_preview_writes_every_card(deck_path: Path, tmp_path: Path) -> None:

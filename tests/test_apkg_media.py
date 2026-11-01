@@ -12,10 +12,16 @@ import zipfile
 from pathlib import Path
 
 from anki_tools.apkg.package import AnkiPackage
-from tests.deck_fixture import MP3_STUB, build_contract_deck
-from tests.test_apkg_package import ANKI21B_NOTE_TYPE, build_anki21b_deck
+from tests.deck_fixture import (
+    ANKI21B_NOTE_TYPE,
+    MP3_STUB,
+    build_anki21b_deck,
+    build_contract_deck,
+    write_mp3s,
+)
 
 ZSTD_MAGIC = b"\x28\xb5\x2f\xfd"
+AUDIO_NAMES = ["a0.mp3", "a1.mp3", "a2.mp3"]
 
 
 def _media_bytes(apkg: Path) -> bytes:
@@ -30,16 +36,6 @@ def _archive_names(apkg: Path) -> set[str]:
         return set(archive.namelist())
 
 
-def _write_mp3s(directory: Path, count: int) -> list[Path]:
-    """Write one tiny MP3 file for each index."""
-    paths = []
-    for index in range(count):
-        path = directory / f"a{index}.mp3"
-        path.write_bytes(MP3_STUB)
-        paths.append(path)
-    return paths
-
-
 def _anki2_deck(tmp_path: Path) -> Path:
     directory = tmp_path / "deck"
     directory.mkdir()
@@ -50,7 +46,7 @@ def _anki21b_audio_deck(tmp_path: Path) -> Path:
     """Write an anki21b package with three media files and two note sounds."""
     deck = build_anki21b_deck(tmp_path / "audio21b.apkg")
     with AnkiPackage(deck) as package:
-        for path in _write_mp3s(tmp_path, 3):
+        for path in write_mp3s(tmp_path, AUDIO_NAMES):
             package.add_media_file(path)
         package.conn.executemany(
             "UPDATE notes SET flds = ? WHERE id = ?",
@@ -67,7 +63,7 @@ def _anki21b_audio_deck(tmp_path: Path) -> Path:
 
 def test_anki21b_round_trip_writes_a_zstd_protobuf(tmp_path: Path) -> None:
     deck = build_anki21b_deck(tmp_path / "deck.apkg")
-    first, second = _write_mp3s(tmp_path, 2)
+    first, second = write_mp3s(tmp_path, AUDIO_NAMES[:2])
 
     with AnkiPackage(deck) as package:
         assert package.add_media_file(first) == "a0.mp3"
@@ -84,8 +80,7 @@ def test_anki21b_round_trip_writes_a_zstd_protobuf(tmp_path: Path) -> None:
 
 def test_anki2_round_trip_stays_json(tmp_path: Path) -> None:
     deck = _anki2_deck(tmp_path)
-    extra = tmp_path / "extra.mp3"
-    extra.write_bytes(MP3_STUB)
+    (extra,) = write_mp3s(tmp_path, ["extra.mp3"])
 
     with AnkiPackage(deck) as package:
         assert package.db_format == "anki2"
@@ -107,7 +102,7 @@ def test_prune_keeps_one_file_and_renumbers_it(tmp_path: Path) -> None:
     deck = build_anki21b_deck(tmp_path / "deck.apkg")
 
     with AnkiPackage(deck) as package:
-        for path in _write_mp3s(tmp_path, 3):
+        for path in write_mp3s(tmp_path, AUDIO_NAMES):
             package.add_media_file(path)
         package.prune_media({"a1.mp3"})
         package.save()
@@ -126,8 +121,7 @@ def test_prune_keeps_one_file_and_renumbers_it(tmp_path: Path) -> None:
 def test_the_deck_flow_prunes_and_adds_on_anki21b(tmp_path: Path) -> None:
     """The cull order: delete the cards, add the reserve media, prune one time."""
     deck = _anki21b_audio_deck(tmp_path)
-    reserve = tmp_path / "reserve.mp3"
-    reserve.write_bytes(MP3_STUB)
+    (reserve,) = write_mp3s(tmp_path, ["reserve.mp3"])
 
     with AnkiPackage(deck) as package:
         doomed = [int(row["id"]) for row in package.get_cards() if int(row["nid"]) == 2]
