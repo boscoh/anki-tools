@@ -18,7 +18,7 @@ with F1 to F12. The ranking F table entered at f5859eb (2026-10-20) with F1 to
 F9. The pack G table entered at b7c3e87 (2026-10-18). The cull G table entered
 at 3e13e76 (2026-10-20). Each table numbers from `G1`.
 
-ADR 0006 records part of the map in `MARK_RULES` (`ranking/cullflow.py`). The
+ADR 0054 records part of the map in `MARK_RULES` (`ranking/cullflow.py`). The
 rest of the map has no record.
 
 Status: accepted.
