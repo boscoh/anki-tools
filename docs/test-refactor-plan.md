@@ -2,7 +2,7 @@
 
 | Field   | Value                                                          |
 | ------- | -------------------------------------------------------------- |
-| Status  | Cull tests done; batches B1 to B3 running; B4 to B10 open      |
+| Status  | Cull tests, B1 to B3 and B9 done; B4 to B8 and B10 open        |
 | Date    | 2026-11-01                                                     |
 | Owner   | anki-tools                                                     |
 | Related | `.agents/skills/refactor-tests/SKILL.md`                       |
@@ -14,6 +14,31 @@ maintain. The method comes from Matteo Vaccari, "Tests as data over tests as
 code". The skill `refactor-tests` holds the procedure. This file holds the
 findings and the plan for this repo. `docs/test-review.md` records the earlier
 cuts.
+
+### Big ideas
+
+1. **Tests are data.** One table row is one case. A new case adds a row, not a
+   function. The runner stays small. The cull tests now use seven tables.
+2. **Test the public entry point.** A black-box test covers more with fewer
+   tests. Private helpers, call order, and module layout stay free to change.
+3. **Fake only at the edge.** The edge is network, TTS, ffprobe, and the spaCy
+   model. Never patch repo code. If a test must replace repo code, add a seam:
+   a keyword argument with the real function as default, and one ADR. `run_fix`
+   is the first case (ADR 0049).
+4. **Prove that a test can fail.** Break production code on purpose. Each kept
+   test must fail for at least one break. A break that survives is a gap: add a
+   row. The audits ran 72 breaks and found 14 survivors.
+5. **Give setup one home.** Shared builders live in fixture modules. A helper
+   used once goes inline. Setup longer than the input and the output is a
+   smell.
+6. **Delete what another test already proves.** One break once failed 13 tests
+   in 9 files. Keep one test for each rule.
+7. **Do not pin snapshots.** Row counts, constants, profile paths, file hashes,
+   and call order record the code. They do not specify behavior.
+8. **Measure the cut.** Report lines, tests, and mocks before and after. A
+   cut batch must not add lines. `test_cli_fix.py` grew from 176 to 258 lines
+   in B9, because the batch also filled gaps. Fill gaps in B10, and cut the
+   B9 rows to one row for each route and error.
 
 ## 2. Done
 
@@ -29,6 +54,25 @@ The cull tests were the first target (commit `89682ed`, paired with `c1de349`).
 - Shared builders now live in `tests/cull_fixture.py`.
 - 32 deliberate breaks in production code: the suite caught all of them except
   one equivalent change.
+
+Batches B1 to B3 (commits `f26cf9f`, `a169926`, `17a0502`) cut the pure-function
+and small-table files. The counts cover only the files each batch touched.
+
+| Batch | Files | Lines before | Lines after | Tests before | Tests after |
+| ----- | ----- | ------------ | ----------- | ------------ | ----------- |
+| B1    | 10    | 2462         | 2408        | 91           | 91          |
+| B2    | 7     | 594          | 531         | 53           | 32          |
+| B3    | 9     | 689          | 693         | 44           | 24          |
+
+- B1 moved the shared deck builder, the MP3 writer, and the contract-deck fixture
+  into `deck_fixture.py` and `conftest.py`. It deleted four dead or single-use
+  helpers.
+- B2 deleted 17 tests and tabled six groups. 11 deleted tests only grepped CSS or
+  HTML strings.
+- B3 rewrote `test_extract_sentences` onto the public `extract_sentences`, added
+  `ast_fixture.py`, and removed the data-file dependency of `test_card_preview`.
+  Lines rose by 4: the table rows cost more than the removed bodies saved.
+- 13 deliberate breaks across the three batches. A test caught each one.
 
 ## 3. Scope of the rest
 
@@ -100,9 +144,9 @@ One worker run per batch. Run B1 first.
 
 | Batch | Scope                                                                         | Risk           | Status  |
 | ----- | ----------------------------------------------------------------------------- | -------------- | ------- |
-| B1    | Fixtures only: `deck_fixture`, `conftest`; update four apkg test files        | low            | running |
-| B2    | Pure-function files: `card_templates`, `char_links`, and five more            | low            | running |
-| B3    | Small tables: `extract_sentences`, `duplicates`, and five more                | low            | running |
+| B1    | Fixtures only: `deck_fixture`, `conftest`; update four apkg test files        | low            | done    |
+| B2    | Pure-function files: `card_templates`, `char_links`, and five more            | low            | done    |
+| B3    | Small tables: `extract_sentences`, `duplicates`, and five more                | low            | done    |
 | B4    | `test_core_deck`; fold in `test_assemble`; fix `test_core_similarity`         | medium         | open    |
 | B5    | Rule tables: `shared_coreflow`, `gate_id_map`, and two more                   | medium         | open    |
 | B6    | Mandarin audit and deck, through `run_pack_audit(load_table=, probe=)`        | medium         | open    |
@@ -138,6 +182,8 @@ equivalent changes and need no test.
 | Audio                 | Validation failure, retry exhausted, unreadable ffprobe output                           |
 | Swadesh vocab         | `--prune`; the missing-audio path                                                        |
 | APKG                  | `delete_model` success path                                                              |
+| Card preview          | `write_preview`, `build_sections`, `vocab_card` (B3 removed the data-file tests)         |
+| Card templates        | Shared CSS holds the common classes and the Cantonese font stack (B2 removed the greps)  |
 
 B10 adds one black-box test for each row. Start with the audit gates and the
 core selection, because a mutation test already proves those gaps.
@@ -152,5 +198,7 @@ core selection, because a mutation test already proves those gaps.
 
 ## 10. Out of scope
 
-`rank.py::jaccard_similarity` and `duplicates.jaccard` are production
-duplicates. File a bead if you want to merge them.
+Two ADR files use the number 0049:
+`0049-fix-route-takes-its-flows.md` and
+`0049-sense-exceptions-compound-rows-and-core-word-check.md`. Renumber the
+newer one.

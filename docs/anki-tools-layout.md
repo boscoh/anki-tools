@@ -52,7 +52,7 @@ Shared ranking code only. No language data.
 | `anki_tools/ranking/cullflow.py`  | Cull flow behind the `CullProfile` seam               |
 | `anki_tools/ranking/cullgates.py` | Gates G1, G2, G5, G6 of the cull deck                 |
 
-`jaccard_similarity`, `compute_similarity_penalties`, and the word metrics of
+`duplicates.jaccard`, `compute_similarity_penalties`, and the word metrics of
 `latin.py` are the shared helpers. The core and cull flows call them.
 
 `cover.greedy_cover` holds the selection loop. A language module gives the

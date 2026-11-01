@@ -7,10 +7,10 @@ The helpers hold script data only. The per-language word metrics stay in the
 
 from __future__ import annotations
 
+from anki_tools.ranking.duplicates import jaccard
 from anki_tools.ranking.rank import (
     Sentence,
     compute_similarity_penalties,
-    jaccard_similarity,
 )
 
 
@@ -59,7 +59,7 @@ def char_similarity_zh(sent_a: str, sent_b: str) -> float:
     """
     chars_a = set(get_chinese_chars(sent_a))
     chars_b = set(get_chinese_chars(sent_b))
-    return jaccard_similarity(chars_a, chars_b)
+    return jaccard(chars_a, chars_b)
 
 
 def char_similarity_zh_same_len(sent_a: str, sent_b: str) -> float:
@@ -76,7 +76,7 @@ def char_similarity_zh_same_len(sent_a: str, sent_b: str) -> float:
     chars_b = set(get_chinese_chars(sent_b))
     if len(chars_a) != len(chars_b) or not chars_a:
         return 0.0
-    return jaccard_similarity(chars_a, chars_b)
+    return jaccard(chars_a, chars_b)
 
 
 def compute_similarity_penalties_zh(

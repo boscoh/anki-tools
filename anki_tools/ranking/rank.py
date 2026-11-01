@@ -205,18 +205,6 @@ def extract_sentences(
 # =============================================================================
 
 
-def jaccard_similarity(items_a: set, items_b: set) -> float:
-    """Calculate Jaccard similarity between two sets.
-
-    :param items_a: First set of items.
-    :param items_b: Second set of items.
-    :returns: Similarity between 0 (no overlap) and 1 (identical).
-    """
-    if not items_a or not items_b:
-        return 0.0
-    return len(items_a & items_b) / len(items_a | items_b)
-
-
 
 
 def compute_similarity_penalties(
