@@ -599,20 +599,6 @@ def single_hits(sentence: str, forms: Iterable[str]) -> dict[str, int]:
     return {form: 1 for form in set(forms) if len(form_offsets(sentence, form)) == 1}
 
 
-def sentence_hits(sentence: str, forms: Iterable[str]) -> dict[str, int]:
-    """Count the whole-token forms that the sentence contains.
-
-    :param sentence: Traditional Cantonese sentence.
-    :param forms: Word-table forms to look for.
-    :returns: Mapping from form to its occurrence count.
-    """
-    hits: dict[str, int] = {}
-    for form in set(forms):
-        count = len(form_offsets(sentence, form))
-        if count:
-            hits[form] = count
-    return hits
-
 
 def count_form_occurrences(sentence: str, form: str) -> int:
     """Count the whole-token occurrences of a form.

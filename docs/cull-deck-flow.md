@@ -323,7 +323,6 @@ it.
 | `anki_tools/ranking/cardfilter.py`        | shared filter rules F1 to F9                   |
 | `anki_tools/ranking/cover.py`             | the generic greedy cover loop                  |
 | `anki_tools/ranking/duplicates.py`        | Jaccard value and the limit test               |
-| `anki_tools/ranking/coverage.py`          | coverage CSV rows                              |
 | `anki_tools/languages/<language>/cull.py` | one `CullProfile` per language                 |
 | `anki_tools/cli.py`                       | the `--select` mode of `fix <lang>`            |
 

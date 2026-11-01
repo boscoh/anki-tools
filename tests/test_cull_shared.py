@@ -8,7 +8,6 @@ unit tests of the shared flow.
 
 from __future__ import annotations
 
-import csv
 import json
 import math
 from collections import Counter
@@ -267,13 +266,6 @@ def _cap_fixture() -> tuple[
     return cards, tokens, [_target("chat", 1)], {"chat": 1}
 
 
-def _read_csv(path: Path) -> tuple[list[str], list[dict[str, str]]]:
-    with path.open(encoding="utf-8", newline="") as handle:
-        reader = csv.DictReader(handle)
-        rows = list(reader)
-        header = list(reader.fieldnames or [])
-    return header, rows
-
 
 def test_a_count_below_five_uses_the_written_term() -> None:
     row = _freq_row("rare", count=4, pm=0.0, written=12.5)
@@ -484,7 +476,7 @@ class TestOrder:
             )
 
 
-def test_cull_csv_columns_and_reasons(tmp_path: Path) -> None:
+def test_cull_rows_columns_and_reasons() -> None:
     cards = [
         _card("Le chat mange vite.", index=0),
         _card("Le chien dort bien.", index=1),
@@ -499,15 +491,11 @@ def test_cull_csv_columns_and_reasons(tmp_path: Path) -> None:
         card_targets={1: ("chien",)},
         card_hardest={1: 3},
     )
-    path = tmp_path / "run.cull.csv"
 
-    cullflow.write_cull_csv(cards, ["internal_mark", "", ""], selection, [1], path)
-    header, rows = _read_csv(path)
-    raw = path.read_bytes()
-    assert raw.split(b"\n")[0] == ",".join(cullflow.CULL_COLUMNS).encode()
-    assert b"\r" not in raw
+    rows = cullflow.cull_rows(cards, ["internal_mark", "", ""], selection, [1])
 
-    assert header == list(cullflow.CULL_COLUMNS)
+
+    assert all(set(row) == set(cullflow.CULL_COLUMNS) for row in rows)
     assert len(rows) == 3
     assert [row["sentence"] for row in rows] == [
         cards[1].sentence,
@@ -522,7 +510,7 @@ def test_cull_csv_columns_and_reasons(tmp_path: Path) -> None:
     assert rows[1]["gain"] == ""
 
 
-def test_coverage_csv_statuses(tmp_path: Path) -> None:
+def test_coverage_rows_statuses() -> None:
     targets = [_target("chat", 1), _target("boire", 2), _target("lait", 3)]
     selection = cullflow.SelectionResult(
         kept=[0, 1],
@@ -531,14 +519,12 @@ def test_coverage_csv_statuses(tmp_path: Path) -> None:
         exempt=set(),
         reasons={},
     )
-    path = tmp_path / "run.coverage.csv"
 
-    cullflow.write_coverage_csv(targets, selection, path, {"chat": "cat"})
-    header, rows = _read_csv(path)
+    rows = cullflow.coverage_rows(targets, selection, {"chat": "cat"})
 
-    assert header == list(cullflow.COVERAGE_COLUMNS)
+    assert all(set(row) == set(cullflow.COVERAGE_COLUMNS) for row in rows)
     assert [row["word"] for row in rows] == ["chat", "boire", "lait"]
-    assert [row["count"] for row in rows] == ["2", "1", "0"]
+    assert [row["count"] for row in rows] == [2, 1, 0]
     assert [row["status"] for row in rows] == ["covered", "partial", "absent"]
     assert [row["gloss"] for row in rows] == ["cat", "", ""]
 

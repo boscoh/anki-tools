@@ -51,7 +51,6 @@ from anki_tools.ranking.corelist import (
     lemma_sets,
 )
 from anki_tools.ranking.cover import greedy_cover
-from anki_tools.ranking.coverage import write_rows
 from anki_tools.ranking.duplicates import at_limit
 from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.sentence_pack.english_sense import (
@@ -896,26 +895,6 @@ def cull_rows(
     return rows
 
 
-def write_cull_csv(
-    cards: Sequence[InputCard],
-    reasons: Sequence[str],
-    selection: SelectionResult,
-    ordered: Sequence[int],
-    path: Path,
-    reserve: Sequence[ReserveCard] = (),
-) -> None:
-    """Write the cull CSV.
-
-    :param cards: Input cards.
-    :param reasons: Filter reason per input index, empty for a passed card.
-    :param selection: Result of the selection.
-    :param ordered: Input indices of the kept cards in the final order.
-    :param path: Output CSV file.
-    :param reserve: Kept reserve cards, written first.
-    """
-    write_rows(path, CULL_COLUMNS, cull_rows(cards, reasons, selection, ordered, reserve))
-
-
 def _reserve_row(card: ReserveCard) -> dict[str, Any]:
     """Build one row of the cull CSV for a reserve card.
 
@@ -989,22 +968,6 @@ def coverage_rows(
             }
         )
     return rows
-
-
-def write_coverage_csv(
-    targets: Sequence[TargetWord],
-    selection: SelectionResult,
-    path: Path,
-    glosses: Mapping[str, str],
-) -> None:
-    """Write the coverage CSV.
-
-    :param targets: Target words in rank order.
-    :param selection: Result of the selection.
-    :param path: Output CSV file.
-    :param glosses: Lemma to the gloss of its sense row.
-    """
-    write_rows(path, COVERAGE_COLUMNS, coverage_rows(targets, selection, glosses))
 
 
 def coverage_status(count: int) -> str:

@@ -658,24 +658,6 @@ def highlight(sentence: str, form: str) -> str:
     return sentence
 
 
-def sentence_hits(sentence: str, forms: Iterable[str]) -> dict[str, int]:
-    """Count the word-table forms that the sentence contains.
-
-    :param sentence: Simplified Chinese sentence.
-    :param forms: Word-table forms to look for.
-    :returns: Mapping from form to its occurrence count, for forms that occur.
-    """
-    chars = "".join(get_chinese_chars(sentence))
-    present = set(chars)
-    hits: dict[str, int] = {}
-    for form in set(forms):
-        if form and form[0] in present:
-            count = len(form_occurrences(sentence, form))
-            if count:
-                hits[form] = count
-    return hits
-
-
 def single_hits(sentence: str, forms: Iterable[str]) -> dict[str, int]:
     """Count the forms that the sentence contains exactly one time.
 

@@ -15,8 +15,8 @@ from anki_tools.languages.mandarin.profile import (
     known_words,
     count_form_occurrences,
     han_tokens,
-    sentence_hits,
     sentence_pinyin,
+    single_hits,
     write_sentence_csv,
     write_sentence_review_csv,
 )
@@ -212,15 +212,15 @@ class TestTokenChecks:
     def test_target_must_appear_once(self) -> None:
         assert count_form_occurrences("我要喝水。", "水") == 1
         assert count_form_occurrences("我要喝水，水很凉。", "水") == 2
-        assert sentence_hits("我要喝水。", ["水", "火"]) == {"水": 1}
-        assert sentence_hits("我要喝水，水很凉。", ["水"]) == {"水": 2}
+        assert single_hits("我要喝水。", ["水", "火"]) == {"水": 1}
+        assert single_hits("我要喝水，水很凉。", ["水"]) == {}
 
     def test_false_friend_compound_does_not_hit(self) -> None:
         assert count_form_occurrences("你看新闻吗？", "闻") == 0
         assert count_form_occurrences("我闻花香。", "闻") == 1
         assert count_form_occurrences("一切都好。", "切") == 0
         assert count_form_occurrences("他的数学很好。", "数") == 0
-        assert sentence_hits("一切都好。", ["切", "好"]) == {"好": 1}
+        assert single_hits("一切都好。", ["切", "好"]) == {"好": 1}
 
     def test_sense_rows_reject_false_friend_english(self) -> None:
         def fails(form: str, english: str) -> bool:

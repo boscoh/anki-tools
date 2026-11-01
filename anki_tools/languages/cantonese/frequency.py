@@ -20,9 +20,7 @@ from typing import Protocol
 
 import jieba
 
-from anki_tools.languages.mandarin.characters import get_chinese_chars
 from anki_tools.cache import download_cached_file
-from anki_tools.ranking.rank import FrequencyData
 
 CIFU_URL = "https://raw.githubusercontent.com/gwinterstein/Cifu/master/Lexicon/Cifu-v1.txt"
 CIFU_ATTRIBUTION = (
@@ -320,19 +318,6 @@ def load_yue_frequency(
     return data
 
 
-def to_frequency_data(data: YueFrequency, max_words: int) -> FrequencyData:
-    """Convert the list to the rank tables of the sentence ranker.
-
-    :param data: The ranked list.
-    :param max_words: Number of most frequent words to keep.
-    :returns: Filled :class:`FrequencyData`.
-    """
-    ranks = {row.word: row.rank for row in data.rows if row.rank <= max_words}
-    add_variant_ranks(ranks, data.variants)
-    return frequency_data_from_ranks(ranks)
-
-
-
 def check_frequency(data: YueFrequency) -> list[tuple[str, bool, str]]:
     """Run gates G1, G3, and G4 of the spec on the list.
 
@@ -488,33 +473,4 @@ def _read_word_count_tsv(path: Path) -> dict[str, int]:
         counts[word] = counts.get(word, 0) + int(count)
     return counts
 
-
-def frequency_data_from_ranks(ranks: dict[str, int]) -> FrequencyData:
-    """Build word and character rank tables from word ranks.
-
-    Characters take the rank of the first word that contains them, as in
-    :func:`anki_tools.ranking.rank.load_wordfreq_data`.
-
-    :param ranks: Word to rank, 1 is most frequent.
-    :returns: Filled :class:`FrequencyData`.
-    """
-    data = FrequencyData()
-    data.word_freq.update(ranks)
-    for word, rank in sorted(ranks.items(), key=lambda item: item[1]):
-        for char in get_chinese_chars(word):
-            data.char_freq.setdefault(char, rank)
-    return data
-
-
-def add_variant_ranks(ranks: dict[str, int], variants: dict[str, str]) -> None:
-    """Give each variant the rank of its standard form.
-
-    A variant with no ranked standard form keeps no rank.
-
-    :param ranks: Word to rank. The function adds the variant keys.
-    :param variants: Variant to standard form.
-    """
-    for variant, standard in variants.items():
-        if standard in ranks:
-            ranks.setdefault(variant, ranks[standard])
 
