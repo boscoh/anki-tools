@@ -41,8 +41,17 @@ The `marks` rule has four checks:
 
 1. The last character is a final mark.
 2. The sentence has exactly one final mark.
-3. The sentence has no quotation mark and no dialogue dash.
+3. The sentence has no character of the language `QUOTE_MARKS`.
 4. The sentence has at most one internal mark.
+
+Check 3 tests only the sentence text, never the English. `clean_english` in
+`anki_tools/ranking/coreflow.py` strips the wrapping double quotes of the English
+field, and no rule tests them. `QUOTE_MARKS` differs by language:
+
+| Language               | `QUOTE_MARKS` holds                                       |
+| ---------------------- | --------------------------------------------------------- |
+| Cantonese, Mandarin    | quote marks only (`"`, curly, corner brackets); no dash   |
+| French, Spanish, Greek | guillemets and double quotes, plus the dashes `—` and `–` |
 
 No flow tests the English length.
 

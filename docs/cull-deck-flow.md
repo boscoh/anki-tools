@@ -128,7 +128,7 @@ than the target list.
 | F3  | the text passes `digit_marks` and `script`                      |
 | F4  | the last character is an accepted final mark                    |
 | F5  | the text holds exactly one final mark                           |
-| F6  | the text holds no quotation mark and no dialogue dash           |
+| F6  | the text holds no `QUOTE_MARKS` character of the language       |
 | F7  | the text holds at most one comma, colon, or semicolon           |
 | F8  | the text holds no proper noun tag                               |
 | F9  | the sentence text is not kept yet                               |

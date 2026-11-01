@@ -141,7 +141,7 @@ A card must pass every rule. `filter_cards` applies F1 to F9 through
 | F3  | the text holds no digit, bracket, link, or ellipsis             |
 | F4  | the last character is an accepted final mark                    |
 | F5  | the text holds exactly one final mark                           |
-| F6  | the text holds no quotation mark and no dialogue dash           |
+| F6  | the text holds no `QUOTE_MARKS` character of the language       |
 | F7  | the text holds at most one comma, colon, or semicolon           |
 | F8  | the text holds no proper noun tag                               |
 | F9  | the sentence text is not kept yet                               |
