@@ -8,9 +8,10 @@ from anki_tools.sentence_pack.guards import (
     inside_spans,
     occurrences,
 )
+from anki_tools.languages.cantonese.profile import form_offsets
 from anki_tools.languages.french.profile import FRENCH
 from anki_tools.languages.greek.profile import GREEK
-from anki_tools.languages.mandarin.profile import MANDARIN
+from anki_tools.languages.mandarin.profile import MANDARIN, count_form_occurrences
 
 
 def test_guard_table_matches_the_filter_order() -> None:
@@ -91,4 +92,11 @@ def test_compound_spans_and_inside_spans() -> None:
 
 def test_compounds_come_from_the_sense_file_of_the_chinese_packs() -> None:
     assert form_compounds(MANDARIN.sense_path, "\u6765") == ("\u51fa\u6765", "\u8d77\u6765")
+
+
+def test_compound_rows_block_insect_and_can_hear() -> None:
+    assert form_offsets("\u6606\u87f2\u597d\u7d30", "\u87f2") == []
+    assert form_offsets("\u87f2\u597d\u7d30", "\u87f2") == [0]
+    assert count_form_occurrences("\u6211\u542c\u5f97\u5230\u3002", "\u5f97\u5230") == 0
+    assert count_form_occurrences("\u6211\u5f97\u5230\u4e86\u3002", "\u5f97\u5230") == 1
 

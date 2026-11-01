@@ -23,7 +23,7 @@ def test_the_runner_reports_a_gate_that_cannot_read_a_file() -> None:
 
     results = gates.run_gates(
         [gates.Gate("K1", broken), gates.Gate("K2", lambda _files: (True, "ok"))],
-        _Files(),
+        _Files(),  # type: ignore[arg-type]
     )
 
     assert [(result.name, result.passed) for result in results] == [
@@ -99,7 +99,61 @@ class _CoverageFiles:
 def test_coverage_floor_counts_absent_targets_as_not_covered(
     counts: list[str], passed: bool
 ) -> None:
-    ok, message = coregates.gate_coverage_floor(_CoverageFiles(counts, 0.6))
+    ok, message = coregates.gate_coverage_floor(_CoverageFiles(counts, 0.6))  # type: ignore[arg-type]
 
     assert ok is passed
     assert "floor 0.60" in message
+
+
+class _CoreWordFiles:
+    """Reader with two kept cards whose Core words may be swapped."""
+
+    def __init__(self, shown: dict[int, str]) -> None:
+        self.profile = SimpleNamespace(
+            hits=lambda sentence, forms: {form for form in forms if form in sentence}
+        )
+        self._shown = shown
+        self._cards = [
+            SimpleNamespace(note_id=1, sentence="le chat dort"),
+            SimpleNamespace(note_id=2, sentence="le chien mange"),
+        ]
+
+    def coverage(self) -> list[dict[str, str]]:
+        return [
+            {"key": "S1:chat", "tier": "S", "word": "chat"},
+            {"key": "S2:chien", "tier": "S", "word": "chien"},
+        ]
+
+    def rows(self) -> list[dict[str, str]]:
+        return [
+            {"kept": "1", "note_id": "1", "sentence": "le chat dort", "targets": "S1:chat"},
+            {"kept": "1", "note_id": "2", "sentence": "le chien mange", "targets": "S2:chien"},
+        ]
+
+    def output(self) -> dict[str, list]:
+        return {"cards": self._cards}
+
+    def tokens(self) -> list[list]:
+        return [[], []]
+
+    def fields(self) -> list[str]:
+        return ["Audio", "Sentence", "English", "Core", "CoreGloss"]
+
+    def notes(self) -> dict[int, list[str]]:
+        return {note: ["", "", "", word, ""] for note, word in self._shown.items()}
+
+
+@pytest.mark.parametrize(
+    ("shown", "passed"),
+    [
+        ({1: "chat", 2: "chien"}, True),
+        ({1: "chat", 2: ""}, True),
+        ({1: "chien", 2: "chat"}, False),
+    ],
+)
+def test_target_in_sentence_also_checks_the_shown_core_word(
+    shown: dict[int, str], passed: bool
+) -> None:
+    ok, _message = coregates.gate_target_in_sentence(_CoreWordFiles(shown))  # type: ignore[arg-type]
+
+    assert ok is passed

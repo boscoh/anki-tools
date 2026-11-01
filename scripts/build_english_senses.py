@@ -108,11 +108,13 @@ EXTRA_WORDS: dict[str, tuple[str, ...]] = {
         "wrestle", "wrestles", "wrestled", "wrestling",
     ),
     "fingernail": ("nail", "nails"),
+    "flow": ("run", "runs", "ran", "running"),
     "hand": ("manual", "manually"),
     "live": ("life", "lives", "alive"),
     "mother": ("mom", "mum", "mommy", "mummy", "mama", "mamma"),
     "near": ("nearby", "close", "closer", "closest"),
     "sun": ("solar",),
+    "thin": ("slim", "slimmer", "slimmest"),
 }
 
 # Multiword glosses that WordNet does not list as a lemma.

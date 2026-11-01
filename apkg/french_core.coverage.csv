@@ -104,7 +104,7 @@ S102:entendre,entendre,to hear,S,102,2,2,covered
 S103:savoir,savoir,to know,S,103,2,2,covered
 S104:penser,penser,to think,S,104,2,2,covered
 S105:sentir,sentir,to smell,S,105,2,1,partial
-S106:craindre,craindre,to fear,S,106,2,2,covered
+S106:craindre,craindre,to fear,S,106,2,1,partial
 S107:dormir,dormir,to sleep,S,107,2,2,covered
 S108:vivre,vivre,to live,S,108,2,2,covered
 S109:mourir,mourir,to die,S,109,2,2,covered
@@ -132,7 +132,7 @@ S130:serrer,serrer,to squeeze,S,130,2,0,absent_sense
 S131:frotter,frotter,to rub,S,131,0,0,absent
 S132:laver,laver,to wash,S,132,2,2,covered
 S133:essuyer,essuyer,to wipe,S,133,0,0,absent
-S134:tirer,tirer,to pull,S,134,2,2,covered
+S134:tirer,tirer,to pull,S,134,2,1,partial
 S135:pousser,pousser,to push,S,135,2,0,absent_sense
 S136:jeter,jeter,to throw,S,136,2,2,covered
 S137:lier,lier,to tie,S,137,0,0,absent
@@ -194,7 +194,7 @@ S192:émoussé,émoussé,dull,S,192,0,0,absent
 S193:lisse,lisse,smooth,S,193,0,0,absent
 S194:mouillé,mouillé,wet,S,194,0,0,absent
 S195:sec,sec,dry,S,195,0,0,absent
-S196:juste,juste,correct,S,196,2,2,covered
+S196:juste,juste,correct,S,196,2,1,partial
 S197:près,près,near,S,197,2,2,covered
 S198:loin,loin,far,S,198,2,2,covered
 S199:droite,droite,right,S,199,2,2,covered

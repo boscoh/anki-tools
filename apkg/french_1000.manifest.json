@@ -1,5 +1,5 @@
 {
-  "build_date": "2026-11-01T03:09:17+00:00",
+  "build_date": "2026-11-01T07:02:13+00:00",
   "source": {
     "input": "apkg/6000_French_Sentences_w_Audio.apkg",
     "deck": "French 1000",
@@ -12,26 +12,26 @@
     "max_uses": 4,
     "exempt_top": 100,
     "spoken_weight": 0.5,
-    "min_words": 3,
-    "max_words": 12,
+    "min_words": 4,
+    "max_words": 10,
     "similarity": 0.67,
     "order": "coverage",
     "name": "French 1000"
   },
   "counts": {
     "input": 5928,
-    "passed": 5578,
-    "cards": 888,
-    "frequency_cards": 694,
+    "passed": 3957,
+    "cards": 891,
+    "frequency_cards": 697,
     "reserve": 194,
-    "content": 1820,
+    "content": 1687,
     "targets": 300,
-    "covered": 295,
-    "covered2": 260,
-    "swadesh_covered": 206,
+    "covered": 290,
+    "covered2": 251,
+    "swadesh_covered": 205,
     "swadesh_total": 207,
-    "dropped_no_core": 112,
-    "bolded": 694,
+    "dropped_no_core": 109,
+    "bolded": 697,
     "unbolded": 0
   },
   "frequency": {
@@ -39,8 +39,8 @@
     "spoken_weight": 0.5
   },
   "files": {
-    "cull_csv": "sha256:7b6c84a62820d13a59e51fa1ce153eb34a8ae4baf0da070f91a55140c49895cc",
-    "coverage_csv": "sha256:dbbaecc5aa014502b9bc9d047dfc80307c9a995c651d3c4917a35f18c9a1ad19",
+    "cull_csv": "sha256:e7aca8d6aba01bfbf249a2c52cadfc9064cf49e6bc980d41787df915d2d6afb0",
+    "coverage_csv": "sha256:3f23503cb742a84f1346b4dff760814222b03b26bee22155a2686ec89a583c92",
     "input_apkg": "sha256:230dd01bcf6223bcb8a5ea303eee01fd4a55e19ce418d0bf66a81193037024b5"
   },
   "licenses": {
@@ -48,7 +48,7 @@
     "wordfreq": "wordfreq list: Apache License 2.0",
     "audio": "Input audio: license of the source deck"
   },
-  "kept_order": "sha256:3c7b5a3b2484a734f1a098179d1045a27fa9564b20d1bdff2f00f1f66c4997d1",
+  "kept_order": "sha256:5e86f70a8dde46840eaeedad5e2b175015c889c09fb5160056fbb9c44d4ceb2a",
   "reserve_pack": "apkg/swadesh_sentences_french.apkg",
   "swadesh_exceptions": [
     "intestins"

@@ -56,7 +56,7 @@ parameter.
 | --- | ------------------------- | --------------------------------------------------------- |
 | G1  | `gate_card_cap`           | The deck has the cap number of cards, or the pool ends.   |
 | G2  | `gate_use_cap`            | No lemma appears in more cards than the cap.              |
-| K13 | `gate_target_in_sentence` | Each card sentence holds its target word.                 |
+| K13 | `gate_target_in_sentence` | Each card sentence holds its targets and its Core word.   |
 | K23 | `gate_coverage_floor`     | The share of targets with a kept card reaches the floor.  |
 
 The pack has more checks, for example G10 coverage. The cull has no coverage
@@ -113,7 +113,9 @@ when a pack check must serve a second flow.
 - The pack manifest has a second shape. `sentence_pack/pack.py` writes it, and
   `G11` reads it. The rank manifest comes from `ranking/assemble.py`.
 - The `sense` filter is the one test of the word sense (ADR 0039). No gate
-  repeats it. Core `K13` stays: it tests that the form is in the sentence.
+  repeats it. Core `K13` stays: it tests that the form is in the sentence. It
+  tests each credited target and the word in the `Core` field of the card
+  (ADR 0049). A card with an empty `Core` field has no Core word to test.
 - Cull `G1` checks the cap or the pool end. The pool ends when no passed card
   keeps the reason `max_cards`. The old core `K1` count check is retired
   (ADR 0043).

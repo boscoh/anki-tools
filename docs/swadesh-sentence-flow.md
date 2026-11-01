@@ -200,12 +200,14 @@ The `compounds` column of a tier S row lists the compounds that use the form in
 a different sense. An occurrence inside one of those compounds does not count as
 a hit.
 
-| Pack      | Example        | Result                        |
-| --------- | -------------- | ----------------------------- |
-| Mandarin  | 闻 inside 新闻 | the occurrence does not count |
-| Mandarin  | 闻 in 我闻花香 | the occurrence counts         |
-| Cantonese | 聽 inside 聽日 | the occurrence does not count |
-| Cantonese | 聽 in 我聽音樂 | the occurrence counts         |
+| Pack      | Example            | Result                        |
+| --------- | ------------------ | ----------------------------- |
+| Mandarin  | 闻 inside 新闻     | the occurrence does not count |
+| Mandarin  | 闻 in 我闻花香     | the occurrence counts         |
+| Mandarin  | 得到 inside 听得到 | the occurrence does not count |
+| Cantonese | 聽 inside 聽日     | the occurrence does not count |
+| Cantonese | 聽 in 我聽音樂     | the occurrence counts         |
+| Cantonese | 蟲 inside 昆蟲     | the occurrence does not count |
 
 `compound_spans` and `inside_spans` give the blocked spans and the test.
 Mandarin applies the helpers to the Han character stream. Cantonese applies

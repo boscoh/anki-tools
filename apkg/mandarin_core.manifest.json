@@ -1,5 +1,5 @@
 {
-  "build_date": "2026-10-31T23:54:19+00:00",
+  "build_date": "2026-11-01T07:01:30+00:00",
   "source": {
     "input": "apkg/Neri's Chinese Sents Part 2.apkg",
     "deck": "Mandarin Core",
@@ -23,44 +23,40 @@
     "lambda_seed": 0.01,
     "simple_units": 7,
     "similarity": 0.65,
-    "min_units": 2,
-    "max_units": 8,
+    "min_units": 4,
+    "max_units": 7,
     "spoken_weight": 0.5,
     "bold_target": true,
-    "max_unchecked_sense": 0,
-    "max_unranked": 0,
     "name": "Mandarin Core"
   },
   "counts": {
-    "cards": 147,
-    "targets": 140,
-    "absent": 121,
-    "absent_sense": 23,
+    "cards": 145,
+    "targets": 147,
+    "absent": 114,
+    "absent_sense": 28,
     "unchecked": 0,
     "unranked": 0,
-    "covered1": 117,
-    "covered2": 96,
-    "full": 219,
-    "outside": 40,
-    "outside_rare": 1,
+    "covered1": 119,
+    "covered2": 91,
+    "full": 207,
+    "outside": 38,
+    "outside_rare": 2,
     "tail_words": 0,
-    "sense_rows": 140,
+    "sense_rows": 147,
     "dropped_no_core": 0,
-    "bolded": 147,
+    "bolded": 145,
     "unbolded": 0,
     "rows": 5009,
-    "rejected_c3": 1,
-    "rejected_c4": 0,
-    "sense_failures": 1424
+    "sense_failures": 1278
   },
   "frequency": {
     "path": "data/mandarin_frequency.tsv",
     "spoken_weight": 0.5
   },
   "files": {
-    "core_csv": "sha256:4c705336d0b581e5ff6dabbdf6ed04fdc25283f24a0e250a937d1f9b649a7f2c",
-    "coverage_csv": "sha256:df96292912e3e44ff7eaa4bad7bb5001cc3f2710e0d5d7a6e93245887b9ba9d3",
+    "core_csv": "sha256:05802e821d9212e51ebe844065d955acd1e6ffe881ddccd3ed855170cfde5e96",
+    "coverage_csv": "sha256:6838f6d4e7b9c4b1c3bf9962a252dc2a240ddee7d5d90e9648fbb42d3c36fd1c",
     "input_apkg": "sha256:e7c99d9f7e176d108652f810388575438b514d9aedec806d9d09a88e71b1b3f1"
   },
-  "kept_order": "sha256:821141fb7546d71edeb600da73071159a4479bc1ef45e5e8cfc76d24dd3fdfe9"
+  "kept_order": "sha256:132245d64a7a59ce48876cc5391e6f37a9aa51ead9a47f8e891dd414bdc185b1"
 }

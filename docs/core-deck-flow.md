@@ -300,7 +300,7 @@ The coverage status of a target is one of these values:
 | Group      | Gates              | Checks                                                              |
 | ---------- | ------------------ | ------------------------------------------------------------------- |
 | rules      | K5, K6             | F1 to F9, similarity                                                |
-| cards      | K13                | target in the text                                                  |
+| cards      | K13                | targets and the shown Core word in the text                         |
 | coverage   | K23                | share of targets with a kept card, floor from the language profile  |
 
 The build report holds the value of K3 and K15, Covered twice, and the count of

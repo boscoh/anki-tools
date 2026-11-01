@@ -10,9 +10,9 @@ rank,note_id,sentence,kept
 9,1485727928327,Ne manquez pas de venir ici à cinq heures.,1
 10,1485727928427,Elle se présenta aux personnes qui étaient là.,1
 11,1485727928297,Qui t'a dit d'écrire avec ta main gauche ?,1
-12,1485727931769,C'est quoi cette photo dans ton casier ?,1
-13,1485727929675,Elle insista pour qu'il reste où il était.,1
-14,1485727928362,La vieille femme s'est blessée quand elle est tombée.,1
+12,1485727933217,"Pris au dépourvu, je n'ai pas su quoi répondre.",1
+13,1485727928151,Commencez à lire là où vous vous êtes arrêté.,1
+14,1485727932008,Je ne sais avec certitude quand il arrivera.,1
 15,1485727927655,J'ignore comment c'est à nouveau arrivé.,1
 16,1485727929042,Les fleurs meurent si elles n'ont pas d'eau.,1
 17,1485727932104,"Ils sont tous bons, alors choisis trois livres.",1
@@ -20,41 +20,41 @@ rank,note_id,sentence,kept
 19,1485727933113,Ils me demandèrent quelque chose à boire.,1
 20,1485727932809,Très peu d'hommes gros ont de longs nez.,1
 21,1485727933553,Les animaux moururent l'un après l'autre.,1
-22,1485727927751,J'ai un grand frère et deux petites sœurs.,1
+22,1485727929060,"Au Japon, la plupart des routes sont à une voie.",1
 23,1485727928271,Je me brosse les dents deux fois par jour.,1
 24,1485727932233,Les meilleurs poissons sentent au bout de trois jours.,1
 25,1485727931963,Elle va passer les quatre prochaines années en prison.,1
 26,1485727928925,Notre famille se compose de cinq personnes.,1
-27,1485727930935,La Belgique n'est pas aussi grande que la France.,1
+27,1485727932071,C'est la plus grande maison du voisinage.,1
 28,1485727932897,Un lapin a de longues oreilles et une petite queue.,1
 29,1485727932797,Nous voulons atteindre un public plus large.,1
 30,1485727932639,La glace était assez épaisse pour marcher dessus.,1
 31,1485727927709,Cette valise est trop lourde pour que je la porte.,1
-32,1485727927721,Il y a une petite colline près de la mer.,1
-33,1485727930546,Je n'aurais jamais trouvé explication aussi courte.,1
+32,1485727929174,Le vieil homme lui donna une petite poupée.,1
+33,1485727929903,La vie est trop courte pour apprendre l'allemand.,1
 34,1485727931884,"Mon oncle est mince, mais ma tante est grosse.",1
-35,1485727931330,Voici la femme dont on a volé les voitures.,1
-36,1485727930692,L'homme qui s'enfuit peut se battre à nouveau.,1
-37,1485727930733,Les êtres humains ont accompli beaucoup plus que les animaux.,1
-38,1485727931034,"Enfant, j'allais souvent pêcher avec mon père.",1
-39,1485727928570,J'ai perdu mon épouse dans un accident de circulation.,1
-40,1485727927947,Mon dernier mari était vraiment stupide.,1
-41,1485727931858,Ma mère m'avait préparé à ces mauvaises nouvelles.,1
-42,1485727927673,Mon père s'est arrêté de fumer récemment.,1
-43,1485727928622,Les poissons sont des animaux à sang froid.,1
-44,1485727929941,Il a étudié la manière dont les oiseaux volent.,1
-45,1485727930562,Je nourris mon chien deux fois par jour.,1
-46,1485727932161,Elle n'aime pas les serpents et les mathématiques.,1
-47,1485727932499,On devrait juger un arbre d'après ses fruits.,1
-48,1485727933417,Des animaux sauvages vivent dans la forêt.,1
-49,1485727929642,Mon arbre a quelques fleurs mais aucun fruit.,1
-50,1485727929127,Les feuilles ont commencé à devenir rouge et jaune.,1
-51,1485727933244,L'argent est la racine de tous les maux.,1
+35,1485727930207,Vous êtes une femme d'une grande patience.,1
+36,1485727930733,Les êtres humains ont accompli beaucoup plus que les animaux.,1
+37,1485727931034,"Enfant, j'allais souvent pêcher avec mon père.",1
+38,1485727928570,J'ai perdu mon épouse dans un accident de circulation.,1
+39,1485727927947,Mon dernier mari était vraiment stupide.,1
+40,1485727931858,Ma mère m'avait préparé à ces mauvaises nouvelles.,1
+41,1485727927673,Mon père s'est arrêté de fumer récemment.,1
+42,1485727928622,Les poissons sont des animaux à sang froid.,1
+43,1485727929941,Il a étudié la manière dont les oiseaux volent.,1
+44,1485727930435,Il trouva un chien abandonné dans la forêt.,1
+45,1485727932161,Elle n'aime pas les serpents et les mathématiques.,1
+46,1485727932499,On devrait juger un arbre d'après ses fruits.,1
+47,1485727932713,Les enfants perdirent leur chemin dans la forêt.,1
+48,1485727929642,Mon arbre a quelques fleurs mais aucun fruit.,1
+49,1485727929127,Les feuilles ont commencé à devenir rouge et jaune.,1
+50,1485727933244,L'argent est la racine de tous les maux.,1
+51,1485727930837,Les fleurs sont mortes par manque d'eau.,1
 52,1485727931531,Quelques enfants sont en train de jouer sur l'herbe.,1
 53,1485727927864,Je veux un couteau avec lequel couper la corde.,1
 54,1485727932780,La viande a pourri à cause de la chaleur.,1
 55,1485727930922,Le sang humain a la même couleur partout.,1
-56,1485727933159,Je fais de l'urticaire lorsque je mange des œufs.,1
+56,1485727931114,Les œufs sont bon marché en cette saison.,1
 57,1485727931014,"J'ai vu la queue d'une baleine, aujourd'hui.",1
 58,1485727931174,Tom aime les longs cheveux noirs de Marie.,1
 59,1485727929779,J'ai senti une goutte de pluie sur ma tête.,1
@@ -64,7 +64,7 @@ rank,note_id,sentence,kept
 63,1485727931673,Tom se brosse les dents après chaque repas.,1
 64,1485727932189,Le japonais est notre langue maternelle.,1
 65,1485727928368,Je ne me coupe jamais les ongles le soir.,1
-66,1485727932326,La ville s'étend au pied d'une montagne.,1
+66,1485727931314,Vous voyez un bâtiment blanc au pied de la colline.,1
 67,1485727929613,Je pense que la jambe de Tom est cassée.,1
 68,1485727932404,Nous ne faisions que nous tenir la main.,1
 69,1485727931615,Son long cou ressemble à celui d'un cheval.,1
@@ -72,164 +72,164 @@ rank,note_id,sentence,kept
 71,1485727933302,Ses seins ne donnent pas encore assez de lait.,1
 72,1485727929974,Mon cœur souffre pour ces enfants qui meurent de faim.,1
 73,1485727930394,On peut boire cette eau sans aucun risque.,1
-74,1485727932496,Choisis un bon restaurant où aller manger.,1
+74,1485727930057,Je n'ai jamais mangé avec des baguettes.,1
 75,1485727932902,Il pouvait toujours dire dans quelle direction soufflait le vent.,1
 76,1485727933135,Il est bon pour la santé de respirer profondément.,1
 77,1485727931261,Le président n'a pas pu s'empêcher de rire.,1
-78,1485727931900,Allez tout droit et vous verrez le magasin.,1
+78,1485727927643,Nous avons vu un étranger marcher dehors.,1
 79,1485727927989,J'aimerais vous entendre chanter votre nouvelle chanson.,1
-80,1485727932008,Je ne sais avec certitude quand il arrivera.,1
-81,1485727933028,Ils pensaient qu'il était le fils du soleil.,1
-82,1485727929893,Ne craignez pas de rencontrer de nouvelles gens !,1
+80,1485727928595,Personne ne savait à quoi ressemblait la machine.,1
+81,1485727930780,"Je pense, que nous sommes encore en Pologne !",1
+82,1485727932649,Ne craignez pas de faire des fautes en parlant anglais.,1
 83,1485727932296,Il travaillait la nuit et dormait le jour.,1
 84,1485727927905,"Sans eau, personne ne pourrait vivre sur terre.",1
-85,1485727933120,Beaucoup d'hommes furent tués dans cette guerre.,1
-86,1485727930984,Les femmes de ce pays se battent pour leur liberté.,1
+85,1485727931184,Certains lisent des livres pour tuer le temps.,1
+86,1485727932003,Tom est trop malin pour se battre avec toi.,1
 87,1485727928270,"C'est moi que Bob a frappé, et non elle.",1
 88,1485727927914,Elle s'est coupé la main avec un couteau.,1
 89,1485727932340,J'entends un chat qui gratte à la fenêtre.,1
 90,1485727928377,Pourquoi quiconque voudrait nager dans cette rivière ?,1
 91,1485727931776,"Elle courut après moi, ses cheveux volant au vent.",1
-92,1485727927643,Nous avons vu un étranger marcher dehors.,1
-93,1485727928283,Aujourd'hui je venais au travail en voiture.,1
+92,1485727928283,Aujourd'hui je venais au travail en voiture.,1
+93,1485727932326,La ville s'étend au pied d'une montagne.,1
 94,1485727929647,Tout le monde veut s'asseoir à côté d'elle.,1
 95,1485727931060,Les élèves se lèvent lorsque leur professeur entre.,1
 96,1485727933479,Il s'est tourné et retourné toute la nuit.,1
 97,1485727932471,Presque toutes les feuilles sont tombées.,1
-98,1485727930039,J'espère que je peux te donner quelque chose.,1
-99,1485727930703,Ma femme tient les comptes de la maison.,1
-100,1485727928953,"Tu ne t'es pas encore lavé les mains, si ?",1
-101,1485727930119,Cette musique m'a tiré les larmes des yeux.,1
-102,1485727932944,Il a jeté de nombreuses vieilles lettres.,1
-103,1485727932446,Je t'ai toujours comptée au nombre de mes amis.,1
-104,1485727930515,On dit qu'il a passé quelques années en Espagne.,1
-105,1485727927737,Nous ne l'avons jamais entendu chanter la chanson.,1
-106,1485727927636,Il fait trop sombre pour jouer au tennis.,1
-107,1485727933573,Fais couler de l'eau chaude dans le bain.,1
-108,1485727929568,Le soleil est plus brillant que la lune.,1
-109,1485727930690,La lune est sortie de derrière les nuages.,1
-110,1485727930775,Il y a des milliards d'étoiles dans le ciel.,1
-111,1485727929110,"Un soir de pluie, il conduisait une voiture.",1
-112,1485727928161,Il allait souvent pêcher dans la rivière.,1
-113,1485727930004,La vieille église du lac est très belle.,1
-114,1485727932773,Nous passons nos vacances toujours à la mer.,1
-115,1485727933397,"Enfin, la pierre précieuse était dans ses mains.",1
-116,1485727929527,"La Terre n'est pas une étoile, mais une planète.",1
-117,1485727933503,Il y a aujourd'hui quelques nuages de plus qu'hier.,1
-118,1485727933196,Londres est célèbre pour son brouillard.,1
-119,1485727930617,"Aujourd'hui, le ciel est bleu et sans nuages.",1
-120,1485727933321,Ils disent que nous allons avoir des vents forts.,1
-121,1485727929701,Le pays en entier était couvert de neige.,1
-122,1485727932818,"Oh la vache, cette glace est vraiment bonne !",1
-123,1485727931725,Cessez de fumer si vous voulez vivre longtemps !,1
-124,1485727932850,Les protestataires mirent le feu à de nombreuses voitures.,1
-125,1485727928128,Vous devez prendre soin que le gâteau ne brûle pas.,1
-126,1485727931248,Elle conduisait sur une petite route de campagne.,1
-127,1485727931448,Mes parents se sont rencontrés dans les montagnes.,1
-128,1485727928237,J'aime le vin rouge plus que le vin blanc.,1
-129,1485727931311,La maison avec le toit vert c'est la mienne.,1
-130,1485727930768,Un lis blanc est vraiment magnifique à regarder.,1
-131,1485727931935,Nos yeux prennent du temps pour s'adapter au noir.,1
-132,1485727930673,Tout commença par une chaude nuit d'été.,1
-133,1485727929368,Tu dois te taire pendant quelques jours.,1
-134,1485727932108,Il retira son manteau parce qu'il faisait chaud.,1
-135,1485727931002,"Il faisait froid, aussi nous avons allumé un feu.",1
-136,1485727933491,Ce restaurant est plein de jeunes couples.,1
-137,1485727932352,La nouvelle école est de construction simple et moderne.,1
-138,1485727931307,La bonne nouvelle lui tira des larmes des yeux.,1
-139,1485727929471,Elle n'a pas fait de mauvaises expériences.,1
-140,1485727932942,Ne touche pas mes livres avec des mains sales.,1
-141,1485727931946,Les examens se tiennent juste après les vacances d'été.,1
-142,1485727933624,L'accident se produisit près de chez lui.,1
-143,1485727930626,Le fruit ne tombe jamais loin de l'arbre.,1
-144,1485727930687,Vous trouverez le restaurant sur votre droite.,1
-145,1485727928683,Il s'est blessé la main gauche avec un couteau.,1
-146,1485727933379,Les femmes ne se jettent pas vraiment à mon cou.,1
-147,1485727932421,Deux familles vivent dans la même maison.,1
-148,1485727932124,J'espère pouvoir y aller avec toi aujourd'hui.,1
-149,1485727928364,Il leur donnait de la nourriture et de l'argent.,1
-150,1485727929371,J'ignore si j'aurai le temps de le faire.,1
-151,1485727932135,Je me lave les mains parce qu'elles sont sales.,1
-152,1485727927743,Nous devons choisir un nom pour l'enfant.,1
-153,1485727931923,Cette maison ne correspond pas à mes besoins.,1
-154,1485727932786,Jamais ils ne retournèrent en leur pays.,1
-155,1485727931491,Il découvrit finalement comment le faire.,1
-156,1485727931857,La Russie est le pays le plus étendu du monde.,1
-157,1485727927777,Vous pouvez toujours compter sur lui en cas d'urgence.,1
-158,1485727933426,Il alla dormir et ne se réveilla jamais.,1
-159,1485727929033,Il parle espagnol aussi bien que français.,1
-160,1485727928100,Je veux quelqu'un qui sache parler français.,1
-161,1485727928983,J'ignore pourquoi nous devons nous arrêter.,1
-162,1485727932002,Nous connaissons tous bien cette chanson.,1
-163,1485727929341,Une femme conduisait une voiture sur une route de campagne.,1
-164,1485727933261,C'est pour ça qu'ils étudient l'anglais.,1
+98,1485727930703,Ma femme tient les comptes de la maison.,1
+99,1485727932919,Elle mit le linge sale dans la machine à laver.,1
+100,1485727932641,Ne me force pas à tirer sur la gâchette !,1
+101,1485727932944,Il a jeté de nombreuses vieilles lettres.,1
+102,1485727932446,Je t'ai toujours comptée au nombre de mes amis.,1
+103,1485727930515,On dit qu'il a passé quelques années en Espagne.,1
+104,1485727927737,Nous ne l'avons jamais entendu chanter la chanson.,1
+105,1485727930253,Je ne pourrai plus jamais jouer à nouveau.,1
+106,1485727933573,Fais couler de l'eau chaude dans le bain.,1
+107,1485727929568,Le soleil est plus brillant que la lune.,1
+108,1485727930690,La lune est sortie de derrière les nuages.,1
+109,1485727930775,Il y a des milliards d'étoiles dans le ciel.,1
+110,1485727929023,Si seulement la pluie pouvait s'arrêter !,1
+111,1485727928161,Il allait souvent pêcher dans la rivière.,1
+112,1485727930004,La vieille église du lac est très belle.,1
+113,1485727927721,Il y a une petite colline près de la mer.,1
+114,1485727929990,"Vue de loin, cette pierre ressemble à un visage humain.",1
+115,1485727929527,"La Terre n'est pas une étoile, mais une planète.",1
+116,1485727933095,"Il va bientôt pleuvoir, regarde ces nuages noirs.",1
+117,1485727933196,Londres est célèbre pour son brouillard.,1
+118,1485727930617,"Aujourd'hui, le ciel est bleu et sans nuages.",1
+119,1485727933321,Ils disent que nous allons avoir des vents forts.,1
+120,1485727929701,Le pays en entier était couvert de neige.,1
+121,1485727932818,"Oh la vache, cette glace est vraiment bonne !",1
+122,1485727931725,Cessez de fumer si vous voulez vivre longtemps !,1
+123,1485727931002,"Il faisait froid, aussi nous avons allumé un feu.",1
+124,1485727928128,Vous devez prendre soin que le gâteau ne brûle pas.,1
+125,1485727930727,Vous devriez être très prudents pour traverser la route.,1
+126,1485727928461,Toute la neige sur la montagne a disparu.,1
+127,1485727928237,J'aime le vin rouge plus que le vin blanc.,1
+128,1485727931311,La maison avec le toit vert c'est la mienne.,1
+129,1485727928837,Tout a commencé par une chaude nuit d'été.,1
+130,1485727929368,Tu dois te taire pendant quelques jours.,1
+131,1485727932082,La paix est revenue après trois années de guerre.,1
+132,1485727932108,Il retira son manteau parce qu'il faisait chaud.,1
+133,1485727933491,Ce restaurant est plein de jeunes couples.,1
+134,1485727932352,La nouvelle école est de construction simple et moderne.,1
+135,1485727928362,La vieille femme s'est blessée quand elle est tombée.,1
+136,1485727932496,Choisis un bon restaurant où aller manger.,1
+137,1485727929471,Elle n'a pas fait de mauvaises expériences.,1
+138,1485727932942,Ne touche pas mes livres avec des mains sales.,1
+139,1485727931900,Allez tout droit et vous verrez le magasin.,1
+140,1485727930251,Les examens ont lieu juste après les congés d'été.,1
+141,1485727933624,L'accident se produisit près de chez lui.,1
+142,1485727930626,Le fruit ne tombe jamais loin de l'arbre.,1
+143,1485727930687,Vous trouverez le restaurant sur votre droite.,1
+144,1485727928683,Il s'est blessé la main gauche avec un couteau.,1
+145,1485727933379,Les femmes ne se jettent pas vraiment à mon cou.,1
+146,1485727932421,Deux familles vivent dans la même maison.,1
+147,1485727932124,J'espère pouvoir y aller avec toi aujourd'hui.,1
+148,1485727928364,Il leur donnait de la nourriture et de l'argent.,1
+149,1485727929371,J'ignore si j'aurai le temps de le faire.,1
+150,1485727932135,Je me lave les mains parce qu'elles sont sales.,1
+151,1485727927743,Nous devons choisir un nom pour l'enfant.,1
+152,1485727930935,La Belgique n'est pas aussi grande que la France.,1
+153,1485727932786,Jamais ils ne retournèrent en leur pays.,1
+154,1485727931491,Il découvrit finalement comment le faire.,1
+155,1485727931857,La Russie est le pays le plus étendu du monde.,1
+156,1485727927777,Vous pouvez toujours compter sur lui en cas d'urgence.,1
+157,1485727933426,Il alla dormir et ne se réveilla jamais.,1
+158,1485727929033,Il parle espagnol aussi bien que français.,1
+159,1485727928100,Je veux quelqu'un qui sache parler français.,1
+160,1485727928983,J'ignore pourquoi nous devons nous arrêter.,1
+161,1485727933261,C'est pour ça qu'ils étudient l'anglais.,1
+162,1485727932253,"Bien qu'il soit malin, il n'est pas prudent.",1
+163,1485727931667,Votre jardin a besoin d'un peu d'attention.,1
+164,1485727933440,Tom veut toujours s'asseoir au premier rang.,1
 165,1485727927910,Il courut vers sa mère dans la bibliothèque.,1
-166,1485727928461,Toute la neige sur la montagne a disparu.,1
-167,1485727928595,Personne ne savait à quoi ressemblait la machine.,1
-168,1485727928734,Elles étaient toutes surprises de me voir là.,1
-169,1485727928761,Je suis juste venu vous informer du fait.,1
-170,1485727928814,J'ai découvert que tu parles dans mon dos.,1
-171,1485727927987,Ne me racontez pas ce que je sais déjà !,1
-172,1485727928964,Le lac est ici à sa plus grande profondeur.,1
-173,1485727929791,Il prit un miroir et se regarda la langue.,1
-174,1485727929982,Elle ne sait rien des oiseaux et des abeilles.,1
-175,1485727929992,"Il ne rit que rarement, si ce n'est jamais.",1
-176,1485727930660,"En d'autres termes, elle est devenue une bonne épouse.",1
-177,1485727931404,La pauvreté est à la racine de tout mal.,1
-178,1485727931856,Elle a de longs bras et de longues jambes.,1
-179,1485727933467,Elle a de petits seins mais ça m'est égal.,1
-180,1485727928369,"Si vous avez une question, veuillez lever la main droite.",1
+166,1485727928734,Elles étaient toutes surprises de me voir là.,1
+167,1485727928761,Je suis juste venu vous informer du fait.,1
+168,1485727933028,Ils pensaient qu'il était le fils du soleil.,1
+169,1485727927987,Ne me racontez pas ce que je sais déjà !,1
+170,1485727928964,Le lac est ici à sa plus grande profondeur.,1
+171,1485727929791,Il prit un miroir et se regarda la langue.,1
+172,1485727929982,Elle ne sait rien des oiseaux et des abeilles.,1
+173,1485727929992,"Il ne rit que rarement, si ce n'est jamais.",1
+174,1485727930660,"En d'autres termes, elle est devenue une bonne épouse.",1
+175,1485727931404,La pauvreté est à la racine de tout mal.,1
+176,1485727931856,Elle a de longs bras et de longues jambes.,1
+177,1485727933320,"Lequel est venu en premier, la poule ou l'œuf ?",1
+178,1485727933467,Elle a de petits seins mais ça m'est égal.,1
+179,1485727928369,"Si vous avez une question, veuillez lever la main droite.",1
+180,1485727929967,Les protestataires ont mis le feu à de nombreuses voitures.,1
 181,1485727931703,Tous les points sur terre sont aussi loin des cieux.,1
 182,1485727932731,L'aéroport était fermé à cause du brouillard.,1
 183,1485727928420,S'il vous plaît portez ceci à mon compte.,1
-184,1485727931102,Il n'aura aucune chance de gagner son cœur.,1
-185,1485727931114,Les œufs sont bon marché en cette saison.,1
+184,1485727930697,La rivière coule trop vite pour y nager.,1
+185,1485727931102,Il n'aura aucune chance de gagner son cœur.,1
 186,1485727929292,Il se demande si tu as peur des serpents.,1
-187,1485727931761,Ce garçon a fait exprès de frapper son fils.,1
-188,1485727932243,Il a le coup d'œil pour les objets anciens.,1
-189,1485727933241,La corde n'était pas assez solide pour le soutenir.,1
-190,1485727928981,Je suis jaloux parce que tu as un bon patron.,1
+187,1485727929793,J'ai une sale douleur dans le bas du dos.,1
+188,1485727931761,Ce garçon a fait exprès de frapper son fils.,1
+189,1485727932243,Il a le coup d'œil pour les objets anciens.,1
+190,1485727933241,La corde n'était pas assez solide pour le soutenir.,1
 191,1485727933122,Je me suis cogné fort la tête contre le mur.,1
-192,1485727928194,Il a compris la manière d'ouvrir la boîte.,1
-193,1485727932425,"Plus tu étudies, plus tu as envie d'étudier.",1
-194,1485727932755,"Quoi qu'il dise, je ne changerai pas d'avis.",1
-195,1485727928909,Tu prends un risque important en lui faisant confiance.,1
-196,1485727929211,Je suis sûr que Jim a inventé cette histoire.,1
-197,1485727931582,Il s'attendait à ce que la conversation dure longtemps.,1
-198,1485727933157,J'ai diminué la quantité de viande que je mange.,1
-199,1485727928405,Cela prendra seulement un instant pour répondre à la question.,1
-200,1485727930042,Il faut mettre en place la République du bon sens.,1
-201,1485727931899,Nous considérons Tom comme un honnête homme.,1
+192,1485727929257,"Au début, je croyais qu'il était malade.",1
+193,1485727928194,Il a compris la manière d'ouvrir la boîte.,1
+194,1485727928824,J'ai utilisé des cartes lors de mon voyage.,1
+195,1485727932425,"Plus tu étudies, plus tu as envie d'étudier.",1
+196,1485727928909,Tu prends un risque important en lui faisant confiance.,1
+197,1485727929211,Je suis sûr que Jim a inventé cette histoire.,1
+198,1485727929549,"Ainsi, nous pouvons montrer le résultat de notre discussion.",1
+199,1485727931669,J'attendais à peine depuis une minute quand il arriva.,1
+200,1485727933157,J'ai diminué la quantité de viande que je mange.,1
+201,1485727930042,Il faut mettre en place la République du bon sens.,1
 202,1485727932351,Il préfère le football américain au baseball.,1
 203,1485727928563,Tu dois expliquer la raison de ton absence.,1
-204,1485727928824,J'ai utilisé des cartes lors de mon voyage.,1
-205,1485727929621,Fais le ménage dans la chambre ce matin.,1
+204,1485727929621,Fais le ménage dans la chambre ce matin.,1
+205,1485727930322,Il semblerait que personne ne connaissait la vérité.,1
 206,1485727931364,La phrase avec le numéro suivant est vraie.,1
 207,1485727931479,Nous sommes restés ensemble par mesure de sécurité.,1
 208,1485727931696,Il possède quelque cinquante romans écrits en anglais.,1
-209,1485727932358,Je t'ai acheté un crayon comme cadeau d'anniversaire.,1
-210,1485727933190,Tu peux me joindre à l'adresse écrite ici.,1
-211,1485727933225,J'ai profité de l'occasion pour visiter le musée.,1
-212,1485727928106,Cette équipe se situe toujours au bas du tableau.,1
-213,1485727928227,Je fus capable de réussir grâce à votre conseil.,1
-214,1485727928509,Nettoyer le garage n'était pas une partie de plaisir.,1
-215,1485727929716,"Il posa la clé sur le bureau, comme d'habitude.",1
-216,1485727929955,Il semblait heureux comparé à ceux autour de lui.,1
-217,1485727930638,Ne laissez personne s'approcher ou entrer dans cette pièce.,1
-218,1485727931679,Viens donc nous rendre visite dans notre nouveau logement.,1
-219,1485727931864,Je m'occuperai de tes affaires quand tu seras mort.,1
-220,1485727932315,Je me rends au supermarché pour effectuer quelques courses.,1
-221,1485727932335,On rencontre souvent des touristes japonais dans ce quartier.,1
-222,1485727932336,On aurait dû téléphoner auparavant et réserver une table.,1
+209,1485727932574,J'aimerais changer cette chemise que j'ai achetée hier.,1
+210,1485727932869,Il est incroyablement facile de tromper le système.,1
+211,1485727932933,Le voleur s'enfuit quand le policier le vit.,1
+212,1485727933073,Je me souviens fréquemment de mon enfance heureuse.,1
+213,1485727933190,Tu peux me joindre à l'adresse écrite ici.,1
+214,1485727933225,J'ai profité de l'occasion pour visiter le musée.,1
+215,1485727928227,Je fus capable de réussir grâce à votre conseil.,1
+216,1485727929716,"Il posa la clé sur le bureau, comme d'habitude.",1
+217,1485727931679,Viens donc nous rendre visite dans notre nouveau logement.,1
+218,1485727931864,Je m'occuperai de tes affaires quand tu seras mort.,1
+219,1485727932315,Je me rends au supermarché pour effectuer quelques courses.,1
+220,1485727932335,On rencontre souvent des touristes japonais dans ce quartier.,1
+221,1485727932336,On aurait dû téléphoner auparavant et réserver une table.,1
+222,1485727932398,La majorité des gens se marient tôt ou tard.,1
 223,1485727932682,J'ai entendu un bruit étrange provenant de la cuisine.,1
 224,1485727932800,Disposer d'une petite lampe de poche peut être utile.,1
-225,1485727933296,"Pour sauver son crédit, il faut cacher sa perte.",1
-226,1485727933369,Ces politiciens veulent construire un pont vers nulle part.,1
-227,1485727933458,N'importe quoi auquel vous êtes bon contribue au bonheur.,1
-228,1485727928746,Faisons une fête avec les membres du club de tennis.,1
-229,1485727928831,"Veuillez consacrer quelques minutes à y réfléchir, je vous prie.",1
+225,1485727932900,Je dus quitter le théâtre au milieu du concert.,1
+226,1485727933296,"Pour sauver son crédit, il faut cacher sa perte.",1
+227,1485727933369,Ces politiciens veulent construire un pont vers nulle part.,1
+228,1485727933458,N'importe quoi auquel vous êtes bon contribue au bonheur.,1
+229,1485727928676,Il a payé un million de dollars pour ce tableau.,1
 230,1485727929028,Nous avons décidé de déplacer la réunion à dimanche prochain.,1
-231,1485727931818,Il se leva et partit au milieu de la discussion.,1
+231,1485727930782,On nous a ordonné de partir sans la moindre explication.,1
 232,1485727932090,"Si ça chute demain, ça aura descendu depuis une semaine.",1
 233,1485727932158,Marie est la plus paresseuse de ses camarades de classe.,1
 234,1485727932530,Le temple fut érigé il y a deux cents ans.,1
@@ -238,40 +238,41 @@ rank,note_id,sentence,kept
 237,1485727932814,Cet article de journal est plus intéressant que le précédent.,1
 238,1485727932929,"Après que tu as bu du thé, continue de pratiquer.",1
 239,1485727933041,Termine ça et envoie tout le truc sur mon téléphone.,1
-240,1485727931492,Certains disent que voyager en avion est plutôt économique.,1
-241,1485727933089,Le Japon joue un rôle clé dans l'économie mondiale.,1
-242,1485727928323,Le beau temps a fait baisser le prix des légumes.,1
-243,1485727928367,Prenons un déjeuner rapide au petit café près du parc !,1
-244,1485727930286,Tu auras des problèmes si ta copine apprend la vérité.,1
-245,1485727931538,Je quitte mon emploi actuel à la fin du mois.,1
-246,1485727932272,Il a parfois des difficultés à exprimer clairement ses opinions.,1
-247,1485727932834,"Afin de mieux vous servir, votre appel peut être enregistré.",1
-248,1485727933488,Ajouter des commentaires rend le code plus facile à lire.,1
-249,1485727931119,La seule vraie science est la connaissance des faits.,1
-250,1485727930560,On devrait se taire dans une bibliothèque.,1
-251,1485727928181,"Le temps est court, nous devons agir MAINTENANT.",1
-252,1485727929769,Je n'aimais pas mon nom quand j'étais petit.,1
-253,1485727930642,"Ma vie serait complètement vide, sans toi.",1
-254,1485727932895,Je ne vous laisserai plus jamais seules.,1
-255,1485727929423,J'ai senti quelque chose toucher mes pieds.,1
-256,1485727932649,Ne craignez pas de faire des fautes en parlant anglais.,1
-257,1485727928225,Tu n'as aucune expérience de la conduite.,1
+240,1485727929248,Ils ont utilisé un appareil photo à haute vitesse.,1
+241,1485727931492,Certains disent que voyager en avion est plutôt économique.,1
+242,1485727933089,Le Japon joue un rôle clé dans l'économie mondiale.,1
+243,1485727928323,Le beau temps a fait baisser le prix des légumes.,1
+244,1485727928367,Prenons un déjeuner rapide au petit café près du parc !,1
+245,1485727928746,Faisons une fête avec les membres du club de tennis.,1
+246,1485727931538,Je quitte mon emploi actuel à la fin du mois.,1
+247,1485727932272,Il a parfois des difficultés à exprimer clairement ses opinions.,1
+248,1485727932834,"Afin de mieux vous servir, votre appel peut être enregistré.",1
+249,1485727933618,Sa sœur aînée est plus âgée que mon frère aîné.,1
+250,1485727928799,Tu as une façon de réfléchir très logique.,1
+251,1485727931119,La seule vraie science est la connaissance des faits.,1
+252,1485727930560,On devrait se taire dans une bibliothèque.,1
+253,1485727928181,"Le temps est court, nous devons agir MAINTENANT.",1
+254,1485727929769,Je n'aimais pas mon nom quand j'étais petit.,1
+255,1485727932895,Je ne vous laisserai plus jamais seules.,1
+256,1485727929423,J'ai senti quelque chose toucher mes pieds.,1
+257,1485727928981,Je suis jaloux parce que tu as un bon patron.,1
 258,1485727932432,Cela nous prit deux heures d'atteindre Tokyo.,1
-259,1485727933440,Tom veut toujours s'asseoir au premier rang.,1
+259,1485727932773,Nous passons nos vacances toujours à la mer.,1
 260,1485727929264,Certains étudiants aiment les mathématiques et d'autres non.,1
 261,1485727932960,Elle cacha le secret à son mari toute sa vie.,1
 262,1485727931225,Il y a peu de personnes tuées dans cet accident.,1
-263,1485727930251,Les examens ont lieu juste après les congés d'été.,1
+263,1485727930562,Je nourris mon chien deux fois par jour.,1
 264,1485727928125,Il ne se rendit pas vraiment à l'église.,1
-265,1485727930435,Il trouva un chien abandonné dans la forêt.,1
-266,1485727930697,La rivière coule trop vite pour y nager.,1
-267,1485727930563,Vous connaissez probablement déjà notre entreprise.,1
-268,1485727933324,"C'est sombre, alors regardez où vous mettez les pieds.",1
+265,1485727928145,Cette maison est trop petite pour que nous y vivions.,1
+266,1485727928497,Il faisait déjà nuit quand Tom rentra à la maison.,1
+267,1485727928078,J'ai déjà présenté mes excuses pour cela.,1
+268,1485727928502,Je le rencontrai alors pour la première fois.,1
 269,1485727932671,Ils arrivèrent à l'hôtel à quatre heures.,1
-270,1485727931667,Votre jardin a besoin d'un peu d'attention.,1
+270,1485727932790,Les Anglais auraient besoin d'un chef fort.,1
 271,1485727929008,Ils se mirent immédiatement à travailler.,1
-272,1485727932398,La majorité des gens se marient tôt ou tard.,1
-273,1485727928291,J'ai entendu qu'il cherchait du travail.,1
+272,1485727930259,Je n'aime pas que les gens me regardent.,1
+273,1485727928713,"Écoute, je ne veux pas perdre mon travail.",1
 274,1485727932363,Son ouvrage devint rapidement un livre à succès.,1
-275,1485727929488,"Pour faire cela, il te faut prendre des risques.",1
-276,1485727930506,Nous ne croyons le mal que quand il est venu.,1
+275,1485727930984,Les femmes de ce pays se battent pour leur liberté.,1
+276,1485727929488,"Pour faire cela, il te faut prendre des risques.",1
+277,1485727928558,Ne me forcez pas à vous faire à nouveau mal !,1

@@ -18,6 +18,7 @@ from anki_tools.gate_files import GateFileReader, read_notes
 
 from anki_tools.ranking.core import SIMILARITY_LIMIT
 from anki_tools.ranking.coreflow import (
+    OUTPUT_CORE_FIELD,
     TARGET_SEPARATOR,
     filter_core_cards,
     read_output,
@@ -130,9 +131,18 @@ def _key_of(row: dict[str, str]) -> str:
 
 
 def gate_target_in_sentence(files: CoreFiles) -> tuple[bool, str]:
-    """K13: each card holds the form or lemma of its targets."""
+    """K13: each card holds the form or lemma of its targets and of its Core word.
+
+    The Core word is the word that the card shows in the ``Core`` field. A card
+    with an empty ``Core`` field is skipped for this part. The Core word is
+    tested like a target of its own tier, so a swap of the Core word between two
+    cards fails.
+    """
     coverage = files.coverage()
     form = {_key_of(row): (row["tier"], row["word"]) for row in coverage}
+    tier_of = {row["word"]: row["tier"] for row in reversed(coverage)}
+    core_index = files.fields().index(OUTPUT_CORE_FIELD)
+    notes = files.notes()
     by_note = _output_by_note(files)
     note_tokens = {
         card.note_id: card_tokens
@@ -150,10 +160,15 @@ def gate_target_in_sentence(files: CoreFiles) -> tuple[bool, str]:
             for lemma, pos in note_tokens.get(note, ())
             if pos in CONTENT_POS
         }
-        for key in row["targets"].split(TARGET_SEPARATOR):
-            if not key:
-                continue
-            tier, word = form.get(key, ("?", ""))
+        held = [
+            form.get(key, ("?", ""))
+            for key in row["targets"].split(TARGET_SEPARATOR)
+            if key
+        ]
+        shown = notes[note][core_index] if note in notes else ""
+        if shown:
+            held.append((tier_of.get(shown, "?"), shown))
+        for tier, word in dict.fromkeys(held):
             ok = (
                 bool(files.profile.hits(card.sentence, {word}))
                 if tier == "S"
