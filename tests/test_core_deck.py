@@ -7,35 +7,20 @@ spaCy, ffprobe, or the frequency list.
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 from collections import Counter
 from dataclasses import replace
 from pathlib import Path
-from types import SimpleNamespace
-from typing import Sequence
+from typing import Any
 
 import pytest
 
-from anki_tools.apkg import deck_writer
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.apkg.shape import OutputShape, write_package
 from anki_tools.languages.french import core, cull
-from anki_tools.ranking import assemble, coreflow, corelist
+from anki_tools.languages.mandarin.core import MANDARIN_CORE_PROFILE
+from anki_tools.ranking import assemble, coreflow
 from anki_tools.ranking.assemble import write_rank_csv
-from anki_tools.ranking.coreflow import (
-    coverage_rows_of,
-    InputCard,
-    kept_order_hash,
-    outside_lemmas,
-    size_check,
-)
-from anki_tools.sentence_pack.english_sense import (
-    SenseRow,
-    read_senses,
-    sense_failure,
-)
-from anki_tools.ranking.identity import DeckIdentity
-from anki_tools.ranking.corelist import TargetWord, build_core_targets
 from anki_tools.ranking.core import (
     CoreCandidate,
     CoreOptions,
@@ -45,79 +30,92 @@ from anki_tools.ranking.core import (
     select,
     target_quotas,
 )
-from anki_tools.ranking import coregates
-from anki_tools.ranking.scan import CoreProfile, drop_silent_cards
-from tests.deck_fixture import write_mp3s
+from anki_tools.ranking.coreflow import (
+    InputCard,
+    coverage_rows_of,
+    kept_order_hash,
+    outside_lemmas,
+    size_check,
+)
+from anki_tools.ranking.corelist import TargetWord, build_core_targets
+from anki_tools.ranking.identity import DeckIdentity
+from anki_tools.ranking.scan import drop_silent_cards
+from anki_tools.sentence_pack.english_sense import SenseRow
+from tests.cull_fixture import (
+    card,
+    core_deck,
+    core_target,
+    run_core,
+    write_core_package,
+)
 
 
-def _card(
-    sentence: str,
-    index: int = 0,
-    english: str = "A short English line.",
-    audio: str = "a.mp3",
-) -> InputCard:
-    return InputCard(
-        note_id=1000 + index,
-        sentence=sentence,
-        english=english,
-        audio=audio,
-        index=index,
-    )
-
-
-def _target(
-    key: str,
-    tier: str = "S",
-    position: int = 1,
-    form: str = "",
-    gloss: str = "",
-    senses: frozenset[str] = frozenset(),
-) -> corelist.CoreTarget:
-    return corelist.CoreTarget(
-        key=key,
-        tier=tier,
-        position=position,
-        form=form or key.split(":")[-1],
-        gloss=gloss,
-        sense=SenseRow(senses=senses),
-    )
-
-
-class TestTargetQuotas:
-    def test_a_ubiquitous_target_gets_one_example(self) -> None:
-        options = CoreOptions(per_word=2, ubiquitous_share=0.25)
-        quotas = target_quotas(
-            {"S1:je": 1, "S2:eau": 2},
+@pytest.mark.parametrize(
+    ("options", "shares", "expected"),
+    [
+        pytest.param(
+            {"ubiquitous_share": 0.25},
             {"S1:je": 0.9, "S2:eau": 0.1},
-            options,
-        )
+            {"S1:je": 1, "S2:eau": 2},
+            id="a ubiquitous target gets one example",
+        ),
+        pytest.param(
+            {"ubiquitous_share": 0.25},
+            {"S1:a": 0.25, "S2:b": 0.26},
+            {"S1:a": 2, "S2:b": 1},
+            id="a share at the limit is not ubiquitous",
+        ),
+        pytest.param(
+            {"third_examples": 1},
+            {"S1:eau": 0.1, "S2:feu": 0.1},
+            {"S1:eau": 3, "S2:feu": 2},
+            id="the third example raises the top target",
+        ),
+    ],
+)
+def test_the_quota_follows_the_share_and_the_position(
+    options: dict[str, Any], shares: dict[str, float], expected: dict[str, int]
+) -> None:
+    positions = {key: number for number, key in enumerate(shares, 1)}
 
-        assert quotas == {"S1:je": 1, "S2:eau": 2}
+    quotas = target_quotas(positions, shares, CoreOptions(per_word=2, **options))
 
-    def test_the_third_example_can_raise_the_top_target(self) -> None:
-        options = CoreOptions(per_word=2, third_examples=1)
-        quotas = target_quotas(
-            {"S1:eau": 1, "S2:feu": 2}, {"S1:eau": 0.1, "S2:feu": 0.1}, options
-        )
-
-        assert quotas == {"S1:eau": 3, "S2:feu": 2}
+    assert quotas == expected
 
 
-class TestCost:
-    def test_a_new_rare_word_costs_three_times_a_frequent_one(self) -> None:
-        options = CoreOptions(lambda_new=1.0, lambda_repeat=0.0, lambda_len=0.0)
-        ranks = {"rare": 5000, "common": 10}
-        rare = CoreCandidate(0, ("F:x",), ("rare",), 5)
-        common = CoreCandidate(1, ("F:x",), ("common",), 5)
+COST_BASE: dict[str, Any] = {"lambda_new": 1.0, "lambda_repeat": 0.0, "lambda_len": 0.0}
+COST_RANKS = {"common": 10, "mid": 2000, "rare": 5000}
 
-        assert card_cost(rare, set(), ranks, options) == pytest.approx(3.0)
-        assert card_cost(common, set(), ranks, options) == pytest.approx(1.0)
 
-    def test_a_repeated_outside_word_costs_less(self) -> None:
-        options = CoreOptions(lambda_new=1.0, lambda_repeat=0.0, lambda_len=0.0)
-        card = CoreCandidate(0, ("F:x",), ("rare",), 5)
+@pytest.mark.parametrize(
+    ("options", "outside", "introduced", "units", "expected"),
+    [
+        pytest.param({}, ("common",), set(), 5, 1.0, id="a frequent new word"),
+        pytest.param({}, ("mid",), set(), 5, 1.8, id="a harder new word"),
+        pytest.param({}, ("rare",), set(), 5, 3.0, id="a rare new word"),
+        pytest.param({}, ("rare",), {"rare"}, 5, 0.0, id="a free repeat"),
+        pytest.param(
+            {"lambda_repeat": 0.5}, ("rare",), {"rare"}, 5, 0.5, id="a repeat cost"
+        ),
+        pytest.param(
+            {"lambda_len": 0.25}, ("common",), set(), 9, 1.5, id="a long card"
+        ),
+    ],
+)
+def test_the_cost_follows_the_outside_words_and_the_length(
+    options: dict[str, Any],
+    outside: tuple[str, ...],
+    introduced: set[str],
+    units: int,
+    expected: float,
+) -> None:
+    candidate = CoreCandidate(0, ("F:x",), outside, units)
 
-        assert card_cost(card, {"rare"}, {"rare": 5000}, options) == 0.0
+    cost = card_cost(
+        candidate, introduced, COST_RANKS, CoreOptions(**COST_BASE | options)
+    )
+
+    assert cost == pytest.approx(expected)
 
 
 def _selection_fixture() -> tuple[list[CoreCandidate], dict[str, int], dict[str, int]]:
@@ -185,17 +183,20 @@ class TestSelection:
             CoreCandidate(2, ("S1:a",), (), 5),
         ]
         positions = {"S1:a": 1, "S2:b": 2}
-        options = CoreOptions(max_cards=10, completion_cards=0)
 
         result = select(
             candidates,
             positions=positions,
             quotas={"S1:a": 2, "S2:b": 1},
             ranks={},
-            options=options,
+            options=CoreOptions(max_cards=10, completion_cards=0),
         )
 
-        assigned = [positions[result.assigned[index]] for index in result.order if index in result.assigned]
+        assigned = [
+            positions[result.assigned[index]]
+            for index in result.order
+            if index in result.assigned
+        ]
         assert assigned == sorted(assigned)
 
     def test_assign_targets_uses_the_lowest_free_target(self) -> None:
@@ -203,499 +204,336 @@ class TestSelection:
             CoreCandidate(0, ("S1:a", "S2:b"), (), 5),
             CoreCandidate(1, ("S2:b",), (), 5),
         ]
+
         assigned = assign_targets([0, 1], candidates, {"S1:a": 1, "S2:b": 2})
 
         assert assigned == {0: "S1:a", 1: "S2:b"}
 
 
-class TestBuildTargets:
-    def test_two_glosses_with_one_sense_merge(self) -> None:
-        table = [(1, "je", "I"), (2, "je", "me")]
-        targets, dropped = build_core_targets(table, [], {}, 0)
+@pytest.mark.parametrize(
+    ("budget", "kept", "reasons"),
+    [
+        pytest.param(0, [0, 1], {}, id="no budget keeps both"),
+        pytest.param(1, [0], {1: "outside_budget"}, id="a second outside lemma breaks the budget"),
+        pytest.param(2, [0, 1], {}, id="a lemma count at the budget fits"),
+    ],
+)
+def test_the_outside_budget_caps_the_distinct_outside_lemmas(
+    budget: int, kept: list[int], reasons: dict[int, str]
+) -> None:
+    result = select(
+        [
+            CoreCandidate(0, ("S1:a",), ("x",), 5),
+            CoreCandidate(1, ("S2:b",), ("y",), 5),
+        ],
+        positions={"S1:a": 1, "S2:b": 2},
+        quotas={"S1:a": 1, "S2:b": 1},
+        ranks={},
+        options=CoreOptions(max_cards=10, completion_cards=0, outside_budget=budget),
+    )
 
-        assert len(targets) == 1
-        assert len(dropped) == 1
-
-    def test_two_senses_keep_two_targets(self) -> None:
-        table = [(1, "voler", "fly"), (2, "voler", "steal")]
-        targets, dropped = build_core_targets(table, [], {}, 0)
-
-        assert [target.key for target in targets] == ["S1:voler", "S2:voler"]
-        assert not dropped
-
-    def test_a_frequency_lemma_that_is_a_swadesh_form_is_not_added(self) -> None:
-        table = [(1, "eau", "water")]
-        frequency = [
-            TargetWord("eau", 1, 3, 1.0, 1.0),
-            TargetWord("pain", 2, 3, 1.0, 1.0),
-        ]
-
-        targets, _dropped = build_core_targets(table, frequency, {}, 5)
-
-        assert [target.key for target in targets] == ["S1:eau", "F:pain"]
-
-    def test_the_core_words_cut_the_frequency_list(self) -> None:
-        frequency = [TargetWord(f"w{index}", index, 3, 1.0, 1.0) for index in range(1, 6)]
-
-        targets, _dropped = build_core_targets([], frequency, {}, 2)
-
-        assert [target.key for target in targets] == ["F:w1", "F:w2"]
-
-    def test_a_frequency_lemma_gets_its_first_sense_as_the_gloss(self) -> None:
-        frequency = [TargetWord("faire", 1, 3, 1.0, 1.0)]
-        senses = {
-            ("F", "faire"): SenseRow(frozenset({"do", "make"}), first="do")
-        }
-
-        targets, _dropped = build_core_targets([], frequency, senses, 1)
-
-        assert targets[0].gloss == "do"
+    assert result.kept == kept
+    assert {
+        index: reason
+        for index, reason in result.reasons.items()
+        if reason != "max_cards"
+    } == reasons
 
 
-class TestDropSilentCards:
-    def test_a_card_without_a_media_file_leaves_and_the_rest_are_reindexed(
-        self, tmp_path: Path
-    ) -> None:
-        source = _tiny_deck(tmp_path)
-        cards = cull.load_input_deck(source)
-        cards[0] = replace(cards[0], audio="missing.mp3")
+@pytest.mark.parametrize(
+    ("table", "lemmas", "senses", "core_words", "expected", "dropped"),
+    [
+        pytest.param(
+            [(1, "je", "I"), (2, "je", "me")],
+            [],
+            {},
+            0,
+            [("S1:je", "I")],
+            1,
+            id="two glosses with one sense merge",
+        ),
+        pytest.param(
+            [(1, "voler", "fly"), (2, "voler", "steal")],
+            [],
+            {},
+            0,
+            [("S1:voler", "fly"), ("S2:voler", "steal")],
+            0,
+            id="two senses keep two targets",
+        ),
+        pytest.param(
+            [(1, "eau", "water")],
+            ["eau", "pain"],
+            {},
+            5,
+            [("S1:eau", "water"), ("F:pain", "")],
+            0,
+            id="a swadesh form is not added again",
+        ),
+        pytest.param(
+            [],
+            ["w1", "w2", "w3", "w4", "w5"],
+            {},
+            2,
+            [("F:w1", ""), ("F:w2", "")],
+            0,
+            id="the core words cut the frequency list",
+        ),
+        pytest.param(
+            [],
+            ["faire"],
+            {("F", "faire"): SenseRow(frozenset({"do", "make"}), first="do")},
+            1,
+            [("F:faire", "do")],
+            0,
+            id="a frequency lemma gets its first sense as the gloss",
+        ),
+    ],
+)
+def test_the_core_list_merges_swadesh_rows_and_adds_frequency_lemmas(
+    table: list[tuple[int, str, str]],
+    lemmas: list[str],
+    senses: dict[tuple[str, str], SenseRow],
+    core_words: int,
+    expected: list[tuple[str, str]],
+    dropped: int,
+) -> None:
+    frequency = [
+        TargetWord(lemma, rank, 3, 1.0, 1.0) for rank, lemma in enumerate(lemmas, 1)
+    ]
 
-        kept = drop_silent_cards(cards, source)
+    targets, merged = build_core_targets(table, frequency, senses, core_words)
 
-        assert [card.sentence for card in kept] == [
-            "Le chat mange.",
-            "Le lapin court.",
-        ]
-        assert [card.index for card in kept] == [0, 1]
-
-
-class TestSense:
-    def test_a_hit_needs_a_sense_word(self) -> None:
-        row = SenseRow(senses=frozenset({"time"}))
-        assert sense_failure("I saw it.", row) == "sense"
-        assert sense_failure("What time is it?", row) is None
-
-    def test_a_false_friend_blocks_the_hit(self) -> None:
-        row = SenseRow(
-            senses=frozenset({"time"}), false_friends=frozenset({"have"})
-        )
-        assert sense_failure("I have time.", row) == "false_friend"
-
-    def test_an_unchecked_target_accepts_every_hit(self) -> None:
-        assert sense_failure("anything", SenseRow()) is None
-
-    def test_the_sense_file_loads(self, tmp_path: Path) -> None:
-        senses = tmp_path / "senses.tsv"
-        senses.write_text(
-            "word\tsenses\tfalse_friends\npas\tnot\t\n", encoding="utf-8"
-        )
-
-        assert read_senses(senses) == {
-            ("F", "pas"): SenseRow(frozenset({"not"}), first="not")
-        }
-
-
-class TestOutside:
-    def test_a_core_form_is_not_an_outside_word(self) -> None:
-        tokens = [[("chat", "NOUN"), ("manger", "VERB"), ("vite", "ADV")]]
-
-        outside = outside_lemmas(0, tokens, frozenset({"chat", "vite"}))
-
-        assert outside == ("manger",)
-
-
-class TestCoverage:
-    def test_the_status_follows_the_count_and_the_quota(self) -> None:
-        targets = [
-            _target("S1:a", position=1),
-            _target("S2:b", position=2),
-            _target("S3:c", position=3),
-            _target("S4:d", position=4, senses=frozenset({"thing"})),
-        ]
-        result = CoreResult(
-            kept=[],
-            uses=Counter({"S1:a": 2, "S2:b": 1, "S4:d": 0}),
-            quotas={"S1:a": 2, "S2:b": 2, "S3:c": 2, "S4:d": 2},
-        )
-
-        rows = coverage_rows_of(
-            targets,
-            result,
-            {"S1:a": True, "S2:b": True, "S3:c": False, "S4:d": True},
-            {"S1:a": 2, "S2:b": 2, "S3:c": 2, "S4:d": 2},
-        )
-        status = {row["key"]: row["status"] for row in rows}
-
-        assert status == {
-            "S1:a": "covered",
-            "S2:b": "partial",
-            "S3:c": "absent",
-            "S4:d": "absent_sense",
-        }
-
-    def test_a_target_without_a_sense_row_is_unchecked(self) -> None:
-        targets = [_target("F:x", tier="F", position=1)]
-        result = CoreResult(
-            kept=[], uses=Counter({"F:x": 1}), quotas={"F:x": 2}
-        )
-
-        rows = coverage_rows_of(
-            targets, result, {"F:x": True}, {"F:x": 2}
-        )
-
-        assert rows[0]["status"] == "unchecked"
+    assert [(target.key, target.gloss) for target in targets] == expected
+    assert len(merged) == dropped
 
 
-class TestSizeCheck:
-    def test_a_small_budget_stops_the_run(self) -> None:
+def test_a_card_without_a_media_file_leaves_and_the_rest_are_reindexed(
+    tmp_path: Path,
+) -> None:
+    source = core_deck(tmp_path)
+    cards = cull.load_input_deck(source)
+    cards[0] = replace(cards[0], audio="missing.mp3")
+
+    kept = drop_silent_cards(cards, source)
+
+    assert [(card.sentence, card.index) for card in kept] == [
+        ("Le chat mange.", 0),
+        ("Le lapin court.", 1),
+    ]
+
+
+def test_a_core_form_is_not_an_outside_word() -> None:
+    tokens = [[("chat", "NOUN"), ("manger", "VERB"), ("vite", "ADV")]]
+
+    assert outside_lemmas(0, tokens, frozenset({"chat", "vite"})) == ("manger",)
+
+
+def test_the_status_follows_the_count_the_quota_and_the_sense_row() -> None:
+    targets = [
+        core_target("S1:a", position=1),
+        core_target("S2:b", position=2),
+        core_target("S3:c", position=3),
+        core_target("S4:d", position=4, senses=frozenset({"thing"})),
+        core_target("F:x", tier="F", position=5),
+    ]
+    result = CoreResult(
+        kept=[],
+        uses=Counter({"S1:a": 2, "S2:b": 1, "S4:d": 0, "F:x": 1}),
+        quotas={"S1:a": 2, "S2:b": 2, "S3:c": 2, "S4:d": 2, "F:x": 2},
+    )
+    held = {"S1:a": True, "S2:b": True, "S3:c": False, "S4:d": True, "F:x": True}
+
+    rows = coverage_rows_of(targets, result, held, {key: 2 for key in held})
+
+    assert {row["key"]: row["status"] for row in rows} == {
+        "S1:a": "covered",
+        "S2:b": "partial",
+        "S3:c": "absent",
+        "S4:d": "absent_sense",
+        "F:x": "unchecked",
+    }
+
+
+@pytest.mark.parametrize(
+    ("budget", "fits"),
+    [pytest.param(50, False, id="a small budget"), pytest.param(300, True, id="a large budget")],
+)
+def test_a_small_budget_stops_the_run(budget: int, fits: bool) -> None:
+    quotas = {f"t{index}": 2 for index in range(100)}
+
+    if fits:
+        size_check(quotas, budget)
+    else:
         with pytest.raises(ValueError, match="cannot fit"):
-            size_check({f"t{index}": 2 for index in range(100)}, 50)
-
-    def test_a_large_budget_passes(self) -> None:
-        size_check({f"t{index}": 2 for index in range(100)}, 300)
+            size_check(quotas, budget)
 
 
-class TestFiles:
-    def test_the_rank_csv_holds_the_kept_cards_in_order(self, tmp_path: Path) -> None:
-        cards = [_card("A.", index=0), _card("B.", index=1)]
-        path = tmp_path / "x.rank.csv"
+def test_the_rank_csv_holds_the_kept_cards_in_order(tmp_path: Path) -> None:
+    path = tmp_path / "x.rank.csv"
 
-        write_rank_csv([(1, 1001, "B.", 1), (2, 1000, "A.", 1)], path)
-        rows = list(csv.DictReader(path.open(encoding="utf-8")))
+    write_rank_csv([(1, 1001, "B.", 1), (2, 1000, "A.", 1)], path)
 
-        assert [row["sentence"] for row in rows] == ["B.", "A."]
-        assert [row["rank"] for row in rows] == ["1", "2"]
-        assert kept_order_hash(cards, [1, 0]) == kept_order_hash(cards, [1, 0])
+    rows = list(csv.DictReader(path.open(encoding="utf-8")))
+    assert [(row["sentence"], row["rank"]) for row in rows] == [("B.", "1"), ("A.", "2")]
 
 
-class TestBoldColumn:
-    def test_the_card_csv_holds_a_bold_row_and_a_plain_row(
-        self, tmp_path: Path
-    ) -> None:
-        run, _output, _profile = _run_core(tmp_path)
+def test_the_order_hash_follows_the_kept_sentences() -> None:
+    cards = [card("A.", index=0), card("B.", index=1)]
+    digest = hashlib.sha256(b"B.\nA.").hexdigest()
 
-        with run.sides["core.csv"].open(encoding="utf-8", newline="") as handle:
-            rows = list(csv.DictReader(handle))
-
-        assert {(row["kept"], row["bold"]) for row in rows} == {
-            ("1", "1"),
-            ("0", "0"),
-        }
+    assert kept_order_hash(cards, [1, 0]) == f"sha256:{digest}"
+    assert kept_order_hash(cards, [0, 1]) != kept_order_hash(cards, [1, 0])
 
 
-def _absent_core(tmp_path: Path) -> tuple[deck_writer.RunFiles, Path, CoreProfile]:
-    """Run the tiny deck with one tier S target that no card holds."""
-    source = _tiny_deck(tmp_path)
-    profile = replace(
-        _offline_profile(tmp_path),
-        word_table=lambda: [(1, "chat", "cat"), (2, "fromage", "cheese")],
-    )
-    output = tmp_path / "core.apkg"
-    run = coreflow.run_core(
-        coreflow.CoreRequest(
-            input_path=source,
-            output_path=output,
-            core_words=0,
-            max_cards=profile.default_options.max_cards,
-        ),
-        profile,
-    )
-    return run, output, profile
+def test_the_front_shows_only_the_audio() -> None:
+    front = core.CORE_FRONT_TEMPLATE
+
+    assert "{{Audio}}" in front
+    for hidden in ("{{Sentence}}", "{{English}}", "{{Core}}", "hint"):
+        assert hidden not in front
 
 
-class TestCoverageFile:
-    def test_an_absent_target_gets_a_coverage_row(self, tmp_path: Path) -> None:
-        run, _output, _profile = _absent_core(tmp_path)
-
-        with run.sides["coverage.csv"].open(encoding="utf-8", newline="") as handle:
-            rows = {row["word"]: row for row in csv.DictReader(handle)}
-        assert run.manifest_path is not None
-        manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
-
-        assert rows["fromage"]["status"] == "absent"
-        assert rows["fromage"]["count"] == "0"
-        assert manifest["counts"]["absent"] == 1
-        assert manifest["counts"]["targets"] == len(rows) - 1
-
-    def test_the_report_shows_the_two_card_share(
-        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
-    ) -> None:
-        _absent_core(tmp_path)
-
-        shown = capsys.readouterr().out
-
-        assert "Covered twice:" in shown
-        assert "0 of 1 (0.000)" in shown
-
-
-def _tiny_deck(tmp_path: Path) -> Path:
-    sentences = ["Le chat dort.", "Le chat mange.", "Le lapin court."]
-    english = ["The cat sleeps.", "The cat eats.", "The rabbit runs."]
-    media = [
-        str(path)
-        for path in write_mp3s(tmp_path, [f"a{index}.mp3" for index in range(len(sentences))])
-    ]
-    rows = [
-        {
-            "French": sentence,
-            "sound": f"[sound:a{index}.mp3]",
-            "Back": line,
-            "freq ranks": "[ 1 2 ]",
-        }
-        for index, (sentence, line) in enumerate(zip(sentences, english))
-    ]
-    source = tmp_path / "input.apkg"
-    AnkiPackage.create(
-        source,
-        "Source Deck",
-        fields=["French", "sound", "Back", "freq ranks"],
-        cards=rows,
-        media_files=media,
-        model_name=cull.MODEL_NAME,
-    )
-    return source
-
-
-def _tokens(cards: Sequence[InputCard]) -> list[list[tuple[str, str]]]:
-    """Tokenize each sentence into its words, with a content tag."""
-    return [
-        [(word.strip(".").casefold(), "VERB") for word in card.sentence.split()]
-        for card in cards
+def test_the_back_shows_audio_sentence_english_and_core_word() -> None:
+    back = core.CORE_BACK_TEMPLATE
+    order = [
+        back.index(f"{{{{{name}}}}}")
+        for name in ("Audio", "Sentence", "English", "Core", "CoreGloss")
     ]
 
+    assert order == sorted(order)
+    assert "{{#Core}}" not in back
 
-def _offline_profile(tmp_path: Path) -> CoreProfile:
-    """Give the French core hooks with no spaCy model and no data file."""
-    return replace(
-        core.FRENCH_CORE_PROFILE,
-        tokenize_deck=_tokens,
-        load_frequency=list,
-        read_names=set,
-        word_table=lambda: [(1, "chat", "cat")],
-        sense_path=tmp_path / "absent_senses.tsv",
-        min_units=1,
-        max_units=9,
-        default_options=CoreOptions(
-            max_cards=10, per_word=1, completion_cards=0, tail_cards=1
-        ),
+
+def test_the_run_writes_one_deck_with_one_note_type(tmp_path: Path) -> None:
+    run, output, profile = run_core(tmp_path)
+    identity = DeckIdentity(output)
+    assert run.manifest_path is not None
+    manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
+
+    with AnkiPackage(output) as package:
+        models = package.get_models(include_templates=True)
+        decks = package.get_decks()
+        cards = package.get_cards()
+        notes = [str(row["flds"]).split("\x1f") for row in package.get_notes()]
+        model_decks = json.loads(
+            package.conn.execute("SELECT models FROM col").fetchone()[0]
+        )
+
+    model = next(iter(models.values()))
+    assert {deck["name"] for deck in decks.values()} == {identity.title}
+    assert [model["name"] for model in models.values()] == [identity.title]
+    assert str(next(iter(model_decks.values()))["did"]) in decks
+    assert [field["name"] for field in model["flds"]] == [
+        "Audio",
+        "Sentence",
+        "English",
+        "Core",
+        "CoreGloss",
+    ]
+    assert [(t["qfmt"], t["afmt"]) for t in model["tmpls"]] == [
+        assemble.deck_templates(profile)[0]
+    ]
+    assert len(cards) == manifest["counts"]["cards"] == 1
+    assert {int(row["ord"]) for row in cards} == {0}
+    assert [values[3:] for values in notes] == [["chat", "cat"]]
+    assert notes[0][0] == "[sound:a0.mp3]"
+    assert "<b>chat</b>" in notes[0][1]
+
+
+def test_the_run_writes_the_side_files_the_manifest_and_the_report(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    run, output, profile = run_core(tmp_path)
+    identity = DeckIdentity(output)
+    assert run.manifest_path is not None
+    manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
+    shown = capsys.readouterr().out
+
+    assert run.sides["core.csv"] == identity.side("core.csv")
+    assert run.sides["coverage.csv"] == identity.side("coverage.csv")
+    assert "rank.csv" not in run.sides
+    assert manifest["source"] == {
+        "input": str(tmp_path / "input.apkg"),
+        "deck": identity.title,
+        "model": identity.model_name,
+        "input_model": profile.input_model_name,
+    }
+    assert manifest["params"]["name"] == identity.title
+    assert manifest["files"]["core_csv"].startswith("sha256:")
+    assert "Cards:" in shown
+    assert str(output) in shown
+    assert "Dropped, no audio file:" in shown
+
+
+def test_a_kept_card_without_a_core_word_leaves_the_deck(tmp_path: Path) -> None:
+    run, output, _profile = run_core(tmp_path)
+    assert run.manifest_path is not None
+    manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
+    with run.sides["core.csv"].open(encoding="utf-8", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    with AnkiPackage(output) as package:
+        sentences = [str(row["flds"]).split("\x1f")[1] for row in package.get_notes()]
+
+    dropped = [row for row in rows if row["reason"] == "no_core"]
+    assert manifest["counts"]["dropped_no_core"] == 1
+    assert manifest["counts"]["cards"] == 1
+    assert [(row["kept"], row["bold"]) for row in dropped] == [("0", "0")]
+    assert "lapin" in dropped[0]["sentence"]
+    assert {(row["kept"], row["bold"]) for row in rows} == {("1", "1"), ("0", "0")}
+    assert len(sentences) == 1
+    assert "lapin" not in sentences[0]
+
+
+def test_an_absent_target_gets_a_coverage_row_and_a_report_line(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    run, _output, _profile = run_core(
+        tmp_path, word_table=lambda: [(1, "chat", "cat"), (2, "fromage", "cheese")]
+    )
+    assert run.manifest_path is not None
+    manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
+    with run.sides["coverage.csv"].open(encoding="utf-8", newline="") as handle:
+        rows = {row["word"]: row for row in csv.DictReader(handle)}
+    shown = capsys.readouterr().out
+
+    assert (rows["fromage"]["status"], rows["fromage"]["count"]) == ("absent", "0")
+    assert manifest["counts"]["absent"] == 1
+    assert manifest["counts"]["targets"] == len(rows) - 1
+    assert "Covered twice:" in shown
+    assert "0 of 1 (0.000)" in shown
+
+
+def test_the_kept_card_keeps_its_note_id_and_due(tmp_path: Path) -> None:
+    source = core_deck(tmp_path)
+    cards = cull.load_input_deck(source)
+    with AnkiPackage(source) as package:
+        package.conn.execute("UPDATE cards SET due = 42")
+        package.conn.commit()
+        package.touch()
+        package.save()
+    note_id = cards[0].note_id
+
+    counts = write_core_package(
+        source, tmp_path / "core.apkg", cards, [0], core.FRENCH_CORE_PROFILE
     )
 
-
-def _run_core(tmp_path: Path) -> tuple[deck_writer.RunFiles, Path, CoreProfile]:
-    """Run the core mode on the tiny deck."""
-    source = _tiny_deck(tmp_path)
-    profile = _offline_profile(tmp_path)
-    output = tmp_path / "core.apkg"
-    run = coreflow.run_core(
-        coreflow.CoreRequest(
-            input_path=source,
-            output_path=output,
-            core_words=0,
-            max_cards=profile.default_options.max_cards,
-        ),
-        profile,
-    )
-    return run, output, profile
+    with AnkiPackage(tmp_path / "core.apkg") as package:
+        rows = package.conn.execute("SELECT nid, due FROM cards").fetchall()
+    assert counts == {"notes": 1, "media": 1, "items": 1}
+    assert {int(row["nid"]): int(row["due"]) for row in rows} == {note_id: 42}
 
 
-def _cards(path: Path) -> dict[int, tuple[int, int, int]]:
-    """Give the card id, due, and ord of each note of a package."""
-    with AnkiPackage(path) as package:
-        rows = package.conn.execute("SELECT id, nid, due, ord FROM cards").fetchall()
-    return {int(row["nid"]): (int(row["id"]), int(row["due"]), int(row["ord"])) for row in rows}
+def test_the_mandarin_build_filter_rejects_a_repeated_phrase() -> None:
+    cards = [
+        InputCard(1, "起来 起来.", "Get up! Get up!", "a.mp3", 0),
+        InputCard(2, "起来吧大家.", "Get up.", "a.mp3", 1),
+    ]
 
+    kept, reasons = coreflow.filter_core_cards(cards, MANDARIN_CORE_PROFILE)
 
-class TestCardDesign:
-    def test_the_front_shows_only_the_audio(self) -> None:
-        front = core.CORE_FRONT_TEMPLATE
-
-        assert "{{Audio}}" in front
-        assert "{{Sentence}}" not in front
-        assert "{{English}}" not in front
-        assert "{{Core}}" not in front
-        assert "hint" not in front
-
-    def test_the_back_shows_audio_sentence_english_and_core_word(self) -> None:
-        back = core.CORE_BACK_TEMPLATE
-        order = [
-            back.index(f"{{{{{name}}}}}")
-            for name in ("Audio", "Sentence", "English", "Core", "CoreGloss")
-        ]
-
-        assert order == sorted(order)
-        assert "{{#Core}}" not in back
-
-    def test_the_deck_has_one_card_template(self) -> None:
-        assert len(core.CORE_TEMPLATES) == 1
-
-    def test_the_run_writes_one_note_type_with_the_output_fields(
-        self, tmp_path: Path
-    ) -> None:
-        run, output, profile = _run_core(tmp_path)
-
-        with AnkiPackage(output) as package:
-            models = package.get_models(include_templates=True)
-            cards = package.get_cards()
-
-        assert [model["name"] for model in models.values()] == [
-            DeckIdentity(output).title
-        ]
-        model = next(iter(models.values()))
-        assert [field["name"] for field in model["flds"]] == list(
-            assemble.output_fields(profile)
-        )
-        assert [
-            (template["qfmt"], template["afmt"]) for template in model["tmpls"]
-        ] == [assemble.deck_templates(profile)[0]]
-        assert run.manifest_path is not None
-        manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
-        assert len(cards) == manifest["counts"]["cards"]
-        assert {int(row["ord"]) for row in cards} == {0}
-
-    def test_the_title_the_note_type_and_the_manifest_name_agree(
-        self, tmp_path: Path
-    ) -> None:
-        run, output, _profile = _run_core(tmp_path)
-        assert run.manifest_path is not None
-        manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
-
-        with AnkiPackage(output) as package:
-            decks = {deck["name"] for deck in package.get_decks().values()}
-            models = {model["name"] for model in package.get_models().values()}
-
-        identity = DeckIdentity(output)
-        assert decks == models == {manifest["source"]["model"]}
-        assert manifest["source"]["model"] == identity.title
-
-
-    def test_the_note_type_points_at_the_output_deck(self, tmp_path: Path) -> None:
-        _run, output, _profile = _run_core(tmp_path)
-
-        with AnkiPackage(output) as package:
-            decks = package.get_decks()
-            models = json.loads(
-                package.conn.execute("SELECT models FROM col").fetchone()[0]
-            )
-
-        assert str(next(iter(models.values()))["did"]) in decks
-    def test_the_model_gets_the_core_field_and_templates(self, tmp_path: Path) -> None:
-        _run, output, _profile = _run_core(tmp_path)
-
-
-        with AnkiPackage(output) as package:
-            models = package.get_models()
-            notes = {
-                int(row["id"]): str(row["flds"]).split("\x1f")
-                for row in package.get_notes()
-            }
-
-        assert list(models) != []
-        model = next(iter(models.values()))
-        assert model["name"] == DeckIdentity(output).title
-        assert [field["name"] for field in model["flds"]] == [
-            "Audio",
-            "Sentence",
-            "English",
-            "Core",
-            "CoreGloss",
-        ]
-        assert [values[3:] for values in notes.values()] == [["chat", "cat"]]
-        values = next(iter(notes.values()))
-        assert values[0] == "[sound:a0.mp3]"
-        assert "<b>chat</b>" in values[1]
-
-    def test_every_kept_note_holds_a_bold_core_word(self, tmp_path: Path) -> None:
-        _run, output, profile = _run_core(tmp_path)
-        files = coregates.CoreFiles(output, profile)
-        notes = files.notes()
-        sentence_index = files.fields().index("Sentence")
-
-        assert all(
-            "<b>" in values[sentence_index] for values in notes.values()
-        )
-
-    def test_the_report_shows_the_silent_card_count(
-        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
-    ) -> None:
-        _run_core(tmp_path)
-
-        shown = capsys.readouterr().out
-
-        assert "Dropped, no audio file:" in shown
-
-    def test_a_kept_card_without_a_core_word_leaves_the_deck(
-        self, tmp_path: Path
-    ) -> None:
-        run, output, profile = _run_core(tmp_path)
-
-        assert run.manifest_path is not None
-        manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
-        with run.sides["core.csv"].open(encoding="utf-8", newline="") as handle:
-            rows = list(csv.DictReader(handle))
-        dropped = [row for row in rows if row["reason"] == "no_core"]
-
-        assert manifest["counts"]["dropped_no_core"] == 1
-        assert len(dropped) == 1
-        assert dropped[0]["kept"] == "0"
-        assert "lapin" in dropped[0]["sentence"]
-        assert manifest["counts"]["cards"] == 1
-        with AnkiPackage(output) as package:
-            sentences = [
-                str(row["flds"]).split("\x1f")[1] for row in package.get_notes()
-            ]
-        assert len(sentences) == 1
-        assert all("lapin" not in sentence for sentence in sentences)
-
-    def test_the_kept_card_keeps_its_note_id_and_due(self, tmp_path: Path) -> None:
-        source = _tiny_deck(tmp_path)
-        cards = cull.load_input_deck(source)
-        with AnkiPackage(source) as package:
-            package.conn.execute("UPDATE cards SET due = 42")
-            package.conn.commit()
-            package.touch()
-            package.save()
-        before = _cards(source)
-        output = tmp_path / "core.apkg"
-
-        profile = core.FRENCH_CORE_PROFILE
-        identity = DeckIdentity(output)
-        note_fields, _bolded, _unbolded = coreflow.note_values(
-            source, cards, [0], profile, {}
-        )
-        counts = write_package(
-            source,
-            output,
-            OutputShape(
-                deck_name=identity.title,
-                model_name=identity.model_name,
-                input_model_name=profile.input_model_name,
-                fields=assemble.output_fields(profile),
-                templates=assemble.deck_templates(profile),
-                css=profile.card_css(),
-            ),
-            note_fields,
-        )
-
-        after = _cards(output)
-        note_id = cards[0].note_id
-        assert counts == {"notes": 1, "media": 1, "items": 1}
-        assert after[note_id] == before[note_id]
-        assert after[note_id][1] == 42
-
-
-class TestMandarinRepeatRule:
-    def test_the_build_filter_rejects_a_repeated_phrase(self) -> None:
-        from anki_tools.languages.mandarin.core import MANDARIN_CORE_PROFILE as profile
-
-        cards = [
-            InputCard(1, "起来 起来.", "Get up! Get up!", "a.mp3", 0),
-            InputCard(2, "起来吧大家.", "Get up.", "a.mp3", 1),
-        ]
-
-        kept, reasons = coreflow.filter_core_cards(cards, profile)
-
-        assert kept == [1]
-        assert reasons[0] == "repeat"
+    assert kept == [1]
+    assert reasons[0] == "repeat"
 
 
 @pytest.mark.parametrize(

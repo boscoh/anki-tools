@@ -1,38 +1,20 @@
 """Tests for the Cantonese core adapter and its output note type."""
 
 from __future__ import annotations
+
 from pathlib import Path
 
 from anki_tools.apkg.package import AnkiPackage
-from anki_tools.apkg.shape import OutputShape, write_package
-from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.languages.cantonese import core
-from anki_tools.ranking import assemble, coreflow
-from tests.deck_fixture import write_mp3s
+from tests.cull_fixture import tiny_deck, write_core_package
 
 
-def test_profile_holds_the_deck_paths():
-    """The profile names the LTL deck files and the Cantonese hooks."""
-    profile = core.CANTONESE_CORE_PROFILE
-    assert profile.input_model_name == "LTL Note Type - Cantonese"
-    assert profile.input_sentence_field == "Front"
-    assert profile.input_english_field == "Back"
-    assert profile.input_audio_field == "Audio"
-    assert profile.romanization_source == "Jyutping"
-    assert profile.min_units < profile.max_units
-    assert profile.templates
-    assert profile.card_css().startswith("/*")
-
-
-def _build_output(tmp_path, jyutping: str) -> tuple[Path, int]:
+def _build_output(tmp_path: Path, jyutping: str) -> tuple[Path, int]:
     """Write the core package of one note and give its path and note id."""
-    (audio,) = write_mp3s(tmp_path, ["a.mp3"])
-    source = tmp_path / "input.apkg"
-    AnkiPackage.create(
-        source,
-        "Source Deck",
-        fields=["Front", "Back", "Audio", "Jyutping"],
-        cards=[
+    source = tiny_deck(
+        tmp_path,
+        ["Front", "Back", "Audio", "Jyutping"],
+        [
             {
                 "Front": "死開!",
                 "Back": "Get lost!",
@@ -40,34 +22,16 @@ def _build_output(tmp_path, jyutping: str) -> tuple[Path, int]:
                 "Jyutping": jyutping,
             }
         ],
-        media_files=[str(audio)],
-        model_name=core.MODEL_NAME,
+        core.MODEL_NAME,
+        ["a.mp3"],
     )
     cards = core.load_input_deck(source)
     output = tmp_path / "core.apkg"
-    profile = core.CANTONESE_CORE_PROFILE
-    identity = DeckIdentity(output)
-    note_fields, _bolded, _unbolded = coreflow.note_values(
-        source, cards, [0], profile, {}
-    )
-    write_package(
-        source,
-        output,
-        OutputShape(
-            deck_name=identity.title,
-            model_name=identity.model_name,
-            input_model_name=profile.input_model_name,
-            fields=assemble.output_fields(profile),
-            templates=assemble.deck_templates(profile),
-            css=profile.card_css(),
-        ),
-        note_fields,
-    )
+    write_core_package(source, output, cards, [0], core.CANTONESE_CORE_PROFILE)
     return output, cards[0].note_id
 
 
-def test_the_jyutping_field_survives_the_new_model(tmp_path) -> None:
-    """The extra field sits at position 4 and keeps the input value."""
+def test_the_jyutping_field_survives_the_new_model(tmp_path: Path) -> None:
     output, _note_id = _build_output(tmp_path, "séihōi ！")
 
     with AnkiPackage(output) as package:
@@ -79,7 +43,7 @@ def test_the_jyutping_field_survives_the_new_model(tmp_path) -> None:
     assert values[3] == "séihōi ！"
 
 
-def test_finalize_writes_the_jyutping_of_the_sentence(tmp_path) -> None:
+def test_finalize_writes_the_jyutping_of_the_sentence(tmp_path: Path) -> None:
     """The LTL deck holds Yale in its Jyutping field, so the fix derives it."""
     output, note_id = _build_output(tmp_path, "séihōi ！")
     core_csv = tmp_path / "core.csv"
