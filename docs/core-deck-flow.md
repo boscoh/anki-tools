@@ -23,8 +23,8 @@ One command runs the stages in order: `anki fix <language> --core`. The
 | K5    | order   | K4                                        | card order, assigned target per card        |
 | K6    | write   | K0, K4, K5                                | APKG and four side files                    |
 
-The gates K1 to K21 run after K6. The table holds 13 rows: K3, K15, and K17
-are gone, and gates K4, K7, K9, K10, K14, and K22 are retired (ADR 0038, 0039, 0040, 0041). The flow step K4
+The gates K1 to K21 run after K6. The table holds 5 rows: K2, K5, K6, K11, and
+K13. The other gate ids are retired (ADR 0038 to 0044). The flow step K4
 is the selection.
 
 The `--cards` and `--words` values change the tier F target count and the
@@ -298,33 +298,23 @@ The coverage status of a target is one of these values:
 
 | Group      | Gates              | Checks                                                              |
 | ---------- | ------------------ | ------------------------------------------------------------------- |
-| size       | K1                 | card count                                                          |
-| coverage   | K2, K11            | covered targets, coverage CSV                                       |
+| coverage   | K2, K11            | offered targets without a card, coverage count per target           |
 | rules      | K5, K6             | F1 to F9, similarity                                                |
-| files      | K8, K12            | counts, manifest hashes                                             |
 | cards      | K13                | target in the text                                                  |
-| sense      | K16, K19, K20      | unchecked target, core word and gloss, unranked word                |
-| shape      | K18                | each tail card brings a new content lemma                           |
-| note type  | K21                | one note type, the output fields, one card per note                 |
 
 The build report holds the value of K3 and K15, Covered twice, and the count of
-cards that K1 drops for a missing audio file. A report line does not fail the
-run.
+cards that K1 drops for a missing audio file. It also holds the count of
+unchecked targets. The manifest holds the count of unranked tier F targets. No
+gate limits these counts, and a report line does not fail the run.
 
-K19 checks that
-every note holds a
-`Core`, a `CoreGloss`, and a bold core word, that the gloss is the coverage
-gloss of the core word, and
-that the gloss has no comma. K21 checks the single note type, the field set,
-and one card per note. The `sense` filter is the one sense test (ADR 0039); no
-gate repeats it.
+The `sense` filter is the one sense test (ADR 0039); no gate repeats it.
 
 ## 9. File map
 
 | Path                                            | Content                                    |
 | ----------------------------------------------- | ------------------------------------------ |
 | `anki_tools/ranking/coreflow.py`                | K0 to K6 flow, output field values         |
-| `anki_tools/ranking/coregates.py`               | gates K1 to K21, 16 rows                   |
+| `anki_tools/ranking/coregates.py`               | gates K1 to K21, 5 rows                    |
 | `anki_tools/gates.py`                           | gate value, row, runner, reader contract   |
 | `anki_tools/ranking/gates.py`                   | report, shared gates                       |
 | `anki_tools/ranking/assemble.py`                | deck, side files, manifest, report         |

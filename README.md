@@ -346,7 +346,7 @@ The flags:
 - `--words` adds content lemmas in blended frequency order.
 - `--cards` sets the card cap.
 - `--output` sets the path. The default is `apkg/<language>_core.apkg`.
-- `--check` runs the gates K1 to K21 on the built deck.
+- `--check` runs the gates K1 to K21, without the retired gates, on the built deck.
 
 The core list starts with the reviewed Swadesh forms of the language. The
 selection is a greedy cover. Each card has a value from the target examples
@@ -385,7 +385,7 @@ output file stem. The assigned target is bold in the sentence.
 Measured result on 2026-10-21: 300 cards for 209 targets (159 Swadesh forms
 and 50 frequency lemmas). 183 targets have 2 cards, 21 have one, and 5 are
 `absent_sense`. The core cards hold 247 support words, of which 18 are rare,
-and the tail adds 346 new words. Gates K1 to K19 pass.
+and the tail adds 346 new words. The core gates pass.
 
 ### Cantonese Core
 
@@ -446,7 +446,7 @@ non-exempt word appears in more than 4 cards.
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
     --output apkg/french_1000.apkg
 
-# Run gates G1, G2, G5, G6, G8, G9, G12, G13, G16, and G17 on the written output
+# Run gates G1, G2, G5, and G6 on the written output
 uv run anki fix fr "apkg/6000_French_Sentences_w_Audio.apkg" --select \
     --output apkg/french_1000.apkg --check
 ```

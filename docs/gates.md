@@ -19,8 +19,8 @@ checks. A doc row, a report line, and an issue must name the flow with the id.
 | Flow            | Command                            | Gate ids                                        | Rows  |
 | --------------- | ---------------------------------- | ----------------------------------------------- | ----- |
 | Sentence pack   | `anki swadesh pack <lang>`         | G1 to G19, one list for each language           | 15-16 |
-| Cull deck       | `anki fix <lang> <input> --select` | G1, G2, G5, G6, G8, G9, G12, G13, G16, G17      | 10    |
-| Core deck       | `anki fix <lang> <input> --core`   | K1, K2, K5, K6, K8, K11 to K13, K16, K18 to K21 | 13    |
+| Cull deck       | `anki fix <lang> <input> --select` | G1, G2, G5, G6                                  | 4     |
+| Core deck       | `anki fix <lang> <input> --core`   | K2, K5, K6, K11, K13                            | 5     |
 | Vocabulary deck | `anki swadesh vocab <lang>`        | none                                            | 0     |
 
 The pack lists differ by language:
@@ -41,22 +41,14 @@ Each flow doc gives the check of each pack, cull, and core row:
 ### Shared checks
 
 More than one flow runs these checks. The cull and core rows call one function
-in `ranking/gates.py` and pass their own values. The similarity limit, the
-manifest file keys, and the media check are the parameters.
+in `ranking/gates.py` and pass their own values. The similarity limit is the
+parameter.
 
 | Check                  | Pack | Cull | Core | Plain meaning                                       |
 | ---------------------- | ---- | ---- | ---- | --------------------------------------------------- |
 | `gate_word_table`      | G1   | -    | -    | The word table is valid. Five copies exist (open).  |
 | `gate_filter_recheck`  | G14  | G5   | K5   | Every kept card passes the filter rules.            |
 | `gate_similarity`      | -    | G6   | K6   | No two cards are almost the same sentence.          |
-| `gate_counts`          | -    | G8   | K8   | The deck, the CSV, and the manifest counts agree.   |
-| `gate_manifest_hashes` | -    | G13  | K12  | The manifest hashes match the two CSV files.        |
-| `gate_output_model`    | -    | G16  | K21  | One note type, the right fields, one card per note. |
-| `gate_core_word`       | -    | G17  | K19  | Every note has a core word, a gloss, and bold text. |
-
-Two names differ in the code. Cull G8 is `gate_note_count`, and core K12 is
-`gate_hashes`. Both call the shared function. Core K8 also tests that the media
-set equals the card audio. Cull G9 tests the media set alone.
 
 ### Cull-only and core-only checks
 
@@ -64,29 +56,24 @@ set equals the card audio. Cull G9 tests the media set alone.
 | --- | ------------------------- | --------------------------------------------------------- |
 | G1  | `gate_card_cap`           | The deck has the cap number of cards, or the pool ends.   |
 | G2  | `gate_use_cap`            | No lemma appears in more cards than the cap.              |
-| G9  | `gate_media`              | The deck holds exactly the audio files of the kept cards. |
-| G12 | `gate_coverage_shape`     | The coverage CSV has one row for each target word.        |
-| K1  | `gate_card_count`         | The CSV, the deck, and the manifest give the same count.  |
-| K2  | `gate_covered_targets`    | Every target that can have a card has a card.             |
-| K11 | `gate_coverage_agreement` | The coverage CSV agrees with the card CSV.                |
+| K2  | `gate_covered_targets`    | Every target that a card offers has a kept card.          |
+| K11 | `gate_coverage_agreement` | Each coverage count is the use count in the kept cards.   |
 | K13 | `gate_target_in_sentence` | Each card sentence holds its target word.                 |
-| K16 | `gate_unchecked_sense`    | The unchecked targets stay inside the limit.              |
-| K18 | `gate_tail`               | Each tail card adds a new content lemma.                  |
-| K20 | `gate_unranked`           | The unranked tier F targets stay inside the limit.        |
 
-The pack has more checks, for example G10 coverage. The three coverage checks
-(pack G10, cull G12, core K2) measure different things and stay separate. The
-cull has no gate on the share of targets with one card or two cards (ADR 0033).
+The pack has more checks, for example G10 coverage. The two coverage checks
+(pack G10 and core K2) measure different things and stay separate. The cull has
+no coverage gate (ADR 0045). It has no gate on the share of targets with one
+card or two cards (ADR 0033).
 
 ### Retired ids
 
 A removed row leaves a gap in the numbering. The ids are not reused.
 
-| Flow | Retired ids                                                | ADR                          |
-| ---- | ---------------------------------------------------------- | ---------------------------- |
-| Cull | G3, G4, G7, G10, G11, G14, G15, G18                        | 0033, 0035, 0039, 0040, 0041 |
-| Core | K3, K4, K7, K9, K10, K14, K15, K17, K22                    | 0038, 0039, 0040, 0041       |
-| Pack | sense, attribution, typography, license, and script gates  | 0039                         |
+| Flow | Retired ids                                                    | ADR                          |
+| ---- | -------------------------------------------------------------- | ---------------------------- |
+| Cull | G3, G4, G7 to G18                                              | 0033, 0035, 0039 to 0045     |
+| Core | K1, K3, K4, K7 to K10, K12, K14 to K22                         | 0038 to 0044                 |
+| Pack | sense, attribution, typography, license, and script gates      | 0039                         |
 
 ## 3. The gate contract
 
@@ -125,10 +112,12 @@ when a pack check must serve a second flow.
 - The pack manifest has a second shape. `sentence_pack/pack.py` writes it, and
   `G11` reads it. The rank manifest comes from `ranking/assemble.py`.
 - The `sense` filter is the one test of the word sense (ADR 0039). No gate
-  repeats it. Core `K13` and `K16` stay: `K13` tests that the form is in the
-  sentence, and `K16` counts the unchecked targets.
-- Core `K1` checks a three-way count agreement. Cull `G1` checks the cap or the
-  pool end. The two functions stay separate.
+  repeats it. Core `K13` stays: it tests that the form is in the sentence.
+- Cull `G1` checks the cap or the pool end. The pool ends when no passed card
+  keeps the reason `max_cards`. The old core `K1` count check is retired
+  (ADR 0043).
+- Core `K2` compares the targets that the card rows offer with the coverage
+  counts. A target that no card offers is not a miss (ADR 0043).
 - Mandarin `G12` checks the native audio authors, not every sentence author, so
   it holds its own function.
 
@@ -142,7 +131,8 @@ function behind an id:
   typography, license, native audio, targets-in-table, and target-once checks
   are gone.
 - The function name states the check. For example, `gate_hit` is now
-  `gate_target_in_sentence`, and `gate_card_count` is now `gate_card_cap`.
+  `gate_target_in_sentence`, and the cull `gate_card_count` is now
+  `gate_card_cap`.
 - A row that could not fail left the table. Its value is a report line or a
   manifest value:
   - core `K3` is Covered twice
@@ -153,6 +143,10 @@ function behind an id:
 - A gate left the table when one build step wrote both sides of its comparison
   (ADR 0041), or when it only ran a filter again or tested a rule that no card
   can break (ADR 0039).
+- A gate must be able to fail on a wrong analysis, not only on a broken writer.
+  A status that the writer derives from a count cannot fail when the gate
+  derives it again from the same count (ADR 0043). A gate that excludes the
+  failure that its name states is a gate that cannot fail.
 
 Rejected:
 
@@ -172,8 +166,8 @@ Both items are in `anki-ujvj`.
   Spanish `check_word_table` take no `csv_path`, so one shared function needs a
   profile hook for the path.
 - One output reader. The pack `read_apkg` returns a different shape from the
-  rank `read_output`. One reader lets pack `G13` use `gate_output_model`, and it
-  lets the pack share the audio check. This is the highest-risk item.
+  rank `read_output`. One reader lets the pack share the audio check. This is
+  the highest-risk item.
 
 ## 7. Verification
 

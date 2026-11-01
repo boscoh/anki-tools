@@ -24,7 +24,7 @@ One command runs the stages in order: `anki fix <language> --select`. The
 | C4    | select    | C1, C2, C3, reserve pack | kept cards and reserve cards                |
 | C5    | write     | C0, C4                   | APKG and three side files                   |
 
-The gates G1, G2, G5, G6, G8, G9, G12, G13, G16, and G17 run after C5. G3, G4, G7, G10, G11, G14, G15, and G18 are retired.
+The gates G1, G2, G5, and G6 run after C5. G3, G4, G7 to G18 are retired.
 
 The `--cards` and `--reserve` values change the request. The other
 `CullRequest` fields, such as `max_uses` and `target_words`, keep their
@@ -74,7 +74,7 @@ C4  selection
 C5  APKG, .cull.csv, .coverage.csv, .manifest.json
         |
         v
-    gates G1, G2, G5, G6, G8, G9, G12, G13, G16, G17
+    gates G1, G2, G5, G6
 ```
 
 ## 3. Target words (C1 and C2)
@@ -275,19 +275,12 @@ exceptions.
 | Group     | Gates        | Checks                                                    |
 | --------- | ------------ | --------------------------------------------------------- |
 | size      | G1, G2       | card count against the cap, lemma uses against the cap    |
-| coverage  | G12          | coverage CSV rows                                         |
 | rules     | G5, G6       | F1 to F9 on every kept card, similarity                   |
-| files     | G8, G9       | note count, media set                                     |
-| manifest  | G13          | the two CSV hashes                                        |
-| note type | G16, G17     | one note type, its fields, the core word, gloss, and bold |
 
-G3, G4, G7, G10, G11, G14, and G15 are retired (ADR 0033, 0035, 0040, 0041). Their ids are not reused. The
+G3, G4, G7 to G11, G13 to G17 are retired (ADR 0033, 0035, 0040 to 0045). Their ids are not reused. The
 report and the coverage CSV still give the targets with one card and with two
 cards, and the Swadesh count of the reserve concepts. No gate tests them.
 
-G16 checks the single note type, the field set, and
-one card per note. G17 checks that every note holds a `Core`, a `CoreGloss`,
-and a bold core word, and that the gloss is the coverage gloss of that word.
 G18 is retired (ADR 0039). The `sense` filter is the one sense test, and no gate
 repeats it.
 
@@ -295,10 +288,11 @@ G2 counts the lemma uses with `sense_lemma_sets`, the same function that
 `select_cards` uses. A lemma that fails the sense test on a card is not a use of
 that card.
 
-G1 passes when the kept count plus `counts.dropped_no_core` reaches the cap, or
-when the pool has no more cards. A kept card without a core word leaves the
-deck, so the gate compares the count before that drop. A small input deck does
-not fail G1.
+G1 passes when the kept count plus `counts.dropped_no_core` reaches the cap. It
+also passes when the pool has no more cards: no unkept row has the reason
+`max_cards`. Every other passed card then has the reason `similar`,
+`use_cap`, or `no_gain`. A kept card without a core word leaves the deck, so the
+gate compares the count before that drop. A small input deck does not fail G1.
 
 The similarity test of `select_cards` and G6 use the full lemma sets of the
 cards. A duplicate is a property of the text, so the sense test does not change
@@ -309,7 +303,7 @@ it.
 | Path                                      | Content                                        |
 | ----------------------------------------- | ---------------------------------------------- |
 | `anki_tools/ranking/cullflow.py`          | C0 to C5 flow, profile, selection, values      |
-| `anki_tools/ranking/cullgates.py`         | gates G1 to G17, 13 rows                       |
+| `anki_tools/ranking/cullgates.py`         | gates G1 to G17, 4 rows                        |
 | `anki_tools/gates.py`                     | gate value, row, runner, reader contract       |
 | `anki_tools/ranking/gates.py`             | report, shared gates                           |
 | `anki_tools/ranking/assemble.py`          | deck, side files, manifest, report             |

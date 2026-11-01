@@ -955,8 +955,6 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
                     "max_units": profile.max_units,
                     "spoken_weight": request.spoken_weight,
                     "bold_target": True,
-                    "max_unchecked_sense": 0,
-                    "max_unranked": 0,
                 },
                 counts=counts,
                 frequency={

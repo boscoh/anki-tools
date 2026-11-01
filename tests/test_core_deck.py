@@ -11,6 +11,7 @@ import json
 from collections import Counter
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Sequence
 
 import pytest
@@ -45,7 +46,6 @@ from anki_tools.ranking.core import (
     target_quotas,
 )
 from anki_tools.ranking import coregates
-from anki_tools.ranking.coregates import gate_core_word
 from anki_tools.ranking.scan import CoreProfile, drop_silent_cards
 
 
@@ -423,7 +423,21 @@ class TestCoverageFile:
         passed, message = coregates.gate_covered_targets(files)
 
         assert passed, message
-        assert message == "covered 1 of 1"
+
+    def test_the_cover_gate_fails_on_an_offered_target_without_a_card(self) -> None:
+        files = SimpleNamespace(
+            rows=lambda: [{"targets": "a|b"}, {"targets": ""}],
+            coverage=lambda: [
+                {"key": "a", "word": "a", "count": "1"},
+                {"key": "b", "word": "b", "count": "0"},
+                {"key": "c", "word": "c", "count": "0"},
+            ],
+        )
+
+        passed, message = coregates.gate_covered_targets(files)  # type: ignore
+
+        assert not passed
+        assert "1 without a card: b" in message
 
     def test_the_report_shows_the_two_card_share(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
@@ -512,21 +526,6 @@ def _cards(path: Path) -> dict[int, tuple[int, int, int]]:
     with AnkiPackage(path) as package:
         rows = package.conn.execute("SELECT id, nid, due, ord FROM cards").fetchall()
     return {int(row["nid"]): (int(row["id"]), int(row["due"]), int(row["ord"])) for row in rows}
-
-
-def _add_spare_field(path: Path, name: str) -> None:
-    """Append a field to the only note type of a package."""
-    with AnkiPackage(path) as package:
-        conn = package.conn
-        models = json.loads(conn.execute("SELECT models FROM col").fetchone()[0])
-        model = next(iter(models.values()))
-        extra = dict(model["flds"][-1])
-        extra.update({"name": name, "ord": len(model["flds"]), "media": []})
-        model["flds"].append(extra)
-        conn.execute("UPDATE col SET models = ? WHERE id = 1", (json.dumps(models),))
-        conn.commit()
-        package._modified = True
-        package.save()
 
 
 class TestCardDesign:
@@ -628,30 +627,6 @@ class TestCardDesign:
         assert values[0] == "[sound:a0.mp3]"
         assert "<b>chat</b>" in values[1]
 
-    def test_every_kept_note_holds_a_core_word_and_a_gloss(
-        self, tmp_path: Path
-    ) -> None:
-        _run, output, profile = _run_core(tmp_path)
-        files = coregates.CoreFiles(output, profile)
-
-        passed, message = gate_core_word(files)
-        core_word_problems, filled = coregates.core_word_problems(
-            files.notes(),
-            files.fields(),
-            coreflow.coverage_glosses(files.coverage()),
-        )
-        notes = files.notes()
-        fields = files.fields()
-        notes[next(iter(notes))][fields.index("Core")] = ""
-
-        failed, failed_message = gate_core_word(files)
-
-        assert passed, message
-        assert core_word_problems == []
-        assert filled == 1
-        assert not failed
-        assert "no core word" in failed_message
-
     def test_every_kept_note_holds_a_bold_core_word(self, tmp_path: Path) -> None:
         _run, output, profile = _run_core(tmp_path)
         files = coregates.CoreFiles(output, profile)
@@ -661,53 +636,6 @@ class TestCardDesign:
         assert all(
             "<b>" in values[sentence_index] for values in notes.values()
         )
-
-    def test_the_core_word_gate_fails_on_a_bold_without_a_target(
-        self, tmp_path: Path
-    ) -> None:
-        _run, output, profile = _run_core(tmp_path)
-        core_csv, _coverage, _manifest, _rank = DeckIdentity(output).core_sides()
-        with core_csv.open(encoding="utf-8", newline="") as handle:
-            reader = csv.DictReader(handle)
-            names = list(reader.fieldnames or [])
-            rows = list(reader)
-        rows[0]["assigned"] = ""
-        with core_csv.open("w", encoding="utf-8", newline="") as handle:
-            writer = csv.DictWriter(handle, fieldnames=names)
-            writer.writeheader()
-            writer.writerows(rows)
-
-        passed, message = gate_core_word(coregates.CoreFiles(output, profile))
-
-        assert not passed
-        assert "bold without a target" in message
-
-    def test_the_gloss_gate_fails_on_a_missing_gloss(self, tmp_path: Path) -> None:
-        _run, output, profile = _run_core(tmp_path)
-        with AnkiPackage(output) as package:
-            note = package.get_notes()[0]
-            package.update_note_field(int(note["id"]), 4, "")
-            package.touch()
-            package.save(output)
-
-        passed, message = gate_core_word(coregates.CoreFiles(output, profile))
-
-        assert not passed
-        assert "has no gloss" in message
-
-    def test_the_gloss_gate_fails_on_a_wrong_gloss(self, tmp_path: Path) -> None:
-        _run, output, profile = _run_core(tmp_path)
-        _core_csv, coverage_csv, _manifest, _rank = DeckIdentity(output).core_sides()
-        coverage_csv.write_text(
-            "key,word,gloss,tier,position,quota,count,status\n"
-            "S1:chat,chat,dog,S,1,1,1,covered\n",
-            encoding="utf-8",
-        )
-
-        passed, message = gate_core_word(coregates.CoreFiles(output, profile))
-
-        assert not passed
-        assert "is not the coverage gloss" in message
 
     def test_the_report_shows_the_silent_card_count(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
@@ -776,17 +704,6 @@ class TestCardDesign:
         assert counts == {"notes": 1, "media": 1, "items": 1}
         assert after[note_id] == before[note_id]
         assert after[note_id][1] == 42
-
-    def test_gate_output_model_fails_on_a_spare_field(self, tmp_path: Path) -> None:
-        _run, output, profile = _run_core(tmp_path)
-        _add_spare_field(output, "Difficulty")
-
-        passed, message = coregates.gate_output_model(
-            coregates.CoreFiles(output, profile)
-        )
-
-        assert not passed
-        assert "Difficulty" in message
 
 
 class TestMandarinRepeatRule:

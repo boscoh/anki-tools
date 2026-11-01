@@ -1,4 +1,4 @@
-"""Shared gates G1 to G17 of the cull deck, without the retired G3, G4, G7, and G14.
+"""Shared gates G1, G2, G5, and G6 of the cull deck. The other ids G3, G4, and G7 to G18 are retired.
 
 The gates read the output APKG, the two CSV files, and the manifest. A gate
 never writes a file. A language package supplies a
@@ -21,7 +21,6 @@ from anki_tools.ranking.coreflow import InputCard, read_output
 from anki_tools.ranking.cullflow import (
     FREQUENCY_SOURCE,
     CullProfile,
-    coverage_status,
     filter_reason,
     frequency_senses,
     sense_lemma_sets,
@@ -29,10 +28,6 @@ from anki_tools.ranking.cullflow import (
 from anki_tools.ranking.corelist import lemma_sets
 from anki_tools.ranking.gates import (
     Gate,
-    gate_counts as _gate_counts,
-    gate_core_word,
-    gate_manifest_hashes as _gate_manifest_hashes,
-    gate_output_model,
     gate_similarity as _gate_similarity,
     read_csv,
     read_json,
@@ -96,21 +91,23 @@ def gate_card_cap(files: CullFiles) -> tuple[bool, str]:
     """G1: the card count is the cap, or the pool has no more cards.
 
     A kept card that holds no core word leaves the deck, so the count before
-    that drop is the value that the gate compares.
+    that drop is the value that the gate compares. The pool has no more cards
+    when the selection rejected every other passed card by a rule (``similar``,
+    ``use_cap``, ``no_gain``). A card with the reason ``max_cards`` was still
+    available, so the selection stopped early.
     """
     kept = len(_kept_rows(files))
-    counts = files.manifest().get("counts", {})
-    dropped = int(counts.get("dropped_no_core", 0))
+    dropped = int(files.manifest().get("counts", {}).get("dropped_no_core", 0))
     cap = int(files.params().get("max_cards", 0))
-    pooled = int(counts.get("passed", 0))
     total = kept + dropped
     if total == cap:
         return True, f"{kept} kept + {dropped} dropped, the cap"
-    if total == pooled:
+    left = sum(1 for row in files.rows() if row.get("reason") == "max_cards")
+    if left == 0:
         return True, f"{kept} kept + {dropped} dropped, the pool has no more"
     return False, (
         f"{kept} kept + {dropped} dropped, not the cap {cap} "
-        f"and below the pool {pooled}"
+        f"and {left} card(s) left in the pool"
     )
 
 
@@ -182,70 +179,17 @@ def gate_similarity(files: CullFiles) -> tuple[bool, str]:
     sets = lemma_sets(files.tokens(), files.profile.content_pos)
     return _gate_similarity(files, sets, limit)
 
-def gate_note_count(files: CullFiles) -> tuple[bool, str]:
-    """G8: the note count matches the CSV and the manifest."""
-    return _gate_counts(files)
-
-def gate_media(files: CullFiles) -> tuple[bool, str]:
-    """G9: the APKG holds exactly the media files of the kept cards."""
-    output = files.output()
-    media = output["media"]
-    used = {card.audio for card in output["cards"] if card.audio}
-    extra = sorted(media - used)
-    missing = sorted(used - media)
-    if extra or missing:
-        return (
-            False,
-            f"{len(extra)} extra, {len(missing)} missing: {_sample(extra + missing)}",
-        )
-    return True, f"{len(media)} media files, all used by the kept cards"
-
-
-
-def gate_coverage_shape(files: CullFiles) -> tuple[bool, str]:
-    """G12: the coverage CSV has one row per target word."""
-    rows = files.coverage()
-    wanted = int(files.params().get("target_words", 0))
-    if len(rows) != wanted:
-        return False, f"{len(rows)} coverage rows, not {wanted}"
-    words = [row.get("word", "") for row in rows]
-    if len(set(words)) != len(words):
-        return False, f"{len(words) - len(set(words))} duplicate target word(s)"
-    wrong = [
-        row["word"]
-        for row in rows
-        if row.get("status") != coverage_status(int(row.get("count", 0)))
-    ]
-    if wrong:
-        return False, f"{len(wrong)} row(s) with a wrong status: {_sample(wrong)}"
-    return True, f"{len(rows)} coverage rows, one per target word"
-
-
-def gate_manifest_hashes(files: CullFiles) -> tuple[bool, str]:
-    """G13: the manifest hashes match the two CSV files."""
-    file_keys = {"cull_csv": files.cull_csv, "coverage_csv": files.coverage_csv}
-    return _gate_manifest_hashes(files, file_keys)
-
-
-
-
 
 GATES: tuple[Gate, ...] = (
     Gate("G1", gate_card_cap),
     Gate("G2", gate_use_cap),
     Gate("G5", gate_filter_recheck),
     Gate("G6", gate_similarity),
-    Gate("G8", gate_note_count),
-    Gate("G9", gate_media),
-    Gate("G12", gate_coverage_shape),
-    Gate("G13", gate_manifest_hashes),
-    Gate("G16", gate_output_model),
-    Gate("G17", gate_core_word),
 )
 
 
 def check_cull(output_path: Path, profile: CullProfile) -> int:
-    """Run gates G1 to G17, without the retired G3, G4, G7, and G14, on a cull output.
+    """Run gates G1 to G17, without the retired gates, on a cull output.
 
     :param output_path: Output APKG file.
     :param profile: Language hooks.

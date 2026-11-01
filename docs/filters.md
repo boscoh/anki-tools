@@ -153,9 +153,8 @@ row by tier and word. A blank `tier` is `F`.
 - `vocab/english_senses.json` gives the sense words of a Swadesh gloss. WordNet
   builds it.
 
-`sense` does not replace the shape rules, `unique`, or the deck gates such as
-`gate_core_word`. Core `K13` (form in the sentence) and core `K16` (count of
-unchecked targets) stay.
+`sense` does not replace the shape rules or `unique`. Core `K13` (form in the
+sentence) stays.
 
 ## 7. History
 
