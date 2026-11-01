@@ -111,13 +111,15 @@ Windows by language, as minimum to maximum:
 | Mandarin  | 4 to 7               | `FALLBACK_MIN_HAN`    |
 | Cantonese | 3 to 12              | `FALLBACK_MIN_HAN`    |
 
-Each language states the window once, in its pack profile. `CullRequest` can
-override it with `min_words` and `max_words`. The cull writes the window that
-it used to the manifest.
+Each language states the window once, in its pack profile. The pack command has
+`--min-words` and `--max-words`. The `fix` select and core modes have the same
+two flags. Each flag replaces one end of the profile window for that run. Both
+modes write the window that they used to the manifest.
 
-The gate rechecks use the same windows: K5 reads `profile.min_units` and
-`max_units`, G5 reads `min_words` and `max_words` from the stored params, and
-`scaffold_problem` reads the scaffold window.
+The gate rechecks read the window of the run: K5 and G5 read `min_units` and
+`max_units`, or `min_words` and `max_words`, from the stored params. K5 falls
+back to the profile for an old manifest. `scaffold_problem` reads the scaffold
+window.
 
 ### 4.2 Known differences between flows
 

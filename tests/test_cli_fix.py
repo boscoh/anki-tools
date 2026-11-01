@@ -65,7 +65,7 @@ def test_select_goes_to_the_cull(
     output = deck_file.parent / "small.apkg"
 
     cli.fr(deck_file, select=True, reserve=False, cards=500)
-    cli.fr(deck_file, select=True, output=output)
+    cli.fr(deck_file, select=True, output=output, min_words=5, max_words=9)
 
     request, run_profile = runs[0]
     assert request.input_path == deck_file
@@ -74,6 +74,8 @@ def test_select_goes_to_the_cull(
     assert request.max_cards == 500
     assert run_profile is french_cull.FRENCH_CULL_PROFILE
     assert runs[1][0].output_path == output
+    assert (request.min_words, request.max_words) == (None, None)
+    assert (runs[1][0].min_words, runs[1][0].max_words) == (5, 9)
 
 
 def test_select_defaults_the_output_name() -> None:
@@ -96,6 +98,11 @@ def test_core_builds_the_request(
     assert request.output_path == Path("apkg/french_core.apkg")
     assert request.core_words == french_core.DEFAULT_CORE_WORDS
     assert request.max_cards == 42
+    assert (request.min_words, request.max_words) == (None, None)
+
+    cli.fr(deck_file, core=True, min_words=5, max_words=9)
+
+    assert (runs[1][0].min_words, runs[1][0].max_words) == (5, 9)
     assert run_profile is french_core.FRENCH_CORE_PROFILE
 
 

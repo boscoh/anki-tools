@@ -409,12 +409,16 @@ def apply(
 fix_app = cyclopts.App(name="fix", help="Fix and optimize Anki decks")
 app.command(fix_app)
 
+_MIN_WORDS_HELP = "Select and core mode: minimum unit count (language default)."
+_MAX_WORDS_HELP = "Select and core mode: maximum unit count (language default)."
 
 _PARAMS_DOC = """
 :param apkg_path: Input .apkg file.
 :param output: Output .apkg file (default: from the language and mode).
 :param core: Build the core deck.
 :param words: Core mode: tier F words after the Swadesh set.
+:param min_words: Select and core mode: minimum unit count of a card.
+:param max_words: Select and core mode: maximum unit count of a card.
 :param check: Run the gates on the output and do not run the mode again.
 """
 
@@ -437,6 +441,12 @@ def _declare_core_fix(
             int | None, Parameter(help="Core mode: card cap (300).")
         ] = None,
         words: int = declaration.words,
+        min_words: Annotated[
+            int | None, Parameter(help=_MIN_WORDS_HELP)
+        ] = None,
+        max_words: Annotated[
+            int | None, Parameter(help=_MAX_WORDS_HELP)
+        ] = None,
         check: bool = False,
     ) -> None:
         fixrun.run_fix(
@@ -446,6 +456,8 @@ def _declare_core_fix(
             core=core,
             cards=cards,
             words=words,
+            min_words=min_words,
+            max_words=max_words,
             check=check,
         )
 
@@ -476,6 +488,12 @@ def _declare_cull_fix(
             bool, Parameter(help="Select mode: add the Swadesh reserve cards.")
         ] = True,
         words: int = declaration.words,
+        min_words: Annotated[
+            int | None, Parameter(help=_MIN_WORDS_HELP)
+        ] = None,
+        max_words: Annotated[
+            int | None, Parameter(help=_MAX_WORDS_HELP)
+        ] = None,
         check: bool = False,
     ) -> None:
         fixrun.run_fix(
@@ -487,6 +505,8 @@ def _declare_cull_fix(
             cards=cards,
             reserve=reserve,
             words=words,
+            min_words=min_words,
+            max_words=max_words,
             check=check,
         )
 

@@ -85,6 +85,8 @@ The shared options:
 | `--core`          | every command        | build the core-word deck                     |
 | `--cards`         | `--select`, `--core` | card cap of the mode (select 1000, core 300) |
 | `--words`         | core mode            | tier F words after the Swadesh set           |
+| `--min-words`     | `--select`, `--core` | minimum unit count of a card                 |
+| `--max-words`     | `--select`, `--core` | maximum unit count of a card                 |
 | `--check`         | `--select`, `--core` | run the gates on the written output          |
 
 The frequency term and the similarity limit are values of the language module,
@@ -345,6 +347,7 @@ The flags:
 
 - `--words` adds content lemmas in blended frequency order.
 - `--cards` sets the card cap.
+- `--min-words` and `--max-words` replace one end of the language window.
 - `--output` sets the path. The default is `apkg/<language>_core.apkg`.
 - `--check` runs the gates K1 to K22 on the built deck.
 
@@ -379,8 +382,8 @@ output file stem. The assigned target is bold in the sentence.
   120 cards.
 - A card must pass the cull filter F1 to F9 and the guards C3 to C5: no name,
   no loan word, and an audio file.
-- The sentence window is 5 to 9 words, set by the `min_units` and `max_units`
-  fields of `CoreRequest`.
+- The sentence window is 4 to 10 words, set by the French language profile.
+  `--min-words` and `--max-words` replace one end for a run.
 - See `specs/core-word-small-deck.md` sections 4 and 5.
 
 Measured result on 2026-10-21: 300 cards for 209 targets (159 Swadesh forms
