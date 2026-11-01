@@ -265,8 +265,7 @@ class TestCandidatePool:
         assert counts["script"] == 11
         assert counts["repeat"] == 10
         assert counts["marks"] == 6
-        assert counts["english_words"] == 5
-        assert counts["unique"] == 4
+        assert counts["unique"] == 5
         assert report["pool_candidates"] == len(pool)
         assert report["core_sentences"] == len(pool)
 

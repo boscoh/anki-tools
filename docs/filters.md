@@ -31,15 +31,14 @@ cap, and they have no concept quota.
 | `script`         | the language alphabet test         | the same                             | the same                                                                 |
 | `repeat`         | no repeated pattern                | the same                             | the same                                                                 |
 | `marks`          | final, quote, and internal marks   | the same                             | the same                                                                 |
-| `english_words`  | English words inside the window    | the same                             | the same                                                                 |
 | `unique`         | dedupe key is new                  | the same                             | the same                                                                 |
 | `sense`          | English gloss holds the sense      | the same, per target                 | the same, per target                                                     |
 | C3 to C5         | -                                  | -                                    | a name test, a loan word test, and the media map                         |
 
-The pack tests 9 ids, the cull 8, and the core 8 plus C3 to C5. The profile
+The pack tests 8 ids, the cull 7, and the core 7 plus C3 to C5. The profile
 of the language gives the `repeat` test and the `unique` key to all three flows.
-It also gives the `english_words` window, 2 to 12 words by default, so the three
-flows use one window (`DEFAULT_ENGLISH_BOUNDS`, `english_bounds`).
+The language states its own length rule: `unit_count` and the window
+(`min_units`, `max_units`). No flow tests the English length.
 The cull and the core apply `sense` to a card and target pair, not to a whole card.
 Section 5, L9, states the meaning of `sense` and the status of the code.
 
@@ -47,17 +46,15 @@ Section 5, L9, states the meaning of `sense` and the status of the code.
 
 The pack runs two phases. `SHAPE_GUARDS` holds `length_window` to
 `marks` and runs first, because those tests are cheap. The measure step
-reads the tokens and the facts. Then `FACT_GUARDS` holds `english_words` to `sense`.
+reads the tokens and the facts. Then `FACT_GUARDS` holds `unique` and `sense`.
 `FILTER_KEYS` is the report order. A
 sentence that passes no guard becomes a candidate for the lowest-index word it
 covers.
 
 The cull runs one list in `filter_reason`, in the same order as the pack:
-`length_window`, `digit_marks`, `script`, `repeat`, the mark rules,
-`english_words`, then `unique`. The shape guard `check_sentence_shape` gives all
-rules except `english_words` and `unique`. `LENGTH_RULES`, `TEXT_RULES`, and
-`MARK_RULES` hold their ids. The window of `english_words` is
-`profile.english_bounds`, the same window as the pack.
+`length_window`, `digit_marks`, `script`, `repeat`, the mark rules, then `unique`.
+The shape guard `check_sentence_shape` gives all rules except `unique`.
+`LENGTH_RULES`, `TEXT_RULES`, and `MARK_RULES` hold their ids.
 
 The core runs `filter_cards` with `filter_reason`, the function of the cull, then
 C3 to C5 in `filter_core_cards`.
@@ -127,7 +124,7 @@ These differences are deliberate, because the jobs differ. A reader must not
 compare the reject counts of two flows directly.
 
 - Frames: a pack frame sentence runs the shape guards and a target-form test
-  only. It skips `english_words`, `unique`, and the scaffold retry. This is
+  only. It skips `unique` and the scaffold retry. This is
   deliberate: a frame sentence is template text, not a Tatoeba pair.
 
 The cull and core reports once left out `repeat`. Both report lists now hold it.
@@ -203,7 +200,7 @@ are tokenizer lemmas, and its languages have no compounds.
 | `gate_unchecked_sense` (K16)                             | a limit on the `sense` rule in every flow |
 | `gate_target_in_sentence` (K13)                          | test 1 of the rule                        |
 
-`sense` does not replace `english_link`, `english_words`, the shape rules,
+`sense` does not replace `english_link`, the shape rules,
 `unique`, C3 to C5, or the deck gates such as `gate_core_word`.
 
 S3 is done. `sense_failure(english, row, gloss)` in

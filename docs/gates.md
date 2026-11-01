@@ -55,7 +55,6 @@ The reverse direction reads each check as a row and each flow as a column.
 | filter | `script`                  | yes                              | yes                               | yes                               | -               |
 | filter | `repeat`                  | yes                              | yes                               | yes                               | -               |
 | filter | `marks`                   | yes                              | yes                               | yes                               | -               |
-| filter | `english_words`           | yes                              | yes                               | yes                               | -               |
 | filter | `unique`                  | yes                              | yes                               | yes                               | -               |
 | filter | `sense`                   | yes                              | -                                 | -                                 | -               |
 | filter | C3 to C5                  | -                                | -                                 | yes                               | -               |

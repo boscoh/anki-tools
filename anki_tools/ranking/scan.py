@@ -51,7 +51,6 @@ class CoreProfile:
     :param dedupe_key: Key of the ``unique`` rule.
     :param unit_count: Unit count of a sentence, the same count as the sentence
         pack.
-    :param english_bounds: English word-count window of the ``english_words`` rule.
     :param default_options: Selection settings of the core cover.
     :param frequency_source: Label of the frequency source for the manifest.
     :param lemma_overrides: Lemma repair map of the lemmatizer artefacts,
@@ -93,7 +92,6 @@ class CoreProfile:
     is_repeated: Callable[[str], bool]
     dedupe_key: Callable[[str], str]
     unit_count: Callable[[str], int]
-    english_bounds: tuple[int, int]
     default_options: Any
     frequency_source: str
     lemma_overrides: Mapping[str, str] = field(default_factory=dict)

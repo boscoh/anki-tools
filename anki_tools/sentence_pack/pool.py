@@ -40,7 +40,6 @@ FILTER_KEYS = [
     "script",
     "repeat",
     "marks",
-    "english_words",
     "unique",
     "sense",
 ]
@@ -51,7 +50,6 @@ FILTER_NAMES = {
     "script": "script",
     "repeat": "no repeated pattern",
     "marks": "final mark, no quotation mark, at most one internal mark",
-    "english_words": "english word count",
     "unique": "unique text",
     "sense": "english sense",
 }
@@ -225,25 +223,17 @@ def shape_failure(
 class FactInput:
     """Measured values of the fact guards.
 
-    :param english_words: Word count of the English translation.
-    :param english_bounds: Accepted English word-count window.
     :param duplicate: True when the dedupe key is already kept.
     :param unknown_words: Token count outside the known set.
     :param hits: Forms that the form filter keeps.
     :param sense_hits: Forms whose paired English holds the card sense.
     """
 
-    english_words: int
-    english_bounds: tuple[int, int]
     duplicate: bool
     unknown_words: int
     hits: tuple[str, ...]
     sense_hits: tuple[str, ...]
 
-
-def _passes_english(item: FactInput) -> bool:
-    low, high = item.english_bounds
-    return low <= item.english_words <= high
 
 
 def _passes_unique(item: FactInput) -> bool:
@@ -255,7 +245,6 @@ def _passes_sense(item: FactInput) -> bool:
 
 
 FACT_GUARDS: tuple[tuple[str, Callable[[FactInput], bool]], ...] = (
-    ("english_words", _passes_english),
     ("unique", _passes_unique),
     ("sense", _passes_sense),
 )
@@ -515,7 +504,6 @@ def build_candidate_pool(
             _warm(profile, warm_buffer)
             warm_buffer.clear()
         unknown_words = profile.count_unknown(sentence, known_words)
-        english_words = len(english_text.split())
         dedupe = profile.dedupe_key(sentence)
 
         hits = tuple(sorted(profile.hits(sentence, form_set)))
@@ -531,8 +519,6 @@ def build_candidate_pool(
         hits = tuple(form for form in hits if failures[form] != FALSE_FRIEND)
 
         measured = FactInput(
-            english_words=english_words,
-            english_bounds=profile.english_bounds(),
             duplicate=dedupe in seen,
             unknown_words=unknown_words,
             hits=hits,
@@ -611,8 +597,6 @@ def build_candidate_pool(
             continue
         dedupe = profile.dedupe_key(sentence)
         measured = FactInput(
-            english_words=len(frame_english.split()),
-            english_bounds=profile.english_bounds(),
             duplicate=dedupe in seen,
             unknown_words=profile.count_unknown(sentence, known_words),
             hits=hits,

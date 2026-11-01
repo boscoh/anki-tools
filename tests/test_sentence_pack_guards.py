@@ -71,8 +71,6 @@ def test_shape_failure_applies_only_the_requested_keys() -> None:
 
 def test_fact_failure_can_skip_the_sense_guard() -> None:
     measured = pool.FactInput(
-        english_words=5,
-        english_bounds=(2, 12),
         duplicate=False,
         unknown_words=0,
         hits=("火",),

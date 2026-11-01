@@ -2,9 +2,8 @@
 
 The cull and the core read their length window, text rules, and mark rules from
 the sentence shape guard with the values of the language profile. This module
-holds :func:`filter_reason`, which runs the shape guard first, as the sentence
-pack does, and then the English window ``english_words`` of the language
-profile. :func:`filter_cards` adds the ``unique`` dedupe.
+holds :func:`filter_reason`, which runs the shape guard as the sentence pack does.
+:func:`filter_cards` adds the ``unique`` dedupe.
 """
 
 from __future__ import annotations
@@ -65,9 +64,6 @@ class ShapeProfile(SentenceShape, Protocol):
     @property
     def dedupe_key(self) -> Callable[[str], str]: ...
 
-    @property
-    def english_bounds(self) -> tuple[int, int]: ...
-
 
 def filter_reason(
     card: Any,
@@ -77,38 +73,24 @@ def filter_reason(
 ) -> str:
     """Give the first failed filter rule of one card of the cull or the core.
 
-    The shape guard runs first, as in the sentence pack. The length window, the
-    text rules, and the mark rules come from the sentence shape guard, so the
-    unit count, the marks, and the alphabet test are those of the language
-    profile. The English window of the language profile runs last.
+    The length window, the text rules, and the mark rules come from the sentence
+    shape guard, so the unit count, the marks, and the alphabet test are those of
+    the language profile.
 
     :param card: Input card.
     :param min_words: Minimum unit count of a card.
     :param max_words: Maximum unit count of a card.
-    :param profile: Shape values and English window of the language.
-    :returns: The rule id from ``length_window`` to ``english_words``, or the
-        empty string on a pass.
+    :param profile: Shape values of the language.
+    :returns: The first failed rule id, or the empty string on a pass.
     """
     # The rank flows pass only the length, text, and mark keys.
-    reason = check_sentence_shape(
-        card.sentence,
-        profile,
-        min_words,
-        max_words,
-        keys=LENGTH_RULES + TEXT_RULES + MARK_RULES,
+    return (
+        check_sentence_shape(
+            card.sentence,
+            profile,
+            min_words,
+            max_words,
+            keys=LENGTH_RULES + TEXT_RULES + MARK_RULES,
+        )
+        or ""
     )
-    return reason or english_rule(card, profile.english_bounds)
-
-
-def english_rule(card: Any, bounds: tuple[int, int]) -> str:
-    """Give filter ``english_words``: the English word window.
-
-    :param card: Input card.
-    :param bounds: Minimum and maximum English word count, from the language
-        profile.
-    :returns: ``english_words``, or the empty string on a pass.
-    """
-    low, high = bounds
-    if low <= len(card.english.split()) <= high:
-        return ""
-    return "english_words"

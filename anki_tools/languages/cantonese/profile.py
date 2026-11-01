@@ -700,7 +700,7 @@ def form_positions(table: Sequence[WordForm]) -> dict[str, tuple[int, int]]:
 
 
 def known_words(word_table: Sequence[WordForm]) -> set[str]:
-    """Build the known word set of filter english_words.
+    """Build the known word set of the unknown-word count.
 
     The set holds the Swadesh forms and the most frequent ``wordfreq`` Chinese
     words in Traditional characters.

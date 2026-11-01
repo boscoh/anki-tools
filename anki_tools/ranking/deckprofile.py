@@ -19,7 +19,6 @@ from typing import Any, Callable, Iterable
 
 from anki_tools.ranking.cullflow import CullProfile
 from anki_tools.ranking.scan import CoreProfile
-from anki_tools.sentence_pack.profile import DEFAULT_ENGLISH_BOUNDS
 
 
 def _tokenize_deck(tokenize_texts: Callable[[Iterable[str]], Any]) -> Callable[[Any], Any]:
@@ -61,8 +60,6 @@ class LanguageDeckProfile:
     :param min_units: Minimum unit count of the window, the same window as the
         sentence pack.
     :param max_units: Maximum unit count of the window.
-    :param english_bounds: English word-count window of the ``english_words``
-        rule, the same window as the sentence pack.
     :param highlight: Bold hook, or None when the language does not bold.
     :param romanization_source: Input field of the romanization line, or None
         when the language has none.
@@ -86,7 +83,6 @@ class LanguageDeckProfile:
     unit_count: Callable[[str], int]
     min_units: int
     max_units: int
-    english_bounds: tuple[int, int] = DEFAULT_ENGLISH_BOUNDS
     highlight: Callable[[str, str], str] | None = None
     romanization_source: str | None = None
 
@@ -115,7 +111,6 @@ class LanguageDeckProfile:
             "unit_count": self.unit_count,
             "min_units": self.min_units,
             "max_units": self.max_units,
-            "english_bounds": self.english_bounds,
             "highlight": self.highlight,
             "romanization_source": self.romanization_source,
         }
@@ -147,7 +142,6 @@ class LanguageDeckProfile:
             "unit_count": self.unit_count,
             "min_units": self.min_units,
             "max_units": self.max_units,
-            "english_bounds": self.english_bounds,
             "highlight": self.highlight,
             "romanization_source": self.romanization_source,
         }

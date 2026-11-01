@@ -73,7 +73,6 @@ COVERAGE_COLUMNS: tuple[str, ...] = (
     "status",
 )
 FILTER_KEYS = (
-    "english_words",
     "length_window",
     "digit_marks",
     "script",

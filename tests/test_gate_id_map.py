@@ -10,12 +10,10 @@ PACK_KEYS = (
     "script",
     "repeat",
     "marks",
-    "english_words",
     "unique",
     "sense",
 )
 CULL_KEYS = (
-    "english_words",
     "length_window",
     "digit_marks",
     "script",

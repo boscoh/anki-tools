@@ -321,7 +321,6 @@ def test_pool_uses_the_french_filters(tmp_path: Path) -> None:
     assert counts["length_window"] == 6
     assert counts["script"] == 5
     assert counts["marks"] == 3
-    assert counts["english_words"] == 3
     assert counts["unique"] == 3
     assert report["forms_with_core_candidate"] == 2
     assert report["pool_candidates"] == 3

@@ -15,8 +15,6 @@ from functools import partial
 from pathlib import Path
 from typing import Collection
 
-import pytest
-
 from anki_tools.languages.spanish import core as spanish_core
 from anki_tools.ranking import cardfilter, coreflow
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
@@ -332,12 +330,6 @@ class TestCardFilter:
 
         assert passed == [0]
         assert reasons == [""]
-
-    def test_f1_rejects_a_short_english_line(self) -> None:
-        passed, reasons = _filter_cards([_card(english="Hi.")])
-
-        assert passed == []
-        assert reasons[0] == "english_words"
 
     def test_f2_rejects_a_card_outside_the_window(self) -> None:
         passed, reasons = _filter_cards([_card("El perro.")])

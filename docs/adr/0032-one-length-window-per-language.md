@@ -6,7 +6,7 @@ The pack, the cull, and the core each had their own length window. The pack read
 counted units in three ways, and the `english_words` gate had one window for the pack
 and another for the cull and the core.
 
-Status: accepted.
+Status: accepted. ADR 0034 supersedes the English window (`english_bounds`) part.
 
 ## Decision
 

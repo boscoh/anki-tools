@@ -39,7 +39,6 @@ def test_the_two_mode_views_agree_on_the_language_facts(core_view, cull_view) ->
         cull_view.min_units,
         cull_view.max_units,
     )
-    assert core_view.english_bounds == cull_view.english_bounds
 
 
 def test_the_views_use_the_pack_window_and_unit_count() -> None:

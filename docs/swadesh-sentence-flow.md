@@ -104,7 +104,6 @@ The pool measures the sentence only after the shape guards pass.
 | Value        | Meaning                                                            |
 | ------------ | ------------------------------------------------------------------ |
 | `unknown`    | the token count outside the known word set                         |
-| `english`    | the word count of the paired English text                          |
 | `hits`       | the forms that appear one time, after the form false-friend filter |
 | `sense_hits` | the hits whose English text holds the card sense                   |
 | `dedupe`     | the exact dedupe key of the prepared text                          |

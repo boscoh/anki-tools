@@ -12,9 +12,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Collection, Iterable, Protocol, Sequence
 
-#: Accepted English word-count window of filter ``english_words``, for every language.
-DEFAULT_ENGLISH_BOUNDS = (2, 12)
-
 #: Swadesh concept indices of the nouns, the rows where gate G20 reports a gender.
 NOUN_INDICES = frozenset(
     {
@@ -207,13 +204,6 @@ class LanguageProfile:
         :returns: Word or character count of the sentence.
         """
         return self.candidate_length(candidate)
-
-    def english_bounds(self) -> tuple[int, int]:
-        """Give the accepted English word-count window of filter english_words.
-
-        :returns: Minimum and maximum English word count.
-        """
-        return DEFAULT_ENGLISH_BOUNDS
 
 
 def excluded_forms(
