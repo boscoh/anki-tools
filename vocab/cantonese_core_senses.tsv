@@ -1,4 +1,4 @@
-word	senses	false_friends	compounds	tier
+word	senses	false_friends	tier
 我	i,me,my,mine,myself	
 你	you,your,yours,yourself	
 佢	he,him,his,she,her,hers,it,its,they,them,their	
@@ -210,16 +210,13 @@ word	senses	false_friends	compounds	tier
 口	mouth,mouths,lips,lip,opening	
 心口	breast,breasts,chest,heart,bust	
 剪	cut,cuts,cutting,scissors,trim,clip	
-切			趕得切,一切	S
-聽			聽日	S
-數	count,counts,counted,counting	math,maths,mathematics,arithmetic,number,numbers	着數,數學,彩數,多數	S
-燒	burn,burns,burned,burnt,burning,fire	fever,fevers,temperature,temperatures	發燒	S
-揸	hold,holds,held,holding,grip,grips,grasp,grasps,clutch,clutches	drive,drives,drove,driving,driver,fly,flies,flew,flying,pilot,plane,planes	揸車	S
-蟲			昆蟲	S
-一	a,an			S
-肚	stomachache			S
-腳	leg,legs			S
-人	person,people,anybody,anyone,nobody,everybody,everyone,somebody,someone			S
-瞓	sleep,sleeps,slept,sleeping,asleep,nap			S
-飛	flight			S
-玩	fun			S
+數	count,counts,counted,counting	math,maths,mathematics,arithmetic,number,numbers	S
+燒	burn,burns,burned,burnt,burning,fire	fever,fevers,temperature,temperatures	S
+揸	hold,holds,held,holding,grip,grips,grasp,grasps,clutch,clutches	drive,drives,drove,driving,driver,fly,flies,flew,flying,pilot,plane,planes	S
+一	a,an		S
+肚	stomachache		S
+腳	leg,legs		S
+人	person,people,anybody,anyone,nobody,everybody,everyone,somebody,someone		S
+瞓	sleep,sleeps,slept,sleeping,asleep,nap		S
+飛	flight		S
+玩	fun		S

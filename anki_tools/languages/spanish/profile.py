@@ -48,11 +48,6 @@ from anki_tools.sentence_pack.audit import (
     run_pack_audit,
     sample,
 )
-from anki_tools.sentence_pack.guards import (
-    compound_spans,
-    form_compounds,
-    inside_spans,
-)
 from anki_tools.sentence_pack.pack import (
     ATTRIBUTION_PATH,
     attribution_lines,
@@ -491,7 +486,6 @@ def hits(sentence: str, forms: Collection[str]) -> dict[str, int]:
     """
     tokens = word_tokens(sentence)
     index = key_index(frozenset(forms))
-    lowered = sentence.lower()
     counts: dict[str, int] = {}
     for token in tokens:
         matched: set[str] = set()
@@ -503,9 +497,7 @@ def hits(sentence: str, forms: Collection[str]) -> dict[str, int]:
                 or surface_key(form) not in SURFACE_ONLY
             )
         for form in matched:
-            blocked = compound_spans(lowered, form_compounds(SENSE_PATH, form))
-            if not inside_spans(token.idx, blocked):
-                counts[form] = counts.get(form, 0) + 1
+            counts[form] = counts.get(form, 0) + 1
     found = {form: count for form, count in counts.items() if count == 1}
     for form in forms:
         if form in found or len(form_parts(form)) <= 1:

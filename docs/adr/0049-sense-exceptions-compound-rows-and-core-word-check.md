@@ -1,13 +1,16 @@
 # Add two sense exceptions, two compound rows, and a Core word check in K13
 
-Status: accepted.
+Status: accepted. The `compounds` part (step 2, its evidence, and the
+consequence about `compounds` entries) is superseded by ADR 0053, which removed
+the column. The rows no longer exist.
 
 ## Decision
 
 1. `EXTRA_WORDS` in `scripts/build_english_senses.py` gets `thin`: `slim`,
    `slimmer`, `slimmest`, and `flow`: `run`, `runs`, `ran`, `running`.
    `vocab/english_senses.json` is rebuilt with the builder.
-2. The `compounds` column gets two tier S rows, with no code change:
+2. The `compounds` column got two tier S rows, with no code change (ADR 0053
+   removed them):
    Cantonese `蟲` blocks `昆蟲`, and Mandarin `得到` blocks `听得到`. The
    tokenizer and `hits` do not change.
 3. Core gate `K13` (`gate_target_in_sentence`) also tests the word in the `Core`
@@ -78,8 +81,9 @@ G6. The core `coverage_floor` values do not change. The share of Cantonese is
 
 - A word that a real card needs, and that the first synset does not hold, goes
   in `EXTRA_WORDS`. The check is a rebuild and a diff of the coverage CSV.
-- A new false match in Mandarin or Cantonese needs one `compounds` entry. A
-  false match in French or Spanish needs a code change.
+- (Superseded by ADR 0053.) A new false match in Mandarin or Cantonese needed
+  one `compounds` entry. A false match in French or Spanish needed a code
+  change.
 - K13 now fails when the `Core` field and the sentence disagree.
 
 ## Amendment: a tier S `senses` word passes the form (anki-jkeq)

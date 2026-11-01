@@ -48,13 +48,11 @@ class SenseRow:
 
     :param senses: English words that show the sense.
     :param false_friends: English words that show another sense.
-    :param compounds: Sentence strings in which the word takes another sense.
     :param first: First sense word of the file, used as the card gloss.
     """
 
     senses: frozenset[str] = frozenset()
     false_friends: frozenset[str] = frozenset()
-    compounds: tuple[str, ...] = ()
     first: str = ""
 
 
@@ -126,9 +124,8 @@ def _split(text: str) -> list[str]:
 def read_senses(path: Path) -> dict[tuple[str, str], SenseRow]:
     """Read the sense file of a language.
 
-    The columns are ``word``, ``senses``, ``false_friends``, ``compounds``, and
-    ``tier``. The word lists hold comma-separated values. A blank ``tier`` is
-    ``F``, a frequency lemma. ``S`` is a Swadesh form. A missing file gives no
+    The columns are ``word``, ``senses``, ``false_friends``, and ``tier``. The
+    word lists hold comma-separated values. A blank ``tier`` is ``F``, a frequency lemma. ``S`` is a Swadesh form. A missing file gives no
     rows. The result is cached, so the caller must not change it.
 
     :param path: TSV file.
@@ -150,7 +147,6 @@ def read_senses(path: Path) -> dict[tuple[str, str], SenseRow]:
                 false_friends=frozenset(
                     _split((row.get("false_friends") or "").casefold())
                 ),
-                compounds=tuple(_split(row.get("compounds") or "")),
                 first=senses[0] if senses else "",
             )
     return table

@@ -46,13 +46,14 @@ Decisions:
   Mandarin tier S `hits` match the character stream on purpose, so 水 hits
   inside 喝水.
 - Cantonese: the `elif` branch of `form_offsets` is deliberate. The sense table
-  once credited 蟲 inside 昆蟲; the tier S `compounds` row for 蟲 now blocks
-  that credit (the dead tier F row listing `insect` was deleted). A strict
+  once credited 蟲 inside 昆蟲; a tier S `compounds` row for 蟲 then blocked
+  that credit (the dead tier F row listing `insect` was deleted). ADR 0053
+  removed the row; the sense test rejects the card instead. A strict
   whole-token rule was tried and reverted. The Cantonese tokenizer gives tokens
   such as 蟲好 and 好忙, so a whole-token rule rejects true hits. It changed the
   core deck from 116 targets and 109 cards to 90 targets and 89 cards, and it
-  broke the preview card for 忙. A fix needs a better tokenizer, or a
-  `compounds` entry in `vocab/cantonese_core_senses.tsv` per false compound.
+  broke the preview card for 忙. A fix needs a better tokenizer, or
+  an English-side sense entry (ADR 0053 removed the `compounds` column).
 - French: not changed. The lemma key is the cause.
 
 ## Reason

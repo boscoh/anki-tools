@@ -40,9 +40,6 @@ from anki_tools.sentence_pack.pack import (
     write_attribution_section,
 )
 from anki_tools.sentence_pack.guards import (
-    compound_spans,
-    form_compounds,
-    inside_spans,
     occurrences,
 )
 from anki_tools.sentence_pack.profile import LanguageProfile, register
@@ -533,8 +530,7 @@ def form_offsets(sentence: str, form: str) -> list[int]:
     Cantonese 我 and 我哋 are different Swadesh concepts. A form matches when
     it holds whole tokens. An occurrence inside a longer word counts only when
     that word is not itself a target form, so 食 hits inside 食飯 but 我 does
-    not hit inside 我哋. An occurrence inside a false-friend compound never
-    counts, so 聽 does not hit inside 聽日.
+    not hit inside 我哋.
 
     :param sentence: Traditional Cantonese sentence.
     :param form: Word-table form.
@@ -546,11 +542,8 @@ def form_offsets(sentence: str, form: str) -> list[int]:
     starts = {start for _, start, _ in spans}
     ends = {end for _, _, end in spans}
     targets = table_forms()
-    blocked = compound_spans(sentence, form_compounds(SENSE_PATH, form))
     found: list[int] = []
     for position in occurrences(sentence, form):
-        if inside_spans(position, blocked):
-            continue
         if position in starts and position + len(form) in ends:
             found.append(position)
         elif _token_at(spans, position) not in targets:

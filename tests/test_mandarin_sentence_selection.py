@@ -129,13 +129,10 @@ def test_unknown_tokens_come_from_the_word_table(pool_table: list[WordForm]) -> 
     [
         pytest.param("我要喝水。", "水", 1, id="once"),
         pytest.param("我要喝水，水很凉。", "水", 2, id="twice"),
-        pytest.param("你看新闻吗？", "闻", 0, id="inside a compound"),
         pytest.param("我闻花香。", "闻", 1, id="the verb"),
-        pytest.param("一切都好。", "切", 0, id="compound with yi"),
-        pytest.param("他的数学很好。", "数", 0, id="compound with xue"),
     ],
 )
-def test_a_form_inside_a_compound_does_not_hit(
+def test_count_form_occurrences(
     sentence: str, form: str, expected: int
 ) -> None:
     assert count_form_occurrences(sentence, form) == expected
@@ -144,7 +141,6 @@ def test_a_form_inside_a_compound_does_not_hit(
 def test_a_target_must_appear_once() -> None:
     assert single_hits("我要喝水。", ["水", "火"]) == {"水": 1}
     assert single_hits("我要喝水，水很凉。", ["水"]) == {}
-    assert single_hits("一切都好。", ["切", "好"]) == {"好": 1}
 
 
 @pytest.mark.parametrize(

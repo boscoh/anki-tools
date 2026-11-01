@@ -59,10 +59,7 @@ FUNCTION_WORDS: dict[str, tuple[str, ...]] = {
         "many", "much", "lots", "lot", "plenty", "several", "numerous",
         "more", "most",
     ),
-    "some": (
-        "some", "any", "several", "certain", "someone", "somebody",
-        "something",
-    ),
+    "some": ("some", "any", "several", "certain"),
     "few": ("few", "little", "less", "least", "hardly", "scarcely"),
     "other": ("other", "another", "others", "else", "different"),
     "one": ("one", "1", "single"),

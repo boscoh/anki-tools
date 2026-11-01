@@ -1,5 +1,5 @@
 {
-  "build_date": "2026-11-01T07:53:18+00:00",
+  "build_date": "2026-11-01T09:26:03+00:00",
   "source": {
     "input": "apkg/LTL Cantonese Deck Level 1 - Short.apkg",
     "deck": "Cantonese Core",
@@ -31,32 +31,32 @@
   },
   "counts": {
     "cards": 115,
-    "targets": 115,
-    "absent": 97,
-    "absent_sense": 21,
+    "targets": 117,
+    "absent": 95,
+    "absent_sense": 23,
     "unchecked": 0,
     "unranked": 0,
     "covered1": 94,
-    "covered2": 53,
-    "full": 151,
+    "covered2": 52,
+    "full": 148,
     "outside": 149,
     "outside_rare": 11,
     "tail_words": 0,
-    "sense_rows": 115,
+    "sense_rows": 117,
     "dropped_no_core": 0,
     "bolded": 115,
     "unbolded": 0,
     "rows": 999,
-    "sense_failures": 479
+    "sense_failures": 490
   },
   "frequency": {
     "path": "Cifu and Apple Daily blend",
     "spoken_weight": 0.5
   },
   "files": {
-    "core_csv": "sha256:531f76fd959e8d9aabfc93d30891090b43e61b798d27d149d6719e94ec7e17fc",
-    "coverage_csv": "sha256:23bacf6fa8af66b934c0bef0e6e4c44fc9932dd5d0464ae5afc266c22bb53d15",
+    "core_csv": "sha256:dd736ff0df846515f062db2b2a7fa689395b222bffd2351199031e6f6db1bb02",
+    "coverage_csv": "sha256:42e92b6cd52c8f2510bfa373e260f170fce239d316a578d380f6e55dbb988594",
     "input_apkg": "sha256:7f4c1d34f8b4423252eabbe475520923bfd0da7659be7bd078cf8d125bf2be00"
   },
-  "kept_order": "sha256:dae83b92185b41e07b94d9b955f8fef346b35ef49cd77d3e06fda5f20dc89a0d"
+  "kept_order": "sha256:a484ea8f74e0f1857065963ed1d5d5cabec817236b891093f43ffe249804c311"
 }

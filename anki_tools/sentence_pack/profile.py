@@ -125,7 +125,7 @@ class LanguageProfile:
         word table and the card target set.
     :param finalize_candidate: Hook that fills the language-specific card fields.
     :param sense_path: TSV file of the sense rows: the English sense words, the
-        false-friend words, and the compounds of each target.
+        and false-friend words of each target.
     :param highlight: Hook that marks the matched target tokens of a card
         sentence, None to wrap the first target substring.
     :param warm_tokens: Hook that tokenizes a whole sentence pool in one pass, so

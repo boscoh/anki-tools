@@ -59,8 +59,6 @@ K3  filter
         v
     target hits (`core_hits`)
         |
-        +--> compounds: Mandarin and Cantonese, a compound hides a hit
-        |
         +--> sense: sense_failure per target; a failed target leaves the card
         |
         v

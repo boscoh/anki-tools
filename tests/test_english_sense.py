@@ -36,6 +36,7 @@ def test_contractions_expand_to_words() -> None:
 HOLD = SenseRow(senses=frozenset({"hold"}), false_friends=frozenset({"drive"}))
 TIME = SenseRow(senses=frozenset({"time"}), false_friends=frozenset({"weather"}))
 BELLY = SenseRow(senses=frozenset({"stomachache"}))
+GET = sense_row(Path("vocab/mandarin_core_senses.tsv"), "F", "\u5f97\u5230")
 
 
 @pytest.mark.parametrize(
@@ -70,6 +71,11 @@ BELLY = SenseRow(senses=frozenset({"stomachache"}))
         ("What time is it?", TIME, None, None),
         ("Time and weather.", TIME, None, "false_friend"),
         ("What day is it?", TIME, None, "sense"),
+        ("He hates insects.", None, "worm", "sense"),
+        ("That is something you should not have said.", None, "some", "sense"),
+        ("Some people came.", None, "some", None),
+        ("Can you hear me?", GET, None, "sense"),
+        ("She got a gift.", GET, None, None),
         ("anything", SenseRow(), None, None),
         ("anything", None, None, None),
     ],
@@ -85,22 +91,14 @@ def test_read_senses_keeps_a_tier_s_row_apart_from_a_tier_f_row(
 ) -> None:
     path = tmp_path / "senses.tsv"
     path.write_text(
-        "word\tsenses\tfalse_friends\tcompounds\ttier\n"
-        "Voler\tFly\tSteal\t\tS\n"
-        "voler\tsteal,rob\t\t\n"
-        "\u6570\t\t\t\u6570\u5b66,\u4eba\u6570\tS\n",
+        "word\tsenses\tfalse_friends\ttier\n"
+        "Voler\tFly\tSteal\tS\n"
+        "voler\tsteal,rob\t\t\n",
         encoding="utf-8",
     )
     assert read_senses(path) == {
-        ("S", "voler"): SenseRow(
-            frozenset({"fly"}), frozenset({"steal"}), (), "fly"
-        ),
-        ("F", "voler"): SenseRow(
-            frozenset({"steal", "rob"}), frozenset(), (), "steal"
-        ),
-        ("S", "\u6570"): SenseRow(
-            frozenset(), frozenset(), ("\u6570\u5b66", "\u4eba\u6570"), ""
-        ),
+        ("S", "voler"): SenseRow(frozenset({"fly"}), frozenset({"steal"}), "fly"),
+        ("F", "voler"): SenseRow(frozenset({"steal", "rob"}), frozenset(), "steal"),
     }
     assert sense_row(path, "S", "VOLER") == read_senses(path)["S", "voler"]
     assert sense_row(path, "F", "absent") is None

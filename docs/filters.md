@@ -130,11 +130,10 @@ Do not compare the reject counts of two flows directly.
 ## 6. The sense rule
 
 `sense` is the one rule for the meaning of a target word. A card shows a target
-when three tests hold:
+when two tests hold:
 
 1. The form or the lemma is in the sentence.
-2. The form is not inside a compound that gives a different meaning.
-3. The English holds a sense word of the target and no false-friend word. A
+2. The English holds a sense word of the target and no false-friend word. A
    tier S form also passes on a `senses` word alone, or on its Swadesh gloss when
    it holds no false-friend word (ADR 0049).
 
@@ -155,16 +154,10 @@ row by tier and word. A blank `tier` is `F`.
 | --------------- | ---------------------------------------- | -------- |
 | `senses`        | English words that show the sense        | English  |
 | `false_friends` | English words that show another sense    | English  |
-| `compounds`     | sentence strings that give another sense | sentence |
 | `tier`          | `S` or `F`                               | -        |
 
-- The compound test stays inside the occurrence count (`form_occurrences`,
-  `single_hits`). The "exactly one hit" rule counts only the occurrences outside
-  a compound, so `sense` calls that same code.
-- The cull does not use `compounds`. Its targets are tokenizer lemmas, and its
-  languages have no compounds.
-- A compound-only sentence has no hit. It is not a candidate, so the pack counts
-  no failure for it.
+- A compound with another sense, such as 昆蟲 for 蟲, is a fault of the English
+  side. The sense test rejects it through the sense words (ADR 0053).
 - Greek has no core flow. `vocab/greek_core_senses.tsv` holds tier S rows only.
 - `vocab/english_senses.json` gives the sense words of a Swadesh gloss. WordNet
   builds it from the first synset of each gloss word (ADR 0048).
@@ -213,7 +206,7 @@ L9 removed these parts:
 | Part                                                     | Replacement                          |
 | -------------------------------------------------------- | ------------------------------------ |
 | `sense_filter` hook, `make_sense_filter`, `SENSE_CHECKS` | the `false_friends` column           |
-| `false_friend_spans` hook, `FALSE_FRIENDS`               | the `compounds` column               |
+| `false_friend_spans` hook, `FALSE_FRIENDS`               | the sense test (ADR 0053)            |
 | `holds_sense`, `holds_tier_s_sense`, `sense_match`       | `sense_failure`                      |
 | `gate_no_sense_mismatch`, `gate_no_false_friend`         | the `sense` filter (ADR 0039)        |
 | `gate_sense` (cull G18, core K22)                        | the `sense` filter (ADR 0039)        |

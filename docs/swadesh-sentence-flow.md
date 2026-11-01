@@ -188,32 +188,13 @@ needs a card. Thus one sentence never becomes two cards.
 
 ## 5. Language guards
 
-Two form-level guards add language data. The shared scan code is in
+The form-level guards add language data. The shared scan code is in
 `anki_tools/sentence_pack/guards.py`. The data is the sense file of the
 language, `vocab/<language>_core_senses.tsv`. A row with `tier` `S` holds a
 Swadesh form, and a row with a blank tier holds a tier F lemma of the core and
 the cull. `read_senses` keys a row by tier and word, so the two never collide.
 
-### 5.1 False-friend compound
-
-The `compounds` column of a tier S row lists the compounds that use the form in
-a different sense. An occurrence inside one of those compounds does not count as
-a hit.
-
-| Pack      | Example            | Result                        |
-| --------- | ------------------ | ----------------------------- |
-| Mandarin  | 闻 inside 新闻     | the occurrence does not count |
-| Mandarin  | 闻 in 我闻花香     | the occurrence counts         |
-| Mandarin  | 得到 inside 听得到 | the occurrence does not count |
-| Cantonese | 聽 inside 聽日     | the occurrence does not count |
-| Cantonese | 聽 in 我聽音樂     | the occurrence counts         |
-| Cantonese | 蟲 inside 昆蟲     | the occurrence does not count |
-
-`compound_spans` and `inside_spans` give the blocked spans and the test.
-Mandarin applies the helpers to the Han character stream. Cantonese applies
-them to the sentence text.
-
-### 5.2 Form sense filter
+### 5.1 Form sense filter
 
 The `senses` and `false_friends` columns of a tier S row hold two word sets.
 `sense_failure` returns `false_friend` when the paired English holds a
@@ -228,13 +209,13 @@ gloss test.
 The S2 measure step applies this test to the hits. A form that fails it does
 not enter the hit list.
 
-### 5.3 English gloss sense
+### 5.2 English gloss sense
 
 `sense_failure` also compares the English of a sentence with the Swadesh gloss
 of the card word. The S2 `sense` guard rejects a sentence when every hit fails this
 test. The guard keeps a sentence that has no hit.
 
-### 5.4 Whole-token match
+### 5.3 Whole-token match
 
 Cantonese 我 and 我哋 are different concepts. `form_offsets` accepts a form
 only when it holds whole tokens. An occurrence inside a longer word counts when

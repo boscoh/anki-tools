@@ -27,13 +27,7 @@ from anki_tools.languages.mandarin.characters import (
     is_repeated_zh_sentence,
 )
 from anki_tools.apkg.templates import TEMPLATES_DIR, load_text
-from anki_tools.sentence_pack.english_sense import read_senses
-from anki_tools.sentence_pack.guards import (
-    compound_spans,
-    form_compounds,
-    inside_spans,
-    occurrences,
-)
+from anki_tools.sentence_pack.guards import occurrences
 from anki_tools.sentence_pack.pack import (
     ATTRIBUTION_PATH,
     audio_license_source,
@@ -466,18 +460,12 @@ def check_word_table(
 
 
 def load_user_dictionary(word_table: list[WordForm]) -> None:
-    """Add the word-table forms and the compounds to the jieba user dictionary.
-
-    A compound is one token, so tier F never credits a part of it. For example,
-    听得到 does not credit 得到.
+    """Add the word-table forms to the jieba user dictionary.
 
     :param word_table: Word table from :func:`load_word_table`.
     """
     for form in word_table:
         jieba.add_word(form.mandarin)
-    for row in read_senses(SENSE_PATH).values():
-        for compound in row.compounds:
-            jieba.add_word(compound)
 
 
 def known_words(word_table: list[WordForm]) -> set[str]:
@@ -559,35 +547,27 @@ def form_occurrences(sentence: str, form: str) -> list[int]:
     :param form: Word-table form.
     :returns: Start offsets in the Han character stream.
     """
-    if not form:
-        return []
-    chars = "".join(get_chinese_chars(sentence))
-    blocked = compound_spans(chars, form_compounds(SENSE_PATH, form))
-    return [
-        position
-        for position in occurrences(chars, form)
-        if not inside_spans(position, blocked)
-    ]
+    return occurrences("".join(get_chinese_chars(sentence)), form)
 
 
 def count_form_occurrences(sentence: str, form: str) -> int:
     """Count the form occurrences that keep the Swadesh sense.
 
     The count does not use the token list, because jieba merges some forms into
-    a longer word. For example, 水 stays inside the token 喝水. An occurrence
-    inside a false-friend compound never counts, so 闻 does not hit inside 新闻.
+    a longer word. For example, 水 stays inside the token 喝水.
 
     :param sentence: Simplified Chinese sentence.
     :param form: Word-table form.
-    :returns: Occurrence count outside a different-sense compound.
+    :returns: Occurrence count.
     """
     return len(form_occurrences(sentence, form))
+
 
 def highlight(sentence: str, form: str) -> str:
     """Wrap the matched spans of a card target in a bold tag.
 
     The span rule is the hit rule of the core deck: the form as a character
-    span, minus the compounds where it takes another sense.
+    span.
 
     :param sentence: Simplified Chinese sentence.
     :param form: Word-table form.

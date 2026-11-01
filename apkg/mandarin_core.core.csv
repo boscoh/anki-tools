@@ -50,7 +50,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1734873753695,3988,不要杀我.,Don't kill me!,googletts-0c394643-08cdf65a-8cad70d2-75f13f33-cbbccbbb.mp3,1,depth,,F:不要|S110:杀,S110:杀,0.0953,0.0000,3,0,0,1
 1734873754297,4590,你敢打我?,Do you dare hit me?,googletts-d22147bd-a5f127d4-63561078-65195442-bd5a0be8.mp3,1,seed,,S113:打,S113:打,0.1276,0.1800,4,1,0,1
 1734873754478,4771,我不会游泳.,I can't swim.,googletts-fc851edb-c84d45c0-737e06a0-10d037d9-20cf1df8.mp3,1,seed,,F:不会|S119:游泳,S119:游泳,0.2714,0.0000,3,0,0,1
-1734873751834,2128,有人来了.,Someone's coming.,googletts-e4c8b2ee-2ba56d9c-0eaba99d-516cb8ee-e99d14fa.mp3,1,seed,,F:有人|S122:来,S122:来,0.1252,0.0000,3,0,0,1
+1734873752131,2425,他出来了.,He came out.,googletts-f82e21fc-a49eafab-08d9042d-c57252bd-6a2c9081.mp3,1,seed,,F:出来|S122:来,S122:来,0.1257,0.0000,3,0,0,1
 1734873751955,2249,过来 坐下.,"Come here, sit down.",googletts-6ab1be21-ca14e072-aded76d4-e21b7c9f-dab540d8.mp3,1,seed,,S124:坐,S124:坐,0.1249,0.1800,2,1,0,1
 1734873752577,2871,转过身去.,Turn around.,googletts-a9841be8-ebe645f7-9ac394ef-5e67a623-42434e38.mp3,1,seed,,S126:转,S126:转,0.1024,0.4000,2,2,0,1
 1734873752104,2398,把它给我.,Give it to me.,googletts-c73a8a79-85240777-b3164063-605604d7-753a09c4.mp3,1,depth,,S128:给|S3:它,S128:给,0.1851,0.0000,4,0,0,1
@@ -71,9 +71,9 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1734873751698,1992,这不重要.,This isn't important.,googletts-b0d7b013-f05031f5-e5b08162-f01f8354-2e770273.mp3,1,depth,,F:重要,S7:这,0.0443,0.0000,3,0,0,1
 1734873751814,2108,我不能说.,I can't say.,googletts-e1be3d72-d4888282-1080da69-39125900-a2221c3b.mp3,1,depth,,F:不能,S1:我,0.0448,0.0000,3,0,0,1
 1734873751843,2137,给我坐下.,Sit down.,googletts-c51f9c4b-952b72cb-b2c79d01-67c6a2a3-401558ab.mp3,1,depth,,S124:坐,S124:坐,0.0200,0.0300,3,0,0,1
+1734873752085,2379,这里有人吗?,Is anyone here?,googletts-ed76d7d6-8e3a5c64-8a86a7a9-cb96ee85-391bdc34.mp3,1,depth,,F:有人,S9:这里,0.0438,0.0000,3,0,0,1
 1734873752433,2727,希望你不介意.,I hope you don't mind.,googletts-d5892959-68d8ea10-edb62130-d7d8e0f3-f276c4d4.mp3,1,depth,,F:希望,S2:你,0.0442,0.0000,3,0,0,1
 1734873752437,2731,我在工作.,I'm working.,googletts-d6e9d9a1-5215be7e-30fc059b-f9b642cd-a42f77ca.mp3,1,depth,,F:工作,S1:我,0.0449,0.0000,3,0,0,1
-1734873752646,2940,我出来了.,I came out.,googletts-ed912742-4a5f076e-64dfe206-a40bbcfe-d2d5aa03.mp3,1,depth,,F:出来,S1:我,0.0440,0.0000,3,0,0,1
 1734873754135,4428,我不想听.,I don't want to hear it.,googletts-05f2d197-3e9f4540-c3f16777-e2151b6b-2aa7bfb9.mp3,1,completion,,S102:听,S1:我,0.0220,0.0300,3,1,0,1
 1734873754518,4811,这怎么可能.,That's impossible!,googletts-974ebf92-cf12cbe0-ae618478-9207b1a2-c38266aa.mp3,1,depth,,F:可能,F:可能,0.0449,0.0000,3,0,0,1
 1734873751791,2085,我是对的.,I'm right.,googletts-961929fc-3e6669d9-12eadc95-1f6f5990-ceb3bdc6.mp3,1,depth,,S196:对,S1:我,0.0157,0.0300,4,0,0,1
@@ -132,12 +132,12 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1734873752426,2720,我希望如此.,I hope so.,googletts-7fa85d5d-5e96c763-8f46a316-8da5038e-e3498fe8.mp3,1,seed,,F:希望,F:希望,0.1262,0.0000,3,0,0,1
 1734873752384,2678,我没那么说.,I didn't say that.,googletts-09c64fdc-fe6cefe6-208d566c-3b696405-cae83575.mp3,1,seed,,F:那么|S140:说,F:那么,0.0961,0.0300,4,0,0,1
 1734873754597,4890,你一定是疯了.,You must be crazy.,googletts-9b9646ef-23b24a61-4f0eb4b6-56a972b5-145440c9.mp3,1,seed,,F:一定,F:一定,0.0780,0.2100,5,0,0,1
-1734873752131,2425,他出来了.,He came out.,googletts-f82e21fc-a49eafab-08d9042d-c57252bd-6a2c9081.mp3,1,seed,,F:出来,F:出来,0.1257,0.0000,3,0,0,1
+1734873752646,2940,我出来了.,I came out.,googletts-ed912742-4a5f076e-64dfe206-a40bbcfe-d2d5aa03.mp3,1,depth,,F:出来,F:出来,0.0440,0.0000,3,0,0,1
 1734873752803,3097,我有东西给你.,I have something for you.,googletts-cc1c6448-2192036e-c334dc31-f26a8bec-34f96f33.mp3,1,seed,,F:东西,F:东西,0.1155,0.1000,5,1,0,1
 1734873751605,1899,一个朋友.,A friend.,googletts-10f58f8e-4d96ca7f-3ea40086-6b6a27ee-43295104.mp3,1,seed,,F:朋友,F:朋友,0.1254,0.0000,2,0,0,1
 1734873751572,1866,大家听着.,Listen everyone!,googletts-7eab6135-8654316b-17fd0ff9-dbd7bdae-96a83905.mp3,1,seed,,F:大家,F:大家,0.1254,0.0000,3,0,0,1
 1734873752466,2760,好 非常好.,"Good, very good.",googletts-0dbdaa63-7ba368d5-c450d677-854c5185-db576e28.mp3,1,depth,,F:非常,F:非常,0.0438,0.0000,3,0,0,1
-1734873752085,2379,这里有人吗?,Is anyone here?,googletts-ed76d7d6-8e3a5c64-8a86a7a9-cb96ee85-391bdc34.mp3,1,depth,,F:有人,F:有人,0.0438,0.0000,3,0,0,1
+1734873751834,2128,有人来了.,Someone's coming.,googletts-e4c8b2ee-2ba56d9c-0eaba99d-516cb8ee-e99d14fa.mp3,1,seed,,F:有人,F:有人,0.1252,0.0000,3,0,0,1
 1734873752239,2533,一切还好吗?,Is everything alright?,googletts-8d1cb151-114eab75-f7a0957a-c25daf2d-a90d6f35.mp3,1,seed,,F:一切,F:一切,0.1069,0.1800,3,1,0,1
 1734873750367,661,当然不是.,Of course not.,googletts-d8494e47-a0746388-abf819c4-ac7ee5d8-86cf0a2f.mp3,1,depth,,F:当然,F:当然,0.0437,0.0000,2,0,0,1
 1734873750672,966,准备什么?,Preparing what?,googletts-cac1a956-0c8614c1-555e407b-4e7a9140-d71a9c1d.mp3,1,seed,,F:准备,F:准备,0.1247,0.0000,2,0,0,1
@@ -4152,7 +4152,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1734873753831,4124,别看着我.,Don't look at me.,googletts-ecd2eae7-0a018c05-dda92e29-a89c4d6d-d5e64ce8.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
 1734873753832,4125,都怪我.,It's all my fault.,googletts-e118c79b-83d1c079-1dbaf43a-9f672109-550b5c47.mp3,0,,length_window,,,0.0000,0.0000,3,0,0,0
 1734873753833,4126,你冷静点.,Calm down.,googletts-13c8cc38-68d5e886-a28ed3e7-65605dab-ad681101.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
-1734873753835,4128,给我出来.,Come out!,googletts-30ff68ea-415a5a0c-fb12af2f-bd6723e2-58ed6408.mp3,0,,max_cards,F:出来,,0.0000,0.0000,3,0,0,0
+1734873753835,4128,给我出来.,Come out!,googletts-30ff68ea-415a5a0c-fb12af2f-bd6723e2-58ed6408.mp3,0,,max_cards,F:出来|S122:来,,0.0000,0.0000,3,0,0,0
 1734873753836,4129,放我出来.,Let me out!,googletts-58892ffc-5ebaf583-86e25f8b-692d9240-5e87ce42.mp3,0,,unique,,,0.0000,0.0000,3,0,0,0
 1734873753837,4130,哦 拜托.,"Oh, please.",googletts-1f984b18-e40b2b71-6dcae1ec-395d1e36-f9dcc597.mp3,0,,length_window,,,0.0000,0.0000,2,0,0,0
 1734873753838,4131,放我下来.,Put me down.,googletts-35c04808-c0d3027e-ed4b94f9-d3665b4c-3c2757d8.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0

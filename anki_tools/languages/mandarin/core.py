@@ -13,9 +13,6 @@ the English gloss of the row decide. The character span keeps the 25 forms that
 jieba merges into a longer token, for example 水 inside 喝水, and the guard
 rejects the cards where the form takes another sense. A character bigram holds
 143 one-character forms zero times, so the module does not use a bigram.
-The ``compounds`` column of the sense file blocks the spans where a form is a
-part of a longer word with another sense, so 来 does not hit inside 出来 and
-起来.
 
 The card count sets the ceiling of the deck. The run holds 140 targets: 90
 tier S forms with a card and the 50 tier F words. Gate K3 reports a two-card

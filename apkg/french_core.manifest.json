@@ -1,5 +1,5 @@
 {
-  "build_date": "2026-11-01T07:47:02+00:00",
+  "build_date": "2026-11-01T09:24:47+00:00",
   "source": {
     "input": "apkg/6000_French_Sentences_w_Audio.apkg",
     "deck": "French Core",
@@ -47,14 +47,14 @@
     "bolded": 277,
     "unbolded": 0,
     "rows": 5928,
-    "sense_failures": 3656
+    "sense_failures": 3692
   },
   "frequency": {
     "path": "data/french_frequency.tsv",
     "spoken_weight": 0.5
   },
   "files": {
-    "core_csv": "sha256:09d97bf007eea434a966fe4539145980bbe9f2dcec8a5285768a2dc61893aba7",
+    "core_csv": "sha256:7608a93641883740545f9ce0daa10ec3f4aa2e2c90599db9960602e02cf85861",
     "coverage_csv": "sha256:eab8b5d88ed54618dfc4945917cb914b42b3c12de4a7baea4e2064cf7735326b",
     "input_apkg": "sha256:230dd01bcf6223bcb8a5ea303eee01fd4a55e19ce418d0bf66a81193037024b5"
   },

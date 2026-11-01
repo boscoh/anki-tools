@@ -1,4 +1,4 @@
-word	senses	false_friends	compounds	tier
+word	senses	false_friends	tier
 pas	not,cannot,no,never,nothing,nobody,none,without,neither,nor	
 ne	not,never,no,nothing,nobody,nor,neither,cannot,without,none,nowhere,only,just,hardly,seldom,rarely	
 faire	do,does,did,done,doing,make,makes,made,making,take,takes,took,taken,taking,give,gives,gave,given,giving,go,goes,went,going,gone,play,plays,played,playing,pretend,pretends,pretended,pretending,shopping,weather,hot,cold,cause,causes,caused	
@@ -301,14 +301,13 @@ parfois	sometimes,occasionally,times
 article	article,articles,item,piece,product	
 service	service,services,help,favor,duty,department	
 président	president,chairman,chair,head	
-queue	tail,tails	queue,queues,queuing,queued,line,lines,wait,waiting		S
-sentir	smell,smells,smelled,smelt,smelling,scent,scents	feel,feels,felt,feeling		S
-voler	fly,flies,flew,flying,flown,flight	steal,steals,stole,stolen,stealing,rob,robbed,theft		S
-tirer	pull,pulls,pulled,pulling,drag,drags,dragged	shoot,shoots,shot,shooting		S
-langue	tongue,tongues	language,languages		S
-plume	feather,feathers,plumage	pen,pens,quill,quills		S
-foie	liver,livers	chicken,scared,afraid,fear,frightened,feet		S
-gonfler	swell,swells,swelled,swollen,swelling,inflate,inflated	bold,nerve,cheeky,cheek,gall		S
-rond	round,rounded,circle,circular	dime,dimes,penny,pennies,money,cash,coin,coins		S
-droit	straight	right,rights,allowed,entitled,permit,permission		S
-quelques			quelque chose	S
+queue	tail,tails	queue,queues,queuing,queued,line,lines,wait,waiting	S
+sentir	smell,smells,smelled,smelt,smelling,scent,scents	feel,feels,felt,feeling	S
+voler	fly,flies,flew,flying,flown,flight	steal,steals,stole,stolen,stealing,rob,robbed,theft	S
+tirer	pull,pulls,pulled,pulling,drag,drags,dragged	shoot,shoots,shot,shooting	S
+langue	tongue,tongues	language,languages	S
+plume	feather,feathers,plumage	pen,pens,quill,quills	S
+foie	liver,livers	chicken,scared,afraid,fear,frightened,feet	S
+gonfler	swell,swells,swelled,swollen,swelling,inflate,inflated	bold,nerve,cheeky,cheek,gall	S
+rond	round,rounded,circle,circular	dime,dimes,penny,pennies,money,cash,coin,coins	S
+droit	straight	right,rights,allowed,entitled,permit,permission	S

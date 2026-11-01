@@ -115,10 +115,10 @@ S110:杀,杀,to kill,S,113,2,2,covered
 S111:打架,打架,to fight,S,114,0,0,absent
 S112:打猎,打猎,to hunt,S,115,0,0,absent
 S113:打,打,to hit,S,116,2,1,partial
-S114:切,切,to cut,S,117,0,0,absent
+S114:切,切,to cut,S,117,2,0,absent_sense
 S115:分开,分开,to split,S,118,0,0,absent
 S116:刺,刺,to stab,S,119,0,0,absent
-S117:抓,抓,to scratch,S,120,0,0,absent
+S117:抓,抓,to scratch,S,120,2,0,absent_sense
 S118:挖,挖,to dig,S,121,0,0,absent
 S119:游泳,游泳,to swim,S,122,2,1,partial
 S120:飞,飞,to fly,S,123,0,0,absent
@@ -252,7 +252,7 @@ F:朋友,朋友,friend,F,250,2,2,covered
 F:大家,大家,everyone,F,251,2,2,covered
 F:非常,非常,very,F,252,2,2,covered
 F:有人,有人,someone,F,253,2,2,covered
-F:得到,得到,can,F,254,0,0,absent
+F:得到,得到,get,F,254,0,0,absent
 F:那个,那个,that,F,255,2,2,covered
 F:一切,一切,everything,F,256,2,2,covered
 F:当然,当然,certainly,F,257,2,2,covered
