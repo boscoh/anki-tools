@@ -126,21 +126,22 @@ Batches B8 and B10 finished the plan (commits `03cc7ad`, `b2b774f`, `f9ff560`).
 
 The whole suite, from the first audit to the end:
 
-| Item                    | Start | After B10 | End   |
-| ----------------------- | ----- | --------- | ----- |
-| Test and fixture files  | 44    | 55        | 53    |
-| Lines in `tests/`       | 7 800 | 7 403     | 6 747 |
-| Test functions          | 374   | 270       | 225   |
-| Tests collected         | 416   | 568       | 500   |
-| `monkeypatch.setattr`   | 22    | 9         | 8     |
-| Run time                | 6 s   | 8 s       | 8 s   |
+| Item                    | Start | After B10 | After 2.1 | End   |
+| ----------------------- | ----- | --------- | --------- | ----- |
+| Test and fixture files  | 44    | 55        | 53        | 52    |
+| Lines in `tests/`       | 7 800 | 7 403     | 6 747     | 6 523 |
+| Test functions          | 374   | 270       | 225       | 213   |
+| Tests collected         | 416   | 568       | 500       | 432   |
+| `monkeypatch.setattr`   | 22    | 9         | 8         | 12    |
+| Run time                | 6 s   | 8 s       | 7 s       | 6.4 s |
 
-- **Fewer, smaller tests.** Functions fell by 40% and lines by 14%. The count
-  includes the fixture files and the 298 gap lines of B10.
-- **More cases than at the start.** Table rows count as separate cases. Other
-  people also added tests during the work, for example `test_french_lemma.py`.
-- **Mocks.** The 8 that remain patch an edge: gTTS, sleep, urlopen, `ROOT`, and
-  `load_model`.
+- **Fewer, smaller tests.** Functions fell by 43%, lines by 16%, and cases by 24%
+  since the peak. The collected count is now above the start by 16 cases, because
+  other people added tests, for example `test_core_recount.py`.
+- **Mocks.** The count rose, because three edges are now faked: ToJyutping,
+  `spacy.load`, and `subprocess.run`. Each fake replaces a real library call. No
+  patch touches our own code except the two trivial wiring tests in
+  `test_swadesh_build.py`.
 - **Every cut test had a reason.** The cuts in section 2.1 kept all 507 mutants
   killed.
 
@@ -170,6 +171,38 @@ makes was deleted.
   `test_import_graph`, `test_language_layout`, and the review-file check.
 - The 312 survivors were not checked one by one. Some are equivalent changes.
   Section 8 lists the ones that matter.
+
+### 2.2 Cut by library
+
+Commits `026121e`, `184b862`, `081c586`, `b4ef4da`, `3c49cea`. The rule: test our
+logic and our contracts. Do not test third-party libraries. Every test got a tier.
+
+| Tier | Meaning                                                       | Action                      | Count |
+| ---- | ------------------------------------------------------------- | --------------------------- | ----- |
+| A    | Our decision logic, file contracts, routing, invariants       | Keep                        | 185   |
+| B    | Our logic over a token, lemma, or audio source                | Keep, fake the library      | 17    |
+| C    | Claims only what a library or a data row returns              | Cut                         | 20    |
+| D    | Our curated data                                              | Keep cross-file checks only | 7     |
+
+- Faked at the edge: `spacy.load`, jieba, ToJyutping, pypinyin, and `subprocess.run`
+  for ffprobe. The fakes check our code, not the model data.
+- Cut: 18 tests that pinned a lemma, a segmentation, a pinyin, a template string,
+  a font, or a data-file row. Two more were replaced by pure or faked tests.
+- 16 deliberate breaks. Four survived a cut at first, so the worker kept or
+  rewrote the covering test.
+- The suite went from 504 to 432 cases, 229 to 213 functions, and 7.9 s to 6.4 s.
+
+Left on the real French model, because a fake model would write to the real
+token cache `data/tokens_french.sqlite`:
+
+| Test                                                    | Why it stays                         |
+| ------------------------------------------------------- | ------------------------------------ |
+| `test_the_gates_pass_on_a_tiny_cull`                    | Real French model                    |
+| French register, highlight, form-key, noun-credited     | A break survived without each        |
+| `test_the_sentence_pack_card_bolds_the_target` (French) | Profile token cache                  |
+
+A seam on `_TOKEN_CACHE` would let a fake model run them. That is a production
+change and needs an ADR.
 
 ## 3. Scope of the rest
 
@@ -310,6 +343,8 @@ sense-exceptions ADR.
 | ---- | ---------------------------------------------------------------------------------------------- |
 | 1    | Decide on the `vocab_dir` seam for the preview. It needs one short ADR.                        |
 | 2    | Add string, regex and return-value mutators. Run the matrix on the cull, sentence-select and Mandarin files that were in flux. |
-| 3    | Cut `test_english_sense`, `test_mandarin_sentence_selection`, `test_sentence_pack_guards` and `test_mandarin_compound_tokens`. The first cut skipped them. |
+| 3    | Done in 2.2 for the French, Spanish, Mandarin, template and sense tests.                       |
 | 4    | Turn the matrix script into a repo tool, `uv run python -m tools.mutants`. Run it before a release. |
 | 5    | Decide for each module in the gap table (section 8) whether to test it or delete it.           |
+| 6    | Decide on a `_TOKEN_CACHE` seam, so the French model tests can run on a fake model.            |
+| 7    | Decide if a one-row guard for a swapped front and back template comes back.                    |
