@@ -76,6 +76,28 @@ def test_every_template_class_has_a_css_rule() -> None:
     assert missing == set()
 
 
+@pytest.mark.parametrize("profile", PACK_PROFILES, ids=lambda profile: profile.name)
+def test_a_pack_card_styles_its_classes_from_the_shared_sheet_and_its_own(
+    profile,
+) -> None:
+    used: set[str] = set()
+    for names in CLASS_ATTRIBUTE.findall(profile.front_template + profile.back_template):
+        used.update(names.split())
+    css = load_text(SHARED_CSS_PATH) + profile.extra_css
+    defined = {name for selector in CSS_SELECTOR.findall(css) for name in CSS_CLASS.findall(selector)}
+
+    assert used - defined - SCRIPT_HOOK_CLASSES == set()
+
+
+def test_the_cantonese_sheet_sets_its_own_font_stack() -> None:
+    fonts = re.compile(r"font-family:([^;]+);")
+
+    shared = fonts.findall(load_text(SHARED_CSS_PATH))
+    cantonese = fonts.findall(PROFILES["cantonese"].extra_css)
+
+    assert cantonese and cantonese[-1] != shared[0]
+
+
 def test_the_shared_sheet_comes_first() -> None:
     pack_css = TEMPLATES_DIR / "sentence_pack" / "mandarin" / "card.css"
     css = load_css_layers(SHARED_CSS_PATH, pack_css)

@@ -219,6 +219,23 @@ def test_delete_model_refuses_a_note_that_still_uses_it(
     assert anki21b.get_models()[ANKI21B_NOTE_TYPE]["name"] == ANKI21B_NOTE_TYPE_NAME
 
 
+@pytest.mark.parametrize("fixture", ["editable", "anki21b"])
+def test_delete_model_removes_a_note_type_that_no_note_holds(
+    fixture: str, request: pytest.FixtureRequest
+) -> None:
+    """The unused clone goes, and the note type of the notes stays."""
+    package: AnkiPackage = request.getfixturevalue(fixture)
+    kept = set(package.get_models())
+    model_id = package.clone_model(
+        next(iter(kept)), "Unused", list(CLONE_FIELDS), list(CLONE_TEMPLATES), CLONE_CSS
+    )
+    assert model_id in package.get_models()
+
+    package.delete_model(model_id)
+
+    assert set(package.get_models()) == kept
+
+
 def test_update_note_writes_the_fields_and_the_model(editable: AnkiPackage) -> None:
     """One call sets the fields, the note type, the sort field, and the checksum."""
     model_id = next(iter(editable.get_models()))

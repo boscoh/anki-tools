@@ -1,10 +1,13 @@
 """Tests for the browser card preview builder."""
 
+from pathlib import Path
+
 import pytest
 
 from anki_tools.languages import LANGUAGES, profile_languages, vocab_languages
 from anki_tools.preview import (
     SENTENCE_LANGUAGES,
+    VOCAB_DIR,
     VOCAB_LANGUAGES,
     PreviewSection,
     build_page,
@@ -12,6 +15,7 @@ from anki_tools.preview import (
     fix_card,
     render_template,
     sentence_card,
+    write_preview,
 )
 
 
@@ -126,3 +130,21 @@ def test_the_language_lists_follow_the_registry() -> None:
         assert name in vocab_names
         assert dict(VOCAB_LANGUAGES)[name] == LANGUAGES[name].label
     assert "french" not in vocab_names
+
+
+def test_the_written_page_holds_a_panel_for_each_card_that_the_vocab_files_allow(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "preview" / "cards.html"
+
+    cards, sections = write_preview(output)
+
+    page = output.read_text(encoding="utf-8")
+    assert page.count('class="card-panel"') == cards
+    assert page.count("<section id=") == sections
+    for name, label in VOCAB_LANGUAGES:
+        has_file = (VOCAB_DIR / f"english-{name}.csv").exists()
+        assert (f"{label} vocabulary</h3>" in page) is has_file, name
+    for name, label in SENTENCE_LANGUAGES:
+        has_file = (VOCAB_DIR / f"{name}_sentences.csv").exists()
+        assert (f"{label} sentence</h3>" in page) is has_file, name
