@@ -17,9 +17,9 @@ from pathlib import Path
 from typing import Any, Callable, Iterable, Sequence
 
 from anki_tools.apkg.deck_writer import sha256_value
-from anki_tools.apkg.package import AnkiPackage
 from anki_tools.gate_files import GateFileReader
 from anki_tools.gates import Gate, GateResult, run_gates
+from anki_tools.ranking.coreflow import read_output
 from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.sentence_pack.audio import (
     AUDIO_INDEX_NAME,
@@ -99,7 +99,7 @@ class AuditInputs(GateFileReader):
                     self.audio_dir / AUDIO_INDEX_NAME
                 ),
                 "manifest": lambda: read_json(self.manifest_path),
-                "apkg": lambda: read_apkg(self.apkg_path),
+                "output": lambda: read_output(self.apkg_path),
             }
         )
 
@@ -117,12 +117,12 @@ class AuditInputs(GateFileReader):
         """
         return self._load("index")
 
-    def apkg(self) -> dict[str, Any]:
+    def output(self) -> dict[str, Any]:
         """Open the APKG file and summarize it.
 
-        :returns: Note count, models, and media file names.
+        :returns: The mapping of :func:`anki_tools.ranking.coreflow.read_output`.
         """
-        return self._load("apkg")
+        return self._load("output")
 
 
 def read_rows(path: Path) -> list[dict[str, str]]:
@@ -158,21 +158,6 @@ def read_json(path: Path) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise ValueError(f"expected an object in {path}")
     return data
-
-
-def read_apkg(path: Path) -> dict[str, Any]:
-    """Open an APKG file and summarize it.
-
-    :param path: APKG file.
-    :returns: Note count, models, and media file names.
-    """
-    with AnkiPackage(path) as package:
-        notes = package.get_notes()
-        models = package.get_models()
-        media = set(package.get_media_mapping().values())
-    return {"notes": len(notes), "models": models, "media": media}
-
-
 
 
 def sample(items: Iterable[str], limit: int = FAILURE_SAMPLE) -> str:
@@ -457,7 +442,7 @@ def gate_media_count(
     :returns: Pass flag and detail text.
     """
     expected = expected_media(inputs)
-    media = inputs.apkg()["media"]
+    media = inputs.output()["media"]
     if len(media) != len(expected):
         return False, (
             f"APKG holds {len(media)} media files, cards use {len(expected)}"
@@ -524,30 +509,28 @@ def gate_manifest_counts(
     return True, f"{len(expected)} counts and 2 file hashes match"
 
 
-def gate_apkg(
+def gate_output_model(
     inputs: AuditInputs, profile: LanguageProfile
 ) -> tuple[bool, str]:
-    """Gate P13: the APKG opens and lists the expected notes.
+    """Gate P13: the APKG holds the expected notes and note type.
+
+    The check reads the one output reader, which needs a single note type.
 
     :param inputs: Lazy file reader of the audit.
     :param profile: Language profile.
     :returns: Pass flag and detail text.
     """
-    info = inputs.apkg()
+    info = inputs.output()
     rows = inputs.rows()
     problems: list[str] = []
     if info["notes"] != len(rows):
         problems.append(f"{info['notes']} notes but {len(rows)} cards")
-    models = info["models"]
     model_name = DeckIdentity(inputs.apkg_path).model_name
-    model = next(
-        (item for item in models.values() if item["name"] == model_name), None
-    )
-    if model is None:
-        names = sorted(item.get("name", "") for item in models.values())
+    if model_name not in info["note_models"]:
+        names = sorted(info["note_models"])
         problems.append(f"model {model_name!r} not found in {names}")
     else:
-        fields = [field["name"] for field in model["flds"]]
+        fields = info["fields"]
         if fields != list(profile.fields):
             problems.append(f"model fields {fields} != {list(profile.fields)}")
     if problems:
@@ -656,7 +639,7 @@ GENERIC_GATES: tuple[tuple[str, GateCheck], ...] = (
     ("P8", gate_media_count),
     ("P10", gate_coverage),
     ("P11", gate_manifest_counts),
-    ("P13", gate_apkg),
+    ("P13", gate_output_model),
     ("P14", gate_filter_recheck),
     ("P15", gate_review_file),
     ("P16", gate_word_audio),

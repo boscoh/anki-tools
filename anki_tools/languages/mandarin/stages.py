@@ -54,7 +54,7 @@ from anki_tools.sentence_pack import tatoeba
 from anki_tools.sentence_pack.audio import AUDIO_INDEX_NAME, probe_duration
 from anki_tools.sentence_pack.audit import (
     AuditInputs,
-    gate_apkg,
+    gate_output_model,
     gate_coverage,
     gate_manifest_counts,
     gate_media_count,
@@ -339,7 +339,7 @@ GATES: tuple[tuple[str, GateCheck], ...] = (
     ("P10", gate_coverage),
     ("P11", gate_manifest_counts),
     ("P12", _gate_p12),
-    ("P13", gate_apkg),
+    ("P13", gate_output_model),
     ("P14", gate_filter_recheck),
     ("P15", gate_review_file),
     ("P16", gate_word_audio),

@@ -1024,7 +1024,7 @@ def spanish_gates() -> tuple[tuple[str, Any], ...]:
     :returns: Pairs of gate name and gate function.
     """
     from anki_tools.sentence_pack.audit import (
-        gate_apkg,
+        gate_output_model,
         gate_coverage,
         gate_manifest_counts,
         gate_media_count,
@@ -1051,7 +1051,7 @@ def spanish_gates() -> tuple[tuple[str, Any], ...]:
         ("P8", gate_media_count),
         ("P10", gate_coverage),
         ("P11", gate_manifest_counts),
-        ("P13", gate_apkg),
+        ("P13", gate_output_model),
         ("P14", gate_filter_recheck),
         ("P15", gate_review_file),
         ("P16", gate_word_audio),

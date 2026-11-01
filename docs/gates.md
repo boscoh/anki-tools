@@ -2,7 +2,7 @@
 
 | Field   | Value                                                  |
 | ------- | ------------------------------------------------------ |
-| Status  | Consolidation done; one output reader open             |
+| Status  | Consolidation done                                     |
 | Date    | 2026-11-01                                             |
 | Owner   | anki-tools                                             |
 | Related | `docs/filters.md`, ADR 0021, ADR 0027, ADR 0057        |
@@ -116,6 +116,12 @@ when a pack check must serve a second flow.
 - The pack gates read input artifacts: the word table, the review CSV, and the
   sentence CSV. The cull and core gates read the output APKG, the output CSVs,
   and the manifest.
+- The pack and the rank flows read the output APKG with one reader,
+  `read_output` in `ranking/coreflow.py`. Pack `P8` reads its media set, and
+  pack `P13` (`gate_output_model`) reads its note count, note type name, and
+  field names. The reader needs one note type, which every pack has. The cull
+  and core flows have no note type or audio gate (ADR 0042), so no other check
+  shares the reader yet.
 - Pack `P6` uses `profile.similarity` on the sentence text. Cull `R6` and core
   `K6` use the lemma Jaccard value on the full lemma set of a card.
 - The pack manifest has a second shape. `sentence_pack/pack.py` writes it, and
@@ -173,15 +179,7 @@ Rejected:
 Deferred: one rule record schema and one manifest shape. Neither removes a
 current fault, so both wait for a third consumer.
 
-## 6. Open work
-
-One item is in `anki-ujvj`.
-
-- One output reader. The pack `read_apkg` returns a different shape from the
-  rank `read_output`. One reader lets the pack share the audio check. This is
-  the highest-risk item.
-
-## 7. Verification
+## 6. Verification
 
 Run the focused tests:
 
@@ -203,7 +201,7 @@ uv run anki fix fr apkg/french_core.apkg --core --check
 A changed pass or fail is a defect. A changed table length is a defect too,
 unless the change removes a report-only row.
 
-## 8. References
+## 7. References
 
 | Path                                     | Content                                               |
 | ---------------------------------------- | ----------------------------------------------------- |
