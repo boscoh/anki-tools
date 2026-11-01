@@ -178,8 +178,6 @@ class TestFilterCoreCards:
             {"a.mp3"},
             [],
             [],
-            min_units=1,
-            max_units=9,
             shape=spanish_core.SPANISH_CORE_PROFILE,
         )
 
@@ -194,8 +192,6 @@ class TestFilterCoreCards:
             {"a.mp3"},
             [],
             [],
-            min_units=1,
-            max_units=9,
             shape=spanish_core.SPANISH_CORE_PROFILE,
         )
 

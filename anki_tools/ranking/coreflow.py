@@ -106,10 +106,6 @@ class CoreRequest:
     :param core_words: Tier F words after the Swadesh set.
     :param spoken_weight: Weight of the spoken term in the blend.
     :param max_cards: Card cap of the cover, or None for the profile value.
-    :param min_words: Minimum unit count of a card, or None for the window of
-        the language profile.
-    :param max_words: Maximum unit count of a card, or None for the window of
-        the language profile.
     """
 
     input_path: Path
@@ -117,8 +113,6 @@ class CoreRequest:
     core_words: int
     spoken_weight: float = 0.5
     max_cards: int | None = None
-    min_words: int | None = None
-    max_words: int | None = None
 
 
 def read_loanwords(path: Path) -> frozenset[str]:
@@ -220,8 +214,6 @@ def filter_core_cards(
     names: Collection[str],
     loanwords: Collection[str],
     *,
-    min_units: int,
-    max_units: int,
     shape: ShapeProfile,
 ) -> tuple[list[int], list[str]]:
     """Apply the shared filter rules and C3 to C5 to the cards.
@@ -230,16 +222,12 @@ def filter_core_cards(
     :param media: File names of the input media map.
     :param names: Name list of rule C3.
     :param loanwords: Loan word list of rule C4.
-    :param min_units: First unit count of the window.
-    :param max_units: Last unit count of the window.
-    :param shape: Shape values and English window of the language profile.
+    :param shape: Shape values and length window of the language profile.
     :returns: The input indices that pass, and the reason per input index. A
         passed card has the empty string as its reason.
     """
     passed, cull_reasons = filter_cards(
         cards,
-        min_words=min_units,
-        max_words=max_units,
         card_rule=partial(filter_reason, profile=shape),
         dedupe_key=shape.dedupe_key,
     )
@@ -930,8 +918,6 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
     options = profile.default_options
     if request.max_cards is not None:
         options = replace(options, max_cards=request.max_cards)
-    min_units = profile.min_units if request.min_words is None else request.min_words
-    max_units = profile.max_units if request.max_words is None else request.max_words
     sense_path = profile.sense_path
     loan_path = profile.loan_path
     identity = DeckIdentity(output_path)
@@ -965,8 +951,6 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
         media,
         names,
         loanwords,
-        min_units=min_units,
-        max_units=max_units,
         shape=profile,
     )
     hits, sense_failures, present = core_hits(
@@ -1098,8 +1082,8 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
                     "lambda_seed": options.lambda_seed,
                     "simple_units": options.simple_units,
                     "similarity": options.similarity,
-                    "min_units": min_units,
-                    "max_units": max_units,
+                    "min_units": profile.min_units,
+                    "max_units": profile.max_units,
                     "spoken_weight": request.spoken_weight,
                     "bold_target": True,
                     "max_unchecked_sense": 0,

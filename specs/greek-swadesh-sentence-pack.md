@@ -682,8 +682,6 @@ Options:
 | `sentences` | `--per-word`     | 2         | Max sentences per word      |
 | `sentences` | `--max-cards`    | 340       | Hard card cap               |
 | `sentences` | `--max-unknown`  | 2         | Unknown tokens per sentence |
-| `sentences` | `--min-words`    | 4         | Minimum word count          |
-| `sentences` | `--max-words`    | 10        | Maximum word count          |
 | `audio`     | `--tts`          | gtts      | `gtts` or `edge`            |
 | `audio`     | `--voice`        | `gtts:el` | TTS voice                   |
 | `audio`     | `--slow-audio`   | off       | Add a slow variant per card |

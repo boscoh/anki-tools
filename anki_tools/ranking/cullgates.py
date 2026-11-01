@@ -170,8 +170,6 @@ def gate_use_cap(files: CullFiles) -> tuple[bool, str]:
 
 def gate_filter_recheck(files: CullFiles) -> tuple[bool, str]:
     """G5: every kept card passes the filter rules."""
-    min_words = int(files.params().get("min_words", 0))
-    max_words = int(files.params().get("max_words", 0))
     rows = _kept_rows(files)
     problems: list[str] = []
     seen: set[str] = set()
@@ -183,7 +181,7 @@ def gate_filter_recheck(files: CullFiles) -> tuple[bool, str]:
             audio="",
             index=0,
         )
-        reason = filter_reason(card, min_words, max_words, files.profile)
+        reason = filter_reason(card, files.profile)
         key = files.profile.dedupe_key(card.sentence)
         if not reason and key in seen:
             reason = "unique"

@@ -53,8 +53,6 @@ def run_fix(
     cards: int | None = None,
     reserve: bool = True,
     words: int = 0,
-    min_words: int | None = None,
-    max_words: int | None = None,
     check: bool = False,
 ) -> None:
     """Run the mode of a fix command, or its gates when ``check`` is set.
@@ -67,8 +65,6 @@ def run_fix(
     :param cards: Core and select mode: card cap.
     :param reserve: Select mode: add the Swadesh reserve cards.
     :param words: Core mode: tier F words after the Swadesh set.
-    :param min_words: Minimum unit count of a card, or None for the profile value.
-    :param max_words: Maximum unit count of a card, or None for the profile value.
     :param check: Run the gates on the output and do not run the mode again.
     :raises SystemExit: No mode is set, two modes are set, or a gate fails.
     """
@@ -83,14 +79,10 @@ def run_fix(
     if core and select:
         raise SystemExit(f"Error: choose one mode: {' '.join(language.modes)}")
     if core:
-        _run_core(
-            language, apkg_path, output, cards, words, min_words, max_words, check
-        )
+        _run_core(language, apkg_path, output, cards, words, check)
         return
     if select and language.cull is not None:
-        _run_cull(
-            language, apkg_path, output, cards, reserve, min_words, max_words, check
-        )
+        _run_cull(language, apkg_path, output, cards, reserve, check)
         return
     raise SystemExit(f"Error: {language.label} has no --select mode.")
 
@@ -101,8 +93,6 @@ def _run_core(
     output: Path | None,
     cards: int | None,
     words: int,
-    min_words: int | None,
-    max_words: int | None,
     check: bool,
 ) -> None:
     """Build the core deck of a deck command, or run its gates."""
@@ -121,8 +111,6 @@ def _run_core(
         output_path=output_path,
         core_words=words,
         max_cards=cards,
-        min_words=min_words,
-        max_words=max_words,
     )
     coreflow.run_core(request, profile)
 
@@ -133,8 +121,6 @@ def _run_cull(
     output: Path | None,
     cards: int | None,
     reserve: bool,
-    min_words: int | None,
-    max_words: int | None,
     check: bool,
 ) -> None:
     """Build the cull deck of a deck command, or run its gates."""
@@ -151,8 +137,6 @@ def _run_cull(
         input_path=apkg_path,
         output_path=output_path,
         no_reserve=not reserve,
-        min_words=min_words,
-        max_words=max_words,
     )
     if cards is not None:
         request = replace(request, max_cards=cards)

@@ -409,16 +409,12 @@ def apply(
 fix_app = cyclopts.App(name="fix", help="Fix and optimize Anki decks")
 app.command(fix_app)
 
-_MIN_WORDS_HELP = "Select and core mode: minimum unit count (language default)."
-_MAX_WORDS_HELP = "Select and core mode: maximum unit count (language default)."
 
 _PARAMS_DOC = """
 :param apkg_path: Input .apkg file.
 :param output: Output .apkg file (default: from the language and mode).
 :param core: Build the core deck.
 :param words: Core mode: tier F words after the Swadesh set.
-:param min_words: Select and core mode: minimum unit count of a card.
-:param max_words: Select and core mode: maximum unit count of a card.
 :param check: Run the gates on the output and do not run the mode again.
 """
 
@@ -441,12 +437,6 @@ def _declare_core_fix(
             int | None, Parameter(help="Core mode: card cap (300).")
         ] = None,
         words: int = declaration.words,
-        min_words: Annotated[
-            int | None, Parameter(help=_MIN_WORDS_HELP)
-        ] = None,
-        max_words: Annotated[
-            int | None, Parameter(help=_MAX_WORDS_HELP)
-        ] = None,
         check: bool = False,
     ) -> None:
         fixrun.run_fix(
@@ -456,8 +446,6 @@ def _declare_core_fix(
             core=core,
             cards=cards,
             words=words,
-            min_words=min_words,
-            max_words=max_words,
             check=check,
         )
 
@@ -488,12 +476,6 @@ def _declare_cull_fix(
             bool, Parameter(help="Select mode: add the Swadesh reserve cards.")
         ] = True,
         words: int = declaration.words,
-        min_words: Annotated[
-            int | None, Parameter(help=_MIN_WORDS_HELP)
-        ] = None,
-        max_words: Annotated[
-            int | None, Parameter(help=_MAX_WORDS_HELP)
-        ] = None,
         check: bool = False,
     ) -> None:
         fixrun.run_fix(
@@ -505,8 +487,6 @@ def _declare_cull_fix(
             cards=cards,
             reserve=reserve,
             words=words,
-            min_words=min_words,
-            max_words=max_words,
             check=check,
         )
 
@@ -592,8 +572,6 @@ def pack(
     stage: Literal["fetch", "sentences", "audio", "all"] = "all",
     per_word: int = 2,
     max_cards: int = 450,
-    min_words: int | None = None,
-    max_words: int | None = None,
     native_audio: str = "none",
     voice: str = "",
     slow_audio: bool = False,
@@ -610,10 +588,6 @@ def pack(
     :param stage: Last stage to run: fetch, sentences, audio, or all.
     :param per_word: Card limit per word form.
     :param max_cards: Hard card cap.
-    :param min_words: Minimum word count of a card. The profile default
-        applies when empty.
-    :param max_words: Maximum word count of a card. The profile default
-        applies when empty.
     :param native_audio: Tatoeba tier: none, auto, or only.
     :param voice: TTS voice name. The profile default applies when empty.
     :param slow_audio: Generate the slow variant.
@@ -636,8 +610,6 @@ def pack(
         entry.profile,
         per_word=per_word,
         max_cards=max_cards,
-        min_words=min_words,
-        max_words=max_words,
     )
     if stage == "sentences":
         return
@@ -681,8 +653,6 @@ def _language_sentences(
     profile,
     per_word: int,
     max_cards: int,
-    min_words: int | None,
-    max_words: int | None,
 ) -> None:
     """Build the candidate pool and the card CSV files of one sentence pack.
 
@@ -690,8 +660,6 @@ def _language_sentences(
     :param profile: Language profile of the pack.
     :param per_word: Card limit per word form.
     :param max_cards: Hard card cap.
-    :param min_words: Minimum word count of a core card.
-    :param max_words: Maximum word count of a card.
     """
     table = module.load_word_table()
     failures = module.check_word_table(table)
@@ -703,8 +671,6 @@ def _language_sentences(
     pool, pool_report = sentence_pool.build_candidate_pool(
         table,
         profile,
-        min_units=profile.min_units if min_words is None else min_words,
-        max_units=profile.max_units if max_words is None else max_words,
         fallback=True,
         known_words=known,
         make_candidate=module.make_candidate,

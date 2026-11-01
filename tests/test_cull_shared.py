@@ -71,8 +71,8 @@ def _profile() -> cullflow.CullProfile:
         is_repeated=lambda sentence: False,
         dedupe_key=str,
         unit_count=lambda sentence: len(sentence.split()),
-        min_units=3,
-        max_units=12,
+        min_units=2,
+        max_units=4,
         input_model_name=MODEL_NAME,
         input_sentence_field="Text",
         input_english_field="Meaning",
@@ -126,8 +126,6 @@ def test_a_second_profile_drives_every_output_value(tmp_path: Path) -> None:
             output_path=output,
             max_cards=2,
             target_words=2,
-            min_words=2,
-            max_words=4,
         ),
         _profile(),
     )
@@ -187,8 +185,8 @@ def test_a_han_profile_keeps_one_character_lemmas_and_a_han_final_mark() -> None
 
     assert [target.lemma for target in targets] == ["水"]
     assert content == 1
-    assert cullflow.filter_reason(cards[0], 1, 12, profile) == ""
-    assert cullflow.filter_reason(cards[0], 1, 12, _profile()) == "marks"
+    assert cullflow.filter_reason(cards[0], profile) == ""
+    assert cullflow.filter_reason(cards[0], _profile()) == "marks"
 
 
 def _card(
@@ -631,8 +629,6 @@ def test_the_cull_writes_the_output_note_type(tmp_path: Path) -> None:
             output_path=output,
             max_cards=2,
             target_words=2,
-            min_words=2,
-            max_words=4,
         ),
         profile,
     )
@@ -673,8 +669,6 @@ def test_the_cull_fills_the_core_word_and_the_gloss(tmp_path: Path) -> None:
             output_path=output,
             max_cards=2,
             target_words=2,
-            min_words=2,
-            max_words=4,
         ),
         profile,
     )
@@ -702,8 +696,6 @@ def test_the_cull_keeps_the_due_of_a_kept_card(tmp_path: Path) -> None:
             output_path=output,
             max_cards=1,
             target_words=2,
-            min_words=2,
-            max_words=4,
         ),
         _profile(),
     )
@@ -742,8 +734,6 @@ def _run_tiny_cull(tmp_path: Path, profile: cullflow.CullProfile) -> Path:
             output_path=output,
             max_cards=2,
             target_words=2,
-            min_words=2,
-            max_words=4,
         ),
         profile,
     )

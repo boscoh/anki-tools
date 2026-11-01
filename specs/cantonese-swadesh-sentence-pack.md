@@ -353,9 +353,8 @@ The commands write these files:
 | `apkg/swadesh_sentences_cantonese.manifest.json`        | counts, coverage, and file hashes |
 | `ATTRIBUTION.md`                                        | the `## Cantonese pack` section   |
 
-The `sentences` command takes `--min-words` and `--max-words`. Without them the
-profile window applies, which is 4 to 7 for Cantonese and 4 to 10 for Greek
-and French.
+The profile window applies to the `sentences` stage: 4 to 7 for Cantonese and 4 to
+10 for Greek and French. Change it in the language profile (ADR 0034).
 
 The back template has `class="sentence char-links"` on the `Sentence`
 field. The profile field `char_links` adds `templates/shared/char_links.html`, which

@@ -76,9 +76,7 @@ def _filter(
         {"a.mp3"},
         names,
         loanwords,
-        min_units=1,
-        max_units=9,
-        shape=replace(profile, script_ok=lambda sentence: True),
+        shape=replace(profile, script_ok=lambda sentence: True, min_units=1, max_units=9),
     )
 
 
@@ -868,8 +866,6 @@ class TestMandarinRepeatRule:
             {"a.mp3"},
             [],
             [],
-            min_units=profile.min_units,
-            max_units=profile.max_units,
             shape=profile,
         )
 

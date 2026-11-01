@@ -23,8 +23,6 @@ _WORD_PATTERN = re.compile(r"[^\W\d_]+")
 
 def filter_cards(
     cards: Sequence[Any],
-    min_words: int = 3,
-    max_words: int = 12,
     *,
     card_rule: Callable[..., str],
     dedupe_key: Callable[[str], str],
@@ -32,8 +30,6 @@ def filter_cards(
     """Apply the shared filter rules.
 
     :param cards: Input cards.
-    :param min_words: Minimum word count of a card.
-    :param max_words: Maximum word count of a card.
     :param card_rule: Rule function of one card, :func:`filter_reason` with the
         profile of the language.
     :param dedupe_key: Key of filter ``unique``, from the language profile.
@@ -45,7 +41,7 @@ def filter_cards(
     passed: list[int] = []
     seen: set[str] = set()
     for index, card in enumerate(cards):
-        reason = card_rule(card, min_words, max_words)
+        reason = card_rule(card)
         if reason:
             reasons[index] = reason
             continue
@@ -64,11 +60,15 @@ class ShapeProfile(SentenceShape, Protocol):
     @property
     def dedupe_key(self) -> Callable[[str], str]: ...
 
+    @property
+    def min_units(self) -> int: ...
+
+    @property
+    def max_units(self) -> int: ...
+
 
 def filter_reason(
     card: Any,
-    min_words: int,
-    max_words: int,
     profile: ShapeProfile,
 ) -> str:
     """Give the first failed filter rule of one card of the cull or the core.
@@ -78,8 +78,6 @@ def filter_reason(
     the language profile.
 
     :param card: Input card.
-    :param min_words: Minimum unit count of a card.
-    :param max_words: Maximum unit count of a card.
     :param profile: Shape values of the language.
     :returns: The first failed rule id, or the empty string on a pass.
     """
@@ -88,8 +86,8 @@ def filter_reason(
         check_sentence_shape(
             card.sentence,
             profile,
-            min_words,
-            max_words,
+            profile.min_units,
+            profile.max_units,
             keys=LENGTH_RULES + TEXT_RULES + MARK_RULES,
         )
         or ""

@@ -28,6 +28,7 @@ from anki_tools.languages.mandarin.stages import (
     mandarin_shape_failure,
     select_mandarin_sentences,
 )
+from anki_tools.sentence_pack.guards import check_sentence_shape
 from anki_tools.sentence_pack.pool import build_pack_report
 from anki_tools.sentence_pack.select import serialize_rank_key
 
@@ -158,7 +159,6 @@ class TestSentenceShape:
     def test_length_window_stops_at_seven(self) -> None:
         assert mandarin_shape_failure("我们今天去学校。") is None
         assert mandarin_shape_failure("我们今天要去学校。") == "length_window"
-        assert mandarin_shape_failure("我们今天要去学校。", max_han=8) is None
 
     def test_profile_window_is_four_to_seven(self) -> None:
         assert (MANDARIN.min_units, MANDARIN.max_units) == (4, 7)
@@ -181,7 +181,12 @@ class TestSentenceShape:
 
     def test_fallback_window_accepts_short_sentence(self) -> None:
         assert mandarin_shape_failure("火灭了。") == "length_window"
-        assert mandarin_shape_failure("火灭了。", min_han=3) is None
+        assert (
+            check_sentence_shape(
+                "火灭了。", MANDARIN, MANDARIN.fallback_min_units, MANDARIN.max_units
+            )
+            is None
+        )
 
 
 class TestTokenChecks:

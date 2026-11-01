@@ -143,16 +143,12 @@ GateCheck = Callable[[AuditInputs, Any], tuple[bool, str]]
 def mandarin_candidate_pool(
     word_table: list[WordForm],
     data_dir: Path = Path("data/tatoeba"),
-    min_han: int = 4,
-    max_han: int = 7,
     fallback: bool = False,
 ) -> tuple[list[Candidate], dict[str, Any]]:
     """Build the S2 candidate pool from the Tatoeba exports.
 
     :param word_table: Word table from ``load_word_table``.
     :param data_dir: Directory with the Tatoeba TSV files.
-    :param min_han: Minimum Han character count for a core candidate.
-    :param max_han: Maximum Han character count.
     :param fallback: Add scaffold candidates for forms with no core candidate.
     :returns: The candidate list and the pool report.
     """
@@ -162,8 +158,6 @@ def mandarin_candidate_pool(
         word_table,
         MANDARIN,
         data_dir=data_dir,
-        min_units=min_han,
-        max_units=max_han,
         fallback=fallback,
         known_words=known,
         make_candidate=make_candidate,
@@ -171,18 +165,20 @@ def mandarin_candidate_pool(
 
 
 def mandarin_shape_failure(
-    sentence: str, min_han: int = 4, max_han: int = 7, *, final_mark: bool = True
+    sentence: str, *, final_mark: bool = True
 ) -> str | None:
     """Apply filters length_window to marks to one Mandarin sentence.
 
     :param sentence: Simplified Chinese sentence.
-    :param min_han: Minimum Han character count.
-    :param max_han: Maximum Han character count.
     :param final_mark: Apply the final-mark checks of the marks filter.
     :returns: The first failed filter key, or None when all filters pass.
     """
     return shared_guards.check_sentence_shape(
-        sentence, MANDARIN, min_han, max_han, final_mark=final_mark
+        sentence,
+        MANDARIN,
+        MANDARIN.min_units,
+        MANDARIN.max_units,
+        final_mark=final_mark,
     )
 
 

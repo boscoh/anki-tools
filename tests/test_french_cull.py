@@ -32,8 +32,6 @@ from anki_tools.ranking import (
 from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.sentence_pack import pool
 ENGLISH = "A short English line."
-MIN_WORDS = 3
-MAX_WORDS = 12
 DECK_NAME = "French 1000 Core Sentences"
 DECK_FIELDS = ["French", "sound", "Back", "freq ranks"]
 
@@ -138,8 +136,8 @@ class TestNames:
         ("digit_marks", "Le chat a 3 ans.", ENGLISH),
         ("digit_marks", "Le chat [noir] mange.", ENGLISH),
         ("digit_marks", "Voir le site www.exemple.fr.", ENGLISH),
-        ("digit_marks", "Le chat mange...", ENGLISH),
-        ("repeat", "Oui oui oui.", ENGLISH),
+        ("digit_marks", "Le chat mange vite...", ENGLISH),
+        ("repeat", "Oui oui oui oui.", ENGLISH),
         ("marks", "Le chat mange vite", ENGLISH),
         ("marks", "Le chat mange. Le chien dort.", ENGLISH),
         ("marks", "Le chat « mange » vite.", ENGLISH),
@@ -150,9 +148,7 @@ class TestNames:
 def test_one_card_per_filter_rule(rule: str, sentence: str, english: str) -> None:
     card = _card(sentence, english=english)
 
-    assert cullflow.filter_reason(
-        card, MIN_WORDS, MAX_WORDS, cull_fr.FRENCH_CULL_PROFILE
-    ) == rule
+    assert cullflow.filter_reason(card, cull_fr.FRENCH_CULL_PROFILE) == rule
 
 
 @pytest.mark.parametrize(
@@ -163,10 +159,10 @@ def test_the_pack_and_the_cull_agree_on_the_shape_rules(sentence: str) -> None:
     card = _card(sentence)
     keys = cardfilter.LENGTH_RULES + cardfilter.TEXT_RULES + cardfilter.MARK_RULES
 
-    pack_reason = pool.shape_failure(sentence, FRENCH, MIN_WORDS, MAX_WORDS, keys=keys)
-    cull_reason = cullflow.filter_reason(
-        card, MIN_WORDS, MAX_WORDS, cull_fr.FRENCH_CULL_PROFILE
+    pack_reason = pool.shape_failure(
+        sentence, FRENCH, FRENCH.min_units, FRENCH.max_units, keys=keys
     )
+    cull_reason = cullflow.filter_reason(card, cull_fr.FRENCH_CULL_PROFILE)
 
     assert (pack_reason or "") == cull_reason
 
@@ -174,12 +170,7 @@ def test_the_pack_and_the_cull_agree_on_the_shape_rules(sentence: str) -> None:
 def test_a_clean_card_passes_every_rule() -> None:
     card = _card("Le chat mange vite.")
 
-    assert (
-        cullflow.filter_reason(
-            card, MIN_WORDS, MAX_WORDS, cull_fr.FRENCH_CULL_PROFILE
-        )
-        == ""
-    )
+    assert cullflow.filter_reason(card, cull_fr.FRENCH_CULL_PROFILE) == ""
 
 
 def test_filter_cards_rejects_a_duplicate_text() -> None:
@@ -191,8 +182,6 @@ def test_filter_cards_rejects_a_duplicate_text() -> None:
 
     passed, reasons = cullflow.filter_cards(
         cards,
-        MIN_WORDS,
-        MAX_WORDS,
         card_rule=partial(
             cullflow.filter_reason, profile=cull_fr.FRENCH_CULL_PROFILE
         ),
@@ -208,8 +197,6 @@ def test_filter_cards_rejects_a_duplicate_that_differs_in_marks() -> None:
 
     passed, reasons = cullflow.filter_cards(
         cards,
-        MIN_WORDS,
-        MAX_WORDS,
         card_rule=partial(
             cullflow.filter_reason, profile=cull_fr.FRENCH_CULL_PROFILE
         ),
@@ -500,8 +487,8 @@ def test_run_gates_passes_on_a_tiny_output(
                     "max_uses": 4,
                     "exempt_top": 0,
                     "spoken_weight": 0.5,
-                    "min_words": MIN_WORDS,
-                    "max_words": MAX_WORDS,
+                    "min_words": FRENCH.min_units,
+                    "max_words": FRENCH.max_units,
                     "similarity": 0.67,
                     "order": "coverage",
                 },

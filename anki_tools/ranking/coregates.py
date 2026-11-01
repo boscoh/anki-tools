@@ -165,14 +165,11 @@ def gate_filter_recheck(files: CoreFiles) -> tuple[bool, str]:
     output = files.output()
     cards = output["cards"]
     profile = files.profile
-    params = files.manifest()["params"]
     kept, _reasons = filter_core_cards(
         cards,
         set(output["media"]),
         profile.read_names(),
         read_loanwords(profile.loan_path),
-        min_units=int(params.get("min_units", profile.min_units)),
-        max_units=int(params.get("max_units", profile.max_units)),
         shape=profile,
     )
     if len(kept) != len(cards):

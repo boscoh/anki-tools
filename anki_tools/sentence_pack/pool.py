@@ -418,8 +418,6 @@ def build_candidate_pool(
     profile: LanguageProfile,
     *,
     data_dir: Path = Path("data/tatoeba"),
-    min_units: int | None = None,
-    max_units: int | None = None,
     fallback: bool = False,
     known_words: Collection[str] = (),
     make_candidate: Callable[..., Any],
@@ -432,8 +430,6 @@ def build_candidate_pool(
     :param word_table: Reviewed word table of the language.
     :param profile: Language profile.
     :param data_dir: Directory with the Tatoeba TSV files.
-    :param min_units: Minimum unit count for a core candidate.
-    :param max_units: Maximum unit count.
     :param fallback: Add scaffold candidates for forms with no core candidate.
     :param known_words: Known word set that counts the unknown tokens.
     :param make_candidate: Callable that builds a card object from the facts.
@@ -441,8 +437,8 @@ def build_candidate_pool(
         passes the same guards as a Tatoeba sentence.
     :returns: The candidate list and the pool report.
     """
-    min_units = profile.min_units if min_units is None else min_units
-    max_units = profile.max_units if max_units is None else max_units
+    min_units = profile.min_units
+    max_units = profile.max_units
     forms = [profile.form_text(form) for form in word_table]
     form_set = set(forms)
     positions = profile.form_positions(word_table)
