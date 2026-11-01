@@ -46,4 +46,5 @@ FRENCH_CORE_PROFILE = cull.FRENCH_LANGUAGE.core(
     default_options=DEFAULT_OPTIONS,
     frequency_source=str(cull.FREQUENCY_PATH),
     coverage_floor=0.80,
+    recount_model="fr_core_news_sm",
 )

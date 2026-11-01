@@ -58,19 +58,21 @@ parameter.
 | G2  | `gate_use_cap`            | No lemma appears in more cards than the cap.              |
 | K13 | `gate_target_in_sentence` | Each card sentence holds its targets and its Core word.   |
 | K23 | `gate_coverage_floor`     | The share of targets with a kept card reaches the floor.  |
-| K24 | `gate_recount_forms`      | Each card text holds its tier S forms, by substring.      |
+| K24 | `gate_recount_forms`      | Each card holds its tier S forms, by substring or lemma.  |
 
 The pack has more checks, for example G10 coverage. The cull has no coverage
 gate (ADR 0045, ADR 0046). The core has one floor gate, K23 (ADR 0048). The
 floor is `coverage_floor` in the language core profile: the current share
 rounded down to 0.05. It is a ratchet, and a drop below it means the selection
-or the input got worse. K24 is the independent recount (ADR 0052): it imports
-no producer code and tests the form by a plain substring match. A form absent
-from the text is a fault. A form present is not proof, because `得到` is a
-substring of `听得到`. It runs for Mandarin and Cantonese, where
-`CoreProfile.exact_forms` is true. French and Spanish headwords inflect
-(`savoir`, `sais`), so K24 passes with the message `skipped`. Neither flow has a gate on the share of targets with one
-card or two cards (ADR 0033).
+or the input got worse. K24 is the independent recount (ADR 0052, ADR 0052
+amendment): it imports no producer code and tests the form by a plain substring
+match. A form absent from the text is a fault. A form present is not proof,
+because `得到` is a substring of `听得到`. Mandarin and Cantonese use the plain
+match. French and Spanish headwords inflect (`savoir`, `sais`), so
+`CoreProfile.recount_model` names a spaCy model, and a form also holds when each
+part of it is a lemma or a word of the text, or shares a stem of 4 characters
+with one. Neither flow has a gate on the share of targets with one card or two
+cards (ADR 0033).
 
 ### Retired ids
 

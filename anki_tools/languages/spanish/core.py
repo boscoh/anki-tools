@@ -198,5 +198,6 @@ SPANISH_CORE_PROFILE = SPANISH_LANGUAGE.core(
     default_options=DEFAULT_OPTIONS,
     frequency_source=str(FREQUENCY_PATH),
     coverage_floor=0.85,
+    recount_model="es_core_news_sm",
     lemma_overrides=LEMMA_OVERRIDES,
 )

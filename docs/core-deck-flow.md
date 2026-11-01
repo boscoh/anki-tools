@@ -25,7 +25,7 @@ One command runs the stages in order: `anki fix <language> --core`. The
 
 The gates run after K6. The table holds 5 rows: K5, K6, K13, K23, and K24. The other
 gate ids are retired (ADR 0038 to 0044, ADR 0046). K23 is the coverage floor
-(ADR 0048). K24 is the independent substring recount (ADR 0052). The flow step K4 is the selection.
+(ADR 0048). K24 is the independent recount, substring and spaCy lemma (ADR 0052). The flow step K4 is the selection.
 
 The `--cards` and `--words` values change the tier F target count and the
 card cap. The other `CoreRequest` fields keep their defaults.
@@ -300,7 +300,7 @@ The coverage status of a target is one of these values:
 | rules      | K5, K6             | F1 to F9, similarity                                                |
 | cards      | K13                | targets and the shown Core word in the text                         |
 | coverage   | K23                | share of targets with a kept card, floor from the language profile  |
-| recount    | K24                | tier S forms in the text by substring, no producer code             |
+| recount    | K24                | tier S forms in the text by substring or lemma, no producer code    |
 
 The build report holds the value of K3 and K15, Covered twice, and the count of
 cards that K1 drops for a missing audio file. It also holds the count of

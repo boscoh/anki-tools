@@ -297,6 +297,5 @@ MANDARIN_CORE_PROFILE = MANDARIN_LANGUAGE.core(
     default_options=DEFAULT_OPTIONS,
     frequency_source=str(FREQUENCY_PATH),
     coverage_floor=0.40,
-    exact_forms=True,
     finalize=lambda run: finalize_output(run.output_path, run.sides["core.csv"]),
 )
