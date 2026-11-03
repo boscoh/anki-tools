@@ -19,24 +19,12 @@ from anki_tools.ranking import (
     assemble,
     coreflow,
     cullflow,
-    cullgates,
 )
 from anki_tools.ranking.identity import DeckIdentity
-from tests.cull_fixture import freq_row, tiny_deck
+from tests.cull_fixture import cull_deck, tiny_deck
 from tests.token_fixture import fake_spacy_load  # noqa: F401
 
 PROFILE = cull_fr.FRENCH_CULL_PROFILE
-DECK_FIELDS = ["French", "sound", "Back", "freq ranks"]
-DECK_SENTENCES = [
-    "Le chat aime la fille.",
-    "Le chat voit le chien.",
-    "Le chat aime la maison.",
-]
-DECK_ENGLISH = [
-    "The cat likes the girl.",
-    "The cat sees the dog.",
-    "The cat likes the house.",
-]
 
 
 def test_the_loader_builds_the_file_once_from_the_corpus(tmp_path: Path) -> None:
@@ -66,20 +54,6 @@ def test_read_names_skips_blanks_and_comments(tmp_path: Path) -> None:
     assert cullflow.read_names(path) == {"paris", "zoe"}
 
 
-def _tiny_deck(tmp_path: Path) -> Path:
-    rows = [
-        {
-            "French": sentence,
-            "sound": f"[sound:a{index}.mp3]",
-            "Back": english,
-            "freq ranks": "",
-        }
-        for index, (sentence, english) in enumerate(zip(DECK_SENTENCES, DECK_ENGLISH))
-    ]
-    audio = [f"a{index}.mp3" for index in range(len(rows))]
-    return tiny_deck(tmp_path, DECK_FIELDS, rows, cull_fr.MODEL_NAME, audio)
-
-
 def _write_cull_deck(
     source: Path,
     cards: list[cull_fr.InputCard],
@@ -107,32 +81,6 @@ def _write_cull_deck(
         reserve_pack_path=reserve_pack_path,
         reserve_values=PROFILE.reserve_fields,
     )
-
-
-def test_the_gates_pass_on_a_tiny_cull(tmp_path: Path) -> None:
-    senses = tmp_path / "senses.tsv"
-    senses.write_text("word\tsenses\tfalse_friends\nchat\tcat\t\n", encoding="utf-8")
-    profile = replace(
-        PROFILE, load_frequency=lambda: [freq_row("chat")], sense_path=senses
-    )
-
-    run = cullflow.run_cull(
-        cullflow.CullRequest(
-            input_path=_tiny_deck(tmp_path),
-            output_path=tmp_path / "gated.apkg",
-            max_cards=3,
-            target_words=1,
-            no_reserve=True,
-        ),
-        profile,
-    )
-    rows = cullgates.run_gates(
-        cullgates.GATES, cullgates.CullFiles(run.output_path, profile)
-    )
-
-    assert [gate for gate, _passed, _message in rows] == ["R1", "R2", "R5", "R6"]
-    for gate, passed, message in rows:
-        assert passed, f"{gate}: {message}"
 
 
 SWADESH_FIELDS = [
@@ -169,7 +117,7 @@ def _tiny_swadesh_deck(tmp_path: Path) -> Path:
 
 
 def test_write_deck_inserts_the_reserve_card(tmp_path: Path) -> None:
-    source = _tiny_deck(tmp_path)
+    source = cull_deck(tmp_path)
     cards = cull_fr.load_input_deck(source)
     swadesh = _tiny_swadesh_deck(tmp_path)
     reserve = cullflow.load_reserve(swadesh, cull_fr.SWADESH_MODEL_NAME)

@@ -157,7 +157,7 @@ def _verb_tokens(
 
 
 def run_core(
-    tmp_path: Path, **overrides: Any
+    tmp_path: Path, core_words: int = 0, **overrides: Any
 ) -> tuple[deck_writer.RunFiles, Path, CoreProfile]:
     """Run the French core mode on ``core_deck``, with no spaCy and no data file."""
     profile = replace(
@@ -179,12 +179,67 @@ def run_core(
         coreflow.CoreRequest(
             input_path=core_deck(tmp_path),
             output_path=output,
-            core_words=0,
+            core_words=core_words,
             max_cards=profile.default_options.max_cards,
         ),
         profile,
     )
     return run, output, profile
+
+
+CULL_FIELDS = ["French", "sound", "Back", "freq ranks"]
+CULL_SENTENCES = [
+    "Le chat aime la fille.",
+    "Le chat voit le chien.",
+    "Le chat aime la maison.",
+    "Le chat mange la soupe.",
+    "Le chat dort sur le lit.",
+]
+CULL_ENGLISH = [
+    "The cat likes the girl.",
+    "The cat sees the dog.",
+    "The cat likes the house.",
+    "The cat eats the soup.",
+    "The cat sleeps on the bed.",
+]
+
+
+def cull_deck(tmp_path: Path) -> Path:
+    """Write a French source deck of five cat sentences with one stub MP3 each."""
+    rows = [
+        {
+            "French": sentence,
+            "sound": f"[sound:a{index}.mp3]",
+            "Back": english,
+            "freq ranks": "",
+        }
+        for index, (sentence, english) in enumerate(zip(CULL_SENTENCES, CULL_ENGLISH))
+    ]
+    audio = [f"a{index}.mp3" for index in range(len(rows))]
+    return tiny_deck(tmp_path, CULL_FIELDS, rows, french_cull.MODEL_NAME, audio)
+
+
+def run_cull(tmp_path: Path) -> tuple[Path, cullflow.CullProfile]:
+    """Run the French cull on ``cull_deck`` with the one target word ``chat``."""
+    senses = tmp_path / "senses.tsv"
+    senses.write_text("word\tsenses\tfalse_friends\nchat\tcat\t\n", encoding="utf-8")
+    profile = replace(
+        french_cull.FRENCH_CULL_PROFILE,
+        load_frequency=lambda: [freq_row("chat")],
+        sense_path=senses,
+    )
+    output = tmp_path / "gated.apkg"
+    cullflow.run_cull(
+        cullflow.CullRequest(
+            input_path=cull_deck(tmp_path),
+            output_path=output,
+            max_cards=5,
+            target_words=1,
+            no_reserve=True,
+        ),
+        profile,
+    )
+    return output, profile
 
 
 def write_core_package(

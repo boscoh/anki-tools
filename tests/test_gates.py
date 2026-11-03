@@ -10,9 +10,11 @@ from typing import Any
 import pytest
 
 from anki_tools.gate_files import GateFileReader
-from anki_tools.ranking import coregates, gates
+from anki_tools.ranking import coregates, cullgates, gates
+from anki_tools.ranking.core import CoreOptions
+from anki_tools.ranking.cullflow import CullProfile
 from anki_tools.ranking.scan import CoreProfile
-from tests.cull_fixture import gate_reader, run_core
+from tests.cull_fixture import gate_reader, run_core, run_cull
 
 
 def test_a_missing_file_fails_only_the_gates_that_read_it(tmp_path: Path) -> None:
@@ -133,9 +135,17 @@ def _copy_run(output: Path, tmp_path: Path) -> Path:
     return tmp_path / "run" / output.name
 
 
-def _failed(output: Path, profile: CoreProfile) -> list[str]:
-    results = gates.run_gates(coregates.GATES, coregates.CoreFiles(output, profile))
+def _failed(table: tuple[gates.Gate, ...], files: GateFileReader) -> list[str]:
+    results = gates.run_gates(table, files)
     return sorted(result.name for result in results if not result.passed)
+
+
+def _failed_core(output: Path, profile: CoreProfile) -> list[str]:
+    return _failed(coregates.GATES, coregates.CoreFiles(output, profile))
+
+
+def _failed_cull(output: Path, profile: CullProfile) -> list[str]:
+    return _failed(cullgates.GATES, cullgates.CullFiles(output, profile))
 
 
 def _corrupt(run: Path, side: str, old: str, new: str) -> None:
@@ -150,7 +160,7 @@ def test_the_core_gates_pass_on_a_real_core_run(
 ) -> None:
     output, profile = core_run
 
-    assert _failed(_copy_run(output, tmp_path), profile) == []
+    assert _failed_core(_copy_run(output, tmp_path), profile) == []
 
 
 @pytest.mark.parametrize(
@@ -198,7 +208,73 @@ def test_a_corrupt_core_output_fails_the_named_gates(
     run = _copy_run(output, tmp_path)
     _corrupt(run, side, old, new)
 
-    assert _failed(run, profile) == failed
+    assert _failed_core(run, profile) == failed
+
+
+def _same_lemma_tokens(cards: list[Any]) -> list[list[tuple[str, str]]]:
+    return [[("chat", "VERB")] for _ in cards]
+
+
+@pytest.fixture(scope="module")
+def twin_core_run(
+    tmp_path_factory: pytest.TempPathFactory,
+) -> tuple[Path, CoreProfile]:
+    """Run a core run that keeps two cards with the same lemma set."""
+    options = CoreOptions(
+        max_cards=10,
+        per_word=2,
+        ubiquitous_share=1.0,
+        completion_cards=0,
+        tail_cards=1,
+        similarity=1.1,
+    )
+    _run, output, profile = run_core(
+        tmp_path_factory.mktemp("twin_core_run"),
+        tokenize_deck=_same_lemma_tokens,
+        default_options=options,
+    )
+    return output, profile
+
+
+def test_k6_fails_when_the_run_keeps_two_cards_with_the_same_lemmas(
+    twin_core_run: tuple[Path, CoreProfile], tmp_path: Path
+) -> None:
+    output, profile = twin_core_run
+
+    assert _failed_core(_copy_run(output, tmp_path), profile) == ["K6"]
+
+
+def _minou_tokens(cards: list[Any]) -> list[list[tuple[str, str]]]:
+    """Tag the word chat as the noun lemma minou and the word le as a determiner."""
+    words = [[word.strip(".").casefold() for word in card.sentence.split()] for card in cards]
+    return [
+        [("minou" if word == "chat" else word, "DET" if word == "le" else "NOUN") for word in line]
+        for line in words
+    ]
+
+
+@pytest.fixture(scope="module")
+def lemma_target_core_run(
+    tmp_path_factory: pytest.TempPathFactory,
+) -> tuple[Path, CoreProfile]:
+    """Run a core run with a tier F target whose lemma is not a form of the sentence."""
+    _run, output, profile = run_core(
+        tmp_path_factory.mktemp("lemma_target_core_run"),
+        core_words=1,
+        tokenize_deck=_minou_tokens,
+        word_table=lambda: [(1, "lapin", "rabbit")],
+    )
+    return output, profile
+
+
+def test_k13_tests_a_tier_f_target_by_its_lemma(
+    lemma_target_core_run: tuple[Path, CoreProfile], tmp_path: Path
+) -> None:
+    output, profile = lemma_target_core_run
+    run = _copy_run(output, tmp_path)
+
+    assert "F:minou,minou," in (run.parent / "core.coverage.csv").read_text(encoding="utf-8")
+    assert _failed_core(run, profile) == []
 
 
 def test_check_core_returns_the_exit_code_of_the_gate_table(
@@ -212,3 +288,70 @@ def test_check_core_returns_the_exit_code_of_the_gate_table(
     _corrupt(run, "core.coverage.csv", "S,1,1,1,covered", "S,1,1,0,covered")
 
     assert coregates.check_core(run, profile) == 1
+
+
+@pytest.fixture(scope="module")
+def cull_run(tmp_path_factory: pytest.TempPathFactory) -> tuple[Path, CullProfile]:
+    return run_cull(tmp_path_factory.mktemp("cull_run"))
+
+
+def test_the_cull_gates_pass_on_a_real_cull_run(
+    cull_run: tuple[Path, CullProfile], tmp_path: Path
+) -> None:
+    output, profile = cull_run
+
+    assert _failed_cull(_copy_run(output, tmp_path), profile) == []
+
+
+@pytest.mark.parametrize(
+    ("side", "old", "new", "failed"),
+    [
+        pytest.param(
+            "gated.cull.csv",
+            "a4.mp3,1,,",
+            "a4.mp3,0,max_cards,",
+            ["R1"],
+            id="R1: a card left in the pool and the count is below the cap",
+        ),
+        pytest.param(
+            "gated.coverage.csv",
+            "chat,1,5,",
+            "chien,1,5,",
+            ["R2"],
+            id="R2: a lemma with 5 uses is not exempt",
+        ),
+        pytest.param(
+            "gated.cull.csv",
+            "Le chat aime la fille.,",
+            "Le chat.,",
+            ["R5"],
+            id="R5: a kept card is under the length window",
+        ),
+    ],
+)
+def test_a_corrupt_cull_output_fails_the_named_gates(
+    cull_run: tuple[Path, CullProfile],
+    tmp_path: Path,
+    side: str,
+    old: str,
+    new: str,
+    failed: list[str],
+) -> None:
+    output, profile = cull_run
+    run = _copy_run(output, tmp_path)
+    _corrupt(run, side, old, new)
+
+    assert _failed_cull(run, profile) == failed
+
+
+def test_check_cull_returns_the_exit_code_of_the_gate_table(
+    cull_run: tuple[Path, CullProfile], tmp_path: Path
+) -> None:
+    output, profile = cull_run
+    run = _copy_run(output, tmp_path)
+
+    assert cullgates.check_cull(run, profile) == 0
+
+    _corrupt(run, "gated.cull.csv", "a4.mp3,1,,", "a4.mp3,0,max_cards,")
+
+    assert cullgates.check_cull(run, profile) == 1

@@ -89,6 +89,26 @@ patch repo code. The other patches (`spacy.load`, `gtts`, `edge_tts`, `urlopen`,
   - Surviving mutants: the K6 limit set to 0.0 (no K6 row). The K13 tier test
     flipped to `!=` fails only the pure table, because the fixture tags each
     word as a verb.
+- Follow-up (anki-5n5b):
+  - Cull rows: `test_gates.py` has a module-scoped `run_cull` fixture and rows for R1
+    (a card left in the pool), R2 (a lemma with 5 uses that is not exempt) and R5 (a kept
+    card under the length window), plus one `check_cull` exit-code test and the pass case.
+    The tiny French deck moved to `cull_fixture.cull_deck`; it now has 5 sentences.
+  - R6 has no row. It reads only the output file, which a text edit cannot change.
+  - K6: `test_k6_fails_when_the_run_keeps_two_cards_with_the_same_lemmas` runs the core
+    with `similarity=1.1`, `per_word=2`, `ubiquitous_share=1.0` and a tokenizer that gives
+    every card the same lemma set. Only K6 fails. The named helper is `_same_lemma_tokens`.
+  - K13: `test_k13_tests_a_tier_f_target_by_its_lemma` runs the core with `core_words=1`
+    (a new `run_core` argument) and the helper `_minou_tokens`, which tags chat as the
+    noun lemma minou. The tier F target is not a form of the sentence, so the flip to
+    `tier != "S"` fails the test.
+  - Tests added: 7 (cull pass case, 3 rows, `check_cull`, K6, K13); 1 moved test removed
+    from `test_french_cull.py`. The count goes from 438 to 444.
+  - Mutants killed: R1, R2, R5 forced pass; K6 forced pass; K6 limit 1.01; K13 tier flip;
+    R1 `left >= 0`; R2 without the exempt test; R2 `limit + 1`.
+  - Surviving mutants: the K6 limit set to 0.0, because the K6 run fails with any limit
+    that the equal lemma sets reach.
+  - Time: the suite goes from 10.1 s to 10.8 s (wall 13.2 s to 12.8 s).
 
 ### B. One profile table for the shared cull flow (Worth exploring)
 
