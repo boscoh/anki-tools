@@ -13,6 +13,7 @@ from anki_tools.apkg.shape import OutputShape, write_package
 from anki_tools.gate_files import GateFileReader
 from anki_tools.languages.french import core as french_core
 from anki_tools.languages.french import cull as french_cull
+from anki_tools.languages.spanish import cull as spanish_cull
 from anki_tools.ranking import assemble, coreflow, corelist, cullflow
 from anki_tools.ranking.core import CoreOptions
 from anki_tools.ranking.identity import DeckIdentity
@@ -219,15 +220,52 @@ def cull_deck(tmp_path: Path) -> Path:
     return tiny_deck(tmp_path, CULL_FIELDS, rows, french_cull.MODEL_NAME, audio)
 
 
+SPANISH_FIELDS = ["SpanishSentence", "Audio", "EnglishSentence"]
+SPANISH_SENTENCES = [
+    "El gato come el pescado.",
+    "El gato mira por la ventana.",
+    "El gato duerme en la cama.",
+    "El gato bebe la leche fría.",
+    "El gato corre por el jardín.",
+]
+SPANISH_ENGLISH = [
+    "The cat eats the fish.",
+    "The cat looks out of the window.",
+    "The cat sleeps in the bed.",
+    "The cat drinks the cold milk.",
+    "The cat runs through the garden.",
+]
+
+
+def spanish_cull_deck(tmp_path: Path) -> Path:
+    """Write a Spanish source deck of five cat sentences with one stub MP3 each."""
+    rows = [
+        {
+            "SpanishSentence": sentence,
+            "Audio": f"[sound:a{index}.mp3]",
+            "EnglishSentence": english,
+        }
+        for index, (sentence, english) in enumerate(zip(SPANISH_SENTENCES, SPANISH_ENGLISH))
+    ]
+    audio = [f"a{index}.mp3" for index in range(len(rows))]
+    model_name = spanish_cull.SPANISH_CULL_PROFILE.input_model_name
+    return tiny_deck(tmp_path, SPANISH_FIELDS, rows, model_name, audio)
+
+
+def one_word_profile(
+    tmp_path: Path, profile: cullflow.CullProfile, word: str
+) -> cullflow.CullProfile:
+    """Give ``profile`` with ``word`` as the one frequency row and its sense row."""
+    senses = tmp_path / "senses.tsv"
+    senses.write_text(f"word\tsenses\tfalse_friends\n{word}\tcat\t\n", encoding="utf-8")
+    return replace(
+        profile, load_frequency=lambda: [freq_row(word)], sense_path=senses
+    )
+
+
 def run_cull(tmp_path: Path) -> tuple[Path, cullflow.CullProfile]:
     """Run the French cull on ``cull_deck`` with the one target word ``chat``."""
-    senses = tmp_path / "senses.tsv"
-    senses.write_text("word\tsenses\tfalse_friends\nchat\tcat\t\n", encoding="utf-8")
-    profile = replace(
-        french_cull.FRENCH_CULL_PROFILE,
-        load_frequency=lambda: [freq_row("chat")],
-        sense_path=senses,
-    )
+    profile = one_word_profile(tmp_path, french_cull.FRENCH_CULL_PROFILE, "chat")
     output = tmp_path / "gated.apkg"
     cullflow.run_cull(
         cullflow.CullRequest(

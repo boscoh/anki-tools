@@ -130,10 +130,40 @@ patch repo code. The other patches (`spacy.load`, `gtts`, `edge_tts`, `urlopen`,
 - Seam: `cullflow.run_cull(request, profile)`.
 - Benefits: one interface, N profiles; one four-call helper deleted; one test for
   each rule.
-- Note: `docs/test-refactor-plan.md` already cut the cull tests once. Check the
-  cut-by-value matrix before a test is deleted.
+- Note: commit 89682ed cut the cull tests once, under `docs/test-refactor-plan.md`.
+  The plan batches B1 to B3 cover other files and do not overlap this candidate.
 - Harness change: production code none; test data one profile table; test runner
   one parametrized runner.
+- Decisions (anki-y9g7):
+  - Surface is `cullflow.run_cull(CullRequest, CullProfile)`. No new interface and no
+    production change.
+  - Step 1: delete `_write_cull_deck`, `_tiny_swadesh_deck`, `SWADESH_FIELDS` and
+    `test_write_deck_inserts_the_reserve_card`. Fold their asserts into
+    `test_the_cull_fills_the_core_word_and_the_gloss`: media set, model name equals
+    `DeckIdentity(output).title`, note, card and media counts, and the reserve row.
+  - Step 2: `test_a_second_profile_drives_every_output_value` becomes the table
+    `test_a_profile_drives_every_output_value` over the fake, French and Spanish
+    profiles. The English line, the licenses and the missing `reserve_pack` key move
+    to `test_the_fake_profile_values_reach_the_output`.
+  - Step 3: the French row uses `FRENCH_CULL_PROFILE` and `cull_deck`. The Spanish row
+    uses `SPANISH_CULL_PROFILE` and the new `spanish_cull_deck`. Both rows use
+    `no_reserve=True`, the real spaCy models, and `one_word_profile` for the faked
+    frequency and sense files. The Spanish cull gates do not run.
+  - No other test is deleted. `_tiny_deck` in `test_cull_shared.py` is not the same
+    as `cull_fixture.tiny_deck`: it is a wrapper that builds a fixed three-row deck
+    and calls `tiny_deck`. The two stay apart.
+- Result:
+  - Tests: 444 before, 447 after. Removed 1, added 4 (two table rows, one fake-only
+    test, one French reserve-fields test).
+  - Pytest time: 10.1 s before and 10.1 s after.
+  - The French reserve-fields mutant survived the fold, because the folded test uses
+    the fake `reserve_fields`. The new `test_french_cull` test kills it.
+  - Mutants killed: Spanish `reserve_fields` swap (`test_spanish_cull`, not the new
+    row, which uses `no_reserve=True`); `OUTPUT_FIELDS` order (all three rows);
+    French `input_model_name` (French row); bolding removed (all three rows); deck
+    name, manifest `input_model` (all three rows); gloss emptied and reserve media
+    not copied (the folded test). No mutant survives. `git diff HEAD -- anki_tools/`
+    is empty.
 
 ### C. Run the pack audit for every language (Worth exploring)
 

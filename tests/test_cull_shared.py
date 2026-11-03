@@ -13,21 +13,26 @@ from collections import Counter
 from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Iterable
+from typing import Callable, Iterable
 
 import pytest
 
 from anki_tools.apkg.deck_writer import RunFiles
 from anki_tools.apkg.package import AnkiPackage
+from anki_tools.languages.french import cull as french_cull
+from anki_tools.languages.spanish import cull as spanish_cull
 from anki_tools.ranking import corelist, coreflow, cullflow, cullgates
 from anki_tools.ranking.identity import DeckIdentity
 from tests.cull_fixture import (
     CONTENT_POS,
     ENGLISH,
     card,
+    cull_deck,
     freq_row,
     gate_reader,
+    one_word_profile,
     select,
+    spanish_cull_deck,
     target,
     tiny_deck,
 )
@@ -129,6 +134,7 @@ def _cull(
     max_cards: int = 2,
     source: Path | None = None,
     name: str = "culled.apkg",
+    no_reserve: bool = False,
 ) -> RunFiles:
     return cullflow.run_cull(
         cullflow.CullRequest(
@@ -136,6 +142,7 @@ def _cull(
             output_path=tmp_path / name,
             max_cards=max_cards,
             target_words=2,
+            no_reserve=no_reserve,
         ),
         profile,
     )
@@ -146,32 +153,67 @@ def _notes(path: Path) -> list[list[str]]:
         return [str(row["flds"]).split("\x1f") for row in package.get_notes()]
 
 
-def test_a_second_profile_drives_every_output_value(tmp_path: Path) -> None:
-    run = _cull(tmp_path, _profile())
-    output = run.output_path
+def _fake_profile(tmp_path: Path) -> cullflow.CullProfile:
+    return _profile()
 
-    title = DeckIdentity(output).title
-    with AnkiPackage(output) as package:
+
+def _french_profile(tmp_path: Path) -> cullflow.CullProfile:
+    return one_word_profile(tmp_path, french_cull.FRENCH_CULL_PROFILE, "chat")
+
+
+def _spanish_profile(tmp_path: Path) -> cullflow.CullProfile:
+    return one_word_profile(tmp_path, spanish_cull.SPANISH_CULL_PROFILE, "gato")
+
+
+OUTPUT_FIELDS = ["Audio", "Sentence", "English", "Core", "CoreGloss"]
+
+
+@pytest.mark.parametrize(
+    ("make_profile", "make_deck", "fields", "bolded"),
+    [
+        pytest.param(_fake_profile, _tiny_deck, OUTPUT_FIELDS, "kat", id="fake"),
+        pytest.param(_french_profile, cull_deck, OUTPUT_FIELDS, "chat", id="french"),
+        pytest.param(_spanish_profile, spanish_cull_deck, OUTPUT_FIELDS, "gato", id="spanish"),
+    ],
+)
+def test_a_profile_drives_every_output_value(
+    tmp_path: Path,
+    make_profile: Callable[[Path], cullflow.CullProfile],
+    make_deck: Callable[[Path], Path],
+    fields: list[str],
+    bolded: str,
+) -> None:
+    profile = make_profile(tmp_path)
+
+    run = _cull(tmp_path, profile, source=make_deck(tmp_path), no_reserve=True)
+
+    title = DeckIdentity(run.output_path).title
+    with AnkiPackage(run.output_path) as package:
         models = package.get_models()
         decks = {deck["name"] for deck in package.get_decks().values()}
-        fields = [field["name"] for model in models.values() for field in model["flds"]]
+        names = [field["name"] for model in models.values() for field in model["flds"]]
         cards = package.get_cards()
-    notes = _notes(output)
-
+    notes = _notes(run.output_path)
     assert {model["name"] for model in models.values()} == {title}
     assert decks == {title}
-    assert fields == ["Audio", "Sentence", "English", "Core", "CoreGloss"]
+    assert names == fields
     assert len(cards) == len(notes) == 2
     assert {int(row["ord"]) for row in cards} == {0}
-    assert notes[0][1].startswith("<b>kat</b> ser")
-    assert notes[0][2] == "cat is big."
-    assert notes[0][3] == "kat"
-
+    assert notes[0][3] == bolded
+    assert f"<b>{bolded}</b>" in notes[0][1]
     assert run.manifest_path is not None
     manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
     assert manifest["source"]["model"] == title
-    assert manifest["source"]["input_model"] == MODEL_NAME
     assert manifest["source"]["deck"] == title
+    assert manifest["source"]["input_model"] == profile.input_model_name
+
+
+def test_the_fake_profile_values_reach_the_output(tmp_path: Path) -> None:
+    run = _cull(tmp_path, _profile())
+
+    assert _notes(run.output_path)[0][2] == "cat is big."
+    assert run.manifest_path is not None
+    manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
     assert manifest["licenses"] == {"data": "test license"}
     assert "reserve_pack" not in manifest
 
@@ -480,11 +522,20 @@ def test_the_cull_fills_the_core_word_and_the_gloss(tmp_path: Path) -> None:
         reserve_pack=_reserve_pack(tmp_path),
     )
 
-    values = _notes(_cull(tmp_path, profile).output_path)
+    output = _cull(tmp_path, profile).output_path
+
+    with AnkiPackage(output) as package:
+        media = set(package.get_media_mapping().values())
+        models = {model["name"] for model in package.get_models().values()}
+        cards = package.get_cards()
+    values = _notes(output)
 
     reserve = next(row for row in values if "<b>je</b>" in row[1])
     frequency = next(row for row in values if "<b>je</b>" not in row[1])
-    assert reserve[3:] == ["je", "I"]
+    assert len(values) == len(cards) == len(media) == 2
+    assert media == {"in.mp3", "reserve.mp3"}
+    assert models == {DeckIdentity(output).title}
+    assert reserve[:1] + reserve[2:5] == ["[sound:reserve.mp3]", "I am here.", "je", "I"]
     assert frequency[3:] == ["kat", "cat"]
 
 
