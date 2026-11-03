@@ -121,6 +121,13 @@ rank checks live in `anki_tools/ranking/gates.py`, and the reader lives in
 `anki_tools/gate_files.py`. `docs/gates.md` holds the tables and the contract.
 _Avoid_: audit list, check list
 
+**Corrupt-output case**:
+One row of a gate table test that damages one side file of a real run, then
+proves that a named gate fails. It belongs to the **Gate table** tests. The row
+holds the gate id, the side file, the old text, the new text, and the sorted
+gate ids that fail. The code lives in `tests/test_gates.py`.
+_Avoid_: mutation test, fuzz case
+
 **Language deck profile**:
 The language facts of one deck family, with a core mode view and a cull mode
 view over them. The code lives in `anki_tools/ranking/deckprofile.py`.

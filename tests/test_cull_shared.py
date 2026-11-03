@@ -26,6 +26,7 @@ from tests.cull_fixture import (
     ENGLISH,
     card,
     freq_row,
+    gate_reader,
     select,
     target,
     tiny_deck,
@@ -542,18 +543,18 @@ def test_the_use_cap_gate(
         SimpleNamespace(sentence=f"kat {index}", english=text)
         for index, text in enumerate(english)
     ]
-    files = SimpleNamespace(
-        coverage=list,
-        rows=lambda: [
+    files = gate_reader(
+        replace(_profile(), sense_path=_senses(tmp_path)),
+        coverage=[],
+        rows=[
             {"sentence": card.sentence, "source": source, "kept": "1"}
             for card, source in zip(cards, sources)
         ],
-        output=lambda: {"cards": cards},
-        tokens=lambda: [[("kat", "NOUN")]] * len(cards),
-        profile=replace(_profile(), sense_path=_senses(tmp_path)),
+        output={"cards": cards},
+        tokens=[[("kat", "NOUN")]] * len(cards),
     )
 
-    result, message = cullgates.gate_use_cap(files)  # type: ignore
+    result, message = cullgates.gate_use_cap(files)
 
     assert result is passes, message
 
@@ -566,14 +567,12 @@ def test_the_use_cap_gate(
     ],
 )
 def test_the_filter_gate_skips_a_reserve_card(source: str, passes: bool) -> None:
-    files = SimpleNamespace(
-        rows=lambda: [
-            {"sentence": "kat", "english": "cat", "source": source, "kept": "1"}
-        ],
-        profile=_profile(),
+    files = gate_reader(
+        _profile(),
+        rows=[{"sentence": "kat", "english": "cat", "source": source, "kept": "1"}],
     )
 
-    result, message = cullgates.gate_filter_recheck(files)  # type: ignore
+    result, message = cullgates.gate_filter_recheck(files)
 
     assert result is passes, message
 
@@ -587,15 +586,15 @@ def test_the_filter_gate_skips_a_reserve_card(source: str, passes: bool) -> None
     ],
 )
 def test_the_card_cap_gate(kept: int, dropped: int, left: int, passes: bool) -> None:
-    files = SimpleNamespace(
-        rows=lambda: [{"kept": "1"}] * kept
+    files = gate_reader(
+        None,
+        rows=[{"kept": "1"}] * kept
         + [{"kept": "0", "reason": "max_cards"}] * left
         + [{"kept": "0", "reason": "similar"}],
-        params=lambda: {"max_cards": 1000},
-        manifest=lambda: {"counts": {"dropped_no_core": dropped}},
+        manifest={"params": {"max_cards": 1000}, "counts": {"dropped_no_core": dropped}},
     )
 
-    result, message = cullgates.gate_card_cap(files)  # type: ignore
+    result, message = cullgates.gate_card_cap(files)
 
     assert result is passes, message
     assert f"{kept} kept + {dropped} dropped" in message

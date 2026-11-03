@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
+import shutil
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any
 
 import pytest
 
 from anki_tools.gate_files import GateFileReader
 from anki_tools.ranking import coregates, gates
+from anki_tools.ranking.scan import CoreProfile
+from tests.cull_fixture import gate_reader, run_core
 
 
 def test_a_missing_file_fails_only_the_gates_that_read_it(tmp_path: Path) -> None:
@@ -58,17 +62,6 @@ def test_the_report_prints_one_table(capsys) -> None:
     assert "1 of 1 gates failed: K1" in failed
 
 
-class _CoverageFiles:
-    """Reader with one coverage table and one profile floor."""
-
-    def __init__(self, counts: list[str], floor: float) -> None:
-        self._rows = [{"count": count} for count in counts]
-        self.profile = SimpleNamespace(coverage_floor=floor)
-
-    def coverage(self) -> list[dict[str, str]]:
-        return self._rows
-
-
 @pytest.mark.parametrize(
     ("counts", "passed"),
     [(["2", "1", "1", "0", "0"], True), (["2", "1", "0", "0", "0"], False)],
@@ -76,48 +69,41 @@ class _CoverageFiles:
 def test_coverage_floor_counts_absent_targets_as_not_covered(
     counts: list[str], passed: bool
 ) -> None:
-    ok, message = coregates.gate_coverage_floor(_CoverageFiles(counts, 0.6))  # type: ignore[arg-type]
+    files = gate_reader(
+        SimpleNamespace(coverage_floor=0.6),
+        coverage=[{"count": count} for count in counts],
+    )
+
+    ok, message = coregates.gate_coverage_floor(files)
 
     assert ok is passed
     assert "floor 0.60" in message
 
 
-class _CoreWordFiles:
-    """Reader with two kept cards whose Core words may be swapped."""
-
-    def __init__(self, shown: dict[int, str]) -> None:
-        self.profile = SimpleNamespace(
+def _core_word_files(shown: dict[int, str]) -> Any:
+    """Give a reader of two kept cards whose Core words may be swapped."""
+    return gate_reader(
+        SimpleNamespace(
             hits=lambda sentence, forms: {form for form in forms if form in sentence}
-        )
-        self._shown = shown
-        self._cards = [
-            SimpleNamespace(note_id=1, sentence="le chat dort"),
-            SimpleNamespace(note_id=2, sentence="le chien mange"),
-        ]
-
-    def coverage(self) -> list[dict[str, str]]:
-        return [
+        ),
+        coverage=[
             {"key": "S1:chat", "tier": "S", "word": "chat"},
             {"key": "S2:chien", "tier": "S", "word": "chien"},
-        ]
-
-    def rows(self) -> list[dict[str, str]]:
-        return [
+        ],
+        rows=[
             {"kept": "1", "note_id": "1", "sentence": "le chat dort", "targets": "S1:chat"},
             {"kept": "1", "note_id": "2", "sentence": "le chien mange", "targets": "S2:chien"},
-        ]
-
-    def output(self) -> dict[str, list]:
-        return {"cards": self._cards}
-
-    def tokens(self) -> list[list]:
-        return [[], []]
-
-    def fields(self) -> list[str]:
-        return ["Audio", "Sentence", "English", "Core", "CoreGloss"]
-
-    def notes(self) -> dict[int, list[str]]:
-        return {note: ["", "", "", word, ""] for note, word in self._shown.items()}
+        ],
+        output={
+            "cards": [
+                SimpleNamespace(note_id=1, sentence="le chat dort"),
+                SimpleNamespace(note_id=2, sentence="le chien mange"),
+            ]
+        },
+        tokens=[[], []],
+        fields=["Audio", "Sentence", "English", "Core", "CoreGloss"],
+        notes={note: ["", "", "", word, ""] for note, word in shown.items()},
+    )
 
 
 @pytest.mark.parametrize(
@@ -131,6 +117,98 @@ class _CoreWordFiles:
 def test_target_in_sentence_also_checks_the_shown_core_word(
     shown: dict[int, str], passed: bool
 ) -> None:
-    ok, _message = coregates.gate_target_in_sentence(_CoreWordFiles(shown))  # type: ignore[arg-type]
+    ok, _message = coregates.gate_target_in_sentence(_core_word_files(shown))
 
     assert ok is passed
+
+
+@pytest.fixture(scope="module")
+def core_run(tmp_path_factory: pytest.TempPathFactory) -> tuple[Path, CoreProfile]:
+    _run, output, profile = run_core(tmp_path_factory.mktemp("core_run"))
+    return output, profile
+
+
+def _copy_run(output: Path, tmp_path: Path) -> Path:
+    shutil.copytree(output.parent, tmp_path / "run")
+    return tmp_path / "run" / output.name
+
+
+def _failed(output: Path, profile: CoreProfile) -> list[str]:
+    results = gates.run_gates(coregates.GATES, coregates.CoreFiles(output, profile))
+    return sorted(result.name for result in results if not result.passed)
+
+
+def _corrupt(run: Path, side: str, old: str, new: str) -> None:
+    path = run.parent / side
+    text = path.read_text(encoding="utf-8")
+    assert old in text
+    path.write_text(text.replace(old, new), encoding="utf-8")
+
+
+def test_the_core_gates_pass_on_a_real_core_run(
+    core_run: tuple[Path, CoreProfile], tmp_path: Path
+) -> None:
+    output, profile = core_run
+
+    assert _failed(_copy_run(output, tmp_path), profile) == []
+
+
+@pytest.mark.parametrize(
+    ("side", "old", "new", "failed"),
+    [
+        pytest.param(
+            "core.core.csv",
+            "Le chat dort.,",
+            "Le chat dort ici.,",
+            ["K5"],
+            id="K5: the CSV sentence differs from the output",
+        ),
+        pytest.param(
+            "core.coverage.csv",
+            "S1:chat,chat,",
+            "S1:chat,cha,",
+            ["K13"],
+            id="K13: the target form is not a word of the sentence",
+        ),
+        pytest.param(
+            "core.coverage.csv",
+            "S,1,1,1,covered",
+            "S,1,1,0,covered",
+            ["K23"],
+            id="K23: the coverage count is 0",
+        ),
+        pytest.param(
+            "core.coverage.csv",
+            "S1:chat,chat,",
+            "S1:chat,lapin,",
+            ["K13", "K24"],
+            id="K24: the form is absent from the text",
+        ),
+    ],
+)
+def test_a_corrupt_core_output_fails_the_named_gates(
+    core_run: tuple[Path, CoreProfile],
+    tmp_path: Path,
+    side: str,
+    old: str,
+    new: str,
+    failed: list[str],
+) -> None:
+    output, profile = core_run
+    run = _copy_run(output, tmp_path)
+    _corrupt(run, side, old, new)
+
+    assert _failed(run, profile) == failed
+
+
+def test_check_core_returns_the_exit_code_of_the_gate_table(
+    core_run: tuple[Path, CoreProfile], tmp_path: Path
+) -> None:
+    output, profile = core_run
+    run = _copy_run(output, tmp_path)
+
+    assert coregates.check_core(run, profile) == 0
+
+    _corrupt(run, "core.coverage.csv", "S,1,1,1,covered", "S,1,1,0,covered")
+
+    assert coregates.check_core(run, profile) == 1

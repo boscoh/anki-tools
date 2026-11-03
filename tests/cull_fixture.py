@@ -10,6 +10,7 @@ from typing import Any, Sequence
 from anki_tools.apkg import deck_writer
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.shape import OutputShape, write_package
+from anki_tools.gate_files import GateFileReader
 from anki_tools.languages.french import core as french_core
 from anki_tools.languages.french import cull as french_cull
 from anki_tools.ranking import assemble, coreflow, corelist, cullflow
@@ -21,6 +22,17 @@ from tests.deck_fixture import write_mp3s
 
 ENGLISH = "A short English line."
 CONTENT_POS = corelist.CONTENT_POS
+
+
+def gate_reader(profile: Any, **values: Any) -> Any:
+    """Give a gate reader with ``profile`` that returns each given value by name.
+
+    The type is ``Any``: the gates name ``CoreFiles`` or ``CullFiles`` in their
+    signatures, and the reader is a stand-in for both.
+    """
+    reader = GateFileReader({name: lambda value=value: value for name, value in values.items()})
+    reader.profile = profile
+    return reader
 
 
 def card(

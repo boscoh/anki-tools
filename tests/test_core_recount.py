@@ -9,8 +9,10 @@ from types import SimpleNamespace
 import pytest
 import spacy
 
+from anki_tools.gate_files import GateFileReader
 from anki_tools.ranking import corerecount
 from tests.ast_fixture import imported_names
+from tests.cull_fixture import gate_reader
 
 LEMMAS = {"sais": "savoir", "donne": "donner", "senté": "sentar"}
 
@@ -28,16 +30,11 @@ def _fake_spacy(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(spacy, "load", lambda _name, **_kwargs: nlp)
 
 
-class _Files:
-    """Reader with one kept card, one coverage table, and the card fields."""
-
-    def __init__(self, sentence: str, targets: str, core: str, model: str = "") -> None:
-        self.profile = SimpleNamespace(recount_model=model)
-        self._fields = [sentence, core]
-        self._targets = targets
-
-    def coverage(self) -> list[dict[str, str]]:
-        return [
+def _files(sentence: str, targets: str, core: str, model: str = "") -> GateFileReader:
+    """Give a reader with one kept card, one coverage table, and the card fields."""
+    return gate_reader(
+        SimpleNamespace(recount_model=model),
+        coverage=[
             {"key": "S1:得到", "tier": "S", "word": "得到"},
             {"key": "S2:我", "tier": "S", "word": "我"},
             {"key": "F:好", "tier": "F", "word": "好"},
@@ -45,19 +42,14 @@ class _Files:
             {"key": "S4:ne pas", "tier": "S", "word": "ne pas"},
             {"key": "S5:fumée", "tier": "S", "word": "fumée"},
             {"key": "S6:sentarse", "tier": "S", "word": "sentarse"},
-        ]
-
-    def rows(self) -> list[dict[str, str]]:
-        return [
-            {"kept": "1", "note_id": "1", "sentence": self._fields[0], "targets": self._targets},
+        ],
+        rows=[
+            {"kept": "1", "note_id": "1", "sentence": sentence, "targets": targets},
             {"kept": "0", "note_id": "2", "sentence": "没有", "targets": "S1:得到"},
-        ]
-
-    def fields(self) -> list[str]:
-        return ["Sentence", "Core"]
-
-    def notes(self) -> dict[int, list[str]]:
-        return {1: self._fields}
+        ],
+        fields=["Sentence", "Core"],
+        notes={1: [sentence, core]},
+    )
 
 
 MODEL = "fake_model"
@@ -79,13 +71,13 @@ CASES = [
 
 @pytest.mark.parametrize(("label", "sentence", "targets", "core", "model", "passed"), CASES)
 def test_recount_forms(label, sentence, targets, core, model, passed) -> None:
-    ok, _message = corerecount.gate_recount_forms(_Files(sentence, targets, core, model))  # type: ignore[arg-type]
+    ok, _message = corerecount.gate_recount_forms(_files(sentence, targets, core, model))
 
     assert ok is passed, label
 
 
 def test_the_gate_names_the_missing_form() -> None:
-    _ok, message = corerecount.gate_recount_forms(_Files("我拿到了。", "S1:得到", ""))  # type: ignore[arg-type]
+    _ok, message = corerecount.gate_recount_forms(_files("我拿到了。", "S1:得到", ""))
 
     assert message.startswith("1 form(s) absent of 1 checked: 得到")
 
