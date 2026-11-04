@@ -21,7 +21,7 @@ from tests.mandarin_fixture import (
     ROWS,
     TABLE,
     audio_entries,
-    card,
+    pack_row,
     write_audio,
     write_csv,
 )
@@ -187,7 +187,7 @@ def _gate(results: list[GateResult], gate_id: str) -> tuple[bool, str]:
     return next((passed, message) for gate, passed, message in results if gate == gate_id)
 
 
-def _card(**changes: str) -> dict[str, str]:
+def _row_with(**changes: str) -> dict[str, str]:
     return ROWS[0] | changes
 
 
@@ -200,7 +200,7 @@ def test_base_pack_fails_only_the_word_table_gate(tmp_path: Path) -> None:
     assert print_audit(results) == 1
 
 
-MOON = card("月", "月亮很大。", "yuè liang hěn dà", "The moon is big.", "900", "bob")
+MOON = pack_row("月", "月亮很大。", "yuè liang hěn dà", "The moon is big.", "900", "bob")
 SIMILAR_AT_LIMIT = _overlap_pair(67)
 SIMILAR_BELOW_LIMIT = _overlap_pair(66)
 
@@ -227,17 +227,17 @@ SIMILAR_BELOW_LIMIT = _overlap_pair(66)
             id="P3 a target on a shared form",
         ),
         pytest.param(
-            {"rows": ROWS + [_card(sentence="这里没有水。", pinyin="zhè lǐ méi yǒu shuǐ")]},
+            {"rows": ROWS + [_row_with(sentence="这里没有水。", pinyin="zhè lǐ méi yǒu shuǐ")]},
             "P4", False, ("duplicate Tatoeba id", "200"),
             id="P4 a repeated Tatoeba id",
         ),
         pytest.param(
-            {"rows": ROWS + [_card(sentence="水里有水。", pinyin="shuǐ lǐ yǒu shuǐ", tatoeba_id="600")]},
+            {"rows": ROWS + [_row_with(sentence="水里有水。", pinyin="shuǐ lǐ yǒu shuǐ", tatoeba_id="600")]},
             "P5", False, ("水 x2",),
             id="P5 a target that appears twice",
         ),
         pytest.param(
-            {"rows": ROWS + [_card(sentence="我要水。", pinyin="wǒ yào shuǐ", tatoeba_id="700")]},
+            {"rows": ROWS + [_row_with(sentence="我要水。", pinyin="wǒ yào shuǐ", tatoeba_id="700")]},
             "P6", False, ("0.67 limit", "0.75"),
             id="P6 a similar pair",
         ),
@@ -245,8 +245,8 @@ SIMILAR_BELOW_LIMIT = _overlap_pair(66)
             {
                 "rows": ROWS
                 + [
-                    _card(sentence=SIMILAR_AT_LIMIT[0], tatoeba_id="701"),
-                    _card(target="火", sentence=SIMILAR_AT_LIMIT[1], tatoeba_id="702"),
+                    _row_with(sentence=SIMILAR_AT_LIMIT[0], tatoeba_id="701"),
+                    _row_with(target="火", sentence=SIMILAR_AT_LIMIT[1], tatoeba_id="702"),
                 ]
             },
             "P6", False, ("= 0.67",),
@@ -256,8 +256,8 @@ SIMILAR_BELOW_LIMIT = _overlap_pair(66)
             {
                 "rows": ROWS
                 + [
-                    _card(sentence=SIMILAR_BELOW_LIMIT[0], tatoeba_id="701"),
-                    _card(target="火", sentence=SIMILAR_BELOW_LIMIT[1], tatoeba_id="702"),
+                    _row_with(sentence=SIMILAR_BELOW_LIMIT[0], tatoeba_id="701"),
+                    _row_with(target="火", sentence=SIMILAR_BELOW_LIMIT[1], tatoeba_id="702"),
                 ]
             },
             "P6", True, ("stay below",),

@@ -293,6 +293,28 @@ patch repo code. The other patches (`spacy.load`, `gtts`, `edge_tts`, `urlopen`,
 - Benefits: locality (one edit, one place); about eight copies deleted.
 - Harness change: production code none; test data none; test runner fixture
   modules only.
+- Decisions:
+  - Merge only the two real duplicates: `_card` and `_target`.
+  - `_card` in `test_shared_coreflow.py` is deleted. Its call sites use
+    `cull_fixture.card`. The default English is the fixture `ENGLISH`.
+  - `_target` is deleted. `cull_fixture.core_target` takes the keyword
+    parameters `form` and `gloss`.
+  - `mandarin_fixture.card` is now `pack_row`. `test_mandarin_audit._card` is
+    now `_row_with`.
+  - `_form`, `_profile`, and `_tiny_deck` stay. They are not duplicates.
+    `_form` builds a French `WordForm` in one file and a Mandarin `WordForm` in
+    the other. `_profile` builds a `CoreProfile` in one file and a `CullProfile`
+    in the other. `_tiny_deck` is a wrapper with fixed rows. The text above
+    overstated the problem.
+- Result:
+  - Two builders deleted, not eight. Two names changed.
+  - The test count stays 510. The run time stays near 11 s.
+  - The default English does not change a result: the one call that uses it,
+    `filter_core_cards([card(sentence)], profile)`, reads only the sentence.
+  - No test fails when the `1000 + index` rule changes. No test reads the
+    `note_id` of a fixture card.
+  - The unused `false_friends` parameter of the old `_target` was not kept. No
+    call used it.
 
 ### G. Name tests for behavior and table the repeats (Speculative)
 

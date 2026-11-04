@@ -14,7 +14,7 @@ from anki_tools.languages.french import profile as french
 from anki_tools.languages.greek import profile as greek
 from anki_tools.languages.spanish import profile as spanish
 from anki_tools.sentence_pack import pack
-from tests.mandarin_fixture import audio_entries, card, write_audio, write_csv
+from tests.mandarin_fixture import audio_entries, pack_row, write_audio, write_csv
 from tests.token_fixture import nlp  # noqa: F401
 
 CARDS = [
@@ -51,7 +51,7 @@ def test_the_pack_build_writes_one_bold_card_with_its_audio(
     tmp_path: Path, profile: Any, form: Any, sentence: str
 ) -> None:
     target = profile.form_text(form)
-    row = card(target, sentence, "", "I want water.", "200", "bob") | {
+    row = pack_row(target, sentence, "", "I want water.", "200", "bob") | {
         "jyutping": "ngo5 soeng2 jam2 seoi2"
     }
     audio_dir = tmp_path / "audio"

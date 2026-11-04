@@ -31,7 +31,7 @@ TABLE = [
 ]
 
 
-def card(
+def pack_row(
     target: str,
     sentence: str,
     pinyin: str,
@@ -55,10 +55,10 @@ def card(
 
 
 ROWS = [
-    card("水", "我要喝水。", "wǒ yào hē shuǐ", "I want to drink water.", "200", "bob"),
-    card("火", "这场火很大。", "zhè chǎng huǒ hěn dà", "This fire is big.", "300", "amy"),
-    card("山", "山上有雪。", "shān shàng yǒu xuě", "There is snow on the mountain.", "400", "bob"),
-    card("狗", "那只狗很黑。", "nà zhī gǒu hěn hēi", "That dog is black.", "500", "amy"),
+    pack_row("水", "我要喝水。", "wǒ yào hē shuǐ", "I want to drink water.", "200", "bob"),
+    pack_row("火", "这场火很大。", "zhè chǎng huǒ hěn dà", "This fire is big.", "300", "amy"),
+    pack_row("山", "山上有雪。", "shān shàng yǒu xuě", "There is snow on the mountain.", "400", "bob"),
+    pack_row("狗", "那只狗很黑。", "nà zhī gǒu hěn hēi", "That dog is black.", "500", "amy"),
 ]
 
 

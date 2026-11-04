@@ -18,45 +18,11 @@ from anki_tools.ranking import coreflow
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
 from anki_tools.ranking.corelist import CoreTarget
 from anki_tools.ranking.scan import CoreProfile
-from anki_tools.sentence_pack.english_sense import SenseRow
+from tests.cull_fixture import card, core_target
 from tests.shape_fixture import PROFILES, shape_rules
 
 WORD_PATTERN = re.compile(r"[^\W\d_]+")
 TWO = ("El perro come pan.", "El gato come pan.")
-
-
-def _card(
-    sentence: str = "El perro come pan.",
-    index: int = 0,
-    english: str = "The dog eats bread.",
-    audio: str = "a.mp3",
-) -> coreflow.InputCard:
-    return coreflow.InputCard(
-        note_id=1000 + index,
-        sentence=sentence,
-        english=english,
-        audio=audio,
-        index=index,
-    )
-
-
-def _target(
-    key: str,
-    tier: str = "S",
-    position: int = 1,
-    form: str = "",
-    gloss: str = "",
-    senses: frozenset[str] = frozenset(),
-    false_friends: frozenset[str] = frozenset(),
-) -> CoreTarget:
-    return CoreTarget(
-        key=key,
-        tier=tier,
-        position=position,
-        form=form or key.split(":")[-1],
-        gloss=gloss,
-        sense=SenseRow(senses=senses, false_friends=false_friends),
-    )
 
 
 def _hits(sentence: str, forms: Collection[str]) -> dict[str, int]:
@@ -75,11 +41,11 @@ def _profile(**overrides: object) -> CoreProfile:
 def _hit_fixture() -> tuple[
     list[coreflow.InputCard], list[list[tuple[str, str]]], list[CoreTarget]
 ]:
-    cards = [_card("Yo bebo agua.", english="I drink water.")]
+    cards = [card("Yo bebo agua.", english="I drink water.")]
     tokens = [[("beber", "VERB")]]
     targets = [
-        _target("S1:agua", position=1, form="agua", gloss="water"),
-        _target("F:beber", tier="F", position=2, senses=frozenset({"drink"})),
+        core_target("S1:agua", position=1, form="agua", gloss="water"),
+        core_target("F:beber", tier="F", position=2, senses=frozenset({"drink"})),
     ]
     return cards, tokens, targets
 
@@ -87,7 +53,7 @@ def _hit_fixture() -> tuple[
 class TestCoreHits:
     def test_a_tier_s_hit_without_the_gloss_is_a_sense_failure(self) -> None:
         _fixture_cards, tokens, targets = _hit_fixture()
-        cards = [_card("Yo bebo agua.", english="I drink wine.")]
+        cards = [card("Yo bebo agua.", english="I drink wine.")]
 
         hits, failures, _present = coreflow.core_hits(
             cards, tokens, [0], targets, _profile()
@@ -99,7 +65,7 @@ class TestCoreHits:
     def test_a_tier_f_hit_needs_its_sense(self) -> None:
         cards, tokens, _targets = _hit_fixture()
         targets = [
-            _target("F:beber", tier="F", position=1, senses=frozenset({"eat"}))
+            core_target("F:beber", tier="F", position=1, senses=frozenset({"eat"}))
         ]
 
         hits, failures, present = coreflow.core_hits(
@@ -112,7 +78,7 @@ class TestCoreHits:
 
     def test_a_token_outside_the_core_list_is_ignored(self) -> None:
         _cards, _tokens, targets = _hit_fixture()
-        cards = [_card("Yo bebo vino.", english="I drink wine.")]
+        cards = [card("Yo bebo vino.", english="I drink wine.")]
         tokens = [[("perro", "NOUN")]]
 
         hits, failures, present = coreflow.core_hits(
@@ -125,7 +91,7 @@ class TestCoreHits:
 
     def test_a_function_word_token_is_ignored(self) -> None:
         _cards, _tokens, targets = _hit_fixture()
-        cards = [_card("Yo bebo vino.", english="I drink wine.")]
+        cards = [card("Yo bebo vino.", english="I drink wine.")]
         tokens = [[("beber", "DET")]]
 
         hits, _failures, present = coreflow.core_hits(
@@ -218,7 +184,7 @@ class TestCardFilter:
     ) -> None:
         profile = PROFILES[language]
 
-        passed, reasons = coreflow.filter_core_cards([_card(sentence)], profile)
+        passed, reasons = coreflow.filter_core_cards([card(sentence)], profile)
 
         assert reasons == [expected]
         assert passed == ([] if expected else [0])
@@ -235,7 +201,7 @@ class TestCardFilter:
     def test_a_card_is_unique_by_its_sentence_and_its_english(
         self, sentences: tuple[str, str], english: tuple[str, str], expected: list[int]
     ) -> None:
-        cards = [_card(sentences[i], i, english[i]) for i in (0, 1)]
+        cards = [card(sentences[i], i, english[i]) for i in (0, 1)]
 
         passed, reasons = coreflow.filter_core_cards(cards, PROFILES["spanish"])
 

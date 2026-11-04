@@ -115,13 +115,15 @@ def core_target(
     tier: str = "S",
     position: int = 1,
     senses: frozenset[str] = frozenset(),
+    form: str = "",
+    gloss: str = "",
 ) -> corelist.CoreTarget:
     return corelist.CoreTarget(
         key=key,
         tier=tier,
         position=position,
-        form=key.split(":")[-1],
-        gloss="",
+        form=form or key.split(":")[-1],
+        gloss=gloss,
         sense=SenseRow(senses=senses),
     )
 
