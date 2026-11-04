@@ -181,6 +181,42 @@ patch repo code. The other patches (`spacy.load`, `gtts`, `edge_tts`, `urlopen`,
   composed; one fixture, not two.
 - Harness change: production code none; test data one extra column; test runner
   one extra step.
+- Decisions (anki-s050):
+  - Surface is `run_pack_audit(profile, gates, ...)` on the output of `pack.build_pack`. No
+    production change.
+  - The gate list is the language gate list, not `GENERIC_GATES`: `french_gates()`,
+    `greek_gates()`, `spanish_gates()`, `cantonese_gates()` and `mandarin.stages.GATES`.
+    `GENERIC_GATES` has no production caller, so the table does not use it.
+  - The `CARDS` table gets a `gates` column and a Mandarin row (five rows). Each row builds
+    the pack, audits it, and asserts that only P1 fails. The word CSV is a bare header, so
+    P1 is the one gate that cannot pass.
+  - `tests/pack_fixture.py` holds `write_inputs` (audio directory, sentence CSV, word CSV, review
+    CSV), `write_apkg` and `build_env`, moved from `test_mandarin_audit.py`. `write_inputs` serves
+    `build_env` and the build test. The old copies are deleted.
+  - `test_french_pack._audit_inputs` stays. It builds a bare `AuditInputs` for single-gate calls
+    with a hand-set row and no APKG, which `write_inputs` cannot give. The single-gate rows of
+    `test_mandarin_audit.py` stay.
+  - The Mandarin pinyin column moves to the row for every language, next to `jyutping`, because
+    P9 counts the syllables of the sentence. Other languages ignore it.
+- Result:
+  - Tests: 510 before, 511 after. The test `test_the_pack_build_writes_one_bold_card_with_its_audio`
+    is now `..._that_passes_the_audit`; the Mandarin row is the one new item.
+  - Pytest time: 11.2 s before and 10.8 s after.
+  - Mutants killed, each by the audit assert of `test_pack_build` (all five rows unless noted):
+    P8 `!=` flipped to `==`; P10 `<` flipped to `>`; P11 `cards` plus one; P13 note count
+    `!=` flipped to `==`; P16 `startswith` negated; P1 forced to pass; Cantonese P17 flag
+    inverted (Cantonese row only); French P19 forced to fail (French row only); Spanish P19
+    forced to fail (Spanish row only); Mandarin P9 `!=` flipped to `==` (Mandarin row only);
+    Greek P18 source test `native` swapped for `tts` (Greek row only).
+  - Surviving mutants: none among those tried. P2 to P7, P14, P15 and the Mandarin P12 were not
+    mutated here; the single-gate tables cover them. `git diff HEAD -- anki_tools/` is empty.
+- Gaps:
+  - French P19 and Spanish P19 pass without a check: the one-card pool holds no discontinuous
+    or pair target, so only a forced failure proves the gate runs. A real check needs a pool row
+    with such a target.
+  - Cantonese P18 and Mandarin P12 pass on tts rows only. A native-audio pool would need a license
+    row and an author map.
+  - The review CSV is the Mandarin row for every language; only its status is read by P15.
 
 ### D. One case table for all language profiles (Worth exploring)
 

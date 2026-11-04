@@ -2,37 +2,19 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 import pytest
 
-from anki_tools.apkg.package import AnkiPackage
 from anki_tools.gates import GateResult
-from anki_tools.languages.mandarin.profile import FIELDS, SENTENCE_FIELDS, WordForm
+from anki_tools.languages.mandarin.profile import FIELDS, WordForm
 from anki_tools.languages.mandarin.stages import GATES, MANDARIN, print_audit
-from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.sentence_pack.audio import MAX_DURATION_S, MIN_DURATION_S
 from anki_tools.sentence_pack.audit import run_pack_audit
-from tests.deck_fixture import write_mp3s
-from tests.mandarin_fixture import (
-    ROWS,
-    TABLE,
-    audio_entries,
-    pack_row,
-    write_audio,
-    write_csv,
-)
-
-PACK_PATH = default_output("mandarin", "pack")
-MODEL_NAME = DeckIdentity(PACK_PATH).model_name
-REVIEW_FIELDS = ["lang", "index", "english", "current", "canonical", "issue", "fix", "status"]
-
-
-def _sha256(path: Path) -> str:
-    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
+from tests.mandarin_fixture import ROWS, TABLE, pack_row
+from tests.pack_fixture import MODEL_NAME, build_env, write_apkg
 
 
 def _probe(duration: float):
@@ -48,117 +30,6 @@ def _overlap_pair(shared: int) -> tuple[str, str]:
     chars = [chr(0x5000 + index) for index in range(100)]
     only_first = chars[shared : shared + 16]
     return "".join(chars[:shared] + only_first), "".join(chars[:shared] + chars[shared + 16 :])
-
-
-def write_apkg(
-    env: dict[str, Path],
-    notes: int = len(ROWS),
-    fields: Sequence[str] = FIELDS,
-    model_name: str = MODEL_NAME,
-    drop: tuple[str, ...] = (),
-    extra: tuple[str, ...] = (),
-) -> None:
-    """Write the pack APKG with the MP3 files of the audio directory, less ``drop``, plus ``extra``."""
-    audio_dir = env["audio_dir"]
-    write_mp3s(audio_dir, list(extra))
-    media = [
-        str(path)
-        for path in sorted(audio_dir.glob("*.mp3"))
-        if path.name not in drop
-    ]
-    AnkiPackage.create(
-        env["apkg_path"],
-        DeckIdentity(PACK_PATH).title,
-        fields=list(fields),
-        cards=[{field: "" for field in fields} for _ in range(notes)],
-        media_files=media,
-        model_name=model_name,
-    )
-
-
-def build_env(
-    tmp_path: Path,
-    *,
-    table: list[WordForm] = TABLE,
-    rows: list[dict[str, str]] = ROWS,
-    review_status: str = "fixed",
-    no_file: frozenset[str] = frozenset(),
-    no_index: frozenset[str] = frozenset(),
-) -> dict[str, Path]:
-    """Write one small pack that passes every gate but P1.
-
-    :param tmp_path: Test directory.
-    :param table: Word table that the audit reads.
-    :param rows: Card rows of the sentence CSV.
-    :param review_status: Status value of the review row.
-    :param no_file: Texts with an index row but no MP3 file.
-    :param no_index: Texts with neither an index row nor a file.
-    :returns: The keyword paths of ``run_pack_audit``.
-    """
-    audio_dir = tmp_path / "audio"
-    entries = [entry for entry in audio_entries(rows) if entry[1] not in no_index]
-    write_audio(audio_dir, entries, no_file)
-
-    sentences_csv = tmp_path / "sentences.csv"
-    write_csv(sentences_csv, SENTENCE_FIELDS, rows)
-    word_csv = tmp_path / "words.csv"
-    write_csv(
-        word_csv,
-        ["english", "mandarin", "transliteration"],
-        [
-            {"english": form.english, "mandarin": form.mandarin, "transliteration": form.pinyin}
-            for form in table
-        ],
-    )
-    review_csv = tmp_path / "swadesh_review.csv"
-    write_csv(
-        review_csv,
-        REVIEW_FIELDS,
-        [
-            {
-                "lang": "cmn",
-                "index": "3",
-                "english": "he/she/it/they (singular)",
-                "current": "他/她",
-                "canonical": "他/她/它",
-                "issue": "label",
-                "fix": "他/她/它",
-                "status": review_status,
-            }
-        ],
-    )
-    manifest_path = tmp_path / "manifest.json"
-    manifest_path.write_text(
-        json.dumps(
-            {
-                "counts": {
-                    "words": len(table),
-                    "cards": len(rows),
-                    "scaffold": sum(row["tier"] == "scaffold" for row in rows),
-                    "native_audio": sum(row["audio_source"] == "native" for row in rows),
-                    "tts_audio": sum(row["audio_source"] == "tts" for row in rows),
-                },
-                "files": {
-                    "source_csv": _sha256(word_csv),
-                    "sentences_csv": _sha256(sentences_csv),
-                },
-            }
-        ),
-        encoding="utf-8",
-    )
-    attribution_path = tmp_path / "ATTRIBUTION.md"
-    attribution_path.write_text("# Attribution\n\nSentences: Tatoeba.\n", encoding="utf-8")
-    env = {
-        "apkg_path": tmp_path / PACK_PATH.name,
-        "sentences_csv": sentences_csv,
-        "word_csv": word_csv,
-        "review_csv": review_csv,
-        "audio_dir": audio_dir,
-        "manifest_path": manifest_path,
-        "attribution_path": attribution_path,
-    }
-    write_apkg(env, notes=len(rows))
-    return env
 
 
 def run(
