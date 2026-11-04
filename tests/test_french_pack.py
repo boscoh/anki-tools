@@ -7,6 +7,8 @@ import json
 from dataclasses import replace
 from pathlib import Path
 
+import pytest
+
 from anki_tools.languages.french import profile as french
 from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.sentence_pack import audio, pack, pool, select
@@ -103,15 +105,29 @@ def test_the_review_file_is_closed_and_agrees_with_the_table() -> None:
     assert sorted(gender) == sorted({form.swadesh_index for form in _nouns()})
 
 
-def test_module_cleanup() -> None:
-    assert french.clean_term("[[ne]] [[pas]]") == "ne pas"
-    assert french.clean_term("se battre") == "se battre"
-    assert french.clean_term("εσύ (ενικός)") == "εσύ"
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        pytest.param("[[ne]] [[pas]]", "ne pas", id="link brackets are removed"),
+        pytest.param("se battre", "se battre", id="a plain term is kept"),
+        pytest.param(
+            "εσύ (ενικός)", "εσύ", id="a bracketed note after the term is dropped"
+        ),
+    ],
+)
+def test_clean_term_strips_markup_from_a_module_term(raw: str, expected: str) -> None:
+    assert french.clean_term(raw) == expected
 
+
+def test_parse_module_terms_reads_one_or_many_terms_per_entry() -> None:
     text = (
         'm[1] = {{term = "je"}}\nm[2] = {\n    {term = "tu"},\n    {term = "vous"}\n}\n'
     )
+
     assert french.parse_module_terms(text) == {1: ("je",), 2: ("tu", "vous")}
+
+
+def test_module_terms_cover_every_row_of_the_word_table() -> None:
     assert len(french.module_terms()) == len(french.load_word_table())
 
 
@@ -150,20 +166,40 @@ def test_set_cover_on_a_small_fixture() -> None:
     assert report["forms"]["with_card"] == 1
 
 
-def test_audio_file_names_are_deterministic() -> None:
+def test_audio_hash_is_stable_and_changes_with_the_voice() -> None:
     sentence = "Je voudrais un verre d'eau."
     first = audio.audio_hash(sentence, "gtts:fr", "-10%")
 
     assert first == audio.audio_hash(sentence, "gtts:fr", "-10%")
     assert first != audio.audio_hash(sentence, "gtts:en", "-10%")
+
+
+def test_audio_file_names_carry_the_hash_and_a_kind_prefix() -> None:
+    sentence = "Je voudrais un verre d'eau."
+    digest = audio.audio_hash(sentence, "gtts:fr", "-10%")
+
     assert (
         audio.sentence_audio_name(sentence, "gtts:fr", "-10%", "tts", 0)
-        == f"tts_{first}.mp3"
+        == f"tts_{digest}.mp3"
     )
     assert audio.word_audio_name("eau", "gtts:fr", "-10%").startswith("word_")
-    assert audio.choose_source({}, "none", french.FRENCH) == "tts"
-    noncommercial = {"audio_id": "9", "audio_license": "CC BY-NC 4.0"}
-    assert audio.choose_source(noncommercial, "auto", french.FRENCH) == "tts"
+
+
+@pytest.mark.parametrize(
+    ("row", "mode"),
+    [
+        pytest.param({}, "none", id="the none mode always gives tts"),
+        pytest.param(
+            {"audio_id": "9", "audio_license": "CC BY-NC 4.0"},
+            "auto",
+            id="a non-commercial licence gives tts in auto mode",
+        ),
+    ],
+)
+def test_choose_source_gives_tts_when_native_audio_is_not_allowed(
+    row: dict[str, str], mode: str
+) -> None:
+    assert audio.choose_source(row, mode, french.FRENCH) == "tts"
 
 
 def test_scaffold_cards_take_the_p14_exemption(tmp_path: Path) -> None:

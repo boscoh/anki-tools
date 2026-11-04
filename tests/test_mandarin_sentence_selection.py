@@ -117,7 +117,9 @@ def test_a_target_must_appear_once() -> None:
 
 
 class TestRankingKey:
-    def test_key_order(self) -> None:
+    def test_candidates_rank_by_unknown_words_then_zipf_then_length_then_id(
+        self,
+    ) -> None:
         best = _candidate(unknown_words=0, zipf_mean=5.0, han_len=5, tatoeba_id=1)
         high_id = _candidate(han_len=5, tatoeba_id=9)
         low_zipf = _candidate(zipf_mean=3.0, han_len=5, tatoeba_id=4)
@@ -134,7 +136,9 @@ class TestRankingKey:
             more_unknown,
         ]
 
-    def test_key_serialization(self) -> None:
+    def test_rank_key_serializes_as_pipe_separated_parts_with_three_zipf_places(
+        self,
+    ) -> None:
         candidate = _candidate(unknown_words=2, zipf_mean=5.1234, tatoeba_id=42)
         assert candidate.rank_key == "2|0|-5.123|1|42"
         assert mandarin_rank_key_parts(candidate) == (2, 0, -5.1234, 1, 42)
@@ -152,7 +156,9 @@ class TestRankingKey:
 
 
 class TestCandidatePool:
-    def test_filter_counts(self, pool_table: list[WordForm], pool_data: Path) -> None:
+    def test_pool_reports_the_count_left_after_each_filter(
+        self, pool_table: list[WordForm], pool_data: Path
+    ) -> None:
         pool, report = mandarin_candidate_pool(pool_table, data_dir=pool_data)
         counts = report["counts"]
         assert report["total_linked"] == 14
@@ -180,7 +186,7 @@ class TestCandidatePool:
         assert first.tatoeba_author == "alice"
         assert first.english == "I want to drink water."
 
-    def test_fallback_scaffold(
+    def test_pool_adds_scaffold_candidates_only_with_fallback_for_forms_without_core(
         self, pool_table: list[WordForm], pool_data: Path
     ) -> None:
         core_pool, core_report = mandarin_candidate_pool(pool_table, data_dir=pool_data)
@@ -236,7 +242,9 @@ class TestSelection:
         cards, _ = select_mandarin_sentences(pool, table, per_word=2)
         assert [card.target for card in cards] == ["老", "旧"]
 
-    def test_per_word_limit(self, pool_table: list[WordForm]) -> None:
+    def test_selection_keeps_at_most_per_word_cards_for_a_form(
+        self, pool_table: list[WordForm]
+    ) -> None:
         pool = [
             _candidate(tatoeba_id=1),
             _candidate(tatoeba_id=2, sentence="我要喝水了。"),
@@ -246,7 +254,7 @@ class TestSelection:
         assert len(cards) == 2
         assert report["tier_counts"]["core"] == 2
 
-    def test_card_cap(self, pool_table: list[WordForm]) -> None:
+    def test_selection_stops_at_max_cards(self, pool_table: list[WordForm]) -> None:
         sentences = [
             "我要喝水。",
             "他吃饭了。",
@@ -285,7 +293,9 @@ class TestSelection:
         cards, _ = select_mandarin_sentences(pool, pool_table, per_word=2)
         assert len(cards) == 1
 
-    def test_scaffold_card_is_selected(self, pool_table: list[WordForm]) -> None:
+    def test_selection_takes_a_scaffold_card_for_a_form_without_a_core_card(
+        self, pool_table: list[WordForm]
+    ) -> None:
         pool = [
             _candidate(tatoeba_id=1),
             _candidate(
@@ -307,7 +317,9 @@ class TestSelection:
         assert report["tier_counts"] == {"core": 1, "scaffold": 1}
         assert report["core_coverage"]["ratio"] == 1.0
 
-    def test_pinyin_is_filled(self, pool_table: list[WordForm]) -> None:
+    def test_selected_cards_get_the_pinyin_of_their_sentence(
+        self, pool_table: list[WordForm]
+    ) -> None:
         cards, _ = select_mandarin_sentences([_candidate()], pool_table, per_word=1)
         assert cards[0].pinyin == sentence_pinyin(cards[0].sentence) != ""
 

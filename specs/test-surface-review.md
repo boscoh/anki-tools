@@ -313,6 +313,39 @@ patch repo code. The other patches (`spacy.load`, `gtts`, `edge_tts`, `urlopen`,
   `ranking.core.select` for the pure selection rules.
 - Harness change: production code none; test data tables; test runner none.
 
+Decisions:
+
+- Leave `tests/test_core_deck.py` as it is. Its names already state behavior and its
+  helper tests stay.
+- Do two jobs only: split two French tests and rename eight Mandarin tests.
+- Each old assert survives in a split. The split adds no new assert.
+- Rename in place with the style `test_<subject>_<verb>_<outcome>`. Keep the
+  classes and bodies. Do not parametrize.
+- Check each split with one break of the code under test per old assert. A
+  rename needs no break.
+
+Result:
+
+- Dropped from the scope: `tests/test_core_deck.py`. Its names are already behavior
+  names. Its helpers have production callers in `coreflow.py`.
+- `test_module_cleanup` became a table of three `clean_term` rows, one
+  `parse_module_terms` test and one `module_terms` count test.
+- `test_audio_file_names_are_deterministic` became a hash test, a file name test
+  and a table of two `choose_source` rows.
+- Renamed in `tests/test_mandarin_sentence_selection.py`:
+  `test_key_order`, `test_key_serialization`, `test_filter_counts`,
+  `test_card_cap`, `test_per_word_limit`, `test_fallback_scaffold`,
+  `test_scaffold_card_is_selected` and `test_pinyin_is_filled`.
+- Test count: 503 before, 510 after. The French splits add 7 tests.
+- Breaks, each restored with `git checkout`, and the test that failed:
+  - `clean_term` keeps the note: the `clean_term` note row failed.
+  - `parse_module_terms` starts at depth 1: the `parse_module_terms` test failed.
+  - `module_terms` drops index 1: the count test failed.
+  - `audio_hash` ignores the voice: the hash test failed.
+  - The sentence name uses `audio_` for `tts_`: the file name test failed.
+  - `choose_source` returns native for a non-commercial licence: the licence row failed.
+  - `choose_source` returns native in `none` mode: the `none` row failed.
+
 ## 3. Not proposed
 
 - The tests that read the shipped word table, the review file and
