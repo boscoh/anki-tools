@@ -7,8 +7,6 @@ import json
 from dataclasses import replace
 from pathlib import Path
 
-import pytest
-
 from anki_tools.languages.french import profile as french
 from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.sentence_pack import audio, pack, pool, select
@@ -105,23 +103,6 @@ def test_the_review_file_is_closed_and_agrees_with_the_table() -> None:
     assert sorted(gender) == sorted({form.swadesh_index for form in _nouns()})
 
 
-@pytest.mark.parametrize(
-    ("sentence", "form", "expected"),
-    [
-        pytest.param(
-            "Ils se battent ici.", "se battre", "Ils <b>se battent</b> ici.", id="pair"
-        ),
-        pytest.param(
-            "Je ne parle pas.", "ne", "Je <b>ne</b> parle <b>pas</b>.", id="negative"
-        ),
-    ],
-)
-def test_highlight_marks_the_matched_token(
-    sentence: str, form: str, expected: str
-) -> None:
-    assert french.highlight(sentence, form) == expected
-
-
 def test_module_cleanup() -> None:
     assert french.clean_term("[[ne]] [[pas]]") == "ne pas"
     assert french.clean_term("se battre") == "se battre"
@@ -132,35 +113,6 @@ def test_module_cleanup() -> None:
     )
     assert french.parse_module_terms(text) == {1: ("je",), 2: ("tu", "vous")}
     assert len(french.module_terms()) == len(french.load_word_table())
-
-
-def test_whitespace_normalization() -> None:
-    assert (
-        french.prepare_text("Bonjour\u202f! Ça va\u00a0? Oui\u202f!")
-        == "Bonjour ! Ça va ? Oui !"
-    )
-    assert french.prepare_text("Écoute\u00a0: le chien.") == "Écoute : le chien."
-    assert french.unit_count(french.prepare_text("Ça va\u00a0?")) == 2
-
-
-@pytest.mark.parametrize(
-    ("sentence", "form", "expected"),
-    [
-        pytest.param("La pluie tombe depuis hier.", "pluie", 1, id="plain"),
-        pytest.param("La voiture est en panne.", "eau", 0, id="absent"),
-        pytest.param("Ils se battent dans la rue.", "se battre", 1, id="pair"),
-        pytest.param(
-            "Il aime battre le tambour.", "se battre", 0, id="pair needs the clitic"
-        ),
-        pytest.param(
-            "Il se dit de battre le tambour.", "se battre", 0, id="pair is adjacent"
-        ),
-        pytest.param("Je ne veux pas partir.", "ne pas", 1, id="both parts"),
-        pytest.param("Je viens.", "parce que", 0, id="no match"),
-    ],
-)
-def test_form_key_rule(sentence: str, form: str, expected: int) -> None:
-    assert french.token_matches(sentence, form) == expected
 
 
 def test_set_cover_on_a_small_fixture() -> None:
@@ -319,15 +271,3 @@ def test_sentence_csv_columns() -> None:
         header = next(csv.reader(handle))
 
     assert header == french.SENTENCE_FIELDS
-
-
-
-@pytest.mark.parametrize(
-    ("sentence", "credited"),
-    [
-        ("Cessez de fumer si vous voulez vivre longtemps !", False),
-        ("Il y a de la fumée dans la cuisine.", True),
-    ],
-)
-def test_a_noun_form_is_not_credited_by_its_verb(sentence: str, credited: bool) -> None:
-    assert ("fumée" in french.hits(sentence, ["fumée"])) is credited

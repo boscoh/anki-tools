@@ -203,6 +203,63 @@ patch repo code. The other patches (`spacy.load`, `gtts`, `edge_tts`, `urlopen`,
   example a native reader or a dictionary.
 - Harness change: production code none; test data one case table; test runner one
   parametrized runner.
+- Decisions (anki-neua):
+  - Surface is the `LanguageProfile` object: `FRENCH.highlight`, `SPANISH.match_count`,
+    `GREEK.hits`. Spanish uses `SPANISH` from `languages/spanish/profile.py`, not the
+    `CoreProfile` of `shape_fixture`. No production change.
+  - The table file is `tests/language_cases.py`, in the style of `shape_fixture.py`. It has one
+    NamedTuple for each hook: `HighlightCase`, `MatchCase`, `HitCase`, `PrepareCase`,
+    `UnitCase`. Each row has a last field `rule`, an id in words. `MatchCase` names its count
+    field `matches`, because `count` clashes with `tuple.count`.
+  - `tests/test_language_hooks.py` has one parametrized runner for each hook. The `unit_count`
+    runner prepares the sentence first, as the profile docstring requires.
+  - There is no `token_matches` test, because `match_count` is an alias of it. There is no
+    meta-test that every language has a row.
+  - The four French tests move into rows and are deleted. No other test is deleted.
+  - Oracle rule (P12): each Spanish row comes from a rule in the hook docstrings. Greek,
+    Cantonese and Mandarin get only mechanical rows: an exact word, an absent word, and one
+    whole token in bold.
+- Result:
+  - Tests: 447 before, 503 after. Removed 12 test items (the four French tests), added 68 rows.
+  - Pytest time: 10.2 s before and 10.4 s after.
+  - Rows by language and hook:
+
+    | Language  | highlight | match_count | hits | prepare_text | unit_count |
+    | --------- | --------- | ----------- | ---- | ------------ | ---------- |
+    | French    | 2         | 7           | 3    | 2            | 1          |
+    | Spanish   | 10        | 10          | 7    | 4            | 4          |
+    | Greek     | 2         | 2           | 2    | gap          | gap        |
+    | Cantonese | 2         | 2           | 2    | gap          | gap        |
+    | Mandarin  | 2         | 2           | 2    | gap          | gap        |
+
+  - Breaks killed: Spanish `hits` `count == 1` flipped to `>= 1` (2 rows); Greek `hits`
+    `count == 1` flipped to `!= 1` (the Greek exact-word row); Spanish `prepare_text` without
+    NFC (the NFC row); Cantonese highlight `end` plus one (the Cantonese row and one pack-build
+    test); Mandarin highlight span end set to the start of the last character (the Mandarin row
+    and two Mandarin deck tests); French `hits` `>= 1` (the French double-match row, added
+    after the break survived); French highlight without the `ne pas` rule (the `ne` row);
+    Spanish `_reflexive_stem` returning an empty string (2 rows); Spanish `_token_keys`
+    without the surface-only guard (3 rows).
+  - Breaks that survive: Greek `hits` `>= 1`, because Greek has no row with two matches.
+    Spanish `_reflexive_stem` `[:-3]`, because the carrier lemma of `acostar` gives the same
+    key. Spanish `carrier_keys` without the early return for `SURFACE_ONLY` forms; the
+    guard in `_token_keys` makes it equivalent for every row.
+  - Rows left out because the output differed from the rule: none.
+  - `git diff HEAD -- anki_tools/` is empty.
+- Gaps (language and hook with no row):
+  - Greek: no row for `prepare_text` or `unit_count`, and no row with a repeated word.
+  - Cantonese: no row for `prepare_text` (Traditional conversion) or `unit_count`, and no
+    row for the whole-token rule of `form_offsets` (`我` inside `我哋`).
+  - Mandarin: no row for `prepare_text` (simplified conversion) or `unit_count`, and no row
+    for a multi-character form.
+  - Greek, Cantonese and Mandarin: no language-specific rule rows, because P12 needs a
+    native reader for the expected values.
+  - Spanish `unit_count`, `hits` and `highlight` have no row for a clitic or a contraction
+    (`del`, `al`), because the Spanish docstrings state no rule for them.
+- Open questions:
+  - Who reads the Greek, Cantonese and Mandarin rules to give trusted rows?
+  - Is the `SURFACE_ONLY` early return in `carrier_keys` dead code? The `_token_keys` guard
+    covers it.
 
 ### E. Add the two open seams: model cache and vocab directory (Worth exploring)
 
