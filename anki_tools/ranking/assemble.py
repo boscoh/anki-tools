@@ -16,10 +16,23 @@ from typing import Any, Callable, Mapping, Protocol, Sequence
 from anki_tools.apkg import deck_writer
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.templates import TemplateSpec, assemble_templates
+from anki_tools.ranking.deckreader import (
+    OUTPUT_AUDIO_FIELD,
+    OUTPUT_CORE_FIELD,
+    OUTPUT_ENGLISH_FIELD,
+    OUTPUT_GLOSS_FIELD,
+    OUTPUT_SENTENCE_FIELD,
+)
 from anki_tools.ranking.identity import DeckIdentity
 
 #: Field names of the output note type, in order, without the romanization.
-OUTPUT_FIELDS: tuple[str, ...] = ("Audio", "Sentence", "English", "Core", "CoreGloss")
+OUTPUT_FIELDS: tuple[str, ...] = (
+    OUTPUT_AUDIO_FIELD,
+    OUTPUT_SENTENCE_FIELD,
+    OUTPUT_ENGLISH_FIELD,
+    OUTPUT_CORE_FIELD,
+    OUTPUT_GLOSS_FIELD,
+)
 OUTPUT_ROMANIZATION_FIELD = "Romanization"
 
 

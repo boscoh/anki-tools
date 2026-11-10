@@ -19,7 +19,7 @@ from typing import Any, Callable, Iterable, Sequence
 from anki_tools.apkg.deck_writer import sha256_value
 from anki_tools.gate_files import GateFileReader
 from anki_tools.gates import Gate, GateResult, run_gates
-from anki_tools.ranking.coreflow import read_output
+from anki_tools.ranking.deckreader import read_output
 from anki_tools.ranking.identity import DeckIdentity, default_output
 from anki_tools.sentence_pack.audio import (
     AUDIO_INDEX_NAME,
@@ -120,7 +120,7 @@ class AuditInputs(GateFileReader):
     def output(self) -> dict[str, Any]:
         """Open the APKG file and summarize it.
 
-        :returns: The mapping of :func:`anki_tools.ranking.coreflow.read_output`.
+        :returns: The mapping of :func:`anki_tools.ranking.deckreader.read_output`.
         """
         return self._load("output")
 

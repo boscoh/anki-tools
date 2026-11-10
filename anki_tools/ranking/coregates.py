@@ -21,10 +21,10 @@ from anki_tools.ranking.coreflow import (
     OUTPUT_CORE_FIELD,
     TARGET_SEPARATOR,
     filter_core_cards,
-    read_output,
 )
 from anki_tools.ranking.corelist import CONTENT_POS, lemma_sets
 from anki_tools.ranking.corerecount import gate_recount_forms
+from anki_tools.ranking.deckreader import read_output
 from anki_tools.ranking.gates import (
     Gate,
     GateResult,

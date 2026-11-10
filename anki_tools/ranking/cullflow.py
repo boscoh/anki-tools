@@ -42,7 +42,6 @@ from anki_tools.ranking.cardfilter import (
     filter_cards,
     filter_reason,
 )
-from anki_tools.ranking.coreflow import InputCard
 from anki_tools.ranking.corelist import (
     UNRANKED_RANK,
     TargetWord,
@@ -51,6 +50,7 @@ from anki_tools.ranking.corelist import (
     lemma_sets,
 )
 from anki_tools.ranking.cover import greedy_cover
+from anki_tools.ranking.deckreader import InputCard
 from anki_tools.ranking.duplicates import at_limit
 from anki_tools.ranking.identity import DeckIdentity
 from anki_tools.ranking.scan import drop_silent_cards

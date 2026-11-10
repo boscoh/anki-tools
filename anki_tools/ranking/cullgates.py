@@ -18,7 +18,6 @@ from typing import Any
 
 from anki_tools.gate_files import GateFileReader, read_notes
 
-from anki_tools.ranking.coreflow import InputCard, read_output
 from anki_tools.ranking.cullflow import (
     DEFAULT_MAX_USES,
     EXEMPT_TOP,
@@ -31,6 +30,7 @@ from anki_tools.ranking.cullflow import (
     sense_lemma_sets,
 )
 from anki_tools.ranking.corelist import lemma_sets
+from anki_tools.ranking.deckreader import InputCard, read_output
 from anki_tools.ranking.gates import (
     Gate,
     gate_similarity as _gate_similarity,
