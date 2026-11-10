@@ -24,9 +24,8 @@ from anki_tools.languages.french.profile import (
     TOKENIZER,
     register_ok,
 )
-from anki_tools.ranking import coreflow, corelist, cullflow
+from anki_tools.ranking import corelist, cullflow
 from anki_tools.ranking.identity import DeckIdentity, default_output
-from anki_tools.ranking.coreflow import InputCard
 from anki_tools.ranking.deckprofile import LanguageDeckProfile
 from anki_tools.apkg.templates import load_css
 from anki_tools.sentence_pack.tokens import load_model
@@ -57,21 +56,6 @@ LICENSES = {
 }
 
 
-def load_input_deck(path: Path) -> list[InputCard]:
-    """Read the cards of the French sentence model from an APKG file.
-
-    :param path: Input APKG file.
-    :raises RuntimeError: The package has no ``French Sentences`` model.
-    :returns: One card per note, in the input order.
-    """
-    return coreflow.read_input_deck(
-        path,
-        MODEL_NAME,
-        FRENCH_FIELD,
-        ENGLISH_FIELD,
-        AUDIO_FIELD,
-        cullflow.plain_sentence,
-    )
 
 
 # The small spaCy model leaves these verb forms as their own lemma, which splits one target in two.
@@ -160,7 +144,6 @@ def _reserve_fields(card: cullflow.ReserveCard) -> list[str]:
 
 
 FRENCH_LANGUAGE = LanguageDeckProfile(
-    load_input_deck=load_input_deck,
     tokenize_texts=tokenize_texts,
     load_frequency=load_or_build_frequency,
     frequency_ranks=cullflow.frequency_ranks,

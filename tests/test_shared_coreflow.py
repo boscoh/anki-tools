@@ -9,6 +9,7 @@ from __future__ import annotations
 import re
 from collections import Counter
 from dataclasses import replace
+from pathlib import Path
 from typing import Collection
 
 import pytest
@@ -17,7 +18,7 @@ from anki_tools.languages.spanish import core as spanish_core
 from anki_tools.ranking import coreflow
 from anki_tools.ranking.core import CoreCandidate, CoreOptions, CoreResult
 from anki_tools.ranking.corelist import CoreTarget
-from anki_tools.ranking.scan import CoreProfile
+from anki_tools.ranking.scan import CoreProfile, scan
 from tests.cull_fixture import card, core_target
 from tests.shape_fixture import PROFILES, shape_rules
 
@@ -36,6 +37,30 @@ def _profile(**overrides: object) -> CoreProfile:
     values: dict[str, object] = {"hits": _hits}
     values.update(overrides)
     return replace(spanish_core.SPANISH_CORE_PROFILE, **values)
+
+
+def test_the_scan_runs_on_a_card_list_with_no_package(tmp_path: Path) -> None:
+    profile = _profile(
+        tokenize_deck=lambda cards: [
+            [(word.strip(".").casefold(), "VERB") for word in item.sentence.split()]
+            for item in cards
+        ],
+        load_frequency=list,
+        frequency_ranks=lambda frequency, weight: {"dormir": 1},
+        read_names=set,
+        lemma_overrides={"dort": "dormir"},
+    )
+    cards = [card("Le chat dort."), card("Le chien dort.")]
+
+    result = scan(profile, cards, 0.5)
+
+    assert result.tokens == [
+        [("le", "VERB"), ("chat", "VERB"), ("dormir", "VERB")],
+        [("le", "VERB"), ("chien", "VERB"), ("dormir", "VERB")],
+    ]
+    assert result.ranks == {"dormir": 1}
+    assert result.names == set()
+    assert list(tmp_path.iterdir()) == []
 
 
 def _hit_fixture() -> tuple[

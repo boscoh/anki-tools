@@ -49,7 +49,7 @@ from anki_tools.ranking.deckreader import (  # noqa: F401
     OUTPUT_SENTENCE_FIELD,
     InputCard,
     clean_english,
-    read_input_deck,
+    read_cards,
     read_output,
     read_output_deck,
     sound_name,
@@ -627,8 +627,8 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
     sense_path = profile.sense_path
     identity = DeckIdentity(output_path)
 
-    scanned = scan(profile, apkg_path, request.spoken_weight)
-    cards = scanned.cards
+    cards, silent = read_cards(apkg_path, profile)
+    scanned = scan(profile, cards, request.spoken_weight)
     tokens = scanned.tokens
     ranks = scanned.ranks
     names = scanned.names
@@ -726,7 +726,7 @@ def run_core(request: CoreRequest, profile: CoreProfile) -> deck_writer.RunFiles
     report: list[tuple[str | None, str]] = [
         ("Input", str(apkg_path)),
         ("Input cards", str(len(cards))),
-        ("Dropped, no audio file", str(scanned.silent)),
+        ("Dropped, no audio file", str(silent)),
         ("Passed", str(len(passed))),
     ]
     report += [

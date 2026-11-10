@@ -12,9 +12,9 @@ flow would close an import cycle.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Collection, Sequence
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.apkg.shape import find_model_id, find_only_model_id
@@ -67,6 +67,64 @@ def sound_name(field_value: str) -> str:
     return match.group(1) if match else ""
 
 
+def _input_cards(
+    package: AnkiPackage,
+    model_name: str,
+    sentence_field: str,
+    english_field: str,
+    audio_field: str,
+    clean_sentence: Callable[[str], str],
+) -> list[InputCard]:
+    """Read one card per note of the sentence model of an open package.
+
+    A note without a sound tag is skipped.
+
+    :param package: Open input package.
+    :param model_name: Name of the note model.
+    :param sentence_field: Name of the sentence field.
+    :param english_field: Name of the English field.
+    :param audio_field: Name of the audio field.
+    :param clean_sentence: Cleaner of the raw sentence field value.
+    :raises RuntimeError: The package has no model with that name.
+    :returns: One card per note, in the input order.
+    """
+    models = package.get_models()
+    model_id = find_model_id(models, model_name)
+    fields = [field["name"] for field in models[model_id]["flds"]]
+    index = {name: position for position, name in enumerate(fields)}
+    sentence = index[sentence_field]
+    english = index[english_field]
+    audio = index[audio_field]
+
+    chosen: dict[int, Any] = {}
+    for row in package.get_cards():
+        if str(row["mid"]) != model_id:
+            continue
+        if len(row["flds"].split("\x1f")) != len(fields):
+            continue
+        note_id = int(row["nid"])
+        current = chosen.get(note_id)
+        if current is None or int(row["ord"]) < int(current["ord"]):
+            chosen[note_id] = row
+
+    cards: list[InputCard] = []
+    for note_id, row in chosen.items():
+        values = row["flds"].split("\x1f")
+        sound = _SOUND_PATTERN.search(values[audio])
+        if sound is None:
+            continue
+        cards.append(
+            InputCard(
+                note_id=note_id,
+                sentence=clean_sentence(values[sentence]),
+                english=clean_english(values[english]),
+                audio=sound.group(1),
+                index=len(cards),
+            )
+        )
+    return cards
+
+
 def read_input_deck(
     path: Path,
     model_name: str,
@@ -89,41 +147,56 @@ def read_input_deck(
     :returns: One card per note, in the input order.
     """
     with AnkiPackage(path) as package:
-        models = package.get_models()
-        model_id = find_model_id(models, model_name)
-        fields = [field["name"] for field in models[model_id]["flds"]]
-        index = {name: position for position, name in enumerate(fields)}
-        sentence = index[sentence_field]
-        english = index[english_field]
-        audio = index[audio_field]
+        return _input_cards(
+            package,
+            model_name,
+            sentence_field,
+            english_field,
+            audio_field,
+            clean_sentence,
+        )
 
-        chosen: dict[int, Any] = {}
-        for row in package.get_cards():
-            if str(row["mid"]) != model_id:
-                continue
-            if len(row["flds"].split("\x1f")) != len(fields):
-                continue
-            note_id = int(row["nid"])
-            current = chosen.get(note_id)
-            if current is None or int(row["ord"]) < int(current["ord"]):
-                chosen[note_id] = row
 
-        cards: list[InputCard] = []
-        for note_id, row in chosen.items():
-            values = row["flds"].split("\x1f")
-            sound = _SOUND_PATTERN.search(values[audio])
-            if sound is None:
-                continue
-            cards.append(
-                InputCard(
-                    note_id=note_id,
-                    sentence=clean_sentence(values[sentence]),
-                    english=clean_english(values[english]),
-                    audio=sound.group(1),
-                    index=len(cards),
-                )
-            )
-        return cards
+def drop_silent_cards(
+    cards: Sequence[InputCard], media: Collection[str]
+) -> list[InputCard]:
+    """Keep the input cards whose audio file is in the media map of the package.
+
+    The kept cards get new indices, so an index stays the position in the list.
+
+    :param cards: Input cards, as :func:`read_input_deck` returns them.
+    :param media: File names of the media map of the package.
+    :returns: The cards that have an audio file.
+    """
+    heard = [card for card in cards if card.audio in media]
+    return [replace(card, index=index) for index, card in enumerate(heard)]
+
+
+def read_cards(path: Path, profile: Any) -> tuple[list[InputCard], int]:
+    """Read the heard cards of the input deck of a profile.
+
+    The function opens the package once. It filters the cards that have no
+    audio file in the media map, and it counts them.
+
+    :param path: Input APKG file.
+    :param profile: Core or cull profile, which states the input field names
+        and the sentence cleaner.
+    :raises RuntimeError: The package has no model with the profile name.
+    :returns: The cards that have an audio file, and the count of the dropped
+        cards.
+    """
+    with AnkiPackage(path) as package:
+        media = set(package.get_media_mapping().values())
+        cards = _input_cards(
+            package,
+            profile.input_model_name,
+            profile.input_sentence_field,
+            profile.input_english_field,
+            profile.input_audio_field,
+            profile.clean_sentence,
+        )
+    kept = drop_silent_cards(cards, media)
+    return kept, len(cards) - len(kept)
 
 
 _BOLD_TAG = re.compile(r"</?b>")

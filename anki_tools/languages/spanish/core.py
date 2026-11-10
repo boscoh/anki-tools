@@ -11,7 +11,6 @@ live in ``vocab/spanish_core_senses.tsv``. The generic logic lives in
 from __future__ import annotations
 
 import re
-from pathlib import Path
 from typing import Any, Iterable, Sequence
 
 from anki_tools.languages.spanish.frequency import (
@@ -78,21 +77,6 @@ def _sentence(field_value: str) -> str:
     return prepare_text(_plain_sentence(field_value))
 
 
-def load_input_deck(path: Path) -> list[coreflow.InputCard]:
-    """Read the cards of the Spanish sentence model from an APKG file.
-
-    :param path: Input APKG file.
-    :raises RuntimeError: The package has no ``Spanish sentences cloze+`` model.
-    :returns: One card per note, in the input order.
-    """
-    return coreflow.read_input_deck(
-        path,
-        MODEL_NAME,
-        SENTENCE_FIELD,
-        ENGLISH_FIELD,
-        AUDIO_FIELD,
-        _sentence,
-    )
 
 
 def tokenize_deck(cards: Sequence[coreflow.InputCard]) -> list[list[tuple[str, str]]]:
@@ -165,7 +149,6 @@ def card_css() -> str:
 
 
 SPANISH_LANGUAGE = LanguageDeckProfile(
-    load_input_deck=load_input_deck,
     tokenize_texts=tokenize_texts,
     load_frequency=load_frequency,
     frequency_ranks=frequency_ranks,

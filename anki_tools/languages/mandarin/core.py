@@ -137,24 +137,6 @@ def _ensure_dictionary() -> None:
         _dictionary_ready = True
 
 
-def load_input_deck(path: Path) -> list[coreflow.InputCard]:
-    """Read the cards of the Mandarin sentence model from an APKG file.
-
-    The package also holds two ``TEXT CARD`` notes of another model, so only the
-    cards of ``0 2024 Sentences Deck`` enter the list.
-
-    :param path: Input APKG file.
-    :raises RuntimeError: The package has no ``0 2024 Sentences Deck`` model.
-    :returns: One card per note, in the input order.
-    """
-    return coreflow.read_input_deck(
-        path,
-        MODEL_NAME,
-        SENTENCE_FIELD,
-        ENGLISH_FIELD,
-        AUDIO_FIELD,
-        _sentence,
-    )
 
 
 def tokenize_texts(texts: Iterable[str]) -> list[list[tuple[str, str]]]:
@@ -264,7 +246,6 @@ def finalize_output(output_path: Path, core_csv: Path) -> int:
     return written
 
 MANDARIN_LANGUAGE = LanguageDeckProfile(
-    load_input_deck=load_input_deck,
     tokenize_texts=tokenize_texts,
     load_frequency=load_frequency,
     frequency_ranks=frequency_ranks,

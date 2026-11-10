@@ -38,7 +38,6 @@ def _tokenize_deck(tokenize_texts: Callable[[Iterable[str]], Any]) -> Callable[[
 class LanguageDeckProfile:
     """The language facts of one deck family, and the two mode views over them.
 
-    :param load_input_deck: Read the cards of the input deck from an APKG file.
     :param tokenize_texts: Tokenize sentence texts into ``(lemma, part of
         speech)`` pairs. The core view derives its card tokenizer from it.
     :param load_frequency: Read the frequency rows of the language.
@@ -67,7 +66,6 @@ class LanguageDeckProfile:
         has no such rule.
     """
 
-    load_input_deck: Callable[[Path], Any]
     tokenize_texts: Callable[[Iterable[str]], list[list[tuple[str, str]]]]
     load_frequency: Callable[[], Any]
     frequency_ranks: Callable[[Any, float], dict[str, int]]
@@ -97,7 +95,6 @@ class LanguageDeckProfile:
         :returns: The core profile of the flow.
         """
         facts: dict[str, Any] = {
-            "load_input_deck": self.load_input_deck,
             "tokenize_deck": _tokenize_deck(self.tokenize_texts),
             "load_frequency": self.load_frequency,
             "frequency_ranks": self.frequency_ranks,
@@ -106,6 +103,7 @@ class LanguageDeckProfile:
             "input_sentence_field": self.input_sentence_field,
             "input_english_field": self.input_english_field,
             "input_audio_field": self.input_audio_field,
+            "clean_sentence": self.clean_sentence,
             "card_css": self.card_css,
             "sense_path": self.sense_path,
             "script_ok": self.script_ok,

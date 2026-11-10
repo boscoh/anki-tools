@@ -2,28 +2,25 @@
 
 The scan is the first stage of the core flow of spec section 3. A language
 package supplies the adapters of a :class:`CoreProfile`, and :func:`scan`
-runs the five scan adapters in order. The rest of the profile feeds the shared
+runs the four scan adapters in order. The rest of the profile feeds the shared
 target-list builders of ``anki_tools/ranking/corelist.py`` and the shared core
 flow of ``anki_tools/ranking/coreflow.py``.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Collection, Mapping, Sequence
-
-from anki_tools.apkg.package import AnkiPackage
 
 
 @dataclass(frozen=True)
 class CoreProfile:
     """Language hooks of the shared core flow.
 
-    The first five fields are the scan adapters, called by :func:`scan` in the
+    The first four fields are the scan adapters, called by :func:`scan` in the
     order below. The remaining fields feed the rest of the core flow.
 
-    :param load_input_deck: Read the cards of the input deck from an APKG file.
     :param tokenize_deck: Tokenize every card into ``(lemma, part of speech)``
         pairs.
     :param load_frequency: Read the frequency rows of the language.
@@ -40,6 +37,7 @@ class CoreProfile:
     :param input_sentence_field: Name of the sentence field of the input model.
     :param input_english_field: Name of the English field of the input model.
     :param input_audio_field: Name of the audio field of the input model.
+    :param clean_sentence: Cleaner of the raw sentence field value.
     :param templates: Card templates of the core deck.
     :param card_css: CSS of the core deck.
     :param min_units: Minimum word count of a card.
@@ -69,7 +67,6 @@ class CoreProfile:
         example ``Jyutping`` or ``Sentence (Latin)``. The output field is
         ``Romanization``. None when the language has no romanization.
     """
-    load_input_deck: Callable[[Path], Any]
     tokenize_deck: Callable[[Any], Any]
     load_frequency: Callable[[], Any]
     frequency_ranks: Callable[[Any, float], dict[str, int]]
@@ -84,6 +81,7 @@ class CoreProfile:
     input_sentence_field: str
     input_english_field: str
     input_audio_field: str
+    clean_sentence: Callable[[str], str]
     templates: tuple[tuple[str, str], ...]
     card_css: Callable[[], str]
     min_units: int
@@ -109,52 +107,31 @@ class CoreProfile:
 class ScanResult:
     """Output of one scan.
 
-    :param cards: Input cards, as ``load_input_deck`` returns them.
     :param tokens: Lemma and part of speech per card, as ``tokenize_deck``
         returns them.
     :param ranks: Lemma to blended frequency rank.
     :param names: Name stoplist.
-    :param silent: Count of input cards dropped for a missing audio file.
     """
 
-    cards: Any
     tokens: Any
     ranks: dict[str, int]
     names: set[str]
-    silent: int = 0
 
 
-def drop_silent_cards(cards: Sequence[Any], apkg_path: Path) -> list[Any]:
-    """Keep the input cards whose audio file is in the media map of the package.
-
-    The kept cards get new indices, so an index stays the position in the list.
-
-    :param cards: Input cards, as ``load_input_deck`` returns them.
-    :param apkg_path: Input APKG file.
-    :returns: The cards that have an audio file.
-    """
-    with AnkiPackage(apkg_path) as package:
-        media = set(package.get_media_mapping().values())
-    heard = [card for card in cards if card.audio in media]
-    return [replace(card, index=index) for index, card in enumerate(heard)]
-
-
-def scan(profile: CoreProfile, apkg_path: Path, spoken_weight: float) -> ScanResult:
-    """Read the input deck, drop the silent cards, and run the scan adapters.
+def scan(
+    profile: CoreProfile, cards: Sequence[Any], spoken_weight: float
+) -> ScanResult:
+    """Run the scan adapters over the input cards.
 
     The lemma overrides of the profile repair the tokens after
     ``tokenize_deck``, so the target list and the sense guard see the
     repaired lemma.
 
     :param profile: Language hooks of the scan.
-    :param apkg_path: Input APKG file.
+    :param cards: Input cards that have an audio file.
     :param spoken_weight: Weight of the spoken term in the frequency blend.
-    :returns: The cards, the tokens, the ranks, the names, and the count of
-        input cards dropped for a missing audio file.
+    :returns: The tokens, the ranks, and the names.
     """
-    loaded = profile.load_input_deck(apkg_path)
-    cards = drop_silent_cards(loaded, apkg_path)
-    silent = len(loaded) - len(cards)
     tokens = profile.tokenize_deck(cards)
     overrides = profile.lemma_overrides
     if overrides:
@@ -165,6 +142,4 @@ def scan(profile: CoreProfile, apkg_path: Path, spoken_weight: float) -> ScanRes
     frequency = profile.load_frequency()
     ranks = profile.frequency_ranks(frequency, spoken_weight)
     names = profile.read_names()
-    return ScanResult(
-        cards=cards, tokens=tokens, ranks=ranks, names=names, silent=silent
-    )
+    return ScanResult(tokens=tokens, ranks=ranks, names=names)

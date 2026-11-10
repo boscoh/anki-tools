@@ -93,21 +93,6 @@ def _sentence(field_value: str) -> str:
         return text[:-1] + _FINAL_MARKS[text[-1]]
     return text
 
-def load_input_deck(path: Path) -> list[coreflow.InputCard]:
-    """Read the cards of the Cantonese sentence model from an APKG file.
-
-    :param path: Input APKG file.
-    :raises RuntimeError: The package has no ``LTL Note Type - Cantonese`` model.
-    :returns: One card per note, in the input order.
-    """
-    return coreflow.read_input_deck(
-        path,
-        MODEL_NAME,
-        SENTENCE_FIELD,
-        ENGLISH_FIELD,
-        AUDIO_FIELD,
-        _sentence,
-    )
 
 
 def tokenize_texts(texts: Iterable[str]) -> list[list[tuple[str, str]]]:
@@ -224,7 +209,6 @@ def finalize_output(output_path: Path, core_csv: Path) -> int:
     return written
 
 CANTONESE_LANGUAGE = LanguageDeckProfile(
-    load_input_deck=load_input_deck,
     tokenize_texts=tokenize_texts,
     load_frequency=load_frequency,
     frequency_ranks=frequency_ranks,

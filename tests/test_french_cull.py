@@ -14,6 +14,7 @@ import pytest
 
 from anki_tools.languages.french import cull as cull_fr
 from anki_tools.ranking import cullflow
+from anki_tools.ranking.deckreader import InputCard
 from tests.token_fixture import fake_spacy_load  # noqa: F401
 
 PROFILE = cull_fr.FRENCH_CULL_PROFILE
@@ -86,7 +87,7 @@ def test_swadesh_coverage_counts_a_word_from_another_card() -> None:
     ],
 )
 def test_the_register_rule_rejects_a_passe_simple(sentence: str, expected: str) -> None:
-    card = cull_fr.InputCard(
+    card = InputCard(
         note_id=0, sentence=sentence, english="", audio="", index=0
     )
 

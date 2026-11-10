@@ -8,6 +8,7 @@ import pytest
 
 from anki_tools.apkg.package import AnkiPackage
 from anki_tools.languages.cantonese import core
+from anki_tools.ranking.deckreader import read_cards
 from tests.cull_fixture import tiny_deck, write_core_package
 
 
@@ -27,7 +28,7 @@ def _build_output(tmp_path: Path, jyutping: str) -> tuple[Path, int]:
         core.MODEL_NAME,
         ["a.mp3"],
     )
-    cards = core.load_input_deck(source)
+    cards, _dropped = read_cards(source, core.CANTONESE_CORE_PROFILE)
     output = tmp_path / "core.apkg"
     write_core_package(source, output, cards, [0], core.CANTONESE_CORE_PROFILE)
     return output, cards[0].note_id

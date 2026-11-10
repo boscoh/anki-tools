@@ -218,6 +218,24 @@ def test_the_fake_profile_values_reach_the_output(tmp_path: Path) -> None:
     assert "reserve_pack" not in manifest
 
 
+
+def test_the_cull_report_counts_the_dropped_audio_cards(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    rows = [
+        {"Text": sentence, "Audio": "[sound:in.mp3]", "Meaning": english}
+        for sentence, english in SENTENCES
+    ]
+    rows.append(
+        {"Text": "hunden sover.", "Audio": "[sound:absent.mp3]", "Meaning": "dog"}
+    )
+    source = tiny_deck(tmp_path, FIELDS, rows, MODEL_NAME, ["in.mp3"])
+
+    _cull(tmp_path, _profile(), source=source, no_reserve=True)
+
+    shown = capsys.readouterr().out
+    assert "Dropped, no audio file:1" in shown
+
 def test_a_han_profile_keeps_one_character_lemmas_and_a_han_final_mark() -> None:
     profile = replace(
         _profile(),

@@ -50,10 +50,9 @@ from anki_tools.ranking.corelist import (
     lemma_sets,
 )
 from anki_tools.ranking.cover import greedy_cover
-from anki_tools.ranking.deckreader import InputCard
+from anki_tools.ranking.deckreader import InputCard, read_cards
 from anki_tools.ranking.duplicates import at_limit
 from anki_tools.ranking.identity import DeckIdentity
-from anki_tools.ranking.scan import drop_silent_cards
 from anki_tools.sentence_pack.english_sense import (
     SenseRow,
     read_senses,
@@ -1033,15 +1032,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> deck_writer.RunFiles
     apkg_path = Path(request.input_path)
     output_path = Path(request.output_path)
     reserve_pack = profile.reserve_pack
-    cards = coreflow.read_input_deck(
-        apkg_path,
-        profile.input_model_name,
-        profile.input_sentence_field,
-        profile.input_english_field,
-        profile.input_audio_field,
-        profile.clean_sentence,
-    )
-    cards = drop_silent_cards(cards, apkg_path)
+    cards, silent = read_cards(apkg_path, profile)
     senses = frequency_senses(profile.sense_path)
     glosses = {lemma: row.first for lemma, row in senses.items()}
     frequency = profile.load_frequency()
@@ -1162,6 +1153,7 @@ def run_cull(request: CullRequest, profile: CullProfile) -> deck_writer.RunFiles
     report: list[tuple[str | None, str]] = [
         ("Input", str(apkg_path)),
         ("Input cards", str(len(cards))),
+        ("Dropped, no audio file", str(silent)),
         ("Passed", str(len(passed))),
     ]
     report += [

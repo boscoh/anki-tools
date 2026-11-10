@@ -36,7 +36,7 @@ from anki_tools.ranking.coreflow import (
 )
 from anki_tools.ranking.corelist import TargetWord, build_core_targets
 from anki_tools.ranking.identity import DeckIdentity
-from anki_tools.ranking.scan import drop_silent_cards
+from anki_tools.ranking.deckreader import drop_silent_cards, read_cards
 from anki_tools.sentence_pack.english_sense import SenseRow
 from tests.cull_fixture import (
     card,
@@ -299,10 +299,10 @@ def test_a_card_without_a_media_file_leaves_and_the_rest_are_reindexed(
     tmp_path: Path,
 ) -> None:
     source = core_deck(tmp_path)
-    cards = cull.load_input_deck(source)
+    cards, _dropped = read_cards(source, cull.FRENCH_CULL_PROFILE)
     cards[0] = replace(cards[0], audio="missing.mp3")
 
-    kept = drop_silent_cards(cards, source)
+    kept = drop_silent_cards(cards, {"a1.mp3", "a2.mp3"})
 
     assert [(card.sentence, card.index) for card in kept] == [
         ("Le chat mange.", 0),
@@ -429,7 +429,7 @@ def test_the_run_writes_the_side_files_the_manifest_and_the_report(
 
 def test_the_kept_card_keeps_its_note_id_and_due(tmp_path: Path) -> None:
     source = core_deck(tmp_path)
-    cards = cull.load_input_deck(source)
+    cards, _dropped = read_cards(source, cull.FRENCH_CULL_PROFILE)
     with AnkiPackage(source) as package:
         package.conn.execute("UPDATE cards SET due = 42")
         package.conn.commit()
