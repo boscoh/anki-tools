@@ -62,27 +62,40 @@ Out:
 
 ## Findings
 
-| Fact                                           | Value                           |
-| ---------------------------------------------- | ------------------------------- |
-| Input read, core mode                          | Hook, `scan.py:155`             |
-| Input read, cull mode                          | Direct call, `cullflow.py:1036` |
-| Implementations of the read                    | 1                               |
-| Binding functions over it                      | 5, no logic in any              |
-| Bindings unused by their own mode              | 2                               |
-| Tests that replace the hook                    | 0                               |
-| APKG opens per input run                       | 2                               |
-| APKG opens per output read                     | 2                               |
-| Core tests that run flow logic with no package | 7 of 26                         |
-| Cull tests that run flow logic with no package | 0 of 29                         |
-| Package builders in `tests/cull_fixture.py`    | 4, about 78 lines               |
-| Copies of the five output field names          | 3                               |
+The read path is a hook in the core and a direct call in the cull. Both modes state the same five values.
+
+### Read path
+
+| Fact                              | Value                           |
+| --------------------------------- | ------------------------------- |
+| Input read, core mode             | Hook, `scan.py:155`             |
+| Input read, cull mode             | Direct call, `cullflow.py:1036` |
+| Implementations of the read       | 1                               |
+| Binding functions over it         | 5, no logic in any              |
+| Bindings unused by their own mode | 2                               |
+| Tests that replace the hook       | 0                               |
 
 The hook exists to break a cycle: `coreflow` imports `scan`, so `scan` cannot call `coreflow.read_input_deck`.
 
-Those unknowns:
+### Cost
+
+| Fact                                           | Value             |
+| ---------------------------------------------- | ----------------- |
+| APKG opens per input run                       | 2                 |
+| APKG opens per output read                     | 2                 |
+| Core tests that run flow logic with no package | 7 of 26           |
+| Cull tests that run flow logic with no package | 0 of 29           |
+| Package builders in `tests/cull_fixture.py`    | 4, about 78 lines |
+| Copies of the five output field names          | 3                 |
+
+Measured by reading the code:
 
 - `read_input_deck` opens the package, then `drop_silent_cards` opens it again.
 - `read_output_deck` opens the package, then `read_output` opens it again.
+
+Assumption: the six verify commands use the flags of `anki fix` today.
+
+Assumption: no language needs a second input deck shape today.
 
 ## Design
 
@@ -168,9 +181,9 @@ Re-run the four core gates and the two cull gates after wave 2.
 | T3  | none, prose only                         |
 | T4  | `uv run pytest -q` and the six gate runs |
 
-Allowed files:
+Allowed files (table C, split for width):
 
-- T1: `anki_tools/ranking/{deckreader,coreflow,coregates,cullgates,assemble,cullflow}.py`, `anki_tools/sentence_pack/audit.py`, `anki_tools/languages/*/{core,cull}.py`
+- T1: `anki_tools/ranking/{deckreader,coreflow,coregates,cullgates,assemble,cullflow}.py`, `anki_tools/sentence_pack/audit.py`, `anki_tools/languages/*/{core,cull}.py`, `tests/test_deckreader.py`
 - T2: `anki_tools/ranking/{coreflow,scan,deckprofile,cullflow}.py`, `anki_tools/languages/*/{core,cull}.py`, `tests/{test_core_deck,test_shared_coreflow}.py`, `tests/cull_fixture.py`
 - T3: `docs/adr/`, `docs/anki-tools-layout.md`, `docs/{core-deck-flow,cull-deck-flow,gates,filters}.md`
 - T4: none
