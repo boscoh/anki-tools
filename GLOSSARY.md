@@ -54,6 +54,7 @@ The small deck that holds one card per Swadesh target, then the tier F words.
 Each card shows one example sentence of a large sentence deck. The
 `anki fix <lang> --core` command writes it.
 _Avoid_: starter deck, base deck, small deck
+
 ## Deck output
 
 **Output stem**:
@@ -89,6 +90,14 @@ values, the media, the side tables, the manifest, and the report of one run.
 Two adapters sit behind it: write a new package, and edit an input package. The
 code lives in `anki_tools/apkg/deck_writer.py`. ADR 0024 records the interface.
 _Avoid_: builder, exporter, packager
+
+**Deck reader**:
+The one module that reads an input or an output package: the note type by
+name, the field indices, and one card per note, with the silent cards
+dropped and their count returned. It opens the package once, so no drop
+step opens a second time. The code lives in
+`anki_tools/ranking/deckreader.py`. ADR 0059 records the interface.
+_Avoid_: deck loader, card extractor
 
 **Card template assembly**:
 The one module that turns the front text, the back text, the CSS layers, the

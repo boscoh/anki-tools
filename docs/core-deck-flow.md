@@ -13,15 +13,15 @@ Related: `docs/vocab-deck-flow.md`, `docs/cull-deck-flow.md`,
 One command runs the stages in order: `anki fix <language> --core`. The
 `--check` flag runs the gates on the output and skips K0 to K6.
 
-| Stage | Name    | Input                                     | Output                                      |
-| ----- | ------- | ----------------------------------------- | ------------------------------------------- |
-| K0    | extract | input APKG                                | one card per note: sentence, English, audio |
-| K1    | scan    | K0, frequency list, name list             | tokens with lemma and tag, ranks, names     |
-| K2    | targets | K1, Swadesh word table, tier F sense file | core list: tier S, then tier F              |
-| K3    | filter  | K1                                        | passed cards, reason per card               |
-| K4    | select  | K2, K3, ranks                             | kept cards, quota, uses                     |
-| K5    | order   | K4                                        | card order, assigned target per card        |
-| K6    | write   | K0, K4, K5                                | APKG and four side files                    |
+| Stage | Name       | Input                                     | Output                                      |
+| ----- | ---------- | ----------------------------------------- | ------------------------------------------- |
+| K0    | extract    | input APKG                                | one card per note: sentence, English, audio |
+| K1    | read, scan | input APKG, frequency list, name list     | cards, tokens with lemma and tag, ranks     |
+| K2    | targets    | K1, Swadesh word table, tier F sense file | core list: tier S, then tier F              |
+| K3    | filter     | K1                                        | passed cards, reason per card               |
+| K4    | select     | K2, K3, ranks                             | kept cards, quota, uses                     |
+| K5    | order      | K4                                        | card order, assigned target per card        |
+| K6    | write      | K0, K4, K5                                | APKG and four side files                    |
 
 The gates run after K6. The table holds 5 rows: K5, K6, K13, K23, and K24. The other
 gate ids are retired (ADR 0038 to 0044, ADR 0046). K23 is the coverage floor
@@ -36,9 +36,12 @@ keeps the lowest card of each note. It cleans the sentence with
 `clean_sentence`. It strips one pair of wrapping double quotes from the English
 text (`clean_english`), and the output deck writes the clean value.
 
-K1 drops a card whose audio file is not in the media map of the input APKG
-(`drop_silent_cards` in `ranking/scan.py`). The kept cards get new indices. The
-build report shows the count as `Dropped, no audio file`.
+K1 starts from `read_cards(path, profile)` in `ranking/deckreader.py`. That call
+opens the input APKG once and drops a card whose audio file is not in the
+media map (`drop_silent_cards`). It returns the kept cards, with new indices,
+and the count of the dropped cards. The build report shows the count as
+`Dropped, no audio file`. `scan(profile, cards, spoken_weight)` then takes that
+card list, so the scan opens no package.
 
 ## 2. Flow diagram
 
@@ -46,7 +49,7 @@ build report shows the count as `Dropped, no audio file`.
 K0  input APKG (sentence, English, audio)
         |
         v
-K1  scan: cards, tokens, frequency ranks, names
+K1  read, scan: cards, tokens, frequency ranks, names
         |
         v
 K2  core list (tier S in Swadesh order, then tier F by rank)
@@ -82,10 +85,10 @@ K6  APKG, .core.csv, .coverage.csv, .manifest.json
 
 ### 3.1 Two tiers
 
-| Tier | Source                                            | Order              |
-| ---- | ------------------------------------------------- | ------------------ |
-| S    | the reviewed Swadesh word table                   | `swadesh_index`    |
-| F    | the blended frequency list, after the tier S form | blended rank       |
+| Tier | Source                                            | Order           |
+| ---- | ------------------------------------------------- | --------------- |
+| S    | the reviewed Swadesh word table                   | `swadesh_index` |
+| F    | the blended frequency list, after the tier S form | blended rank    |
 
 Tier S comes first. Tier F follows in rank order. A target has a 1-based
 `position` in the list. The key is `S<index>:<form>` for tier S and
@@ -102,13 +105,13 @@ with an error when the list is empty.
 
 These rules are in `build_targets` of `anki_tools/ranking/corelist.py`.
 
-| Rule            | Value                                             |
-| --------------- | ------------------------------------------------- |
-| Part of speech  | `NOUN`, `VERB`, `ADJ`, or `ADV`                   |
-| Deck count      | at least 3 content tokens                         |
-| Content share   | at least 0.5 of all occurrences of the lemma      |
-| Lemma length    | at least `min_lemma_length`, 2 by default         |
-| Name list       | the lemma is not in the name stoplist             |
+| Rule           | Value                                        |
+| -------------- | -------------------------------------------- |
+| Part of speech | `NOUN`, `VERB`, `ADJ`, or `ADV`              |
+| Deck count     | at least 3 content tokens                    |
+| Content share  | at least 0.5 of all occurrences of the lemma |
+| Lemma length   | at least `min_lemma_length`, 2 by default    |
+| Name list      | the lemma is not in the name stoplist        |
 
 The tier F targets are the first `--words` of the rest in rank order. The
 default is 50.
@@ -300,12 +303,12 @@ The coverage status of a target is one of these values:
 
 `--check` reads the output files only. The gates fall in these groups:
 
-| Group      | Gates              | Checks                                                              |
-| ---------- | ------------------ | ------------------------------------------------------------------- |
-| rules      | K5, K6             | F1 to F9, similarity                                                |
-| cards      | K13                | targets and the shown Core word in the text                         |
-| coverage   | K23                | share of targets with a kept card, floor from the language profile  |
-| recount    | K24                | tier S forms in the text by substring or lemma, no producer code    |
+| Group    | Gates  | Checks                                                             |
+| -------- | ------ | ------------------------------------------------------------------ |
+| rules    | K5, K6 | F1 to F9, similarity                                               |
+| cards    | K13    | targets and the shown Core word in the text                        |
+| coverage | K23    | share of targets with a kept card, floor from the language profile |
+| recount  | K24    | tier S forms in the text by substring or lemma, no producer code   |
 
 The build report holds the value of K3 and K15, Covered twice, and the count of
 cards that K1 drops for a missing audio file. It also holds the count of
@@ -316,25 +319,26 @@ The `sense` filter is the one sense test (ADR 0039); no gate repeats it.
 
 ## 9. File map
 
-| Path                                            | Content                                    |
-| ----------------------------------------------- | ------------------------------------------ |
-| `anki_tools/ranking/coreflow.py`                | K0 to K6 flow, output field values         |
-| `anki_tools/ranking/coregates.py`               | gates K5, K6, K13, K23, K24, 5 rows        |
-| `anki_tools/ranking/corerecount.py`             | gate K24, imports no producer code         |
-| `anki_tools/gates.py`                           | gate value, row, runner, reader contract   |
-| `anki_tools/ranking/gates.py`                   | report, shared gates                       |
-| `anki_tools/ranking/assemble.py`                | deck, side files, manifest, report         |
-| `anki_tools/ranking/identity.py`                | deck title, note type, side-file stems     |
-| `anki_tools/ranking/deckprofile.py`             | language facts, core view, cull view       |
-| `anki_tools/apkg/shape.py`                      | the written package shape                  |
-| `anki_tools/ranking/core.py`                    | value, cost, passes, assignment, order     |
-| `anki_tools/ranking/corelist.py`                | tier S and tier F target list, sense rows  |
-| `anki_tools/ranking/cardfilter.py`              | shared filter rules F1 to F9               |
-| `anki_tools/ranking/scan.py`                    | `CoreProfile` and the scan adapters        |
-| `anki_tools/ranking/duplicates.py`              | Jaccard value and the limit test           |
-| `anki_tools/ranking/fixrun.py`                  | the shared `fix` route                     |
-| `anki_tools/languages/<language>/core.py`       | one `CoreProfile` per language             |
-| `anki_tools/cli.py`                             | the `fix <lang> --core` command            |
+| Path                                      | Content                                   |
+| ----------------------------------------- | ----------------------------------------- |
+| `anki_tools/ranking/coreflow.py`          | K0 to K6 flow, output field values        |
+| `anki_tools/ranking/coregates.py`         | gates K5, K6, K13, K23, K24, 5 rows       |
+| `anki_tools/ranking/corerecount.py`       | gate K24, imports no producer code        |
+| `anki_tools/gates.py`                     | gate value, row, runner, reader contract  |
+| `anki_tools/ranking/gates.py`             | report, shared gates                      |
+| `anki_tools/ranking/assemble.py`          | deck, side files, manifest, report        |
+| `anki_tools/ranking/identity.py`          | deck title, note type, side-file stems    |
+| `anki_tools/ranking/deckprofile.py`       | language facts, core view, cull view      |
+| `anki_tools/ranking/deckreader.py`        | input and output deck readers             |
+| `anki_tools/apkg/shape.py`                | the written package shape                 |
+| `anki_tools/ranking/core.py`              | value, cost, passes, assignment, order    |
+| `anki_tools/ranking/corelist.py`          | tier S and tier F target list, sense rows |
+| `anki_tools/ranking/cardfilter.py`        | shared filter rules F1 to F9              |
+| `anki_tools/ranking/scan.py`              | `CoreProfile` and the scan adapters       |
+| `anki_tools/ranking/duplicates.py`        | Jaccard value and the limit test          |
+| `anki_tools/ranking/fixrun.py`            | the shared `fix` route                    |
+| `anki_tools/languages/<language>/core.py` | one `CoreProfile` per language            |
+| `anki_tools/cli.py`                       | the `fix <lang> --core` command           |
 
 ## 10. Invariants
 

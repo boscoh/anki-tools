@@ -26,30 +26,31 @@ no language package.
 
 ## 2. apkg
 
-| Path                           | Content                                         |
-| ------------------------------ | ----------------------------------------------- |
-| `anki_tools/apkg/package.py`   | Read, write, and edit APKG files                |
-| `anki_tools/apkg/media.py`     | The media map of anki2 and anki21b              |
+| Path                           | Content                                          |
+| ------------------------------ | ------------------------------------------------ |
+| `anki_tools/apkg/package.py`   | Read, write, and edit APKG files                 |
+| `anki_tools/apkg/media.py`     | The media map of anki2 and anki21b               |
 | `anki_tools/apkg/shape.py`     | The output package shape and the format adapters |
-| `anki_tools/apkg/templates.py` | Template and CSS loaders, and `apply_templates` |
+| `anki_tools/apkg/templates.py` | Template and CSS loaders, and `apply_templates`  |
 
 ## 3. ranking
 
 Shared ranking code only. No language data.
 
-| Path                              | Content                                               |
-| --------------------------------- | ----------------------------------------------------- |
-| `anki_tools/ranking/rank.py`      | Sentence data, frequency tables, shared score drivers |
-| `anki_tools/ranking/latin.py`     | Shared Latin-script text helpers                      |
-| `anki_tools/ranking/cover.py`     | Generic greedy cover over items with changing gains   |
-| `anki_tools/ranking/core.py`      | Core-word value, cost, passes, and order              |
-| `anki_tools/ranking/identity.py`  | The output stem, deck title, note type, and side paths |
-| `anki_tools/ranking/assemble.py`  | The deck, the side files, the manifest, and the report |
-| `anki_tools/ranking/gates.py`     | The report and the shared checks                      |
-| `anki_tools/ranking/deckprofile.py` | One language deck profile with two mode views      |
-| `anki_tools/ranking/fixrun.py`    | The one route of the four fix commands                |
-| `anki_tools/ranking/cullflow.py`  | Cull flow behind the `CullProfile` seam               |
-| `anki_tools/ranking/cullgates.py` | Gates R1, R2, R5, R6 of the cull deck                 |
+| Path                                | Content                                                |
+| ----------------------------------- | ------------------------------------------------------ |
+| `anki_tools/ranking/rank.py`        | Sentence data, frequency tables, shared score drivers  |
+| `anki_tools/ranking/latin.py`       | Shared Latin-script text helpers                       |
+| `anki_tools/ranking/cover.py`       | Generic greedy cover over items with changing gains    |
+| `anki_tools/ranking/core.py`        | Core-word value, cost, passes, and order               |
+| `anki_tools/ranking/identity.py`    | The output stem, deck title, note type, and side paths |
+| `anki_tools/ranking/assemble.py`    | The deck, the side files, the manifest, and the report |
+| `anki_tools/ranking/gates.py`       | The report and the shared checks                       |
+| `anki_tools/ranking/deckprofile.py` | One language deck profile with two mode views          |
+| `anki_tools/ranking/deckreader.py`  | The input and output deck readers, and the field names |
+| `anki_tools/ranking/fixrun.py`      | The one route of the four fix commands                 |
+| `anki_tools/ranking/cullflow.py`    | Cull flow behind the `CullProfile` seam                |
+| `anki_tools/ranking/cullgates.py`   | Gates R1, R2, R5, R6 of the cull deck                  |
 
 `duplicates.jaccard`, `compute_similarity_penalties`, and the word metrics of
 `latin.py` are the shared helpers. The core and cull flows call them.
@@ -80,22 +81,22 @@ in `docs/swadesh-sentence-flow.md`.
 
 One package per language. The package holds all the code of that language.
 
-| Path                                                | Content                                            |
-| --------------------------------------------------- | -------------------------------------------------- |
-| `anki_tools/languages/registry.py`                  | `LANGUAGES`, `ALIASES`, and the CLI list           |
-| `anki_tools/languages/cantonese/profile.py`         | Cantonese profile and word metrics                 |
-| `anki_tools/languages/cantonese/frequency.py`       | Spoken and written frequency list and download     |
-| `anki_tools/languages/cantonese/jyutping.py`        | Jyutping repair and Traditional convert            |
-| `anki_tools/languages/mandarin/profile.py`          | Mandarin profile and word metrics                  |
-| `anki_tools/languages/mandarin/pinyin.py`           | Pinyin repair for Chinese cards                    |
-| `anki_tools/languages/mandarin/characters.py`       | Han character helpers and similarity               |
-| `anki_tools/languages/mandarin/stages.py`           | S1 to S3 caller of the shared pipeline             |
-| `anki_tools/languages/french/profile.py`            | French profile and form matching                   |
-| `anki_tools/languages/french/cull.py`               | French cull profile, values, and bindings          |
-| `anki_tools/languages/french/core.py`               | French core deck: profile, wrappers, and gates     |
-| `anki_tools/languages/greek/profile.py`             | Greek profile and form matching                    |
-| `anki_tools/languages/greek/rank.py`                | Greek sentence ranking                             |
-| `anki_tools/languages/spanish/cull.py`              | Spanish cull profile, values, and bindings        |
+| Path                                          | Content                                        |
+| --------------------------------------------- | ---------------------------------------------- |
+| `anki_tools/languages/registry.py`            | `LANGUAGES`, `ALIASES`, and the CLI list       |
+| `anki_tools/languages/cantonese/profile.py`   | Cantonese profile and word metrics             |
+| `anki_tools/languages/cantonese/frequency.py` | Spoken and written frequency list and download |
+| `anki_tools/languages/cantonese/jyutping.py`  | Jyutping repair and Traditional convert        |
+| `anki_tools/languages/mandarin/profile.py`    | Mandarin profile and word metrics              |
+| `anki_tools/languages/mandarin/pinyin.py`     | Pinyin repair for Chinese cards                |
+| `anki_tools/languages/mandarin/characters.py` | Han character helpers and similarity           |
+| `anki_tools/languages/mandarin/stages.py`     | S1 to S3 caller of the shared pipeline         |
+| `anki_tools/languages/french/profile.py`      | French profile and form matching               |
+| `anki_tools/languages/french/cull.py`         | French cull profile, values, and bindings      |
+| `anki_tools/languages/french/core.py`         | French core deck: profile, wrappers, and gates |
+| `anki_tools/languages/greek/profile.py`       | Greek profile and form matching                |
+| `anki_tools/languages/greek/rank.py`          | Greek sentence ranking                         |
+| `anki_tools/languages/spanish/cull.py`        | Spanish cull profile, values, and bindings     |
 
 `languages/mandarin/characters.py` holds the Han script helpers. Cantonese
 imports them, because both languages write the Han script.

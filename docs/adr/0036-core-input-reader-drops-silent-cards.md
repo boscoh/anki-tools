@@ -47,3 +47,12 @@ with the data. The owner decided that the core deck does not need them.
 
 Keep C5 as a filter rule. It mixes a file check with the sentence rules and
 needs the media map in the filter signature.
+
+## Amendment
+
+ADR 0059 moved the drop out of `scan`. `read_cards` in
+`ranking/deckreader.py` now reads the cards and drops the silent ones in one
+call, and `scan` takes a card list. The cull flow drops the same cards and
+prints the same count. The decision above still holds for the core deck: a
+silent card has no row in `core.csv`. Its two statements that the drop lives
+in `scan` and that the cull flow does not change no longer hold.

@@ -1,11 +1,11 @@
 # Gates
 
-| Field   | Value                                                  |
-| ------- | ------------------------------------------------------ |
-| Status  | Consolidation done                                     |
-| Date    | 2026-11-01                                             |
-| Owner   | anki-tools                                             |
-| Related | `docs/filters.md`, ADR 0021, ADR 0027, ADR 0057        |
+| Field   | Value                                           |
+| ------- | ----------------------------------------------- |
+| Status  | Consolidation done                              |
+| Date    | 2026-11-01                                      |
+| Owner   | anki-tools                                      |
+| Related | `docs/filters.md`, ADR 0021, ADR 0027, ADR 0057 |
 
 ## 1. What a gate is
 
@@ -16,12 +16,12 @@ sentence or a card before selection (`docs/filters.md`).
 Each flow owns its gate prefix (ADR 0057): pack `P`, cull `R`, core `K`. Pack
 `P5` and cull `R5` are different checks. The prefix names the flow.
 
-| Flow            | Command                            | Gate ids                                        | Rows  |
-| --------------- | ---------------------------------- | ----------------------------------------------- | ----- |
-| Sentence pack   | `anki swadesh pack <lang>`         | P1 to P19, one list for each language           | 15-16 |
-| Cull deck       | `anki fix <lang> <input> --select` | R1, R2, R5, R6                                  | 4     |
-| Core deck       | `anki fix <lang> <input> --core`   | K5, K6, K13, K23, K24                           | 5     |
-| Vocabulary deck | `anki swadesh vocab <lang>`        | none                                            | 0     |
+| Flow            | Command                            | Gate ids                              | Rows  |
+| --------------- | ---------------------------------- | ------------------------------------- | ----- |
+| Sentence pack   | `anki swadesh pack <lang>`         | P1 to P19, one list for each language | 15-16 |
+| Cull deck       | `anki fix <lang> <input> --select` | R1, R2, R5, R6                        | 4     |
+| Core deck       | `anki fix <lang> <input> --core`   | K5, K6, K13, K23, K24                 | 5     |
+| Vocabulary deck | `anki swadesh vocab <lang>`        | none                                  | 0     |
 
 The pack lists differ by language:
 
@@ -44,21 +44,21 @@ More than one flow runs these checks. The cull and core rows call one function
 in `ranking/gates.py` and pass their own values. The similarity limit is the
 parameter.
 
-| Check                  | Pack | Cull | Core | Plain meaning                                       |
-| ---------------------- | ---- | ---- | ---- | --------------------------------------------------- |
-| `gate_word_table`      | P1   | -    | -    | The word table is valid.                            |
-| `gate_filter_recheck`  | P14  | R5   | K5   | Every kept card passes the filter rules.            |
-| `gate_similarity`      | -    | R6   | K6   | No two cards are almost the same sentence.          |
+| Check                 | Pack | Cull | Core | Plain meaning                              |
+| --------------------- | ---- | ---- | ---- | ------------------------------------------ |
+| `gate_word_table`     | P1   | -    | -    | The word table is valid.                   |
+| `gate_filter_recheck` | P14  | R5   | K5   | Every kept card passes the filter rules.   |
+| `gate_similarity`     | -    | R6   | K6   | No two cards are almost the same sentence. |
 
 ### Cull-only and core-only checks
 
-| Id  | Check                     | Plain meaning                                             |
-| --- | ------------------------- | --------------------------------------------------------- |
-| R1  | `gate_card_cap`           | The deck has the cap number of cards, or the pool ends.   |
-| R2  | `gate_use_cap`            | No lemma appears in more cards than the cap.              |
-| K13 | `gate_target_in_sentence` | Each card sentence holds its targets and its Core word.   |
-| K23 | `gate_coverage_floor`     | The share of targets with a kept card reaches the floor.  |
-| K24 | `gate_recount_forms`      | Each card holds its tier S forms, by substring or lemma.  |
+| Id  | Check                     | Plain meaning                                            |
+| --- | ------------------------- | -------------------------------------------------------- |
+| R1  | `gate_card_cap`           | The deck has the cap number of cards, or the pool ends.  |
+| R2  | `gate_use_cap`            | No lemma appears in more cards than the cap.             |
+| K13 | `gate_target_in_sentence` | Each card sentence holds its targets and its Core word.  |
+| K23 | `gate_coverage_floor`     | The share of targets with a kept card reaches the floor. |
+| K24 | `gate_recount_forms`      | Each card holds its tier S forms, by substring or lemma. |
 
 The pack has more checks, for example P10 coverage. The cull has no coverage
 gate (ADR 0045, ADR 0046). The core has one floor gate, K23 (ADR 0048). The
@@ -78,11 +78,11 @@ cards (ADR 0033).
 
 A removed row leaves a gap in the numbering. The ids are not reused.
 
-| Flow | Retired ids                                                    | ADR                          |
-| ---- | -------------------------------------------------------------- | ---------------------------- |
-| Cull | R3, R4, R7 to R18                                              | 0033, 0035, 0039 to 0045     |
-| Core | K1 to K4, K7 to K12, K14 to K22                               | 0038 to 0044, 0046           |
-| Pack | sense, attribution, typography, license, and script gates      | 0039                         |
+| Flow | Retired ids                                               | ADR                      |
+| ---- | --------------------------------------------------------- | ------------------------ |
+| Cull | R3, R4, R7 to R18                                         | 0033, 0035, 0039 to 0045 |
+| Core | K1 to K4, K7 to K12, K14 to K22                           | 0038 to 0044, 0046       |
+| Pack | sense, attribution, typography, license, and script gates | 0039                     |
 
 ## 3. The gate contract
 
@@ -117,7 +117,7 @@ when a pack check must serve a second flow.
   sentence CSV. The cull and core gates read the output APKG, the output CSVs,
   and the manifest.
 - The pack and the rank flows read the output APKG with one reader,
-  `read_output` in `ranking/coreflow.py`. Pack `P8` reads its media set, and
+  `read_output` in `ranking/deckreader.py`. Pack `P8` reads its media set, and
   pack `P13` (`gate_output_model`) reads its note count, note type name, and
   field names. The reader needs one note type, which every pack has. The cull
   and core flows have no note type or audio gate (ADR 0042), so no other check

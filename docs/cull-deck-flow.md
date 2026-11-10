@@ -15,14 +15,14 @@ Related: `docs/vocab-deck-flow.md`, `docs/core-deck-flow.md`,
 One command runs the stages in order: `anki fix <language> --select`. The
 `--check` flag runs the gates on the output and skips C0 to C5.
 
-| Stage | Name      | Input                    | Output                                      |
-| ----- | --------- | ------------------------ | ------------------------------------------- |
-| C0    | extract   | input APKG               | one card per note: sentence, English, audio |
-| C1    | frequency | Tatoeba file, `wordfreq` | frequency rows and blended ranks            |
-| C2    | tokenize  | C0                       | lemma and tag per card                      |
-| C3    | filter    | C2, name list, marks     | passed cards, reason per card               |
-| C4    | select    | C1, C2, C3, reserve pack | kept cards and reserve cards                |
-| C5    | write     | C0, C4                   | APKG and three side files                   |
+| Stage | Name      | Input                    | Output                                   |
+| ----- | --------- | ------------------------ | ---------------------------------------- |
+| C0    | read      | input APKG               | cards: sentence, English, audio, dropped |
+| C1    | frequency | Tatoeba file, `wordfreq` | frequency rows and blended ranks         |
+| C2    | tokenize  | C0                       | lemma and tag per card                   |
+| C3    | filter    | C2, name list, marks     | passed cards, reason per card            |
+| C4    | select    | C1, C2, C3, reserve pack | kept cards and reserve cards             |
+| C5    | write     | C0, C4                   | APKG and three side files                |
 
 The gates R1, R2, R5, and R6 run after stage C5. The gate ids R3, R4, and R7 to R18 are retired. A cull gate id starts with `R` (ADR 0057).
 
@@ -35,13 +35,17 @@ The input fields come from the profile: `input_model_name`,
 keeps the lowest card of each note. It cleans the sentence with
 `clean_sentence`.
 
-C0 drops a note with no sound tag. It also drops a card whose audio file is not
-in the media map of the input APKG (`drop_silent_cards` in `ranking/scan.py`).
+C0 is one call, `read_cards(path, profile)` in `ranking/deckreader.py`. It
+opens the input APKG once, and it drops a note with no sound tag. It also
+drops a card whose audio file is not in the media map (`drop_silent_cards`).
+It returns the kept cards, with new indices, and the count of the dropped
+cards. No profile hook supplies the read. The cull report prints the count as
+`Dropped, no audio file`.
 
 ## 2. Flow diagram
 
 ```text
-C0  input APKG (sentence, English, audio)
+C0  read_cards: input APKG (sentence, English, audio)
         |
         v
 C1  frequency: Tatoeba counts blended with written counts, then ranks
@@ -101,13 +105,13 @@ that the file does not hold gets the rank `UNRANKED_RANK`, 100000.
 A target is a content lemma that the deck holds. These rules are in
 `build_targets` of `anki_tools/ranking/corelist.py`.
 
-| Rule           | Value                                          |
-| -------------- | ---------------------------------------------- |
-| Part of speech | `NOUN`, `VERB`, `ADJ`, or `ADV`                |
-| Deck count     | at least 3 content tokens                      |
-| Content share  | at least 0.5 of all occurrences of the lemma   |
-| Lemma length   | at least `min_lemma_length`, 2 by default      |
-| Name list      | the lemma is not in the name stoplist          |
+| Rule           | Value                                        |
+| -------------- | -------------------------------------------- |
+| Part of speech | `NOUN`, `VERB`, `ADJ`, or `ADV`              |
+| Deck count     | at least 3 content tokens                    |
+| Content share  | at least 0.5 of all occurrences of the lemma |
+| Lemma length   | at least `min_lemma_length`, 2 by default    |
+| Name list      | the lemma is not in the name stoplist        |
 
 The targets are the first `target_words` of the rest in rank order, 300 by
 default. The value is a `CullRequest` field, not a flag.
@@ -121,17 +125,17 @@ than the target list.
 `filter_cards` applies F1 to F9 in order. The card rule is `filter_reason` of
 `cardfilter.py`.
 
-| Key | The rule passes when                                            |
-| --- | --------------------------------------------------------------- |
-| F1  | retired: the English text length (ADR 0034)                     |
-| F2  | the unit count is inside the `min_units` to `max_units` window  |
-| F3  | the text passes `digit_marks` and `script`                      |
-| F4  | the last character is an accepted final mark                    |
-| F5  | the text holds exactly one final mark                           |
-| F6  | the text holds no `QUOTE_MARKS` character of the language       |
-| F7  | the text holds at most one comma, colon, or semicolon           |
-| F8  | the English text holds no listed given name                     |
-| F9  | the sentence text is not kept yet                               |
+| Key | The rule passes when                                           |
+| --- | -------------------------------------------------------------- |
+| F1  | retired: the English text length (ADR 0034)                    |
+| F2  | the unit count is inside the `min_units` to `max_units` window |
+| F3  | the text passes `digit_marks` and `script`                     |
+| F4  | the last character is an accepted final mark                   |
+| F5  | the text holds exactly one final mark                          |
+| F6  | the text holds no `QUOTE_MARKS` character of the language      |
+| F7  | the text holds at most one comma, colon, or semicolon          |
+| F8  | the English text holds no listed given name                    |
+| F9  | the sentence text is not kept yet                              |
 
 A language with a `register_ok` hook also runs the `register` rule after the
 mark rules. French rejects a sentence with a passe simple verb (ADR 0055). The
@@ -182,8 +186,7 @@ gain(card) = sum over content lemmas w of the card of
 weight(w)  = 1 / log2(rank(w) + 1)
 ```
 
-The top `exempt_top` targets by rank are exempt from the cap. The default is
-100. A non-exempt lemma appears in at most `max_uses` kept cards. The default
+The top `exempt_top` targets by rank are exempt from the cap. The default is 100. A non-exempt lemma appears in at most `max_uses` kept cards. The default
 is 4. A card that holds a non-exempt lemma at its cap is skipped with the
 reason `use_cap`.
 
@@ -223,12 +226,12 @@ cards, and the reserve notes follow them.
 
 ## 7. Files (C5)
 
-| File                       | Content                                                 |
-| -------------------------- | ------------------------------------------------------- |
-| `<language>_1000.apkg`       | the deck: the kept cards and the reserve cards          |
-| `<stem>.cull.csv`          | one row per input card and reserve card                 |
-| `<stem>.coverage.csv`      | per target: word, rank, count, status, gloss            |
-| `<stem>.manifest.json`     | params, counts, frequency source, licenses, hashes      |
+| File                   | Content                                            |
+| ---------------------- | -------------------------------------------------- |
+| `<language>_1000.apkg` | the deck: the kept cards and the reserve cards     |
+| `<stem>.cull.csv`      | one row per input card and reserve card            |
+| `<stem>.coverage.csv`  | per target: word, rank, count, status, gloss       |
+| `<stem>.manifest.json` | params, counts, frequency source, licenses, hashes |
 
 `identity.default_output(language, "cull")` gives `apkg/<language>_1000.apkg`.
 Every name comes from the output file stem (`anki_tools/ranking/identity.py`).
@@ -243,11 +246,11 @@ The gloss comes from the sense file of the profile, `sense_path`.
 
 The coverage status of a target is one of these values:
 
-| Status    | Meaning                              |
-| --------- | ------------------------------------ |
-| `covered` | the target holds two or more cards   |
-| `partial` | the target holds one card            |
-| `absent`  | the target holds no card             |
+| Status    | Meaning                            |
+| --------- | ---------------------------------- |
+| `covered` | the target holds two or more cards |
+| `partial` | the target holds one card          |
+| `absent`  | the target holds no card           |
 
 The deck title and the note type name are the output file stem, and so is
 `manifest.source.model`. The writer (`anki_tools/apkg/shape.py`) clones the
@@ -284,10 +287,10 @@ exceptions.
 
 `--check` reads the output files only. The gates fall in these groups:
 
-| Group     | Gates        | Checks                                                    |
-| --------- | ------------ | --------------------------------------------------------- |
-| size      | R1, R2       | card count against the cap, lemma uses against the cap    |
-| rules     | R5, R6       | F1 to F9 on every kept card, similarity                   |
+| Group | Gates  | Checks                                                 |
+| ----- | ------ | ------------------------------------------------------ |
+| size  | R1, R2 | card count against the cap, lemma uses against the cap |
+| rules | R5, R6 | F1 to F9 on every kept card, similarity                |
 
 The gate ids R3, R4, R7 to R11, R13 to R17 are retired (ADR 0033, 0035, 0040 to 0045). Their ids are not reused. The
 report and the coverage CSV still give the targets with one card and with two
@@ -314,24 +317,25 @@ it.
 
 ## 9. File map
 
-| Path                                      | Content                                        |
-| ----------------------------------------- | ---------------------------------------------- |
-| `anki_tools/ranking/cullflow.py`          | C0 to C5 flow, profile, selection, values      |
-| `anki_tools/ranking/cullgates.py`         | gates R1, R2, R5, R6, 4 rows                   |
-| `anki_tools/gates.py`                     | gate value, row, runner, reader contract       |
-| `anki_tools/ranking/gates.py`             | report, shared gates                           |
-| `anki_tools/ranking/assemble.py`          | deck, side files, manifest, report             |
-| `anki_tools/ranking/identity.py`          | deck title, note type, side-file stems         |
-| `anki_tools/ranking/deckprofile.py`       | language facts, core view, cull view           |
-| `anki_tools/apkg/shape.py`                | the written package shape                      |
-| `anki_tools/ranking/fixrun.py`            | the shared `fix` route                         |
-| `anki_tools/ranking/coreflow.py`          | input deck reader, output field values         |
-| `anki_tools/ranking/corelist.py`          | target word list                               |
-| `anki_tools/ranking/cardfilter.py`        | shared filter rules F1 to F9                   |
-| `anki_tools/ranking/cover.py`             | the generic greedy cover loop                  |
-| `anki_tools/ranking/duplicates.py`        | Jaccard value and the limit test               |
-| `anki_tools/languages/<language>/cull.py` | one `CullProfile` per language                 |
-| `anki_tools/cli.py`                       | the `--select` mode of `fix <lang>`            |
+| Path                                      | Content                                   |
+| ----------------------------------------- | ----------------------------------------- |
+| `anki_tools/ranking/cullflow.py`          | C0 to C5 flow, profile, selection, values |
+| `anki_tools/ranking/cullgates.py`         | gates R1, R2, R5, R6, 4 rows              |
+| `anki_tools/gates.py`                     | gate value, row, runner, reader contract  |
+| `anki_tools/ranking/gates.py`             | report, shared gates                      |
+| `anki_tools/ranking/assemble.py`          | deck, side files, manifest, report        |
+| `anki_tools/ranking/identity.py`          | deck title, note type, side-file stems    |
+| `anki_tools/ranking/deckprofile.py`       | language facts, core view, cull view      |
+| `anki_tools/apkg/shape.py`                | the written package shape                 |
+| `anki_tools/ranking/fixrun.py`            | the shared `fix` route                    |
+| `anki_tools/ranking/deckreader.py`        | input and output deck readers             |
+| `anki_tools/ranking/coreflow.py`          | output field values, the core flow        |
+| `anki_tools/ranking/corelist.py`          | target word list                          |
+| `anki_tools/ranking/cardfilter.py`        | shared filter rules F1 to F9              |
+| `anki_tools/ranking/cover.py`             | the generic greedy cover loop             |
+| `anki_tools/ranking/duplicates.py`        | Jaccard value and the limit test          |
+| `anki_tools/languages/<language>/cull.py` | one `CullProfile` per language            |
+| `anki_tools/cli.py`                       | the `--select` mode of `fix <lang>`       |
 
 ## 10. Invariants
 

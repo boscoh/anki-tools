@@ -1,10 +1,10 @@
 # Input deck reading: one seam for every flow
 
-| Field  | Value               |
-| ------ | ------------------- |
-| Status | Draft, for approval |
-| Owner  | boscoh              |
-| Date   | 2026-11-10          |
+| Field  | Value      |
+| ------ | ---------- |
+| Status | Landed     |
+| Owner  | boscoh     |
+| Date   | 2026-11-10 |
 
 ## Summary
 
@@ -133,15 +133,24 @@ The new file holds `InputCard`, `clean_english`, `sound_name`, `read_input_deck`
 
 ## Tests
 
-| Area        | Cases                                                              |
-| ----------- | ------------------------------------------------------------------ |
-| Reader      | One package, one open; cards in input order with fresh indices     |
-| Reader      | A card with no audio file drops, and the count is returned         |
-| Scan        | Runs on a card list, with no package on disk                       |
-| Core flow   | Keeps the `Dropped, no audio file` line                            |
-| Cull flow   | Prints the same line; the `"fake"` case no longer writes a package |
-| Output read | One open; the note type and deck name still resolve                |
-| Field names | `assemble.OUTPUT_FIELDS` equals the reader constants               |
+| Area        | Cases                                                          |
+| ----------- | -------------------------------------------------------------- |
+| Reader      | One package, one open; cards in input order with fresh indices |
+| Reader      | A card with no audio file drops, and the count is returned     |
+| Scan        | Runs on a card list, with no package on disk                   |
+| Core flow   | Keeps the `Dropped, no audio file` line                        |
+| Cull flow   | Prints the same line; the `"fake"` case still writes a package |
+| Output read | One open; the note type and deck name still resolve            |
+| Field names | `assemble.OUTPUT_FIELDS` equals the reader constants           |
+
+## Outcome
+
+Status: landed. Commits `266fb54` (T1), `5ef9efc` (T2), and this commit (T3).
+
+Three deviations from the plan. `drop_silent_cards` takes the media names
+rather than moving unchanged, so it cannot open the package again. Only
+`core()` lost the `load_input_deck` field, because `cull()` never had it.
+`scan` takes a card list, and `read_cards` makes the one read call.
 
 ## Safety and open questions
 

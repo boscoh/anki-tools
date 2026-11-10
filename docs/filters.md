@@ -29,17 +29,17 @@ All three flows run the same seven rule ids. The cull and the core also run
 `register`, and only for a language with a test for it (French; ADR 0055). The
 cull and the core also run `name`, which reads the English field.
 
-| Id              | Test                                              | Note                                           |
-| --------------- | ------------------------------------------------- | ---------------------------------------------- |
-| `length_window` | unit count inside the window                      | section 4                                      |
-| `digit_marks`   | no digit, bracket, link, or ellipsis              | no language input                              |
-| `script`        | the alphabet test of the language                 | the profile hook `script_ok`                   |
-| `repeat`        | no repeated pattern                               | the profile gives the test                     |
-| `marks`         | final, quote, and internal marks                  | four checks, no sub-reason                     |
-| `register`      | the sentence has no passe simple verb             | cull and core only; the hook `register_ok`     |
-| `name`          | the English holds no listed given name            | cull and core only; `vocab/english_names.txt`  |
-| `unique`        | the dedupe key is new                             | section 2.1; the profile gives the key         |
-| `sense`         | the English holds the sense of the target         | per target in the cull and the core; section 6 |
+| Id              | Test                                      | Note                                           |
+| --------------- | ----------------------------------------- | ---------------------------------------------- |
+| `length_window` | unit count inside the window              | section 4                                      |
+| `digit_marks`   | no digit, bracket, link, or ellipsis      | no language input                              |
+| `script`        | the alphabet test of the language         | the profile hook `script_ok`                   |
+| `repeat`        | no repeated pattern                       | the profile gives the test                     |
+| `marks`         | final, quote, and internal marks          | four checks, no sub-reason                     |
+| `register`      | the sentence has no passe simple verb     | cull and core only; the hook `register_ok`     |
+| `name`          | the English holds no listed given name    | cull and core only; `vocab/english_names.txt`  |
+| `unique`        | the dedupe key is new                     | section 2.1; the profile gives the key         |
+| `sense`         | the English holds the sense of the target | per target in the cull and the core; section 6 |
 
 The `marks` rule has four checks:
 
@@ -49,7 +49,7 @@ The `marks` rule has four checks:
 4. The sentence has at most one internal mark.
 
 Check 3 tests only the sentence text, never the English. `clean_english` in
-`anki_tools/ranking/coreflow.py` strips the wrapping double quotes of the English
+`anki_tools/ranking/deckreader.py` strips the wrapping double quotes of the English
 field, and no rule tests them. `QUOTE_MARKS` differs by language:
 
 | Language               | `QUOTE_MARKS` holds                                       |
@@ -175,11 +175,11 @@ tier S form passes a Swadesh `gloss`. A tier F lemma passes none.
 One TSV file per language holds one record per target word. `read_senses` keys a
 row by tier and word. A blank `tier` is `F`.
 
-| Column          | Content                                  | Side     |
-| --------------- | ---------------------------------------- | -------- |
-| `senses`        | English words that show the sense        | English  |
-| `false_friends` | English words that show another sense    | English  |
-| `tier`          | `S` or `F`                               | -        |
+| Column          | Content                               | Side    |
+| --------------- | ------------------------------------- | ------- |
+| `senses`        | English words that show the sense     | English |
+| `false_friends` | English words that show another sense | English |
+| `tier`          | `S` or `F`                            | -       |
 
 - A compound with another sense, such as 昆蟲 for 蟲, is a fault of the English
   side. The sense test rejects it through the sense words (ADR 0053).
@@ -194,16 +194,16 @@ word in the sentence) stays.
 
 ## 7. History
 
-| Id | Change                                           | Result                                           | Reference           |
-| -- | ------------------------------------------------ | ------------------------------------------------ | ------------------- |
-| L2 | one rule record, `(key, name, test)`             | deferred until a third consumer needs it         | -                   |
-| L3 | one mark source for the core                     | done; one Cantonese core count changed           | `anki-0d3d`, 0028   |
-| L4 | one manifest shape                               | deferred to the next pack rebuild                | -                   |
-| L5 | one rule key namespace                           | rejected                                         | ADR 0027            |
-| L6 | one identical rule set for every flow            | rejected; the jobs differ                        | -                   |
-| L7 | `length_window` in the gate layer                | rejected; a gate never rejects a sentence        | -                   |
-| L8 | `digit_marks` and `script` in all flows          | done; one Cantonese core card changed            | `anki-sxzu`, 0029   |
-| L9 | one `sense` rule in every flow                   | done, S1 to S5                                   | ADR 0030, 0031      |
+| Id  | Change                                  | Result                                    | Reference         |
+| --- | --------------------------------------- | ----------------------------------------- | ----------------- |
+| L2  | one rule record, `(key, name, test)`    | deferred until a third consumer needs it  | -                 |
+| L3  | one mark source for the core            | done; one Cantonese core count changed    | `anki-0d3d`, 0028 |
+| L4  | one manifest shape                      | deferred to the next pack rebuild         | -                 |
+| L5  | one rule key namespace                  | rejected                                  | ADR 0027          |
+| L6  | one identical rule set for every flow   | rejected; the jobs differ                 | -                 |
+| L7  | `length_window` in the gate layer       | rejected; a gate never rejects a sentence | -                 |
+| L8  | `digit_marks` and `script` in all flows | done; one Cantonese core card changed     | `anki-sxzu`, 0029 |
+| L9  | one `sense` rule in every flow          | done, S1 to S5                            | ADR 0030, 0031    |
 
 Detail of the changes:
 
@@ -218,32 +218,32 @@ Detail of the changes:
 
 Steps of L9:
 
-| Id | Task                                                                  | Status            |
-| -- | --------------------------------------------------------------------- | ----------------- |
-| S1 | write the sense section                                               | done              |
-| S2 | cull: remove a lemma that fails `sense_failure` in `select_cards`     | done, ADR 0030    |
-| S3 | one shared function and one record; move the dicts into the TSV files | done              |
-| S4 | one `sense` recheck gate in the cull and the core (R18, K22)          | retired, ADR 0039 |
-| S5 | sense rows for all 300 cull targets, and a Cantonese file             | done, ADR 0031    |
+| Id  | Task                                                                  | Status            |
+| --- | --------------------------------------------------------------------- | ----------------- |
+| S1  | write the sense section                                               | done              |
+| S2  | cull: remove a lemma that fails `sense_failure` in `select_cards`     | done, ADR 0030    |
+| S3  | one shared function and one record; move the dicts into the TSV files | done              |
+| S4  | one `sense` recheck gate in the cull and the core (R18, K22)          | retired, ADR 0039 |
+| S5  | sense rows for all 300 cull targets, and a Cantonese file             | done, ADR 0031    |
 
 L9 removed these parts:
 
-| Part                                                     | Replacement                          |
-| -------------------------------------------------------- | ------------------------------------ |
-| `sense_filter` hook, `make_sense_filter`, `SENSE_CHECKS` | the `false_friends` column           |
-| `false_friend_spans` hook, `FALSE_FRIENDS`               | the sense test (ADR 0053)            |
-| `holds_sense`, `holds_tier_s_sense`, `sense_match`       | `sense_failure`                      |
-| `gate_no_sense_mismatch`, `gate_no_false_friend`         | the `sense` filter (ADR 0039)        |
-| `gate_sense` (cull R18, core K22)                        | the `sense` filter (ADR 0039)        |
+| Part                                                     | Replacement                   |
+| -------------------------------------------------------- | ----------------------------- |
+| `sense_filter` hook, `make_sense_filter`, `SENSE_CHECKS` | the `false_friends` column    |
+| `false_friend_spans` hook, `FALSE_FRIENDS`               | the sense test (ADR 0053)     |
+| `holds_sense`, `holds_tier_s_sense`, `sense_match`       | `sense_failure`               |
+| `gate_no_sense_mismatch`, `gate_no_false_friend`         | the `sense` filter (ADR 0039) |
+| `gate_sense` (cull R18, core K22)                        | the `sense` filter (ADR 0039) |
 
 A deck built before S2 can keep a card that no sense test checked, and no gate
 reports it. Build the deck again.
 
 ## 8. Open work
 
-| Issue       | Problem                                          |
-| ----------- | ------------------------------------------------ |
-| `anki-xrfk` | Spanish cull R5: one card fails `length_window`  |
+| Issue       | Problem                                         |
+| ----------- | ----------------------------------------------- |
+| `anki-xrfk` | Spanish cull R5: one card fails `length_window` |
 
 ## 9. Verification
 
