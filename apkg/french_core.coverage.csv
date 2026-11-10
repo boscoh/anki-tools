@@ -122,7 +122,7 @@ S120:voler,voler,to fly,S,120,2,2,covered
 S121:marcher,marcher,to walk,S,121,2,2,covered
 S122:venir,venir,to come,S,122,2,2,covered
 S123:s'étendre,s'étendre,to lie down,S,123,2,1,partial
-S124:s'asseoir,s'asseoir,to sit,S,124,2,2,covered
+S124:s'asseoir,s'asseoir,to sit,S,124,2,1,partial
 S125:se lever,se lever,to stand,S,125,2,1,partial
 S126:tourner,tourner,to turn (intransitive),S,126,2,1,partial
 S127:tomber,tomber,to fall,S,127,2,2,covered

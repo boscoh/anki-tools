@@ -26,7 +26,8 @@ The flows differ because their jobs differ:
 ## 2. Rules
 
 All three flows run the same seven rule ids. The cull and the core also run
-`register`, and only for a language with a test for it (French; ADR 0055).
+`register`, and only for a language with a test for it (French; ADR 0055). The
+cull and the core also run `name`, which reads the English field.
 
 | Id              | Test                                              | Note                                           |
 | --------------- | ------------------------------------------------- | ---------------------------------------------- |
@@ -36,6 +37,7 @@ All three flows run the same seven rule ids. The cull and the core also run
 | `repeat`        | no repeated pattern                               | the profile gives the test                     |
 | `marks`         | final, quote, and internal marks                  | four checks, no sub-reason                     |
 | `register`      | the sentence has no passe simple verb             | cull and core only; the hook `register_ok`     |
+| `name`          | the English holds no listed given name            | cull and core only; `vocab/english_names.txt`  |
 | `unique`        | the dedupe key is new                             | section 2.1; the profile gives the key         |
 | `sense`         | the English holds the sense of the target         | per target in the cull and the core; section 6 |
 
@@ -71,19 +73,27 @@ and core `K5` call `filter_cards`, so they use the same rule (ADR 0047). The
 pack has its own sentence dedupe in `sentence_pack/pool.py` and does not test
 the English key.
 
+### 2.2 The name rule
+
+`name` reads the English field, not the sentence text. It rejects a card whose
+English holds a token of `vocab/english_names.txt`. `load_names` in
+`anki_tools/sentence_pack/english_sense.py` reads the file one time, and
+`english_tokens` casefolds and expands a contraction, so `Mary's` gives `mary`.
+The rule runs after `register` and before `unique`.
+
 ## 3. Rule order
 
-| Flow | Order                                                                                              |
-| ---- | -------------------------------------------------------------------------------------------------- |
-| Pack | `SHAPE_GUARDS`, the measure step, then `FACT_GUARDS`                                               |
-| Cull | `filter_reason`: `length_window`, `digit_marks`, `script`, `repeat`, `marks`, `register`, `unique` |
-| Core | `filter_cards` with the `filter_reason` of the cull, in `filter_core_cards`                        |
+| Flow | Order                                                                                                      |
+| ---- | ---------------------------------------------------------------------------------------------------------- |
+| Pack | `SHAPE_GUARDS`, the measure step, then `FACT_GUARDS`                                                       |
+| Cull | `filter_reason`: `length_window`, `digit_marks`, `script`, `repeat`, `marks`, `register`, `name`, `unique` |
+| Core | `filter_cards` with the `filter_reason` of the cull, in `filter_core_cards`                                |
 
 - `SHAPE_GUARDS` holds `length_window` to `marks`. `FACT_GUARDS` holds `unique`
   and `sense`. The shape tests run first, because they are cheap.
 - `FILTER_KEYS` gives the report order of the pack. The pack has no `register`
-  rule, so it is not in `SHAPE_GUARDS`: `filter_reason` runs it after the shape
-  guards.
+  rule and no `name` rule, so they are not in `SHAPE_GUARDS`: `filter_reason`
+  runs them after the shape guards, in that order.
 - A language with no `register_ok` hook skips `register`. Only French has one.
   A French pack card with a passe simple verb stays in the pack.
 - `check_sentence_shape` gives all rules except `unique`.

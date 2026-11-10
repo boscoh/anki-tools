@@ -11,6 +11,7 @@ from __future__ import annotations
 import re
 from typing import Any, Callable, Protocol, Sequence
 
+from anki_tools.sentence_pack.english_sense import load_names, name_failure
 from anki_tools.sentence_pack.guards import check_sentence_shape
 from anki_tools.sentence_pack.profile import SentenceShape
 
@@ -93,7 +94,9 @@ def filter_reason(
     The length window, the text rules, and the mark rules come from the sentence
     shape guard, so the unit count, the marks, and the alphabet test are those of
     the language profile. The ``register`` rule follows them, when the profile
-    has a test for it. The sentence pack does not run it.
+    has a test for it. The ``name`` rule follows ``register`` and reads the
+    English field, so the cull and the core reject a card whose translation
+    holds a personal name. The sentence pack does not run either rule.
 
     :param card: Input card.
     :param profile: Shape values of the language.
@@ -110,4 +113,7 @@ def filter_reason(
     if reason:
         return reason
     register_ok = profile.register_ok
-    return "register" if register_ok and not register_ok(card.sentence) else ""
+    if register_ok and not register_ok(card.sentence):
+        return "register"
+    names = load_names()
+    return "name" if name_failure(card.english, names) else ""

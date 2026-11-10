@@ -590,7 +590,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269880,543,我口渴到死.,I'm dying of thirst.,azure-e0de4e5b-5b4cb07c-0f002cf3-4dce6012-2ccf402e-c12bd41a70b5aade0c07809eefb206efe080ca47.mp3,0,,max_cards,S109:死|S1:我,,0.0000,0.0000,4,0,0,0
 1621761269881,544,我仲讀緊書.,I'm still in school.,azure-004cc6ca-0426ced9-7b1a28a0-1e01bb31-bd84ef0c.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
 1621761269882,545,咪一樣嘅嘢.,It's the same thing.,azure-60117786-7aade733-194e16c5-5910e8c1-389eba66.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
-1621761269883,546,蕾拉長大緊.,Layla is growing up.,azure-f760cd7a-3d493c0c-0bbef7c2-d5e96c09-8d57c70e-1f17853ba70814bd4734baffe8e45aaf2799cb65.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
+1621761269883,546,蕾拉長大緊.,Layla is growing up.,azure-f760cd7a-3d493c0c-0bbef7c2-d5e96c09-8d57c70e-1f17853ba70814bd4734baffe8e45aaf2799cb65.mp3,0,,name,,,0.0000,0.0000,3,0,0,0
 1621761269884,547,我阿妹好靚.,My sister is pretty.,azure-cba55abb-599191dd-4210d68a-98d5f5f0-bbd09017-7629502f5f6d567f8b159c490ee1d903025819f3.mp3,0,,max_cards,S1:我,,0.0000,0.0000,3,0,0,0
 1621761269885,548,到你開波喇.,Now it's your serve.,azure-cf61213b-24e537dd-bc45a61a-df4ec61e-3e467d93.mp3,0,,max_cards,S2:你,,0.0000,0.0000,4,0,0,0
 1621761269886,549,估估嚇㗎咋.,That's just a guess.,azure-61424a53-34dc5ba9-982bdb5c-de90ecec-ea8ad0f4.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
@@ -698,8 +698,8 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761269997,660,我請你飲嘢吖.,I'll buy you a drink.,azure-74f0c007-67fe0a4c-83d1df15-f08c25aa-8769d9ce.mp3,0,,max_cards,S1:我|S2:你|S92:飲,,0.0000,0.0000,6,0,0,0
 1621761269998,661,份工唔易做㗎.,It's a difficult job.,azure-0f0be35f-9e14661c-6707f342-2ed621a9-65a58429.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1621761269999,662,呢樣唔係小事.,It's no small matter.,azure-94bab16a-982fc915-dc8273db-b4148bae-96de28d4.mp3,0,,max_cards,S16:唔,,0.0000,0.0000,3,0,0,0
-1621761270000,663,蕾拉好唔開心.,Layla was very upset.,azure-810a533c-21d0485e-92ea6275-bcb1db2c-c9ae5132.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
-1621761270001,664,蕾拉返咗屋企.,Layla went back home.,azure-3eae60cf-f93185c7-e95687f8-e9946b7d-a45668aa.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
+1621761270000,663,蕾拉好唔開心.,Layla was very upset.,azure-810a533c-21d0485e-92ea6275-bcb1db2c-c9ae5132.mp3,0,,name,,,0.0000,0.0000,5,0,0,0
+1621761270001,664,蕾拉返咗屋企.,Layla went back home.,azure-3eae60cf-f93185c7-e95687f8-e9946b7d-a45668aa.mp3,0,,name,,,0.0000,0.0000,5,0,0,0
 1621761270002,665,我呀妹係護士.,My sister is a nurse.,azure-7fad8a98-7357eb18-a9e1de83-4b12386a-10595b64.mp3,0,,max_cards,S1:我,,0.0000,0.0000,5,0,0,0
 1621761270003,666,冇人會傷害你.,No one will hurt you.,azure-74ef1f7b-25553dec-98b2d5c9-cd05f3e1-3ddce58d.mp3,0,,max_cards,S2:你,,0.0000,0.0000,4,0,0,0
 1621761270004,667,抵抗係無用嘅.,Resistance is futile.,azure-6b37c5f3-cdcd1ff0-001f5fae-3ddb603b-76fc119c.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
@@ -725,7 +725,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761270026,689,俾幾分鐘時間我.,I need a few minutes.,azure-e348f9eb-d82a8271-92b88ce5-4f4b7232-e164b8ff.mp3,0,,max_cards,S1:我,,0.0000,0.0000,5,0,0,0
 1621761270027,690,我要好好噉讀書.,I need to study well.,azure-7f220456-57fc3dde-c8a5c517-e9531fd4-2eeac522.mp3,0,,max_cards,S1:我,,0.0000,0.0000,5,0,0,0
 1621761270028,691,我覺得好大壓力.,I'm feeling stressed.,azure-bd5484c3-d86aa5b6-4aad11bc-aee41ea6-7d43afe7.mp3,0,,max_cards,S1:我,,0.0000,0.0000,5,0,0,0
-1621761270029,692,蕾拉好有責任感.,Layla is responsible.,azure-e157e847-8366b719-e5d636a4-be5a87e1-8272e60e.mp3,0,,max_cards,,,0.0000,0.0000,6,0,0,0
+1621761270029,692,蕾拉好有責任感.,Layla is responsible.,azure-e157e847-8366b719-e5d636a4-be5a87e1-8272e60e.mp3,0,,name,,,0.0000,0.0000,6,0,0,0
 1621761270030,693,我送你返屋企啦.,Let me take you home.,azure-73d13c20-f48acae6-20651e06-a8d8313f-d4af38c0.mp3,0,,max_cards,S1:我|S2:你,,0.0000,0.0000,6,0,0,0
 1621761270031,694,我哋今晚出街吖?,Let's go out tonight?,azure-1a05383e-66ec68f2-8bb78fbf-24cca5bc-3225eb2a.mp3,0,,max_cards,S4:我哋,,0.0000,0.0000,4,0,0,0
 1621761270032,695,哦，我而家明喇.,"Oh, now I understand.",azure-0832b59d-a2f304ae-c0737504-81d7373c-14c838f1.mp3,0,,max_cards,S1:我,,0.0000,0.0000,4,0,0,0
@@ -779,7 +779,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761270080,743,你好靚呀.,How beautiful you are!,azure-2880ee75-a8620b8e-634bcce4-e8b39337-26c0857d.mp3,0,,max_cards,S2:你,,0.0000,0.0000,3,0,0,0
 1621761270081,744,有幾難呀?,How difficult is that?,azure-53820aea-bc441910-5b2eb2e7-3d7319c2-bce2f8b3.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761270082,745,仲好貴添.,"It was expensive, too.",azure-6c916100-c776020e-61ba3cff-9efa31ea-90311448.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
-1621761270083,746,蕾拉想走.,Layla wanted to leave.,azure-e1ce5075-c0c87e61-85e5e063-6b899185-7744fa4b.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
+1621761270083,746,蕾拉想走.,Layla wanted to leave.,azure-e1ce5075-c0c87e61-85e5e063-6b899185-7744fa4b.mp3,0,,name,,,0.0000,0.0000,4,0,0,0
 1621761270084,747,唔出奇吖.,That's not surprising.,azure-12f35002-4b433286-13b87287-a02da714-2fed6984.mp3,0,,max_cards,S16:唔,,0.0000,0.0000,3,0,0,0
 1621761270085,748,你做得對.,You're doing it right.,azure-45530f37-c0956306-5119894b-f578a027-57f0bb96.mp3,0,,max_cards,S2:你,,0.0000,0.0000,4,0,0,0
 1621761270086,749,你高過我.,You're taller than me.,azure-fa2276cb-4a01fd17-a9a84856-a27d9790-b8243c22.mp3,0,,max_cards,S1:我|S2:你,,0.0000,0.0000,3,0,0,0
@@ -834,7 +834,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761270140,803,嗰啲材料好唔好?,Is that material good?,azure-72f09a4f-faee9aee-03a71eb1-71a1442e-60bfef35.mp3,0,,max_cards,S8:嗰,,0.0000,0.0000,5,0,0,0
 1621761270141,804,呢把遮係咪你㗎?,Is this your umbrella?,azure-29152b61-8eff6c11-318db4df-bf239864-3bc50cd7.mp3,0,,max_cards,S2:你,,0.0000,0.0000,5,0,0,0
 1621761270142,805,你隻錶準唔準㗎?,Is your watch correct?,azure-1ce970b0-4bd780f6-f0d00f5a-cd04810f-260a69e9.mp3,0,,max_cards,S2:你,,0.0000,0.0000,5,0,0,0
-1621761270143,806,蕾拉又肥又樣衰.,Layla is fat and ugly.,azure-207d5d0a-7d067541-dd133412-036dfa57-e67a8b30.mp3,0,,max_cards,,,0.0000,0.0000,6,0,0,0
+1621761270143,806,蕾拉又肥又樣衰.,Layla is fat and ugly.,azure-207d5d0a-7d067541-dd133412-036dfa57-e67a8b30.mp3,0,,name,,,0.0000,0.0000,6,0,0,0
 1621761270145,808,首先，你要有樣.,Step 1: Be attractive.,azure-a1267a07-d71ef804-4bfd6bb4-5aa39385-633c692a.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1621761270147,810,隻貓食咗隻老鼠.,The cat ate the mouse.,azure-d8ea7cc0-4defba82-06e2d417-c381f65d-6eb0ca4e.mp3,0,,max_cards,S93:食,,0.0000,0.0000,5,0,0,0
 1621761270149,812,佢哋改變咗好多.,They've changed a lot.,azure-fe641850-70971eb8-927bf83d-ece4e0aa-e9f5d1b9.mp3,0,,max_cards,S18:多|S6:佢哋,,0.0000,0.0000,5,0,0,0
@@ -906,7 +906,7 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761270220,883,我喊咗成晚.,I cried all night long.,azure-86b729a4-a957e9c0-a1e0c82f-0cc926ea-6bab53cb.mp3,0,,max_cards,S1:我,,0.0000,0.0000,4,0,0,0
 1621761270222,885,我想你坐低.,I want you to sit down.,azure-a99e9558-0c58950a-d7238a1c-e096bb1e-cf43f145.mp3,0,,max_cards,S124:坐|S1:我|S2:你,,0.0000,0.0000,3,0,0,0
 1621761270223,886,我冇嬲過你.,I was never mad at you.,azure-64d4ec27-0fe1b6d4-e72ed536-92d84386-6e7fb2a4.mp3,0,,max_cards,S1:我|S2:你,,0.0000,0.0000,4,0,0,0
-1621761270225,888,蕾拉脫咗險.,Layla is out of danger.,azure-7c963f96-c66b415d-76d89850-3579071f-10511697.mp3,0,,max_cards,,,0.0000,0.0000,5,0,0,0
+1621761270225,888,蕾拉脫咗險.,Layla is out of danger.,azure-7c963f96-c66b415d-76d89850-3579071f-10511697.mp3,0,,name,,,0.0000,0.0000,5,0,0,0
 1621761270226,889,小心揸車呀.,Please drive carefully.,azure-322a8f1e-805fdd9e-69fb7fae-589b03ca-b9a9a465.mp3,0,,max_cards,,,0.0000,0.0000,3,0,0,0
 1621761270227,890,佢開美容院.,She runs a beauty shop.,azure-10c6e10d-c0ae7290-31c32fbb-6e53229b-bedf4feb.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,4,0,0,0
 1621761270228,891,佢喊咗成晚.,She wept all the night.,azure-bba24a73-b6ece82f-23016f01-5bbd8164-23cdf8f7.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,4,0,0,0
@@ -920,8 +920,8 @@ note_id,index,sentence,english,audio,kept,pass,reason,targets,assigned,value,cos
 1621761270241,904,我好鐘意音樂.,I like music very much.,azure-2498c739-e4723ee0-5f329f37-9a851c6f-2f23581f.mp3,0,,max_cards,S1:我,,0.0000,0.0000,4,0,0,0
 1621761270242,905,我好似發燒呀.,I seem to have a fever.,azure-9989c95e-19b8abcc-fe2f8b66-dde8e76e-4fcf420a.mp3,0,,max_cards,S1:我,,0.0000,0.0000,4,0,0,0
 1621761270245,908,唔係我哋做㗎.,It's not us who did it.,azure-ebc5a1f2-02f5d260-110700ac-b45cecb3-18e7882d.mp3,0,,max_cards,S16:唔|S4:我哋,,0.0000,0.0000,3,0,0,0
-1621761270246,909,蕾拉想返屋企.,Layla wants to go home.,azure-6d9488de-53e7811b-3ba25379-377224a0-8c5d06fd.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
-1621761270247,910,蕾拉瞓得好稔.,Layla was sound asleep.,azure-432b47bb-964f93cc-8b861a96-519c5ade-7e367286.mp3,0,,max_cards,S123:瞓,,0.0000,0.0000,6,0,0,0
+1621761270246,909,蕾拉想返屋企.,Layla wants to go home.,azure-6d9488de-53e7811b-3ba25379-377224a0-8c5d06fd.mp3,0,,name,,,0.0000,0.0000,4,0,0,0
+1621761270247,910,蕾拉瞓得好稔.,Layla was sound asleep.,azure-432b47bb-964f93cc-8b861a96-519c5ade-7e367286.mp3,0,,name,,,0.0000,0.0000,6,0,0,0
 1621761270248,911,佢感動到喊咗.,She was moved to tears.,azure-4f6cfbe8-76c3bbb9-7333ca11-9aad4f72-95237fcd-3414d53bf99d2d7bef70f07fcf8d5bbda58caccf.mp3,0,,max_cards,S3:佢,,0.0000,0.0000,5,0,0,0
 1621761270250,913,呢粒蘋果好酸.,This apple tastes sour.,azure-6a617fa0-d82b4458-8d8a4b98-3d7df682-97fd410e.mp3,0,,max_cards,,,0.0000,0.0000,4,0,0,0
 1621761270251,914,呢支筆係我㗎.,This pen belongs to me.,azure-678f8da2-31ee5e9c-428c9304-90bec265-6c2d8e7b.mp3,0,,max_cards,S1:我,,0.0000,0.0000,4,0,0,0

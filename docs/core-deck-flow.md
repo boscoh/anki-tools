@@ -143,12 +143,14 @@ A card must pass every rule. `filter_cards` applies F1 to F9 through
 | F5  | the text holds exactly one final mark                           |
 | F6  | the text holds no `QUOTE_MARKS` character of the language       |
 | F7  | the text holds at most one comma, colon, or semicolon           |
-| F8  | the text holds no proper noun tag                               |
+| F8  | the English text holds no listed given name                     |
 | F9  | the sentence text is not kept yet                               |
 
 A language with a `register_ok` hook also runs the `register` rule after the
-mark rules and before F9. French rejects a sentence with a passe simple verb
-(ADR 0055).
+mark rules. French rejects a sentence with a passe simple verb (ADR 0055). The
+`name` rule runs after `register` and before F9. It reads the English field and
+rejects the card when a token of that text is a name of
+`vocab/english_names.txt`.
 
 The run stores the first failed rule as the `reason` of the card. The reason
 value is one of F1 to F9. A passed card has the empty reason.

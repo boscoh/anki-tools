@@ -80,6 +80,7 @@ FILTER_KEYS = (
     "repeat",
     "marks",
     "register",
+    "name",
     "unique",
 )
 TARGET_SEPARATOR = "|"

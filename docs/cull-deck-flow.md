@@ -130,17 +130,20 @@ than the target list.
 | F5  | the text holds exactly one final mark                           |
 | F6  | the text holds no `QUOTE_MARKS` character of the language       |
 | F7  | the text holds at most one comma, colon, or semicolon           |
-| F8  | the text holds no proper noun tag                               |
+| F8  | the English text holds no listed given name                     |
 | F9  | the sentence text is not kept yet                               |
 
 A language with a `register_ok` hook also runs the `register` rule after the
-mark rules and before F9. French rejects a sentence with a passe simple verb
-(ADR 0055).
+mark rules. French rejects a sentence with a passe simple verb (ADR 0055). The
+`name` rule runs after `register` and before F9.
 
-The proper-noun rule F8 is a shared rule of `anki_tools/ranking/cardfilter.py`. F2
-to F7 come from the sentence shape guard `check_sentence_shape`, with the window,
-the marks, and the alphabet test of the language profile. One card filter,
-`marks` (`MARK_RULES`), covers F4 to F7.
+The `name` rule is a shared rule of `anki_tools/ranking/cardfilter.py`. It
+reads the English field of the card, not the sentence. It rejects the card when
+a token of the English text is a name of `vocab/english_names.txt`, and
+`english_tokens` expands a contraction, so `Mary's` gives `mary`. F2 to F7 come
+from the sentence shape guard `check_sentence_shape`, with the window, the
+marks, and the alphabet test of the language profile. One card filter, `marks`
+(`MARK_RULES`), covers F4 to F7.
 
 The unit count of F2 is `profile.unit_count`, and the window is `profile.min_units`
 to `profile.max_units`. The language module states both (ADR 0034).

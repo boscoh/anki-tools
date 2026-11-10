@@ -64,7 +64,7 @@ S62:piel,piel,skin,S,62,0,0,absent
 S63:carne,carne,meat,S,63,2,2,covered
 S64:sangre,sangre,blood,S,64,2,2,covered
 S65:hueso,hueso,bone,S,65,2,2,covered
-S66:grasa,grasa,fat (noun),S,66,2,1,partial
+S66:grasa,grasa,fat (noun),S,66,0,0,absent
 S67:huevo,huevo,egg,S,67,2,2,covered
 S68:cuerno,cuerno,horn,S,68,0,0,absent
 S69:cola,cola,tail,S,69,2,1,partial
@@ -93,7 +93,7 @@ S91:hígado,hígado,liver,S,91,0,0,absent
 S92:beber,beber,to drink,S,92,2,2,covered
 S93:comer,comer,to eat,S,93,2,2,covered
 S94:morder,morder,to bite,S,94,2,2,covered
-S95:chupar,chupar,to suck,S,95,2,0,absent_sense
+S95:chupar,chupar,to suck,S,95,0,0,absent
 S96:escupir,escupir,to spit,S,96,0,0,absent
 S97:vomitar,vomitar,to vomit,S,97,2,1,partial
 S98:soplar,soplar,to blow,S,98,2,2,covered
@@ -114,8 +114,8 @@ S112:cazar,cazar,to hunt,S,112,2,1,partial
 S113:golpear,golpear,to hit,S,113,2,2,covered
 S114:cortar,cortar,to cut,S,114,2,2,covered
 S115:dividir,dividir,to split,S,115,2,2,covered
-S116:apuñalar,apuñalar,to stab,S,116,2,1,partial
-S117:rascar,rascar,to scratch,S,117,2,2,covered
+S116:apuñalar,apuñalar,to stab,S,116,0,0,absent
+S117:rascar,rascar,to scratch,S,117,2,1,partial
 S118:cavar,cavar,to dig,S,118,2,2,covered
 S119:nadar,nadar,to swim,S,119,2,2,covered
 S120:volar,volar,to fly,S,120,2,2,covered
@@ -127,9 +127,9 @@ S125:estar de pie,estar de pie,to stand,S,125,0,0,absent
 S126:girar,girar,to turn (intransitive),S,126,2,2,covered
 S127:caer,caer,to fall,S,127,2,2,covered
 S128:dar,dar,to give,S,128,2,2,covered
-S129:sostener,sostener,to hold,S,129,2,1,partial
-S130:apretar,apretar,to squeeze,S,130,2,0,absent_sense
-S131:frotar,frotar,to rub,S,131,2,1,partial
+S129:sostener,sostener,to hold,S,129,0,0,absent
+S130:apretar,apretar,to squeeze,S,130,0,0,absent
+S131:frotar,frotar,to rub,S,131,0,0,absent
 S132:lavar,lavar,to wash,S,132,2,2,covered
 S133:limpiar,limpiar,to wipe,S,133,2,0,absent_sense
 S134:tirar de,tirar de,to pull,S,134,2,0,absent_sense

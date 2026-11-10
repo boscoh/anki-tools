@@ -6,7 +6,7 @@ from anki_tools.ranking import cardfilter, coreflow, cullflow
 from anki_tools.sentence_pack import pool
 
 SHAPE_KEYS = ("length_window", "digit_marks", "script", "repeat", "marks", "unique")
-CARD_KEYS = (*SHAPE_KEYS[:5], "register", "unique")
+CARD_KEYS = (*SHAPE_KEYS[:5], "register", "name", "unique")
 
 
 @pytest.mark.parametrize(

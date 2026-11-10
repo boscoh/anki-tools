@@ -172,11 +172,19 @@ language with no test for it skips the rule. The pack does not run it. ADR 0055
 records it.
 _Avoid_: style filter, tense filter
 
+**Name rule**:
+The card filter rule `name`. It rejects a card whose English field holds a
+given name, for example `Tom`. The names come from `vocab/english_names.txt`,
+and `load_names` in `sentence_pack/english_sense.py` reads them. The rule runs
+after `register`. The pack does not run it.
+_Avoid_: proper-noun rule, F8
+
 **Rule key**:
-The `F` number of one card rule in the pack guard table or in the ranking filter
-table. The two tables number from `F1` and differ: pack `F8` is the internal mark
-rule, and rank `F8` is the name rule. `MARK_RULES` in `ranking/cardfilter.py`
-gives the map. ADR 0027 records it.
+The semantic id of one card rule in the pack guard table or in the ranking
+filter table. The two tables differ: the pack has no `register` rule and no
+`name` rule. `LENGTH_RULES`, `TEXT_RULES`, and `MARK_RULES` in
+`ranking/cardfilter.py` give the id of the guard of each card rule. ADR 0027
+records the namespace.
 _Avoid_: filter name, rule number
 
 **Gate**:

@@ -132,7 +132,7 @@ S130:搾,搾,to squeeze,S,130,0,0,absent
 S131:擦,擦,to rub,S,131,0,0,absent
 S132:洗,洗,to wash,S,132,2,1,partial
 S133:抹,抹,to wipe,S,133,0,0,absent
-S134:拉,拉,to pull,S,134,2,0,absent_sense
+S134:拉,拉,to pull,S,134,0,0,absent
 S135:推,推,to push,S,135,0,0,absent
 S136:掟,掟,to throw,S,136,2,1,partial
 S137:綁,綁,to tie,S,137,0,0,absent

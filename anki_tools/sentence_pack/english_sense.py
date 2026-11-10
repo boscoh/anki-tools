@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Mapping, Sequence
 
 SENSE_PATH = Path("vocab/english_senses.json")
+NAME_PATH = Path("vocab/english_names.txt")
 
 CONTRACTIONS: dict[str, str] = {
     "let's": "let us",
@@ -82,6 +83,37 @@ def english_tokens(text: str) -> tuple[str, ...]:
         lambda match: CONTRACTIONS[match.group(0)], folded
     )
     return tuple(TOKEN_PATTERN.findall(expanded))
+
+
+@lru_cache(maxsize=4)
+def load_names(path: Path = NAME_PATH) -> frozenset[str]:
+    """Read the English given names of the ``name`` filter rule.
+
+    Each line holds one name. A blank line and a line that starts with ``#``
+    are skipped. The result is cached, so the caller must not change it.
+
+    :param path: Text file with one lower-case name per line.
+    :returns: The casefolded names. It is empty when the file is absent.
+    """
+    source = Path(path)
+    if not source.exists():
+        return frozenset()
+    lines = source.read_text(encoding="utf-8").splitlines()
+    return frozenset(
+        line.strip().casefold()
+        for line in lines
+        if line.strip() and not line.strip().startswith("#")
+    )
+
+
+def name_failure(english: str, names: frozenset[str]) -> bool:
+    """Test whether the English text holds a listed given name.
+
+    :param english: English text of a card.
+    :param names: Names from :func:`load_names`.
+    :returns: True when a token of the text is a listed name.
+    """
+    return bool(names & set(english_tokens(english)))
 
 
 @lru_cache(maxsize=8)

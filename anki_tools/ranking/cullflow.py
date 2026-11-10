@@ -76,6 +76,7 @@ FILTER_RULES = (
     "repeat",
     "marks",
     "register",
+    "name",
     "unique",
 )
 EXEMPT_GAIN = 0.1
